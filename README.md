@@ -1,2 +1,35 @@
 # CSHTML5
+
+
+
+```diff
+- NOTE: The source code above corresponds to CSHTML5 version 2.x,
+- which is currently in the "Technology Preview" phase. You can
+- download the VSIX of the version 2.x Preview at:
+- http://forums.cshtml5.com/viewforum.php?f=6
+```
+
+### What is CSHTML5?
 CSHTML5 – also called 'C#/XAML for HTML5' – is the first production-ready solution to make web apps in C# and XAML. It is also the only tool that enables to port existing Silverlight and WPF applications to the web, by compiling C# and XAML files to HTML and JavaScript.
+
+Further information can be found at: http://cshtml5.com/
+
+CSHTML5 version 2.x is powered by [Bridge.NET](https://bridge.net/)
+
+### How to build the source code?
+1. Open the "CSHTML5.sln" solution with Visual Studio 2017 or newer
+2. Build either the "Debug" configuration or the "Migration" configuration, depending on whether you want to use the "CSHTML5" NuGet package (recommended for creating new apps) or the "CSHTML5.Migration" package (recommended for migrating existing Silverlight or WPF applications). This will generate the assembly "CSHTML5.dll" or "CSHTML5.Migration.dll" in the "bin/Debug" folder.
+
+### How to use or test the source code?
+1. Create a new Visual Studio project of type CSHTML5 version 2.x. To do so, you can install the VSIX available at http://forums.cshtml5.com/viewforum.php?f=6 (look for the latest version 2.x), which will add new project templates to the Visual Studio "New Project" dialog.
+2. Build the CSHTML5 source code (cf. previous question)
+3. Copy the file "CSHTML5.dll" from the "bin/Debug" folder of the CSHTML5 source code into the "packages/CSHTML5(...)/lib/net40" folder of the project you created at step 1, overwriting the existing file
+4. Build and run the project you created at step 1
+
+### Where is the rest of the source code?
+The full source code of the CSHTML5 runtime has now been published to GitHub. You should be able to view and modify the source code of all the .NET types, the C# types, and the XAML types. Many low-level types are located in the Bridge.NET repository, which is available [here](https://github.com/cshtml5/Bridge). Any remaining part will be published to GitHub as soon as possible.
+
+### How is the source code licensed?
+The CSHTML5 source code is dual-licensed:
+* GNU General Public License (GPLv3). Please note that this license does not permit incorporating the code into proprietary programs nor into programs with a license other than GPLv3. More information can be found in the [LICENSE.txt](LICENSE.txt) file.
+* Commercial licenses. They can be obtained from: http://cshtml5.com
