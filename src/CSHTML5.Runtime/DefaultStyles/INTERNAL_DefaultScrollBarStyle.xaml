@@ -1,0 +1,62 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
+
+    <Style x:Key="DefaultScrollBarStyle" TargetType="ScrollBar">
+        <Setter Property="Background" Value="#FFF1F1F1" />
+        <Setter Property="Foreground" Value="#FF333333" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid x:Name="Root">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver" />
+                                <VisualState x:Name="Disabled" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Canvas x:Name="HorizontalRoot" Visibility="Collapsed" Background="{TemplateBinding Background}">
+                            <Button x:Name="HorizontalSmallDecrease" Padding="0" Cursor="Arrow">
+                                <Path x:Name="ArrowLeft" Fill="#FF555555" Width="9" Height="9" Margin="0,0,3,0" StrokeThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Data="M 2,4.5 L 5.5,1 L 5.5,8"/>
+                            </Button>
+                            <Button x:Name="HorizontalSmallIncrease" Padding="0" Cursor="Arrow">
+                                <Path x:Name="ArrowRight" Fill="#FF555555" Width="9" Height="9" Margin="0,0,3,0" StrokeThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Data="M 2,1 L 5.5,4.5 L 2,8"/>
+                            </Button>
+                            <Button x:Name="HorizontalLargeDecrease" Padding="0" Cursor="Arrow" />
+                            <Button x:Name="HorizontalLargeIncrease" Padding="0" Cursor="Arrow" />
+                            <Thumb x:Name="HorizontalThumb" Cursor="Arrow">
+                                <Thumb.Template>
+                                    <ControlTemplate>
+                                        <Border Background="#FFBBBBBB"/>
+                                    </ControlTemplate>
+                                </Thumb.Template>
+                            </Thumb>
+                        </Canvas>
+                        <Canvas x:Name="VerticalRoot" Visibility="Collapsed" Background="{TemplateBinding Background}">
+                            <Button x:Name="VerticalSmallDecrease" Padding="0" Cursor="Arrow">
+                                <Path x:Name="ArrowTop" Fill="#FF555555" Width="9" Height="9" Margin="0,0,3,0" StrokeThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Data="M 4.5,2 L 1,5.5 L 8,5.5"/>
+                            </Button>
+                            <Button x:Name="VerticalSmallIncrease" Padding="0" Cursor="Arrow">
+                                <Path x:Name="ArrowBottom" Fill="#FF555555" Width="9" Height="9" Margin="0,0,3,0" StrokeThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Data="M 1,2 L 4.5,5.5 L 8,2"/>
+                            </Button>
+                            <Button x:Name="VerticalLargeDecrease" Padding="0" Cursor="Arrow" />
+                            <Button x:Name="VerticalLargeIncrease" Padding="0" Cursor="Arrow" />
+                            <Thumb x:Name="VerticalThumb" Background="#FFBBBBBB" Cursor="Arrow">
+                                <Thumb.Template>
+                                    <ControlTemplate>
+                                        <Border Background="#FFBBBBBB"/>
+                                    </ControlTemplate>
+                                </Thumb.Template>
+                            </Thumb>
+                        </Canvas>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
+    

@@ -1,0 +1,76 @@
+// See all bridge.json configuration options at:
+// https://github.com/bridgedotnet/Bridge/wiki/global-configuration
+
+{
+  // The folder to output JavaScript (.js) files.
+  "output": "$(OutDir)/Output/",
+
+  // Set to "Minified" to generate .min.js files.
+  // Set to "Both" to generate both minified and non-minified .js files.
+  // "Formatted" generates non-minified .js files.
+  "outputFormatting": "Both",
+
+  // Enable the Bridge Console.
+  // Default is false.
+  "console": {
+    "enabled": false
+  },
+
+  // Enable browser debugging of C# files.
+  // Default is false.
+  "sourceMap": {
+    "enabled": true
+  },
+
+  // Set to true to disable Reflection metadata generation.
+  // Default is false.
+  "reflection": {
+    "disabled": false
+  },
+
+  // Generate TypeScript Definition (.d.ts) files.
+  // Default is false.
+  "generateTypeScript": false,
+
+  // Delete everything from the output folder.
+  // Default is false
+  //        ** WARNING **
+  // If true, all files within the "output"
+  // folder location will be deleted on Build.
+  //    ** USE WITH CAUTION **
+  "cleanOutputFolderBeforeBuild": false,
+
+  // Set to true to enable bridge.report.log generation.
+  // Default is false.
+  "report": {
+    "enabled": false
+  },
+
+  // Rules to manage generated JavaScript syntax.
+  // Default is "Managed"
+  "rules": {
+    "anonymousType": "Plain",
+    "arrayIndex": "Managed",
+    "autoProperty": "Plain",
+    "boxing": "Managed",
+    "externalCast": "Plain",
+    "inlineComment": "Plain",
+    "integer": "Managed",
+    "lambda": "Plain"
+  },
+
+  // Automatically generate an index.html file
+  // and add the file to the output directory.
+  // Default is false.
+  "html": {
+    "disabled": false
+  },
+
+  // Add compilation logging to your Project.
+  // Outputs a tab-delimited bridge.log file.
+  // Set to "Trace" for full logging.
+  // Default is "None".
+  "logging": {
+    "level": "None"
+  }
+}

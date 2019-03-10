@@ -1,0 +1,121 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
+
+    <Style x:Key="DefaultNumericUpDownStyle"
+        TargetType="NumericUpDown">
+        <Setter
+            Property="Template">
+            <Setter.Value>
+                <ControlTemplate
+                    TargetType="NumericUpDown">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        VerticalAlignment="Top">
+                        <!--<VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup
+                                x:Name="IncrementalButtonStates">
+                                <VisualState
+                                    x:Name="IncrementEnabled">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames
+                                            Storyboard.TargetName="PART_IncrementButton"
+                                            Storyboard.TargetProperty="IsEnabled">
+                                            <DiscreteObjectKeyFrame
+                                                KeyTime="0"
+                                                Value="True" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState
+                                    x:Name="IncrementDisabled">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames
+                                            Storyboard.TargetName="PART_IncrementButton"
+                                            Storyboard.TargetProperty="IsEnabled">
+                                            <DiscreteObjectKeyFrame
+                                                KeyTime="0"
+                                                Value="False" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup
+                                x:Name="DecrementalButtonStates">
+                                <VisualState
+                                    x:Name="DecrementEnabled">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames
+                                            Storyboard.TargetName="PART_DecrementButton"
+                                            Storyboard.TargetProperty="IsEnabled">
+                                            <DiscreteObjectKeyFrame
+                                                KeyTime="0"
+                                                Value="True" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState
+                                    x:Name="DecrementDisabled">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames
+                                            Storyboard.TargetName="PART_DecrementButton"
+                                            Storyboard.TargetProperty="IsEnabled">
+                                            <DiscreteObjectKeyFrame
+                                                KeyTime="0"
+                                                Value="False" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>-->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition
+                                    Width="Auto" />
+                                <ColumnDefinition
+                                    Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid
+                                Grid.Column="0">
+                                <Rectangle
+                                    x:Name="PART_ValueBar"
+                                    IsHitTestVisible="False"
+                                    Fill="#FFFFFFFF" />
+                                <UpDownTextBox
+                                    x:Name="PART_ValueTextBox"
+                                    FontFamily="{TemplateBinding FontFamily}"
+                                    FontSize="{TemplateBinding FontSize}"
+                                    Foreground="{TemplateBinding Foreground}"
+                                    HorizontalAlignment="Stretch"
+                                     />
+                                <!--InputScope="Number"-->
+                                <!--IsEnabled="{TemplateBinding IsEnabled}"-->
+                                <!--IsReadOnly="{TemplateBinding IsReadOnly}"-->
+                                <!--<Rectangle
+                                    x:Name="PART_DragOverlay"
+                                    Fill="Transparent" />-->
+                                <!--extensions:FrameworkElementExtensions.SystemCursor="SizeAll"-->
+                            </Grid>
+                            <RepeatButton
+                                Grid.Column="1"
+                                x:Name="PART_DecrementButton"
+                                Margin="4,0,0,0"
+                                Content="&#x2796;" />
+                            <RepeatButton
+                                Grid.Column="2"
+                                x:Name="PART_IncrementButton"
+                                Margin="3,0,0,0"
+                                Content="&#x2795;" />
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

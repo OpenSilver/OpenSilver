@@ -1,0 +1,152 @@
+﻿using CSHTML5;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace System.IO.IsolatedStorage
+{
+    public class IsolatedStorageFileStream : FileStream, IDisposable
+    {
+        internal string _filePath;
+        MemoryStream _fs;
+
+        // Summary:
+        //     Initializes a new instance of an System.IO.IsolatedStorage.IsolatedStorageFileStream
+        //     object giving access to the file designated by path in the specified mode.
+        //
+        // Parameters:
+        //   path:
+        //     The relative path of the file within isolated storage.
+        //
+        //   mode:
+        //     One of the System.IO.FileMode values.
+        //
+        // Exceptions:
+        //   System.ArgumentException:
+        //     The path is badly formed.
+        //
+        //   System.ArgumentNullException:
+        //     The path is null.
+        //
+        //   System.IO.DirectoryNotFoundException:
+        //     The directory in path does not exist.
+        //
+        //   System.IO.FileNotFoundException:
+        //     No file was found and the mode is set to System.IO.FileMode.Open
+        public IsolatedStorageFileStream(string path, FileMode mode)
+            : base(path, mode)
+        {
+            _filePath = path;
+
+            _fs = new MemoryStream();
+            if (mode == FileMode.Open || mode == FileMode.OpenOrCreate)
+            {
+                //attempt to read the file:
+                string fileContent = Convert.ToString(Interop.ExecuteJavaScript("localStorage.getItem({0})", _filePath.ToLower()));
+                if (fileContent != null) //note: the fileContent
+                {
+                    byte[] bytes = Convert.FromBase64String(fileContent);
+                    _fs.Write(bytes, 0, bytes.Length);
+                    _fs.Position = 0;
+                }
+            }
+        }
+
+        // Exceptions:
+        //   System.IO.IsolatedStorage.IsolatedStorageException:
+        //     The write attempt exceeds the quota for the System.IO.IsolatedStorage.IsolatedStorageFileStream
+        //     object.
+        /// <summary>
+        /// Writes a block of bytes to the System.IO.IsolatedStorage.IsolatedStorageFileStream
+        /// object using data read from a byte array.
+        /// </summary>
+        /// <param name="buffer">The buffer to write.</param>
+        /// <param name="offset">The byte offset in buffer from which to begin.</param>
+        /// <param name="count">The maximum number of bytes to write.</param>
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            //write in the stream:
+            _fs.Write(buffer, offset, count);
+            _fs.Position = 0;
+
+            //read the result and update the localStorage:
+            long msLenght = this.Length;
+            byte[] bytes = new byte[msLenght];
+            _fs.Read(bytes, 0, (int)msLenght); //todo: fix if _ms.Length > int.MaxValue (_ms.Length is an Int64)
+
+            //update the localStorage:
+            string filePath_lowered = _filePath.ToLower();
+            Interop.ExecuteJavaScript("localStorage.setItem({0}, {1})", filePath_lowered + "ǀǀCaseSensitivePath", _filePath); //Note: this is not a pipe (the thing we get with ctrl+alt+6), it is U+01C0
+            Interop.ExecuteJavaScript("localStorage.setItem({0}, {1})", filePath_lowered, System.Convert.ToBase64String(bytes));
+        }
+
+        /// <summary>
+        /// Copies bytes from the current buffered System.IO.IsolatedStorage.IsolatedStorageFileStream
+        /// object to an array.
+        /// </summary>
+        /// <param name="buffer">The buffer to read.</param>
+        /// <param name="offset">The offset in the buffer at which to begin writing.</param>
+        /// <param name="count">The maximum number of bytes to read.</param>
+        /// <returns>
+        /// The total number of bytes read into the buffer. This can be less than the
+        /// number of bytes requested if that many bytes are not currently available,
+        /// or zero if the end of the stream is reached.
+        /// </returns>
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            //_fs.Position = 0;
+            return _fs.Read(buffer, offset, count);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            _fs.Dispose();
+            base.Dispose(disposing);
+        }
+
+        public override void Flush()
+        {
+            _fs.Flush();
+            base.Flush();
+        }
+
+        public override long Position
+        {
+            get { return _fs.Position; }
+            set { _fs.Position = value; }
+        }
+
+        public override long Length
+        {
+            get { return _fs.Length; }
+        }
+
+        public override int ReadByte()
+        {
+            return _fs.ReadByte();
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            return _fs.Seek(offset, origin);
+        }
+
+        public override void WriteByte(byte value)
+        {
+            _fs.WriteByte(value);
+        }
+
+        public override void Close()
+        {
+            _fs.Close();
+            base.Close();
+        }
+
+        public void Dispose()
+        {
+            this.Close();
+        }
+    }
+}
