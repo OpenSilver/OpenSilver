@@ -284,7 +284,6 @@
     <Compile Include="System.Windows.input\CursorConverter.cs" />
     <Compile Include="System.Windows.input\Cursors.cs" />
     <Compile Include="System.Windows.input\ICommand.cs" />
-    <Compile Include="System.Windows.input\Key.cs" />
     <Compile Include="System.Windows.input\Keyboard.cs" />
     <Compile Include="System.Windows.input\MouseButtonEventArgs.cs" />
     <Compile Include="System.Windows.Interactivity\AttachableCollection.cs" />
