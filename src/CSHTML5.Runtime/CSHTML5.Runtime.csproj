@@ -86,7 +86,6 @@
     <Compile Include="ToBeReviewed\SerializationInfo.cs" />
     <Compile Include="ToBeReviewed\TargetInvocationException.cs" />
     <Compile Include="ToBeReviewed\ThrowHelper.cs" />
-    <Compile Include="ToBeReviewed\WaitHandle.cs" />
     <Compile Include="ToBeReviewed\WORKINPROGRESS\DescriptionAttribute.cs" />
     <Compile Include="ToBeReviewed\WORKINPROGRESS\Directory.cs" />
     <Compile Include="ToBeReviewed\WORKINPROGRESS\DirectoryInfo.cs" />
