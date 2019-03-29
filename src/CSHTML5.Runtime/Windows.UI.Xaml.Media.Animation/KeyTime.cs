@@ -68,14 +68,10 @@ namespace Windows.UI.Xaml.Media.Animation
                 else
                 {
 #if BRIDGE
-                    TimeSpan timeSpan = INTERNAL_BridgeWorkarounds.TimeSpanParse(keyTimeCode);
+                    TimeSpan timeSpan = INTERNAL_BridgeWorkarounds.TimeSpanParse(keyTimeCode, false);
 #else
                     TimeSpan timeSpan = TimeSpan.Parse(keyTimeCode);
 #endif
-                    if (timeSpan.Ticks < 0)
-                    {
-                        timeSpan = new TimeSpan();
-                    }
                     return new KeyTime(timeSpan);
                 }
             }
