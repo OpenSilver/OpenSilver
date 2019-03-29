@@ -146,25 +146,28 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register("HorizontalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer), new PropertyMetadata(ScrollBarVisibility.Disabled, HorizontalScrollBarVisibility_Changed));
         static void HorizontalScrollBarVisibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var scrollViewer = (ScrollViewer)d;
-            ScrollBarVisibility newValue = (ScrollBarVisibility)e.NewValue;
-
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(scrollViewer))
+            if (d is ScrollViewer)
             {
-                //-----------------------------
-                // Gain access to the styles:
-                //-----------------------------
+                var scrollViewer = (ScrollViewer)d;
+                ScrollBarVisibility newValue = (ScrollBarVisibility)e.NewValue;
 
-                var outerDiv = scrollViewer.INTERNAL_OuterDomElement;
-                var outerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDiv);
-                var innerDiv = INTERNAL_HtmlDomManager.GetFirstChildDomElement(outerDiv);
-                var innerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDiv);
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(scrollViewer))
+                {
+                    //-----------------------------
+                    // Gain access to the styles:
+                    //-----------------------------
 
-                //----------------
-                // Update the DOM:
-                //----------------
+                    var outerDiv = scrollViewer.INTERNAL_OuterDomElement;
+                    var outerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDiv);
+                    var innerDiv = INTERNAL_HtmlDomManager.GetFirstChildDomElement(outerDiv);
+                    var innerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDiv);
 
-                scrollViewer.INTERNAL_ApplyHorizontalSettings(newValue, outerDivStyle, innerDivStyle);
+                    //----------------
+                    // Update the DOM:
+                    //----------------
+
+                    scrollViewer.INTERNAL_ApplyHorizontalSettings(newValue, outerDivStyle, innerDivStyle);
+                }
             }
         }
 
@@ -483,25 +486,28 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register("VerticalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer), new PropertyMetadata(ScrollBarVisibility.Visible, VerticalScrollBarVisibility_Changed));
         static void VerticalScrollBarVisibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var scrollViewer = (ScrollViewer)d;
-            ScrollBarVisibility newValue = (ScrollBarVisibility)e.NewValue;
-
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(scrollViewer))
+            if (d is ScrollViewer)
             {
-                //-----------------------------
-                // Gain access to the styles:
-                //-----------------------------
+                var scrollViewer = (ScrollViewer)d;
+                ScrollBarVisibility newValue = (ScrollBarVisibility)e.NewValue;
 
-                var outerDiv = scrollViewer.INTERNAL_OuterDomElement;
-                var outerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDiv);
-                var innerDiv = INTERNAL_HtmlDomManager.GetFirstChildDomElement(outerDiv);
-                var innerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDiv);
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(scrollViewer))
+                {
+                    //-----------------------------
+                    // Gain access to the styles:
+                    //-----------------------------
 
-                //----------------
-                // Update the DOM:
-                //----------------
+                    var outerDiv = scrollViewer.INTERNAL_OuterDomElement;
+                    var outerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDiv);
+                    var innerDiv = INTERNAL_HtmlDomManager.GetFirstChildDomElement(outerDiv);
+                    var innerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDiv);
 
-                scrollViewer.INTERNAL_ApplyVerticalSettings(newValue, outerDivStyle, innerDivStyle);
+                    //----------------
+                    // Update the DOM:
+                    //----------------
+
+                    scrollViewer.INTERNAL_ApplyVerticalSettings(newValue, outerDivStyle, innerDivStyle);
+                }
             }
         }
 
