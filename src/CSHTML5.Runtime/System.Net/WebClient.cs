@@ -182,7 +182,7 @@ namespace System.Net
             {
                 headers.Add(key, _headers.Get(key)); //todo-perf: improve performance?
             }
-            return _webRequestHelper.MakeRequest(address, "GET", headers, null, OnDownloadStringCompleted, false, GetCredentialsMode());
+            return _webRequestHelper.MakeRequest(address, "GET", this, headers, null, OnDownloadStringCompleted, false, GetCredentialsMode());
         }
 
         // Exceptions:
@@ -225,7 +225,7 @@ namespace System.Net
                 headers.Add(key, _headers.Get(key)); //todo-perf: improve performance?
             }
 
-            _webRequestHelper.MakeRequest(address, "GET", headers, null, OnDownloadStringCompleted, true, GetCredentialsMode());
+            _webRequestHelper.MakeRequest(address, "GET", this, headers, null, OnDownloadStringCompleted, true, GetCredentialsMode());
 
 
             //define the XMLHttpRequest:
@@ -268,7 +268,7 @@ namespace System.Net
             }
 
             var taskCompletionSource = new TaskCompletionSource<string>();
-            _webRequestHelper.MakeRequest(address, "GET", headers, null, (sender, args) => TriggerDownloadStringTaskCompleted(taskCompletionSource, args), true, GetCredentialsMode());
+            _webRequestHelper.MakeRequest(address, "GET", this, headers, null, (sender, args) => TriggerDownloadStringTaskCompleted(taskCompletionSource, args), true, GetCredentialsMode());
 
             return taskCompletionSource.Task;
         }
@@ -437,7 +437,7 @@ namespace System.Net
             {
                 headers.Add(key, _headers.Get(key)); //todo-perf: improve performance?
             }
-            return _webRequestHelper.MakeRequest(address, method, headers, data, onCompleted, isAsync, GetCredentialsMode());
+            return _webRequestHelper.MakeRequest(address, method, this, headers, data, onCompleted, isAsync, GetCredentialsMode());
         }
 
       
@@ -590,7 +590,7 @@ namespace System.Net
             }
 
             var taskCompletionSource = new TaskCompletionSource<string>();
-            _webRequestHelper.MakeRequest(address, method, headers, data, (sender, args) => TriggerUploadStringTaskCompleted(taskCompletionSource, args), true, GetCredentialsMode());
+            _webRequestHelper.MakeRequest(address, method, this, headers, data, (sender, args) => TriggerUploadStringTaskCompleted(taskCompletionSource, args), true, GetCredentialsMode());
 
             return taskCompletionSource.Task;
         }

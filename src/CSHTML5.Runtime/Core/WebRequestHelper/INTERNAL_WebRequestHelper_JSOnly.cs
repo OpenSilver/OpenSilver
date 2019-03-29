@@ -22,6 +22,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
+using CSHTML5;
 #if BRIDGE
 using Bridge;
 #endif
@@ -42,11 +43,12 @@ namespace System
         /// </summary>
         public INTERNAL_WebRequestHelper_JSOnly() { }
 
-        static Dictionary<string, bool> WebServiceUrlToJsCredentialsSupported = new Dictionary<string,bool>();
+        static Dictionary<string, bool> WebServiceUrlToJsCredentialsSupported = new Dictionary<string, bool>();
 
         // copy the parameters for resending method in case of fail
         Uri _address;
         string _Method;
+        static object _sender;
         Dictionary<string, string> _headers;
         string _body;
         bool _isAsync;
@@ -66,7 +68,7 @@ namespace System
         /// <param name="callbackMethod">The method to be called after the request has been made.</param>
         /// <param name="isAsync">A boolean that determines whether the request must be made synchronously or asynchronously.</param>
         /// <returns>The result of the request as a string.</returns>
-        public string MakeRequest(Uri address, string Method, Dictionary<string, string> headers, string body, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler callbackMethod, bool isAsync, CredentialsMode mode = CredentialsMode.Disabled)
+        public string MakeRequest(Uri address, string Method, object sender, Dictionary<string, string> headers, string body, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler callbackMethod, bool isAsync, CredentialsMode mode = CredentialsMode.Disabled)
         {
             bool askForUnsafeRequest = false; // This is true if we are doing the initial request to determine whether the credentials are supported or not.
 
@@ -83,9 +85,9 @@ namespace System
             //create the request:
             CreateRequest((object)_xmlHttpRequest, address.OriginalString, Method, isAsync);
 
-            if(!WebServiceUrlToJsCredentialsSupported.ContainsKey(address.OriginalString))
+            if (!WebServiceUrlToJsCredentialsSupported.ContainsKey(address.OriginalString))
             {
-                if(mode == CredentialsMode.Auto)
+                if (mode == CredentialsMode.Auto)
                 {
                     WebServiceUrlToJsCredentialsSupported.Add(address.OriginalString, true); // if not supported, this value will be changed soon
                     askForUnsafeRequest = true;
@@ -121,7 +123,7 @@ namespace System
                 SetErrorCallback((object)_xmlHttpRequest, OnError);
 
                 // save the inputs to resend the request in case of error
-                SaveParameters(address, Method, headers, callbackMethod, body, isAsync);
+                SaveParameters(address, Method, sender, headers, callbackMethod, body, isAsync);
 
                 // safe request, will resend the request with different settings if it crashes.
                 return SendUnsafeRequest((object)_xmlHttpRequest, address.OriginalString, Method, isAsync, body);
@@ -130,7 +132,7 @@ namespace System
             {
                 SendRequest((object)_xmlHttpRequest, address.OriginalString, Method, isAsync, body);
             }
-            
+
             if (GetHasError((object)_xmlHttpRequest))
             {
                 throw new Exception("The remote server has returned an error: (" + GetCurrentStatus((object)_xmlHttpRequest) + ") " + GetCurrentStatusText((object)_xmlHttpRequest) + ".");
@@ -217,13 +219,14 @@ namespace System
         private static string ResendLastUnsafeRequest()
         {
             // we need to recreate a webRequestHelper, beacause we can't modify settings after the request was send
-            return new INTERNAL_WebRequestHelper_JSOnly().MakeRequest(_requester._address, _requester._Method, _requester._headers, _requester._body, _requester._callback, _requester._isAsync, CredentialsMode.Disabled);
+            return new INTERNAL_WebRequestHelper_JSOnly().MakeRequest(_requester._address, _requester._Method, _sender, _requester._headers, _requester._body, _requester._callback, _requester._isAsync, CredentialsMode.Disabled);
         }
 
-        private void SaveParameters(Uri address, string Method, Dictionary<string, string> headers, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler callback, string body, bool isAsync)
+        private void SaveParameters(Uri address, string Method, object sender, Dictionary<string, string> headers, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler callback, string body, bool isAsync)
         {
             _address = address;
             _Method = Method;
+            _sender = sender;
             _headers = headers;
             _body = body;
             _isAsync = isAsync;
@@ -238,7 +241,7 @@ namespace System
 #endif
         private static void SetRequestHeader(object xmlHttpRequest, string key, string header)
         {
-            //do nothing
+            Interop.ExecuteJavaScript("$0.setRequestHeader($1, $2)", xmlHttpRequest, key, header);
         }
 
 #if !BRIDGE
@@ -248,18 +251,18 @@ namespace System
 #endif
         internal static dynamic GetWebRequest()
         {
-            throw new NotImplementedException(); //find a better exception for here (we are not supposed to arrive here in C#).
+            return Interop.ExecuteJavaScript("new XMLHttpRequest()");
         }
-         
+
 #if !BRIDGE
         [JSIL.Meta.JSReplacement("$xmlHttpRequest.onload = $OnDownloadStatusCompleted")]
 #else
         [Template("{xmlHttpRequest}.onload = {OnDownloadStatusCompleted}")]
 #endif
 
-        internal static void SetCallbackMethod(object xmlHttpRequest, Action<object, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs> OnDownloadStatusCompleted)
+        internal static void SetCallbackMethod(object xmlHttpRequest, Action OnDownloadStatusCompleted)
         {
-            //do nothing
+            Interop.ExecuteJavaScript("$0.onload = $1", xmlHttpRequest, OnDownloadStatusCompleted);
         }
 
 #if !BRIDGE
@@ -269,7 +272,7 @@ namespace System
 #endif
         private static void CreateRequest(object xmlHttpRequest, string address, string method, bool isAsync)
         {
-            //do nothing
+            Interop.ExecuteJavaScript("$0.open($1, $2, $3)", xmlHttpRequest, method, address, isAsync);
         }
 
 
@@ -280,7 +283,7 @@ namespace System
 #endif
         private static void EnableCookies(object xmlHttpRequest, bool value)
         {
-            throw new NotImplementedException();
+            Interop.ExecuteJavaScript("$0.withCredentials = $1", xmlHttpRequest, value);
         }
 
 
@@ -291,7 +294,7 @@ namespace System
 #endif
         internal static void SetErrorCallback(object xmlHttpRequest, Action<object> OnError)
         {
-            //do nothing
+            Interop.ExecuteJavaScript("$0.onerror = $1", xmlHttpRequest, OnError);
         }
 
 
@@ -302,7 +305,7 @@ namespace System
 #endif
         internal static void ConsoleLog_JSOnly(string message)
         {
-            //do nothing
+            Interop.ExecuteJavaScript("console.log($0);", message);
         }
 
 #if !BRIDGE
@@ -312,16 +315,16 @@ namespace System
 #endif
         internal static void SendRequest(object xmlHttpRequest, string address, string method, bool isAsync, string body)
         {
-            //do nothing
+            Interop.ExecuteJavaScript("$0.send($1)", xmlHttpRequest, body);
         }
 
-        private void OnDownloadStringCompleted(object sender, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs e)
+        private void OnDownloadStringCompleted()
         {
-            e = new INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs();
+            var e = new INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs();
             SetEventArgs(e);
             if (DownloadStringCompleted != null)
             {
-                DownloadStringCompleted(sender, e);
+                DownloadStringCompleted(_sender, e);
             }
         }
 
@@ -356,7 +359,7 @@ namespace System
 #endif
         private static int GetCurrentReadyState(object xmlHttpRequest)
         {
-            throw new NotImplementedException();
+            return Convert.ToInt32(Interop.ExecuteJavaScript("$0.readyState", xmlHttpRequest));
         }
 
 #if !BRIDGE
@@ -368,7 +371,7 @@ namespace System
 
         private static int GetCurrentStatus(object xmlHttpRequest)
         {
-            throw new NotImplementedException();
+            return Convert.ToInt32(Interop.ExecuteJavaScript("$0.status", xmlHttpRequest));
         }
 
 #if !BRIDGE
@@ -379,7 +382,7 @@ namespace System
 #endif
         private static int GetCurrentStatusText(object xmlHttpRequest)
         {
-            throw new NotImplementedException();
+            return Convert.ToInt32(Interop.ExecuteJavaScript("$0.statusText", xmlHttpRequest));
         }
 
 #if !BRIDGE
@@ -391,7 +394,7 @@ namespace System
 
         private static string GetResult(object xmlHttpRequest)
         {
-            throw new NotImplementedException();
+            return Convert.ToString(Interop.ExecuteJavaScript("$0.responseText", xmlHttpRequest));
         }
 
         private static bool GetHasError(object xmlHttpRequest)
