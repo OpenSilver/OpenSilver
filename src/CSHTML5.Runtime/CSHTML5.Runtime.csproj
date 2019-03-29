@@ -40,7 +40,23 @@
     <AssemblyName>CSHTML5.Migration</AssemblyName>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Migration\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;SILVERLIGHTCOMPATIBLEVERSION;SLMIGRATION;MIGRATION;WORKINPROGRESS;DISABLED_BECAUSE_MISSES_CORRECT_MAPPING_OF_KEYCODES</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;SILVERLIGHTCOMPATIBLEVERSION;SLMIGRATION;MIGRATION</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Migration\CSHTML5.Migration.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU'">
+    <!-- ************************************* -->
+    <!-- We manually override the AssemblyName -->
+    <!-- ************************************* -->
+    <AssemblyName>CSHTML5.Migration</AssemblyName>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Migration.WorkInProgress\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;SILVERLIGHTCOMPATIBLEVERSION;SLMIGRATION;MIGRATION;WORKINPROGRESS</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -813,7 +829,20 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">
+    <Reference Include="Bridge, Version=17.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSHTML5.Migration.2.0.0-alpha23-036\lib\net40\Bridge.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CSHTML5.Migration, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSHTML5.Migration.2.0.0-alpha23-036\lib\net40\CSHTML5.Migration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CSHTML5.Stubs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSHTML5.Migration.2.0.0-alpha23-036\lib\net40\CSHTML5.Stubs.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
   <ItemGroup>
     <None Include="DefaultStyles\INTERNAL_DefaultAutoCompleteBoxStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -894,4 +923,5 @@
   </ItemGroup>
   <Import Project="..\packages\CSHTML5.2.0.0-alpha23-036\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
   <Import Project="..\packages\CSHTML5.Migration.2.0.0-alpha23-036\build\CSHTML5.Migration.targets" Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' " />
+  <Import Project="..\packages\CSHTML5.Migration.2.0.0-alpha23-036\build\CSHTML5.Migration.targets" Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' " />
 </Project>
