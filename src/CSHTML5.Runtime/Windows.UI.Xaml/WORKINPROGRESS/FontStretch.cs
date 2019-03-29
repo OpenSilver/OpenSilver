@@ -16,6 +16,7 @@
 
 
 using CSHTML5.Internal;
+using DotNetForHtml5.Core;
 using System;
 using System.Windows.Markup;
 

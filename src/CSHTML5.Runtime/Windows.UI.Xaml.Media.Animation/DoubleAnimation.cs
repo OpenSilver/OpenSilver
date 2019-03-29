@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Animates the value of a Double property between two target values using linear
     /// interpolation over a specified Duration.
     /// </summary>
-    public sealed class DoubleAnimation : Timeline
+    public class DoubleAnimation : Timeline
     {
         ///// <summary>
         ///// Initializes a new instance of the DoubleAnimation class.
@@ -257,7 +257,7 @@ namespace Windows.UI.Xaml.Media.Animation
                         }
                         object cssValue = cssEquivalent.Value(target, to);
 
-                        
+
 
                         object newObj = CSHTML5.Interop.ExecuteJavaScriptAsync(@"new Object()");
 
@@ -289,7 +289,7 @@ $0[$1] = [$2, $3];", newObj, csspropertyName, cssValue, from);
             }
         }
 
-        
+
 
         internal override void Stop(FrameworkElement frameworkElement, string groupName, bool revertToFormerValue = false)
         {
@@ -310,7 +310,7 @@ $0[$1] = [$2, $3];", newObj, csspropertyName, cssValue, from);
                 FieldInfo dependencyPropertyField = dependencyPropertyContainerType.GetField(propertyPath.INTERNAL_DependencyPropertyName + "Property");
                 // - Get the DependencyProperty
 #if MIGRATION
-                    DependencyProperty dp = (global::System.Windows.DependencyProperty)dependencyPropertyField.GetValue(null);
+                DependencyProperty dp = (global::System.Windows.DependencyProperty)dependencyPropertyField.GetValue(null);
 #else
                 DependencyProperty dp = (global::Windows.UI.Xaml.DependencyProperty)dependencyPropertyField.GetValue(null);
 #endif

@@ -66,7 +66,8 @@ namespace Windows.UI.Xaml
 #else
             dynamic
 # endif
-            INTERNAL_OuterDomElement { get; set; } // This is the main DIV of the HTML representation of the control //todo-perfs: replace all these properties with fields?
+            INTERNAL_OuterDomElement
+        { get; set; } // This is the main DIV of the HTML representation of the control //todo-perfs: replace all these properties with fields?
         internal object INTERNAL_InnerDomElement { get; set; } // This is used to add visual children to the DOM (optionally wrapped into additional code, c.f. "INTERNAL_VisualChildInformation")
         internal object INTERNAL_AdditionalOutsideDivForMargins { get; set; } // This is used to define the margins and to remove the div used for the margins when we remove this element.
         internal object INTERNAL_InnerDivOfTheChildWrapperOfTheParentIfAny { get; set; } // This is non-null only if the parent has a "ChildWrapper", that is, a DIV that it creates for each of its children. If it is the case, we store the "inner div" of that child wrapper. It is useful for alignment purposes (cf. alignment methods in the FrameworkElement class).
@@ -76,7 +77,8 @@ namespace Windows.UI.Xaml
 #else
             dynamic
 #endif
-            INTERNAL_OptionalSpecifyDomElementConcernedByFocus { get; set; } // This is optional. When set, it means that the "GotFocus", "LostFocus", "KeyDown", "KeyUp", etc. events of the specified DOM element are used instead of the those of the outer DOM element. An example is the "TextBox", which has many DIVs but we only listen to the inner DIV for the focus and key events. Similarly, setting the focus on the control will call the JS method "focus()" on this DOM element if any.
+            INTERNAL_OptionalSpecifyDomElementConcernedByFocus
+        { get; set; } // This is optional. When set, it means that the "GotFocus", "LostFocus", "KeyDown", "KeyUp", etc. events of the specified DOM element are used instead of the those of the outer DOM element. An example is the "TextBox", which has many DIVs but we only listen to the inner DIV for the focus and key events. Similarly, setting the focus on the control will call the JS method "focus()" on this DOM element if any.
         internal object INTERNAL_OptionalSpecifyDomElementConcernedByIsEnabled { get; set; } // This is optional. When set, it means that the "FrameworkElement.ManageIsEnabled" method sets the "disabled" property on this specified DOM element rather than on the INTERNAL_OuterDomElement. An example is the "CheckBox", which specifies a different DOM element for its "disabled" state.
         internal object INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth { get; set; } // This is optional. When set, it means that the "FrameworkElement.MinHeight" and "MinWidth" properties are applied on this specified DOM element rather than on the INTERNAL_OuterDomElement. An example is the "TextBox", for which applying MinHeight to the outer DOM does not make the inner DOM bigger.
         internal INTERNAL_CellDefinition INTERNAL_SpanParentCell = null; //this is used to know where we put the element when in a cell of a grid that is overlapped (due to the span or presence of another element that was put there previously), which causes it to be "sucked" into the basic cell of the previousl "placed" child.
@@ -97,7 +99,7 @@ namespace Windows.UI.Xaml
 
 
 
-#region Special code for RadioButtons
+        #region Special code for RadioButtons
 
         private string _childrenRadioButtonDefaultName = null;
         internal string INTERNAL_ChildrenRadioButtonDefaultName //this is used to define a name for the radio buttons contained inside this UIElement that have their GroupName property not defined. Mandatory because RadioButtons without GroupName inside a same UIElement are considered to be part of a same group.
@@ -123,10 +125,10 @@ namespace Windows.UI.Xaml
             return "RadioButtonDefaultGroupName" + i.ToString();
         }
 
-#endregion
+        #endregion
 
 
-#region ClipToBounds
+        #region ClipToBounds
 
         /// <summary>
         /// Gets or sets a value indicating whether to clip the content of this element
@@ -159,7 +161,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        #endregion
 
 
         /// <summary>
@@ -201,7 +203,7 @@ namespace Windows.UI.Xaml
         }
 
 
-#region Effect
+        #region Effect
 
         public Effect Effect //todo: we may add the support for multiple effects on the same UIElement since it is possible in html (but not in wpf). If we try to, it will require some changes in the Effects already implemented and some work to make it work properly in the simulator.
         {
@@ -227,10 +229,10 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        #endregion
 
 
-#region RenderTransform and RenderTransformOrigin
+        #region RenderTransform and RenderTransformOrigin
 
         /// <summary>
         /// Gets or sets transform information that affects the rendering position of
@@ -325,7 +327,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        #endregion
 
         static void ApplyRenderTransformOrigin(UIElement uiElement, Point newValue)
         {
@@ -356,7 +358,7 @@ namespace Windows.UI.Xaml
         }
 
 
-#region UseLayoutRounding
+        #region UseLayoutRounding
 
         /// <summary>
         /// Gets or sets a value that determines whether rendering for the object and
@@ -378,10 +380,10 @@ namespace Windows.UI.Xaml
         // NOTE: The "UseLayoutRounding" is currently not supported, but we provide it anyway because it's a pain for end-users to remove the option in all their XAML elements and the benefit of not including it is not significant.
         //------
 
-#endregion
+        #endregion
 
 
-#region Visibility
+        #region Visibility
 
         /// <summary>
         /// Gets or sets the visibility of a UIElement. A UIElement that is not visible
@@ -444,10 +446,10 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        #endregion
 
 
-#region Opacity
+        #region Opacity
 
         /// <summary>
         /// Gets or sets the degree of the object's opacity.
@@ -477,7 +479,7 @@ namespace Windows.UI.Xaml
             }
             );
 
-#endregion
+        #endregion
 
 #if WORKINPROGRESS
         #region OpacityMask, CacheMode, Clip Not supported yet
@@ -534,10 +536,10 @@ namespace Windows.UI.Xaml
 
         // Using a DependencyProperty as the backing store for Clip.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ClipProperty =
-            DependencyProperty.Register("Clip", typeof(Geometry), typeof(UIElement), new PropertyMetadata(0));
+            DependencyProperty.Register("Clip", typeof(Geometry), typeof(UIElement), new PropertyMetadata((Geometry)null));
 
-        
-        
+
+
         #endregion
 #endif
 
@@ -566,7 +568,7 @@ namespace Windows.UI.Xaml
                 isEnabled: element is FrameworkElement ? ((FrameworkElement)element).IsEnabled : true);
         }
 
-#endregion
+        #endregion
 
         internal static void INTERNAL_UpdateCssPointerEventsPropertyBasedOnIsHitTestVisibleAndIsEnabled(UIElement element, bool isHitTestVisible, bool isEnabled)
         {
@@ -602,7 +604,7 @@ namespace Windows.UI.Xaml
         }
 
 
-#region AllowDrop
+        #region AllowDrop
 
         /// <summary>
         /// Gets or sets a value that determines whether this UIElement
@@ -620,7 +622,7 @@ namespace Windows.UI.Xaml
         public static readonly DependencyProperty AllowDropProperty =
             DependencyProperty.Register("AllowDrop", typeof(bool), typeof(UIElement), new PropertyMetadata(false));
 
-#endregion
+        #endregion
 
         internal virtual void INTERNAL_UpdateDomStructureIfNecessary()
         {
@@ -639,7 +641,7 @@ namespace Windows.UI.Xaml
         }
 
 
-#region CapturePointer, ReleasePointerCapture, IsPointerCaptured, and OnLostMouseCapture
+        #region CapturePointer, ReleasePointerCapture, IsPointerCaptured, and OnLostMouseCapture
 
         /// <summary>
         /// Sets pointer capture to a UIElement.
@@ -996,7 +998,7 @@ namespace Windows.UI.Xaml
         public event PointerEventHandler PointerCaptureLost;
 #endif
 
-#endregion
+        #endregion
 
 
         /// <summary>
@@ -1030,14 +1032,14 @@ namespace Windows.UI.Xaml
                 offsetLeft = rectOfThisControl.left - rectOfReferenceVisual.left;
                 offsetTop = rectOfThisControl.top - rectOfReferenceVisual.top;
             }
-//#if !BRIDGE
+            //#if !BRIDGE
             else
             {
                 // ------- SIMULATOR -------
                 offsetLeft = Convert.ToDouble(Interop.ExecuteJavaScript("$0.getBoundingClientRect().left - $1.getBoundingClientRect().left", outerDivOfThisControl, outerDivOfReferenceVisual));
                 offsetTop = Convert.ToDouble(Interop.ExecuteJavaScript("$0.getBoundingClientRect().top - $1.getBoundingClientRect().top", outerDivOfThisControl, outerDivOfReferenceVisual));
             }
-//#endif
+            //#endif
 
             return new TranslateTransform() { X = offsetLeft, Y = offsetTop };
         }

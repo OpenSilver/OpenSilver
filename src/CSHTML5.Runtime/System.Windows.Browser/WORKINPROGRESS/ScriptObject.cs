@@ -25,10 +25,10 @@ using System.Linq.Expressions;
 
 namespace System.Windows.Browser
 {
-    #if WORKINPROGRESS
-    public class ScriptObject : System.Dynamic.IDynamicMetaObjectProvider
+#if WORKINPROGRESS
+    public class ScriptObject : IDynamicMetaObjectProvider
     {
-        #region Not supported yet
+    #region Not supported yet
         DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression parameter)
         {
             return default(DynamicMetaObject);
@@ -65,7 +65,8 @@ namespace System.Windows.Browser
         {
             return null;
         }
-        #endregion
+    #endregion
     }
-    #endif
+#endif
 }
+
