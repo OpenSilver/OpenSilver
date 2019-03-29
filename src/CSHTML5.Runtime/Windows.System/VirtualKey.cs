@@ -107,7 +107,11 @@ namespace Windows.System
         //
         // Summary:
         //     The Caps Lock key or button.
+#if MIGRATION
+        CapsLock = 20,
+#else
         CapitalLock = 20,
+#endif
         //
         // Summary:
         //     The Kana symbol key-shift button.
@@ -219,43 +223,83 @@ namespace Windows.System
         //
         // Summary:
         //     The number "0" key.
+#if MIGRATION
+        D0 = 48,
+#else
         Number0 = 48,
+#endif
         //
         // Summary:
         //     The number "1" key.
+#if MIGRATION
+        D1 = 49,
+#else
         Number1 = 49,
+#endif
         //
         // Summary:
         //     The number "2" key.
+#if MIGRATION
+        D2 = 50,
+#else
         Number2 = 50,
+#endif
         //
         // Summary:
         //     The number "3" key.
+#if MIGRATION
+        D3 = 51,
+#else
         Number3 = 51,
+#endif
         //
         // Summary:
         //     The number "4" key.
+#if MIGRATION
+        D4 = 52,
+#else
         Number4 = 52,
+#endif
         //
         // Summary:
         //     The number "5" key.
+#if MIGRATION
+        D5 = 53,
+#else
         Number5 = 53,
+#endif
         //
         // Summary:
         //     The number "6" key.
+#if MIGRATION
+        D6 = 54,
+#else
         Number6 = 54,
+#endif
         //
         // Summary:
         //     The number "7" key.
+#if MIGRATION
+        D7 = 55,
+#else
         Number7 = 55,
+#endif
         //
         // Summary:
         //     The number "8" key.
+#if MIGRATION
+        D8 = 56,
+#else
         Number8 = 56,
+#endif
         //
         // Summary:
         //     The number "9" key.
+#if MIGRATION
+        D9 = 57,
+#else
         Number9 = 57,
+#endif
         //
         // Summary:
         //     The letter "A" key.
@@ -379,43 +423,83 @@ namespace Windows.System
         //
         // Summary:
         //     The number "0" key as located on a numeric pad.
+#if MIGRATION
+        NumPad0 = 96,
+#else
         NumberPad0 = 96,
+#endif
         //
         // Summary:
         //     The number "1" key as located on a numeric pad.
+#if MIGRATION
+        NumPad1 = 97,
+#else
         NumberPad1 = 97,
+#endif
         //
         // Summary:
         //     The number "2" key as located on a numeric pad.
+#if MIGRATION
+        NumPad2 = 98,
+#else
         NumberPad2 = 98,
+#endif
         //
         // Summary:
         //     The number "3" key as located on a numeric pad.
+#if MIGRATION
+        NumPad3 = 99,
+#else
         NumberPad3 = 99,
+#endif
         //
         // Summary:
         //     The number "4" key as located on a numeric pad.
+#if MIGRATION
+        NumPad4 = 100,
+#else
         NumberPad4 = 100,
+#endif
         //
         // Summary:
         //     The number "5" key as located on a numeric pad.
+#if MIGRATION
+        NumPad5 = 101,
+#else
         NumberPad5 = 101,
+#endif
         //
         // Summary:
         //     The number "6" key as located on a numeric pad.
+#if MIGRATION
+        NumPad6 = 102,
+#else
         NumberPad6 = 102,
+#endif
         //
         // Summary:
         //     The number "7" key as located on a numeric pad.
+#if MIGRATION
+        NumPad7 = 103,
+#else
         NumberPad7 = 103,
+#endif
         //
         // Summary:
         //     The number "8" key as located on a numeric pad.
+#if MIGRATION
+        NumPad8 = 104,
+#else
         NumberPad8 = 104,
+#endif
         //
         // Summary:
         //     The number "9" key as located on a numeric pad.
+#if MIGRATION
+        NumPad9 = 105,
+#else
         NumberPad9 = 105,
+#endif
         //
         // Summary:
         //     The multiply (*) operation key as located on a numeric pad.
