@@ -40,13 +40,13 @@
     <AssemblyName>CSHTML5.Migration</AssemblyName>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Migration\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;SILVERLIGHTCOMPATIBLEVERSION;SLMIGRATION;MIGRATION</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;SILVERLIGHTCOMPATIBLEVERSION;SLMIGRATION;MIGRATION;WORKINPROGRESS;DISABLED_BECAUSE_MISSES_CORRECT_MAPPING_OF_KEYCODES</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Migration\CSHTML5.xml</DocumentationFile>
+    <DocumentationFile>bin\Migration\CSHTML5.Migration.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
