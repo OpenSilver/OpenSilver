@@ -283,22 +283,23 @@ namespace Windows.UI.Xaml.Controls
         {
             DataGridColumnHeader header = new DataGridColumnHeader();
             header.Column = this;
-            if (HeaderTemplate == null && Header is string || Header == null)
-            {
-                TextBlock textblock = new TextBlock();
-                textblock.Text = (string)Header;
 
-                Button button = new Button();
-                button.Content = textblock;
-                button.Click += Header_OnClick;
-                header.Content = button;
-            }
-            else
+            header.Content = Header;
+            if (HeaderTemplate != null)
             {
-                //I don't think there is a DataContext to put there.
-                //todo: check the line above.
-                header.Content = HeaderTemplate.INTERNAL_InstantiateFrameworkTemplate();
+                header.ContentTemplate = HeaderTemplate;
             }
+            if (HeaderStyle != null)
+            {
+                header.Style = HeaderStyle;
+            }
+            else if (_parent.ColumnHeaderStyle != null)
+            {
+                header.Style = _parent.ColumnHeaderStyle;
+            }
+
+            header.Click += Header_OnClick;
+
             _header = header;
             return header;
         }
