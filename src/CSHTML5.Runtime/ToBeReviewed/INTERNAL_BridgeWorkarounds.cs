@@ -36,7 +36,7 @@ public class INTERNAL_BridgeWorkarounds
             return fullName;
     }
 
-    public static TimeSpan TimeSpanParse(string timeSpanAsString)
+    public static TimeSpan TimeSpanParse(string timeSpanAsString, bool canBeNegative = true)
     {
         //-----------------------------------------------------
         // Note: initially Bridge.NET did not support TimeSpan.Parse at all, so we created the workaround below.
@@ -56,101 +56,108 @@ public class INTERNAL_BridgeWorkarounds
         //[ws][-]{ d | [d.]hh:mm[:ss[.ff]] }[ws]
         //we get rid of the white spaces at the beginning and at the end:
         string timeAsString = timeSpanAsString.Trim();
-
-        //timeAsString's format:
-        //[-]{ d | [d.]hh:mm[:ss[.ff]] }
-        //We remember the sign of the TimeSpan:
         int signKeeper = 1;
-        if (timeAsString.StartsWith("-"))
+        if (timeAsString[0] == '-')
         {
             signKeeper = -1;
+            timeAsString = timeAsString.Substring(1);
         }
-        //note: we implement this as if the timeSpan could be negative but in the specific case of KeyTime, it cannot, thus the next test on signKeeper.
-        if (signKeeper != -1)
+        string[] splittedTime = timeAsString.Split(':');
+        // We can't parse timeSpanAsString to a TimeSpan in this case
+        if (splittedTime.Length > 3)
         {
-            if (signKeeper == -1 || timeAsString.StartsWith("+")) //not sure whether there can be a '+' sign or not.
+            throw new FormatException("Could not create KeyTime from \"" + timeSpanAsString + "\".");
+        }
+        else if (splittedTime.Length == 1)
+        {
+            days = int.Parse(splittedTime[0]);
+            if (days < 0)
             {
-                //we remove the sign at the start of the string:
-                timeAsString = timeAsString.Substring(1);
+                throw new FormatException("Could not create KeyTime from \"" + timeSpanAsString + "\". At least one of the numeric components is out of range or contains too many digits.");
             }
-
-            //timeAsString's format:
-            //{ d | [d.]hh:mm[:ss[.ff]] } (this means: d OR [d.]hh:mm[:ss[.ff]]
-            if (!timeAsString.Contains(':'))
-            {
-                //if we arrive here, it means we are in the format that only contains the days:
-                days = int.Parse(timeAsString);
-            }
-            else
-            {
-                //timeAsString's format:
-                //[d.]hh:mm[:ss[.ff]]
-                string[] splittedTime = timeAsString.Split(':');
-
-                if (splittedTime.Length == 1 || splittedTime.Length > 3) //splittedTime.Length == 1  means that we have something like hh: and >3 does not make sense
-                {
-                    throw new FormatException("Could not create KeyTime from \"" + timeSpanAsString + "\".");
-                }
-
-                //we get the days and hours:
-                string hoursAsString = splittedTime[0];
-                //hoursAsString's format:
-                //[d.]hh
-                int i = hoursAsString.IndexOf('.');
-                if (i > 0)
-                {
-                    //hoursAsString's format:
-                    //d.hh
-                    days = int.Parse(hoursAsString.Substring(0, i));
-                    hoursAsString = hoursAsString.Substring(i + 1);
-                }
-                else if (i == 0)
-                {
-                    throw new FormatException("Could not create KeyTime from \"" + timeSpanAsString + "\".");
-                }
-
-                //hoursAsString's format:
-                //hh
-                hours = int.Parse(hoursAsString);
-
-                //we get the minutes:
-                minutes = int.Parse(splittedTime[1]); //the minutes should always be there if there are hours.
-
-                //we get the seconds and fractional seconds
-                if (splittedTime.Length == 3)
-                {
-                    string secondsAsString = splittedTime[2];
-                    //secondsAsString's format:
-                    //ss[.ff]
-                    //note: ff can be from 1 to 7 digits (it's the ticks and there are 10 000 000 ticks per second)
-
-                    i = secondsAsString.IndexOf('.');
-                    if (i > 0)
-                    {
-                        string fractionalSecondsAsString = secondsAsString.Substring(i + 1);
-                        fractionalSeconds = int.Parse(fractionalSecondsAsString) * (int)Math.Pow(10, 6 - fractionalSecondsAsString.Length); //we make sure the fractionalSeconds are in 7 digits (if we had 10.21, we don't want to consider it as if it was 10.0000021 and no way to know once it's an int)
-                        secondsAsString = secondsAsString.Substring(0, i);
-                    }
-                    seconds = int.Parse(secondsAsString);
-                }
-            }
-            //we're done parsing, we can create the TimeSpan:
-            long ticks = days * 24; //24 hours a day
-            ticks += hours;
-            ticks *= 60; //60 minutes an hour
-            ticks += minutes;
-            ticks *= 60; //60 seconds a minute
-            ticks += seconds;
-            ticks *= 10000000; // 10 000 000 ticks per second
-            ticks += fractionalSeconds;
-            ticks *= signKeeper; //if it was a negative TimeSpan, we put it.
-            timeSpan = new TimeSpan(ticks);
         }
         else
         {
-            timeSpan = new TimeSpan();
+            for (int i = 0; i < splittedTime.Length; i++)
+            {
+                if (i == 0)
+                {
+                    // we check if the number of days is specified
+                    string[] daysAndHours = splittedTime[0].Split('.');
+                    if (daysAndHours.Length == 1) // number of days is not specified, so it is 0.
+                    {
+                        hours = int.Parse(daysAndHours[0]);
+                    }
+                    else
+                    {
+                        days = int.Parse(daysAndHours[0]);
+                        if (days < 0)
+                        {
+                            throw new FormatException("Could not create KeyTime from \"" + timeSpanAsString + "\". At least one of the numeric components is out of range or contains too many digits.");
+                        }
+                        hours = int.Parse(daysAndHours[1]);
+                    }
+                    if (hours < 0 || hours > 23)
+                    {
+                        throw new FormatException("Could not create KeyTime from \"" + timeSpanAsString + "\". At least one of the numeric components is out of range or contains too many digits.");
+                    }
+                }
+                else if (i == 1) // In this case we try to get the minutes, so we just avec to parse splittedTime[i] to an int.
+                {
+                    minutes = int.Parse(splittedTime[i]);
+                    if (minutes < 0 || minutes > 59)
+                    {
+                        throw new FormatException("Could not create KeyTime from \"" + timeSpanAsString + "\". At least one of the numeric components is out of range or contains too many digits.");
+                    }
+                }
+                else if (i == 2) // Here we want to get the seconds and milliseconds if specified.
+                {
+                    string[] secondsAndFractionalSeconds = splittedTime[i].Split('.');
+                    if (secondsAndFractionalSeconds.Length == 1)
+                    {
+                        seconds = int.Parse(secondsAndFractionalSeconds[0]);
+                    }
+                    else
+                    {
+                        seconds = int.Parse((secondsAndFractionalSeconds[0] == string.Empty ? "0" : secondsAndFractionalSeconds[0])); // we need to check this because we can have to parse a string with the following format : "00:00:.5".
+                        fractionalSeconds = int.Parse(secondsAndFractionalSeconds[1]);
+                        if (fractionalSeconds < 0 || fractionalSeconds > 9999999)
+                        {
+                            throw new FormatException("Could not create KeyTime from \"" + timeSpanAsString + "\". At least one of the numeric components is out of range or contains too many digits.");
+                        }
+                    }
+                    if (seconds < 0 || seconds > 59)
+                    {
+                        throw new FormatException("Could not create KeyTime from \"" + timeSpanAsString + "\". At least one of the numeric components is out of range or contains too many digits.");
+                    }
+                }
+            }
         }
+        //we're done parsing, we can create the TimeSpan:
+        long ticks = days * 24; //24 hours a day
+        ticks += hours;
+        ticks *= 60; //60 minutes an hour
+        ticks += minutes;
+        ticks *= 60; //60 seconds a minute
+        ticks += seconds;
+        ticks *= 10000000; // 10 000 000 ticks per second
+        ticks += fractionalSeconds;
 
+        if(signKeeper == -1)
+        {
+            if (canBeNegative)
+            {
+                timeSpan = new TimeSpan(ticks * signKeeper);
+            }
+            else
+            {
+                timeSpan = new TimeSpan();
+            }
+        }
+        else
+        {
+            timeSpan = new TimeSpan(ticks);
+        }
         return timeSpan;
     }
 

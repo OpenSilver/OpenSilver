@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Animates the value of a Double property along a set of key frames.
     /// </summary>
     [ContentProperty("KeyFrames")]
-    public sealed class DoubleAnimationUsingKeyFrames : Timeline
+    public sealed class DoubleAnimationUsingKeyFrames : DoubleAnimation
     {
         ///// <summary>
         ///// Initializes a new instance of the DoubleAnimationUsingKeyFrames class.

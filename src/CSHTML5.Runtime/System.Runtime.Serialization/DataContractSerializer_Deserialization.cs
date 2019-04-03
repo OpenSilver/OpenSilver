@@ -149,7 +149,7 @@ namespace System.Runtime.Serialization
             var list = Activator.CreateInstance(typeof(List<>).MakeGenericType(arg));
 #endif
 
-            
+
             // Get a reference to the "Add" method of the generic list that we just created:
             var listAddMethod = list.GetType().GetMethod("Add");
 
@@ -217,8 +217,8 @@ namespace System.Runtime.Serialization
                         || genericTypeDefinition == typeof(IList<>)
                         || genericTypeDefinition == typeof(IEnumerable<>)
                         || genericTypeDefinition == typeof(ICollection<>)
-                //|| genericTypeDefinition == typeof(IReadOnlyCollection<>)
-                //|| genericTypeDefinition == typeof(IReadOnlyList<>)
+                        //|| genericTypeDefinition == typeof(IReadOnlyCollection<>)
+                        //|| genericTypeDefinition == typeof(IReadOnlyList<>)
                         ))
             {
                 //------------------------
@@ -236,7 +236,7 @@ namespace System.Runtime.Serialization
 
                 try
                 {
-                    //todo: check if the type inherits from Dictionary here and if so, we do nothing here and it wil be handled later.
+                    //todo: check if the type inherits from Dictionary here and if so, we do nothing here and it will be handled later.
 #if !BRIDGE
                     object result1 = Activator.CreateInstance(resultType, args: new object[] { list });
 #else
@@ -598,7 +598,7 @@ namespace System.Runtime.Serialization
                                     else
                                     {
                                         //todo: report the error?
-                                        if (memberInformation.MemberType == typeof (List<int>))
+                                        if (memberInformation.MemberType == typeof(List<int>))
                                         {
                                             string[] splittedElements = attributeValue.Split(' ');
 
@@ -607,7 +607,7 @@ namespace System.Runtime.Serialization
 #else
                                             List<int> listint = new List<int>();
 
-                                            foreach(string str in splittedElements)
+                                            foreach (string str in splittedElements)
                                             {
                                                 listint.Add(Int32.Parse(str));
                                             }

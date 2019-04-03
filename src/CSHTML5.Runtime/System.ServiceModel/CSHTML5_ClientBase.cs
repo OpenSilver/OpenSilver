@@ -508,7 +508,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 #else
                         new Uri(_addressOfService)
 #endif
-                        , "POST", headers, request,
+                        , "POST", this, headers, request,
                         (INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler)((sender, e) =>
                         {
                             string xmlReturnedFromTheServer = e.Result;
@@ -554,7 +554,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 }
                 else
                 {
-                    response = _webRequestHelper_JSVersion.MakeRequest(new Uri(_addressOfService), "POST", headers, request, (sender, args2) => ReadAndPrepareResponseGeneric_JSVersion(taskCompletionSource, args2, interfaceType, methodReturnType, isXmlSerializerRatherThanDataContractSerializer), true, Application.Current.Host.Settings.DefaultSoapCredentialsMode);
+                    response = _webRequestHelper_JSVersion.MakeRequest(new Uri(_addressOfService), "POST", this, headers, request, (sender, args2) => ReadAndPrepareResponseGeneric_JSVersion(taskCompletionSource, args2, interfaceType, methodReturnType, isXmlSerializerRatherThanDataContractSerializer), true, Application.Current.Host.Settings.DefaultSoapCredentialsMode);
                 }
 
                 return taskCompletionSource.Task;
@@ -617,7 +617,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 }
                 else
                 {
-                    response = _webRequestHelper_JSVersion.MakeRequest(new Uri(_addressOfService), "POST", headers, request, null, false, Application.Current.Host.Settings.DefaultSoapCredentialsMode);
+                    response = _webRequestHelper_JSVersion.MakeRequest(new Uri(_addressOfService), "POST", this, headers, request, null, false, Application.Current.Host.Settings.DefaultSoapCredentialsMode);
                 }
 
                 Type requestResponseType = methodReturnType; //GetReturnType(); //return type is of type XXXResponse
