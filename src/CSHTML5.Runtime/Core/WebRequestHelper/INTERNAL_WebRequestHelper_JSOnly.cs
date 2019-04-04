@@ -22,8 +22,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-using CSHTML5;
 #if BRIDGE
+using CSHTML5;
 using Bridge;
 #endif
 
@@ -241,7 +241,9 @@ namespace System
 #endif
         private static void SetRequestHeader(object xmlHttpRequest, string key, string header)
         {
+#if BRIDGE
             Interop.ExecuteJavaScript("$0.setRequestHeader($1, $2)", xmlHttpRequest, key, header);
+#endif
         }
 
 #if !BRIDGE
@@ -251,7 +253,11 @@ namespace System
 #endif
         internal static dynamic GetWebRequest()
         {
+#if BRIDGE
             return Interop.ExecuteJavaScript("new XMLHttpRequest()");
+#else
+            throw new InvalidOperationException();//we should never arrive here
+#endif
         }
 
 #if !BRIDGE
@@ -262,7 +268,9 @@ namespace System
 
         internal static void SetCallbackMethod(object xmlHttpRequest, Action OnDownloadStatusCompleted)
         {
+#if BRIDGE
             Interop.ExecuteJavaScript("$0.onload = $1", xmlHttpRequest, OnDownloadStatusCompleted);
+#endif
         }
 
 #if !BRIDGE
@@ -272,7 +280,9 @@ namespace System
 #endif
         private static void CreateRequest(object xmlHttpRequest, string address, string method, bool isAsync)
         {
+#if BRIDGE
             Interop.ExecuteJavaScript("$0.open($1, $2, $3)", xmlHttpRequest, method, address, isAsync);
+#endif
         }
 
 
@@ -283,7 +293,9 @@ namespace System
 #endif
         private static void EnableCookies(object xmlHttpRequest, bool value)
         {
+#if BRIDGE
             Interop.ExecuteJavaScript("$0.withCredentials = $1", xmlHttpRequest, value);
+#endif
         }
 
 
@@ -294,7 +306,9 @@ namespace System
 #endif
         internal static void SetErrorCallback(object xmlHttpRequest, Action<object> OnError)
         {
+#if BRIDGE
             Interop.ExecuteJavaScript("$0.onerror = $1", xmlHttpRequest, OnError);
+#endif
         }
 
 
@@ -305,7 +319,9 @@ namespace System
 #endif
         internal static void ConsoleLog_JSOnly(string message)
         {
+#if BRIDGE
             Interop.ExecuteJavaScript("console.log($0);", message);
+#endif
         }
 
 #if !BRIDGE
@@ -315,7 +331,9 @@ namespace System
 #endif
         internal static void SendRequest(object xmlHttpRequest, string address, string method, bool isAsync, string body)
         {
+#if BRIDGE
             Interop.ExecuteJavaScript("$0.send($1)", xmlHttpRequest, body);
+#endif
         }
 
         private void OnDownloadStringCompleted()
@@ -359,7 +377,11 @@ namespace System
 #endif
         private static int GetCurrentReadyState(object xmlHttpRequest)
         {
+#if BRIDGE
             return Convert.ToInt32(Interop.ExecuteJavaScript("$0.readyState", xmlHttpRequest));
+#else
+            throw new InvalidOperationException(); //We should never arrive here.
+#endif
         }
 
 #if !BRIDGE
@@ -371,7 +393,11 @@ namespace System
 
         private static int GetCurrentStatus(object xmlHttpRequest)
         {
+#if BRIDGE
             return Convert.ToInt32(Interop.ExecuteJavaScript("$0.status", xmlHttpRequest));
+#else
+            throw new InvalidOperationException(); //We should never arrive here.
+#endif
         }
 
 #if !BRIDGE
@@ -382,7 +408,11 @@ namespace System
 #endif
         private static int GetCurrentStatusText(object xmlHttpRequest)
         {
+#if BRIDGE
             return Convert.ToInt32(Interop.ExecuteJavaScript("$0.statusText", xmlHttpRequest));
+#else
+            throw new InvalidOperationException(); //We should never arrive here.
+#endif
         }
 
 #if !BRIDGE
@@ -394,7 +424,11 @@ namespace System
 
         private static string GetResult(object xmlHttpRequest)
         {
+#if BRIDGE
             return Convert.ToString(Interop.ExecuteJavaScript("$0.responseText", xmlHttpRequest));
+#else
+            throw new InvalidOperationException(); //We should never arrive here.
+#endif
         }
 
         private static bool GetHasError(object xmlHttpRequest)
