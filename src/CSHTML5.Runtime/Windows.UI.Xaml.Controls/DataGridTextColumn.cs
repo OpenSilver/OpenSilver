@@ -77,6 +77,7 @@ namespace Windows.UI.Xaml.Controls
         {
             TextBlock textBlock = new TextBlock();
             //textBlock.DataContext = childData;
+            textBlock.VerticalAlignment = VerticalAlignment.Center;
             Binding b = this.INTERNAL_GetBinding(DataGridBoundColumn.BindingProperty); //we get the Binding in the Binding property set by the user.
             if (b != null)
                 textBlock.SetBinding(TextBlock.TextProperty, b);
