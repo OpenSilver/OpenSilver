@@ -49,7 +49,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Initializes a new instance of the System.Windows.Controls.Primitives.DataGridColumnHeader
         /// class.
         /// </summary>
-        public DataGridColumnHeader() { }
+        public DataGridColumnHeader()
+        {
+            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultButtonStyle.GetDefaultStyle()); //todo: use a specifically made Default Style for the DataGridColumnHeader
+        }
 
         /// <summary>
         /// Gets the System.Windows.Controls.DataGridColumn associated with this column
