@@ -493,12 +493,28 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 // Make the actual web service call:
                 if (CSHTML5.Interop.IsRunningInTheSimulator)
                 {
+#if BRIDGE
+                    _webRequestHelper_JSVersion.MakeRequest(
+#if WORKINPROGRESS
+                        INTERNAL_UriHelper.EnsureAbsoluteUri(_addressOfService)
+#else
+                        new Uri(_addressOfService)
+#endif
+                        , "POST", this, headers, request,
+                        (INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler)((sender, e) =>
+                        {
+                            string xmlReturnedFromTheServer = e.Result;
+                            callback(xmlReturnedFromTheServer);
+                        })
+                        , true, Application.Current.Host.Settings.DefaultSoapCredentialsMode);
+#else
                     _webRequestHelper.MakeRequestAsync_CSharpVersion(new Uri(_addressOfService), headers, request,
                         (UploadStringCompletedEventHandler)((sender, e) =>
                         {
                             string xmlReturnedFromTheServer = e.Result;
                             callback(xmlReturnedFromTheServer);
                         }));
+#endif
                 }
                 else
                 {
@@ -550,7 +566,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 var taskCompletionSource = new TaskCompletionSource<T>(); //todo: here we need to change object to the return type
                 if (CSHTML5.Interop.IsRunningInTheSimulator)
                 {
+#if BRIDGE
+                    response = _webRequestHelper_JSVersion.MakeRequest(new Uri(_addressOfService), "POST", this, headers, request, (sender, args2) => ReadAndPrepareResponseGeneric_JSVersion(taskCompletionSource, args2, interfaceType, methodReturnType, isXmlSerializerRatherThanDataContractSerializer), true, Application.Current.Host.Settings.DefaultSoapCredentialsMode);
+#else
                     _webRequestHelper.MakeRequestAsync_CSharpVersion(new Uri(_addressOfService), headers, request, (sender, args2) => ReadAndPrepareResponseGeneric(taskCompletionSource, args2, interfaceType, methodReturnType, isXmlSerializerRatherThanDataContractSerializer));
+#endif
                 }
                 else
                 {
@@ -613,7 +633,12 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
                 if (CSHTML5.Interop.IsRunningInTheSimulator)
                 {
+#if BRIDGE
+                    response = _webRequestHelper_JSVersion.MakeRequest(new Uri(_addressOfService), "POST", this, headers, request, null, false, Application.Current.Host.Settings.DefaultSoapCredentialsMode);
+#else
+
                     response = _webRequestHelper.MakeRequest_CSharpVersion(new Uri(_addressOfService), headers, request);
+#endif
                 }
                 else
                 {
@@ -665,20 +690,29 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 string interfaceTypeNamespace = "http://tempuri.org/";
                 string soapActionPrefix = string.Empty; // initial value // This is used to determine the SOAPAction header to send to the server, by concatenating the soapActionPrefix and the method name.
 
+#if BRIDGE
+                foreach (Attribute attribute in interfaceType.GetCustomAttributes(typeof(ServiceContract2Attribute), true))
+#else
                 foreach (Attribute attribute in interfaceType.GetCustomAttributes(true))
                 {
-                    if (attribute is ServiceContract2Attribute)
-                    {
-                        ServiceContract2Attribute attributeAsDataContractAttribute = (ServiceContract2Attribute)attribute;
+                    if(attribute is ServiceContract2Attribute)
+                    
+#endif
+                {
 
-                        soapActionPrefix = attributeAsDataContractAttribute.SOAPActionPrefix;
-                        if (!string.IsNullOrWhiteSpace(attributeAsDataContractAttribute.Namespace))
-                        {
-                            interfaceTypeNamespace = attributeAsDataContractAttribute.Namespace;
-                            break;
-                        }
+                    ServiceContract2Attribute attributeAsDataContractAttribute = (ServiceContract2Attribute)attribute;
+
+                    soapActionPrefix = attributeAsDataContractAttribute.SOAPActionPrefix;
+                    if (!string.IsNullOrWhiteSpace(attributeAsDataContractAttribute.Namespace))
+                    {
+                        interfaceTypeNamespace = attributeAsDataContractAttribute.Namespace;
+                        break;
                     }
+#if !BRIDGE
+                    }
+#endif
                 }
+
 
                 headers = new Dictionary<string, string>();
                 headers.Add("Content-Type", @"text/xml; charset=utf-8");
@@ -919,14 +953,18 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
                     //get the known types from the interface type:
                     List<Type> knownTypes = new List<Type>();
+#if BRIDGE
+                    foreach (Attribute attribute in interfaceType.GetCustomAttributes(typeof(ServiceKnownTypeAttribute), true))
+#else
                     foreach (Attribute attribute in interfaceType.GetCustomAttributes(true))
+#endif
                     {
+#if !BRIDGE
                         if (attribute is ServiceKnownTypeAttribute)
-                        {
-                            knownTypes.Add(((ServiceKnownTypeAttribute)attribute).Type);
-                        }
+#endif
+                        knownTypes.Add(((ServiceKnownTypeAttribute)attribute).Type);
                     }
-                    DataContractSerializer deSerializer = new DataContractSerializer(typeToDeserialize, knownTypes);
+                        DataContractSerializer deSerializer = new DataContractSerializer(typeToDeserialize, knownTypes);
                     XDocument xDoc = XDocument.Parse(responseAsString);
                     XElement xElement = xDoc.Root;
 
@@ -1027,27 +1065,27 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 #endif
 
 #if WORKINPROGRESS
-        #region Not Supported Stuff
+                        #region Not Supported Stuff
 
-        //    /// <summary>
-        //    /// Gets the underlying System.ServiceModel.ChannelFactory<TChannel> object.
-        //    /// </summary>
-        //    public ChannelFactory<TChannel> ChannelFactory { get; }
+                        //    /// <summary>
+                        //    /// Gets the underlying System.ServiceModel.ChannelFactory<TChannel> object.
+                        //    /// </summary>
+                        //    public ChannelFactory<TChannel> ChannelFactory { get; }
 
-        //    /// <summary>
-        //    /// Gets the client credentials used to call an operation.
-        //    /// </summary>
-        //    public ClientCredentials ClientCredentials { get; }
+                        //    /// <summary>
+                        //    /// Gets the client credentials used to call an operation.
+                        //    /// </summary>
+                        //    public ClientCredentials ClientCredentials { get; }
 
-        //    /// <summary>
-        //    /// Gets the target endpoint for the service to which the WCF client can connect.
-        //    /// </summary>
-        //    public ServiceEndpoint Endpoint { get; }
+                        //    /// <summary>
+                        //    /// Gets the target endpoint for the service to which the WCF client can connect.
+                        //    /// </summary>
+                        //    public ServiceEndpoint Endpoint { get; }
 
-        /// <summary>
-        /// Gets the underlying System.ServiceModel.IClientChannel implementation.
-        /// </summary>
-        public IClientChannel InnerChannel 
+                        /// <summary>
+                        /// Gets the underlying System.ServiceModel.IClientChannel implementation.
+                        /// </summary>
+            public IClientChannel InnerChannel
         {
             get { return null; }
         }
@@ -1125,11 +1163,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         }
 
 
-        #endregion
+#endregion
 #endif
 
 #if WORKINPROGRESS
-        #region ICommunicationObject methods
+#region ICommunicationObject methods
 
         CommunicationState ICommunicationObject.State
         {
@@ -1225,7 +1263,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         //{
 
         //}
-        #endregion
+#endregion
 #endif
     }
 }
