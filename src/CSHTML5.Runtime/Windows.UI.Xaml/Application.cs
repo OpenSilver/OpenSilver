@@ -3,16 +3,18 @@
 //
 //  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
 //
-//  ● This code is dual-licensed (GPLv3 + Commercial). Commercial licenses can be obtained from: http://cshtml5.com
+//  => This code is licensed under the GNU General Public License (GPL v3). A copy of the license is available at:
+//        https://www.gnu.org/licenses/gpl.txt
 //
-//  ● You are NOT allowed to:
-//       – Use this code in a proprietary or closed-source project (unless you have obtained a commercial license)
-//       – Mix this code with non-GPL-licensed code (such as MIT-licensed code), or distribute it under a different license
-//       – Remove or modify this notice
+//  => As stated in the license text linked above, "The GNU General Public License does not permit incorporating your program into proprietary programs". It also does not permit incorporating this code into non-GPL-licensed code (such as MIT-licensed code) in such a way that results in a non-GPL-licensed work (please refer to the license text for the precise terms).
 //
-//  ● Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product.
+//  => Licenses that permit proprietary use are available at:
+//        http://www.cshtml5.com
+//
+//  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
 //
 //===============================================================================
+
 
 
 using CSHTML5;
@@ -125,7 +127,12 @@ namespace Windows.UI.Xaml
             }
 
             // We call the "Startup" event and the "OnLaunched" method using the Dispatcher, because usually the user registers the "Startup" event in the constructor of the "App.cs" class, which is derived from "Application.cs", and therefore when we arrive here the event is not yet registered. Executing the code in the Dispatcher ensures that the constructor of the "App.cs" class has finished before running the code.
-            CoreDispatcher.INTERNAL_GetCurrentDispatcher().BeginInvoke((Action)(() =>
+#if MIGRATION
+            Dispatcher
+#else
+            CoreDispatcher
+#endif
+                .INTERNAL_GetCurrentDispatcher().BeginInvoke((Action)(() =>
             {
                 // Raise the "Startup" event:
                 if (this.Startup != null)
@@ -136,7 +143,7 @@ namespace Windows.UI.Xaml
             }));
         }
 
-        #region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
+#region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
 
 #if !CSHTML5NETSTANDARD
         DispatcherTimer _timerForWorkaroundFireFoxIssue = new DispatcherTimer();
@@ -174,7 +181,7 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Injects the "DataContractSerializer" into the "XmlSerializer" (read note in the "XmlSerializer" implementation to understand why).
@@ -437,7 +444,7 @@ namespace Windows.UI.Xaml
         }
 
 
-        #region Exit event
+#region Exit event
 
         INTERNAL_EventManager<EventHandler, EventArgs> _ExitEventManager;
         INTERNAL_EventManager<EventHandler, EventArgs> ExitEventManager
@@ -489,10 +496,10 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
 #if WORKINPROGRESS
-        #region UnhandledException event (Not supported yet)
+#region UnhandledException event (Not supported yet)
 
         /// <summary>
         /// Occurs when an exception that is raised is not handled.
@@ -508,7 +515,7 @@ namespace Windows.UI.Xaml
         //#endif
         //        }
 
-        #endregion
+#endregion
 #endif
 
         static Host _host;

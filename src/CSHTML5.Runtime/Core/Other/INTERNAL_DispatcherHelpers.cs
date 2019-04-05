@@ -3,16 +3,18 @@
 //
 //  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
 //
-//  ● This code is dual-licensed (GPLv3 + Commercial). Commercial licenses can be obtained from: http://cshtml5.com
+//  => This code is licensed under the GNU General Public License (GPL v3). A copy of the license is available at:
+//        https://www.gnu.org/licenses/gpl.txt
 //
-//  ● You are NOT allowed to:
-//       – Use this code in a proprietary or closed-source project (unless you have obtained a commercial license)
-//       – Mix this code with non-GPL-licensed code (such as MIT-licensed code), or distribute it under a different license
-//       – Remove or modify this notice
+//  => As stated in the license text linked above, "The GNU General Public License does not permit incorporating your program into proprietary programs". It also does not permit incorporating this code into non-GPL-licensed code (such as MIT-licensed code) in such a way that results in a non-GPL-licensed work (please refer to the license text for the precise terms).
 //
-//  ● Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product.
+//  => Licenses that permit proprietary use are available at:
+//        http://www.cshtml5.com
+//
+//  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
 //
 //===============================================================================
+
 
 
 using System;
@@ -36,7 +38,11 @@ namespace CSHTML5.Internal
     {
         static List<Action> _pendingActionsExecute = new List<Action>();
         static bool _isDispatcherPending = false;
+#if MIGRATION
+        static Dispatcher _dispatcher = null;
+#else
         static CoreDispatcher _dispatcher = null;
+#endif
 
         /// <summary>
         /// This will add the action to a list of actions to perform at once in a Dispatcher.Invoke call.
@@ -52,7 +58,13 @@ namespace CSHTML5.Internal
                 _isDispatcherPending = true;
 
                 if (_dispatcher == null)
+                {
+#if MIGRATION
+                    _dispatcher = Dispatcher.INTERNAL_GetCurrentDispatcher();
+#else
                     _dispatcher = CoreDispatcher.INTERNAL_GetCurrentDispatcher();
+#endif
+                }
 
                 _dispatcher.BeginInvoke((Action)(() =>
                     {

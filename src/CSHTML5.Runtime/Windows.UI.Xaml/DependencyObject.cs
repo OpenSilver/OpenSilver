@@ -3,16 +3,18 @@
 //
 //  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
 //
-//  ● This code is dual-licensed (GPLv3 + Commercial). Commercial licenses can be obtained from: http://cshtml5.com
+//  => This code is licensed under the GNU General Public License (GPL v3). A copy of the license is available at:
+//        https://www.gnu.org/licenses/gpl.txt
 //
-//  ● You are NOT allowed to:
-//       – Use this code in a proprietary or closed-source project (unless you have obtained a commercial license)
-//       – Mix this code with non-GPL-licensed code (such as MIT-licensed code), or distribute it under a different license
-//       – Remove or modify this notice
+//  => As stated in the license text linked above, "The GNU General Public License does not permit incorporating your program into proprietary programs". It also does not permit incorporating this code into non-GPL-licensed code (such as MIT-licensed code) in such a way that results in a non-GPL-licensed work (please refer to the license text for the precise terms).
 //
-//  ● Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product.
+//  => Licenses that permit proprietary use are available at:
+//        http://www.cshtml5.com
+//
+//  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
 //
 //===============================================================================
+
 
 
 using CSHTML5.Internal;
@@ -200,16 +202,24 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Gets the CoreDispatcher that this object is associated with.
         /// </summary>
+#if MIGRATION
+        public Dispatcher Dispatcher
+#else
         public CoreDispatcher Dispatcher
+#endif
         {
             get
             {
+#if MIGRATION
+                return Dispatcher.INTERNAL_GetCurrentDispatcher();
+#else
                 return CoreDispatcher.INTERNAL_GetCurrentDispatcher();
+#endif
             }
         }
 
 
-        #region Binding related elements
+#region Binding related elements
 
         internal Binding INTERNAL_GetBinding(DependencyProperty dependencyProperty)
         {
@@ -356,6 +366,6 @@ namespace Windows.UI.Xaml
             // This is particularly useful for elements to clear any references they have to DOM elements. For example, the Grid will use it to set its _tableDiv to null.
         }
 
-        #endregion
+#endregion
     }
 }

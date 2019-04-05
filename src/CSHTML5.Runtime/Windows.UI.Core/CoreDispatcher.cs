@@ -3,16 +3,18 @@
 //
 //  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
 //
-//  ● This code is dual-licensed (GPLv3 + Commercial). Commercial licenses can be obtained from: http://cshtml5.com
+//  => This code is licensed under the GNU General Public License (GPL v3). A copy of the license is available at:
+//        https://www.gnu.org/licenses/gpl.txt
 //
-//  ● You are NOT allowed to:
-//       – Use this code in a proprietary or closed-source project (unless you have obtained a commercial license)
-//       – Mix this code with non-GPL-licensed code (such as MIT-licensed code), or distribute it under a different license
-//       – Remove or modify this notice
+//  => As stated in the license text linked above, "The GNU General Public License does not permit incorporating your program into proprietary programs". It also does not permit incorporating this code into non-GPL-licensed code (such as MIT-licensed code) in such a way that results in a non-GPL-licensed work (please refer to the license text for the precise terms).
 //
-//  ● Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product.
+//  => Licenses that permit proprietary use are available at:
+//        http://www.cshtml5.com
+//
+//  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
 //
 //===============================================================================
+
 
 
 #if !BRIDGE
@@ -35,18 +37,35 @@ namespace Windows.UI.Core
 #endif
 {
     /// <summary>
-    /// Provides the Windows Runtime core event message dispatcher. Instances of
-    /// this type are responsible for processing the window messages and dispatching
-    /// the events to the client.
+    /// Provides the core event message dispatcher. Instances of this type are responsible
+    /// for processing the window messages and dispatching the events to the client.
     /// </summary>
-    public sealed class CoreDispatcher
+#if MIGRATION
+    public class Dispatcher
+#else
+    public class CoreDispatcher
+#endif
     {
+#if MIGRATION
+        static Dispatcher _currentDispatcher;
+#else
         static CoreDispatcher _currentDispatcher;
+#endif
 
+#if MIGRATION
+        internal static Dispatcher INTERNAL_GetCurrentDispatcher()
+#else
         internal static CoreDispatcher INTERNAL_GetCurrentDispatcher()
+#endif
         {
             if (_currentDispatcher == null)
+            {
+#if MIGRATION
+                _currentDispatcher = new Dispatcher();
+#else
                 _currentDispatcher = new CoreDispatcher();
+#endif
+            }
             return _currentDispatcher;
         }
 
