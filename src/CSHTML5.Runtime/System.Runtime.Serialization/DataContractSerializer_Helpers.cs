@@ -34,6 +34,7 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using System.Collections;
 using CSHTML5.Internal;
+using DotNetForHtml5.Core;
 
 namespace System.Runtime.Serialization
 {
@@ -107,7 +108,18 @@ namespace System.Runtime.Serialization
                 // Check if the type implements "IEnumerable<>":
                 else
                 {
+#if BRIDGE
+                    if (Interop.IsRunningInTheSimulator) //todo: fix me (BadImageFormatException when type is from another assembly)
+                    {
+                        genericEnumerable = INTERNAL_Simulator.SimulatorProxy.GetInterface((object)type, "IEnumerable`1");
+                    }
+                    else
+                    {
+                        genericEnumerable = GetInterface(type, typeof(IEnumerable<>).Name);
+                    }
+#else
                     genericEnumerable = GetInterface(type, typeof(IEnumerable<>).Name);
+#endif
                 }
 
                 // If success, we get the type of the "T" in "IEnumerable<T>":
@@ -351,7 +363,7 @@ namespace System.Runtime.Serialization
             return SortMembers(typesToMembersInformations);
         }
 
-        #region to help sort the members for the Serialization
+#region to help sort the members for the Serialization
         /// <summary>
         /// returns a List&lt;MemberInformation&gt; with the memberInformations ordered to fit the requirements of Microsoft's DataContractSerializer (see notes below DataMember2Attribute.Order).
         /// </summary>
@@ -391,7 +403,7 @@ namespace System.Runtime.Serialization
             }
         }
 
-        #endregion
+#endregion
 
         internal static IEnumerable<MemberInformationAndValue> GetDataContractMembersAndValues(object instance, SerializationType serializationType, bool useXmlSerializerFormat) // Note: to better understand "isTypeMarkedWithAttributes", read "Using DataContracts" at: https://msdn.microsoft.com/en-us/library/ms733127(v=vs.100).aspx
         {

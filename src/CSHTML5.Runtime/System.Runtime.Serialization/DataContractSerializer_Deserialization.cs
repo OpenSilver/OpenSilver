@@ -15,6 +15,8 @@
 //===============================================================================
 
 
+using CSHTML5;
+using DotNetForHtml5.Core;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -146,7 +148,16 @@ namespace System.Runtime.Serialization
 #else
             // TODOBRIDGE: verify if the two code are similar
             Type[] arg = { itemsType };
-            var list = Activator.CreateInstance(typeof(List<>).MakeGenericType(arg));
+            object list;
+
+            if (Interop.IsRunningInTheSimulator)
+            {
+                list = INTERNAL_Simulator.SimulatorProxy.MakeInstanceOfGenericType(typeof(List<>), arg);
+            }
+            else
+            {
+                list = Activator.CreateInstance(typeof(List<>).MakeGenericType(arg));
+            }
 #endif
 
 
