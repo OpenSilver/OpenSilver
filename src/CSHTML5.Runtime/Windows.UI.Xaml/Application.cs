@@ -125,7 +125,12 @@ namespace Windows.UI.Xaml
             }
 
             // We call the "Startup" event and the "OnLaunched" method using the Dispatcher, because usually the user registers the "Startup" event in the constructor of the "App.cs" class, which is derived from "Application.cs", and therefore when we arrive here the event is not yet registered. Executing the code in the Dispatcher ensures that the constructor of the "App.cs" class has finished before running the code.
-            CoreDispatcher.INTERNAL_GetCurrentDispatcher().BeginInvoke((Action)(() =>
+#if MIGRATION
+            Dispatcher
+#else
+            CoreDispatcher
+#endif
+                .INTERNAL_GetCurrentDispatcher().BeginInvoke((Action)(() =>
             {
                 // Raise the "Startup" event:
                 if (this.Startup != null)
@@ -136,7 +141,7 @@ namespace Windows.UI.Xaml
             }));
         }
 
-        #region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
+#region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
 
 #if !CSHTML5NETSTANDARD
         DispatcherTimer _timerForWorkaroundFireFoxIssue = new DispatcherTimer();
@@ -174,7 +179,7 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Injects the "DataContractSerializer" into the "XmlSerializer" (read note in the "XmlSerializer" implementation to understand why).
@@ -437,7 +442,7 @@ namespace Windows.UI.Xaml
         }
 
 
-        #region Exit event
+#region Exit event
 
         INTERNAL_EventManager<EventHandler, EventArgs> _ExitEventManager;
         INTERNAL_EventManager<EventHandler, EventArgs> ExitEventManager
@@ -489,10 +494,10 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
 #if WORKINPROGRESS
-        #region UnhandledException event (Not supported yet)
+#region UnhandledException event (Not supported yet)
 
         /// <summary>
         /// Occurs when an exception that is raised is not handled.
@@ -508,7 +513,7 @@ namespace Windows.UI.Xaml
         //#endif
         //        }
 
-        #endregion
+#endregion
 #endif
 
         static Host _host;

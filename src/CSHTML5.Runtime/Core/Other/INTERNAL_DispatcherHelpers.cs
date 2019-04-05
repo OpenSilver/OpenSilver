@@ -36,7 +36,11 @@ namespace CSHTML5.Internal
     {
         static List<Action> _pendingActionsExecute = new List<Action>();
         static bool _isDispatcherPending = false;
+#if MIGRATION
+        static Dispatcher _dispatcher = null;
+#else
         static CoreDispatcher _dispatcher = null;
+#endif
 
         /// <summary>
         /// This will add the action to a list of actions to perform at once in a Dispatcher.Invoke call.
@@ -52,7 +56,13 @@ namespace CSHTML5.Internal
                 _isDispatcherPending = true;
 
                 if (_dispatcher == null)
+                {
+#if MIGRATION
+                    _dispatcher = Dispatcher.INTERNAL_GetCurrentDispatcher();
+#else
                     _dispatcher = CoreDispatcher.INTERNAL_GetCurrentDispatcher();
+#endif
+                }
 
                 _dispatcher.BeginInvoke((Action)(() =>
                     {

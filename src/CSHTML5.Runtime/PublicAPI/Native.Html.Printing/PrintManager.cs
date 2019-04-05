@@ -179,7 +179,12 @@ namespace CSHTML5.Native.Html.Printing
                         RestorePreviousPrintArea(previousPrintArea);
 
                         // Close the temporary popup:
-                        CoreDispatcher.INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
+#if MIGRATION
+                        Dispatcher
+#else
+                        CoreDispatcher
+#endif
+                        .INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
                         {
                             temporaryPopup.IsOpen = false;
                         });

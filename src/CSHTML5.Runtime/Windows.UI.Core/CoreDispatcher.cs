@@ -35,18 +35,35 @@ namespace Windows.UI.Core
 #endif
 {
     /// <summary>
-    /// Provides the Windows Runtime core event message dispatcher. Instances of
-    /// this type are responsible for processing the window messages and dispatching
-    /// the events to the client.
+    /// Provides the core event message dispatcher. Instances of this type are responsible
+    /// for processing the window messages and dispatching the events to the client.
     /// </summary>
-    public sealed class CoreDispatcher
+#if MIGRATION
+    public class Dispatcher
+#else
+    public class CoreDispatcher
+#endif
     {
+#if MIGRATION
+        static Dispatcher _currentDispatcher;
+#else
         static CoreDispatcher _currentDispatcher;
+#endif
 
+#if MIGRATION
+        internal static Dispatcher INTERNAL_GetCurrentDispatcher()
+#else
         internal static CoreDispatcher INTERNAL_GetCurrentDispatcher()
+#endif
         {
             if (_currentDispatcher == null)
+            {
+#if MIGRATION
+                _currentDispatcher = new Dispatcher();
+#else
                 _currentDispatcher = new CoreDispatcher();
+#endif
+            }
             return _currentDispatcher;
         }
 

@@ -200,16 +200,24 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Gets the CoreDispatcher that this object is associated with.
         /// </summary>
+#if MIGRATION
+        public Dispatcher Dispatcher
+#else
         public CoreDispatcher Dispatcher
+#endif
         {
             get
             {
+#if MIGRATION
+                return Dispatcher.INTERNAL_GetCurrentDispatcher();
+#else
                 return CoreDispatcher.INTERNAL_GetCurrentDispatcher();
+#endif
             }
         }
 
 
-        #region Binding related elements
+#region Binding related elements
 
         internal Binding INTERNAL_GetBinding(DependencyProperty dependencyProperty)
         {
@@ -356,6 +364,6 @@ namespace Windows.UI.Xaml
             // This is particularly useful for elements to clear any references they have to DOM elements. For example, the Grid will use it to set its _tableDiv to null.
         }
 
-        #endregion
+#endregion
     }
 }
