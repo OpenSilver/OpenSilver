@@ -319,13 +319,13 @@ namespace Windows.UI.Xaml
                 tcs.SetResult(_resourcesCache[uriResource.OriginalString.ToLower()]);
                 return tcs.Task;
             }
-            HashSet2<string> supportedExtensions = new HashSet2<string>(new string[] { ".txt", ".xml", ".config", ".json" });
+            HashSet2<string> supportedExtensions = new HashSet2<string>(new string[] { ".txt", ".xml", ".config", ".json", ".clientconfig" });
 
             string uriAsString = uriResource.OriginalString;
             string extension = uriAsString.Substring(uriAsString.LastIndexOf('.'));
             if (!supportedExtensions.Contains(extension.ToLower())) //todo: when we will be able to handle more extensions, add them to supportedExtensions and do not forget to update GetResourceStream as well.
             {
-                throw new NotSupportedException("Application.GetResourceString is currently not supported for files with an extension different than .txt, .xml, .json or .config.");
+                throw new NotSupportedException("Application.GetResourceString is currently not supported for files with an extension different than .txt, .xml, .json, .config, or .clientconfig.");
             }
             List<string> uris = new List<string>();
             uris.Add(uriAsString + ".g.js");
@@ -410,17 +410,17 @@ namespace Windows.UI.Xaml
         {
             string resourceString = await GetResourceString(uriResource);
             string uriAsString = uriResource.OriginalString;
-            string extension = uriAsString.Substring(uriAsString.LastIndexOf('.'));
+            string extensionLowercase = uriAsString.Substring(uriAsString.LastIndexOf('.')).ToLower();
 
             byte[] byteArray = Encoding.ASCII.GetBytes(resourceString);
             MemoryStream stream = new MemoryStream(byteArray);
 
             string mimeType = "text/plain";
-            if (extension == ".xml")
+            if (extensionLowercase == ".xml" || extensionLowercase == ".config" || extensionLowercase == ".clientconfig")
             {
                 mimeType = "application/xml";
             }
-            else if (extension == ".json")
+            else if (extensionLowercase == ".json")
             {
                 mimeType = "application/json";
             } //todo: update this when more extensions will be handled
