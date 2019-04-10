@@ -422,7 +422,7 @@ namespace Windows.UI.Xaml
             }
             else if (extension == ".json")
             {
-                mimeType = "application.json";
+                mimeType = "application/json";
             } //todo: update this when more extensions will be handled
 
             StreamResourceInfo resourceInfo = new StreamResourceInfo(stream, mimeType);
