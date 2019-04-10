@@ -43,7 +43,7 @@ namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is cal
     public static class TypeFromStringConverters // Important: DO NOT REMOVE OR RENAME. This class is called by the XAML inspector of the Simulator using reflection. If you wish to remove or rename it, make sure to make the appropriate changes in the Simulator.
     {
         static bool IsBaseTypesConvertersRegistered; // Note: we use this variable instead of a static constructor that makes the call because of a bug in JSIL (2014.04.30).
-        static Dictionary<Type, Func<string, object>> Converters = new Dictionary<Type,Func<string,object>>();
+        static Dictionary<Type, Func<string, object>> Converters = new Dictionary<Type, Func<string, object>>();
         const string AdviseToFixTheError = "To fix the issue, please locate the error by looking for the first XAML file in the Stack Trace.";
 
         static void RegisterBaseTypesConverters()
@@ -240,10 +240,23 @@ namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is cal
         internal static object ConvertUriFromString(string str)
         {
             UriKind uriKind;
-            if (str.Contains(@":/"))
-                uriKind = UriKind.Absolute;
+            if (str.Contains(":"))
+            {
+                // cf. https://stackoverflow.com/questions/1737575/are-colons-allowed-in-urls
+                string textBeforeColon = str.Substring(0, str.IndexOf(":"));
+                if (!textBeforeColon.Contains(@"\") && !textBeforeColon.Contains(@"/"))
+                {
+                    uriKind = UriKind.Absolute;
+                }
+                else
+                {
+                    uriKind = UriKind.Relative;
+                }
+            }
             else
+            {
                 uriKind = UriKind.Relative;
+            }
 
             Uri returnValue = new Uri(str, uriKind);
 
