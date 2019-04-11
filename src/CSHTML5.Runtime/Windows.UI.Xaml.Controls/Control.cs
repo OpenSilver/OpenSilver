@@ -71,6 +71,7 @@ namespace Windows.UI.Xaml.Controls
             base.ManageIsEnabled(isEnabled); // Useful for setting the "disabled" attribute on the DOM element.
 
             _isDisabled = !isEnabled; // We remember the value so that when we update the visual states, we know whether we should go to the "Disabled" state or not.
+            UpdateVisualStates();
         }
 
 
