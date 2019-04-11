@@ -247,16 +247,31 @@ var radios = document.getElementsByName( $0 );
 
 #endregion
 
+
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
-            bool isUsingNativeHtml5RadioButtonRatherThanAControlTemplate = (this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus != null); // Faster than checking if (radioButton.Template != null) because the latter is a DependencyProperty.
-            if (isUsingNativeHtml5RadioButtonRatherThanAControlTemplate)
+            if (INTERNAL_IsTemplated)
             {
-                if (string.IsNullOrWhiteSpace(GroupName))
-                {
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus, "name", ((UIElement)INTERNAL_VisualParent).INTERNAL_ChildrenRadioButtonDefaultName, forceSimulatorExecuteImmediately: true);
-                }
+                //there is a template so we need to make specific changes to make it work with the other RadioButtons
+                this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = this.INTERNAL_OuterDomElement;
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus, "checked", IsChecked, forceSimulatorExecuteImmediately: true);
+                INTERNAL_CheckBoxAndRadioButtonHelpers.SubscribeToBasicEventsForRadioButton(this, this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus, this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
             }
+
+            if (string.IsNullOrWhiteSpace(GroupName))
+            {
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus, "name", ((UIElement)INTERNAL_VisualParent).INTERNAL_ChildrenRadioButtonDefaultName, forceSimulatorExecuteImmediately: true);
+            }
+        }
+
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
+        {
+            base.OnApplyTemplate();
+            UnregisterFromDefaultClickEvent(); //We do not want to have the Click event defined in ToggleButton so that we cannot uncheck the RadioButton (which is set in ToggleButton.OnApplyTemplate) so we unregister from it.
         }
 
         /// <summary>
