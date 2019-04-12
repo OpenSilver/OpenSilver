@@ -266,7 +266,7 @@ $0.focus()
 
         /// <summary>
         /// Builds the visual tree for the
-        /// <see cref="T:System.Windows.Controls.TextBox" /> control when a new
+        /// <see cref="T:System.Windows.Controls.PasswordBox" /> control when a new
         /// template is applied.
         /// </summary>
 #if MIGRATION

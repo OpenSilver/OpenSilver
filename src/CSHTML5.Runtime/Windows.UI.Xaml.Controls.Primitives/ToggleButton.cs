@@ -89,9 +89,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             bool? isChecked = (bool?)e.NewValue;
 
             // Update DOM appearance (if not using a ControlTemplate):
-            bool doesControlHaveAControlTemplate = toggleButton.HasTemplate;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(toggleButton)
-                && !doesControlHaveAControlTemplate)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(toggleButton))
             {
                 toggleButton.UpdateDomBasedOnCheckedState(isChecked);
             }
@@ -302,6 +300,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
+        internal void UnregisterFromDefaultClickEvent()
+        {
+            Click -= ToggleButton_Click;
+        }
+
         protected virtual void UpdateDomBasedOnCheckedState(bool? isChecked)
         {
             // (Virtual method)
@@ -411,6 +414,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             base.ManageIsEnabled(isEnabled); // Useful for setting the "disabled" attribute on the DOM element.
 
             _isDisabled = !isEnabled; // We remember the value so that when we update the visual states, we know whether we should go to the "Disabled" state or not.
+            UpdateVisualStates();
         }
     }
 }
