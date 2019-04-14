@@ -100,89 +100,89 @@ namespace Windows.UI.Xaml.Controls
                             Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
                         };
                     }
-                //GetCSSEquivalents = (instance) =>
-                //    {
-                //        Control control = (Control)instance;
-                //        List<CSSEquivalent> result = new List<CSSEquivalent>();
-                //        if (control.Background != null)
-                //        {
-                //            Brush background = (Brush)control.Background;
-                //            List<KeyValuePair<DependencyObject, DependencyProperty>> tuples = new List<KeyValuePair<DependencyObject, DependencyProperty>>();
-                //            //we make a copy of the list of tuples so that we can modify it while going though it.
-                //            foreach (KeyValuePair<DependencyObject, DependencyProperty> tuple in background.PropertiesWhereUsed)
-                //            {
-                //                tuples.Add(tuple);
-                //            }
-                //            foreach (KeyValuePair<DependencyObject, DependencyProperty> tuple in tuples)
-                //            {
-                //                UIElement uiElement = tuple.Key as UIElement;
-                //                DependencyProperty dependencyProperty = tuple.Value;
-                //                if (uiElement != null)
-                //                {
-                //                    if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
-                //                    {
-                //                        PropertyMetadata propertyMetadata = dependencyProperty.GetTypeMetaData(uiElement.GetType());
-                //                        //if (propertyMetadata.GetCSSEquivalent != null) //todo: temporary test so remove it?
-                //                        //{
-                //                            //var parentPropertyCSSEquivalent = propertyMetadata.GetCSSEquivalent(uiElement);
-                //                            List<string> names = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" };
+                    //GetCSSEquivalents = (instance) =>
+                    //    {
+                    //        Control control = (Control)instance;
+                    //        List<CSSEquivalent> result = new List<CSSEquivalent>();
+                    //        if (control.Background != null)
+                    //        {
+                    //            Brush background = (Brush)control.Background;
+                    //            List<KeyValuePair<DependencyObject, DependencyProperty>> tuples = new List<KeyValuePair<DependencyObject, DependencyProperty>>();
+                    //            //we make a copy of the list of tuples so that we can modify it while going though it.
+                    //            foreach (KeyValuePair<DependencyObject, DependencyProperty> tuple in background.PropertiesWhereUsed)
+                    //            {
+                    //                tuples.Add(tuple);
+                    //            }
+                    //            foreach (KeyValuePair<DependencyObject, DependencyProperty> tuple in tuples)
+                    //            {
+                    //                UIElement uiElement = tuple.Key as UIElement;
+                    //                DependencyProperty dependencyProperty = tuple.Value;
+                    //                if (uiElement != null)
+                    //                {
+                    //                    if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
+                    //                    {
+                    //                        PropertyMetadata propertyMetadata = dependencyProperty.GetTypeMetaData(uiElement.GetType());
+                    //                        //if (propertyMetadata.GetCSSEquivalent != null) //todo: temporary test so remove it?
+                    //                        //{
+                    //                            //var parentPropertyCSSEquivalent = propertyMetadata.GetCSSEquivalent(uiElement);
+                    //                            List<string> names = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" };
 
-                //                            result.Add(new CSSEquivalent()
-                //                            {
-                //                                Name = names,
+                    //                            result.Add(new CSSEquivalent()
+                    //                            {
+                    //                                Name = names,
 
-                //                                Value = (inst, value) =>
-                //                                {
-                //                                    Dictionary<string, object> valuesDict = new Dictionary<string, object>();
-                //                                    foreach (string name in names)
-                //                                    {
-                //                                        if (!name.EndsWith("Alpha"))
-                //                                        {
-                //                                            valuesDict.Add(name, ((Color)value).INTERNAL_ToHtmlStringForVelocity());
-                //                                        }
-                //                                        else
-                //                                        {
-                //                                            valuesDict.Add(name, ((double)((Color)value).A) / 255);
-                //                                        }
-                //                                    }
-                //                                    return valuesDict;
-                //                                },
-                //                                //DomElement = parentPropertyCSSEquivalent.DomElement,
-                //                                UIElement = uiElement
-                //                            });
-                //                        //}
-                //                        //else
-                //                        //{
-                //                        //    //we want to create a CSSEquivalent that will just make the UIElement call the property callback if any:
-                //                        //    if (propertyMetadata.PropertyChangedCallback != null)
-                //                        //    {
-                //                        //        result.Add(new CSSEquivalent()
-                //                        //        {
-                //                        //            UIElement = uiElement,
-                //                        //            CallbackMethod = propertyMetadata.PropertyChangedCallback,
-                //                        //            DependencyProperty = dependencyProperty
-                //                        //        });
-                //                        //    }
-                //                        //}
-                //                    }
-                //                }
-                //                else
-                //                {
-                //                    //Commented because it could be a Setter in a Style
-                //                    //throw new NotSupportedException("A solidColorBrush cannot currently be set inside a class that desn't inherit from UIElement.");
-                //                }
-                //            }
-                //        }
-                //        else
-                //        {
-                //            result.Add(new CSSEquivalent()
-                //                {
-                //                    Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
-                //                });
-                //        }
-                //        return result;
+                    //                                Value = (inst, value) =>
+                    //                                {
+                    //                                    Dictionary<string, object> valuesDict = new Dictionary<string, object>();
+                    //                                    foreach (string name in names)
+                    //                                    {
+                    //                                        if (!name.EndsWith("Alpha"))
+                    //                                        {
+                    //                                            valuesDict.Add(name, ((Color)value).INTERNAL_ToHtmlStringForVelocity());
+                    //                                        }
+                    //                                        else
+                    //                                        {
+                    //                                            valuesDict.Add(name, ((double)((Color)value).A) / 255);
+                    //                                        }
+                    //                                    }
+                    //                                    return valuesDict;
+                    //                                },
+                    //                                //DomElement = parentPropertyCSSEquivalent.DomElement,
+                    //                                UIElement = uiElement
+                    //                            });
+                    //                        //}
+                    //                        //else
+                    //                        //{
+                    //                        //    //we want to create a CSSEquivalent that will just make the UIElement call the property callback if any:
+                    //                        //    if (propertyMetadata.PropertyChangedCallback != null)
+                    //                        //    {
+                    //                        //        result.Add(new CSSEquivalent()
+                    //                        //        {
+                    //                        //            UIElement = uiElement,
+                    //                        //            CallbackMethod = propertyMetadata.PropertyChangedCallback,
+                    //                        //            DependencyProperty = dependencyProperty
+                    //                        //        });
+                    //                        //    }
+                    //                        //}
+                    //                    }
+                    //                }
+                    //                else
+                    //                {
+                    //                    //Commented because it could be a Setter in a Style
+                    //                    //throw new NotSupportedException("A solidColorBrush cannot currently be set inside a class that desn't inherit from UIElement.");
+                    //                }
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            result.Add(new CSSEquivalent()
+                    //                {
+                    //                    Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
+                    //                });
+                    //        }
+                    //        return result;
 
-                //    }
+                    //    }
             }
             );
 
@@ -474,26 +474,29 @@ namespace Windows.UI.Xaml.Controls
 
         internal static CSSEquivalent INTERNAL_GetCSSEquivalentForTextDecorations(DependencyObject instance)
         {
-
             return new CSSEquivalent()
             {
                 Value = (inst, value) =>
                 {
-                    TextDecorations? newTextDecoration = (TextDecorations?)value;
-                    if (newTextDecoration.HasValue)
+#if BRIDGE
+                    if (value != null) //todo: remove this line when Bridge.NET no longer raises exception on the following lines (cf. styles kit v1.1)
                     {
-                        switch (newTextDecoration)
+#endif
+                        TextDecorations? newTextDecoration = (TextDecorations?)value;
+                        if (newTextDecoration.HasValue)
                         {
+                            switch (newTextDecoration)
+                            {
 #if MIGRATION
-                            case global::System.Windows.TextDecorations.OverLine:
-                                return "overline";
-                            case global::System.Windows.TextDecorations.Strikethrough:
-                                return "line-through";
-                            case global::System.Windows.TextDecorations.Underline:
-                                return "underline";
-                            case global::System.Windows.TextDecorations.None:
-                            default:
-                                return ""; // Note: this will reset the value.
+                                case global::System.Windows.TextDecorations.OverLine:
+                                    return "overline";
+                                case global::System.Windows.TextDecorations.Strikethrough:
+                                    return "line-through";
+                                case global::System.Windows.TextDecorations.Underline:
+                                    return "underline";
+                                case global::System.Windows.TextDecorations.None:
+                                default:
+                                    return ""; // Note: this will reset the value.
 #else
                             case global::Windows.UI.Text.TextDecorations.OverLine:
                                 return "overline";
@@ -505,12 +508,19 @@ namespace Windows.UI.Xaml.Controls
                             default:
                                 return ""; // Note: this will reset the value.
 #endif
+                            }
                         }
+                        else
+                        {
+                            return "";
+                        }
+#if BRIDGE
                     }
                     else
                     {
                         return "";
                     }
+#endif
                 },
                 Name = new List<string> { "textDecoration" },
             };
@@ -763,7 +773,7 @@ namespace Windows.UI.Xaml.Controls
         {
             Control control = (Control)d;
             ControlTemplate controlTemplate = (ControlTemplate)e.NewValue;
-            if(controlTemplate == null)
+            if (controlTemplate == null)
             {
                 control.INTERNAL_IsTemplated = false;
             }
@@ -1103,7 +1113,7 @@ namespace Windows.UI.Xaml.Controls
 #if !BRIDGE
                 return base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
 #else
-                return CreateDomElement_WorkaroundBridgeInheritanceBug(parentRef, out domElementWhereToPlaceChildren);
+            return CreateDomElement_WorkaroundBridgeInheritanceBug(parentRef, out domElementWhereToPlaceChildren);
 #endif        
         }
 
