@@ -256,6 +256,7 @@ var radios = document.getElementsByName( $0 );
                 this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = this.INTERNAL_OuterDomElement;
                 INTERNAL_HtmlDomManager.SetDomElementAttribute(this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus, "checked", IsChecked, forceSimulatorExecuteImmediately: true);
                 INTERNAL_CheckBoxAndRadioButtonHelpers.SubscribeToBasicEventsForRadioButton(this, this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus, this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
+                UpdateDomBasedOnCheckedState(IsChecked);
             }
 
             if (string.IsNullOrWhiteSpace(GroupName))
