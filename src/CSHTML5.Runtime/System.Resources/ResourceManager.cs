@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using CSHTML5;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -8,7 +9,7 @@ namespace System.Resources
 {
 #if BRIDGE
 
-#if WORKINPROGRESS
+//#if WORKINPROGRESS
     /// <summary>
     /// Provides convenient access to culture-specific resources at run time.
     /// </summary>
@@ -88,7 +89,15 @@ namespace System.Resources
             if (culture == null)
                 culture = System.Globalization.CultureInfo.CurrentCulture;
 
-            return "[RESX]"; //todo
+            string pathInJSThroughBaseNameField = "";
+            object currentElementInJSPath = Interop.ExecuteJavaScript("document.ResXFiles");
+
+            foreach (string pathPart in BaseNameField.Split('.'))
+            {
+                currentElementInJSPath = Interop.ExecuteJavaScript("{0}[{1}]", currentElementInJSPath, pathPart);
+            }
+
+            return Convert.ToString(Interop.ExecuteJavaScript("{0}[{1}]", currentElementInJSPath, name));
         }
 
         //todo:
@@ -401,7 +410,7 @@ namespace System.Resources
         //protected virtual ResourceSet InternalGetResourceSet(CultureInfo culture, bool createIfNotExists, bool tryParents);
         #endregion
     }
-#endif
+//#endif
 
 #endif
 }
