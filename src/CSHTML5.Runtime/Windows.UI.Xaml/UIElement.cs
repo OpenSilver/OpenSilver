@@ -129,6 +129,10 @@ namespace Windows.UI.Xaml
 
         #endregion
 
+        internal virtual object GetDomElementToSetContentString()
+        {
+            return INTERNAL_InnerDomElement;
+        }
 
         #region ClipToBounds
 

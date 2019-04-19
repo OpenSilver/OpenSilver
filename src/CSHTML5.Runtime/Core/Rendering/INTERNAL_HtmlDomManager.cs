@@ -249,7 +249,7 @@ setTimeout(function() {{
 
         public static void SetContentString(UIElement element, string content, bool removeTextWrapping = false)
         {
-            object domElement = element.INTERNAL_InnerDomElement;
+            object domElement = element.GetDomElementToSetContentString();
 
             //Commented because it does not support Line Breaks:
             //domElement.textContent = content;
@@ -1005,9 +1005,9 @@ parentElement.appendChild(newElement);
                 ExecuteJavaScript(javaScriptToExecute);
                 INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
                 return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, ((INTERNAL_HtmlDomElementReference)parentRef).Parent);
-            //todo-perfs: check if there is a better solution in terms of performance (while still remaining compatible with all browsers).
+                //todo-perfs: check if there is a better solution in terms of performance (while still remaining compatible with all browsers).
 #if !CSHTML5NETSTANDARD
-        }
+            }
 #endif
         }
 

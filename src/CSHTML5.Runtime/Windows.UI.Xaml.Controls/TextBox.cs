@@ -185,6 +185,19 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                 textBox._isCodeProgrammaticallyChangingText = false;
             }
         }
+
+        internal override object GetDomElementToSetContentString()
+        {
+            if (_contentEditableDiv != null)
+            {
+                return _contentEditableDiv;
+            }
+            else
+            {
+                return base.GetDomElementToSetContentString();
+            }
+        }
+
         static object CoerceText(DependencyObject d, object value)
         {
             if (value == null)
@@ -763,7 +776,7 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
             }
 #endif
 
-            if(isTemplated)
+            if (isTemplated)
             {
                 //the following methods were ignored before because _contentEditableDiv was not defined due to the fact that we waited for the template to be made so we would know where to put it.
                 //as a consequence, we call them here:
@@ -807,7 +820,7 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
 
         void TextBox_GotFocus(object e)//object sender, RoutedEventArgs e)
         {
-            if(_contentEditableDiv != null)
+            if (_contentEditableDiv != null)
             {
                 CSHTML5.Interop.ExecuteJavaScript(@"
 if($1.target != $0) {
@@ -871,7 +884,7 @@ var range,selection;
             }
         }
 
-#region Fix "input" event not working under IE.
+        #region Fix "input" event not working under IE.
 
         string previousInnerText = null;
 
@@ -899,7 +912,7 @@ var range,selection;
 #endif
         }
 
-#endregion
+        #endregion
 
 #if !BRIDGE
         [JSReplacement("window.IE_VERSION")]
@@ -921,7 +934,7 @@ var range,selection;
             return false;
         }
 
-#region Text Selection
+        #region Text Selection
 
 
         public int SelectionStart
@@ -1065,9 +1078,9 @@ return globalIndexes;
             this.SelectionLength = this.Text.Length;
         }
 
-#endregion
+        #endregion
 
-#region TextWrapping
+        #region TextWrapping
 
         /// <summary>
         /// Gets or sets how the TextBow wraps text.
@@ -1083,9 +1096,9 @@ return globalIndexes;
         public static readonly DependencyProperty TextWrappingProperty =
             DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBox), new PropertyMetadata(
                 TextWrapping.Wrap) // Note: we have made "Wrap" the default value because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
-                {
-                    MethodToUpdateDom = TextWrapping_MethodToUpdateDom
-                });
+            {
+                MethodToUpdateDom = TextWrapping_MethodToUpdateDom
+            });
 
         static void TextWrapping_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -1121,9 +1134,9 @@ return globalIndexes;
             }
         }
 
-#endregion
+        #endregion
 
-#region HorizontalScrollBarVisibility
+        #region HorizontalScrollBarVisibility
 
         /// <summary>
         /// Gets or sets a value that indicates whether a horizontal ScrollBar should
@@ -1143,9 +1156,9 @@ return globalIndexes;
         public static readonly DependencyProperty HorizontalScrollBarVisibilityProperty =
             DependencyProperty.Register("HorizontalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(TextBox), new PropertyMetadata(
                 ScrollBarVisibility.Hidden)
-                {
-                    MethodToUpdateDom = HorizontalScrollBarVisibility_MethodToUpdateDom
-                });
+            {
+                MethodToUpdateDom = HorizontalScrollBarVisibility_MethodToUpdateDom
+            });
 
         static void HorizontalScrollBarVisibility_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -1176,9 +1189,9 @@ return globalIndexes;
             }
         }
 
-#endregion
+        #endregion
 
-#region VerticalScrollBarVisibility
+        #region VerticalScrollBarVisibility
 
         /// <summary>
         /// Gets or sets a value that indicates whether a vertical ScrollBar should be displayed.
@@ -1194,9 +1207,9 @@ return globalIndexes;
         public static readonly DependencyProperty VerticalScrollBarVisibilityProperty =
             DependencyProperty.Register("VerticalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(TextBox), new PropertyMetadata(
                 ScrollBarVisibility.Hidden)
-                {
-                    MethodToUpdateDom = VerticalScrollBarVisibility_MethodToUpdateDom
-                });
+            {
+                MethodToUpdateDom = VerticalScrollBarVisibility_MethodToUpdateDom
+            });
 
         static void VerticalScrollBarVisibility_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -1227,7 +1240,7 @@ return globalIndexes;
             }
         }
 
-#endregion
+        #endregion
 
         /// <summary>
         /// Gets or sets the value that determines the maximum number of characters allowed
@@ -1270,7 +1283,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
         }
 
 
-#region TextDecorations
+        #region TextDecorations
 
         /// <summary>
         /// Gets or sets the text decorations (underline, strikethrough...).
@@ -1332,7 +1345,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBox.INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
         }
 
-#endregion
+        #endregion
 
 
         protected override void OnAfterApplyHorizontalAlignmentAndWidth()
@@ -1342,7 +1355,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             {
                 var outerDomStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this);
                 var contentEditableStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv);
-                if(TextAreaContainer != null && HorizontalContentAlignment == HorizontalAlignment.Stretch)
+                if (TextAreaContainer != null && HorizontalContentAlignment == HorizontalAlignment.Stretch)
                 {
                     contentEditableStyle.width = "100%";
                     contentEditableStyle.maxWidth = outerDomStyle.maxWidth;
@@ -1350,17 +1363,17 @@ element.setAttribute(""data-maxlength"", ""{1}"");
                 else //it is top, bottom or center so we don't want to stretch, but we want it to be limited as much as the outerDomElement
                 {
                     double maxWidth = Width;
-                    if(double.IsNaN(Width))
+                    if (double.IsNaN(Width))
                     {
-                        if(!double.IsNaN(MaxWidth))
+                        if (!double.IsNaN(MaxWidth))
                         {
-                            contentEditableStyle.maxWidth = outerDomStyle.maxWidth; 
+                            contentEditableStyle.maxWidth = outerDomStyle.maxWidth;
                         }//else, neither Width or maxWidth are set so we let it be.
                     }
                     else
                     {
                         contentEditableStyle.maxWidth = outerDomStyle.width;  //note: this might be incorrect as it does not take into consideration any padding, margin, or other elements that happens between outerDomElement and contentEditableDiv.
-                    } 
+                    }
                 }
             }
         }
