@@ -34,9 +34,10 @@ namespace Windows.UI.Xaml.Media.Animation
     /// An abstract class that defines an animation segment with its own target value
     /// and interpolation method for a DoubleAnimationUsingKeyFrames.
     /// </summary>
+
+#if WORKINPROGRESS
     public abstract class DoubleKeyFrame : Freezable, IKeyFrame
     {
-#if WORKINPROGRESS
         public static readonly DependencyProperty KeyTimeProperty = DependencyProperty.Register("KeyTime", typeof(KeyTime), typeof(DoubleKeyFrame), new PropertyMetadata(new TimeSpan()));
         /// <summary>Gets or sets the time at which the key frame's target <see cref="P:System.Windows.Media.Animation.DoubleKeyFrame.Value" /> should be reached.</summary>
         /// <returns>The time at which the key frame's current value should be equal to its <see cref="P:System.Windows.Media.Animation.DoubleKeyFrame.Value" /> property. The default is null.</returns>
@@ -69,6 +70,6 @@ namespace Windows.UI.Xaml.Media.Animation
                 Value = (double)value;
             }
         }
-#endif
     }
+#endif
 }
