@@ -89,40 +89,12 @@ namespace Windows.UI.Xaml.Controls
             {
                 FrameworkElement element = CellTemplate.INTERNAL_InstantiateFrameworkTemplate();
                 element.DataContext = childData;
-                Binding b = this.INTERNAL_GetBinding(DataGridBoundColumn.BindingProperty); //we get the Binding in the Binding property set by the user.
-                if (b != null)
-                {
-                    if (b.Mode == BindingMode.OneWay)
-                    {
-                        if (!b.INTERNAL_WasModeSetByUserRatherThanDefaultValue())
-                        {
-                            b.Mode = BindingMode.TwoWay;
-                        }
-                    }
-                    element.SetBinding(FrameworkElement.DataContextProperty, b);
-                }
                 return element;
             }
             else //we are going to make a ToString() of the element the user tries to show:
             {
                 TextBlock textBlock = new TextBlock();
-                textBlock.DataContext = childData;
-                Binding b = this.INTERNAL_GetBinding(DataGridBoundColumn.BindingProperty); //we get the Binding in the Binding property set by the user.
-                if (b != null)
-                {
-                    if (b.Mode == BindingMode.OneWay)
-                    {
-                        if (!b.INTERNAL_WasModeSetByUserRatherThanDefaultValue())
-                        {
-                            b.Mode = BindingMode.TwoWay;
-                        }
-                    }
-                    textBlock.SetBinding(TextBlock.TextProperty, b);
-                }
-                else
-                {
-                    textBlock.Text = childData.ToString();
-                }
+                textBlock.Text = childData.ToString();
                 return textBlock;
             }
         }
@@ -133,9 +105,6 @@ namespace Windows.UI.Xaml.Controls
             {
                 FrameworkElement element = CellEditingTemplate.INTERNAL_InstantiateFrameworkTemplate();
                 element.DataContext = childData;
-                Binding b = this.INTERNAL_GetBinding(DataGridBoundColumn.BindingProperty); //we get the Binding in the Binding property set by the user.
-                if (b != null)
-                    element.SetBinding(FrameworkElement.DataContextProperty, b);
                 return element;
             }
             else

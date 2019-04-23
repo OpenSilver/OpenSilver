@@ -92,25 +92,30 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                checkBoxOrRadioButton.SubscribeToClickEventForChildContainerDiv(divWhereToPlaceChild, innerElement);
-                if (checkBoxOrRadioButton is RadioButton)
-                {
-                    INTERNAL_EventsHelper.AttachToDomEvents("change", innerElement, (Action<object>)(e =>
-                    {
-                        ((RadioButton)checkBoxOrRadioButton).ChangedEventReceived();
-                    }));
-                }
-                else
-                {
-                    INTERNAL_EventsHelper.AttachToDomEvents("change", innerElement, (Action<object>)(e =>
-                    {
-                        IsCheckedValueChanged(checkBoxOrRadioButton);
-                    }));
-                }
+                SubscribeToBasicEventsForRadioButton(checkBoxOrRadioButton, innerElement, divWhereToPlaceChild);
             }
 
             domElementWhereToPlaceChildren = divWhereToPlaceChild;
             return outerDiv;
+        }
+
+        internal static void SubscribeToBasicEventsForRadioButton(ToggleButton checkBoxOrRadioButton, object innerElement, object divWhereToPlaceChild)
+        {
+            checkBoxOrRadioButton.SubscribeToClickEventForChildContainerDiv(divWhereToPlaceChild, innerElement);
+            if (checkBoxOrRadioButton is RadioButton)
+            {
+                INTERNAL_EventsHelper.AttachToDomEvents("change", innerElement, (Action<object>)(e =>
+                {
+                    ((RadioButton)checkBoxOrRadioButton).ChangedEventReceived();
+                }));
+            }
+            else
+            {
+                INTERNAL_EventsHelper.AttachToDomEvents("change", innerElement, (Action<object>)(e =>
+                {
+                    IsCheckedValueChanged(checkBoxOrRadioButton);
+                }));
+            }
         }
 
         internal static void IsCheckedValueChanged(ToggleButton checkBoxOrRadioButton)

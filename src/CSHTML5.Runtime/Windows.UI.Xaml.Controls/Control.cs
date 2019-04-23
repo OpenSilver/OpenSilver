@@ -71,6 +71,7 @@ namespace Windows.UI.Xaml.Controls
             base.ManageIsEnabled(isEnabled); // Useful for setting the "disabled" attribute on the DOM element.
 
             _isDisabled = !isEnabled; // We remember the value so that when we update the visual states, we know whether we should go to the "Disabled" state or not.
+            UpdateVisualStates();
         }
 
 
@@ -742,6 +743,8 @@ namespace Windows.UI.Xaml.Controls
         // TEMPLATE
         //-----------------------
 
+        internal bool INTERNAL_IsTemplated = false; //todo: use only this or HasTemplate (whith IsTemplated's efficiency, which means not reading the DependencyProperty and HasTemplate's accuracy, which means taking into consideration INTERNAL_DoNotApplyControlTemplate).
+
         /// <summary>
         /// Gets or sets a control template.
         /// </summary>
@@ -759,9 +762,17 @@ namespace Windows.UI.Xaml.Controls
         private static void Template_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Control control = (Control)d;
+            ControlTemplate controlTemplate = (ControlTemplate)e.NewValue;
+            if(controlTemplate == null)
+            {
+                control.INTERNAL_IsTemplated = false;
+            }
+            else
+            {
+                control.INTERNAL_IsTemplated = true;
+            }
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(control))
             {
-                ControlTemplate controlTemplate = (ControlTemplate)e.NewValue;
 
                 //detach the former control:
                 if (control._renderedControlTemplate != null)
@@ -779,7 +790,6 @@ namespace Windows.UI.Xaml.Controls
                 {
                     // Apply the control template:
                     generatedControl = controlTemplate.INTERNAL_InstantiateAndAttachControlTemplate(templateOwner: control);
-
                     control._renderedControlTemplate = generatedControl;
                 }
                 else

@@ -140,6 +140,24 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
 
         #endregion
 
+        #region PlaceholderText
+
+        /// <summary>
+        /// Gets or sets the text that is displayed in the control until the value is changed by a user action or some other operation.
+        /// </summary>
+        public string PlaceholderText
+        {
+            get { return (string)GetValue(PlaceholderTextProperty); }
+            set { SetValue(PlaceholderTextProperty, value); }
+        }
+        /// <summary>
+        /// Identifies the PlaceholderText dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PlaceholderTextProperty =
+            DependencyProperty.Register("PlaceholderText", typeof(string), typeof(TextBox), new PropertyMetadata(string.Empty) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+
+        #endregion
+
         #region Text
 
         /// <summary>

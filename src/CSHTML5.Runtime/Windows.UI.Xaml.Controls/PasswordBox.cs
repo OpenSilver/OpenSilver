@@ -51,6 +51,13 @@ namespace Windows.UI.Xaml.Controls
         private bool _isUserChangingPassword = false;
         private bool _isCodeProgrammaticallyChangingPassword = false;
 
+        Control TextAreaContainer = null;
+        object _passwordInputField; //todo: use this
+
+        private string[] TextAreaContainerNames = { "ContentElement", "PART_ContentHost" };
+        
+
+
         public PasswordBox()
         {
             UseSystemFocusVisuals = true;
@@ -152,8 +159,25 @@ namespace Windows.UI.Xaml.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            dynamic passwordField = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("input", parentRef, this);
+            return AddPasswordInputDomElement(parentRef, out domElementWhereToPlaceChildren, false);
+        }
+
+        private object AddPasswordInputDomElement(object parentRef, out object domElementWhereToPlaceChildren, bool isTemplated)
+        {
+            dynamic passwordField;
+            var passwordFieldStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("input", parentRef, this, out passwordField);
+            //dynamic passwordField = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("input", parentRef, this);
+
+            _passwordInputField = passwordField;
+
             domElementWhereToPlaceChildren = passwordField; // Note: this value is used by the Padding_Changed method to set the padding of the PasswordBox.
+
+            if (isTemplated) //When templated, we remove the outlining that apears when the element has the focus:
+            {
+                passwordFieldStyle.border = "transparent"; // This removes the border. We do not need it since we are templated
+                passwordFieldStyle.outline = "solid transparent"; // Note: this is to avoind having the weird border when it has the focus. I could have used outlineWidth = "0px" but or some reason, this causes the caret to not work when there is no text.
+                passwordFieldStyle.background = "solid transparent";
+            }
 
             INTERNAL_HtmlDomManager.SetDomElementAttribute(passwordField, "type", "password", forceSimulatorExecuteImmediately: true);
             //passwordField.type = "password";
@@ -207,7 +231,73 @@ namespace Windows.UI.Xaml.Controls
 
             //textArea.style.resize = "none"; //to avoid letting the posibility to the user to resize the TextBox
 
+            if (isTemplated)
+            {
+                //the following methods were ignored before because _contentEditableDiv was not defined due to the fact that we waited for the template to be made so we would know where to put it.
+                //as a consequence, we call them here:
+                OnAfterApplyHorizontalAlignmentAndWidth();
+                OnAfterApplyVerticalAlignmentAndWidth();
+
+                //register to focusin events on the OuterDomElement so that we can "reroute" the focus on the contentEditable element.
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.tabIndex = 32767; $0.addEventListener('focusin', $1)", this.INTERNAL_OuterDomElement, (Action<object>)PasswordBox_GotFocus);
+                //Note on the line above: 32767 is the maximum value commonly allowed in browsers (and can be considered the default value)
+                if (INTERNAL_HtmlDomManager.IsInternetExplorer())
+                {
+                    //workaround due to IE setting the focus at the end of the click, (or at least after the focusin event), which cancels the work done during focusin.
+                    //if I'm not mistaken, the click event happens even when we click on a child of the element so we're all good. (We had to fix the case where a Button had a TextBox inside of it, which is why I assumed that).
+                    CSHTML5.Interop.ExecuteJavaScript(@"$0.addEventListener('click', $1)", this.INTERNAL_OuterDomElement, (Action<object>)PasswordBox_GotFocus);
+                }
+            }
+
             return passwordField;
+        }
+
+        void PasswordBox_GotFocus(object e)//object sender, RoutedEventArgs e)
+        {
+            if (_passwordInputField != null)
+            {
+                CSHTML5.Interop.ExecuteJavaScript(@"
+if($1.target != $0) {
+$0.focus()
+}", _passwordInputField, e);
+                //NEW_SET_SELECTION(_tempSelectionStartIndex, _tempSelectionStartIndex + _tempSelectionLength);
+            }
+        }
+
+        /// <summary>
+        /// Builds the visual tree for the
+        /// <see cref="T:System.Windows.Controls.PasswordBox" /> control when a new
+        /// template is applied.
+        /// </summary>
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
+        {
+            base.OnApplyTemplate();
+
+            TextAreaContainer = null; //set it to null so we don't keep the old Template's container for the TextArea.
+
+            int i = 0;
+            while (TextAreaContainer == null && i < TextAreaContainerNames.Length)
+            {
+                TextAreaContainer = GetTemplateChild(TextAreaContainerNames[i]) as Control;
+                ++i;
+            }
+            if (TextAreaContainer != null)
+            {
+                object domElementWheretoPlaceChildren; //I believe we can basically ignore this one as TextBox shouldn't have any Content (only the text).
+                AddPasswordInputDomElement(TextAreaContainer.INTERNAL_InnerDomElement, out domElementWheretoPlaceChildren, true);
+                //AddTextAreaToVisualTree(TextAreaContainer.INTERNAL_InnerDomElement, out domElementWheretoPlaceChildren);
+                //Remember that the InnerDomElement is now the _contentEditableDiv rather than what was created to contain the template (Note: we need to do this because the _contentEditableDiv was added outside of the usual place we usually set the innerdomElement).
+                INTERNAL_InnerDomElement = _passwordInputField;
+                string text = Password; //this is probably more efficient than to use the property itself on 3 occasions.
+                if (!string.IsNullOrEmpty(text))
+                {
+                    Password_Changed(this, new DependencyPropertyChangedEventArgs(text, text, PasswordProperty));
+                }
+            }
         }
 
         #region Fix "input" event not working under IE.

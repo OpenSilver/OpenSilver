@@ -665,12 +665,15 @@ namespace Windows.UI.Xaml.Controls
                     headers.Add(columnHeader);
 
                     //we set column.IsReadOnly = true if the user explicitely set its binding in OneWay mode:
-                    Binding b = column.INTERNAL_GetBinding(DataGridBoundColumn.BindingProperty);
-                    if (b != null)
+                    if (column is DataGridBoundColumn)
                     {
-                        if (b.Mode == BindingMode.OneWay && b.INTERNAL_WasModeSetByUserRatherThanDefaultValue())
+                        Binding b = column.INTERNAL_GetBinding(DataGridBoundColumn.BindingProperty);
+                        if (b != null)
                         {
-                            column.IsReadOnly = true;
+                            if (b.Mode == BindingMode.OneWay && b.INTERNAL_WasModeSetByUserRatherThanDefaultValue())
+                            {
+                                column.IsReadOnly = true;
+                            }
                         }
                     }
                     ++currentColumnIndex;
@@ -680,8 +683,18 @@ namespace Windows.UI.Xaml.Controls
                 {
                     if (isCSSGrid)
                     {
-                        header.BorderBrush = HorizontalGridLinesBrush;
-                        header.BorderThickness = new Thickness((Grid.GetColumn(header) == 1 ? 1 : 0), 1, 1, 1);
+                        Brush brush = HorizontalGridLinesBrush;
+                        int HorizontalLinesThickness = HorizontalGridLinesBrush.Opacity > 0 ? 1 : 0;
+                        int VerticalLinesThickness = VerticalGridLinesBrush.Opacity > 0 ? 1 : 0;
+                        if (HorizontalLinesThickness == 0)
+                        {
+                            brush = VerticalGridLinesBrush;
+                        }
+                        header.BorderBrush = brush;
+                        header.BorderThickness = new Thickness((Grid.GetColumn(header) == 1 ? VerticalLinesThickness : 0),
+                                                               HorizontalLinesThickness,
+                                                               VerticalLinesThickness,
+                                                               HorizontalLinesThickness);
                     }
                     int u = Grid.GetColumn(header);
                     _grid.Children.Add(header);
@@ -835,8 +848,18 @@ namespace Windows.UI.Xaml.Controls
                     _grid.Children.Add(cell);
                     if (isCSSGrid)
                     {
-                        cell.BorderBrush = HorizontalGridLinesBrush;
-                        cell.BorderThickness = new Thickness((currentColumnIndex == 1 ? 1 : 0), (_grid.RowDefinitions.Count == 1 ? 1 : 0), 1, 1);
+                        Brush brush = HorizontalGridLinesBrush;
+                        int HorizontalLinesThickness = HorizontalGridLinesBrush.Opacity > 0 ? 1 : 0;
+                        int VerticalLinesThickness = VerticalGridLinesBrush.Opacity > 0 ? 1 : 0;
+                        if (HorizontalLinesThickness == 0)
+                        {
+                            brush = VerticalGridLinesBrush;
+                        }
+                        cell.BorderBrush = brush;
+                        cell.BorderThickness = new Thickness((currentColumnIndex == 1 ? VerticalLinesThickness : 0),
+                                                            (_grid.RowDefinitions.Count == 1 ? HorizontalLinesThickness : 0),
+                                                            VerticalLinesThickness,
+                                                            HorizontalLinesThickness);
                         cell.Padding = new Thickness(4, VerticalCellPadding, 4, VerticalCellPadding);
                     }
 
