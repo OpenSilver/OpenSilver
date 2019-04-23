@@ -676,36 +676,18 @@ namespace System.Runtime.Serialization
 
         internal static string GetTypeNameSafeForSerialization(Type type)
         {
-            return GetTypeNameWithGenericElementsSafeForSerialization(type);
+#if !BRIDGE
+            bool isRunningUnderJSIL = !CSHTML5.Interop.IsRunningInTheSimulator; //todowasm: fix this when running in WebAssembly
+#else
+            bool isRunningUnderJSIL = false;
+#endif
 
-
-            ////In case of nested types, replace the '+' with '.'
-            //string typeName = type.Name;
-            ////note: in js, objectType.Name for nested types returns "ParentType+NestedType" while in c#, we only get "NestedType"
-            //if (CSHTML5.Interop.IsRunningInTheSimulator)
-            //{
-            //    Type currentType = type;
-
-            //    while (currentType.IsNested)
-            //    {
-            //        currentType = currentType.DeclaringType;
-            //        typeName = currentType.Name + "." + typeName;
-            //    }
-            //}
-            //else
-            //{
-            //    typeName = typeName.Replace('+', '.');
-            //}
-
-            //return typeName;
-        }
-
-        internal static string GetTypeNameWithGenericElementsSafeForSerialization(Type type)
-        {
-            //putting this into a separate method so that we can more easily differentiate what I just made from what was already there.
-            //todo: move the content of this method to the content of GetTypeNameSafeForSerialization and remove this method and the former content of GetTypeNameSafeForSerialization, once we will have made sure this works.
-
-            if (CSHTML5.Interop.IsRunningInTheSimulator)
+            if (isRunningUnderJSIL)
+            {
+                // Workaround for JSIL because JSIL does not handle Type.IsNested and Type.DeclaringType (at least in the case of nested types)
+                return JSIL_Workaround_GetTypeNameSafeForSerialization(type);
+            }
+            else
             {
                 //In case of nested types, replace the '+' with '.'
                 string typeName = MakeGenericTypeReadyForSerialization(type);
@@ -718,13 +700,7 @@ namespace System.Runtime.Serialization
                     typeName = MakeGenericTypeReadyForSerialization(currentType) + "." + typeName;
                 }
 
-
                 return typeName;
-            }
-            else
-            {
-                //unfortunately, JSIL does not handle Type.IsNested and Type.DeclaringType (at least in the case of nested types) so we need to do everything ourselves
-                return GetTypeNameWithGenericElementsSafeForSerialization_JSVersion(type);
             }
         }
 
@@ -732,18 +708,19 @@ namespace System.Runtime.Serialization
         {
             string readableTypeName;
             string typeName = type.Name;
-            //note: in js, objectType.Name for nested types returns "ParentType+NestedType" while in c#, we only get "NestedType", so we correct it:
+            
+            //with JSIL, objectType.Name for nested types returns "ParentType+NestedType" while in c#, we only get "NestedType", so we correct it:
             int lastIndexOfPlusSign = typeName.LastIndexOf('+');
             if (lastIndexOfPlusSign > -1)
             {
                 typeName = typeName.Substring(lastIndexOfPlusSign + 1);
             }
+
             //now we are certain to only have the current type and not its nested parent(s) in the string.
             if (type.IsGenericType)
             {
                 //if the type is generic, we remove the "`N" part and put "Of" instead:
                 readableTypeName = typeName.Substring(0, typeName.IndexOf('`')) + "Of";
-
 
 #if !BRIDGE
                 foreach (Type typeInGenericTypeArguments in type.GenericTypeArguments)
@@ -769,7 +746,7 @@ namespace System.Runtime.Serialization
             return readableTypeName;
         }
 
-        static string GetTypeNameWithGenericElementsSafeForSerialization_JSVersion(Type type)
+        static string JSIL_Workaround_GetTypeNameSafeForSerialization(Type type)
         {
             string readableTypeName = "";
             string typeName = type.Name;
@@ -797,12 +774,9 @@ namespace System.Runtime.Serialization
                         currentTypeName = currentTypeName.Substring(0, currentTypeName.IndexOf('`')) + "Of"; //to change MyType`N into MyTypeOf (and then add the types)
                         //we add the generic type arguments to the name:
 
-
-
 #if !BRIDGE
                         foreach (Type typeInGenericTypeArguments in type.GenericTypeArguments)
 #else
-                        // TODOBRIDGE: verify if the two code are similar
                         foreach (Type typeInGenericTypeArguments in type.GetGenericArguments())
 #endif
                         {
@@ -813,17 +787,16 @@ namespace System.Runtime.Serialization
                             else
                             {
 
-                                currentTypeName += GetTypeNameWithGenericElementsSafeForSerialization_JSVersion(typeInGenericTypeArguments);
-                                //currentTypeName += MakeGenericTypeReadyForSerialization(typeInGenericTypeArguments);
+                                currentTypeName += JSIL_Workaround_GetTypeNameSafeForSerialization(typeInGenericTypeArguments);
                             }
                         }
                         readableTypeName = currentTypeName + separatorToAdd + readableTypeName;
                     }
                     else
-                    { //the current type is not generic so we only need to copy it into readableTypeName
+                    {
+                        //the current type is not generic so we only need to copy it into readableTypeName
                         readableTypeName = currentTypeName.Substring(currentTypeName.IndexOf('+') + 1) + separatorToAdd + readableTypeName;
                     }
-
 
                     //go to the next type:
                     //if the type is generic, it's type.FullName is: what we want, followed by brackets containing the Generic types names.
