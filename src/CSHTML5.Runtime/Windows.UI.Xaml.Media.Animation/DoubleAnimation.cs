@@ -114,16 +114,16 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <summary>
         /// Gets or sets the animation's ending value.
         /// </summary>
-        public double To //todo: this is supposed to be double? (nullable double)
+        public double? To 
         {
-            get { return (double)GetValue(ToProperty); }
+            get { return (double?)GetValue(ToProperty); }
             set { SetValue(ToProperty, value); }
         }
         /// <summary>
         /// Identifies the To dependency property.
         /// </summary>
         public static readonly DependencyProperty ToProperty =
-            DependencyProperty.Register("To", typeof(double), typeof(DoubleAnimation), new PropertyMetadata(null));
+            DependencyProperty.Register("To", typeof(double?), typeof(DoubleAnimation), new PropertyMetadata(null));
 
         internal override void IterateOnce(IterationParameters parameters, bool isLastLoop)
         {
