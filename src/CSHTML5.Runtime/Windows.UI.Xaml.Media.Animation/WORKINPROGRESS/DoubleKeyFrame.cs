@@ -34,10 +34,11 @@ namespace Windows.UI.Xaml.Media.Animation
     /// An abstract class that defines an animation segment with its own target value
     /// and interpolation method for a DoubleAnimationUsingKeyFrames.
     /// </summary>
-    public abstract class DoubleKeyFrame : DependencyObject
-    {
+
 #if WORKINPROGRESS
-        public static readonly DependencyProperty KeyTimeProperty = DependencyProperty.Register("KeyTime", typeof(KeyTime), typeof(DoubleKeyFrame), null);
+    public abstract class DoubleKeyFrame : Freezable, IKeyFrame
+    {
+        public static readonly DependencyProperty KeyTimeProperty = DependencyProperty.Register("KeyTime", typeof(KeyTime), typeof(DoubleKeyFrame), new PropertyMetadata(new TimeSpan()));
         /// <summary>Gets or sets the time at which the key frame's target <see cref="P:System.Windows.Media.Animation.DoubleKeyFrame.Value" /> should be reached.</summary>
         /// <returns>The time at which the key frame's current value should be equal to its <see cref="P:System.Windows.Media.Animation.DoubleKeyFrame.Value" /> property. The default is null.</returns>
         public KeyTime KeyTime
@@ -46,7 +47,7 @@ namespace Windows.UI.Xaml.Media.Animation
             set { SetValue(KeyTimeProperty, value); }
         }
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(double), typeof(DoubleKeyFrame), null);
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(double), typeof(DoubleKeyFrame), new PropertyMetadata(null));
         /// <summary>Gets or sets the key frame's target value. </summary>
         /// <returns>The key frame's target value, which is the value of this key frame at its specified <see cref="P:System.Windows.Media.Animation.DoubleKeyFrame.KeyTime" />. The default is 0.</returns>
         public double Value
@@ -54,6 +55,21 @@ namespace Windows.UI.Xaml.Media.Animation
             get { return (double)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
         }
-#endif
+
+        /// <summary>
+        /// The value of this key frame at the KeyTime specified.
+        /// </summary>
+        object IKeyFrame.Value
+        {
+            get
+            {
+                return Value;
+            }
+            set
+            {
+                Value = (double)value;
+            }
+        }
     }
+#endif
 }
