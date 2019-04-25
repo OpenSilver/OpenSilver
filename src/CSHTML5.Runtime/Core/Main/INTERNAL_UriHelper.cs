@@ -47,6 +47,11 @@ namespace CSHTML5.Internal
         /// <returns>The URI suitable to use in the HTML5 "src" property</returns>
         public static string ConvertToHtml5Path(string uri, string callerAssemblyName)
         {
+            if(uri == null)
+            {
+                return null;
+            }
+
             var originalStringLowercase = uri.ToLower();
 
             if (originalStringLowercase.StartsWith(@"ms-appx:/"))
