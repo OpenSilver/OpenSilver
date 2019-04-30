@@ -184,7 +184,7 @@ namespace System.Net
 
         public new string UploadString(string address, string data)
         {
-            return UploadString(new Uri(address), null, data);
+            return UploadString(new Uri(address), "POST", data);
         }
 
         public new string UploadString(string address, string method, string data)
@@ -194,7 +194,7 @@ namespace System.Net
 
         public new string UploadString(Uri address, string data)
         {
-            return UploadString(address, null, data);
+            return UploadString(address, "POST", data);
         }
 
         public new string UploadString(Uri address, string method, string data)
