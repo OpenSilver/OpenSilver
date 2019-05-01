@@ -45,7 +45,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a control that supports navigation to and from pages.
     /// </summary>
-    public class Frame : ContentControl//, INavigate
+    public class Frame : ContentControl, INavigate
     {
         bool _isBrowserJournal = true; //we use this so we don't have to determine all the time which journal we want to use.
         bool _isSourceChanging = false;

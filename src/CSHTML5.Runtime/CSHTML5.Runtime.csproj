@@ -291,6 +291,7 @@
     <Compile Include="Windows.UI.Xaml.Controls\Dock.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DockPanel.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Frame.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\INavigate.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Label.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Validation.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ValidationError.cs" />
