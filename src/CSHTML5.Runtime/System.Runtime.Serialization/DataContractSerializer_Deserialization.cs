@@ -418,6 +418,8 @@ namespace System.Runtime.Serialization
             // Quit if attempting to deserialize to an interface: //todo: investigate why this may happen.
             if (!resultType.IsInterface)
             {
+                string resultTypeFullName = resultType.FullName; // For debugging only, can be removed.
+
                 // Create the resulting class:
                 object resultInstance = Activator.CreateInstance(resultType); //todo: replace with "System.Runtime.Serialization.FormatterServices.GetUninitializedObject(type)" so that the type does not require a parameterless constructor.
 
