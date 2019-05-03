@@ -217,22 +217,22 @@ namespace Windows.UI.Xaml.Media.Animation
                         //INTERNAL_RaiseCompletedEvent(applyCallGuid);
                     }
                 }
-                else
-                {
-                    if (isLastLoop)
-                    {
-                        if (parameters.IsVisualStateChange)
-                        {
-                            propertyPath.INTERNAL_PropertySetVisualState(target, To);
-                        }
-                        else
-                        {
-                            propertyPath.INTERNAL_PropertySetLocalValue(target, To);
-                        }
-                    }
-                    OnIterationCompleted(parameters);
-                    //INTERNAL_RaiseCompletedEvent(applyCallGuid);
-                }
+                //else
+                //{
+                //    if (isLastLoop)
+                //    {
+                //        if (parameters.IsVisualStateChange)
+                //        {
+                //            propertyPath.INTERNAL_PropertySetVisualState(target, To);
+                //        }
+                //        else
+                //        {
+                //            propertyPath.INTERNAL_PropertySetLocalValue(target, To);
+                //        }
+                //    }
+                //    OnIterationCompleted(parameters);
+                //    //INTERNAL_RaiseCompletedEvent(applyCallGuid);
+                //}
             }
         }
 
@@ -355,10 +355,10 @@ Velocity($0, ""stop"", $1);", equivalent.DomElement, specificGroupName);
                     }
                 }
             }
-            else
-            {
-                propertyPath.INTERNAL_PropertySetVisualState(target, To); //To = null here --> Is it really what we want to do?
-            }
+            //else
+            //{
+            //    propertyPath.INTERNAL_PropertySetVisualState(target, To); //To = null here --> Is it really what we want to do?
+            //}
 
             if (revertToFormerValue) //todo: check if this is sufficient or if we need to put stuff into the GetCSSEquivalents thing like for ColorAnimation:
             {

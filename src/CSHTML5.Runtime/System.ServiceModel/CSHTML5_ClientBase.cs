@@ -302,6 +302,16 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         break;
                     }
                 }
+#if BRIDGE
+                if (attribute is ServiceContractAttribute)
+                {
+                    contractConfigurationName = ((ServiceContractAttribute)attribute).ConfigurationName;
+                    if (contractConfigurationName != null)
+                    {
+                        break;
+                    }
+                }
+#endif
             }
             if (contractConfigurationName == null)
             {
@@ -701,9 +711,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     
 #endif
                 {
-
                     ServiceContract2Attribute attributeAsDataContractAttribute = (ServiceContract2Attribute)attribute;
-
                     soapActionPrefix = attributeAsDataContractAttribute.SOAPActionPrefix;
                     if (!string.IsNullOrWhiteSpace(attributeAsDataContractAttribute.Namespace))
                     {
@@ -714,7 +722,22 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     }
 #endif
                 }
-
+#if BRIDGE
+                foreach (Attribute attribute in interfaceType.GetCustomAttributes(typeof(ServiceContractAttribute), true))
+                {
+                    ServiceContractAttribute attributeAsDataContractAttribute = (ServiceContractAttribute)attribute;
+                    if (!string.IsNullOrWhiteSpace(attributeAsDataContractAttribute.Namespace))
+                    {
+                        interfaceTypeNamespace = attributeAsDataContractAttribute.Namespace;
+                        soapActionPrefix = attributeAsDataContractAttribute.Namespace;
+                    }
+                    if (!string.IsNullOrWhiteSpace(attributeAsDataContractAttribute.Name))
+                    {
+                        soapActionPrefix += attributeAsDataContractAttribute.Name + "/";
+                    }
+                    break;
+                }
+#endif
 
                 headers = new Dictionary<string, string>();
                 headers.Add("Content-Type", @"text/xml; charset=utf-8");
@@ -966,7 +989,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 #endif
                         knownTypes.Add(((ServiceKnownTypeAttribute)attribute).Type);
                     }
-                        DataContractSerializer deSerializer = new DataContractSerializer(typeToDeserialize, knownTypes);
+                    DataContractSerializer deSerializer = new DataContractSerializer(typeToDeserialize, knownTypes);
                     XDocument xDoc = XDocument.Parse(responseAsString);
                     XElement xElement = xDoc.Root;
 
@@ -1067,27 +1090,27 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 #endif
 
 #if WORKINPROGRESS
-                        #region Not Supported Stuff
+        #region Not Supported Stuff
 
-                        //    /// <summary>
-                        //    /// Gets the underlying System.ServiceModel.ChannelFactory<TChannel> object.
-                        //    /// </summary>
-                        //    public ChannelFactory<TChannel> ChannelFactory { get; }
+        //    /// <summary>
+        //    /// Gets the underlying System.ServiceModel.ChannelFactory<TChannel> object.
+        //    /// </summary>
+        //    public ChannelFactory<TChannel> ChannelFactory { get; }
 
-                        //    /// <summary>
-                        //    /// Gets the client credentials used to call an operation.
-                        //    /// </summary>
-                        //    public ClientCredentials ClientCredentials { get; }
+        //    /// <summary>
+        //    /// Gets the client credentials used to call an operation.
+        //    /// </summary>
+        //    public ClientCredentials ClientCredentials { get; }
 
-                        //    /// <summary>
-                        //    /// Gets the target endpoint for the service to which the WCF client can connect.
-                        //    /// </summary>
-                        //    public ServiceEndpoint Endpoint { get; }
+        //    /// <summary>
+        //    /// Gets the target endpoint for the service to which the WCF client can connect.
+        //    /// </summary>
+        //    public ServiceEndpoint Endpoint { get; }
 
-                        /// <summary>
-                        /// Gets the underlying System.ServiceModel.IClientChannel implementation.
-                        /// </summary>
-            public IClientChannel InnerChannel
+        /// <summary>
+        /// Gets the underlying System.ServiceModel.IClientChannel implementation.
+        /// </summary>
+        public IClientChannel InnerChannel
         {
             get { return null; }
         }
@@ -1165,11 +1188,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         }
 
 
-#endregion
+        #endregion
 #endif
 
 #if WORKINPROGRESS
-#region ICommunicationObject methods
+        #region ICommunicationObject methods
 
         CommunicationState ICommunicationObject.State
         {
@@ -1265,7 +1288,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         //{
 
         //}
-#endregion
+        #endregion
 #endif
     }
 }
