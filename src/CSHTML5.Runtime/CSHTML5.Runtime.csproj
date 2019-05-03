@@ -804,7 +804,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <Reference Include="Bridge, Version=17.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Bridge, Version=17.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CSHTML5.2.0.0-alpha26-041\lib\net40\Bridge.dll</HintPath>
       <Private>True</Private>
     </Reference>
@@ -818,7 +818,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">
-    <Reference Include="Bridge, Version=17.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Bridge, Version=17.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CSHTML5.Migration.2.0.0-alpha26-041\lib\net40\Bridge.dll</HintPath>
       <Private>True</Private>
     </Reference>
@@ -832,7 +832,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">
-    <Reference Include="Bridge, Version=17.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Bridge, Version=17.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CSHTML5.Migration.2.0.0-alpha26-041\lib\net40\Bridge.dll</HintPath>
       <Private>True</Private>
     </Reference>

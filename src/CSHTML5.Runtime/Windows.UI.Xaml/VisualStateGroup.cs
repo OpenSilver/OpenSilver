@@ -71,10 +71,22 @@ namespace Windows.UI.Xaml
         public IList States { get { return _states; } } // Note: this returns "IList" instead of "IList<VisualState>" so that the XAML Code Editor does not complain.
 
 #if WORKINPROGRESS
+
+        private IList<VisualTransition> _transitions;
         /// <summary>
         /// Gets the collection of VisualTransition objects.
         /// </summary>
-        public IList<VisualTransition> Transitions { get; set; }
+        public IList<VisualTransition> Transitions
+        {
+            get
+            {
+                if(_transitions == null)
+                {
+                    _transitions = new List<VisualTransition>();
+                }
+                return _transitions;
+            }
+        }
 #endif
 
         ///// <summary>
