@@ -121,7 +121,8 @@ namespace System.IO.IsolatedStorage
 
         protected override void Dispose(bool disposing)
         {
-            _fs.Dispose();
+            if (_fs != null)
+                _fs.Dispose();
             base.Dispose(disposing);
         }
 
