@@ -63,7 +63,7 @@ namespace System.IO.IsolatedStorage
             if (mode == FileMode.Open || mode == FileMode.OpenOrCreate)
             {
                 //attempt to read the file:
-                string fileContent = Convert.ToString(Interop.ExecuteJavaScript("localStorage.getItem({0})", _filePath.ToLower()));
+                string fileContent = Convert.ToString(Interop.ExecuteJavaScript("localStorage.getItem($0)", _filePath.ToLower()));
                 if (fileContent != null) //note: the fileContent
                 {
                     byte[] bytes = Convert.FromBase64String(fileContent);
@@ -97,8 +97,8 @@ namespace System.IO.IsolatedStorage
 
             //update the localStorage:
             string filePath_lowered = _filePath.ToLower();
-            Interop.ExecuteJavaScript("localStorage.setItem({0}, {1})", filePath_lowered + "ǀǀCaseSensitivePath", _filePath); //Note: this is not a pipe (the thing we get with ctrl+alt+6), it is U+01C0
-            Interop.ExecuteJavaScript("localStorage.setItem({0}, {1})", filePath_lowered, System.Convert.ToBase64String(bytes));
+            Interop.ExecuteJavaScript("localStorage.setItem($0, $1)", filePath_lowered + "ǀǀCaseSensitivePath", _filePath); //Note: this is not a pipe (the thing we get with ctrl+alt+6), it is U+01C0
+            Interop.ExecuteJavaScript("localStorage.setItem($0, $1)", filePath_lowered, System.Convert.ToBase64String(bytes));
         }
 
         /// <summary>
