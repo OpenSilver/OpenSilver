@@ -565,7 +565,7 @@ namespace Windows.UI.Xaml.Controls
 #if BRIDGE
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                if (INTERNAL_BridgeWorkarounds.GetAssemblyNameWithoutCallingGetNameMethod(assembly)== assemblyName)
+                if (INTERNAL_BridgeWorkarounds.GetAssemblyNameWithoutCallingGetNameMethod(assembly) == assemblyName)
                 {
                     Type type = assembly.GetType(instancierName);
                     if (type != null)
@@ -796,7 +796,11 @@ namespace Windows.UI.Xaml.Controls
                 SubscribeToHashChanged();
 
                 // We make it so that when launching the application at an URL that has a particular Hash, the frame displays the correct initial page:
-                LocationHashChanged(); //to set the original page.
+                Dispatcher.BeginInvoke(() => // We use a dispatcher, so that the MainPage has the time to initialize itself (cf. Client_AS when launching directly at the "#/CategoryView" page)
+                {
+                    LocationHashChanged(); //to set the original page.
+                }
+                );
             }
         }
 
