@@ -1129,6 +1129,8 @@ namespace Windows.UI.Xaml.Controls
         }
 
 #if WORKINPROGRESS
+        #region Not supported yet
+
         /// <summary>Called before the <see cref="E:System.Windows.UIElement.MouseWheel" /> event occurs to provide handling for the event in a derived class without attaching a delegate. </summary>
         /// <param name="e">A <see cref="T:System.Windows.Input.MouseWheelEventArgs" /> that contains the event data.</param>
         protected virtual void OnMouseWheel(MouseWheelEventArgs e)
@@ -1136,9 +1138,7 @@ namespace Windows.UI.Xaml.Controls
             throw new NotImplementedException();
         }
 
-        #region Not supported yet
-
-        public static readonly DependencyProperty TabNavigationProperty = DependencyProperty.Register("TabNavigation", typeof(KeyboardNavigationMode), typeof(Control), null);
+        public static readonly DependencyProperty TabNavigationProperty = DependencyProperty.Register("TabNavigation", typeof(KeyboardNavigationMode), typeof(Control), new PropertyMetadata(KeyboardNavigationMode.Local));
 
         public KeyboardNavigationMode TabNavigation
         {
@@ -1146,7 +1146,7 @@ namespace Windows.UI.Xaml.Controls
             set { this.SetValue(Control.TabNavigationProperty, value); }
         }
 
-        public static readonly DependencyProperty FontStretchProperty = DependencyProperty.Register("FontStretch", typeof(FontStretch), typeof(Control), null);
+        public static readonly DependencyProperty FontStretchProperty = DependencyProperty.Register("FontStretch", typeof(FontStretch), typeof(Control), new PropertyMetadata(default(FontStretch)));
 
         /// <summary>
         ///     The stretch of the desired font.
