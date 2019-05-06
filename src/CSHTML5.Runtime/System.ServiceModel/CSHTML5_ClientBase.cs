@@ -723,19 +723,22 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 #endif
                 }
 #if BRIDGE
-                foreach (Attribute attribute in interfaceType.GetCustomAttributes(typeof(ServiceContractAttribute), true))
+                if (string.IsNullOrEmpty(soapActionPrefix))
                 {
-                    ServiceContractAttribute attributeAsDataContractAttribute = (ServiceContractAttribute)attribute;
-                    if (!string.IsNullOrWhiteSpace(attributeAsDataContractAttribute.Namespace))
+                    foreach (Attribute attribute in interfaceType.GetCustomAttributes(typeof(ServiceContractAttribute), true))
                     {
-                        interfaceTypeNamespace = attributeAsDataContractAttribute.Namespace;
-                        soapActionPrefix = attributeAsDataContractAttribute.Namespace;
+                        ServiceContractAttribute attributeAsDataContractAttribute = (ServiceContractAttribute)attribute;
+                        if (!string.IsNullOrWhiteSpace(attributeAsDataContractAttribute.Namespace))
+                        {
+                            interfaceTypeNamespace = attributeAsDataContractAttribute.Namespace;
+                            soapActionPrefix = attributeAsDataContractAttribute.Namespace;
+                        }
+                        if (!string.IsNullOrWhiteSpace(attributeAsDataContractAttribute.Name))
+                        {
+                            soapActionPrefix += attributeAsDataContractAttribute.Name + "/";
+                        }
+                        break;
                     }
-                    if (!string.IsNullOrWhiteSpace(attributeAsDataContractAttribute.Name))
-                    {
-                        soapActionPrefix += attributeAsDataContractAttribute.Name + "/";
-                    }
-                    break;
                 }
 #endif
 
