@@ -66,7 +66,7 @@ namespace CSHTML5.Internal
 #else
                 string assemblyName = INTERNAL_BridgeWorkarounds.GetAssemblyNameWithoutCallingGetNameMethod(assemblyWhereGenericXamlIsLocated);
 #endif
-                assemblyName = assemblyName.Replace(" ", "ǀǀ");
+                assemblyName = assemblyName.Replace(" ", "ǀǀ").Replace(".", "ǀǀ");
                 string factoryTypeName = MakeTitleCase("ǀǀ" + assemblyName + "ǀǀComponentǀǀThemesǀǀGenericǀǀXamlǀǀFactory");
                 Type resourceDictionaryFactoryType = assemblyWhereGenericXamlIsLocated.GetType(factoryTypeName);
                 if (resourceDictionaryFactoryType != null)
