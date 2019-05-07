@@ -635,6 +635,7 @@
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\IEasingFunction.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\IKeyFrame.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\KeySpline.cs" />
+    <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\ResolvedKeyFramesEntries.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\SplineColorKeyFrame.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\SplineDoubleKeyFrame.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Imaging\BitmapImage.cs" />
