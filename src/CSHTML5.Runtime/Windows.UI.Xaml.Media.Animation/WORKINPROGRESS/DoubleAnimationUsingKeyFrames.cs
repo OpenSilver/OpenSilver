@@ -24,6 +24,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
+using System.Windows.Threading;
 #if MIGRATION
 using System.Windows.Controls;
 #else 
@@ -40,32 +41,21 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Animates the value of a Double property along a set of key frames.
     /// </summary>
     [ContentProperty("KeyFrames")]
-    public sealed class DoubleAnimationUsingKeyFrames : DoubleAnimation
+    public sealed class DoubleAnimationUsingKeyFrames : Timeline
     {
-        ///// <summary>
-        ///// Initializes a new instance of the DoubleAnimationUsingKeyFrames class.
-        ///// </summary>
-        //public DoubleAnimationUsingKeyFrames();
 
-        ///// <summary>
-        ///// Gets or sets a value that declares whether animated properties that are considered
-        ///// dependent animations should be permitted to use this animation declaration.
-        ///// </summary>
-        //public bool EnableDependentAnimation
-        //{
-        //    get { return (bool)GetValue(EnableDependentAnimationProperty); }
-        //    set { SetValue(EnableDependentAnimationProperty, value); }
-        //}
-        ///// <summary>
-        ///// Identifies the EnableDependentAnimation dependency property.
-        ///// </summary>
-        //public static readonly DependencyProperty EnableDependentAnimationProperty =
-        //    DependencyProperty.Register("EnableDependentAnimation", typeof(bool), typeof(DoubleAnimationUsingKeyFrames), new PropertyMetadata(true));
+//#if WORKINPROGRESS
+        private IterationParameters _parameters;
+        private bool _isLastLoop;
 
+        private DoubleKeyFrameCollection _keyFrames;
 
+        private int _appliedKeyFramesCount;
+        private TimeSpan _ellapsedTime;
 
-#if WORKINPROGRESS
-        private DoubleKeyFrameCollection _keyFrames = new DoubleKeyFrameCollection();
+        private ResolvedKeyFramesEntries _resolvedKeyFrames;
+
+        private DoubleKeyFrame _currentKeyFrame;
         //     The collection of DoubleKeyFrame objects that define the animation. The default
         //     is an empty collection.
         /// <summary>
@@ -73,51 +63,165 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </summary>
         public DoubleKeyFrameCollection KeyFrames
         {
-            get { return _keyFrames; }
-            set { _keyFrames = value; }
+            get
+            {
+                if(_keyFrames == null)
+                {
+                    _keyFrames = new DoubleKeyFrameCollection();
+                }
+                return _keyFrames;
+            }
+            set
+            {
+                _keyFrames = value;
+            }
         }
+
+        private void InitializeKeyFramesSet()
+        {
+            _resolvedKeyFrames = new ResolvedKeyFramesEntries(_keyFrames);
+            _appliedKeyFramesCount = 0;
+            _ellapsedTime = new TimeSpan();
+        }
+
+        internal override void Apply(IterationParameters parameters, bool isLastLoop)
+        {
+            _parameters = parameters;
+            _isLastLoop = isLastLoop;
+            DependencyObject target;
+            PropertyPath propertyPath;
+            DependencyObject targetBeforePath;
+            GetPropertyPathAndTargetBeforePath(parameters.Target, out targetBeforePath, out propertyPath);
+            DependencyObject parentElement = targetBeforePath; //this will be the parent of the clonable element (if any).
+            foreach (Tuple<DependencyObject, DependencyProperty, int?> element in GoThroughElementsToAccessProperty(propertyPath, targetBeforePath))
+            {
+                DependencyObject depObject = element.Item1;
+                DependencyProperty depProp = element.Item2;
+                int? index = element.Item3;
+                if (depObject is ICloneOnAnimation)
+                {
+
+                    if (!((ICloneOnAnimation)depObject).IsAlreadyAClone())
+                    {
+                        object clone = ((ICloneOnAnimation)depObject).Clone();
+                        if (index != null)
+                        {
+#if BRIDGE
+                            parentElement.GetType().GetProperty("Item").SetValue(parentElement, clone, new object[] { index });
+#else
+                            //JSIL does not support SetValue(object, object, object[])
 #endif
+                        }
+                        else
+                        {
+                            parentElement.SetValue(depProp, clone);
+                        }
+                    }
+                    break;
+                }
+                else
+                {
+                    parentElement = depObject;
+                }
+            }
 
-        //internal override void Apply(FrameworkElement frameworkElement, bool useTransitions)
+            GetTargetElementAndPropertyInfo(parameters.Target, out target, out propertyPath);
+            //DependencyObject lastElementBeforeProperty = propertyPath.INTERNAL_AccessPropertyContainer(target);
+            DependencyProperty dp = GetProperty(target, propertyPath);
+
+            _currentKeyFrame = GetNextKeyFrame();
+            //while(_currentKeyFrame.KeyTime.TimeSpan.Ticks == 0)
+            //{
+            //    ApplyKeyFrame(target, parameters, propertyPath, _currentKeyFrame);
+            //    _currentKeyFrame = GetNextKeyFrame();
+            //}
+            ApplyKeyFrame(_currentKeyFrame);
+        }
+
+        private void ApplyKeyFrame(DoubleKeyFrame keyFrame)
+        {
+            if (keyFrame != null)
+            {
+                DoubleAnimation db = new DoubleAnimation()
+                {
+                    To = keyFrame.Value,
+                    Duration = keyFrame.KeyTime.TimeSpan - _ellapsedTime,
+                    BeginTime = TimeSpan.FromTicks(0)
+                };
+                db.Completed += ApplyNextKeyFrame;
+                Storyboard.SetTargetName(db, Storyboard.GetTargetName(this));
+                Storyboard.SetTargetProperty(db, Storyboard.GetTargetProperty(this));
+                Storyboard.SetTarget(db, Storyboard.GetTarget(this));
+                db.InitializeIteration();
+                db.StartFirstIteration(_parameters, _isLastLoop, new TimeSpan());
+                CheckTimeLineEndAndRaiseCompletedEvent(_parameters);
+            }
+        }
+
+        private void ApplyNextKeyFrame(object sender, EventArgs e)
+        {
+            _appliedKeyFramesCount++;
+            _ellapsedTime = _currentKeyFrame.KeyTime.TimeSpan;
+            _currentKeyFrame = GetNextKeyFrame();
+            ApplyKeyFrame(_currentKeyFrame);
+        }
+
+
+        private DoubleKeyFrame GetNextKeyFrame()
+        {
+            int nextKeyFrameIndex = _resolvedKeyFrames.GetNextKeyFrameIndex(_appliedKeyFramesCount);
+            if(nextKeyFrameIndex == -1)
+            {
+                return null;
+            }
+            else
+            {
+                return _keyFrames[nextKeyFrameIndex];
+            }
+        }
+
+        //private void ApplyKeyFrame(DependencyObject target, IterationParameters parameters, PropertyPath propertyPath, DoubleKeyFrame keyFrame)
         //{
-        //    DependencyObject target;
-        //    PropertyPath propertyPath;
-        //    Control frameworkElementAsControl = frameworkElement as Control;
-        //    if (frameworkElementAsControl != null)
-        //    {
-        //        GetTargetElementAndPropertyInfo(frameworkElement, out target, out propertyPath);
-        //        //DependencyObject lastElementBeforeProperty = propertyPath.INTERNAL_AccessPropertyContainer(target);
-        //        Type lastElementType = target.GetType();
-        //        PropertyInfo propertyInfo = lastElementType.GetProperty(propertyPath.INTERNAL_DependencyPropertyName);
-        //        object value = null;
-        //        KeyTime currentKeyTime = new KeyTime();
-        //        foreach (DoubleKeyFrame keyFrame in KeyFrames) //todo: replace what is inside of this foreach with a code that "starts" the keyframes (uses DispatcherTimer to apply the values at the right times)
-        //        {
-        //            if (keyFrame.KeyTime.TimeSpan >= currentKeyTime.TimeSpan)
-        //            {
-        //                value = keyFrame.Value;
-        //                currentKeyTime = keyFrame.KeyTime;
-        //            }
-        //        }
-        //        if (value is string && propertyInfo.PropertyType != typeof(string))
-        //        {
-        //            if (propertyInfo.PropertyType.IsEnum)
-        //            {
-        //                value = Enum.Parse(propertyInfo.PropertyType, (string)value);
-        //            }
-        //            else
-        //            {
-        //                //we convert the value from the given string:
-        //                value = DotNetForHtml5.Core.TypeFromStringConverters.ConvertFromInvariantString(propertyInfo.PropertyType, (string)value);
-        //            }
-        //        }
+        //    double value = keyFrame.Value;
 
+        //    if (parameters.IsVisualStateChange)
+        //    {
         //        propertyPath.INTERNAL_PropertySetVisualState(target, value);
-        //        //propertyInfo.SetValue(target, value);
         //    }
+        //    else
+        //    {
+        //        propertyPath.INTERNAL_PropertySetLocalValue(target, value);
+        //    }
+        //    _appliedKeyFramesCount++;
+        //    _ellapsedTime = keyFrame.KeyTime.TimeSpan;
         //}
 
+        object thisLock = new object();
+        internal void CheckTimeLineEndAndRaiseCompletedEvent(IterationParameters parameters)
+        {
+            bool raiseEvent = false;
+            lock (thisLock)
+            {
+                if (_appliedKeyFramesCount >= _keyFrames.Count)
+                {
+                    raiseEvent = true;
+                }
+            }
+            if (raiseEvent)
+            {
+                OnIterationCompleted(parameters);
+            }
+        }
 
+        internal override void IterateOnce(IterationParameters parameters, bool isLastLoop)
+        {
+            InitializeKeyFramesSet();
+            base.IterateOnce(parameters, isLastLoop);
+            Apply(parameters, isLastLoop);
+        }
+
+
+//#endif
 
     }
 }
