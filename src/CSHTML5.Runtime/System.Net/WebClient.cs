@@ -583,7 +583,8 @@ namespace System.Net
             Dictionary<string, string> headers = new Dictionary<string, string>();
             if (data != null && data.Length > 0)
             {
-                headers.Add("Content-Length", data.Length.ToString());
+                // Don't add the content-length we get the error :Refused to set unsafe header "Content-Length"
+                // headers.Add("Content-Length", data.Length.ToString());
                 //headers["Content-Type"] = ContentType; //todo: determine content type
             }
             foreach (string key in _headers.AllKeys)
