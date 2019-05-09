@@ -430,11 +430,12 @@ namespace System.Net
         private string UploadString(Uri address, string method, string data, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler onCompleted, bool isAsync) //todo: see if we should use UploadStringCompletedEventHandler instead
         {
             Dictionary<string, string> headers = new Dictionary<string, string>();
-            if (data != null && data.Length > 0)
-            {
-                headers.Add("Content-Length", data.Length.ToString());
-                //headers["Content-Type"] = ContentType; //todo: determine content type
-            }
+            // Don't add the content-length we get the error :Refused to set unsafe header "Content-Length"
+            //if (data != null && data.Length > 0)
+            //{
+            //    headers.Add("Content-Length", data.Length.ToString());
+            //    //headers["Content-Type"] = ContentType; //todo: determine content type
+            //}
             foreach (string key in _headers.AllKeys)
             {
                 headers.Add(key, _headers.Get(key)); //todo-perf: improve performance?
@@ -581,11 +582,12 @@ namespace System.Net
         public Task<string> UploadStringTaskAsync(Uri address, string method, string data)
         {
             Dictionary<string, string> headers = new Dictionary<string, string>();
-            if (data != null && data.Length > 0)
-            {
-                headers.Add("Content-Length", data.Length.ToString());
+            // Don't add the content-length we get the error :Refused to set unsafe header "Content-Length"
+            //if (data != null && data.Length > 0)
+            //{
+                // headers.Add("Content-Length", data.Length.ToString());
                 //headers["Content-Type"] = ContentType; //todo: determine content type
-            }
+            //}
             foreach (string key in _headers.AllKeys)
             {
                 headers.Add(key, _headers.Get(key)); //todo-perf: improve performance?
