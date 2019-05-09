@@ -1525,7 +1525,7 @@ namespace Windows.UI.Xaml
 
 
 
-        internal virtual void INTERNAL_AttachToDomEvents()
+        public virtual void INTERNAL_AttachToDomEvents()
         {
             if (_reactsToKeyboardEventsWhenFocused)
             {
@@ -1581,7 +1581,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal virtual void INTERNAL_DetachFromDomEvents()
+        public virtual void INTERNAL_DetachFromDomEvents()
         {
             if (_pointerMovedEventManager != null)
             {

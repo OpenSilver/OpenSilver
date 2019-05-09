@@ -33,7 +33,7 @@ using Windows.UI.Xaml;
 
 namespace CSHTML5.Internal
 {
-    class INTERNAL_EventManager<EVENT_HANDLER, EVENT_ARGS>
+    public class INTERNAL_EventManager<EVENT_HANDLER, EVENT_ARGS>
     {
         //-----------------------------------------------------------
         // Each "HtmlEventProxy" proxy is the link between a DOM event

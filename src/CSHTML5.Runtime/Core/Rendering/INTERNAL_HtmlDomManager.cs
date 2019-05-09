@@ -44,7 +44,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure to change the dynamic call from the Simulator as well.
 {
-    internal static class INTERNAL_HtmlDomManager // Note: this class is "internal" but still visible to the Simulator because of the "InternalsVisibleTo" flag in "Assembly.cs".
+    public static class INTERNAL_HtmlDomManager // Note: this class is "internal" but still visible to the Simulator because of the "InternalsVisibleTo" flag in "Assembly.cs".
     {
         //------
         // All JavaScript functions (called through dynamic objects) for manipulating the DOM should go here.

@@ -36,7 +36,7 @@ namespace CSHTML5.Internal
 #else
     [External]
 #endif
-    internal class INTERNAL_HtmlDomElementReference
+    public class INTERNAL_HtmlDomElementReference
     {
         public INTERNAL_HtmlDomElementReference(string uniqueIdentifier, INTERNAL_HtmlDomElementReference parent)
         {
