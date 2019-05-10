@@ -88,9 +88,6 @@ namespace Windows.UI.Xaml
                 style.width = "100%";
             else
                 style.width = "auto";
-            //Line height
-            style.lineHeight = "0";
-
 #if PERFSTAT
             Performance.Counter("Size/Alignment: INTERNAL_InitializeOuterDomElementWidthAndHeight", t0);
 #endif

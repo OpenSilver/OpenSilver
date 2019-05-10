@@ -169,8 +169,9 @@ namespace Windows.UI.Xaml.Shapes
                 double verticalMultiplicator;
                 Size shapeActualSize;
                 Shape.GetShapeInfos(this, out xOffsetToApplyBeforeMultiplication, out yOffsetToApplyBeforeMultiplication, out xOffsetToApplyAfterMultiplication, out yOffsetToApplyAfterMultiplication, out sizeX, out sizeY, out horizontalMultiplicator, out verticalMultiplicator, out shapeActualSize);
-
                 ApplyMarginToFixNegativeCoordinates(new Point());
+                //Fix line height issue for shape
+                FixLineHeight(this);
                 if (Stretch == Media.Stretch.None)
                 {
                     ApplyMarginToFixNegativeCoordinates(_marginOffsets);

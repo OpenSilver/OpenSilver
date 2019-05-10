@@ -173,6 +173,7 @@ namespace Windows.UI.Xaml.Shapes
                             break;
                     }
                 }
+
                 if (double.IsNaN(shape.Height))
                 {
                     switch (newValue)
@@ -950,6 +951,21 @@ context.restore();
                     dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(shape._canvasDomElement);
                     context.lineDashOffset = shape.StrokeDashOffset.ToString();
                 }
+            }
+        }
+        /// <summary>
+        /// This method fixes css property line-height for Rectangle.
+        /// Line height is not needed in shapes because it was causing layout issues.
+        /// </summary>
+        /// <param name="shape"></param>
+        internal void FixLineHeight(Shape shape)
+        {
+            if (shape == null) return;
+
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(shape))
+            {
+                dynamic shapeDom = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(shape);
+                shapeDom.lineHeight = "0";
             }
         }
 
