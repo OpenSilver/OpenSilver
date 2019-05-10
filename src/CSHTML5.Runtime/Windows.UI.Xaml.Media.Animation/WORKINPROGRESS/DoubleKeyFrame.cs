@@ -70,6 +70,11 @@ namespace Windows.UI.Xaml.Media.Animation
                 Value = (double)value;
             }
         }
+
+        internal virtual EasingFunctionBase INTERNAL_GetEasingFunction()
+        {
+            return null;
+        }
     }
 #endif
 }
