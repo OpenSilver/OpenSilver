@@ -43,6 +43,12 @@ namespace Windows.UI.Xaml.Media.Animation
             get { return (KeySpline)GetValue(KeySplineProperty); }
             set { SetValue(KeySplineProperty, value); }
         }
+
+        // todo: implement this. At the moment the animation is linear.
+        internal override EasingFunctionBase INTERNAL_GetEasingFunction()
+        {
+            return base.INTERNAL_GetEasingFunction();
+        }
     }
 #endif
 }

@@ -29,7 +29,30 @@ namespace Windows.UI.Xaml.Media.Animation
 #if WORKINPROGRESS
     public sealed class EasingDoubleKeyFrame : DoubleKeyFrame
     {
+        public static readonly DependencyProperty EasingFunctionProperty =  DependencyProperty.Register("EasingFunction",
+                                                                                                        typeof(EasingFunctionBase),
+                                                                                                        typeof(EasingDoubleKeyFrame),
+                                                                                                        new PropertyMetadata(null));
 
+        /// <summary>
+        /// EasingFunction
+        /// </summary>
+        public EasingFunctionBase EasingFunction
+        {
+            get
+            {
+                return (EasingFunctionBase)GetValue(EasingFunctionProperty);
+            }
+            set
+            {
+                SetValue(EasingFunctionProperty, value);
+            }
+        }
+
+        internal override EasingFunctionBase INTERNAL_GetEasingFunction()
+        {
+            return EasingFunction;
+        }
     }
 #endif
 }
