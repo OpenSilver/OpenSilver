@@ -43,8 +43,10 @@ namespace Windows.UI.Xaml.Media.Animation
     [ContentProperty("KeyFrames")]
     public sealed class DoubleAnimationUsingKeyFrames : Timeline
     {
+        string _targetName;
+        PropertyPath _targetProperty;
+        DependencyObject _target;
 
-//#if WORKINPROGRESS
         private IterationParameters _parameters;
         private bool _isLastLoop;
 
@@ -56,6 +58,7 @@ namespace Windows.UI.Xaml.Media.Animation
         private ResolvedKeyFramesEntries _resolvedKeyFrames;
 
         private DoubleKeyFrame _currentKeyFrame;
+        private DoubleAnimation _currentAnimation;
         //     The collection of DoubleKeyFrame objects that define the animation. The default
         //     is an empty collection.
         /// <summary>
@@ -130,11 +133,11 @@ namespace Windows.UI.Xaml.Media.Animation
             DependencyProperty dp = GetProperty(target, propertyPath);
 
             _currentKeyFrame = GetNextKeyFrame();
-            //while(_currentKeyFrame.KeyTime.TimeSpan.Ticks == 0)
-            //{
-            //    ApplyKeyFrame(target, parameters, propertyPath, _currentKeyFrame);
-            //    _currentKeyFrame = GetNextKeyFrame();
-            //}
+
+            _target = parameters.Target;
+            _targetProperty = propertyPath;
+            _targetName = Storyboard.GetTargetName(this);
+
             ApplyKeyFrame(_currentKeyFrame);
         }
 
@@ -142,18 +145,19 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             if (keyFrame != null)
             {
-                DoubleAnimation db = new DoubleAnimation()
+                _currentAnimation = new DoubleAnimation()
                 {
                     To = keyFrame.Value,
                     Duration = keyFrame.KeyTime.TimeSpan - _ellapsedTime,
-                    BeginTime = TimeSpan.FromTicks(0)
+                    BeginTime = TimeSpan.FromTicks(0),
+                    EasingFunction = keyFrame.INTERNAL_GetEasingFunction(),
                 };
-                db.Completed += ApplyNextKeyFrame;
-                Storyboard.SetTargetName(db, Storyboard.GetTargetName(this));
-                Storyboard.SetTargetProperty(db, Storyboard.GetTargetProperty(this));
-                Storyboard.SetTarget(db, Storyboard.GetTarget(this));
-                db.InitializeIteration();
-                db.StartFirstIteration(_parameters, _isLastLoop, new TimeSpan());
+                _currentAnimation.Completed += ApplyNextKeyFrame;
+                Storyboard.SetTargetName(_currentAnimation, _targetName);
+                Storyboard.SetTargetProperty(_currentAnimation, _targetProperty);
+                Storyboard.SetTarget(_currentAnimation, _target);
+                _currentAnimation.InitializeIteration();
+                _currentAnimation.StartFirstIteration(_parameters, _isLastLoop, new TimeSpan());
                 CheckTimeLineEndAndRaiseCompletedEvent(_parameters);
             }
         }
@@ -180,21 +184,17 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        //private void ApplyKeyFrame(DependencyObject target, IterationParameters parameters, PropertyPath propertyPath, DoubleKeyFrame keyFrame)
-        //{
-        //    double value = keyFrame.Value;
 
-        //    if (parameters.IsVisualStateChange)
-        //    {
-        //        propertyPath.INTERNAL_PropertySetVisualState(target, value);
-        //    }
-        //    else
-        //    {
-        //        propertyPath.INTERNAL_PropertySetLocalValue(target, value);
-        //    }
-        //    _appliedKeyFramesCount++;
-        //    _ellapsedTime = keyFrame.KeyTime.TimeSpan;
-        //}
+        internal override void Stop(FrameworkElement frameworkElement, string groupName, bool revertToFormerValue = false) //frameworkElement is for the animations requiring the use of GetCssEquivalent
+        {
+            base.Stop(frameworkElement, groupName, revertToFormerValue);
+
+            if(_currentAnimation != null)
+            {
+                _currentAnimation.Stop(frameworkElement, groupName, revertToFormerValue);
+                _currentAnimation = null;
+            }
+        }
 
         object thisLock = new object();
         internal void CheckTimeLineEndAndRaiseCompletedEvent(IterationParameters parameters)
@@ -219,9 +219,5 @@ namespace Windows.UI.Xaml.Media.Animation
             base.IterateOnce(parameters, isLastLoop);
             Apply(parameters, isLastLoop);
         }
-
-
-//#endif
-
     }
 }
