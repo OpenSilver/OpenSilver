@@ -725,7 +725,7 @@ namespace Windows.UI.Xaml
         public event DependencyPropertyChangedEventHandler DataContextChanged;
 
 
-        public static readonly DependencyProperty FlowDirectionProperty = DependencyProperty.Register("FlowDirection", typeof(FlowDirection), typeof(FrameworkElement), null);
+        public static readonly DependencyProperty FlowDirectionProperty = DependencyProperty.Register("FlowDirection", typeof(FlowDirection), typeof(FrameworkElement), new PropertyMetadata(FlowDirection.LeftToRight));
 
         /// <summary>Gets or sets the direction that text and other user interface elements flow within any parent element that controls their layout.</summary>
         /// <returns>The direction that text and other UI elements flow within their parent element, as a value of the enumeration. The default value is <see cref="F:System.Windows.FlowDirection.LeftToRight" />.</returns>

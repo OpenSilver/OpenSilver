@@ -74,11 +74,39 @@ namespace Windows.UI.Xaml.Controls
         {
             if (NavigateUri != null)
             {
-                HtmlPage.Window.Navigate(NavigateUri, "_blank");
+                string targetName = this.TargetName;
+                object targetElement = null;
+
+                // Look for an element within the application (in the Visual Tree) that has the specified TargetName and implements INavigate:
+                if (!string.IsNullOrEmpty(targetName)
+                    && (targetElement = this.FindName(targetName)) is INavigate) //todo: verify that "FindName" is enough to find the element (it walks up the visual tree and looks in the elements that implement INameScope) or if we should manually traverse all the nodes of the Visual Tree.
+                {
+                    //-----------------
+                    // Navigation within the application
+                    //-----------------
+
+                    ((INavigate)targetElement).Navigate(NavigateUri);
+                }
+                else
+                {
+                    //-----------------
+                    // External navigation (browser navigation)
+                    //-----------------
+
+                    if (string.IsNullOrEmpty(targetName))
+                    {
+#if MIGRATION
+                        targetName = "_self";
+#else
+                        targetName = "_blank";
+#endif
+                    }
+                    HtmlPage.Window.Navigate(NavigateUri, targetName);
+                }
             }
         }
 
-        
+
         /// <summary>
         /// Gets or sets the Uniform Resource Identifier (URI) to navigate to when the
         /// HyperlinkButton is clicked.
@@ -93,6 +121,24 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty NavigateUriProperty =
             DependencyProperty.Register("NavigateUri", typeof(Uri), typeof(HyperlinkButton), new PropertyMetadata(null));
+
+
+
+        /// <summary>
+        /// Gets or sets the name of the target window or frame that the Web page should
+        /// open in, or the name of the object within the application to navigate to.
+        /// </summary>
+        public string TargetName
+        {
+            get { return (string)GetValue(TargetNameProperty); }
+            set { SetValue(TargetNameProperty, value); }
+        }
+        /// <summary>
+        /// Identifies the TargetName dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TargetNameProperty =
+            DependencyProperty.Register("TargetName", typeof(string), typeof(HyperlinkButton), new PropertyMetadata(""));
+
 
     }
 }

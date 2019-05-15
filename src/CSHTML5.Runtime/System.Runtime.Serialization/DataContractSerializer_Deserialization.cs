@@ -381,7 +381,18 @@ namespace System.Runtime.Serialization
                     foreach (var item in (IList)list)
                     {
                         dynamic dynamicItem = item;// using a dynamic here since it it much simpler but if it causes issues, we should use reflection to get Key and Value.
+#if BRIDGE
+                        if (Interop.IsRunningInTheSimulator)
+                        {
+                            addMethod.Invoke(result2, new object[] { dynamicItem.Key, dynamicItem.Value });
+                        }
+                        else
+                        {
+                            addMethod.Invoke(result2, new object[] { dynamicItem.key, dynamicItem.value });
+                        }
+#else
                         addMethod.Invoke(result2, new object[] { dynamicItem.Key, dynamicItem.Value });
+#endif
                     }
                 }
 
@@ -418,6 +429,8 @@ namespace System.Runtime.Serialization
             // Quit if attempting to deserialize to an interface: //todo: investigate why this may happen.
             if (!resultType.IsInterface)
             {
+                string resultTypeFullName = resultType.FullName; // For debugging only, can be removed.
+
                 // Create the resulting class:
                 object resultInstance = Activator.CreateInstance(resultType); //todo: replace with "System.Runtime.Serialization.FormatterServices.GetUninitializedObject(type)" so that the type does not require a parameterless constructor.
 

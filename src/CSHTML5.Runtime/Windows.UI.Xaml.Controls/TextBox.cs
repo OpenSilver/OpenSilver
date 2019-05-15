@@ -325,11 +325,11 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
         //        }
         //    });
         public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register("SelectionBackground", typeof(Brush), typeof(TextBox), null);
- 
+
         #endregion
 #endif
 
-        internal override void INTERNAL_AttachToDomEvents()
+        public override void INTERNAL_AttachToDomEvents()
         {
             base.INTERNAL_AttachToDomEvents();
         }

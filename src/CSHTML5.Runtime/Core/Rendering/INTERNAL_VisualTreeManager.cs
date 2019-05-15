@@ -48,7 +48,7 @@ using Windows.UI.Xaml.Input;
 
 namespace CSHTML5.Internal
 {
-    internal static class INTERNAL_VisualTreeManager
+    public static class INTERNAL_VisualTreeManager
     {
 
         public static void DetachVisualChildIfNotNull(UIElement child, UIElement parent)
@@ -787,7 +787,7 @@ namespace CSHTML5.Internal
 #endregion
         }
 
-        internal static bool IsElementInVisualTree(UIElement child)
+        public static bool IsElementInVisualTree(UIElement child)
         {
             return (child is Window || child is PopupRoot || child.INTERNAL_VisualParent != null); //todo: replace "INTERNAL_VisualParent" with a check of the "_isLoaded" property? (it may work better with bindings, see for example the issue on March 22, where a "Binding" on ListBox.ItemsSource caused the selection to not work properly: it was fixed with a workaround to avoid possible regressions)
         }

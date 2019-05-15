@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         bool _isStreamAsBase64StringValid = false;
 
         private string _streamAsBase64String;
-        internal string INTERNAL_StreamAsBase64String
+        public string INTERNAL_StreamAsBase64String
         {
             get
             {
@@ -76,7 +76,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         protected BitmapSource() : base() { }
 
         private Stream _streamSource;
-        internal Stream INTERNAL_StreamSource
+        public Stream INTERNAL_StreamSource
         {
             get { return _streamSource; }
             private set { _streamSource = value; }
@@ -126,7 +126,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         /// 
         /// Returns the identifier for the PixelHeight dependency property.
         /// </summary>
-        public static readonly DependencyProperty PixelHeightProperty = DependencyProperty.Register("PixelHeight", typeof(int), typeof(BitmapSource), null);
+        public static readonly DependencyProperty PixelHeightProperty = DependencyProperty.Register("PixelHeight", typeof(int), typeof(BitmapSource), new PropertyMetadata(0));
 
         /// <summary>
         /// Gets the width of the bitmap in pixels.
@@ -141,7 +141,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         /// 
         /// Returns the identifier for the PixelWidth dependency property.
         /// </summary>
-        public static readonly DependencyProperty PixelWidthProperty = DependencyProperty.Register("PixelWidth", typeof(int), typeof(BitmapSource), null);
+        public static readonly DependencyProperty PixelWidthProperty = DependencyProperty.Register("PixelWidth", typeof(int), typeof(BitmapSource), new PropertyMetadata(0));
         
         
         ////

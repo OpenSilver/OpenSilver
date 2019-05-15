@@ -71,7 +71,11 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <summary>
         /// Gets the collection of DoubleKeyFrame objects that define the animation.
         /// </summary>
-        public DoubleKeyFrameCollection KeyFrames { get { return _keyFrames; } }
+        public DoubleKeyFrameCollection KeyFrames
+        {
+            get { return _keyFrames; }
+            set { _keyFrames = value; }
+        }
 #endif
 
         //internal override void Apply(FrameworkElement frameworkElement, bool useTransitions)
@@ -112,6 +116,7 @@ namespace Windows.UI.Xaml.Media.Animation
         //        //propertyInfo.SetValue(target, value);
         //    }
         //}
+
 
 
     }

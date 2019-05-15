@@ -21,6 +21,7 @@ using CSHTML5;
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -223,7 +224,7 @@ namespace Windows.UI.Xaml.Data
                         {
                             nonNullableMemberType = Nullable.GetUnderlyingType(propertyType); //We know the value is not null here.
                         }
-                        if(!AreNumericTypes(nonNullableMemberType, value))
+                        if (!AreNumericTypes(nonNullableMemberType, value))
                         {
                             Type valueType = value.GetType();
                             if (!(valueType.Name == "Array" && typeof(IEnumerable).IsAssignableFrom(nonNullableMemberType)))
@@ -238,7 +239,7 @@ namespace Windows.UI.Xaml.Data
                         }
                     }
                 }
-                
+
             }
 
             return value;
@@ -288,9 +289,19 @@ namespace Windows.UI.Xaml.Data
             {
                 try //this try/catch block is solely for the purpose of not raising an exception so that the GetValue finishes its thing (including handling the case where the conversion cannot be done).
                 {
-                        value = global::DotNetForHtml5.Core.TypeFromStringConverters.ConvertFromInvariantString(targetType, (string)value);
+                    value = global::DotNetForHtml5.Core.TypeFromStringConverters.ConvertFromInvariantString(targetType, (string)value);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    if (Application.Current.Host.Settings.EnableBindingErrorsLogging)
+                    {
+                        Debug.WriteLine(ex.ToString());
+                    }
+                    if (Application.Current.Host.Settings.EnableBindingErrorsThrowing)
+                    {
+                        throw;
+                    }
+                }
             }
 
             // Some hard-coded conversions: //todo: generalize this system by implementing "TypeConverter" and "TypeConverterAttribute"

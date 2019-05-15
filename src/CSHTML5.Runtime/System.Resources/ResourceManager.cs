@@ -89,15 +89,22 @@ namespace System.Resources
             if (culture == null)
                 culture = System.Globalization.CultureInfo.CurrentCulture;
 
-            string pathInJSThroughBaseNameField = "";
-            object currentElementInJSPath = Interop.ExecuteJavaScript("document.ResXFiles");
-
-            foreach (string pathPart in BaseNameField.Split('.'))
+            if (Interop.IsRunningInTheSimulator)
             {
-                currentElementInJSPath = Interop.ExecuteJavaScript("{0}[{1}]", currentElementInJSPath, pathPart);
+                return name;
             }
+            else
+            {
+                string pathInJSThroughBaseNameField = "";
+                object currentElementInJSPath = Interop.ExecuteJavaScript("document.ResXFiles");
 
-            return Convert.ToString(Interop.ExecuteJavaScript("{0}[{1}]", currentElementInJSPath, name));
+                foreach (string pathPart in BaseNameField.Split('.'))
+                {
+                    currentElementInJSPath = Interop.ExecuteJavaScript("{0}[{1}]", currentElementInJSPath, pathPart);
+                }
+
+                return Convert.ToString(Interop.ExecuteJavaScript("{0}[{1}]", currentElementInJSPath, name));
+            }
         }
 
         //todo:

@@ -33,7 +33,11 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Defines an animation segment with its own target value and interpolation
     /// method for an ObjectAnimationUsingKeyFrames.
     /// </summary>
+#if WORKINPROGRESS
+    public class ObjectKeyFrame : DependencyObject, IKeyFrame
+#else
     public class ObjectKeyFrame : DependencyObject
+#endif
     {
         ///// <summary>
         ///// Provides base class initialization behavior for ObjectKeyFrame-derived classes.

@@ -427,7 +427,7 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
 
 
         //todo: create a test case for those events.
-        internal override void INTERNAL_AttachToDomEvents()
+        public override void INTERNAL_AttachToDomEvents()
         {
             base.INTERNAL_AttachToDomEvents();
             if (_imageOpenedEventManager != null)
@@ -440,7 +440,7 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
             }
         }
 
-        internal override void INTERNAL_DetachFromDomEvents()
+        public override void INTERNAL_DetachFromDomEvents()
         {
             base.INTERNAL_DetachFromDomEvents();
             if (_imageOpenedEventManager != null)

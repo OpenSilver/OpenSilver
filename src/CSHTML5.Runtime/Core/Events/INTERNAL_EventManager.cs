@@ -33,7 +33,7 @@ using Windows.UI.Xaml;
 
 namespace CSHTML5.Internal
 {
-    class INTERNAL_EventManager<EVENT_HANDLER, EVENT_ARGS>
+    public class INTERNAL_EventManager<EVENT_HANDLER, EVENT_ARGS>
     {
         //-----------------------------------------------------------
         // Each "HtmlEventProxy" proxy is the link between a DOM event
@@ -55,11 +55,11 @@ namespace CSHTML5.Internal
         private List<EVENT_HANDLER> _handlers = new List<EVENT_HANDLER>();
         private List<EVENT_HANDLER> _handlersForHandledEventsToo = new List<EVENT_HANDLER>();
 
-        internal List<EVENT_HANDLER> Handlers
+        public List<EVENT_HANDLER> Handlers
         {
             get { return _handlers; }
         }
-        internal List<EVENT_HANDLER> HandlersForHandledEventsToo
+        public List<EVENT_HANDLER> HandlersForHandledEventsToo
         {
             get { return _handlersForHandledEventsToo; }
         }
@@ -167,7 +167,7 @@ namespace CSHTML5.Internal
             }
         }
 
-        internal void AttachToDomEvents()
+        public void AttachToDomEvents()
         {
             if (_handlers.Count > 0 || _handlersForHandledEventsToo.Count > 0)
             {
@@ -175,7 +175,7 @@ namespace CSHTML5.Internal
             }
         }
 
-        internal void DetachFromDomEvents()
+        public void DetachFromDomEvents()
         {
             if (_isListeningToDomEvents && _htmlEventProxies != null)
             {

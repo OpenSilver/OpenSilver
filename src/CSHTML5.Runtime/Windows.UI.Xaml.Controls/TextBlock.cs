@@ -216,7 +216,7 @@ namespace Windows.UI.Xaml.Controls
         #region Not supported yet
 
         // There is an implementation for TextTrimming in the shelvesheets
-        public static readonly DependencyProperty TextTrimmingProperty = DependencyProperty.Register("TextTrimming", typeof(TextTrimming), typeof(TextBlock), null);
+        public static readonly DependencyProperty TextTrimmingProperty = DependencyProperty.Register("TextTrimming", typeof(TextTrimming), typeof(TextBlock), new PropertyMetadata(TextTrimming.None));
 
         /// <summary>
         /// Gets or sets how the TextBlock trims text.
