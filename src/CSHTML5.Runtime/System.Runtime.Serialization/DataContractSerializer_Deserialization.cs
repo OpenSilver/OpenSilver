@@ -381,7 +381,18 @@ namespace System.Runtime.Serialization
                     foreach (var item in (IList)list)
                     {
                         dynamic dynamicItem = item;// using a dynamic here since it it much simpler but if it causes issues, we should use reflection to get Key and Value.
+#if BRIDGE
+                        if (Interop.IsRunningInTheSimulator)
+                        {
+                            addMethod.Invoke(result2, new object[] { dynamicItem.Key, dynamicItem.Value });
+                        }
+                        else
+                        {
+                            addMethod.Invoke(result2, new object[] { dynamicItem.key, dynamicItem.value });
+                        }
+#else
                         addMethod.Invoke(result2, new object[] { dynamicItem.Key, dynamicItem.Value });
+#endif
                     }
                 }
 
