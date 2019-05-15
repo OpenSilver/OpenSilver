@@ -37,7 +37,7 @@ using System.Windows.Browser;
 
 namespace CSHTML5.Internal
 {
-    internal static class INTERNAL_UriHelper
+    public static class INTERNAL_UriHelper
     {
         /// <summary>
         /// Converts to an URI suitable to use in the HTML5 "src" property.

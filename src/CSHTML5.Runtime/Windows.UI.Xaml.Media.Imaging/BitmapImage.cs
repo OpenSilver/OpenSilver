@@ -52,7 +52,7 @@ namespace Windows.UI.Xaml.Media.Imaging
             UriSource = uriSource;
         }
 
-        internal string INTERNAL_NameOfAssemblyThatSetTheSourceUri; // Useful to convert relative URI to absolute URI.
+        public string INTERNAL_NameOfAssemblyThatSetTheSourceUri; // Useful to convert relative URI to absolute URI.
 
 
         // Summary:

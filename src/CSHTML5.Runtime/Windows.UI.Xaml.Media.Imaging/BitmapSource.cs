@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         bool _isStreamAsBase64StringValid = false;
 
         private string _streamAsBase64String;
-        internal string INTERNAL_StreamAsBase64String
+        public string INTERNAL_StreamAsBase64String
         {
             get
             {
@@ -76,7 +76,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         protected BitmapSource() : base() { }
 
         private Stream _streamSource;
-        internal Stream INTERNAL_StreamSource
+        public Stream INTERNAL_StreamSource
         {
             get { return _streamSource; }
             private set { _streamSource = value; }

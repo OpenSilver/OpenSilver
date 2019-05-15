@@ -66,7 +66,7 @@ namespace Windows.UI.Xaml
                 else
                     return null;
             }
-            internal set
+            set
             {
                 if (value == null || !(value is DependencyObject))
                 {
