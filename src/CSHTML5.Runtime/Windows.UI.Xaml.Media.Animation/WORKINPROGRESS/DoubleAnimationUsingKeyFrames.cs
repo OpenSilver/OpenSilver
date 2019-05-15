@@ -89,6 +89,8 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal override void Apply(IterationParameters parameters, bool isLastLoop)
         {
+            StopCurrentAnimation(parameters.Target, revertToFormerValue: false);
+
             _parameters = parameters;
             _isLastLoop = isLastLoop;
             DependencyObject target;
@@ -189,7 +191,12 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             base.Stop(frameworkElement, groupName, revertToFormerValue);
 
-            if(_currentAnimation != null)
+            StopCurrentAnimation(frameworkElement, groupName, revertToFormerValue);
+        }
+
+        private void StopCurrentAnimation(FrameworkElement frameworkElement, string groupName = "visualStateGroupName", bool revertToFormerValue = false)
+        {
+            if (_currentAnimation != null)
             {
                 _currentAnimation.Stop(frameworkElement, groupName, revertToFormerValue);
                 _currentAnimation = null;
