@@ -24,7 +24,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
-using System.Windows.Threading;
 #if MIGRATION
 using System.Windows.Controls;
 #else 
@@ -43,6 +42,7 @@ namespace Windows.UI.Xaml.Media.Animation
     [ContentProperty("KeyFrames")]
     public sealed class DoubleAnimationUsingKeyFrames : Timeline
     {
+#if WORKINPROGRESS
         string _targetName;
         PropertyPath _targetProperty;
         DependencyObject _target;
@@ -226,5 +226,6 @@ namespace Windows.UI.Xaml.Media.Animation
             base.IterateOnce(parameters, isLastLoop);
             Apply(parameters, isLastLoop);
         }
+#endif
     }
 }
