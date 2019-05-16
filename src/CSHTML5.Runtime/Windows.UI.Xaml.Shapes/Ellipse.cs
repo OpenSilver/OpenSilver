@@ -46,7 +46,7 @@ namespace Windows.UI.Xaml.Shapes
 
         static Ellipse()
         {
-            Ellipse.StretchProperty.OverrideMetadata(typeof(Ellipse), new PropertyMetadata(Stretch.Fill, Shape.Stretch_Changed));
+            Shape.StretchProperty.OverrideMetadata(typeof(Ellipse), new PropertyMetadata(Stretch.Fill, Shape.Stretch_Changed));
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
