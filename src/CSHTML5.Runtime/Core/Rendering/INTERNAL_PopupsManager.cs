@@ -297,11 +297,11 @@ $1.removeChild(popupRoot);
                     // Adjust the position of the popup to remain on-screen:
                     if (widthOfAreaOutsideBounds > 0)
                     {
-                        popup.HorizontalOffset = popup.HorizontalOffset - widthOfAreaOutsideBounds;
+                        popup.HorizontalOffset = popup.HorizontalOffset - widthOfAreaOutsideBounds; //todo: this is probably incorrect, popup.HorizontalOffset should not be changed internally, only the user should be allowed to change it. Add another internal Property to adjust the position.
                     }
                     if (heightOfAreaOutsideBounds > 0)
                     {
-                        popup.VerticalOffset = popup.VerticalOffset - heightOfAreaOutsideBounds;
+                        popup.VerticalOffset = popup.VerticalOffset - heightOfAreaOutsideBounds; //todo: same as for HorizontalOffset.
                     }
                 }
             }

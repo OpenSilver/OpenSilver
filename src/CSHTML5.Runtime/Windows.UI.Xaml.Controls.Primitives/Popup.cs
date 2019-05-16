@@ -46,10 +46,18 @@ namespace Windows.UI.Xaml.Controls.Primitives
     [ContentProperty("Child")]
     public class Popup : FrameworkElement
     {
+        // Note for proper placement of the popup:
+        //      - The HorizontalOffset and VerticalOffset define the placement of the Popup relative to the reference point.
+        //      - The reference point is determined by the Placement and placement target. If the PlacementTarget property is not set, the placement target is the popup's parent. If the popup does not have a parent, then it is the top-left corner of the window (In wpf, it is the top-left corner of the screen but we're in a browser so we cannot do that).
+        // Therefore, in order to correctly place the Popup, Horizontal and VerticalOffset should only be user-defined, and the only coordinates that should be internally set are those of the reference point.
+
+
         PopupRoot _popupRoot;
         Border _outerBorder; // Used for positioning and alignment.
         bool _isVisible;
-        Point _parentPosition = new Point(); // This is the (X,Y) position of the parent, in case the Popup control is in the Visual Tree.
+        Point _referencePosition = new Point(); // This is the (X,Y) position of the reference point defined in the "Note for proper placement of the popup" above.
+        
+
 
         ControlToWatch _controlToWatch; //Note: this is set when the popup is attached to an UIElement, so that we can remove it from the timer for refreshing the position of the popup when needed.
 
@@ -72,7 +80,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Gets or Sets the UIElement that the Popup will stick to. A null value will make the Popup stay at its originally defined position.
         /// </summary>
-        public UIElement PlacementTarget
+        public UIElement PlacementTarget //todo: change this into a DependencyProperty
         {
             get { return _placementTarget; }
             set { _placementTarget = value; }
@@ -82,7 +90,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Gets or sets the position of the Popup relative to the UIElement it is attached to. NOTE: The only currently supported positions are Right and Bottom.
         /// </summary>
-        public PlacementMode Placement
+        public PlacementMode Placement //todo: change this into a DependencyProperty
         {
             get { return _placement; }
             set { _placement = value; }
@@ -261,8 +269,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                         break;
                 }
 
-                HorizontalOffset = placementTargetPosition.X;
-                VerticalOffset = placementTargetPosition.Y;
+                _referencePosition = placementTargetPosition;
+                RepositionPopup(HorizontalOffset, VerticalOffset);
             }
 
             // Raise the internal "PopupMoved" event, which is useful for example to hide the validation popups of TextBoxes in case the user scrolls and the TextBox is no longer visible on screen (cf. ZenDesk 628):
@@ -292,8 +300,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private static void HorizontalOffset_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var popup = (Popup)d;
-            if (popup._outerBorder != null)
-                popup._outerBorder.Margin = new Thickness(popup._parentPosition.X + (double)e.NewValue, popup._parentPosition.Y + popup.VerticalOffset, 0d, 0d);
+            popup.RepositionPopup((double)e.NewValue, popup.VerticalOffset); //todo: the first parameter might need to be changed to a popup._relativePosition which takes into consideration the Placement, PlacementTarget and whether the Popup is in the Visual Tree.
         }
 
 
@@ -319,11 +326,16 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private static void VerticalOffset_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var popup = (Popup)d;
-            if (popup._outerBorder != null)
-                popup._outerBorder.Margin = new Thickness(popup._parentPosition.X + popup.HorizontalOffset, popup._parentPosition.Y + (double)e.NewValue, 0d, 0d);
+            popup.RepositionPopup(popup.HorizontalOffset, (double)e.NewValue);
         }
 
-
+        private void RepositionPopup(double horizontalOffset, double verticalOffset)
+        {
+            if (_outerBorder != null)
+            {
+                _outerBorder.Margin = new Thickness(_referencePosition.X + horizontalOffset, _referencePosition.Y + verticalOffset, 0d, 0d);
+            }
+        }
 
         //-----------------------
         // HORIZONTALCONTENTALIGNMENT (This is specific to CSHTML5 and is very useful for having full-screen popups such as ChildWindows)
@@ -406,7 +418,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     _outerBorder.Child = null;
 
                 // Calculate the position of the parent of the popup, in case that the popup is in the Visual Tree:
-                _parentPosition = CalculateParentPositionIfAny(parentWindow) ?? new Point();
+                _referencePosition = CalculateReferencePosition(parentWindow) ?? new Point();
 
                 // We make it transparent to clicks only if either the popup has a false "IsHitTestVisible", or the content of the popup has a false "IsHitTestVisible":
                 bool transparentToClicks = (!this.IsHitTestVisible) || (child is FrameworkElement && !((FrameworkElement)child).IsHitTestVisible);
@@ -414,7 +426,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 // Create a surrounding border to enable positioning and alignment:
                 _outerBorder = new Border()
                 {
-                    Margin = new Thickness(_parentPosition.X + this.HorizontalOffset, _parentPosition.Y + this.VerticalOffset, 0d, 0d),
+                    Margin = new Thickness(_referencePosition.X + this.HorizontalOffset, _referencePosition.Y + this.VerticalOffset, 0d, 0d),
                     Child = child,
                     HorizontalAlignment = this.HorizontalContentAlignment,
                     VerticalAlignment = this.VerticalContentAlignment,
@@ -461,15 +473,21 @@ namespace Windows.UI.Xaml.Controls.Primitives
             return parentWindow;
         }
 
-        private Point? CalculateParentPositionIfAny(Window parentWindow)
+        private Point? CalculateReferencePosition(Window parentWindow)
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            UIElement placementTarget = this.PlacementTarget;
+            if (placementTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(placementTarget))
+            {
+                GeneralTransform gt = placementTarget.TransformToVisual(parentWindow);
+                Point p = gt.Transform(new Point(0d, 0d));
+            }
+            else if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
                 GeneralTransform gt = this.TransformToVisual(parentWindow);
                 Point p = gt.Transform(new Point(0d, 0d));
                 return p;
             }
-            return null;
+            return new Point();
         }
 
 
