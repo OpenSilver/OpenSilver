@@ -34,7 +34,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if WORKINPROGRESS
+#if !WORKINPROGRESS
     // Summary:
     //     Provides a common collection class for Silverlight collections.
     //

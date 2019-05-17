@@ -42,7 +42,6 @@ namespace Windows.UI.Xaml.Media.Animation
     [ContentProperty("KeyFrames")]
     public sealed class DoubleAnimationUsingKeyFrames : Timeline
     {
-#if WORKINPROGRESS
         string _targetName;
         PropertyPath _targetProperty;
         DependencyObject _target;
@@ -226,6 +225,5 @@ namespace Windows.UI.Xaml.Media.Animation
             base.IterateOnce(parameters, isLastLoop);
             Apply(parameters, isLastLoop);
         }
-#endif
     }
 }

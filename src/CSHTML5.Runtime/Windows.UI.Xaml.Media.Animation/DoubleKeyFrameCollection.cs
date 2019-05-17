@@ -18,7 +18,12 @@
 
 
 using System;
-
+using System.Collections.Generic;
+#if MIGRATION
+using System.Windows;
+#else
+using Windows.UI.Xaml;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -27,32 +32,10 @@ namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
 #if WORKINPROGRESS
-    public sealed class EasingDoubleKeyFrame : DoubleKeyFrame
-    {
-        public static readonly DependencyProperty EasingFunctionProperty =  DependencyProperty.Register("EasingFunction",
-                                                                                                        typeof(EasingFunctionBase),
-                                                                                                        typeof(EasingDoubleKeyFrame),
-                                                                                                        new PropertyMetadata(null));
-
-        /// <summary>
-        /// EasingFunction
-        /// </summary>
-        public EasingFunctionBase EasingFunction
-        {
-            get
-            {
-                return (EasingFunctionBase)GetValue(EasingFunctionProperty);
-            }
-            set
-            {
-                SetValue(EasingFunctionProperty, value);
-            }
-        }
-
-        internal override EasingFunctionBase INTERNAL_GetEasingFunction()
-        {
-            return EasingFunction;
-        }
-    }
+    public sealed class DoubleKeyFrameCollection : PresentationFrameworkCollection<DoubleKeyFrame>
+#else
+    public sealed class DoubleKeyFrameCollection : List<DoubleKeyFrame>
 #endif
+    {
+    }
 }

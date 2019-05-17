@@ -18,11 +18,6 @@
 
 
 using System;
-#if MIGRATION
-using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -30,9 +25,11 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if WORKINPROGRESS
-    public sealed class DoubleKeyFrameCollection : PresentationFrameworkCollection<DoubleKeyFrame>
+    public interface IEasingFunction
     {
+        /// <summary>Transforms normalized time to control the pace of an animation.</summary>
+        /// <returns>The transformed progress.</returns>
+        /// <param name="normalizedTime">Normalized time (progress) of the animation.</param>
+        double Ease(double normalizedTime);
     }
-#endif
 }
