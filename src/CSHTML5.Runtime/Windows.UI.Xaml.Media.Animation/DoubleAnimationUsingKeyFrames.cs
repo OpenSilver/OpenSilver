@@ -54,7 +54,7 @@ namespace Windows.UI.Xaml.Media.Animation
         private int _appliedKeyFramesCount;
         private TimeSpan _ellapsedTime;
 
-        private ResolvedKeyFramesEntries _resolvedKeyFrames;
+        private INTERNAL_ResolvedKeyFramesEntries _resolvedKeyFrames;
 
         private DoubleKeyFrame _currentKeyFrame;
         private DoubleAnimation _currentAnimation;
@@ -81,7 +81,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
         private void InitializeKeyFramesSet()
         {
-            _resolvedKeyFrames = new ResolvedKeyFramesEntries(_keyFrames);
+            _resolvedKeyFrames = new INTERNAL_ResolvedKeyFramesEntries(_keyFrames);
             _appliedKeyFramesCount = 0;
             _ellapsedTime = new TimeSpan();
         }
