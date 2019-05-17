@@ -55,7 +55,7 @@ namespace Windows.UI.Xaml.Shapes
     {
         static Rectangle()
         {
-            Rectangle.StretchProperty.OverrideMetadata(typeof(Rectangle), new PropertyMetadata(Stretch.Fill, Shape.Stretch_Changed));
+            Shape.StretchProperty.OverrideMetadata(typeof(Rectangle), new PropertyMetadata(Stretch.Fill, Shape.Stretch_Changed));
         }
 
         #region former implementation

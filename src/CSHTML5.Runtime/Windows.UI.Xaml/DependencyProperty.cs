@@ -206,7 +206,7 @@ namespace Windows.UI.Xaml
                 return base.ToString();
         }
 
-        internal void OverrideMetadata(Type newOwnerType, PropertyMetadata typeMetadata)
+        public void OverrideMetadata(Type newOwnerType, PropertyMetadata typeMetadata)
         {
             if (_typesToOverridenMetadatas == null)
             {

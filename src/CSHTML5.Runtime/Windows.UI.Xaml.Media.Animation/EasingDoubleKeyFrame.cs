@@ -19,19 +19,38 @@
 
 using System;
 
+
 #if MIGRATION
 namespace System.Windows.Media.Animation
 #else
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if WORKINPROGRESS
-    public interface IEasingFunction
+    public sealed class EasingDoubleKeyFrame : DoubleKeyFrame
     {
-        /// <summary>Transforms normalized time to control the pace of an animation.</summary>
-        /// <returns>The transformed progress.</returns>
-        /// <param name="normalizedTime">Normalized time (progress) of the animation.</param>
-        double Ease(double normalizedTime);
+        public static readonly DependencyProperty EasingFunctionProperty =  DependencyProperty.Register("EasingFunction",
+                                                                                                        typeof(EasingFunctionBase),
+                                                                                                        typeof(EasingDoubleKeyFrame),
+                                                                                                        new PropertyMetadata(null));
+
+        /// <summary>
+        /// EasingFunction
+        /// </summary>
+        public EasingFunctionBase EasingFunction
+        {
+            get
+            {
+                return (EasingFunctionBase)GetValue(EasingFunctionProperty);
+            }
+            set
+            {
+                SetValue(EasingFunctionProperty, value);
+            }
+        }
+
+        internal override EasingFunctionBase INTERNAL_GetEasingFunction()
+        {
+            return EasingFunction;
+        }
     }
-#endif
 }

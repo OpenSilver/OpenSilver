@@ -18,6 +18,7 @@
 
 
 using System;
+using System.Collections.Generic;
 #if MIGRATION
 using System.Windows;
 #else
@@ -32,7 +33,9 @@ namespace Windows.UI.Xaml.Media.Animation
 {
 #if WORKINPROGRESS
     public sealed class DoubleKeyFrameCollection : PresentationFrameworkCollection<DoubleKeyFrame>
+#else
+    public sealed class DoubleKeyFrameCollection : List<DoubleKeyFrame>
+#endif
     {
     }
-#endif
 }

@@ -37,6 +37,9 @@ namespace Windows.UI.Xaml.Media.Animation
 
 #if WORKINPROGRESS
     public abstract class DoubleKeyFrame : Freezable, IKeyFrame
+#else
+    public abstract class DoubleKeyFrame : DependencyObject, IKeyFrame
+#endif
     {
         public static readonly DependencyProperty KeyTimeProperty = DependencyProperty.Register("KeyTime", typeof(KeyTime), typeof(DoubleKeyFrame), new PropertyMetadata(new TimeSpan()));
         /// <summary>Gets or sets the time at which the key frame's target <see cref="P:System.Windows.Media.Animation.DoubleKeyFrame.Value" /> should be reached.</summary>
@@ -70,6 +73,10 @@ namespace Windows.UI.Xaml.Media.Animation
                 Value = (double)value;
             }
         }
+
+        internal virtual EasingFunctionBase INTERNAL_GetEasingFunction()
+        {
+            return null;
+        }
     }
-#endif
 }
