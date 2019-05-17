@@ -11,17 +11,17 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-    internal class ResolvedKeyFramesEntries : IEnumerable<int>
+    internal class INTERNAL_ResolvedKeyFramesEntries : IEnumerable<int>
     {
 
         private List<int> _resolvedKeyFramesIndexes;
 
-        internal ResolvedKeyFramesEntries()
+        internal INTERNAL_ResolvedKeyFramesEntries()
         {
             _resolvedKeyFramesIndexes = new List<int>(); 
         }
 
-        internal ResolvedKeyFramesEntries(IList<DoubleKeyFrame> keyFrames) : this()
+        internal INTERNAL_ResolvedKeyFramesEntries(IList<DoubleKeyFrame> keyFrames) : this()
         {
             int index = 0;
             foreach(DoubleKeyFrame keyFrame in keyFrames)
