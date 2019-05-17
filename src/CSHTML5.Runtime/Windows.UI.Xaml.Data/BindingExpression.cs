@@ -313,6 +313,8 @@ namespace Windows.UI.Xaml.Data
             return value;
         }
 
+        internal bool INTERNAL_ForceValidateOnNextSetValue = false; //This boolean is set to true in OnAttached to force Validation at the next UpdateSourceObject. Its purpose is to force the Validation only once to avoid hindering performances.
+
         internal override void OnAttached(DependencyObject target)
         {
             if (IsAttached)
@@ -324,9 +326,49 @@ namespace Windows.UI.Xaml.Data
 
             PropertyPathWalker.Update(source); //FindSource should find the source now. Otherwise, the PropertyPathNodes shoud do the work (their properties will change when the source will become available)
 
+            //Listen to changes on the Target if the Binding is TwoWay:
             if (ParentBinding.Mode == BindingMode.TwoWay)
             {
                 PropertyListener = INTERNAL_PropertyStore.ListenToChanged(Target, Property, UpdateSourceCallback);
+
+                //If the user wants to force the Validation of the value when the element is added to the Visual tree, we set a boolean to do it as soon as possible:
+                if (ParentBinding.ValidatesOnExceptions && ParentBinding.ValidatesOnLoad)
+                {
+                    INTERNAL_ForceValidateOnNextSetValue = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// This method is used to check whether the value is Valid if needed.
+        /// </summary>
+        /// <param name="initialValue"></param>
+        internal void CheckInitialValueValidity(object initialValue)
+        {
+            if (ParentBinding.ValidatesOnExceptions && ParentBinding.ValidatesOnLoad)
+            {
+                if (!PropertyPathWalker.IsPathBroken)
+                {
+                    INTERNAL_ForceValidateOnNextSetValue = false;
+                    try
+                    {
+                        PropertyPathNode node = (PropertyPathNode)PropertyPathWalker.FinalNode;
+                        node.SetValue(node.Value); //we set the source property to its own value to check whether it causes an exception, in which case the value is not valid.
+                    }
+                    catch (Exception e) //todo: put the content of this catch in a method which will be called here and in UpdateSourceObject (OR put the whole try/catch in the method and put the Value to set as parameter).
+                    {
+                        //We get the new Error (which is the innermost exception as far as I know):
+                        Exception currentException = e;
+
+                        if (Interop.IsRunningInTheSimulator) // Note: "InnerException" is only supported in the Simulator as of July 27, 2017.
+                        {
+                            while (currentException.InnerException != null)
+                                currentException = currentException.InnerException;
+                        }
+
+                        Validation.MarkInvalid(this, new ValidationError(this) { Exception = currentException, ErrorContent = currentException.Message });
+                    }
+                }
             }
         }
 
