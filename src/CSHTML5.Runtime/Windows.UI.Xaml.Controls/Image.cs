@@ -476,5 +476,13 @@ e.preventDefault();
             domElementWhereToPlaceChildren = null;
             return div;
         }
+
+        public object INTERNAL_DomImageElement
+        {
+            get
+            {
+                return _imageDiv;
+            }
+        }
     }
 }
