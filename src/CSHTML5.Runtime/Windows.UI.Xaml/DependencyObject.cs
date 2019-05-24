@@ -326,6 +326,17 @@ namespace Windows.UI.Xaml
             {
                 computedValue = computedValue.ToString();
             }
+
+            //If we use validation, we determine whether the value is Invalid or not.
+            if (newExpression is BindingExpression)
+            {
+                BindingExpression bindingExpression = newExpression as BindingExpression;
+                if (bindingExpression.INTERNAL_ForceValidateOnNextSetValue)
+                {
+                    bindingExpression.CheckInitialValueValidity(computedValue);
+                }
+            }
+
 #if PERFSTAT
             Performance.Counter("DependencyObject.SetValueInternal", t);
 #endif

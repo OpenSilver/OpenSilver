@@ -315,6 +315,9 @@ namespace Windows.UI.Xaml.Data
             get { return _templateOwner; }
             set { _templateOwner = value; }
         }
+
+        #region Validation
+
 #if WORKINPROGRESS
         private bool _validatesOnDataErrors;
 
@@ -356,6 +359,21 @@ namespace Windows.UI.Xaml.Data
             get { return _notifyOnValidationError; }
             set { _notifyOnValidationError = value; }
         }
+
+        private bool _validatesOnLoad = false;
+        /// <summary>
+        /// True to force the property to go through the Validation process when the Binding is set or when the Target is added in the Visual tree.
+        /// This way, if the source property has an Invalid value when setting the Binding, it will immediately be marked as Invalid instead of waiting
+        /// for a value change that keeps/makes it Invalid (which is what happens on Silverlight).
+        /// Defaults to False since it is the behaviour of Silverlight and WPF.
+        /// </summary>
+        public bool ValidatesOnLoad
+        {
+            get { return _validatesOnLoad; }
+            set { _validatesOnLoad = value; }
+        }
+
+        #endregion
 
 #if WORKINPROGRESS
         private bool _bindsDirectlyToSource;
