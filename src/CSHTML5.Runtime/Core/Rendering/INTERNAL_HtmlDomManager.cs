@@ -378,18 +378,18 @@ element.style.visibility=""collapse"";
 #endif
         }
 
-        public static string GetTextBoxText(UIElement element)
+        public static string GetTextBoxText(object domElementRef)
         {
 #if !CSHTML5NETSTANDARD
             if (IsRunningInJavaScript())
             {
-                return GetTextBoxText_JavaScript(element.INTERNAL_OuterDomElement.childNodes[0].childNodes[0]);
+                return GetTextBoxText_JavaScript(domElementRef);
             }
             else
             {
 #endif
-                string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)element.INTERNAL_OuterDomElement).UniqueIdentifier;
-                object domElement = Interop.ExecuteJavaScriptAsync(@"document.getElementById($0).childNodes[0].childNodes[0]", uniqueIdentifier);
+                string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
+                object domElement = Interop.ExecuteJavaScriptAsync(@"document.getElementById($0)", uniqueIdentifier);
                 //todo-perfs: replace the code above with a call to the faster "ExecuteJavaScript" method instead of "ExecuteJavaScriptWithResult". To do so, see other methods in this class, or see the class "INTERNAL_HtmlDomStyleReference.cs".
 
                 string innerText = Interop.ExecuteJavaScript("$0.innerText", domElement).ToString();
