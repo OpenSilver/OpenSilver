@@ -275,7 +275,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     else
                     {
                         var selectedPropertyPath = selector.SelectedValuePath;
-                        object item = selector.Items.First(element => Object.Equals(PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(element, selectedPropertyPath), newValue)); //todo: perf? //Note: there is no way we can know which value was intended in the case of multiple items with the same values.
+                        object item = selector.Items.FirstOrDefault(element => Object.Equals(PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(element, selectedPropertyPath), newValue)); //todo: perf? //Note: there is no way we can know which value was intended in the case of multiple items with the same values.
                         selector.SetLocalValue(SelectedIndexProperty, GetIndexOfElementInItems(selector, item)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
                         selector.SetLocalValue(SelectedItemProperty, item); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
 
@@ -306,7 +306,19 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #endif
         private static bool AreObjectsEqual(object item1, object item2)
         {
-            return (item1 != null && item1.Equals(item2)) || (item1 == null && item2 == null); //we are forced to do that kind of test since e.OldValue and e.NewValue are objects which makes e.OldValue != e.NewValue always true for some reason
+            // we need to check if both items or null separatly because of a Bridge issue : item1.Equals(item2) throws an error if item1 is null which is normal) and/or item2 is null (error : "cannot get property "low" of null")
+            if(item1 == null)
+            {
+                return item2 == null;
+            }
+            else if(item2 == null)
+            {
+                return item1 == null;
+            }
+            else
+            {
+                return item1.Equals(item2);
+            }
         }
 
         //todo: remove the following method when the bug with ObservableCollection.IndexOf (that makes it not work in the simulator) will be fixed
