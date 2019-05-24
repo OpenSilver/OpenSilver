@@ -176,8 +176,12 @@ namespace Windows.UI.Xaml.Controls
             {
                 passwordFieldStyle.border = "transparent"; // This removes the border. We do not need it since we are templated
                 passwordFieldStyle.outline = "solid transparent"; // Note: this is to avoind having the weird border when it has the focus. I could have used outlineWidth = "0px" but or some reason, this causes the caret to not work when there is no text.
-                passwordFieldStyle.background = "solid transparent";
+                passwordFieldStyle.backgroundColor = "transparent";
+                passwordFieldStyle.fontSize = "inherit"; // Not inherited by default for "input" DOM elements
             }
+
+            passwordFieldStyle.width = "100%";
+            passwordFieldStyle.height = "100%";
 
             INTERNAL_HtmlDomManager.SetDomElementAttribute(passwordField, "type", "password", forceSimulatorExecuteImmediately: true);
             //passwordField.type = "password";
