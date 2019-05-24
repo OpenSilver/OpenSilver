@@ -126,7 +126,7 @@ namespace Windows.UI.Xaml.Controls
                 yield return new ColumnDefinition();
         }
 
-        public static string ConvertGridLengthToCssString(GridLength gridLength, string signUsedForPercentage = "%")
+        public static string ConvertGridLengthToCssString(GridLength gridLength, double minSize, string signUsedForPercentage = "%")
         {
             if (gridLength.IsAuto)
             {
@@ -137,10 +137,12 @@ namespace Windows.UI.Xaml.Controls
                 bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
                 if (isCSSGrid)
                 {
-                    return "minmax(0px, " + gridLength.Value.ToString().Replace(',', '.') + signUsedForPercentage + ")"; //todo: replace the comma replacement with "ToString(CultureInfo.InvariantCulture)" when JSIL will support it.
+                    string minWidthString = (double.IsNaN(minSize) || double.IsInfinity(minSize) ? "0px" : minSize.ToString().Replace(',', '.') + "px"); //todo: replace the comma replacement with "ToString(CultureInfo.InvariantCulture)" when JSIL will support it.
+                    return "minmax(" + minWidthString + ", " + gridLength.Value.ToString().Replace(',', '.') + signUsedForPercentage + ")"; //todo: replace the comma replacement with "ToString(CultureInfo.InvariantCulture)" when JSIL will support it.
                 }
                 else
                 {
+                    //todo: implement MinWidth / MinHeight (minSize) for legacy non-CSS-Grid compatible browsers
                     return gridLength.Value.ToString().Replace(',', '.') + signUsedForPercentage; //todo: replace the comma replacement with "ToString(CultureInfo.InvariantCulture)" when JSIL will support it.
                 }
             }
@@ -385,7 +387,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     if (col.Width.IsStar)
                     {
-                        normalizedColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(col.Width.Value / smallestColumnStarValue, GridUnitType.Star) });
+                        normalizedColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(col.Width.Value / smallestColumnStarValue, GridUnitType.Star), MinWidth = col.MinWidth, MaxWidth = col.MaxWidth });
                     }
                     else
                     {
@@ -410,7 +412,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     if (row.Height.IsStar)
                     {
-                        normalizedRowDefinitions.Add(new RowDefinition() { Height = new GridLength(row.Height.Value / smallestRowStarValue, GridUnitType.Star) });
+                        normalizedRowDefinitions.Add(new RowDefinition() { Height = new GridLength(row.Height.Value / smallestRowStarValue, GridUnitType.Star), MinHeight = row.MinHeight, MaxHeight = row.MaxHeight });
                     }
                     else
                     {
@@ -499,7 +501,7 @@ namespace Windows.UI.Xaml.Controls
                     if (!hadStarRow && rowDefinition.Height.IsStar)
                         hadStarRow = true;
 
-                    rowsAsString = rowsAsString + (!isFirstRow ? " " : "") + Grid_InternalHelpers.ConvertGridLengthToCssString(rowDefinition.Height, signUsedForPercentage: "fr");
+                    rowsAsString = rowsAsString + (!isFirstRow ? " " : "") + Grid_InternalHelpers.ConvertGridLengthToCssString(rowDefinition.Height, rowDefinition.MinHeight, signUsedForPercentage: "fr");
                     isFirstRow = false;
                 }
                 if (!hadStarRow) //We add a "star" row if there was none explicitely defined, since absolutely sized rows and columns are exactly their size.
@@ -536,7 +538,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 rowDefinition = grid._rowDefinitionsOrNull[rowIndex];
             }
-            string rowHeight = ConvertGridLengthToCssString(rowDefinition.Height);
+            string rowHeight = ConvertGridLengthToCssString(rowDefinition.Height, rowDefinition.MinHeight);
             string internalElementForRowHeight = "100%";
             if (rowHeight.EndsWith("px"))
             {
@@ -651,7 +653,7 @@ namespace Windows.UI.Xaml.Controls
             //todo: factorize the common parts ([getting rowHeight and internalElementForRowHeight] and [setting the cell's dom element's style]).
             bool clipToBounds = grid.ClipToBounds;
 
-            string rowHeight = ConvertGridLengthToCssString(normalizedRowDefinition.Height);
+            string rowHeight = ConvertGridLengthToCssString(normalizedRowDefinition.Height, normalizedRowDefinition.MinHeight);
             string internalElementForRowHeight = "100%";
             if (rowHeight.EndsWith("px"))
             {
@@ -723,7 +725,7 @@ namespace Windows.UI.Xaml.Controls
             if (!cell.IsOverlapped)
             {
                 dynamic tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.ColumnDomElement);
-                string columnWidth = ConvertGridLengthToCssString(normalizedColumnDefinition.Width);
+                string columnWidth = ConvertGridLengthToCssString(normalizedColumnDefinition.Width, normalizedColumnDefinition.MinWidth);
                 string internalElementForColumnWidth = "100%";
                 if (columnWidth.EndsWith("px"))
                 {
@@ -796,19 +798,19 @@ namespace Windows.UI.Xaml.Controls
                     Grid_InternalHelpers.NormalizeWidthAndHeightPercentages(grid, grid._columnDefinitionsOrNull, null, out normalizedColumnDefinitions, out normalizedRowDefinitions);
                 }
 
-                bool hadStarColumn = false;
+                bool hasStarColumn = false;
                 //int indexToLastColumn = normalizedColumnDefinitions.Count;
                 List<int> collapsedColumns = new List<int>();
                 int currentIndex = 0;
                 // Concatenate the string that defines the CSS "gridTemplateColumns" property:
                 foreach (ColumnDefinition columnDefinition in normalizedColumnDefinitions)
                 {
-                    if (!hadStarColumn && columnDefinition.Width.IsStar)
-                        hadStarColumn = true;
+                    if (!hasStarColumn && columnDefinition.Width.IsStar)
+                        hasStarColumn = true;
 
                     if (columnDefinition.Visibility == Visibility.Visible)
                     {
-                        columnsAsString = columnsAsString + (!isFirstColumn ? " " : "") + Grid_InternalHelpers.ConvertGridLengthToCssString(columnDefinition.Width, signUsedForPercentage: "fr");
+                        columnsAsString = columnsAsString + (!isFirstColumn ? " " : "") + Grid_InternalHelpers.ConvertGridLengthToCssString(columnDefinition.Width, columnDefinition.MinWidth, signUsedForPercentage: "fr");
                     }
                     else
                     {
@@ -819,7 +821,7 @@ namespace Windows.UI.Xaml.Controls
 
                     isFirstColumn = false;
                 }
-                if (!hadStarColumn) //We add a "star" row if there was none explicitely defined, since absolutely sized rows and columns are exactly their size.
+                if (!hasStarColumn) //We add a "star" column if there was none explicitely defined, since absolutely sized rows and columns are exactly their size.
                 {
                     columnsAsString = columnsAsString + (!isFirstColumn ? " minmax(0px, 1fr)" : "minmax(0px, 1fr)");
                 }
@@ -830,7 +832,7 @@ namespace Windows.UI.Xaml.Controls
                 //go through the children and set their overflow to hidden for those that are only in Collapsed columns, and to visible for the other ones:
                 foreach (UIElement child in grid.Children)
                 {
-                    if(INTERNAL_VisualTreeManager.IsElementInVisualTree(child))
+                    if (INTERNAL_VisualTreeManager.IsElementInVisualTree(child))
                     {
                         int startColumn = Grid.GetColumn(child);
                         int endColumn = startColumn + Grid.GetColumnSpan(child) - 1; //Note: the element does not reach the index of endColumn (example: span = 1, the element is only in one column but endColumn is still biger than starColumn.
@@ -920,7 +922,7 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
                 if (!cell.IsOverlapped)
                 {
                     dynamic tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.ColumnDomElement);
-                    string columnWidth = ConvertGridLengthToCssString(columnDefinition.Width);
+                    string columnWidth = ConvertGridLengthToCssString(columnDefinition.Width, columnDefinition.MinWidth);
                     string internalElementForColumnWidth = "100%";
                     if (columnWidth.EndsWith("px"))
                     {
