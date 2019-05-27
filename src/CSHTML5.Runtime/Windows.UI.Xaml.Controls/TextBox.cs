@@ -343,7 +343,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                 //we get the value:
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 {
-                    string text = INTERNAL_HtmlDomManager.GetTextBoxText(this);
+                    string text = INTERNAL_HtmlDomManager.GetTextBoxText(this.INTERNAL_InnerDomElement);
                     if (!AcceptsReturn) // This is just in case the user managed to enter multi-line text in a single-line textbox. It can happen (due to a bug) when pasting multi-line text under Interned Explorer 10.
                         text = text.Replace("\n", "").Replace("\r", "");
                     _isUserChangingText = true; //To prevent reentrance (infinite loop) when user types some text.
@@ -798,7 +798,7 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
 
         private int GetTextLengthIncludingNewLineCompensation()
         {
-            var text = INTERNAL_HtmlDomManager.GetTextBoxText(this);
+            var text = INTERNAL_HtmlDomManager.GetTextBoxText(this.INTERNAL_InnerDomElement);
             if (!AcceptsReturn)
             {
                 text = text.Replace("\n", "").Replace("\r", "");
