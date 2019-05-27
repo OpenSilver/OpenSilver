@@ -1,4 +1,5 @@
-﻿//===============================================================================
+﻿
+//===============================================================================
 //
 //  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
 //
@@ -13,6 +14,14 @@
 //  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
 //
 //===============================================================================
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace System.Xml.Linq
 {
@@ -31,31 +40,6 @@ namespace System.Xml.Linq
         public static XName operator +(XNamespace ns, string localName)
         {
             return ns.GetName(localName);
-        }
-
-        internal const string xmlPrefixNamespace = "http://www.w3.org/XML/1998/namespace";
-        internal const string xmlnsPrefixNamespace = "http://www.w3.org/2000/xmlns/";
-
-        /// <summary>
-        /// Gets the XNamespace object that corresponds to the xml uri (http://www.w3.org/XML/1998/namespace).
-        /// </summary>
-        public static XNamespace Xml
-        {
-            get
-            {
-                return XNamespace.Get(xmlPrefixNamespace);
-            }
-        }
-
-        /// <summary>
-        /// Gets the XNamespace object that corresponds to the xmlns uri (http://www.w3.org/2000/xmlns/).
-        /// </summary>
-        public static XNamespace Xmlns
-        {
-            get
-            {
-                return XNamespace.Get(xmlnsPrefixNamespace);
-            }
         }
 
         /// <summary>
