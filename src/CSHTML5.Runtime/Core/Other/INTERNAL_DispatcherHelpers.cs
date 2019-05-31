@@ -34,7 +34,7 @@ using Windows.UI.Xaml.Media;
 
 namespace CSHTML5.Internal
 {
-    internal static class INTERNAL_DispatcherHelpers
+    public static class INTERNAL_DispatcherHelpers
     {
         static List<Action> _pendingActionsExecute = new List<Action>();
         static bool _isDispatcherPending = false;
@@ -46,7 +46,8 @@ namespace CSHTML5.Internal
 
         /// <summary>
         /// This will add the action to a list of actions to perform at once in a Dispatcher.Invoke call.
-        /// This has better performance than calling Dispatcher.BeginInvoke directly.
+        /// This has better performance than calling Dispatcher.BeginInvoke directly, because all the
+        /// queued actions are performed together in a single Dispatch.BeginInvoke call.
         /// </summary>
         /// <param name="action">The action to queue.</param>
         public static void QueueAction(Action action)
