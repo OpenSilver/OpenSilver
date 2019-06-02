@@ -177,7 +177,7 @@ namespace System.Runtime.Serialization
         }
 
         /// <summary>
-        /// If the given namespacealready has an assigned prefix, returns that prefix,
+        /// If the given namespace already has an assigned prefix, returns that prefix,
         /// otherwise, generates a unique, unused prefix, defines it in the element, then returns the prefix.
         /// </summary>
         /// <param name="element">The XElement in which to define the prefix.</param>
@@ -194,9 +194,14 @@ namespace System.Runtime.Serialization
             }
             else
             {
+                // Generate a unique prefix by calculating a hash of the namespaceName, and then incrementing an index we find a prefix that is available:
+                int index = 0;
                 while (true)
                 {
-                    prefix = GeneratePrefix();
+                    // Generate a candidate prefix:
+                    prefix = "Prefix" + namespaceName.GetHashCode().ToString() + index.ToString();
+
+                    // Check if the prefix is already used or if it is available for use:
                     if (string.IsNullOrWhiteSpace(element.GetNamespaceOfPrefix(prefix).NamespaceName))
                     {
                         //we found an unused prefix:
@@ -209,6 +214,7 @@ namespace System.Runtime.Serialization
                         //and we return the prefix so the calling method can use it.
                         return prefix;
                     }
+                    index++;
                 }
             }
         }
@@ -1053,13 +1059,6 @@ namespace System.Runtime.Serialization
 
 
 #region Private Helpers
-
-        static string GeneratePrefix()
-        {
-            Random rd = new Random();
-            int prefixNumber = rd.Next(1, 10000000); //a maximum of 7 characters shoud be sufficient for a random prefix 
-            return "Prefix" + prefixNumber;
-        }
 
         static bool ShouldMemberBeConsideredForSerialization(MemberInfo memberInfo, SerializationType serializationType, bool useXmlSerializerFormat)
         {
