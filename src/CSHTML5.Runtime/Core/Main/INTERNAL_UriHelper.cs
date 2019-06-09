@@ -153,15 +153,48 @@ namespace CSHTML5.Internal
                     && TryGetLocationOfXamlFile(elementThatARelativeUriIsRelativeTo, out xamlSourcePath)
                     && xamlSourcePath.Contains(@"\"))
                 {
-                    // Remove the filename from the .XAML file location, so as to keep only the path of the .XAML file:
-                    string xamlSourcePathWithoutFileName = xamlSourcePath.Substring(0, xamlSourcePath.LastIndexOf(@"\"));
+                    // Note: the "XamlSourcePath" is always in the following format: AssemblyName\Folder1\Folder2\FileName.xaml
 
                     // Fix the slashes:
                     uri = uri.Replace('\\', '/');
-                    xamlSourcePathWithoutFileName = xamlSourcePathWithoutFileName.Replace('\\', '/');
+                    xamlSourcePath = xamlSourcePath.Replace('\\', '/');
+
+                    // Remove the filename from the "XamlSourcePath":
+                    string xamlSourcePathWithoutFileName = xamlSourcePath.Substring(0, xamlSourcePath.LastIndexOf('/'));
+
+                    // Remove the assembly name from the "XamlSourcePath", so as to keep only the folder:
+                    string assemblyName;
+                    string folderWhereXamlFileIsLoated_PossibleEmpty;
+                    if (xamlSourcePathWithoutFileName.Contains('/'))
+                    {
+                        assemblyName = xamlSourcePathWithoutFileName.Substring(0, xamlSourcePathWithoutFileName.IndexOf('/'));
+                        folderWhereXamlFileIsLoated_PossibleEmpty = xamlSourcePathWithoutFileName.Substring(assemblyName.Length + 1);
+                    }
+                    else
+                    {
+                        assemblyName = xamlSourcePathWithoutFileName;
+                        folderWhereXamlFileIsLoated_PossibleEmpty = "";
+                    }
+
+                    // Handle ".." in a way that, if we reach the root, we ignore any additional ".." (this is the same behavior as in Silverlight):
+                    while (uri.StartsWith("../"))
+                    {
+                        // Remove the "../":
+                        uri = uri.Substring(3);
+
+                        // Remove the last folder (if any) in the xamlSourcePath:
+                        if (folderWhereXamlFileIsLoated_PossibleEmpty.Contains('/'))
+                        {
+                            folderWhereXamlFileIsLoated_PossibleEmpty = folderWhereXamlFileIsLoated_PossibleEmpty.Substring(0, folderWhereXamlFileIsLoated_PossibleEmpty.LastIndexOf('/'));
+                        }
+                        else
+                        {
+                            folderWhereXamlFileIsLoated_PossibleEmpty = "";
+                        }
+                    }
 
                     // Merge the path of the .XAML file with the relative URI specified as parameter of this method:
-                    string absolutePath = "ms-appx:/" + xamlSourcePathWithoutFileName + (!uri.StartsWith("/") ? "/" : "") + uri;
+                    string absolutePath = "ms-appx:/" + assemblyName + (folderWhereXamlFileIsLoated_PossibleEmpty != "" ? "/" + folderWhereXamlFileIsLoated_PossibleEmpty : "") + (!uri.StartsWith("/") ? "/" : "") + uri;
 
                     // Call again this very method (re-entrance), but this time pass the absolute path instead of the relative path:
                     string result = ConvertToHtml5Path(absolutePath, null);
