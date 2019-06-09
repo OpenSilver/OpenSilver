@@ -34,6 +34,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Browser;
+#if MIGRATION
+using System.Windows;
+#else
+using Windows.UI.Xaml;
+#endif
 
 namespace CSHTML5.Internal
 {
@@ -43,11 +48,15 @@ namespace CSHTML5.Internal
         /// Converts to an URI suitable to use in the HTML5 "src" property.
         /// </summary>
         /// <param name="uri">The URI with the C#/XAML syntax.</param>
-        /// <param name="callerAssemblyName">The name of the assembly where the URI is defined, in order to transform relative URI to absolute URI.</param>
+        /// <param name="elementThatARelativeUriIsRelativeTo">This is an optional parameter that is helpful
+        /// in case of relative URI's. In fact, when an URI is relative, we need to transform it into an
+        /// absolute URI in order to locate the resources. A relative URI is usually relative to the place
+        /// where the .XAML file is located. For example, when using an Image control, relative image paths
+        /// are relative to the location of the .XAML file that contains the Image control.</param>
         /// <returns>The URI suitable to use in the HTML5 "src" property</returns>
-        public static string ConvertToHtml5Path(string uri, string callerAssemblyName)
+        public static string ConvertToHtml5Path(string uri, UIElement elementThatARelativeUriIsRelativeTo = null)
         {
-            if(uri == null)
+            if (uri == null)
             {
                 return null;
             }
@@ -105,7 +114,7 @@ namespace CSHTML5.Internal
             else if (uri.Contains(@";component/"))
             {
                 //----------------
-                // This is the Silverlight/WPF syntax for files in the app package.
+                // This is the Silverlight/WPF syntax for files in the app package (absolute paths).
                 //----------------
 
                 string componentKeyword = @";component/";
@@ -132,8 +141,58 @@ namespace CSHTML5.Internal
                 return html5Path;
             }
             else
-                throw new Exception(@"Unless you specify the URI in XAML, the current version only supports absolute URIs that start with http:// or https:// or that are in the form of ""ms-appx:///AssemblyName/Folder/FileName"" or ""/AssemblyName;component/Folder/FileName"""
-                    + (!originalStringLowercase.Contains(":") ? "    - Try adding  ms-appx:///YourAssemblyName/  to the beginning of your path." : string.Empty));
+            {
+                //----------------
+                // The path is a relative path. We convert it to an absolute path, and call this very method again.
+                //----------------
+
+                // Try to determine the location of the .XAML file so as to transform the relative path into an absolute path:
+                string xamlSourcePath = null;
+                if (elementThatARelativeUriIsRelativeTo != null
+                    && INTERNAL_VisualTreeManager.IsElementInVisualTree(elementThatARelativeUriIsRelativeTo)
+                    && TryGetLocationOfXamlFile(elementThatARelativeUriIsRelativeTo, out xamlSourcePath)
+                    && xamlSourcePath.Contains(@"\"))
+                {
+                    // Remove the filename from the .XAML file location, so as to keep only the path of the .XAML file:
+                    string xamlSourcePathWithoutFileName = xamlSourcePath.Substring(0, xamlSourcePath.LastIndexOf(@"\"));
+
+                    // Fix the slashes:
+                    uri = uri.Replace('\\', '/');
+                    xamlSourcePathWithoutFileName = xamlSourcePathWithoutFileName.Replace('\\', '/');
+
+                    // Merge the path of the .XAML file with the relative URI specified as parameter of this method:
+                    string absolutePath = "ms-appx:/" + xamlSourcePathWithoutFileName + (!uri.StartsWith("/") ? "/" : "") + uri;
+
+                    // Call again this very method (re-entrance), but this time pass the absolute path instead of the relative path:
+                    string result = ConvertToHtml5Path(absolutePath, null);
+                    return result;
+                }
+                else
+                {
+                    throw new Exception(@"Unless you specify the URI in XAML, the current version only supports absolute URIs that start with http:// or https:// or that are in the form of ""ms-appx:///AssemblyName/Folder/FileName"" or ""/AssemblyName;component/Folder/FileName"""
+                            + (!originalStringLowercase.Contains(":") ? "    - Try adding  ms-appx:///YourAssemblyName/  to the beginning of your path." : string.Empty));
+                }
+            }
+        }
+
+        private static bool TryGetLocationOfXamlFile(UIElement element, out string xamlSourcePath)
+        {
+            // Walk up the visual tree until we find the root of the .XAML file (if any):
+            UIElement current = element;
+            while (current != null)
+            {
+                if (!string.IsNullOrEmpty(current.XamlSourcePath))
+                {
+                    xamlSourcePath = current.XamlSourcePath;
+                    return true;
+                }
+                else
+                {
+                    current = current.INTERNAL_VisualParent as UIElement;
+                }
+            }
+            xamlSourcePath = null;
+            return false;
         }
 
         //todo: Replace with "TrimStart" when it works in JSIL:
@@ -261,10 +320,10 @@ namespace CSHTML5.Internal
                 assemblyLocation = assemblyLocation + '\\';
 
             string outputRootPath = StartupAssemblyInfo.OutputRootPath.Replace('/', '\\');  // Note: this is populated at the startup of the application (cf. "codeToPutInTheInitializeComponentOfTheApplicationClass" in the "Compiler" project)
-            
+
             if (!outputRootPath.EndsWith("\\") && outputRootPath != "")
                 outputRootPath = outputRootPath + '\\';
-            
+
             string outputAbsolutePath = INTERNAL_Simulator.SimulatorProxy.PathCombine(assemblyLocation, outputRootPath); // Note: previously, when the path was hard-coded, it was: Path.Combine(assemblyLocation, @"Output\");
             string finalAbsolutePath = INTERNAL_Simulator.SimulatorProxy.PathCombine(outputAbsolutePath, relativePath);
             finalAbsolutePath = @"file:///" + finalAbsolutePath.Replace('\\', '/');
@@ -308,7 +367,7 @@ namespace CSHTML5.Internal
                 int lastIndexOfSlash = originalString.LastIndexOf('/');
                 if (lastIndexOfSlash > -1)
                 {
-                    if(originalString.Substring(0,lastIndexOfSlash + 1).ToLower() == "https://" 
+                    if (originalString.Substring(0, lastIndexOfSlash + 1).ToLower() == "https://"
                         || originalString.Substring(0, lastIndexOfSlash + 1).ToLower() == "http://")
                     {
                         return new Uri(originalString + "/" + uriString, UriKind.Absolute);
