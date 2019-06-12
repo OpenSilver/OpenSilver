@@ -70,6 +70,14 @@ namespace Windows.UI.Xaml.Controls
             }
             else if (childData is string)
                 textBox.Text = (string)childData;
+
+            // Focus the TextBox when loaded, and select all text:
+            textBox.Loaded += (s, e) =>
+            {
+                textBox.Focus();
+                textBox.SelectAll();
+            };
+
             return textBox;
         }
 

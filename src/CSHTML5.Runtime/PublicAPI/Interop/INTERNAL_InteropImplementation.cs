@@ -290,7 +290,7 @@ result;
 
         internal static void LoadJavaScriptFile(string url, string callerAssemblyName, Action callbackOnSuccess, Action callbackOnFailure = null)
         {
-            string html5Path = INTERNAL_UriHelper.ConvertToHtml5Path(url, callerAssemblyName);
+            string html5Path = INTERNAL_UriHelper.ConvertToHtml5Path(url);
 
             CSHTML5.Interop.ExecuteJavaScript(
 @"// Add the script tag to the head
@@ -343,7 +343,7 @@ head.appendChild(script);", html5Path, callbackOnSuccess, callbackOnFailure);
             string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
 
-            string html5Path = INTERNAL_UriHelper.ConvertToHtml5Path(url, callerAssemblyName);
+            string html5Path = INTERNAL_UriHelper.ConvertToHtml5Path(url);
 
             CSHTML5.Interop.ExecuteJavaScript(
 @"// Add the link tag to the head

@@ -23,6 +23,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if MIGRATION
+using System.Windows;
+#else
+using Windows.UI.Xaml;
+#endif
+
 namespace CSHTML5.Internal
 {
     internal static class INTERNAL_FontsHelper
@@ -34,8 +40,13 @@ namespace CSHTML5.Internal
         /// Creates a css style with @font-face for the given font, then returns the name to use as the font-family. This name is actually the relative path to the file containing the font.
         /// </summary>
         /// <param name="fontPath">The path to the font.</param>
+        /// <param name="elementThatARelativeUriIsRelativeTo">This is an optional parameter that is helpful
+        /// in case of relative URI's. In fact, when an URI is relative, we need to transform it into an
+        /// absolute URI in order to locate the resources. A relative URI is usually relative to the place
+        /// where the .XAML file is located. For example, when using an Image control, relative image paths
+        /// are relative to the location of the .XAML file that contains the Image control.</param>
         /// <returns>The name to use to set the font-family property, a.k.a: the relative path to the font.</returns>
-        internal static string LoadFont(string fontPath)
+        internal static string LoadFont(string fontPath, UIElement elementThatARelativeUriIsRelativeTo = null)
         {
             if(!fontPath.Contains('.')) //Note: if the path does not contain the character '.', then it means that there is no specified file. It is therefore a default font or thet path to a folder containing fonts, which we cannot handle so we simply return the font as is.
             {
@@ -61,7 +72,7 @@ namespace CSHTML5.Internal
             }
 
             //Get a path that will lead to the position of the file:
-            string relativeFontPath = INTERNAL_UriHelper.ConvertToHtml5Path(fontPathWithoutCustomName, "");
+            string relativeFontPath = INTERNAL_UriHelper.ConvertToHtml5Path(fontPathWithoutCustomName, elementThatARelativeUriIsRelativeTo);
 
             if (_loadedFonts.ContainsKey(relativeFontPath))
             {

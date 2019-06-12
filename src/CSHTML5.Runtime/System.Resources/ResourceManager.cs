@@ -9,7 +9,7 @@ namespace System.Resources
 {
 #if BRIDGE
 
-//#if WORKINPROGRESS
+    //#if WORKINPROGRESS
     /// <summary>
     /// Provides convenient access to culture-specific resources at run time.
     /// </summary>
@@ -25,7 +25,7 @@ namespace System.Resources
         /// Indicates the main System.Reflection.Assembly that contains the resources.
         /// </summary>
         protected Assembly MainAssembly;
-        
+
         /// <summary>
         /// Initializes a new instance of the System.Resources.ResourceManager class that
         /// looks up resources contained in files derived from the specified root name using
@@ -97,13 +97,21 @@ namespace System.Resources
             {
                 string pathInJSThroughBaseNameField = "";
                 object currentElementInJSPath = Interop.ExecuteJavaScript("document.ResXFiles");
-
-                foreach (string pathPart in BaseNameField.Split('.'))
+                string[] splittedPath = BaseNameField.Split('.');
+                string result = null;
+                try //todo-perfs: for better performance, replace the try/catch below with a check of "undefined" in the code below.
                 {
-                    currentElementInJSPath = Interop.ExecuteJavaScript("{0}[{1}]", currentElementInJSPath, pathPart);
+                    foreach (string pathPart in splittedPath)
+                    {
+                        currentElementInJSPath = Interop.ExecuteJavaScript("{0}[{1}]", currentElementInJSPath, pathPart);
+                    }
+                    result = Convert.ToString(Interop.ExecuteJavaScript("{0}[{1}]", currentElementInJSPath, name));
                 }
-
-                return Convert.ToString(Interop.ExecuteJavaScript("{0}[{1}]", currentElementInJSPath, name));
+                catch (Exception)
+                {
+                    // The resource was not found. We return null.
+                }
+                return result;
             }
         }
 
@@ -417,7 +425,7 @@ namespace System.Resources
         //protected virtual ResourceSet InternalGetResourceSet(CultureInfo culture, bool createIfNotExists, bool tryParents);
         #endregion
     }
-//#endif
+    //#endif
 
 #endif
 }

@@ -298,6 +298,24 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
+        /// Gets or sets a value that indicates whether entering Edit Mode requires two steps
+        /// (like in Silverlight) rather than one. 'True' means that the user must first select
+        /// a cell and then click again to enter Edit Mode. 'False' means that the DataGrid
+        /// enters Edit Mode immediately when a cell is clicked, even if the cell is not
+        /// selected yet (it will get selected too). Default is false.
+        /// </summary>
+        public bool EnableTwoStepsEditMode
+        {
+            get { return (bool)GetValue(EnableTwoStepsEditModeProperty); }
+            set { SetValue(EnableTwoStepsEditModeProperty, value); }
+        }
+
+        public static readonly DependencyProperty EnableTwoStepsEditModeProperty =
+            DependencyProperty.Register("EnableTwoStepsEditMode", typeof(bool), typeof(DataGrid), new PropertyMetadata(false));
+
+
+
+        /// <summary>
         /// Gets or sets a value that indicates how rows and cells are selected in the
         /// System.Windows.Controls.DataGrid.
         /// </summary>
@@ -899,6 +917,10 @@ namespace Windows.UI.Xaml.Controls
             DataGridCell cell = (DataGridCell)sender;
             if (_currentCell != cell)
             {
+                //-----------------------
+                // The clicked cell was not already selected
+                //-----------------------
+
                 if (SelectionMode == DataGridSelectionMode.Single && SelectedItem != null)
                 {
                     UnselectItem(SelectedItem);
@@ -909,10 +931,21 @@ namespace Windows.UI.Xaml.Controls
                 }
                 SelectItem(cell.Item);
                 _currentCell = cell;
+
+                // Enter Edit Mode (upon selection) only if the option "EnableTwoStepsEditMode" is not enabled (otherwise the user must first select the cell, like in Silverlight):
+                if (!EnableTwoStepsEditMode)
+                {
+                    EnterCellEditionMode(cell);
+                }
             }
             else
             {
-                EnterCellEditionMode(cell); //if _currentCell == cell, it means that the cell clicked was already selected.
+                //-----------------------
+                // The clicked cell was already selected
+                //-----------------------
+
+                // Enter Edit Mode:
+                EnterCellEditionMode(cell);
             }
         }
 
