@@ -19,13 +19,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSHTML5;
 #if MIGRATION
 using System.Windows;
-using System.Diagnostics;
 #else
 using Windows.UI.Text;
 using Windows.UI.Xaml;
