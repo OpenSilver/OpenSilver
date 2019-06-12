@@ -52,7 +52,7 @@ namespace Windows.UI.Xaml.Media.Animation
                                                                  "System.Windows.Media.Animation.",
                                                                  "System.Windows.Media.Imaging.",
                                                                  "System.Windows.Shapes.",
-                                                             };
+                                                              };
 #else
         internal static readonly string[] defaultTypesPaths = {
                                                                  "", //keep an empty one to test the type directly.
@@ -113,7 +113,10 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <summary>
         /// Provides base class initialization behavior for Timeline-derived classes.
         /// </summary>
-        protected Timeline() { }
+        protected Timeline()
+        {
+
+        }
 
         //// The default is false.
         ///// <summary>
@@ -166,6 +169,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </summary>
         public static readonly DependencyProperty DurationProperty =
             DependencyProperty.Register("Duration", typeof(Duration), typeof(Timeline), new PropertyMetadata(Duration.Automatic));
+
 
 
         // Returns:
@@ -524,6 +528,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal virtual void IterateOnce(IterationParameters parameters, bool isLastLoop)
         {
+            ComputeDuration();
             if (Duration.HasTimeSpan && Duration.TimeSpan.TotalMilliseconds > 0)
             {
                 _parameters = parameters;
@@ -606,9 +611,31 @@ namespace Windows.UI.Xaml.Media.Animation
             OnIterationCompleted(_parameters);
         }
 #if WORKINPROGRESS
-        #region Not supported yet
 
-        public static readonly DependencyProperty SpeedRatioProperty = DependencyProperty.Register("SpeedRatio", typeof(double), typeof(Timeline), null);
+        /// <summary>
+        /// Implemented by the class author to provide a custom natural Duration
+        /// in the case that the Duration property is set to Automatic.  If the author
+        /// cannot determine the Duration, this method should return Automatic.
+        /// </summary>
+        /// <returns>
+        /// A Duration quantity representing the natural duration.
+        /// </returns>
+        private void ComputeDuration()
+        {
+            if(Duration == Duration.Automatic)
+            {
+                Duration = GetNaturalDurationCore();
+            }
+        }
+
+        protected virtual Duration GetNaturalDurationCore()
+        {
+            return Duration.Automatic;
+        }
+
+#region Not supported yet
+
+        public static readonly DependencyProperty SpeedRatioProperty = DependencyProperty.Register("SpeedRatio", typeof(double), typeof(Timeline), new PropertyMetadata(1d));
 
         public double SpeedRatio
         {
@@ -616,7 +643,7 @@ namespace Windows.UI.Xaml.Media.Animation
             set { this.SetValue(Timeline.SpeedRatioProperty, value); }
         }
 
-        #endregion
+#endregion
 #endif
     }
 }

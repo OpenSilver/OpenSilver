@@ -32,7 +32,11 @@ namespace Windows.UI.Xaml.Media.Animation
     /// of key frames.
     /// </summary>
     [ContentProperty("KeyFrames")]
+#if WORKINPROGRESS
+    public class ColorAnimationUsingKeyFrames : AnimationTimeline
+#else
     public class ColorAnimationUsingKeyFrames : Timeline
+#endif
     {
         private ColorKeyFrameCollection _keyFrames;
         // Summary:

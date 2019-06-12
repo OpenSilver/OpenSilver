@@ -40,7 +40,11 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Animates the value of a Double property along a set of key frames.
     /// </summary>
     [ContentProperty("KeyFrames")]
+#if WORKINPROGRESS
+    public sealed class DoubleAnimationUsingKeyFrames : AnimationTimeline
+#else
     public sealed class DoubleAnimationUsingKeyFrames : Timeline
+#endif
     {
         string _targetName;
         PropertyPath _targetProperty;
@@ -67,7 +71,7 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             get
             {
-                if(_keyFrames == null)
+                if (_keyFrames == null)
                 {
                     _keyFrames = new DoubleKeyFrameCollection();
                 }
@@ -76,6 +80,30 @@ namespace Windows.UI.Xaml.Media.Animation
             set
             {
                 _keyFrames = value;
+            }
+        }
+
+        /// <summary>
+        /// Returns the largest time span specified key time from all of the key frames.
+        /// If there are not time span key times a time span of one second is returned
+        /// to match the default natural duration of the From/To/By animations.
+        /// </summary>
+        private TimeSpan LargestTimeSpanKeyTime
+        {
+            get
+            {
+                if (_keyFrames == null || _keyFrames.Count == 0)
+                {
+                    return TimeSpan.FromTicks(0);
+                }
+                if (_resolvedKeyFrames != null)
+                {
+                    return _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)].KeyTime.TimeSpan;
+                }
+                else
+                {
+                    throw new Exception("DoubleAnimationUsingKeyFrames has not been setup yet.");
+                }
             }
         }
 
@@ -146,13 +174,7 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             if (keyFrame != null)
             {
-                _currentAnimation = new DoubleAnimation()
-                {
-                    To = keyFrame.Value,
-                    Duration = keyFrame.KeyTime.TimeSpan - _ellapsedTime,
-                    BeginTime = TimeSpan.FromTicks(0),
-                    EasingFunction = keyFrame.INTERNAL_GetEasingFunction(),
-                };
+                _currentAnimation = InstantiateAnimationFromKeyFrame(keyFrame);
                 _currentAnimation.Completed += ApplyNextKeyFrame;
                 Storyboard.SetTargetName(_currentAnimation, _targetName);
                 Storyboard.SetTargetProperty(_currentAnimation, _targetProperty);
@@ -161,6 +183,17 @@ namespace Windows.UI.Xaml.Media.Animation
                 _currentAnimation.StartFirstIteration(_parameters, _isLastLoop, new TimeSpan());
                 CheckTimeLineEndAndRaiseCompletedEvent(_parameters);
             }
+        }
+
+        private DoubleAnimation InstantiateAnimationFromKeyFrame(DoubleKeyFrame keyFrame)
+        {
+            return new DoubleAnimation()
+            {
+                BeginTime = TimeSpan.Zero,
+                To = keyFrame.Value,
+                Duration = keyFrame.KeyTime.TimeSpan - _ellapsedTime,
+                EasingFunction = keyFrame.INTERNAL_GetEasingFunction(),
+            };
         }
 
         private void ApplyNextKeyFrame(object sender, EventArgs e)
@@ -175,7 +208,7 @@ namespace Windows.UI.Xaml.Media.Animation
         private DoubleKeyFrame GetNextKeyFrame()
         {
             int nextKeyFrameIndex = _resolvedKeyFrames.GetNextKeyFrameIndex(_appliedKeyFramesCount);
-            if(nextKeyFrameIndex == -1)
+            if (nextKeyFrameIndex == -1)
             {
                 return null;
             }
@@ -185,12 +218,22 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
+        private void ApplyLastKeyFrame()
+        {
+            DoubleKeyFrame lastKeyFrame = _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)];
+            _targetProperty.INTERNAL_PropertySetLocalValue(_target, lastKeyFrame.Value);
+        }
 
         internal override void Stop(FrameworkElement frameworkElement, string groupName, bool revertToFormerValue = false) //frameworkElement is for the animations requiring the use of GetCssEquivalent
         {
             base.Stop(frameworkElement, groupName, revertToFormerValue);
 
             StopCurrentAnimation(frameworkElement, groupName, revertToFormerValue);
+
+            if (!revertToFormerValue)
+            {
+                ApplyLastKeyFrame();
+            }
         }
 
         private void StopCurrentAnimation(FrameworkElement frameworkElement, string groupName = "visualStateGroupName", bool revertToFormerValue = false)
@@ -224,6 +267,11 @@ namespace Windows.UI.Xaml.Media.Animation
             InitializeKeyFramesSet();
             base.IterateOnce(parameters, isLastLoop);
             Apply(parameters, isLastLoop);
+        }
+
+        protected override Duration GetNaturalDurationCore()
+        {
+            return new Duration(LargestTimeSpanKeyTime);
         }
     }
 }

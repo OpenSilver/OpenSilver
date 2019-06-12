@@ -40,7 +40,11 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Animates the value of a Double property between two target values using linear
     /// interpolation over a specified Duration.
     /// </summary>
+#if WORKINPROGRESS
+    public class DoubleAnimation : AnimationTimeline
+#else
     public class DoubleAnimation : Timeline
+#endif
     {
         ///// <summary>
         ///// Initializes a new instance of the DoubleAnimation class.
@@ -236,6 +240,21 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
+        private void OnAnimationCompleted(bool isLastLoop, IterationParameters parameters, PropertyPath propertyPath, FrameworkElement target)
+        {
+            if (isLastLoop)
+            {
+                if (parameters.IsVisualStateChange)
+                {
+                    propertyPath.INTERNAL_PropertySetVisualState(target, To);
+                }
+                else
+                {
+                    propertyPath.INTERNAL_PropertySetLocalValue(target, To);
+                }
+            }
+            OnIterationCompleted(parameters);
+        }
 
         static void StartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, double? from, object to, Duration Duration, EasingFunctionBase easingFunction, string visualStateGroupName, Action callbackForWhenfinished = null)
         {
