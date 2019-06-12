@@ -41,6 +41,7 @@ namespace Windows.UI.Xaml
     /// </summary>
     public struct Duration
     {
+        private DurationType _durationType;
         // Exceptions:
         //   System.ArgumentException:
         //     timeSpan evaluates as less than System.TimeSpan.Zero.
@@ -54,6 +55,7 @@ namespace Windows.UI.Xaml
             if (timeSpan >= TimeSpan.Zero)
             {
                 _timeSpan = timeSpan;
+                _durationType = DurationType.TimeSpan;
             }
             else
             {
@@ -85,11 +87,22 @@ namespace Windows.UI.Xaml
 
             }
 
-            if (t1.Equals(Duration.Forever) && !t2.Equals(Duration.Forever))
-                {
-                    return Duration.Forever;
-                }
-            return Duration.Automatic; //todo: how are we supposed to return null ?
+            if (t1._durationType == DurationType.Forever && t2.HasTimeSpan)
+            {
+                return Duration.Forever;
+            }
+            else
+            {
+                // This covers the following conditions:
+                // Forever - Forever
+                // TimeSpan - Forever
+                // TimeSpan - Automatic
+                // Forever - Automatic
+                // Automatic - Automatic
+                // Automatic - Forever
+                // Automatic - TimeSpan
+                return Duration.Automatic;
+            }
         }
 
         /// <summary>
@@ -103,16 +116,7 @@ namespace Windows.UI.Xaml
         /// </returns>
         public static bool operator !=(Duration t1, Duration t2)
         {
-            if (t1.HasTimeSpan != t2.HasTimeSpan)
-            {
-                return true;
-            }
-            //from now on, we know that t1.HasTimeSpan == t2.HasTimeSpan, otherwise, we  would already have returned true.
-            if (t1.HasTimeSpan)
-            {
-                return t1.TimeSpan == t2.TimeSpan;
-            }
-            return false;
+            return !(t1.Equals(t2));
         }
 
         /// <summary>
@@ -171,11 +175,7 @@ namespace Windows.UI.Xaml
         /// </returns>
         public static bool operator ==(Duration t1, Duration t2)
         {
-            if (t1.HasTimeSpan && t2.HasTimeSpan)
-            {
-                return t1.TimeSpan == t2.TimeSpan;
-            }
-            return false;
+            return t1.Equals(t2);
         }
 
         ///// <summary>
@@ -221,7 +221,12 @@ namespace Windows.UI.Xaml
         public static Duration Automatic
         {
             //Note: we put 1 millisecond in the TimeSpan below because Velocity does not like animations with a duration of 0ms (it decides it is something like 1 second or something like that)
-            get { return new Duration() { _timeSpan = new TimeSpan() }; }//todo: instead of just a new TimeSpan, we would probably need to determine the duration depending on the animation that contains it or even the Storyboard that contains the animation.
+            get
+            {
+                Duration duration = new Duration(new TimeSpan());
+                duration._durationType = DurationType.Automatic;
+                return duration;
+            }
         }
 
         /// <summary>
@@ -230,7 +235,12 @@ namespace Windows.UI.Xaml
         public static Duration Forever
         {
             //get { return new Duration(TimeSpan.MaxValue); }
-            get { return new Duration(new TimeSpan(9999, 0, 0, 0)); } //todo: fix support for TimeSpan.MaxValue and then replace this line with the commented one above.
+            get
+            {
+                Duration duration = new Duration(new TimeSpan(9999, 0, 0, 0));
+                duration._durationType = DurationType.Forever;
+                return duration;
+            } //todo: fix support for TimeSpan.MaxValue and then replace this line with the commented one above.
         }
 
         /// <summary>
@@ -240,9 +250,10 @@ namespace Windows.UI.Xaml
         public bool HasTimeSpan { //we assume it is like that
             get
             {
-                return (_timeSpan != null
-                    //&& _timeSpan != TimeSpan.MaxValue);
-                    && _timeSpan != new TimeSpan(9999, 0, 0, 0)); //todo: fix support for TimeSpan.MaxValue and then replace this line with the commented one above.
+                //return (_timeSpan != null
+                //    //&& _timeSpan != TimeSpan.MaxValue);
+                //    && _timeSpan != new TimeSpan(9999, 0, 0, 0)); //todo: fix support for TimeSpan.MaxValue and then replace this line with the commented one above.
+                return _durationType == DurationType.TimeSpan;
             }
         }
 
@@ -301,7 +312,21 @@ namespace Windows.UI.Xaml
         /// <returns>true if duration is equal to this Windows.UI.Xaml.Duration; otherwise, false.</returns>
         public bool Equals(Duration duration)
         {
-            return this == duration;
+            if (HasTimeSpan)
+            {
+                if (duration.HasTimeSpan)
+                {
+                    return _timeSpan == duration._timeSpan;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return _durationType == duration._durationType;
+            }
         }
 
         /// <summary>
@@ -359,6 +384,16 @@ namespace Windows.UI.Xaml
             TimeSpan timeSpan = TimeSpan.Parse(p);
 #endif
             return new Duration(timeSpan);
+        }
+
+        /// <summary>
+        /// An enumeration of the different types of Duration behaviors.
+        /// </summary>
+        private enum DurationType
+        {
+            Automatic,
+            TimeSpan,
+            Forever
         }
     }
 }
