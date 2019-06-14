@@ -118,7 +118,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <summary>
         /// Gets or sets the animation's ending value.
         /// </summary>
-        public double? To 
+        public double? To
         {
             get { return (double?)GetValue(ToProperty); }
             set { SetValue(ToProperty, value); }
@@ -142,12 +142,19 @@ namespace Windows.UI.Xaml.Media.Animation
             if (parameters.Target != null)
             {
                 GetTargetElementAndPropertyInfo(parameters.Target, out target, out propertyPath, parameters.IsTargetParentTheTarget);
-                DependencyProperty dp = GetProperty(target, propertyPath);
 
                 //todo: find out why we put the test on target and put it back? (I removed it because id kept ScaleTransform from working properly)
-                if (To != null)// && target is FrameworkElement)
+                if (To != null)//&& target is FrameworkElement)
                 {
+                    //if (Duration == TimeSpan.Zero)
+                    //{
+                    //    AnimationHelpers.ApplyInstantAnimationWorkAround()
+                    //    OnAnimationCompleted(parameters, isLastLoop, target, propertyPath);
+                    //}
+                    //else
+                    //{
                     // - Get the propertyMetadata from the property
+                    DependencyProperty dp = GetProperty(target, propertyPath);
                     PropertyMetadata propertyMetadata = dp.GetTypeMetaData(target.GetType());
 
                     //we make a specific name for this animation:
@@ -160,22 +167,8 @@ namespace Windows.UI.Xaml.Media.Animation
                         if (cssEquivalent != null)
                         {
                             cssEquivalentExists = true;
-                            StartAnimation(target, cssEquivalent, From, To, Duration, EasingFunction, specificGroupName, () =>
-                            {
-                                if (isLastLoop)
-                                {
-                                    if (parameters.IsVisualStateChange) //if we change the visual state, we set the VisualStateValue in the storage
-                                    {
-                                        propertyPath.INTERNAL_PropertySetVisualState(target, To);
-                                    }
-                                    else //otherwise (if we used Storyboard.Begin()), we set the Local value in the storage
-                                    {
-                                        propertyPath.INTERNAL_PropertySetLocalValue(target, To);
-                                    }
-                                }
-                                OnIterationCompleted(parameters);
-                                //INTERNAL_RaiseCompletedEvent(applyCallGuid);
-                            });
+                            StartAnimation(target, cssEquivalent, From, To, Duration, EasingFunction, specificGroupName,
+                                OnAnimationCompleted(parameters, isLastLoop, target, propertyPath));
                         }
                     }
                     //todo: use GetCSSEquivalent instead (?)
@@ -185,75 +178,29 @@ namespace Windows.UI.Xaml.Media.Animation
                         foreach (CSSEquivalent equivalent in cssEquivalents)
                         {
                             cssEquivalentExists = true;
-                            StartAnimation(target, equivalent, From, To, Duration, EasingFunction, specificGroupName, () =>
-                            {
-                                if (isLastLoop)
-                                {
-                                    if (parameters.IsVisualStateChange) //if we change the visual state, we set the VisualStateValue in the storage
-                                    {
-                                        propertyPath.INTERNAL_PropertySetVisualState(target, To);
-                                    }
-                                    else //otherwise (if we used Storyboard.Begin()), we set the Local value in the storage
-                                    {
-                                        propertyPath.INTERNAL_PropertySetLocalValue(target, To);
-                                    }
-                                }
-                                OnIterationCompleted(parameters);
-                                //INTERNAL_RaiseCompletedEvent(applyCallGuid);
-                            });
+                            StartAnimation(target, equivalent, From, To, Duration, EasingFunction, specificGroupName,
+                                OnAnimationCompleted(parameters, isLastLoop, target, propertyPath));
                         }
                     }
 
                     if (!cssEquivalentExists)
                     {
-                        if (isLastLoop)
-                        {
-                            if (parameters.IsVisualStateChange)
-                            {
-                                propertyPath.INTERNAL_PropertySetVisualState(target, To);
-                            }
-                            else
-                            {
-                                propertyPath.INTERNAL_PropertySetLocalValue(target, To);
-                            }
-                        }
-                        OnIterationCompleted(parameters);
-                        //INTERNAL_RaiseCompletedEvent(applyCallGuid);
+                        OnAnimationCompleted(parameters, isLastLoop, target, propertyPath);
                     }
+                    //}
                 }
-                //else
-                //{
-                //    if (isLastLoop)
-                //    {
-                //        if (parameters.IsVisualStateChange)
-                //        {
-                //            propertyPath.INTERNAL_PropertySetVisualState(target, To);
-                //        }
-                //        else
-                //        {
-                //            propertyPath.INTERNAL_PropertySetLocalValue(target, To);
-                //        }
-                //    }
-                //    OnIterationCompleted(parameters);
-                //    //INTERNAL_RaiseCompletedEvent(applyCallGuid);
-                //}
             }
         }
-
-        private void OnAnimationCompleted(bool isLastLoop, IterationParameters parameters, PropertyPath propertyPath, FrameworkElement target)
+        private Action OnAnimationCompleted(IterationParameters parameters, bool isLastLoop, DependencyObject target, PropertyPath propertyPath)
         {
-            if (isLastLoop)
+            return () =>
             {
-                if (parameters.IsVisualStateChange)
+                if (isLastLoop)
                 {
-                    propertyPath.INTERNAL_PropertySetVisualState(target, To);
+                    AnimationHelpers.ApplyInstantAnimation(target, propertyPath, To.Value, parameters.IsVisualStateChange);
                 }
-                else
-                {
-                    propertyPath.INTERNAL_PropertySetLocalValue(target, To);
-                }
-            }
-            OnIterationCompleted(parameters);
+                OnIterationCompleted(parameters);
+            };
         }
 
         static void StartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, double? from, object to, Duration Duration, EasingFunctionBase easingFunction, string visualStateGroupName, Action callbackForWhenfinished = null)
@@ -278,29 +225,23 @@ namespace Windows.UI.Xaml.Media.Animation
                         }
                         object cssValue = cssEquivalent.Value(target, to);
 
-
-
                         object newObj = CSHTML5.Interop.ExecuteJavaScriptAsync(@"new Object()");
 
                         if (from == null)
                         {
                             foreach (string csspropertyName in cssEquivalent.Name)
                             {
-                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0[$1] = $2;", newObj, csspropertyName, cssValue);
+                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", newObj, csspropertyName, cssValue);
                             }
                         }
                         else
                         {
                             foreach (string csspropertyName in cssEquivalent.Name)
                             {
-                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0[$1] = [$2, $3];", newObj, csspropertyName, cssValue, from);
+                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = [$2, $3];", newObj, csspropertyName, cssValue, from);
                             }
                         }
-
                         AnimationHelpers.CallVelocity(cssEquivalent.DomElement, Duration, easingFunction, visualStateGroupName, callbackForWhenfinished, newObj);
-
                     }
                 }
             }
@@ -316,13 +257,11 @@ $0[$1] = [$2, $3];", newObj, csspropertyName, cssValue, from);
         {
             base.Stop(frameworkElement, groupName, revertToFormerValue);
 
-
             DependencyObject target;
             PropertyPath propertyPath;
             GetTargetElementAndPropertyInfo(frameworkElement, out target, out propertyPath);
             Type lastElementType = target.GetType();
             PropertyInfo propertyInfo = lastElementType.GetProperty(propertyPath.INTERNAL_DependencyPropertyName);
-
 
             //todo: find out why we put the test on target and put it back? (I removed it because id kept ScaleTransform from working properly)
             if (To != null)// && target is FrameworkElement) //todo: "To" can never be "null", fix this.
@@ -357,8 +296,7 @@ $0[$1] = [$2, $3];", newObj, csspropertyName, cssValue, from);
                         }
                         if (cssEquivalent.DomElement != null)
                         {
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-Velocity($0, ""stop"", $1);", cssEquivalent.DomElement, specificGroupName);
+                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", cssEquivalent.DomElement, specificGroupName);
                         }
                     }
                 }
@@ -368,16 +306,12 @@ Velocity($0, ""stop"", $1);", cssEquivalent.DomElement, specificGroupName);
                     foreach (CSSEquivalent equivalent in cssEquivalents)
                     {
                         if (equivalent.DomElement != null)
-
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-Velocity($0, ""stop"", $1);", equivalent.DomElement, specificGroupName);
+                        {
+                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", equivalent.DomElement, specificGroupName);
+                        }
                     }
                 }
             }
-            //else
-            //{
-            //    propertyPath.INTERNAL_PropertySetVisualState(target, To); //To = null here --> Is it really what we want to do?
-            //}
 
             if (revertToFormerValue) //todo: check if this is sufficient or if we need to put stuff into the GetCSSEquivalents thing like for ColorAnimation:
             {

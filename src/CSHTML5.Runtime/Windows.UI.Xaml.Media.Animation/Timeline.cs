@@ -474,7 +474,7 @@ namespace Windows.UI.Xaml.Media.Animation
         }
 
 
-        
+
 
 
         //Stuff added for loops purposes:
@@ -509,7 +509,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 {
                     _beginTimeTimer = new DispatcherTimer(); //this line is to avoid having more than one callback on the tick (we cannot use "_beginTimeTimer.Tick -= XXX" since we use a anonymous method).
                     _beginTimeTimer.Interval = BeginTime.Value;
-                  
+
                     //Note: anonymous method since it allows us to use simply parameters and isLastLoop.
                     _beginTimeTimer.Tick += (sender, args) =>
                     {
@@ -528,15 +528,25 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal virtual void IterateOnce(IterationParameters parameters, bool isLastLoop)
         {
+#if WORKINPROGRESS
             ComputeDuration();
-            if (Duration.HasTimeSpan && Duration.TimeSpan.TotalMilliseconds > 0)
+#endif
+            if (Duration.HasTimeSpan)
             {
-                _parameters = parameters;
-                _animationTimer.Interval = Duration.TimeSpan;
-                _animationTimer.Tick -= _animationTimer_Tick;
-                _animationTimer.Tick += _animationTimer_Tick;
-                _isAnimationDurationReached = false;
-                _animationTimer.Start();
+                if (Duration.TimeSpan.TotalMilliseconds > 0)
+                {
+                    _parameters = parameters;
+                    _animationTimer.Interval = Duration.TimeSpan;
+                    _animationTimer.Tick -= _animationTimer_Tick;
+                    _animationTimer.Tick += _animationTimer_Tick;
+                    _isAnimationDurationReached = false;
+                    _animationTimer.Start();
+                }
+                else
+                {
+                    _isAnimationDurationReached = true;
+                    //OnIterationCompleted(parameters);
+                }
             }
         }
 
@@ -559,14 +569,12 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-
         DispatcherTimer _animationTimer = new DispatcherTimer();
         internal void OnIterationCompleted(IterationParameters parameters)
         {
-            if (!Duration.HasTimeSpan || Duration.TimeSpan.TotalMilliseconds == 0 || _isAnimationDurationReached) //the default duration is Automatic, which currently has a TimeSpan of 0 ms (which is considered here to be no timespan).
+            if (_isAnimationDurationReached) //the default duration is Automatic, which currently has a TimeSpan of 0 ms (which is considered here to be no timespan).
             {
                 --remainingIterations;
-
                 if (remainingIterations <= 0)
                 {
                     if (this is Storyboard)
@@ -579,7 +587,6 @@ namespace Windows.UI.Xaml.Media.Animation
                     }
 
                     INTERNAL_RaiseCompletedEvent();
-                    _isAnimationDurationReached = false; //for the next time.
                 }
                 else
                 {
@@ -592,11 +599,6 @@ namespace Windows.UI.Xaml.Media.Animation
                         Stop(parameters.Target, revertToFormerValue: true);
                     }
 
-                    if (Duration.HasTimeSpan && Duration.TimeSpan.TotalMilliseconds > 0)
-                    {
-                        _isAnimationDurationReached = false;
-                        _animationTimer.Start();
-                    }
                     IterateOnce(parameters, isLastLoop: remainingIterations == 1);
                 }
             }
@@ -622,7 +624,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </returns>
         private void ComputeDuration()
         {
-            if(Duration == Duration.Automatic)
+            if (Duration == Duration.Automatic)
             {
                 Duration = GetNaturalDurationCore();
             }

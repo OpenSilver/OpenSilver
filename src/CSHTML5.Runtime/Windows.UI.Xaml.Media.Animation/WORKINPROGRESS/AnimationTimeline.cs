@@ -11,6 +11,7 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
+#if WORKINPROGRESS
     public abstract class AnimationTimeline : Timeline
     {
         protected override Duration GetNaturalDurationCore()
@@ -18,4 +19,5 @@ namespace Windows.UI.Xaml.Media.Animation
             return new TimeSpan(0, 0, 1);
         }
     }
+#endif
 }

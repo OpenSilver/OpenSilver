@@ -45,7 +45,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <summary>
         /// Gets the collection of child Timeline objects.
         /// </summary>
-        public TimelineCollection Children { get { return _children;} }
+        public TimelineCollection Children { get { return _children; } }
 
         /// <summary>
         /// Gets the value of the Storyboard.TargetName XAML attached property from a
@@ -165,21 +165,24 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal void Begin(FrameworkElement target, bool useTransitions, string visualStateGroupName, bool isVisualStateChange)
         {
-            Guid guid = Guid.NewGuid();
-            IterationParameters parameters = new IterationParameters()
+            Dispatcher.INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
             {
-                Target = target,
-                Guid = guid,
-                UseTransitions = useTransitions,
-                VisualStateGroupName = visualStateGroupName,
-                IsVisualStateChange = isVisualStateChange
-            };
+                Guid guid = Guid.NewGuid();
+                IterationParameters parameters = new IterationParameters()
+                {
+                    Target = target,
+                    Guid = guid,
+                    UseTransitions = useTransitions,
+                    VisualStateGroupName = visualStateGroupName,
+                    IsVisualStateChange = isVisualStateChange
+                };
 
-            InitializeIteration();
+                InitializeIteration();
 
-            bool isThisSingleLoop = RepeatBehavior.Type == RepeatBehaviorType.Count && RepeatBehavior.Count == 1;
+                bool isThisSingleLoop = RepeatBehavior.Type == RepeatBehaviorType.Count && RepeatBehavior.Count == 1;
 
-            StartFirstIteration(parameters, isThisSingleLoop, new TimeSpan()); //todo: use a parameter instead of just a new TimeSpan since we can have a Storyboard inside a Storyboard.
+                StartFirstIteration(parameters, isThisSingleLoop, new TimeSpan()); //todo: use a parameter instead of just a new TimeSpan since we can have a Storyboard inside a Storyboard.
+            });
         }
 
 
@@ -241,9 +244,9 @@ namespace Windows.UI.Xaml.Media.Animation
         ///// </returns>
         //public TimeSpan GetCurrentTime();
 
-        
-        
-       
+
+
+
 
         ///// <summary>
         ///// Pauses the animation clock associated with the storyboard.
@@ -311,9 +314,9 @@ namespace Windows.UI.Xaml.Media.Animation
         //    timeline.SetValue(TargetProperty, target);
         //}
 
-        
 
-        
+
+
 
         ///// <summary>
         ///// Advances the current time of the storyboard's clock to the end of its active
@@ -390,7 +393,7 @@ namespace Windows.UI.Xaml.Media.Animation
                         currentParameters.IsTargetParentTheTarget = false;
                     }
                     bool isTimelineSingleLoop = timeLine.RepeatBehavior.Type == RepeatBehaviorType.Count && timeLine.RepeatBehavior.Count == 1;
-                    timeLine.StartFirstIteration(currentParameters, isTimelineSingleLoop, BeginTime); 
+                    timeLine.StartFirstIteration(currentParameters, isTimelineSingleLoop, BeginTime);
                 }
             }
             else
@@ -409,10 +412,10 @@ namespace Windows.UI.Xaml.Media.Animation
                         timeLine.StartFirstIteration(parameters, isTimelineSingleLoop, BeginTime);
                     }
                 }
-            } 
+            }
         }
 
-        
+
     }
 
     /// <summary>

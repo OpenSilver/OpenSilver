@@ -84,7 +84,6 @@ namespace Windows.UI.Xaml
             if (t1.HasTimeSpan && t2.HasTimeSpan)
             {
                 return new Duration(t1.TimeSpan - t2.TimeSpan);
-
             }
 
             if (t1._durationType == DurationType.Forever && t2.HasTimeSpan)
