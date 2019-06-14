@@ -76,7 +76,6 @@ namespace Windows.UI.Xaml.Media
         //    }
         //});
 
-#if WORKINPROGRESS
         private void ApplyCSSChanges(MatrixTransform matrixTransform)
         {
             throw new NotImplementedException();
@@ -91,7 +90,6 @@ namespace Windows.UI.Xaml.Media
         {
             ApplyCSSChanges(this);
         }
-#endif
 
         internal override void INTERNAL_ApplyTransform()
         {

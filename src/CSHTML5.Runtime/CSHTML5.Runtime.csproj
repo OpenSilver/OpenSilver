@@ -697,8 +697,8 @@
     <Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\GeometryCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\Projection.cs" />
     <Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\RectangleGeometry.cs" />
-    <Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TransformCollection.cs" />
-    <Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TransformGroup.cs" />
+    <Compile Include="Windows.UI.Xaml.Media\TransformCollection.cs" />
+    <Compile Include="Windows.UI.Xaml.Media\TransformGroup.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\NavigatedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\NavigationEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\NavigationFailedEventArgs.cs" />

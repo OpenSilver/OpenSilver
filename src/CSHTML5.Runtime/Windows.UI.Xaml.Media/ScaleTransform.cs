@@ -110,8 +110,6 @@ namespace Windows.UI.Xaml.Media
                     }
             });
 
-
-#if WORKINPROGRESS
         private void ApplyCSSChanges(ScaleTransform scaleTransform, double scaleX, double scaleY)
         {
             CSSEquivalent scaleXcssEquivalent = ScaleXProperty.GetTypeMetaData(typeof(ScaleTransform)).GetCSSEquivalent(scaleTransform);
@@ -131,24 +129,12 @@ namespace Windows.UI.Xaml.Media
             ApplyCSSChanges(this, 1, 1);
         }
 
-#endif
-
         internal void ApplyScaleTransform(double scaleX, double scaleY)
         {
 
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-#if WORKINPROGRESS
                 ApplyCSSChanges(this, scaleX, scaleY);
-#else
-                object parentDom = this.INTERNAL_parent.INTERNAL_OuterDomElement;
-                CSSEquivalent scaleXcssEquivalent = ScaleXProperty.GetTypeMetaData(typeof(ScaleTransform)).GetCSSEquivalent(this);
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleXcssEquivalent.DomElement, scaleXcssEquivalent.Name, scaleXcssEquivalent.Value(this, scaleX));
-
-                CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetTypeMetaData(typeof(ScaleTransform)).GetCSSEquivalent(this);
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleYcssEquivalent.DomElement, scaleYcssEquivalent.Name, scaleYcssEquivalent.Value(this, scaleY));
-#endif
-                //dynamic domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this.INTERNAL_parent);
 
                 //string value = "scale(" + scaleX + ", " + scaleY + ")"; //todo: make sure that the conversion from double to string is culture-invariant so that it uses dots instead of commas for the decimal separator.
 
@@ -176,9 +162,7 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-
         // NOTE: CenterX and CenterY are currently not supported because in CSS there is only the "transformOrigin" property, which is used for the "UIElement.RenderTransformOrigin" property.
-
 
         internal override void INTERNAL_ApplyTransform()
         {
@@ -189,16 +173,7 @@ namespace Windows.UI.Xaml.Media
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-#if WORKINPROGRESS
                 INTERNAL_UnapplyCSSChanges();
-#else
-                object parentDom = this.INTERNAL_parent.INTERNAL_OuterDomElement;
-                CSSEquivalent scaleXcssEquivalent = ScaleXProperty.GetTypeMetaData(typeof(ScaleTransform)).GetCSSEquivalent(this);
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleXcssEquivalent.DomElement, scaleXcssEquivalent.Name, scaleXcssEquivalent.Value(this, 1));
-
-                CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetTypeMetaData(typeof(ScaleTransform)).GetCSSEquivalent(this);
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleYcssEquivalent.DomElement, scaleYcssEquivalent.Name, scaleYcssEquivalent.Value(this, 1));
-#endif
             }
         }
 

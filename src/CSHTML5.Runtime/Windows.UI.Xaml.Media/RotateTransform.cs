@@ -71,7 +71,6 @@ namespace Windows.UI.Xaml.Media
                 }
             });
 
-#if WORKINPROGRESS
         private void ApplyCSSChanges(RotateTransform rotateTransform, double angle)
         {
             CSSEquivalent anglecssEquivalent = AngleProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(rotateTransform);
@@ -87,21 +86,12 @@ namespace Windows.UI.Xaml.Media
         {
             ApplyCSSChanges(this, 0);
         }
-#endif
 
         void ApplyRotateTransform(double angle)
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-#if WORKINPROGRESS
                 ApplyCSSChanges(this, angle);
-#else
-                object parentDom = this.INTERNAL_parent.INTERNAL_OuterDomElement;
-                CSSEquivalent anglecssEquivalent = AngleProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(this);
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(anglecssEquivalent.DomElement, anglecssEquivalent.Name, anglecssEquivalent.Value(this, angle));
-#endif
-
-
 
                 //dynamic domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this.INTERNAL_parent);
 
@@ -146,13 +136,7 @@ namespace Windows.UI.Xaml.Media
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-#if WORKINPROGRESS
                 INTERNAL_UnapplyCSSChanges();
-#else
-                object parentDom = this.INTERNAL_parent.INTERNAL_OuterDomElement;
-                CSSEquivalent anglecssEquivalent = AngleProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(this);
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(anglecssEquivalent.DomElement, anglecssEquivalent.Name, anglecssEquivalent.Value(this, 0));
-#endif
             }
         }
 

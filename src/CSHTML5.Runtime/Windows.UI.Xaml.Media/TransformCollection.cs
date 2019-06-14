@@ -31,6 +31,9 @@ namespace Windows.UI.Xaml.Media
 {
 #if WORKINPROGRESS
     public sealed class TransformCollection : PresentationFrameworkCollection<Transform>
+#else
+    public sealed class TransformCollection : List<Transform>
+#endif
     {
         internal static TransformCollection Empty
         {
@@ -40,5 +43,4 @@ namespace Windows.UI.Xaml.Media
             }
         }
     }
-#endif
 }

@@ -111,8 +111,6 @@ namespace Windows.UI.Xaml.Media
                 }
             });
 
-
-#if WORKINPROGRESS
         private void ApplyCSSChanges(SkewTransform skewTransform, double angleX, double angleY)
         {
             CSSEquivalent angleXcssEquivalent = AngleXProperty.GetTypeMetaData(typeof(SkewTransform)).GetCSSEquivalent(skewTransform);
@@ -130,21 +128,13 @@ namespace Windows.UI.Xaml.Media
         {
             ApplyCSSChanges(this, 0, 0);
         }
-#endif
 
         internal void ApplySkewTransform(double angleX, double angleY)
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-#if WORKINPROGRESS
                 ApplyCSSChanges(this, angleX, angleY);
-#else
-                object parentDom = this.INTERNAL_parent.INTERNAL_OuterDomElement;
-                CSSEquivalent angleXcssEquivalent = AngleXProperty.GetTypeMetaData(typeof(SkewTransform)).GetCSSEquivalent(this);
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(angleXcssEquivalent.DomElement, angleXcssEquivalent.Name, angleXcssEquivalent.Value(this, angleX));
-                CSSEquivalent angleYcssEquivalent = AngleYProperty.GetTypeMetaData(typeof(SkewTransform)).GetCSSEquivalent(this);
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(angleYcssEquivalent.DomElement, angleYcssEquivalent.Name, angleYcssEquivalent.Value(this, angleY));
-#endif
+
                 //dynamic domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this.INTERNAL_parent);
 
                 //string value = "skew(" + angleX + "deg, " + angleY + "deg)"; //todo: make sure that the conversion from double to string is culture-invariant so that it uses dots instead of commas for the decimal separator.
@@ -185,15 +175,7 @@ namespace Windows.UI.Xaml.Media
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-#if WORKINPROGRESS
                 INTERNAL_UnapplyCSSChanges();
-#else
-                object parentDom = this.INTERNAL_parent.INTERNAL_OuterDomElement;
-                CSSEquivalent angleXcssEquivalent = AngleXProperty.GetTypeMetaData(typeof(SkewTransform)).GetCSSEquivalent(this);
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(angleXcssEquivalent.DomElement, angleXcssEquivalent.Name, angleXcssEquivalent.Value(this, 0));
-                CSSEquivalent angleYcssEquivalent = AngleYProperty.GetTypeMetaData(typeof(SkewTransform)).GetCSSEquivalent(this);
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(angleYcssEquivalent.DomElement, angleYcssEquivalent.Name, angleYcssEquivalent.Value(this, 0));
-#endif
             }
         }
 

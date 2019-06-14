@@ -33,7 +33,6 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-#if WORKINPROGRESS
     [ContentProperty("Children")]
     public sealed class TransformGroup : Transform
     {
@@ -51,22 +50,35 @@ namespace Windows.UI.Xaml.Media
             return new Point();
         }
 
-#if WORKINPROGRESS
         private void ApplyCSSChanges(TransformGroup transformGroup, TransformCollection children)
         {
             int childrenCount = (children != null) ? children.Count : 0;
+            UIElement parent = transformGroup.INTERNAL_parent;
+            Transform child;
             for (int i = childrenCount - 1; i > -1; i--)
             {
-                children[i].INTERNAL_ApplyCSSChanges();
+                child = children[i];
+                if (child.INTERNAL_parent != parent)
+                {
+                    child.INTERNAL_parent = parent;
+                }
+                child.INTERNAL_ApplyCSSChanges();
             }
         }
 
         private void UnapplyCSSChanges(TransformGroup transformGroup, TransformCollection children)
         {
             int childrenCount = (children != null) ? children.Count : 0;
+            UIElement parent = transformGroup.INTERNAL_parent;
+            Transform child;
             for (int i = childrenCount - 1; i > -1; i--)
             {
-                children[i].INTERNAL_UnapplyCSSChanges();
+                child = children[i];
+                if (child.INTERNAL_parent != parent)
+                {
+                    child.INTERNAL_parent = parent;
+                }
+                child.INTERNAL_UnapplyCSSChanges();
             }
         }
 
@@ -79,22 +91,12 @@ namespace Windows.UI.Xaml.Media
         {
             UnapplyCSSChanges(this, Children);
         }
-#endif
 
         internal void ApplyTransformGroup(TransformCollection children)
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-                foreach (Transform child in children)
-                {
-                    if (child.INTERNAL_parent != this.INTERNAL_parent)
-                    {
-                        child.INTERNAL_parent = this.INTERNAL_parent;
-                    }
-                }
-#if WORKINPROGRESS
                 ApplyCSSChanges(this, children);
-#endif
             }
         }
 
@@ -102,16 +104,7 @@ namespace Windows.UI.Xaml.Media
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-                foreach (Transform child in children)
-                {
-                    if (child.INTERNAL_parent != this.INTERNAL_parent)
-                    {
-                        child.INTERNAL_parent = this.INTERNAL_parent;
-                    }
-                }
-#if WORKINPROGRESS
                 UnapplyCSSChanges(this, children);
-#endif
             }
         }
 
@@ -125,5 +118,4 @@ namespace Windows.UI.Xaml.Media
             UnapplyTransformGroup(Children);
         }
     }
-#endif
 }
