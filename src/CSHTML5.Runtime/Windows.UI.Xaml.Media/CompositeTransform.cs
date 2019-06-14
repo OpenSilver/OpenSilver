@@ -336,11 +336,61 @@ namespace Windows.UI.Xaml.Media
             compositeTransform.INTERNAL_ApplyTransform();
         }
 
+#if WORKINPROGRESS
+        private void ApplyCSSChanges(CompositeTransform compositeTransform, double scaleX, double scaleY, double skewX, double skewY, double rotation, double translateX, double translateY)
+        {
+            //-------------
+            // In XAML, order is always:
+            // 1. Scale
+            // 2. Skew
+            // 3. Rotate
+            // 4. Translate
+            //
+            // Below we do in reverse order because in CSS the right-most operation is done first.
+            //-------------
+
+            //TranslateX:
+            CSSEquivalent translateXcssEquivalent = TranslateXProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(compositeTransform);
+            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(translateXcssEquivalent.DomElement, translateXcssEquivalent.Name, translateXcssEquivalent.Value(compositeTransform, translateX));
+            //TranslateY:
+            CSSEquivalent translateYcssEquivalent = TranslateYProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(compositeTransform);
+            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(translateYcssEquivalent.DomElement, translateYcssEquivalent.Name, translateYcssEquivalent.Value(compositeTransform, translateY));
+            //Rotation:
+            CSSEquivalent rotationcssEquivalent = RotationProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(compositeTransform);
+            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(rotationcssEquivalent.DomElement, rotationcssEquivalent.Name, rotationcssEquivalent.Value(compositeTransform, rotation));
+            //SkewX:
+            CSSEquivalent skewXcssEquivalent = SkewXProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(compositeTransform);
+            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(skewXcssEquivalent.DomElement, skewXcssEquivalent.Name, skewXcssEquivalent.Value(compositeTransform, skewX));
+            //SkewY:
+            CSSEquivalent skewYcssEquivalent = SkewYProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(compositeTransform);
+            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(skewYcssEquivalent.DomElement, skewYcssEquivalent.Name, skewYcssEquivalent.Value(compositeTransform, skewY));
+            //ScaleX:
+            CSSEquivalent scaleXcssEquivalent = ScaleXProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(compositeTransform);
+            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleXcssEquivalent.DomElement, scaleXcssEquivalent.Name, scaleXcssEquivalent.Value(compositeTransform, scaleX));
+            //ScaleY:
+            CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(compositeTransform);
+            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleYcssEquivalent.DomElement, scaleYcssEquivalent.Name, scaleYcssEquivalent.Value(compositeTransform, scaleY));
+
+        }
+
+        internal override void INTERNAL_ApplyCSSChanges()
+        {
+            ApplyCSSChanges(this, this.ScaleX, this.ScaleY, this.SkewX, this.SkewY, this.Rotation, this.TranslateX, this.TranslateY);
+        }
+
+        internal override void INTERNAL_UnapplyCSSChanges()
+        {
+            ApplyCSSChanges(this, 1, 1, 0, 0, 0, 0, 0);
+        }
+#endif
 
         internal void ApplyCompositeTransform(double scaleX, double scaleY, double skewX, double skewY, double rotation, double translateX, double translateY)
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
+#if WORKINPROGRESS
+                ApplyCSSChanges(this, scaleX, scaleY, skewX, skewY, rotation, translateX, translateY);
+#else
                 object parentDom = this.INTERNAL_parent.INTERNAL_OuterDomElement;
 
                 //-------------
@@ -374,6 +424,7 @@ namespace Windows.UI.Xaml.Media
                 //ScaleY:
                 CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
                 INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleYcssEquivalent.DomElement, scaleYcssEquivalent.Name, scaleYcssEquivalent.Value(this, scaleY));
+#endif
             }
         }
 
@@ -390,6 +441,9 @@ namespace Windows.UI.Xaml.Media
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
+#if WORKINPROGRESS
+                INTERNAL_UnapplyCSSChanges();
+#else
                 object parentDom = this.INTERNAL_parent.INTERNAL_OuterDomElement;
 
                 //-------------
@@ -423,6 +477,7 @@ namespace Windows.UI.Xaml.Media
                 //ScaleY:
                 CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
                 INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleYcssEquivalent.DomElement, scaleYcssEquivalent.Name, scaleYcssEquivalent.Value(this, 1));
+#endif
             }
         }
 

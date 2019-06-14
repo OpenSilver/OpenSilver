@@ -37,5 +37,9 @@ namespace Windows.UI.Xaml.Media
         // Must be implemented by the concrete class:
         internal abstract void INTERNAL_ApplyTransform();
         internal abstract void INTERNAL_UnapplyTransform();
+#if WORKINPROGRESS
+        internal abstract void INTERNAL_ApplyCSSChanges();
+        internal abstract void INTERNAL_UnapplyCSSChanges();
+#endif
     }
 }

@@ -32,7 +32,13 @@ namespace Windows.UI.Xaml.Media
 #if WORKINPROGRESS
     public sealed class TransformCollection : PresentationFrameworkCollection<Transform>
     {
-
+        internal static TransformCollection Empty
+        {
+            get
+            {
+                return new TransformCollection();
+            }
+        }
     }
 #endif
 }

@@ -18,6 +18,8 @@
 
 
 using System.Windows.Markup;
+using CSHTML5.Internal;
+using System.Collections.Generic;
 #if MIGRATION
 using System.Windows;
 #else
@@ -42,21 +44,85 @@ namespace Windows.UI.Xaml.Media
         }
 
         public static readonly DependencyProperty ChildrenProperty =
-            DependencyProperty.Register("Children", typeof(TransformCollection), typeof(TransformGroup), new PropertyMetadata(new TransformCollection()));
+            DependencyProperty.Register("Children", typeof(TransformCollection), typeof(TransformGroup), new PropertyMetadata(TransformCollection.Empty));
 
         protected override Point INTERNAL_TransformPoint(Point point)
         {
             return new Point();
         }
 
+#if WORKINPROGRESS
+        private void ApplyCSSChanges(TransformGroup transformGroup, TransformCollection children)
+        {
+            int childrenCount = (children != null) ? children.Count : 0;
+            for (int i = childrenCount - 1; i > -1; i--)
+            {
+                children[i].INTERNAL_ApplyCSSChanges();
+            }
+        }
+
+        private void UnapplyCSSChanges(TransformGroup transformGroup, TransformCollection children)
+        {
+            int childrenCount = (children != null) ? children.Count : 0;
+            for (int i = childrenCount - 1; i > -1; i--)
+            {
+                children[i].INTERNAL_UnapplyCSSChanges();
+            }
+        }
+
+        internal override void INTERNAL_ApplyCSSChanges()
+        {
+            ApplyCSSChanges(this, Children);
+        }
+
+        internal override void INTERNAL_UnapplyCSSChanges()
+        {
+            UnapplyCSSChanges(this, Children);
+        }
+#endif
+
+        internal void ApplyTransformGroup(TransformCollection children)
+        {
+            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
+            {
+                foreach (Transform child in children)
+                {
+                    if (child.INTERNAL_parent != this.INTERNAL_parent)
+                    {
+                        child.INTERNAL_parent = this.INTERNAL_parent;
+                    }
+                }
+#if WORKINPROGRESS
+                ApplyCSSChanges(this, children);
+#endif
+            }
+        }
+
+        internal void UnapplyTransformGroup(TransformCollection children)
+        {
+            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
+            {
+                foreach (Transform child in children)
+                {
+                    if (child.INTERNAL_parent != this.INTERNAL_parent)
+                    {
+                        child.INTERNAL_parent = this.INTERNAL_parent;
+                    }
+                }
+#if WORKINPROGRESS
+                UnapplyCSSChanges(this, children);
+#endif
+            }
+        }
+
         internal override void INTERNAL_ApplyTransform()
         {
-
+            ApplyTransformGroup(Children);
         }
 
         internal override void INTERNAL_UnapplyTransform()
         {
-
+            UnapplyTransformGroup(Children);
         }
     }
 #endif

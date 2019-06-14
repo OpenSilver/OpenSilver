@@ -119,17 +119,41 @@ namespace Windows.UI.Xaml.Media
         //    translateTransform.ApplyTranslateTransform(translateTransform.X, newY);
         //}
 
+#if WORKINPROGRESS
+        private void ApplyCSSChanges(TranslateTransform translateTransform, double x, double y)
+        {
+            CSSEquivalent translateXcssEquivalent = XProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(translateTransform);
+            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(translateXcssEquivalent.DomElement, translateXcssEquivalent.Name, translateXcssEquivalent.Value(translateTransform, x));
+
+            CSSEquivalent translateYcssEquivalent = YProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(translateTransform);
+            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(translateYcssEquivalent.DomElement, translateYcssEquivalent.Name, translateYcssEquivalent.Value(translateTransform, y));
+        }
+
+        internal override void INTERNAL_ApplyCSSChanges()
+        {
+            ApplyCSSChanges(this, this.X, this.Y);
+        }
+
+        internal override void INTERNAL_UnapplyCSSChanges()
+        {
+            ApplyCSSChanges(this, 0, 0);
+        }
+#endif
+
         internal void ApplyTranslateTransform(double x, double y)
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
+#if WORKINPROGRESS
+                ApplyCSSChanges(this, x, y);
+#else
                 object parentDom = this.INTERNAL_parent.INTERNAL_OuterDomElement;
                 CSSEquivalent translateXcssEquivalent = XProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(this);
                 INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(translateXcssEquivalent.DomElement, translateXcssEquivalent.Name, translateXcssEquivalent.Value(this, x));
 
                 CSSEquivalent translateYcssEquivalent = YProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(this);
                 INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(translateYcssEquivalent.DomElement, translateYcssEquivalent.Name, translateYcssEquivalent.Value(this, y));
-
+#endif
                 //dynamic domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this.INTERNAL_parent);
 
                 //string value = "translate(" + x + "px, " + y + "px)"; //todo: make sure that the conversion from double to string is culture-invariant so that it uses dots instead of commas for the decimal separator.
@@ -167,12 +191,16 @@ namespace Windows.UI.Xaml.Media
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
+#if WORKINPROGRESS
+                INTERNAL_UnapplyCSSChanges();
+#else
                 object parentDom = this.INTERNAL_parent.INTERNAL_OuterDomElement;
                 CSSEquivalent scaleXcssEquivalent = XProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(this);
                 INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleXcssEquivalent.DomElement, scaleXcssEquivalent.Name, scaleXcssEquivalent.Value(this, 0));
 
                 CSSEquivalent scaleYcssEquivalent = YProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(this);
                 INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleYcssEquivalent.DomElement, scaleYcssEquivalent.Name, scaleYcssEquivalent.Value(this, 0));
+#endif
             }
         }
 
