@@ -24,6 +24,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 
+#if !MIGRATION
+using Windows.UI.Core;
+#endif
+
 #if MIGRATION
 namespace System.Windows.Media.Animation
 #else
@@ -165,7 +169,12 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal void Begin(FrameworkElement target, bool useTransitions, string visualStateGroupName, bool isVisualStateChange)
         {
-            Dispatcher.INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
+#if MIGRATION
+            Dispatcher
+#else
+            CoreDispatcher
+#endif
+            .INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
             {
                 Guid guid = Guid.NewGuid();
                 IterationParameters parameters = new IterationParameters()

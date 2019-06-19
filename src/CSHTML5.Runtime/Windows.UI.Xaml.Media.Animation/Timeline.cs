@@ -528,9 +528,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal virtual void IterateOnce(IterationParameters parameters, bool isLastLoop)
         {
-#if WORKINPROGRESS
             ComputeDuration();
-#endif
             if (Duration.HasTimeSpan)
             {
                 if (Duration.TimeSpan.TotalMilliseconds > 0)
@@ -612,7 +610,6 @@ namespace Windows.UI.Xaml.Media.Animation
             _isAnimationDurationReached = true;
             OnIterationCompleted(_parameters);
         }
-#if WORKINPROGRESS
 
         /// <summary>
         /// Implemented by the class author to provide a custom natural Duration
@@ -634,8 +631,9 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             return Duration.Automatic;
         }
+#if WORKINPROGRESS
 
-#region Not supported yet
+        #region Not supported yet
 
         public static readonly DependencyProperty SpeedRatioProperty = DependencyProperty.Register("SpeedRatio", typeof(double), typeof(Timeline), new PropertyMetadata(1d));
 
@@ -645,7 +643,7 @@ namespace Windows.UI.Xaml.Media.Animation
             set { this.SetValue(Timeline.SpeedRatioProperty, value); }
         }
 
-#endregion
+        #endregion
 #endif
     }
 }

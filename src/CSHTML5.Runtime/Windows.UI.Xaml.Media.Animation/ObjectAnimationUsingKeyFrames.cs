@@ -42,11 +42,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// specified Duration.
     /// </summary>
     [ContentProperty("KeyFrames")]
-#if WORKINPROGRESS
     public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline
-#else
-    public sealed class ObjectAnimationUsingKeyFrames : Timeline
-#endif
     {
         Dictionary<ObjectKeyFrame, DispatcherTimer> _keyFramesToObjectTimers = new Dictionary<ObjectKeyFrame,DispatcherTimer>();
         ///// <summary>

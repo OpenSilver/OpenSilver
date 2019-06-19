@@ -40,11 +40,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Animates the value of a Double property between two target values using linear
     /// interpolation over a specified Duration.
     /// </summary>
-#if WORKINPROGRESS
     public class DoubleAnimation : AnimationTimeline
-#else
-    public class DoubleAnimation : Timeline
-#endif
     {
         ///// <summary>
         ///// Initializes a new instance of the DoubleAnimation class.
