@@ -42,19 +42,19 @@ namespace Windows.UI.Xaml.Media.Animation
     [ContentProperty("KeyFrames")]
     public sealed class DoubleAnimationUsingKeyFrames : AnimationTimeline
     {
-        string _targetName;
-        PropertyPath _targetProperty;
-        DependencyObject _target;
-
+        private string _targetName;
+        private PropertyPath _targetProperty;
+        private DependencyObject _target;
         private IterationParameters _parameters;
 
         private DoubleKeyFrameCollection _keyFrames;
 
         private int _appliedKeyFramesCount;
 
-        private INTERNAL_ResolvedKeyFramesEntries _resolvedKeyFrames;
+        private INTERNAL_ResolvedKeyFramesEntries<DoubleKeyFrame> _resolvedKeyFrames;
 
         private Dictionary<DoubleKeyFrame, DoubleAnimation> _keyFrameToDoubleAnimationMap;
+
         //     The collection of DoubleKeyFrame objects that define the animation. The default
         //     is an empty collection.
         /// <summary>
@@ -102,7 +102,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
         private void InitializeKeyFramesSet()
         {
-            _resolvedKeyFrames = new INTERNAL_ResolvedKeyFramesEntries(_keyFrames);
+            _resolvedKeyFrames = new INTERNAL_ResolvedKeyFramesEntries<DoubleKeyFrame>(_keyFrames);
             _keyFrameToDoubleAnimationMap = new Dictionary<DoubleKeyFrame, DoubleAnimation>();
             for (int i = 0; i < KeyFrames.Count; i++)
             {
@@ -128,7 +128,6 @@ namespace Windows.UI.Xaml.Media.Animation
                 int? index = element.Item3;
                 if (depObject is ICloneOnAnimation)
                 {
-
                     if (!((ICloneOnAnimation)depObject).IsAlreadyAClone())
                     {
                         object clone = ((ICloneOnAnimation)depObject).Clone();
@@ -162,8 +161,6 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal override void Apply(IterationParameters parameters, bool isLastLoop)
         {
-            StopAllAnimations(parameters.Target);
-
             ApplyKeyFrame(GetNextKeyFrame());
         }
 
@@ -264,6 +261,7 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             this.Completed -= ApplyLastKeyFrame;
             this.Completed += ApplyLastKeyFrame;
+            StopAllAnimations(parameters.Target);
             BeforeApply(parameters, isLastLoop);
             InitializeKeyFramesSet();
             base.IterateOnce(parameters, isLastLoop);
