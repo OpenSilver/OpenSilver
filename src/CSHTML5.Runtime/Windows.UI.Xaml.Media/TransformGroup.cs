@@ -36,14 +36,19 @@ namespace Windows.UI.Xaml.Media
     [ContentProperty("Children")]
     public sealed class TransformGroup : Transform
     {
+        public TransformGroup()
+        {
+            Children = TransformCollection.Empty;
+        }
+        
         public TransformCollection Children
         {
-            get { return (TransformCollection)GetValue(TransformGroup.ChildrenProperty); }
+            get { return (TransformCollection)GetValue(ChildrenProperty); }
             set { SetValue(ChildrenProperty, value); }
         }
 
         public static readonly DependencyProperty ChildrenProperty =
-            DependencyProperty.Register("Children", typeof(TransformCollection), typeof(TransformGroup), new PropertyMetadata(TransformCollection.Empty));
+            DependencyProperty.Register("Children", typeof(TransformCollection), typeof(TransformGroup), new PropertyMetadata(null));
 
         protected override Point INTERNAL_TransformPoint(Point point)
         {
