@@ -106,7 +106,7 @@ namespace Windows.UI.Xaml.Media.Animation
             {
                 int keyFrameIndex = _resolvedKeyFrames.GetNextKeyFrameIndex(i);
                 ObjectKeyFrame keyFrame = KeyFrames[keyFrameIndex];
-                NullableTimer timer = new NullableTimer(keyFrame.KeyTime.TimeSpan);
+                NullableTimer timer = new NullableTimer(keyFrame.KeyTime.TimeSpan - (i > 0 ? KeyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(i - 1)].KeyTime.TimeSpan : TimeSpan.Zero));
                 timer.Completed -= ApplyNextKeyFrame;
                 timer.Completed += ApplyNextKeyFrame;
                 _keyFramesToObjectTimers.Add(keyFrame, timer);
@@ -286,6 +286,7 @@ namespace Windows.UI.Xaml.Media.Animation
             return new Duration(LargestTimeSpanKeyTime);
         }
 
+        #region Provide a Timer that can be null
         private class NullableTimer
         {
             private bool HasTimer
@@ -349,7 +350,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
             }
         }
-
+        #endregion
     }
 
     
