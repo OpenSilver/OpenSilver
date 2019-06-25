@@ -234,7 +234,10 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             base.Stop(frameworkElement, groupName, revertToFormerValue);
             StopAllTimers();
-            _keyFramesToObjectTimers.Clear();
+            if(_keyFramesToObjectTimers != null)
+            {
+                _keyFramesToObjectTimers.Clear();
+            }
         }
 
         private void StopAllTimers()
