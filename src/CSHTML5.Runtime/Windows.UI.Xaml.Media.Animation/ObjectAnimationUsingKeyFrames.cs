@@ -321,7 +321,11 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
             }
 
+#if MIGRATION
             private void Timer_Tick(object sender, EventArgs e)
+#else
+            private void Timer_Tick(object sender, object e)
+#endif
             {
                 INTERNAL_RaiseCompletedEvent();
                 Stop();
@@ -353,7 +357,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
             }
         }
-        #endregion
+#endregion
     }
 
     
