@@ -33,6 +33,18 @@
     <DocumentationFile>bin\Debug\CSHTML5.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug.WorkInProgress\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;WORKINPROGRESS</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Debug.WorkInProgress\CSHTML5.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration|AnyCPU'">
     <!-- ************************************* -->
     <!-- We manually override the AssemblyName -->
@@ -62,20 +74,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Migration\CSHTML5.Migration.xml</DocumentationFile>
+    <DocumentationFile>bin\Migration.WorkInProgress\CSHTML5.Migration.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug.WorkInProgress\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;WORKINPROGRESS</DefineConstants>
-    <DocumentationFile>bin\Debug\CSHTML5.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
-    <NoStdLib>true</NoStdLib>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
@@ -832,6 +832,20 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' ">
+    <Reference Include="Bridge, Version=17.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSHTML5.2.0.0-alpha28-043\lib\net40\Bridge.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CSHTML5, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSHTML5.2.0.0-alpha28-043\lib\net40\CSHTML5.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CSHTML5.Stubs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSHTML5.2.0.0-alpha28-043\lib\net40\CSHTML5.Stubs.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">
     <Reference Include="Bridge, Version=17.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CSHTML5.Migration.2.0.0-alpha28-043\lib\net40\Bridge.dll</HintPath>
@@ -939,6 +953,7 @@
     </None>
   </ItemGroup>
   <Import Project="..\packages\CSHTML5.2.0.0-alpha28-043\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
+  <Import Project="..\packages\CSHTML5.2.0.0-alpha28-043\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' " />
   <Import Project="..\packages\CSHTML5.Migration.2.0.0-alpha28-043\build\CSHTML5.Migration.targets" Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' " />
   <Import Project="..\packages\CSHTML5.Migration.2.0.0-alpha28-043\build\CSHTML5.Migration.targets" Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' " />
 </Project>
