@@ -115,7 +115,7 @@ namespace System.Runtime.Serialization
             }
 
             // Add the root:
-            List<XNode> xnodesForRoot = DataContractSerializer_Serialization.SerializeToXNodes(obj, _type, _knownTypes, _useXmlSerializerFormat, isRoot: true, isContainedInsideEnumerable: false, parentTypeInformation: typeInformation, nodeDefaultNamespaceIfAny: null);
+            List<XObject> xnodesForRoot = DataContractSerializer_Serialization.SerializeToXObjects(obj, _type, _knownTypes, _useXmlSerializerFormat, isRoot: true, isContainedInsideEnumerable: false, parentTypeInformation: typeInformation, nodeDefaultNamespaceIfAny: null);
             xdoc.Add(xnodesForRoot.First());
             string xml = xdoc.ToString(indentXml);
 
@@ -146,7 +146,7 @@ namespace System.Runtime.Serialization
             }
 
             // Add the root:
-            List<XNode> xnodesForRoot = DataContractSerializer_Serialization.SerializeToXNodes(obj, _type, _knownTypes, _useXmlSerializerFormat, isRoot: true, isContainedInsideEnumerable: false, parentTypeInformation: typeInformation, nodeDefaultNamespaceIfAny: null);
+            List<XObject> xnodesForRoot = DataContractSerializer_Serialization.SerializeToXObjects(obj, _type, _knownTypes, _useXmlSerializerFormat, isRoot: true, isContainedInsideEnumerable: false, parentTypeInformation: typeInformation, nodeDefaultNamespaceIfAny: null);
             xdoc.Add(xnodesForRoot.First());
             return xdoc;
         }

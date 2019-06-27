@@ -29,7 +29,7 @@ namespace System.Xml.Linq
     /// <summary>
     /// Represents an XML attribute.
     /// </summary>
-    public class XAttribute //: XObject
+    public class XAttribute : XObject
     {
         private bool isJsValueUpToDate = false;
 

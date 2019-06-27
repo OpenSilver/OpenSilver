@@ -32,7 +32,7 @@ namespace System.Xml.Linq
     /// Represents the abstract concept of a node (element, comment, document type,
     /// processing instruction, or text node) in the XML tree.
     /// </summary>
-    public abstract class XNode //: XObject
+    public abstract class XNode : XObject
     {
         internal object INTERNAL_jsnode;
 
