@@ -545,6 +545,17 @@ namespace System.Runtime.Serialization
                         }
                         order = attribute.Order;
                     }
+                    else if (attr is DataMemberAttribute)
+                    {
+                        DataMemberAttribute attribute = (DataMemberAttribute)attr;
+                        emitDefaultValue = attribute.EmitDefaultValue;
+                        isRequired = attribute.IsRequired;
+                        if (!string.IsNullOrWhiteSpace(attribute.Name))
+                        {
+                            name = attribute.Name;
+                        }
+                        order = attribute.Order;
+                    }
                     else if (attr is XmlElementAttribute)
                     {
                         XmlElementAttribute attribute = (XmlElementAttribute)attr;
