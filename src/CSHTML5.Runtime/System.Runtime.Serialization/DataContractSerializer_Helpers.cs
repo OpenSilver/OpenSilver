@@ -322,6 +322,7 @@ namespace System.Runtime.Serialization
             //-------------------------
             // Get the members type and information
             //-------------------------
+            //todo: if a property is present in a derived class with the "new" keyword, it currently appears only at the level of the base class instead of being repeated (ie. it is supposed to be serialized twice: at the base class level and at the derived class level).
             Dictionary<Type, List<MemberInformation>> typesToMembersInformations = new Dictionary<Type, List<MemberInformation>>(); //This is to put the properties that come from the same types together since it is important for ordering them (see notes below DataMember2Attribute.Order).
             foreach (PropertyInfo propertyInfo in properties)
             {
@@ -330,10 +331,11 @@ namespace System.Runtime.Serialization
                 if (!IsNullOrUndefined(memberInformation.MemberType))
                 {
                     MemberInfo memberInfo = memberInformation.MemberInfo;
+                    MemberInfo memberInfoBase = memberInformation.MemberInfoBase; // Note: If the member is "override", this variable contains the corresponding "virtual" or "abstract" declaration in the base classes.
                     if (ShouldMemberBeConsideredForSerialization(memberInfo, serializationType, useXmlSerializerFormat)) //only keep the members that will actually be serialized
                     {
                         //Add the member to its corresponding declaring type:
-                        Type propertyDeclaringType = propertyInfo.DeclaringType;
+                        Type propertyDeclaringType = memberInfoBase.DeclaringType; // Note: in case of inheritance of the property, we consider the base class instead of the derived class, because when serializing, the base class properties are serialized first, so a "virtual" or "abstract" property is serialized before the derived class.
                         if (!typesToMembersInformations.ContainsKey(propertyDeclaringType))
                         {
                             typesToMembersInformations.Add(propertyDeclaringType, new List<MemberInformation>());
@@ -538,60 +540,63 @@ namespace System.Runtime.Serialization
             int order = -1;
             bool hasXmlElementAttribute = false;
             bool hasXmlAttributeAttribute = false; // Note: repetition of the word "Attribute" is intended.
-            foreach (var memberInfo in GetMemberInheritanceChain(memberInfo1))
+
+            // Note: if a member is "override", we need to search for the "[DataMember]" attribute at the level of the base class where the "virtual" method is defined.
+            MemberInfo memberInfoBase = WalkUpInheritanceChainToFindWhereMemberIsFirstDefined(memberInfo1);
+
+            foreach (Attribute attr in memberInfoBase.GetCustomAttributes(false))
             {
-                foreach (Attribute attr in memberInfo.GetCustomAttributes(false))
+                if (attr is DataMember2Attribute)
                 {
-                    if (attr is DataMember2Attribute)
+                    DataMember2Attribute attribute = (DataMember2Attribute)attr;
+                    emitDefaultValue = attribute.EmitDefaultValue;
+                    isRequired = attribute.IsRequired;
+                    if (!string.IsNullOrWhiteSpace(attribute.Name))
                     {
-                        DataMember2Attribute attribute = (DataMember2Attribute)attr;
-                        emitDefaultValue = attribute.EmitDefaultValue;
-                        isRequired = attribute.IsRequired;
-                        if (!string.IsNullOrWhiteSpace(attribute.Name))
-                        {
-                            name = attribute.Name;
-                        }
-                        order = attribute.Order;
+                        name = attribute.Name;
                     }
-                    else if (attr is DataMemberAttribute)
+                    order = attribute.Order;
+                }
+                else if (attr is DataMemberAttribute)
+                {
+                    DataMemberAttribute attribute = (DataMemberAttribute)attr;
+                    emitDefaultValue = attribute.EmitDefaultValue;
+                    isRequired = attribute.IsRequired;
+                    if (!string.IsNullOrWhiteSpace(attribute.Name))
                     {
-                        DataMemberAttribute attribute = (DataMemberAttribute)attr;
-                        emitDefaultValue = attribute.EmitDefaultValue;
-                        isRequired = attribute.IsRequired;
-                        if (!string.IsNullOrWhiteSpace(attribute.Name))
-                        {
-                            name = attribute.Name;
-                        }
-                        order = attribute.Order;
+                        name = attribute.Name;
                     }
-                    else if (attr is XmlElementAttribute)
+                    order = attribute.Order;
+                }
+                else if (attr is XmlElementAttribute)
+                {
+                    XmlElementAttribute attribute = (XmlElementAttribute)attr;
+                    hasXmlElementAttribute = true;
+                    if (!string.IsNullOrWhiteSpace(attribute.ElementName))
                     {
-                        XmlElementAttribute attribute = (XmlElementAttribute)attr;
-                        hasXmlElementAttribute = true;
-                        if (!string.IsNullOrWhiteSpace(attribute.ElementName))
-                        {
-                            name = attribute.ElementName;
-                        }
-                        order = attribute.Order;
+                        name = attribute.ElementName;
                     }
-                    else if (attr is XmlAttributeAttribute)
+                    order = attribute.Order;
+                }
+                else if (attr is XmlAttributeAttribute)
+                {
+                    XmlAttributeAttribute attribute = (XmlAttributeAttribute)attr;
+                    hasXmlAttributeAttribute = true;
+                    if (!string.IsNullOrWhiteSpace(attribute.AttributeName))
                     {
-                        XmlAttributeAttribute attribute = (XmlAttributeAttribute)attr;
-                        hasXmlAttributeAttribute = true;
-                        if (!string.IsNullOrWhiteSpace(attribute.AttributeName))
-                        {
-                            name = attribute.AttributeName;
-                        }
+                        name = attribute.AttributeName;
                     }
                 }
             }
             if (name == null)
             {
-                name = memberInfo1.Name;
+                name = memberInfoBase.Name;
             }
-            return new MemberInformation(memberInfo1, emitDefaultValue: emitDefaultValue, isRequired: isRequired, name: name, order: order, hasXmlElementAttribute: hasXmlElementAttribute, hasXmlAttributeAttribute: hasXmlAttributeAttribute);
+            return new MemberInformation(memberInfo1, memberInfoBase, emitDefaultValue: emitDefaultValue, isRequired: isRequired, name: name, order: order, hasXmlElementAttribute: hasXmlElementAttribute, hasXmlAttributeAttribute: hasXmlAttributeAttribute);
         }
 
+        /*
+        // ======= OLD CODE BEFORE June 26, 2019 ========
         private static IEnumerable<MemberInfo> GetMemberInheritanceChain(MemberInfo memberInfo)
         {
             // Note: this method is here to fix the issue that was that it was not possible
@@ -641,6 +646,49 @@ namespace System.Runtime.Serialization
                     }
                 }
             }
+        }
+        */
+
+        /// <summary>
+        /// Same as "MethodInfo.GetBaseDefinition()" (which is not available at the time of writing)
+        /// </summary>
+        private static MemberInfo WalkUpInheritanceChainToFindWhereMemberIsFirstDefined(MemberInfo memberInfo)
+        {
+            //todo: replace this method with "MethodInfo.GetBaseDefinition()" when it will be supported.
+
+            //todo: handle the case where a method uses the "new" keyword to re-define it without overriding it. In that case should stop walking up the inheritance tree.
+
+            Type type = memberInfo.DeclaringType;
+            Type objectType = typeof(object);
+            string memberName = memberInfo.Name;
+            bool isProperty = (memberInfo is PropertyInfo);
+            bool isField = (memberInfo is FieldInfo);
+            MemberInfo result = memberInfo;
+
+            // Walk up the inheritance chain:
+            while ((type = type.BaseType) != null
+                    && (type != objectType))
+            {
+                MemberInfo baseMemberInfo;
+                if (isProperty)
+                {
+                    baseMemberInfo = type.GetProperty(memberName, BindingFlags.DeclaredOnly);
+                }
+                else if (isField)
+                {
+                    baseMemberInfo = type.GetField(memberName);
+                }
+                else
+                {
+                    break;
+                }
+                if (!object.Equals(baseMemberInfo, null))
+                {
+                    result = baseMemberInfo;
+                }
+            }
+
+            return result;
         }
 
         internal static bool IsElementNil(XElement element) //todo: what if it is not nullable?
@@ -1193,8 +1241,20 @@ namespace System.Runtime.Serialization
 
         static bool DoesMemberHaveTheDataMemberAttribute(MemberInfo memberInfo1)
         {
-            //todo: when supported by JSIL, replace the code with the method "IsDefined", such as: "memberInfo.IsDefined(typeof(DataMemberAttribute), false))"  IMPORTANT: verify that it still works fine with abstract inherited properties though.
+            MemberInfo memberInfoBase = WalkUpInheritanceChainToFindWhereMemberIsFirstDefined(memberInfo1);
+            foreach (Attribute attribute in memberInfoBase.GetCustomAttributes(false))
+            {
+                if (attribute is DataMemberAttribute
+                    || attribute is DataMember2Attribute)
+                {
+                    return true;
+                }
+            }
+            return false;
 
+            /*
+            // ======= OLD CODE BEFORE June 26, 2019 ========
+            //todo: when supported by JSIL, replace the code with the method "IsDefined", such as: "memberInfo.IsDefined(typeof(DataMemberAttribute), false))"  IMPORTANT: verify that it still works fine with abstract inherited properties though.
             foreach (MemberInfo memberInfo in GetMemberInheritanceChain(memberInfo1))
             {
                 foreach (Attribute attribute in memberInfo.GetCustomAttributes(false))
@@ -1207,6 +1267,7 @@ namespace System.Runtime.Serialization
                 }
             }
             return false;
+            */
         }
 
         static bool IsValueTheDefault(object value, Type type)

@@ -30,9 +30,10 @@ namespace System.Runtime.Serialization
 {
     internal class MemberInformation
     {
-        public MemberInformation(MemberInfo memberInfo, bool emitDefaultValue, bool isRequired, string name, int order, bool hasXmlElementAttribute, bool hasXmlAttributeAttribute)
+        public MemberInformation(MemberInfo memberInfo, MemberInfo memberInfoBase,  bool emitDefaultValue, bool isRequired, string name, int order, bool hasXmlElementAttribute, bool hasXmlAttributeAttribute)
         {
             this.MemberInfo = memberInfo;
+            this.MemberInfoBase = memberInfoBase;
             this.EmitDefaultValue = emitDefaultValue;
             this.IsRequired = isRequired;
             this.Name = name;
@@ -44,6 +45,12 @@ namespace System.Runtime.Serialization
         #region Initialized in the constructor
 
         public readonly MemberInfo MemberInfo;
+
+        /// <summary>
+        /// If the member is "override", this property contains the corresponding "virtual" or "abstract" declaration in the base classes.
+        /// </summary>
+        public readonly MemberInfo MemberInfoBase;
+
         public readonly bool EmitDefaultValue;
         public readonly bool IsRequired;
         public readonly string Name;
