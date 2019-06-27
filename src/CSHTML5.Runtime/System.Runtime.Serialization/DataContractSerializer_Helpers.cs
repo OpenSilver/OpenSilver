@@ -79,6 +79,14 @@ namespace System.Runtime.Serialization
 
         #region Internal Helpers
 
+        internal static string GetDefaultNamespace(string typeNamespace, bool useXmlSerializerFormat)
+        {
+            if (useXmlSerializerFormat)
+                return null;
+            else
+                return DATACONTRACTSERIALIZER_OBJECT_DEFAULT_NAMESPACE + typeNamespace;
+        }
+
         internal static bool IsAssignableToGenericEnumerableOrArray(Type type, out Type itemsType)
         {
             if (type.IsArray)
@@ -838,7 +846,7 @@ namespace System.Runtime.Serialization
             return readableTypeName;
         }
 
-        internal static TypeInformation GetTypeInformationByReadingAttributes(Type objectType, string nodeDefaultNamespaceIfAny)
+        internal static TypeInformation GetTypeInformationByReadingAttributes(Type objectType, string nodeDefaultNamespaceIfAny, bool useXmlSerializerFormat)
         {
             //todo-perfs: add a cache.
 
@@ -850,7 +858,7 @@ namespace System.Runtime.Serialization
             }
             else
             {
-                namespaceName = DATACONTRACTSERIALIZER_OBJECT_DEFAULT_NAMESPACE + objectType.Namespace;
+                namespaceName = GetDefaultNamespace(objectType.Namespace, useXmlSerializerFormat);
             }
             string name = objectType.Name; //note: we might need to make the name safe for serialization by calling DataContractSerializer_Helpers.GetTypeNameSafeForSerialization(objectType);
             string itemName = null;

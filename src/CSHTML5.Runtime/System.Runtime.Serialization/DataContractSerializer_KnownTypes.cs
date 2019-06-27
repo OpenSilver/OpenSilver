@@ -50,7 +50,7 @@ namespace System.Runtime.Serialization
             return false;
         }
 
-        internal static Type GetCSharpTypeForNode(XElement xElement, Type parentType, Type memberType, IReadOnlyList<Type> knownTypes, MemberInformation parentMemberInformationIfNotRoot)
+        internal static Type GetCSharpTypeForNode(XElement xElement, Type parentType, Type memberType, IReadOnlyList<Type> knownTypes, MemberInformation parentMemberInformationIfNotRoot, bool useXmlSerializerFormat)
         {
             // Look for the XML attribute named "type":
             XAttribute xmlTypeAttribute = null;
@@ -86,7 +86,7 @@ namespace System.Runtime.Serialization
             if (!string.IsNullOrWhiteSpace(typeNamespaceInXmlTypeAttribute) && !string.IsNullOrWhiteSpace(typeNameInXmlTypeAttribute))
             {
                 // Check if the type specified by the "type" attribute is the same as the expected member type:
-                if (IsTypeSameAsTheOneSpecifiedInXmlTypeAttribute(memberType, typeNameInXmlTypeAttribute, typeNamespaceInXmlTypeAttribute))
+                if (IsTypeSameAsTheOneSpecifiedInXmlTypeAttribute(memberType, typeNameInXmlTypeAttribute, typeNamespaceInXmlTypeAttribute, useXmlSerializerFormat))
                 {
                     //----------------------------
                     // The actual type is same as the memberActualType.
@@ -119,7 +119,7 @@ namespace System.Runtime.Serialization
                     bool typeWasFound = false;
                     foreach (Type knownType in knownTypes)
                     {
-                        if (IsTypeSameAsTheOneSpecifiedInXmlTypeAttribute(knownType, typeNameInXmlTypeAttribute, typeNamespaceInXmlTypeAttribute))
+                        if (IsTypeSameAsTheOneSpecifiedInXmlTypeAttribute(knownType, typeNameInXmlTypeAttribute, typeNamespaceInXmlTypeAttribute, useXmlSerializerFormat))
                         {
                             memberType = knownType;
                             typeWasFound = true;
@@ -134,7 +134,7 @@ namespace System.Runtime.Serialization
                         {
                             foreach (Type knownType in GetKnownTypesByReadingKnownTypeAttributes(parentType))
                             {
-                                if (IsTypeSameAsTheOneSpecifiedInXmlTypeAttribute(knownType, typeNameInXmlTypeAttribute, typeNamespaceInXmlTypeAttribute))
+                                if (IsTypeSameAsTheOneSpecifiedInXmlTypeAttribute(knownType, typeNameInXmlTypeAttribute, typeNamespaceInXmlTypeAttribute, useXmlSerializerFormat))
                                 {
                                     memberType = knownType;
                                     typeWasFound = true;
@@ -163,13 +163,13 @@ namespace System.Runtime.Serialization
             return memberType;
         }
 
-        static bool IsTypeSameAsTheOneSpecifiedInXmlTypeAttribute(Type typeToCompare, string typeNameInXmlTypeAttribute, string typeNamespaceInXmlTypeAttribute)
+        static bool IsTypeSameAsTheOneSpecifiedInXmlTypeAttribute(Type typeToCompare, string typeNameInXmlTypeAttribute, string typeNamespaceInXmlTypeAttribute, bool useXmlSerializerFormat)
         {
             string typeName = DataContractSerializer_Helpers.GetTypeNameSafeForSerialization(typeToCompare);
 
-            string typeNamespaceName = DataContractSerializer_Helpers.DATACONTRACTSERIALIZER_OBJECT_DEFAULT_NAMESPACE + typeToCompare.Namespace;
+            string typeNamespaceName = DataContractSerializer_Helpers.GetDefaultNamespace(typeToCompare.Namespace, useXmlSerializerFormat);
             //todo: verify that the namespace is OK or if we should get the namespace specified by the DataContract attribute by calling "GetTypeInformationByReadingAttributes".
-            TypeInformation referenceTypeInfo = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(typeToCompare, null);
+            TypeInformation referenceTypeInfo = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(typeToCompare, null, useXmlSerializerFormat);
             typeNamespaceName = referenceTypeInfo.NamespaceName;
             typeName = referenceTypeInfo.Name;
 

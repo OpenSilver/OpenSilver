@@ -98,7 +98,7 @@ namespace System.Runtime.Serialization
         {
             XDocument xdoc = new XDocument();
 
-            string defaultNamespace = DataContractSerializer_Helpers.DATACONTRACTSERIALIZER_OBJECT_DEFAULT_NAMESPACE + _type.Namespace;
+            string defaultNamespace = DataContractSerializer_Helpers.GetDefaultNamespace(_type.Namespace, _useXmlSerializerFormat);
 
             //todo: USEMETHODTOGETTYPE: make a method that returns the actual type of object and replace all USEMETHODTOGETTYPE with a call to this method. (also find other places where we could use it)
             Type objectType = obj.GetType();
@@ -111,7 +111,7 @@ namespace System.Runtime.Serialization
             if (objectType != _type)
             {
                 // Get the type information (namespace, etc.) by reading the DataContractAttribute and similar attributes, if present:
-                typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(_type, defaultNamespace);
+                typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(_type, defaultNamespace, _useXmlSerializerFormat);
             }
 
             // Add the root:
@@ -129,7 +129,7 @@ namespace System.Runtime.Serialization
         {
             XDocument xdoc = new XDocument();
 
-            string defaultNamespace = DataContractSerializer_Helpers.DATACONTRACTSERIALIZER_OBJECT_DEFAULT_NAMESPACE + _type.Namespace;
+            string defaultNamespace = DataContractSerializer_Helpers.GetDefaultNamespace(_type.Namespace, _useXmlSerializerFormat);
 
             //todo: USEMETHODTOGETTYPE: make a method that returns the actual type of object and replace all USEMETHODTOGETTYPE with a call to this method. (also find other places where we could use it)
             Type objectType = obj.GetType();
@@ -142,7 +142,7 @@ namespace System.Runtime.Serialization
             if (objectType != _type)
             {
                 // Get the type information (namespace, etc.) by reading the DataContractAttribute and similar attributes, if present:
-                typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(_type, defaultNamespace);
+                typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(_type, defaultNamespace, _useXmlSerializerFormat);
             }
 
             // Add the root:
@@ -156,7 +156,7 @@ namespace System.Runtime.Serialization
             XDocument xdoc = XDocument.Parse(xml);
             XElement root = xdoc.Root;
             Type expectedType = this._type;
-            Type actuallyExpectedType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(root, this._type, expectedType, _knownTypes, null);
+            Type actuallyExpectedType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(root, this._type, expectedType, _knownTypes, null, _useXmlSerializerFormat);
             object result = DataContractSerializer_Deserialization.DeserializeToCSharpObject(root.Nodes(), actuallyExpectedType, root, _knownTypes, ignoreErrors: false, useXmlSerializerFormat: _useXmlSerializerFormat);
             return result;
         }
@@ -164,7 +164,7 @@ namespace System.Runtime.Serialization
         public object DeserializeFromXElement(XElement xElement)
         {
             Type expectedType = this._type;
-            Type actuallyExpectedType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(xElement, this._type, expectedType, _knownTypes, null);
+            Type actuallyExpectedType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(xElement, this._type, expectedType, _knownTypes, null, _useXmlSerializerFormat);
             object result = DataContractSerializer_Deserialization.DeserializeToCSharpObject(xElement.Nodes(), actuallyExpectedType, xElement, _knownTypes, ignoreErrors: false, useXmlSerializerFormat: _useXmlSerializerFormat);
             return result;
         }

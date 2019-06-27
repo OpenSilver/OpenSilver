@@ -146,7 +146,7 @@ namespace System.Runtime.Serialization
             List<XObject> result = new List<XObject>();
 
             // Get the type information (namespace, etc.) by reading the DataContractAttribute and similar attributes, if present:
-            TypeInformation typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(objectType, nodeDefaultNamespaceIfAny);
+            TypeInformation typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(objectType, nodeDefaultNamespaceIfAny, useXmlSerializerFormat);
 
             // Traverse the collection:
             foreach (object item in (IEnumerable)obj)
@@ -228,7 +228,7 @@ namespace System.Runtime.Serialization
             CallOnSerializingMethod(obj, objectType);
 
             // Get the type information (namespace, etc.) by reading the DataContractAttribute and similar attributes, if present:
-            TypeInformation typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(objectType, nodeDefaultNamespaceIfAny);
+            TypeInformation typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(objectType, nodeDefaultNamespaceIfAny, useXmlSerializerFormat);
 
             // Process each member of the object:
             List<XObject> childrenObjects = new List<XObject>();
@@ -333,10 +333,10 @@ namespace System.Runtime.Serialization
                                     }
                                     else
                                     {
-                                        string defaultNamespace = DataContractSerializer_Helpers.DATACONTRACTSERIALIZER_OBJECT_DEFAULT_NAMESPACE + memberType.Namespace;
+                                        string defaultNamespace = DataContractSerializer_Helpers.GetDefaultNamespace(memberType.Namespace, useXmlSerializerFormat);
 
                                         // Get the type information (namespace, etc.) by reading the DataContractAttribute and similar attributes, if present:
-                                        TypeInformation childTypeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(memberType, defaultNamespace);
+                                        TypeInformation childTypeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(memberType, defaultNamespace, useXmlSerializerFormat);
 
                                         string prefixForTypeName = "";
                                         if (childTypeInformation.NamespaceName != null) //when the namespaceName is null I guess it means we don't need something like type="sth:ChildTypeName" but type="ChildTypeName" is sufficient.

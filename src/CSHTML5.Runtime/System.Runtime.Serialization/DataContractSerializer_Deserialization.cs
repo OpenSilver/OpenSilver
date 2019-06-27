@@ -191,7 +191,7 @@ namespace System.Runtime.Serialization
                     {
                         IEnumerable<XNode> elementChildNodes = xElement.Nodes();
 
-                        Type childObjectActualType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(xElement, itemsType, itemsType, knownTypes, null); //Note: the two "null" values are used only in the case where we couldn't find the type.
+                        Type childObjectActualType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(xElement, itemsType, itemsType, knownTypes, null, useXmlSerializerFormat); //Note: the two "null" values are used only in the case where we couldn't find the type.
 
 
                         //********** RECURSION **********
@@ -438,7 +438,7 @@ namespace System.Runtime.Serialization
                 CallOnDeserializingMethod(resultInstance, resultType);
 
                 // Get the type information (namespace, etc.) by reading the DataContractAttribute and similar attributes, if present:
-                TypeInformation typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(resultType, null);
+                TypeInformation typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(resultType, null, useXmlSerializerFormat);
 
                 // Read the members of the target type:
                 IEnumerable<MemberInformation> membersInformation = DataContractSerializer_Helpers.GetDataContractMembers(resultType, typeInformation.serializationType, useXmlSerializerFormat);
@@ -522,7 +522,7 @@ namespace System.Runtime.Serialization
                                     if (!isNull)
                                     {
 
-                                        memberActualType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(xElement, memberInformation.MemberInfo.DeclaringType, memberActualType, knownTypes, memberInformation);
+                                        memberActualType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(xElement, memberInformation.MemberInfo.DeclaringType, memberActualType, knownTypes, memberInformation, useXmlSerializerFormat);
 
                                         //if the type is nullable, we get the undelying type:
                                         Type nonNullableMemberType = memberActualType;
