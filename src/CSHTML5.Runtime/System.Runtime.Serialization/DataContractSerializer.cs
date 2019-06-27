@@ -94,7 +94,7 @@ namespace System.Runtime.Serialization
             }
         }
 
-        public string SerializeToString(object obj, bool indentXml = false)
+        public string SerializeToString(object obj, bool indentXml = false, bool omitXmlDeclaration = false)
         {
             XDocument xdoc = new XDocument();
 
@@ -120,7 +120,10 @@ namespace System.Runtime.Serialization
             string xml = xdoc.ToString(indentXml);
 
             // Add the header:
-            xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>" + Environment.NewLine + xml;
+            if (!omitXmlDeclaration)
+            {
+                xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>" + Environment.NewLine + xml;
+            }
 
             return xml;
         }
