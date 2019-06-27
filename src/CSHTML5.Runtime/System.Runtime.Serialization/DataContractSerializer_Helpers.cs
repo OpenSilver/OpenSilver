@@ -672,7 +672,7 @@ namespace System.Runtime.Serialization
                 MemberInfo baseMemberInfo;
                 if (isProperty)
                 {
-                    baseMemberInfo = type.GetProperty(memberName, BindingFlags.DeclaredOnly);
+                    baseMemberInfo = type.GetProperty(memberName);
                 }
                 else if (isField)
                 {
