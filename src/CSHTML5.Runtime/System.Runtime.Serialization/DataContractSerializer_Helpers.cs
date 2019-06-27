@@ -860,7 +860,7 @@ namespace System.Runtime.Serialization
             {
                 namespaceName = GetDefaultNamespace(objectType.Namespace, useXmlSerializerFormat);
             }
-            string name = objectType.Name; //note: we might need to make the name safe for serialization by calling DataContractSerializer_Helpers.GetTypeNameSafeForSerialization(objectType);
+            string name = DataContractSerializer_Helpers.GetTypeNameSafeForSerialization(objectType);
             string itemName = null;
             string keyName = null;
             string valueName = null;

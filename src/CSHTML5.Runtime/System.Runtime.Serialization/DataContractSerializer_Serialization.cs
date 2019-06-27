@@ -404,7 +404,7 @@ namespace System.Runtime.Serialization
                 }
                 else
                 {
-                    objectTypeName = DataContractSerializer_Helpers.GetTypeNameSafeForSerialization(typeExpectedByParentEnumerable); // Note: in case of nested types, this method replaces the '+' with '.', and does other changes to obtain the type name to use in the serialization.
+                    objectTypeName = typeInformation.Name;
                 }
 
                 XName elementName;

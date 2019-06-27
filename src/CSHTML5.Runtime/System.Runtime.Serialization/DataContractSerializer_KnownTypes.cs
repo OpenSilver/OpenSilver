@@ -165,13 +165,9 @@ namespace System.Runtime.Serialization
 
         static bool IsTypeSameAsTheOneSpecifiedInXmlTypeAttribute(Type typeToCompare, string typeNameInXmlTypeAttribute, string typeNamespaceInXmlTypeAttribute, bool useXmlSerializerFormat)
         {
-            string typeName = DataContractSerializer_Helpers.GetTypeNameSafeForSerialization(typeToCompare);
-
-            string typeNamespaceName = DataContractSerializer_Helpers.GetDefaultNamespace(typeToCompare.Namespace, useXmlSerializerFormat);
-            //todo: verify that the namespace is OK or if we should get the namespace specified by the DataContract attribute by calling "GetTypeInformationByReadingAttributes".
             TypeInformation referenceTypeInfo = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(typeToCompare, null, useXmlSerializerFormat);
-            typeNamespaceName = referenceTypeInfo.NamespaceName;
-            typeName = referenceTypeInfo.Name;
+            string typeNamespaceName = referenceTypeInfo.NamespaceName;
+            string typeName = referenceTypeInfo.Name;
 
             // Compare the KnownType with the type name and namespace that we are looking for:
             if (typeName == typeNameInXmlTypeAttribute

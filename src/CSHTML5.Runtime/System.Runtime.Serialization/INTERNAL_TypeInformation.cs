@@ -33,7 +33,7 @@ namespace System.Runtime.Serialization
         public TypeInformation(Type type, string name, string namespaceName, string itemName, string keyName, string valueName, SerializationType isAttributeSuchAsDataContractPresent)
         {
             this.Type = type;
-            this.Name = DataContractSerializer_Helpers.GetTypeNameSafeForSerialization(type);
+            this.Name = name;
             this.NamespaceName = namespaceName;
             this.ItemName = itemName;
             this.KeyName = keyName;
