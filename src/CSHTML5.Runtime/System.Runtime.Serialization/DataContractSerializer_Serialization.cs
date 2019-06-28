@@ -123,9 +123,33 @@ namespace System.Runtime.Serialization
 
             XText xtext = new XText(str);
 
-            // If the value is the root or if it is inside an Enumerable, we add an XElement to surround it:
+            // If the value is the root or if it is inside an Enumerable, we add an XElement to surround it.
+            // For example, if it is an integer 45, we surround 45 with <int xmlns="http://schemas.microsoft.com/2003/10/Serialization/">45</int>
             if (isRoot || isContainedInsideEnumerable)
-                return AddSurroundingXElement(xtext, DataContractSerializer_ValueTypesHandler.TypesToNames[obj.GetType()], isRoot, isContainedInsideEnumerable);
+            {
+                // Determine the name of the type to use in the surrounding XElement:
+                Type objType = obj.GetType();
+                string typeName;
+                string typeNamespace;
+                if (DataContractSerializer_ValueTypesHandler.TypesToNames.ContainsKey(objType))
+                {
+                    //-----------
+                    // System built-in value type (int, bool, etc.)
+                    //-----------
+                    typeName = DataContractSerializer_ValueTypesHandler.TypesToNames[objType];
+                    typeNamespace = "http://schemas.microsoft.com/2003/10/Serialization/";
+                }
+                else
+                {
+                    //-----------
+                    // User custom value type or enum
+                    //-----------
+                    typeName = objType.Name;
+                    typeNamespace = DataContractSerializer_Helpers.GetDefaultNamespace(objType.Namespace, useXmlSerializerFormat);
+                }
+                
+                return AddSurroundingXElement(xtext, typeName, typeNamespace, isRoot, isContainedInsideEnumerable);
+            }
             else
                 return new List<XObject>() { xtext };
         }
@@ -136,7 +160,7 @@ namespace System.Runtime.Serialization
 
             // If the value is the root or if it is inside an Enumerable, we add an XElement to surround it:
             if (isRoot || isContainedInsideEnumerable)
-                return AddSurroundingXElement(xtext, "base64Binary", isRoot, isContainedInsideEnumerable);
+                return AddSurroundingXElement(xtext, "base64Binary", "http://schemas.microsoft.com/2003/10/Serialization/", isRoot, isContainedInsideEnumerable);
             else
                 return new List<XObject>() { xtext };
         }
@@ -473,9 +497,9 @@ namespace System.Runtime.Serialization
             return xnameForMember;
         }
 
-        static List<XObject> AddSurroundingXElement(XText xtext, string surroundingElementName, bool isRoot, bool isContainedInsideEnumerable)
+        static List<XObject> AddSurroundingXElement(XText xtext, string surroundingElementName, string surroundingElementNamespace, bool isRoot, bool isContainedInsideEnumerable)
         {
-            string elementNamespace = isContainedInsideEnumerable ? "http://schemas.microsoft.com/2003/10/Serialization/Arrays" : "http://schemas.microsoft.com/2003/10/Serialization/";
+            string elementNamespace = isContainedInsideEnumerable ? "http://schemas.microsoft.com/2003/10/Serialization/Arrays" : surroundingElementNamespace;
             XElement xElement = new XElement(XNamespace.Get(elementNamespace).GetName(surroundingElementName), xtext);
             return new List<XObject>() { xElement };
         }
