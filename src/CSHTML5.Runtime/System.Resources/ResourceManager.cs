@@ -106,12 +106,13 @@ namespace System.Resources
                         currentElementInJSPath = Interop.ExecuteJavaScript("{0}[{1}]", currentElementInJSPath, pathPart);
                     }
                     result = Convert.ToString(Interop.ExecuteJavaScript("{0}[{1}]", currentElementInJSPath, name));
+                    return result;
                 }
                 catch (Exception)
                 {
-                    // The resource was not found. We return null.
+                    // The resource was not found. We return the key.
+                    return name;
                 }
-                return result;
             }
         }
 
