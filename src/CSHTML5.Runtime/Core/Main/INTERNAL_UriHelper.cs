@@ -183,25 +183,44 @@ namespace CSHTML5.Internal
                         folderWhereXamlFileIsLoated_PossibleEmpty = "";
                     }
 
-                    // Handle ".." in a way that, if we reach the root, we ignore any additional ".." (this is the same behavior as in Silverlight):
-                    while (uri.StartsWith("../"))
+                    string absolutePath;
+
+                    // If the Uri starts with "/", it means that it refers to the root of the assembly, otherwise it is relative to the XAML where it is used (if any):
+                    if (uri.StartsWith("/"))
                     {
-                        // Remove the "../":
-                        uri = uri.Substring(3);
+                        //================
+                        // The path is relative to the root of the assembly:
+                        //================
 
-                        // Remove the last folder (if any) in the xamlSourcePath:
-                        if (folderWhereXamlFileIsLoated_PossibleEmpty.Contains('/'))
-                        {
-                            folderWhereXamlFileIsLoated_PossibleEmpty = folderWhereXamlFileIsLoated_PossibleEmpty.Substring(0, folderWhereXamlFileIsLoated_PossibleEmpty.LastIndexOf('/'));
-                        }
-                        else
-                        {
-                            folderWhereXamlFileIsLoated_PossibleEmpty = "";
-                        }
+                        // Merge the path and the assembly name to obtain an absolute path:
+                        absolutePath = "ms-appx:/" + assemblyName + uri;
                     }
+                    else
+                    {
+                        //================
+                        // The path is relative to the XAML where it is used (if any)
+                        //================
 
-                    // Merge the path of the .XAML file with the relative URI specified as parameter of this method:
-                    string absolutePath = "ms-appx:/" + assemblyName + (folderWhereXamlFileIsLoated_PossibleEmpty != "" ? "/" + folderWhereXamlFileIsLoated_PossibleEmpty : "") + (!uri.StartsWith("/") ? "/" : "") + uri;
+                        // Handle ".." in a way that, if we reach the root, we ignore any additional ".." (this is the same behavior as in Silverlight):
+                        while (uri.StartsWith("../"))
+                        {
+                            // Remove the "../":
+                            uri = uri.Substring(3);
+
+                            // Remove the last folder (if any) in the xamlSourcePath:
+                            if (folderWhereXamlFileIsLoated_PossibleEmpty.Contains('/'))
+                            {
+                                folderWhereXamlFileIsLoated_PossibleEmpty = folderWhereXamlFileIsLoated_PossibleEmpty.Substring(0, folderWhereXamlFileIsLoated_PossibleEmpty.LastIndexOf('/'));
+                            }
+                            else
+                            {
+                                folderWhereXamlFileIsLoated_PossibleEmpty = "";
+                            }
+                        }
+
+                        // Merge the path of the .XAML file with the relative URI specified as parameter of this method:
+                        absolutePath = "ms-appx:/" + assemblyName + (folderWhereXamlFileIsLoated_PossibleEmpty != "" ? "/" + folderWhereXamlFileIsLoated_PossibleEmpty : "") + (!uri.StartsWith("/") ? "/" : "") + uri;
+                    }
 
                     // Call again this very method (re-entrance), but this time pass the absolute path instead of the relative path:
                     string result = ConvertToHtml5Path(absolutePath, null);
