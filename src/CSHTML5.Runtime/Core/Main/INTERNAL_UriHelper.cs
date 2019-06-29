@@ -78,7 +78,9 @@ namespace CSHTML5.Internal
                 html5Path = html5Path.Replace('\\', '/');
 
                 // If the path does not contain an assembly name, we need to add it:
-                if (!DoesPathContainAssemblyName("/" + html5Path))
+                string assemblyNameIncludingSlashes;
+                string pathAfterAssemblyName;
+                if (!DoesPathContainAssemblyName("/" + html5Path, out assemblyNameIncludingSlashes, out pathAfterAssemblyName))
                 {
                     // We are supposed to know the startup assembly (it is set by the constructor of the "Application" class):
                     string startupAssemblyShortName = StartupAssemblyInfo.StartupAssemblyShortName;
@@ -86,6 +88,11 @@ namespace CSHTML5.Internal
                     {
                         html5Path = startupAssemblyShortName + "/" + html5Path.ToLower();
                     }
+                }
+                else
+                {
+                    // Make sure the portion of the path AFTER the assembly name is lowercase:
+                    html5Path = assemblyNameIncludingSlashes + pathAfterAssemblyName.ToLower();
                 }
 
                 // Get the relative path where the resources are located (such as "Resources/"), and ensure that it ends with "/":
@@ -274,29 +281,23 @@ namespace CSHTML5.Internal
             return value;
         }
 
-        static bool DoesPathContainAssemblyName(string path)
+        static bool DoesPathContainAssemblyName(string path, out string assemblyNameIncludingSlashes, out string pathAfterAssemblyName)
         {
-#if !BRIDGE
-            string pathLowercase = path.ToLowerInvariant();
-            string[] listOfAssemblies = GetListOfLoadedAssemblies();
-            foreach (string assemblyShortName in listOfAssemblies)
-            {
-                if (pathLowercase.Contains("/" + assemblyShortName.ToLowerInvariant() + "/"))
-                    return true;
-            }
-            return false;
-#else
-            //BRIDGETODO :
-            // verify "to lower" & "to lower invariant" doesnt change much, otherwise, implement it
+            //BRIDGETODO: verify "to lower" & "to lower invariant" doesnt change much, otherwise, implement it
             string pathLowercase = path.ToLower();
             string[] listOfAssemblies = GetListOfLoadedAssemblies();
             foreach (string assemblyShortName in listOfAssemblies)
             {
                 if (pathLowercase.Contains("/" + assemblyShortName.ToLower() + "/"))
+                {
+                    assemblyNameIncludingSlashes = "/" + assemblyShortName + "/"; // Note: here we deliberately do not call "ToLower()".
+                    pathAfterAssemblyName = pathLowercase.Substring(assemblyNameIncludingSlashes.Length);
                     return true;
+                }
             }
+            assemblyNameIncludingSlashes = null;
+            pathAfterAssemblyName = null;
             return false;
-#endif
         }
 
         static string[] GetListOfLoadedAssemblies()
