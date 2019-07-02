@@ -16,8 +16,8 @@ The attached notices are provided for information only.
 
 
 
-The following 3rd-party libraries are used by CSHTML5.
-They all find themselves into your generated application.
+The following 3rd-party libraries are used by CSHTML5 version 2.x.
+They all get bundled into your generated application (in whole or in part).
 
 - Bridge.NET (Apache License) (https://github.com/bridgedotnet/Bridge)
 - Windows Community Toolkit (MIT License) (https://github.com/windows-toolkit/WindowsCommunityToolkit)
