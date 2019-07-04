@@ -52,7 +52,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
             : base()
         {
             // Set default style:
+#if WORKINPROGRESS
+            this.DefaultStyleKey = typeof(RepeatButton);
+#else
             this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultButtonStyle.GetDefaultStyle());
+#endif
 
 #if UNCOMMENT_WHEN_CLICKMODE_HOVER_WILL_BE_IMPLEMENTED
 
@@ -67,7 +71,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #endif
         }
 
-        #region Dependencies and Events
+#region Dependencies and Events
 
         /// <summary>
         /// Gets or sets the time, in milliseconds, the RepeatButton
@@ -123,9 +127,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
-        #endregion Dependencies and Events
+#endregion Dependencies and Events
 
-        #region Private helpers
+#region Private helpers
 
         private void StartTimer()
         {
@@ -165,9 +169,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
-        #endregion Private helpers
+#endregion Private helpers
 
-        #region Override methods
+#region Override methods
 
         /// <summary>
         /// Raises InvokedAutomationEvent and call the base method to raise the Click event
@@ -248,7 +252,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
 
-        #region Not supported
+#region Not supported
 
         /*
         /// <summary>
@@ -334,8 +338,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         //    base.OnKeyUp(e);
         //}
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
     }
 }

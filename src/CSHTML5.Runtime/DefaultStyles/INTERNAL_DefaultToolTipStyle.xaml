@@ -4,7 +4,8 @@
 
     <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
 
-    <Style x:Key="DefaultToolTipStyle" TargetType="ToolTip">
+    <!--<Style x:Key="DefaultToolTipStyle" TargetType="ToolTip">-->
+    <Style TargetType="ToolTip">
         <Setter Property="Foreground" Value="#FF666666"/>
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderBrush" Value="Gray"/>

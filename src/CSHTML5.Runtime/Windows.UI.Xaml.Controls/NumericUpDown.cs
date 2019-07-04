@@ -273,7 +273,11 @@ namespace Windows.UI.Xaml.Controls
             this.DefaultStyleKey = typeof(NumericUpDown);
 #else
             // Set default style:
+#if WORKINPROGRESS
+            this.DefaultStyleKey = typeof(NumericUpDown);
+#else
             this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultNumericUpDownStyle.GetDefaultStyle());
+#endif
 #endif
             this.Loaded += this.OnLoaded;
             this.Unloaded += this.OnUnloaded;

@@ -51,12 +51,16 @@ namespace Windows.UI.Xaml.Controls
         public TabControl()
         {
             SelectedIndex = -1;
-            SelectionChanged += delegate(object sender, SelectionChangedEventArgs e) { OnSelectionChanged(e); };
+            SelectionChanged += delegate (object sender, SelectionChangedEventArgs e) { OnSelectionChanged(e); };
             //IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
             //DefaultStyleKey = typeof(TabControl);
 
             // Set default style:
+#if WORKINPROGRESS
+            this.DefaultStyleKey = typeof(TabControl);
+#else
             this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultTabControlStyle.GetDefaultStyle());
+#endif
         }
 
         /// <summary>
@@ -279,8 +283,8 @@ namespace Windows.UI.Xaml.Controls
                 SelectionChangedEventArgs args = new SelectionChangedEventArgs(
                     (oldItem == null ? new List<object> { } : new List<object> { oldItem }),
                     (newItem == null ? new List<object> { } : new List<object> { newItem }));
-                    //(oldItem == null ? new List<TabItem> { } : new List<TabItem> { oldItem }),
-                    //(newItem == null ? new List<TabItem> { } : new List<TabItem> { newItem }));
+                //(oldItem == null ? new List<TabItem> { } : new List<TabItem> { oldItem }),
+                //(newItem == null ? new List<TabItem> { } : new List<TabItem> { newItem }));
                 handler(this, args);
             }
         }

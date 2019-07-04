@@ -103,7 +103,11 @@ namespace Windows.UI.Xaml.Controls
                 if (!_useNativeComboBox && this.Style == null)
                 {
                     //todo-perfs:
+#if WORKINPROGRESS
+                    this.DefaultStyleKey = typeof(ComboBox);
+#else
                     this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultComboBoxStyle.GetDefaultStyle());
+#endif
                 }
 
                 base._workaroundForComboBox = _useNativeComboBox; //todo: avoid using this workaround.
@@ -162,7 +166,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #region Native ComboBox implementation
+#region Native ComboBox implementation
 
         void DomSelectionChanged(dynamic element)
         {
@@ -227,9 +231,9 @@ namespace Windows.UI.Xaml.Controls
                 return -1;
         }
 
-        #endregion
+#endregion
 
-        #region Non-Native ComboBox implementation
+#region Non-Native ComboBox implementation
 
         protected override SelectorItem INTERNAL_GenerateContainer(object item)
         {
@@ -258,7 +262,7 @@ namespace Windows.UI.Xaml.Controls
                 _dropDownToggle.IsChecked = false;
         }
 
-        #endregion
+#endregion
 
         IList<object> GetListOfSelectedItemsInCSharp()
         {

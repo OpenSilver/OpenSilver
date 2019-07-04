@@ -4,7 +4,8 @@
 
     <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
 
-    <Style x:Key="DefaultScrollBarStyle" TargetType="ScrollBar">
+    <!--<Style x:Key="DefaultScrollBarStyle" TargetType="ScrollBar">-->
+    <Style TargetType="ScrollBar">
         <Setter Property="Background" Value="#FFF1F1F1" />
         <Setter Property="Foreground" Value="#FF333333" />
         <Setter Property="Template">

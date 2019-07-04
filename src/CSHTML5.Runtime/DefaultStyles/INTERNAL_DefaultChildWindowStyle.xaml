@@ -4,7 +4,8 @@
 
     <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
 
-    <Style x:Key="ChildWindowStyle" TargetType="ChildWindow">
+    <!--<Style x:Key="ChildWindowStyle" TargetType="ChildWindow">-->
+    <Style TargetType="ChildWindow">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />

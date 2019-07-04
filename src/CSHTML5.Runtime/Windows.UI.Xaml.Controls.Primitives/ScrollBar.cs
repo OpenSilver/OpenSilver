@@ -58,7 +58,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
         public ScrollBar()
         {
             // Set default style:
+#if WORKINPROGRESS
+            this.DefaultStyleKey = typeof(ScrollBar);
+#else
             this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultScrollBarStyle.GetDefaultStyle());
+#endif
 
             // Register some events:
             this.Unloaded += ScrollBar_Unloaded;

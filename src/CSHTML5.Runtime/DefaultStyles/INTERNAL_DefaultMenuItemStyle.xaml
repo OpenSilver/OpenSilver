@@ -5,7 +5,8 @@
 
     <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
 
-    <Style x:Key="DefaultMenuItemStyle" TargetType="MenuItem">
+    <!--<Style x:Key="DefaultMenuItemStyle" TargetType="MenuItem">-->
+    <Style TargetType="MenuItem">
         <Setter Property="Background" Value="#FFE2E2E2"/>
         <Setter Property="Foreground" Value="Black"/>
         <Setter Property="BorderThickness" Value="0"/>

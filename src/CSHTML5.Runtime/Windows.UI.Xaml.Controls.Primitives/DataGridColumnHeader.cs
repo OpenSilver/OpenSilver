@@ -53,7 +53,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public DataGridColumnHeader()
         {
+#if WORKINPROGRESS
+            this.DefaultStyleKey = typeof(DataGridColumnHeader);
+#else
             this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultButtonStyle.GetDefaultStyle()); //todo: use a specifically made Default Style for the DataGridColumnHeader
+#endif
         }
 
         /// <summary>
@@ -75,7 +79,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             return div;
         }
 
-        #region not supported stuff
+#region not supported stuff
         //// Summary:
         ////     Identifies the System.Windows.Controls.Primitives.DataGridColumnHeader.CanUserSort
         ////     dependency property.
@@ -238,6 +242,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
         ////   e:
         ////     The event data.
         //protected override void OnMouseMove(MouseEventArgs e);
-        #endregion
+#endregion
     }
 }

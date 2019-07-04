@@ -5,7 +5,8 @@
 
     <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
 
-    <Style x:Key="DefaultComboBoxStyle" TargetType="ComboBox">
+    <!--<Style x:Key="DefaultComboBoxStyle" TargetType="ComboBox">-->
+    <Style TargetType="ComboBox">
         <Setter Property="Background" Value="White"/>
         <Setter Property="Foreground" Value="Black"/>
         <Setter Property="Padding" Value="6,2,30,2"/>

@@ -16,7 +16,7 @@
     <IsCshtml5>true</IsCshtml5>
     <Cshtml5OutputType>Library</Cshtml5OutputType>
     <NoCSHTML5Reference>true</NoCSHTML5Reference>
-    <SkipXamlPreprocessor>true</SkipXamlPreprocessor>
+    <!--<SkipXamlPreprocessor>true</SkipXamlPreprocessor>-->
     <SkipResourcesExtractorAndCopier>true</SkipResourcesExtractorAndCopier>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -407,9 +407,6 @@
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\DragDeltaEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\DragStartedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\DragStartedEventHandler.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls.Primitives\INTERNAL_DefaultScrollBarStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls.Primitives\INTERNAL_DefaultThumbStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls.Primitives\INTERNAL_DefaultToggleButtonStyle.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\MenuBase.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\MultiSelector.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\PlacementMode.cs" />
@@ -494,23 +491,6 @@
     <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_CheckBoxAndRadioButtonHelpers.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_ContextMenuHelpers.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DateTimePickerBase.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultAutoCompleteBoxStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultButtonStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultChildWindowStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultComboBoxStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultDataPagerStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultDatePickerStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultExpanderStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultGridSplitterStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultHyperlinkButtonStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultMenuItemStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultNumericUpDownStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultProgressBarStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultTabControlStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultTabItemStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultTimePickerStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultToolTipStyle.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DefaultViewboxStyle.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ItemCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ItemContainerGenerator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ItemDragEventArgs.cs" />
@@ -876,82 +856,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="DefaultStyles\INTERNAL_DefaultAutoCompleteBoxStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Content Include="Themes\generic.xaml">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultButtonStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultChildWindowStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultComboBoxStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultDataPagerStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultDatePickerStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultExpanderStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultGridSplitterStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultHyperlinkButtonStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultMenuItemStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultNumericUpDownStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultScrollBarStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultTabControlStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultTabItemStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultThumbStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultTimePickerStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultToggleButtonStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultToolTipStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DefaultStyles\INTERNAL_DefaultViewboxStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DefaultStyles\" />
   </ItemGroup>
   <Import Project="..\packages\CSHTML5.2.0.0-alpha28-043\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
   <Import Project="..\packages\CSHTML5.2.0.0-alpha28-043\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' " />

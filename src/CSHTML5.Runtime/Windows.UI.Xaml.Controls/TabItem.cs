@@ -69,7 +69,11 @@ namespace Windows.UI.Xaml.Controls
             //DefaultStyleKey = typeof(TabItem);
 
             // Set default style:
+#if WORKINPROGRESS
+            this.DefaultStyleKey = typeof(TabItem);
+#else
             this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultTabItemStyle.GetDefaultStyle());
+#endif
         }
 
         /// <summary>
@@ -105,7 +109,7 @@ namespace Windows.UI.Xaml.Controls
             ChangeVisualState(false);
         }
 
-        #region Header
+#region Header
         /// <summary>
         /// Gets or sets the header of the
         /// <see cref="T:System.Windows.Controls.TabItem" />.
@@ -182,9 +186,9 @@ namespace Windows.UI.Xaml.Controls
                 header.Content = this.Header;
             }
         }
-        #endregion Header
+#endregion Header
 
-        #region HasHeader
+#region HasHeader
         /// <summary>
         /// Gets a value indicating whether the
         /// <see cref="T:System.Windows.Controls.TabItem" /> has a header.
@@ -215,9 +219,9 @@ namespace Windows.UI.Xaml.Controls
                 typeof(bool),
                 typeof(TabItem),
                 new PropertyMetadata(false));
-        #endregion HasHeader
+#endregion HasHeader
 
-        #region HeaderTemplate
+#region HeaderTemplate
         /// <summary>
         /// Gets or sets the template that is used to display the content of the
         /// <see cref="T:System.Windows.Controls.TabItem" /> header.
@@ -279,9 +283,9 @@ namespace Windows.UI.Xaml.Controls
         {
             UpdateHeaderVisuals();
         }
-        #endregion HeaderTemplate
+#endregion HeaderTemplate
 
-        #region IsSelected
+#region IsSelected
         /// <summary>
         /// Gets or sets a value indicating whether the
         /// <see cref="T:System.Windows.Controls.TabItem" /> is currently
@@ -374,7 +378,7 @@ namespace Windows.UI.Xaml.Controls
             }
             UpdateTabItemVisuals();
         }
-        #endregion IsSelected
+#endregion IsSelected
 
         /// <summary>
         /// This method is invoked when the Content property changes.
@@ -425,7 +429,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #region IsFocused
+#region IsFocused
         /// <summary>
         /// Gets a value indicating whether this element has logical focus.
         /// </summary>
@@ -477,7 +481,7 @@ namespace Windows.UI.Xaml.Controls
         {
             UpdateVisualState();
         }
-        #endregion IsFocused
+#endregion IsFocused
 
         /// <summary>
         /// Change to the correct visual state for the TabItem.
@@ -706,7 +710,7 @@ namespace Windows.UI.Xaml.Controls
         private ContentControl _previousHeader;
 
 
-        #region Properties added by the CSHTML5 team to make styling of tab controls easier
+#region Properties added by the CSHTML5 team to make styling of tab controls easier
 
         /// <summary>
         /// Gets or sets the bakground color of the selected INTERNAL_CorrespondingItem.
@@ -750,6 +754,6 @@ namespace Windows.UI.Xaml.Controls
         public static readonly DependencyProperty SelectedAccentProperty =
             DependencyProperty.Register("SelectedAccent", typeof(Brush), typeof(TabItem), new PropertyMetadata(new SolidColorBrush(Colors.Blue)));
 
-        #endregion
+#endregion
     }
 }

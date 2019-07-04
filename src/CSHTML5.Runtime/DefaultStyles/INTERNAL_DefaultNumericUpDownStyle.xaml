@@ -4,8 +4,8 @@
 
     <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
 
-    <Style x:Key="DefaultNumericUpDownStyle"
-        TargetType="NumericUpDown">
+    <!--<Style x:Key="DefaultNumericUpDownStyle" TargetType="NumericUpDown">-->
+    <Style TargetType="NumericUpDown">
         <Setter
             Property="Template">
             <Setter.Value>

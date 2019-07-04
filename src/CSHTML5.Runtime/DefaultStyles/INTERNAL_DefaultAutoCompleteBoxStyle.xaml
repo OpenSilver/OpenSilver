@@ -3,7 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:TestAutoCompleteBox">
     
-    <Style x:Key="INTERNAL_DefaultAutoCompleteBoxStyle" TargetType="AutoCompleteBox">
+    <!--<Style x:Key="INTERNAL_DefaultAutoCompleteBoxStyle" TargetType="AutoCompleteBox">-->
+    <Style TargetType="AutoCompleteBox">
         <Setter Property="MinimumPrefixLength" Value="1"/>
         <Setter Property="MinimumPopulateDelay" Value="0"/>
         <Setter Property="Background" Value="White"/>

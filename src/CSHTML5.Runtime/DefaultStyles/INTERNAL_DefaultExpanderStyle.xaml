@@ -4,7 +4,8 @@
 
     <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
 
-    <Style x:Key="ExpanderStyle" TargetType="Expander">
+    <!--<Style x:Key="ExpanderStyle" TargetType="Expander">-->
+    <Style TargetType="Expander">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Expander">

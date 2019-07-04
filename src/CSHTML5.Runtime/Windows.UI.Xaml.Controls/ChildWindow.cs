@@ -432,11 +432,15 @@ namespace Windows.UI.Xaml.Controls
             this.InteractionState = WindowInteractionState.NotResponding;
 #else
             // Set default style:
+#if WORKINPROGRESS
+            this.DefaultStyleKey = typeof(ChildWindow);
+#else
             this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultChildWindowStyle.GetDefaultStyle());
+#endif
 #endif
         }
 
-        #endregion Constructors
+#endregion Constructors
 
         #region Events
 

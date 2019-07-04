@@ -4,7 +4,8 @@
 
     <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
 
-    <Style x:Key="TabItemStyle" TargetType="TabItem">
+    <!--<Style x:Key="TabItemStyle" TargetType="TabItem">-->
+    <Style TargetType="TabItem">
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderBrush" Value="#FFDDDDDD"/>
         <Setter Property="BorderThickness" Value="2"/>

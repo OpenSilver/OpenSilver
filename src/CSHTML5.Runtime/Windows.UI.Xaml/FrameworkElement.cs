@@ -580,7 +580,16 @@ namespace Windows.UI.Xaml
             object newValue = e.NewValue;
             if (newValue != null)
             {
-                Style newStyle = Application.Current.XamlResourcesHandler.TryFindResourceInGenericXaml(element.GetType().Assembly, newValue) as Style; //Note: the resource shouldn't be defined in another assembly than that of the type since DefaultStyleKey is protected.
+                //Note: the resource shouldn't be defined in another assembly than that of the type since DefaultStyleKey is protected. (???)
+                Style newStyle = Application.Current.XamlResourcesHandler.TryFindResourceInGenericXaml(element.GetType().Assembly, newValue) as Style;
+                // if we don't find it in the element assembly then we try to find it in the assembly where newValue is defined (since newValue is supposed to be a Type)
+                if (newStyle == null)
+                {
+                    if(newValue is Type)
+                    {
+                        newStyle = Application.Current.XamlResourcesHandler.TryFindResourceInGenericXaml(((Type)newValue).Assembly, newValue) as Style;
+                    }
+                }
                 //todo: if it can be somewhere else than in themes/generic.xaml, find out how and deal with that case.
                 element.INTERNAL_SetDefaultStyle(newStyle);
             }

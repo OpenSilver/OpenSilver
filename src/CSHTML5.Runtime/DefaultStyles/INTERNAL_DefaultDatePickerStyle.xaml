@@ -3,7 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Windows.UI.Xaml.Controls">
 
-    <Style x:Key="DefaultDatePickerStyle" TargetType="DatePicker">
+    <!--<Style x:Key="DefaultDatePickerStyle" TargetType="DatePicker">-->
+    <Style TargetType="DatePicker">
         <Setter Property="BorderBrush" Value="Gray"/>
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template">

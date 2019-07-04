@@ -36,7 +36,11 @@ namespace Windows.UI.Xaml.Controls
         public MenuItem()
         {
             // Set default style:
+#if WORKINPROGRESS
+            this.DefaultStyleKey = typeof(MenuItem);
+#else
             this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultMenuItemStyle.GetDefaultStyle());
+#endif
         }
 
 

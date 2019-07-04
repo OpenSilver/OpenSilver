@@ -52,7 +52,11 @@ namespace Windows.UI.Xaml.Controls
             _defaultText = ""; // the text displayed when no time is selected
 
             // Set default style:
+#if WORKINPROGRESS
+            this.DefaultStyleKey = typeof(TimePicker);
+#else
             this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultTimePickerStyle.GetDefaultStyle());
+#endif
         }
 
         protected override INTERNAL_CalendarOrClockBase GenerateCalendarOrClock()
@@ -86,7 +90,7 @@ namespace Windows.UI.Xaml.Controls
 
         }
 
-        #region dependency property Selection for TimePicker
+#region dependency property Selection for TimePicker
 
         /// <summary>
         /// Gets or sets the currently selected date.
@@ -120,7 +124,7 @@ namespace Windows.UI.Xaml.Controls
             ((TimePicker)d).INTERNAL_SelectedDate = (DateTime?)e.NewValue;
         }
 
-        #endregion
+#endregion
 
     }
 }

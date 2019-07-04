@@ -3,7 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Windows.UI.Xaml.Controls">
 
-    <Style x:Key="DefaultTimePickerStyle" TargetType="TimePicker">
+    <!--<Style x:Key="DefaultTimePickerStyle" TargetType="TimePicker">-->
+    <Style TargetType="TimePicker">
         <Setter Property="BorderBrush" Value="Gray"/>
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template">

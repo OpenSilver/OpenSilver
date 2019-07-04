@@ -52,7 +52,11 @@ namespace Windows.UI.Xaml.Controls
             _defaultText = ""; // the text displayed when no date is selected
 
             // Set default style:
+#if WORKINPROGRESS
+            this.DefaultStyleKey = typeof(DatePicker);
+#else
             this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultDatePickerStyle.GetDefaultStyle());
+#endif
         }
 
         protected override INTERNAL_CalendarOrClockBase GenerateCalendarOrClock()
@@ -87,7 +91,7 @@ namespace Windows.UI.Xaml.Controls
             IsDropDownOpen = false; // close the popup
         }
 
-        #region dependency property Selection for DatePicker
+#region dependency property Selection for DatePicker
 
         /// <summary>
         /// Gets or sets the currently selected date.
@@ -121,7 +125,7 @@ namespace Windows.UI.Xaml.Controls
             ((DatePicker)d).INTERNAL_SelectedDate = (DateTime?)e.NewValue;
         }
 
-        #endregion
+#endregion
 
 
     }

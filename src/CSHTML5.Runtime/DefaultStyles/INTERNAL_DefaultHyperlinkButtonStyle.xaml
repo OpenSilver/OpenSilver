@@ -5,7 +5,8 @@
 
     <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
 
-    <Style x:Key="DefaultHyperlinkButtonStyle" TargetType="HyperlinkButton">
+    <!--<Style x:Key="DefaultHyperlinkButtonStyle" TargetType="HyperlinkButton">-->
+    <Style TargetType="HyperlinkButton">
         <Setter Property="Foreground" Value="#0000EE"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -39,7 +40,7 @@
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
-        </Setter>        
+        </Setter>
     </Style>
 
 </ResourceDictionary>

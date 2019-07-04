@@ -6,7 +6,8 @@
     <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
 
     <!--DataPager-->
-    <Style x:Key="DefaultDataPagerStyle" TargetType="DataPager">
+    <!--<Style x:Key="DefaultDataPagerStyle" TargetType="DataPager">-->
+    <Style TargetType="DataPager">
         <Setter Property="Background" Value="#FFF2F3F4"/>
         <Setter Property="BorderBrush" Value="Gray"/>
         <Setter Property="BorderThickness" Value="1"/>
@@ -281,7 +282,8 @@
                         <Border MinHeight="24" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" VerticalAlignment="Bottom" CornerRadius="2">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Stretch">
                                 <!--FirstPage Button-->
-                                <Button x:Name="FirstPageButton" Height="20" Width="20" Background="#00000000" Foreground="#FF000000" BorderBrush="#FFFFFFFF" BorderThickness="1" Padding="1" HorizontalAlignment="Right" VerticalAlignment="Center"> <!--Template="{StaticResource ButtonTemplate}"-->
+                                <Button x:Name="FirstPageButton" Height="20" Width="20" Background="#00000000" Foreground="#FF000000" BorderBrush="#FFFFFFFF" BorderThickness="1" Padding="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <!--Template="{StaticResource ButtonTemplate}"-->
                                     <Button.Content>
                                         <Grid Height="9" Width="8" >
                                             <Path Stretch="Fill" Data="M0,1 L1,0 L1,2 Z" Width="5" Height="9" HorizontalAlignment="Right" Fill="{TemplateBinding Foreground}"/>
@@ -291,7 +293,8 @@
                                 </Button>
 
                                 <!--PreviousPage Button-->
-                                <Button Name="PreviousPageButton" Background="#00000000" Foreground="#FF000000" BorderBrush="#FFFFFFFF" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center"><!--Template="{StaticResource ButtonTemplate}"-->
+                                <Button Name="PreviousPageButton" Background="#00000000" Foreground="#FF000000" BorderBrush="#FFFFFFFF" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <!--Template="{StaticResource ButtonTemplate}"-->
                                     <Button.Content>
                                         <Path Stretch="Fill" Data="M0,1 L1,0 L1,2 Z" Width="5" Height="9" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{TemplateBinding Foreground}"/>
                                     </Button.Content>
@@ -304,20 +307,23 @@
                                 <!--Page Display-->
                                 <StackPanel x:Name="PageDisplay" Orientation="Horizontal">
                                     <TextBlock x:Name="CurrentPagePrefixTextBlock" Width="Auto" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{TemplateBinding Foreground}"/>
-                                    <TextBox x:Name="CurrentPageTextBox" TextWrapping="Wrap" Width="40" Height="Auto" VerticalAlignment="Center" Margin="4,2,4,2" Foreground="{TemplateBinding Foreground}" BorderBrush="{TemplateBinding BorderBrush}"/><!--Style="{StaticResource PagingTextBoxStyle}"-->
+                                    <TextBox x:Name="CurrentPageTextBox" TextWrapping="Wrap" Width="40" Height="Auto" VerticalAlignment="Center" Margin="4,2,4,2" Foreground="{TemplateBinding Foreground}" BorderBrush="{TemplateBinding BorderBrush}"/>
+                                    <!--Style="{StaticResource PagingTextBoxStyle}"-->
                                     <TextBlock x:Name="CurrentPageSuffixTextBlock" Width="Auto" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="{TemplateBinding Foreground}"/>
                                 </StackPanel>
                                 <Border x:Name="Separator2" Width="2" Background="#FFCCD1D6" BorderBrush="{TemplateBinding BorderBrush}" Margin="0,3,0,3"/>
 
                                 <!--NextPage Button-->
-                                <Button x:Name="NextPageButton" Background="#00000000" Foreground="#FF000000" BorderBrush="#FFFFFFFF" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center"><!--Template="{StaticResource ButtonTemplate}"-->
+                                <Button x:Name="NextPageButton" Background="#00000000" Foreground="#FF000000" BorderBrush="#FFFFFFFF" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <!--Template="{StaticResource ButtonTemplate}"-->
                                     <Button.Content>
                                         <Path Stretch="Fill" Data="M0,0 L1,1 L0,2 Z" Width="5" Height="9" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{TemplateBinding Foreground}"/>
                                     </Button.Content>
                                 </Button>
 
                                 <!--LastPage Button-->
-                                <Button x:Name="LastPageButton" Background="#00000000" Foreground="#FF000000" BorderBrush="#FFFFFFFF" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center"><!--Template="{StaticResource ButtonTemplate}"-->
+                                <Button x:Name="LastPageButton" Background="#00000000" Foreground="#FF000000" BorderBrush="#FFFFFFFF" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <!--Template="{StaticResource ButtonTemplate}"-->
                                     <Button.Content>
                                         <Grid Height="9" Width="8">
                                             <Path Stretch="Fill" Data="M0,0 L1,1 L0,2 Z" Width="5" Height="9" HorizontalAlignment="Left" Fill="{TemplateBinding Foreground}"/>

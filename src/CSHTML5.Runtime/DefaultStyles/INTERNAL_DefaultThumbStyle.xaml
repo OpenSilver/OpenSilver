@@ -4,7 +4,8 @@
 
     <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
 
-    <Style x:Key="DefaultThumbStyle" TargetType="Thumb">
+    <!--<Style x:Key="DefaultThumbStyle" TargetType="Thumb">-->
+    <Style TargetType="Thumb">
         <Setter Property="Background" Value="#FFE2E2E2"/>
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Template">

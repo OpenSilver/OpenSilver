@@ -64,10 +64,14 @@ namespace Windows.UI.Xaml.Controls
 
         public DataPager()
         {
+#if WORKINPROGRESS
+            this.DefaultStyleKey = typeof(DataPager);
+#else
             this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultDataPagerStyle.GetDefaultStyle());
+#endif
         }
 
-        #region DisplayMode
+#region DisplayMode
 
         /// <summary>
         /// Gets or sets the currently selected mode.
@@ -96,9 +100,9 @@ namespace Windows.UI.Xaml.Controls
                 datapager.GenerateControls();
         }
 
-        #endregion
+#endregion
 
-        #region NumericButtonCount
+#region NumericButtonCount
 
         /// <summary>
         /// The max number of numeric button that can be displayed
@@ -127,9 +131,9 @@ namespace Windows.UI.Xaml.Controls
                 datapager.GenerateControls();
         }
 
-        #endregion
+#endregion
 
-        #region Source
+#region Source
 
         /// <summary>
         /// The max number of numeric buttons that can be displayed
@@ -178,9 +182,9 @@ namespace Windows.UI.Xaml.Controls
                 datapager.NumberOfPages = 0;
         }
 
-        #endregion
+#endregion
 
-        #region PageSize
+#region PageSize
 
         /// <summary>
         /// Gets or sets the maximum number of items to display on a page.
@@ -219,9 +223,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion
+#endregion
 
-        #region CurrentPage
+#region CurrentPage
 
         /// <summary>
         /// // the current page that is shown
@@ -260,9 +264,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion
+#endregion
 
-        #region Numeric button style
+#region Numeric button style
 
         /// <summary>
         /// Gets or sets an instance Style that is applied for this object during rendering.
@@ -278,7 +282,7 @@ namespace Windows.UI.Xaml.Controls
         public static readonly DependencyProperty NumericButtonStyleProperty =
             DependencyProperty.Register("NumericButtonStyle", typeof(Style), typeof(DataPager), new PropertyMetadata(null));
 
-        #endregion
+#endregion
 
         // compute the number of pages in the PagedCollectionView
         int CountNumberPage()

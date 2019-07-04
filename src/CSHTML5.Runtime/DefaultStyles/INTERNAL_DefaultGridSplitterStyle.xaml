@@ -1,17 +1,18 @@
 ﻿<!-- Source: https://github.com/Microsoft/UWPCommunityToolkit/tree/master/Microsoft.Toolkit.Uwp.UI.Controls/GridSplitter -->
 
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="using:Microsoft.Toolkit.Uwp.UI.Controls">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Style x:Key="DefaultGridSplitterStyle" TargetType="local:GridSplitter">
-        <!--<Setter Property="IsTabStop" Value="False"></Setter>-->
+    <!--<Style x:Key="DefaultGridSplitterStyle" TargetType="local:GridSplitter">-->
+    <Style TargetType="GridSplitter">
+        <Setter Property="IsTabStop" Value="False"></Setter>
         <Setter Property="Background" Value="#FFF0F0F0"/>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="local:GridSplitter">
+                <ControlTemplate TargetType="GridSplitter">
                     <Grid Background="{TemplateBinding Background}">
-                        <Thumb x:Name="PART_Thumb" Opacity="0" /> <!-- Note: the thumb control is here only in CSHTML5 -->
+                        <Thumb x:Name="PART_Thumb" Opacity="0" />
+                         <!--Note: the thumb control is here only in CSHTML5--> 
                         <ContentPresenter Content="{TemplateBinding Element}" IsHitTestVisible="False" />
                     </Grid>
                 </ControlTemplate>

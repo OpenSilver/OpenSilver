@@ -57,7 +57,11 @@ namespace Windows.UI.Xaml.Controls
         public ToolTip()
         {
             // Set default style:
+#if WORKINPROGRESS
+            this.DefaultStyleKey = typeof(ToolTip);
+#else
             this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultToolTipStyle.GetDefaultStyle());
+#endif
         }
 
         /// <summary>
@@ -215,7 +219,7 @@ namespace Windows.UI.Xaml.Controls
         public event RoutedEventHandler Opened;
 
 #if WORKINPROGRESS
-        #region Not supported yet
+#region Not supported yet
         /// <summary>Gets or sets the visual element or control that the tool tip should be positioned in relation to when opened by the <see cref="T:System.Windows.Controls.ToolTipService" />.</summary>
         /// <returns>The visual element or control that the tool tip should be positioned in relation to when opened by the <see cref="T:System.Windows.Controls.ToolTipService" />. The default is null.</returns>
         public UIElement PlacementTarget
@@ -252,7 +256,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>Identifies the <see cref="P:System.Windows.Controls.ToolTip.Placement" /> dependency property.</summary>
         /// <returns>The identifier for the <see cref="P:System.Windows.Controls.ToolTip.Placement" />dependency property.</returns>
         public static readonly DependencyProperty PlacementProperty = DependencyProperty.Register("Placement", typeof(PlacementMode), typeof(ToolTip), null);
-        #endregion
+#endregion
 #endif
 
         //-----------------------
