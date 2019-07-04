@@ -24,6 +24,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
+using CSHTML5.Internal;
 #if MIGRATION
 using System.Windows.Controls;
 #else 
@@ -42,14 +43,9 @@ namespace Windows.UI.Xaml.Media.Animation
     [ContentProperty("KeyFrames")]
     public sealed class DoubleAnimationUsingKeyFrames : AnimationTimeline
     {
-        private string _targetName;
-        private PropertyPath _targetProperty;
-        private DependencyObject _target;
-        private IterationParameters _parameters;
-
         private DoubleKeyFrameCollection _keyFrames;
 
-        private int _appliedKeyFramesCount;
+        private int _appliedKeyFramesCount = -1;
 
         private INTERNAL_ResolvedKeyFramesEntries<DoubleKeyFrame> _resolvedKeyFrames;
 
@@ -100,26 +96,31 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
+
         private void InitializeKeyFramesSet()
         {
             _resolvedKeyFrames = new INTERNAL_ResolvedKeyFramesEntries<DoubleKeyFrame>(_keyFrames);
             _keyFrameToDoubleAnimationMap = new Dictionary<DoubleKeyFrame, DoubleAnimation>();
+            double? fromIfAny = null;
+            DoubleKeyFrame keyFrame;
             for (int i = 0; i < KeyFrames.Count; i++)
             {
-                int keyFrameIndex = _resolvedKeyFrames.GetNextKeyFrameIndex(i);
-                DoubleAnimation db = InstantiateAnimationFromResolvedKeyFrameIndex(i);
-                _keyFrameToDoubleAnimationMap.Add(KeyFrames[keyFrameIndex], db);
+                keyFrame = KeyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(i)];
+                DoubleAnimation db = InstantiateAnimationFromResolvedKeyFrameIndex(i, fromIfAny);
+                _keyFrameToDoubleAnimationMap.Add(keyFrame, db);
+                fromIfAny = keyFrame.Value;
             }
             _appliedKeyFramesCount = 0;
+            _isInitialized = true;
         }
 
-        private void BeforeApply(IterationParameters parameters, bool isLastLoop)
+        internal override void GetTargetInformation(IterationParameters parameters)
         {
             _parameters = parameters;
             DependencyObject target;
             PropertyPath propertyPath;
             DependencyObject targetBeforePath;
-            GetPropertyPathAndTargetBeforePath(parameters.Target, out targetBeforePath, out propertyPath);
+            GetPropertyPathAndTargetBeforePath(parameters.Target, out targetBeforePath, out propertyPath, parameters.IsTargetParentTheTarget);
             DependencyObject parentElement = targetBeforePath; //this will be the parent of the clonable element (if any).
             foreach (Tuple<DependencyObject, DependencyProperty, int?> element in GoThroughElementsToAccessProperty(propertyPath, targetBeforePath))
             {
@@ -152,10 +153,11 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
             }
 
-            GetTargetElementAndPropertyInfo(parameters.Target, out target, out propertyPath);
+            GetTargetElementAndPropertyInfo(parameters.Target, out target, out propertyPath, parameters.IsTargetParentTheTarget);
 
-            _target = target;
+            _propertyContainer = target;
             _targetProperty = propertyPath;
+            _target = Storyboard.GetTarget(this);
             _targetName = Storyboard.GetTargetName(this);
         }
 
@@ -172,19 +174,21 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        private DoubleAnimation InstantiateAnimationFromResolvedKeyFrameIndex(int index)
+        private DoubleAnimation InstantiateAnimationFromResolvedKeyFrameIndex(int index, double? fromIfAny)
         {
             DoubleKeyFrame keyFrame = KeyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(index)];
             DoubleAnimation db = new DoubleAnimation()
             {
                 BeginTime = TimeSpan.Zero,
+                From = fromIfAny,
                 To = keyFrame.Value,
                 Duration = keyFrame.KeyTime.TimeSpan - (index > 0 ? KeyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(index - 1)].KeyTime.TimeSpan : TimeSpan.Zero),
                 EasingFunction = keyFrame.INTERNAL_GetEasingFunction(),
+                RectifyWhenAnimationEnds = false,
             };
             Storyboard.SetTargetName(db, _targetName);
             Storyboard.SetTargetProperty(db, _targetProperty);
-            Storyboard.SetTarget(db, _parameters.Target);
+            Storyboard.SetTarget(db, _target);
             db.InitializeIteration();
             db.Completed -= ApplyNextKeyFrame;
             db.Completed += ApplyNextKeyFrame;
@@ -215,27 +219,26 @@ namespace Windows.UI.Xaml.Media.Animation
 
         private void ApplyLastKeyFrame(object sender, EventArgs e)
         {
-            DoubleKeyFrame lastKeyFrame = _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)];
-            AnimationHelpers.ApplyInstantAnimation(_target, _targetProperty, lastKeyFrame.Value, _parameters.IsVisualStateChange);
-        }
-
-        internal override void Stop(FrameworkElement frameworkElement, string groupName, bool revertToFormerValue = false) //frameworkElement is for the animations requiring the use of GetCssEquivalent
-        {
-            base.Stop(frameworkElement, groupName, revertToFormerValue);
-            StopAllAnimations(frameworkElement, groupName, revertToFormerValue);
-        }
-
-        private void StopAllAnimations(FrameworkElement frameworkElement, string groupName = "visualStateGroupName", bool revertToFormerValue = false)
-        {
-            if(_keyFrameToDoubleAnimationMap != null)
+            if (!_isAnimationPaused)
             {
-                if(_keyFrameToDoubleAnimationMap.Values != null)
-                {
-                    foreach (var frameAnimation in _keyFrameToDoubleAnimationMap.Values)
-                    {
-                        frameAnimation.Stop(frameworkElement, groupName, revertToFormerValue);
-                    }
-                }
+                DoubleKeyFrame lastKeyFrame = _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)];
+                AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, lastKeyFrame.Value, _parameters.IsVisualStateChange);
+            }
+        }
+
+        internal override void StopAnimation(string groupName) 
+        {
+            if (_isInitialized)
+            {
+                StopAllAnimations(groupName);
+            }
+        }
+
+        private void StopAllAnimations(string groupName)
+        {
+            foreach(var animation in _keyFrameToDoubleAnimationMap.Values)
+            {
+                animation.StopAnimation(groupName);
             }
         }
 
@@ -245,7 +248,7 @@ namespace Windows.UI.Xaml.Media.Animation
             bool raiseEvent = false;
             lock (thisLock)
             {
-                if (_appliedKeyFramesCount >= _keyFrames.Count)
+                if (_appliedKeyFramesCount >= KeyFrames.Count)
                 {
                     raiseEvent = true;
                 }
@@ -254,18 +257,20 @@ namespace Windows.UI.Xaml.Media.Animation
             {
                 OnIterationCompleted(parameters);
             }
-            return raiseEvent;
+            return raiseEvent || _isAnimationPaused;
         }
 
-        internal override void IterateOnce(IterationParameters parameters, bool isLastLoop)
+        internal override void InitializeCore()
         {
             this.Completed -= ApplyLastKeyFrame;
             this.Completed += ApplyLastKeyFrame;
-            StopAllAnimations(parameters.Target);
-            BeforeApply(parameters, isLastLoop);
             InitializeKeyFramesSet();
-            base.IterateOnce(parameters, isLastLoop);
-            Apply(parameters, isLastLoop);
+        }
+
+        internal override void RestoreDefaultCore()
+        {
+            StopAnimation(_parameters.VisualStateGroupName);
+            _appliedKeyFramesCount = 0;
         }
 
         protected override Duration GetNaturalDurationCore()

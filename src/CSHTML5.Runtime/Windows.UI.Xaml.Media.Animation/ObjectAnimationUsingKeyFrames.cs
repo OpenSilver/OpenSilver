@@ -45,9 +45,6 @@ namespace Windows.UI.Xaml.Media.Animation
     public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline
     {
         private DependencyProperty _dp;
-        private PropertyPath _targetProperty;
-        private DependencyObject _target;
-        private IterationParameters _parameters;
 
         private ObjectKeyFrameCollection _keyFrames;
 
@@ -107,7 +104,6 @@ namespace Windows.UI.Xaml.Media.Animation
                 int keyFrameIndex = _resolvedKeyFrames.GetNextKeyFrameIndex(i);
                 ObjectKeyFrame keyFrame = KeyFrames[keyFrameIndex];
                 NullableTimer timer = new NullableTimer(keyFrame.KeyTime.TimeSpan - (i > 0 ? KeyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(i - 1)].KeyTime.TimeSpan : TimeSpan.Zero));
-                timer.Completed -= ApplyNextKeyFrame;
                 timer.Completed += ApplyNextKeyFrame;
                 _keyFramesToObjectTimers.Add(keyFrame, timer);
             }
@@ -116,15 +112,18 @@ namespace Windows.UI.Xaml.Media.Animation
 
         private void ApplyNextKeyFrame(object sender, EventArgs e)
         {
+            // Apply the current key frame
             ApplyKeyFrame(GetNextKeyFrame());
+
             _appliedKeyFramesCount++;
+            // Check timeline and go to next key frame if any.
             if (!CheckTimeLineEndAndRaiseCompletedEvent(_parameters))
             {
                 StartKeyFrame(GetNextKeyFrame());
             }
         }
 
-        private void BeforeApply(IterationParameters parameters, bool isLastLoop)
+        internal override void GetTargetInformation(IterationParameters parameters)
         {
             _parameters = parameters;
             DependencyObject target;
@@ -164,10 +163,9 @@ namespace Windows.UI.Xaml.Media.Animation
             }
 
             GetTargetElementAndPropertyInfo(parameters.Target, out target, out propertyPath);
-            DependencyProperty dp = GetProperty(target, propertyPath);
 
-            _dp = dp;
-            _target = target;
+            _dp = GetProperty(target, propertyPath);
+            _propertyContainer = target;
             _targetProperty = propertyPath;
         }
 
@@ -201,14 +199,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
             object castedValue = DynamicCast(value, _dp.PropertyType);
 
-            if (_parameters.IsVisualStateChange)
-            {
-                _targetProperty.INTERNAL_PropertySetVisualState(_target, castedValue);
-            }
-            else
-            {
-                _targetProperty.INTERNAL_PropertySetLocalValue(_target, castedValue);
-            }
+            AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, castedValue, _parameters.IsVisualStateChange);
         }
 
         private ObjectKeyFrame GetNextKeyFrame()
@@ -226,17 +217,18 @@ namespace Windows.UI.Xaml.Media.Animation
 
         private void ApplyLastKeyFrame(object sender, EventArgs e)
         {
-            ObjectKeyFrame lastKeyFrame = _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)];
-            ApplyKeyFrame(lastKeyFrame);
+            if (!_isAnimationPaused)
+            {
+                ObjectKeyFrame lastKeyFrame = _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)];
+                ApplyKeyFrame(lastKeyFrame);
+            }
         }
 
-        internal override void Stop(FrameworkElement frameworkElement, string groupName, bool revertToFormerValue = false) //frameworkElement is for the animations requiring the use of GetCssEquivalent
+        internal override void StopAnimation(string groupName)
         {
-            base.Stop(frameworkElement, groupName, revertToFormerValue);
-            StopAllTimers();
-            if(_keyFramesToObjectTimers != null)
+            if (_isInitialized)
             {
-                _keyFramesToObjectTimers.Clear();
+                StopAllTimers();
             }
         }
 
@@ -270,18 +262,34 @@ namespace Windows.UI.Xaml.Media.Animation
             {
                 OnIterationCompleted(parameters);
             }
-            return raiseEvent;
+            return raiseEvent || _isAnimationPaused;
         }
 
-        internal override void IterateOnce(IterationParameters parameters, bool isLastLoop)
+        internal override void InitializeCore()
         {
             this.Completed -= ApplyLastKeyFrame;
             this.Completed += ApplyLastKeyFrame;
-            StopAllTimers();
-            BeforeApply(parameters, isLastLoop);
             InitializeKeyFramesSet();
-            base.IterateOnce(parameters, isLastLoop);
-            Apply(parameters, isLastLoop);
+        }
+
+        internal override void RestoreDefaultCore()
+        {
+            ResetAllTimers();
+            _appliedKeyFramesCount = 0;
+        }
+
+        private void ResetAllTimers()
+        {
+            if (_keyFramesToObjectTimers != null)
+            {
+                if (_keyFramesToObjectTimers.Values != null)
+                {
+                    foreach (var frameTimers in _keyFramesToObjectTimers.Values)
+                    {
+                        frameTimers.Reset();
+                    }
+                }
+            }
         }
 
         protected override Duration GetNaturalDurationCore()
@@ -303,22 +311,27 @@ namespace Windows.UI.Xaml.Media.Animation
             private DispatcherTimer _timer;
 
             internal event EventHandler Completed;
- 
+
             internal NullableTimer(TimeSpan interval)
             {
-                if(interval > TimeSpan.Zero)
+                if (interval > TimeSpan.Zero)
                 {
-                    _timer = new DispatcherTimer()
-                    {
-                        Interval = interval,
-                    };
-                    _timer.Tick -= Timer_Tick;
-                    _timer.Tick += Timer_Tick;
+                    _timer = NewTimer(interval);
                 }
                 else
                 {
                     _timer = null;
                 }
+            }
+
+            private DispatcherTimer NewTimer(TimeSpan interval)
+            {
+                DispatcherTimer timer = new DispatcherTimer()
+                {
+                    Interval = interval,
+                };
+                timer.Tick += Timer_Tick;
+                return timer;
             }
 
 #if MIGRATION
@@ -356,9 +369,18 @@ namespace Windows.UI.Xaml.Media.Animation
                     _timer.Stop();
                 }
             }
+
+            internal void Reset()
+            {
+                if (HasTimer)
+                {
+                    _timer.Stop();
+                    _timer = NewTimer(_timer.Interval);
+                }
+            }
         }
-#endregion
+        #endregion
     }
 
-    
+
 }

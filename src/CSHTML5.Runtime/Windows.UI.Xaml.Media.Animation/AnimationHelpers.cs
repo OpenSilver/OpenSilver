@@ -87,15 +87,15 @@ $0.complete = $4;
                                                      domElement, jsFromToValues, options, visualStateGroupName);
         }
 
-        internal static void ApplyInstantAnimation(DependencyObject target, PropertyPath propertyPath, double to, bool isVisualStateChange)
+        internal static void ApplyValue(DependencyObject target, PropertyPath propertyPath, object value, bool isVisualStateChange)
         {
             if (isVisualStateChange)
             {
-                propertyPath.INTERNAL_PropertySetVisualState(target, to);
+                propertyPath.INTERNAL_PropertySetVisualState(target, value);
             }
             else
             {
-                propertyPath.INTERNAL_PropertySetLocalValue(target, to);
+                propertyPath.INTERNAL_PropertySetAnimationValue(target, value);
             }
         }
     }

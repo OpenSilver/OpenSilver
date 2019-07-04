@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// Defines a segment of time.
     /// </summary>
-    public class Timeline : DependencyObject
+    public abstract class Timeline : DependencyObject
     {
 #if MIGRATION
         internal static readonly string[] defaultTypesPaths = {
@@ -110,13 +110,13 @@ namespace Windows.UI.Xaml.Media.Animation
             return dp;
         }
 
-        /// <summary>
-        /// Provides base class initialization behavior for Timeline-derived classes.
-        /// </summary>
-        protected Timeline()
-        {
+        ///// <summary>
+        ///// Provides base class initialization behavior for Timeline-derived classes.
+        ///// </summary>
+        //protected Timeline()
+        //{
 
-        }
+        //}
 
         //// The default is false.
         ///// <summary>
@@ -277,11 +277,6 @@ namespace Windows.UI.Xaml.Media.Animation
             }
             if (Completed != null)
                 Completed(this, new EventArgs());
-        }
-
-        internal virtual void Apply(IterationParameters parameters, bool isLastLoop) //Note: stateContainerGroupName is useful for allowing us to stop the animations made using velocity: we can stop all the animations from a queue of animations that has a given name
-        {
-            //this needs to be overriden
         }
 
         internal virtual void Stop(FrameworkElement frameworkElement, string groupName, bool revertToFormerValue = false)
@@ -528,7 +523,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal virtual void IterateOnce(IterationParameters parameters, bool isLastLoop)
         {
-            ComputeDuration();
+            //ComputeDuration();
             if (Duration.HasTimeSpan)
             {
                 if (Duration.TimeSpan.TotalMilliseconds > 0)
@@ -543,7 +538,6 @@ namespace Windows.UI.Xaml.Media.Animation
                 else
                 {
                     _isAnimationDurationReached = true;
-                    //OnIterationCompleted(parameters);
                 }
             }
         }
@@ -570,8 +564,8 @@ namespace Windows.UI.Xaml.Media.Animation
         DispatcherTimer _animationTimer = new DispatcherTimer();
         internal void OnIterationCompleted(IterationParameters parameters)
         {
-            if (_isAnimationDurationReached) //the default duration is Automatic, which currently has a TimeSpan of 0 ms (which is considered here to be no timespan).
-            {
+            //if (_isAnimationDurationReached) //the default duration is Automatic, which currently has a TimeSpan of 0 ms (which is considered here to be no timespan).
+            //{
                 --remainingIterations;
                 if (remainingIterations <= 0)
                 {
@@ -599,7 +593,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
                     IterateOnce(parameters, isLastLoop: remainingIterations == 1);
                 }
-            }
+            //}
         }
 
         bool _isAnimationDurationReached = false;
@@ -619,7 +613,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <returns>
         /// A Duration quantity representing the natural duration.
         /// </returns>
-        private void ComputeDuration()
+        internal void ComputeDuration()
         {
             if (Duration == Duration.Automatic)
             {

@@ -42,26 +42,6 @@ namespace Windows.UI.Xaml.Media.Animation
     /// </summary>
     public sealed class ColorAnimation : AnimationTimeline
     {
-        ///// <summary>
-        ///// Initializes a new instance of the ColorAnimation class.
-        ///// </summary>
-        //public ColorAnimation();
-
-        ///// <summary>
-        ///// Gets or sets the total amount by which the animation changes its starting
-        ///// value.
-        ///// </summary>
-        //public Color? By
-        //{
-        //    get { return (Color?)GetValue(ByProperty); }
-        //    set { SetValue(ByProperty, value); }
-        //}
-        ///// <summary>
-        ///// Identifies the By dependency property.
-        ///// </summary>
-        //public static readonly DependencyProperty ByProperty =
-        //    DependencyProperty.Register("By", typeof(Color?), typeof(ColorAnimation), new PropertyMetadata(null));
-
         /// <summary>
         /// Gets or sets the easing function applied to this animation.
         /// </summary>
@@ -75,21 +55,6 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </summary>
         public static readonly DependencyProperty EasingFunctionProperty =
             DependencyProperty.Register("EasingFunction", typeof(EasingFunctionBase), typeof(ColorAnimation), new PropertyMetadata(null));
-
-        ///// <summary>
-        ///// Gets or sets a value that declares whether animated properties that are considered
-        ///// dependent animations should be permitted to use this animation declaration.
-        ///// </summary>
-        //public bool EnableDependentAnimation
-        //{
-        //    get { return (bool)GetValue(EnableDependentAnimationProperty); }
-        //    set { SetValue(EnableDependentAnimationProperty, value); }
-        //}
-        ///// <summary>
-        ///// Identifies the EnableDependentAnimation dependency property.
-        ///// </summary>
-        //public static readonly DependencyProperty EnableDependentAnimationProperty =
-        //    DependencyProperty.Register("EnableDependentAnimation", typeof(bool), typeof(ColorAnimation), new PropertyMetadata(false)); // todo: check if the default value should be true
 
         /// <summary>
         /// Gets or sets the animation's starting value.
@@ -119,21 +84,20 @@ namespace Windows.UI.Xaml.Media.Animation
         public static readonly DependencyProperty ToProperty =
             DependencyProperty.Register("To", typeof(Color?), typeof(ColorAnimation), new PropertyMetadata(null));
 
-        internal override void IterateOnce(IterationParameters parameters, bool isLastLoop)
-        {
-            base.IterateOnce(parameters, isLastLoop);
-            Apply(parameters, isLastLoop);
-        }
+        //internal override void IterateOnce(IterationParameters parameters, bool isLastLoop)
+        //{
+        //    base.IterateOnce(parameters, isLastLoop);
+        //    Apply(parameters, isLastLoop);
+        //}
 
-        internal override void Apply(IterationParameters parameters, bool isLastLoop)
+        internal override void GetTargetInformation(IterationParameters parameters)
         {
+            _parameters = parameters;
             DependencyObject target;
             PropertyPath propertyPath;
             DependencyObject targetBeforePath;
             GetPropertyPathAndTargetBeforePath(parameters.Target, out targetBeforePath, out propertyPath, parameters.IsTargetParentTheTarget);
             DependencyObject parentElement = targetBeforePath; //this will be the parent of the clonable element (if any).
-            //we clone what needs to be cloned (ICloneOnAnimation: contient Clone() ) --> 
-            // foreach sur le résultat de la méthode autogénérée avec les yield return et on clone le 1er ICloneOnAnimation
             foreach (Tuple<DependencyObject, DependencyProperty, int?> element in GoThroughElementsToAccessProperty(propertyPath, targetBeforePath))
             {
                 DependencyObject depObject = element.Item1;
@@ -144,20 +108,13 @@ namespace Windows.UI.Xaml.Media.Animation
                     if (!((ICloneOnAnimation)depObject).IsAlreadyAClone())
                     {
                         object clone = ((ICloneOnAnimation)depObject).Clone();
-                        if (index.HasValue)
+                        if (index != null)
                         {
-                            if (Interop.IsRunningInTheSimulator)
-                            {
-                                parentElement.GetType().GetProperty("Item").SetValue(parentElement, clone, new object[] { index.Value });
-                            }
-                            else
-                            {
 #if BRIDGE
-                                parentElement.GetType().GetProperty("Item").SetValue(parentElement, clone, new object[]{ index.Value });
+                            parentElement.GetType().GetProperty("Item").SetValue(parentElement, clone, new object[] { index });
 #else
-                                //JSIL does not support SetValue(object, object, object[])
+                            //JSIL does not support SetValue(object, object, object[])
 #endif
-                            }
                         }
                         else
                         {
@@ -172,24 +129,24 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
             }
 
-
             GetTargetElementAndPropertyInfo(parameters.Target, out target, out propertyPath, parameters.IsTargetParentTheTarget);
 
-            //we do the following normally
+            _propertyContainer = target;
+            _targetProperty = propertyPath;
+            _target = Storyboard.GetTarget(this);
+            _targetName = Storyboard.GetTargetName(this);
+        }
 
-            Type lastElementType = target.GetType();
-            PropertyInfo propertyInfo = lastElementType.GetProperty(propertyPath.INTERNAL_DependencyPropertyName);
-
-
-            //todo: find out why we put the test on target and put it back? (I removed it because it kept ScaleTransform from working properly)
-            if (To != null)// && target is FrameworkElement)
+        internal override void Apply(IterationParameters parameters, bool isLastLoop)
+        {
+            if (To != null)
             {
+                PropertyInfo propertyInfo = _propertyContainer.GetType().GetProperty(_targetProperty.INTERNAL_DependencyPropertyName);
                 Type propertyType = propertyInfo.PropertyType;
                 var castedValue = DynamicCast(To, propertyType); //Note: we put this line here because the Xaml could use a Color gotten from a StaticResource (which was therefore not converted to a SolidColorbrush by the compiler in the .g.cs file) and led to a wrong type set in a property (Color value in a property of type Brush).
 
-
                 Type dependencyPropertyContainerType = propertyInfo.DeclaringType;
-                FieldInfo dependencyPropertyField = dependencyPropertyContainerType.GetField(propertyPath.INTERNAL_DependencyPropertyName + "Property");
+                FieldInfo dependencyPropertyField = dependencyPropertyContainerType.GetField(_targetProperty.INTERNAL_DependencyPropertyName + "Property");
                 // - Get the DependencyProperty
 #if MIGRATION
                 DependencyProperty dp = (global::System.Windows.DependencyProperty)dependencyPropertyField.GetValue(null);
@@ -197,41 +154,26 @@ namespace Windows.UI.Xaml.Media.Animation
                 DependencyProperty dp = (global::Windows.UI.Xaml.DependencyProperty)dependencyPropertyField.GetValue(null);
 #endif
                 // - Get the propertyMetadata from the property
-                PropertyMetadata propertyMetadata = dp.GetTypeMetaData(target.GetType());
+                PropertyMetadata propertyMetadata = dp.GetTypeMetaData(_propertyContainer.GetType());
                 // - Get the cssPropertyName from the PropertyMetadata
-
 
                 //we make a specific name for this animation:
                 string specificGroupName = parameters.VisualStateGroupName + animationInstanceSpecificName.ToString();
 
-
                 bool cssEquivalentExists = false;
                 if (propertyMetadata.GetCSSEquivalent != null)
                 {
-                    CSSEquivalent cssEquivalent = propertyMetadata.GetCSSEquivalent(target);
+                    CSSEquivalent cssEquivalent = propertyMetadata.GetCSSEquivalent(_propertyContainer);
                     if (cssEquivalent != null)
                     {
                         cssEquivalentExists = true;
-                        TryStartAnimation(target, cssEquivalent, From, To, Duration, EasingFunction, specificGroupName, () =>
-                            {
-                                if (isLastLoop)
-                                {
-                                    if (parameters.IsVisualStateChange) //if we change the visual state, we set the VisualStateValue in the storage
-                                    {
-                                        propertyPath.INTERNAL_PropertySetVisualState(target, castedValue);
-                                    }
-                                    else //otherwise (if we used Storyboard.Begin()), we set the Local value in the storage
-                                    {
-                                        propertyPath.INTERNAL_PropertySetLocalValue(target, castedValue);
-                                    }
-                                }
-                                OnIterationCompleted(parameters);
-                            });
+                        TryStartAnimation(_propertyContainer, cssEquivalent, From, To, Duration, EasingFunction, specificGroupName,
+                                          OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty));
                     }
                 }
                 if (propertyMetadata.GetCSSEquivalents != null)
                 {
-                    List<CSSEquivalent> cssEquivalents = propertyMetadata.GetCSSEquivalents(target);
+                    List<CSSEquivalent> cssEquivalents = propertyMetadata.GetCSSEquivalents(_propertyContainer);
                     bool isFirst = true;
                     foreach (CSSEquivalent equivalent in cssEquivalents)
                     {
@@ -240,21 +182,8 @@ namespace Windows.UI.Xaml.Media.Animation
                         {
                             if (isFirst)
                             {
-                                bool updateIsFirst = TryStartAnimation(target, equivalent, From, To, Duration, EasingFunction, specificGroupName, () =>
-                                    {
-                                        if (isLastLoop)
-                                        {
-                                            if (parameters.IsVisualStateChange) //if we change the visual state, we set the VisualStateValue in the storage
-                                            {
-                                                propertyPath.INTERNAL_PropertySetVisualState(target, castedValue);
-                                            }
-                                            else //otherwise (if we used Storyboard.Begin()), we set the Local value in the storage
-                                            {
-                                                propertyPath.INTERNAL_PropertySetLocalValue(target, castedValue);
-                                            }
-                                        }
-                                        OnIterationCompleted(parameters);
-                                    });
+                                bool updateIsFirst = TryStartAnimation(_propertyContainer, equivalent, From, To, Duration, EasingFunction, specificGroupName,
+                                                                       OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty));
                                 if (updateIsFirst)
                                 {
                                     isFirst = false;
@@ -262,64 +191,37 @@ namespace Windows.UI.Xaml.Media.Animation
                             }
                             else
                             {
-                                TryStartAnimation(target, equivalent, From, To, Duration, EasingFunction, specificGroupName, () =>
-                                {
-                                    if (isLastLoop)
-                                    {
-                                        if (parameters.IsVisualStateChange) //if we change the visual state, we set the VisualStateValue in the storage
-                                        {
-                                            propertyPath.INTERNAL_PropertySetVisualState(target, castedValue);
-                                        }
-                                        else //otherwise (if we used Storyboard.Begin()), we set the Local value in the storage
-                                        {
-                                            propertyPath.INTERNAL_PropertySetLocalValue(target, castedValue);
-                                        }
-                                    }
-                                });
+                                TryStartAnimation(_propertyContainer, equivalent, From, To, Duration, EasingFunction, specificGroupName,
+                                                  OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty));
                             }
                         }
                         else
                         {
-                            if (isLastLoop)
-                            {
-                                if (parameters.IsVisualStateChange)
-                                {
-                                    propertyPath.INTERNAL_PropertySetVisualState(target, castedValue);
-                                }
-                                else
-                                {
-                                    propertyPath.INTERNAL_PropertySetLocalValue(target, castedValue);
-                                }
-                            }
-                            OnIterationCompleted(parameters);
+                            OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty)();
                         }
                     }
                 }
                 if (!cssEquivalentExists)
                 {
-                    if (parameters.IsVisualStateChange)
-                    {
-                        propertyPath.INTERNAL_PropertySetVisualState(target, castedValue);
-                    }
-                    else
-                    {
-                        propertyPath.INTERNAL_PropertySetLocalValue(target, castedValue);
-                    }
-                    OnIterationCompleted(parameters);
+                    OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty)();
                 }
             }
             else
             {
-                if (parameters.IsVisualStateChange)
+                OnAnimationCompleted(parameters, isLastLoop, To, _propertyContainer, _targetProperty)();
+            }
+        }
+
+        private Action OnAnimationCompleted(IterationParameters parameters, bool isLastLoop, object value, DependencyObject target, PropertyPath propertyPath)
+        {
+            return () =>
+            {
+                if (isLastLoop)
                 {
-                    propertyPath.INTERNAL_PropertySetVisualState(target, To);
-                }
-                else
-                {
-                    propertyPath.INTERNAL_PropertySetLocalValue(target, To);
+                    AnimationHelpers.ApplyValue(target, propertyPath, value, parameters.IsVisualStateChange);
                 }
                 OnIterationCompleted(parameters);
-            }
+            };
         }
 
         static bool TryStartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, Color? from, object to, Duration Duration, EasingFunctionBase easingFunction, string visualStateGroupName, Action callbackForWhenfinished = null)
@@ -348,7 +250,6 @@ namespace Windows.UI.Xaml.Media.Animation
                                     }
                                     else
                                     {
-                                        //return ((Color)value).INTERNAL_ToHtmlStringForVelocity();
                                         Dictionary<string, object> valuesDict = new Dictionary<string, object>();
                                         foreach (string name in cssEquivalent.Name)
                                         {
@@ -385,8 +286,7 @@ namespace Windows.UI.Xaml.Media.Animation
                                     //      Therefore, we no longer go in the animation from the previous color to the new one but from no color to the new one
                                     if (csspropertyName != "background") //todo: when we will be able to use velocity for linearGradientBrush, we will need another solution here.
                                     {
-                                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0[$1] = $2;", newObj, csspropertyName, cssValue);
+                                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", newObj, csspropertyName, cssValue);
                                     }
                                 }
                             }
@@ -401,8 +301,7 @@ $0[$1] = $2;", newObj, csspropertyName, cssValue);
                                     //      Therefore, we no longer go in the animation from the previous color to the new one but from no color to the new one
                                     if (csspropertyName != "background") //todo: when we will be able to use velocity for linearGradientBrush, we will need another solution here.
                                     {
-                                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0[$1] = $2;", newObj, csspropertyName, cssValueAsDictionary[csspropertyName]);
+                                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", newObj, csspropertyName, cssValueAsDictionary[csspropertyName]);
                                     }
                                 }
                             }
@@ -428,8 +327,7 @@ $0[$1] = $2;", newObj, csspropertyName, cssValueAsDictionary[csspropertyName]);
                                     {
                                         currentFromCssValue = ((Dictionary<string, object>)fromCssValue)[csspropertyName];
                                     }
-                                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0[$1] = [$2, $3];", newObj, csspropertyName, currentCssValue, currentFromCssValue);
+                                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = [$2, $3];", newObj, csspropertyName, currentCssValue, currentFromCssValue);
                                 }
                             }
                         }
@@ -447,93 +345,66 @@ $0[$1] = [$2, $3];", newObj, csspropertyName, currentCssValue, currentFromCssVal
             }
         }
 
-        internal override void Stop(FrameworkElement frameworkElement, string groupName, bool revertToFormerValue = false)
+        internal override void StopAnimation(string groupName)
         {
-            base.Stop(frameworkElement, groupName, revertToFormerValue);
-
-            DependencyObject target;
-            PropertyPath propertyPath;
-            GetTargetElementAndPropertyInfo(frameworkElement, out target, out propertyPath);
-            //DependencyObject lastElementBeforeProperty = propertyPath.INTERNAL_AccessPropertyContainer(target);
-            Type lastElementType = target.GetType();
-            PropertyInfo propertyInfo = lastElementType.GetProperty(propertyPath.INTERNAL_DependencyPropertyName);
-
-            Color? valuetoSet = To;
-            if (revertToFormerValue)
+            if (_isInitialized)
             {
-                valuetoSet = (Color?)propertyInfo.GetValue(target);
-                //propertyInfo.SetValue(target, formerValue);
-            }
+                Type lastElementType = _propertyContainer.GetType();
+                PropertyInfo propertyInfo = lastElementType.GetProperty(_targetProperty.INTERNAL_DependencyPropertyName);
 
-            //todo: find out why we put the test on target and put it back? (I removed it because it kept ScaleTransform from working properly)
-            if (valuetoSet != null)// && target is FrameworkElement)
-            {
-                Type propertyType = propertyInfo.PropertyType;
-                var castedValue = DynamicCast(valuetoSet, propertyType); //Note: we put this line here because the Xaml could use a Color gotten from a StaticResource (which was therefore not converted to a SolidColorbrush by the compiler in the .g.cs file) and led to a wrong type set in a property (Color value in a property of type Brush).
-
-                Type dependencyPropertyContainerType = propertyInfo.DeclaringType;
-                FieldInfo dependencyPropertyField = dependencyPropertyContainerType.GetField(propertyPath.INTERNAL_DependencyPropertyName + "Property");
-                // - Get the DependencyProperty
+                //todo: find out why we put the test on target and put it back? (I removed it because it kept ScaleTransform from working properly)
+                if (To != null)// && target is FrameworkElement)
+                {
+                    Type dependencyPropertyContainerType = propertyInfo.DeclaringType;
+                    FieldInfo dependencyPropertyField = dependencyPropertyContainerType.GetField(_targetProperty.INTERNAL_DependencyPropertyName + "Property");
+                    // - Get the DependencyProperty
 #if MIGRATION
-                DependencyProperty dp = (global::System.Windows.DependencyProperty)dependencyPropertyField.GetValue(null);
+                    DependencyProperty dp = (global::System.Windows.DependencyProperty)dependencyPropertyField.GetValue(null);
 #else
                 DependencyProperty dp = (global::Windows.UI.Xaml.DependencyProperty)dependencyPropertyField.GetValue(null);
 #endif
-                // - Get the propertyMetadata from the property
-                PropertyMetadata propertyMetadata = dp.GetTypeMetaData(target.GetType());
-                // - Get the cssPropertyName from the PropertyMetadata
+                    // - Get the propertyMetadata from the property
+                    PropertyMetadata propertyMetadata = dp.GetTypeMetaData(_propertyContainer.GetType());
+                    // - Get the cssPropertyName from the PropertyMetadata
 
-                //we make a specific name for this animation:
-                string specificGroupName = groupName + animationInstanceSpecificName.ToString();
+                    //we make a specific name for this animation:
+                    string specificGroupName = groupName + animationInstanceSpecificName.ToString();
 
-                bool cssEquivalentExists = false;
-                if (propertyMetadata.GetCSSEquivalent != null)
-                {
-                    CSSEquivalent cssEquivalent = propertyMetadata.GetCSSEquivalent(target);
-                    UIElement uiElement = cssEquivalent.UIElement ?? (target as UIElement); // If no UIElement is specified, we assume that the property is intended to be applied to the instance on which the PropertyChanged has occurred.
-
-                    bool hasTemplate = (uiElement is Control) && ((Control)uiElement).HasTemplate;
-
-                    if (!hasTemplate || cssEquivalent.ApplyAlsoWhenThereIsAControlTemplate)
+                    bool cssEquivalentExists = false;
+                    if (propertyMetadata.GetCSSEquivalent != null)
                     {
-                        if (cssEquivalent.DomElement == null && uiElement != null)
+                        CSSEquivalent cssEquivalent = propertyMetadata.GetCSSEquivalent(_propertyContainer);
+                        UIElement uiElement = cssEquivalent.UIElement ?? (_propertyContainer as UIElement); // If no UIElement is specified, we assume that the property is intended to be applied to the instance on which the PropertyChanged has occurred.
+
+                        bool hasTemplate = (uiElement is Control) && ((Control)uiElement).HasTemplate;
+
+                        if (!hasTemplate || cssEquivalent.ApplyAlsoWhenThereIsAControlTemplate)
                         {
-                            cssEquivalent.DomElement = uiElement.INTERNAL_OuterDomElement; // Default value
-                        }
-                        if (cssEquivalent.DomElement != null)
-                        {
-                            cssEquivalentExists = true;
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-        Velocity($0, ""stop"", $1);", cssEquivalent.DomElement, specificGroupName);
+                            if (cssEquivalent.DomElement == null && uiElement != null)
+                            {
+                                cssEquivalent.DomElement = uiElement.INTERNAL_OuterDomElement; // Default value
+                            }
+                            if (cssEquivalent.DomElement != null)
+                            {
+                                cssEquivalentExists = true;
+                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", cssEquivalent.DomElement, specificGroupName);
+                            }
                         }
                     }
-                }
-                //todo: use GetCSSEquivalent instead (?)
-                if (propertyMetadata.GetCSSEquivalents != null)
-                {
-                    List<CSSEquivalent> cssEquivalents = propertyMetadata.GetCSSEquivalents(target);
-                    foreach (CSSEquivalent equivalent in cssEquivalents)
+                    //todo: use GetCSSEquivalent instead (?)
+                    if (propertyMetadata.GetCSSEquivalents != null)
                     {
-                        if (equivalent.DomElement != null && equivalent.CallbackMethod == null)
+                        List<CSSEquivalent> cssEquivalents = propertyMetadata.GetCSSEquivalents(_propertyContainer);
+                        foreach (CSSEquivalent equivalent in cssEquivalents)
                         {
-                            cssEquivalentExists = true;
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-Velocity($0, ""stop"", $1);", equivalent.DomElement, specificGroupName);
-                            if (revertToFormerValue)
+                            if (equivalent.DomElement != null && equivalent.CallbackMethod == null)
                             {
-                                propertyPath.INTERNAL_PropertySetVisualState(target, castedValue);
+                                cssEquivalentExists = true;
+                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", equivalent.DomElement, specificGroupName);
                             }
                         }
                     }
                 }
-                if (!cssEquivalentExists)
-                {
-                    propertyPath.INTERNAL_PropertySetVisualState(target, castedValue);
-                }
-            }
-            else
-            {
-                propertyPath.INTERNAL_PropertySetVisualState(target, valuetoSet);
             }
         }
     }

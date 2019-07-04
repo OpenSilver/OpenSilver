@@ -54,7 +54,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal int GetNextKeyFrameIndex(int resolvedKeyFrameCount)
         {
-            if(resolvedKeyFrameCount >= _resolvedKeyFramesIndexes.Count)
+            if(resolvedKeyFrameCount >= _resolvedKeyFramesIndexes.Count || resolvedKeyFrameCount < 0)
             {
                 return -1;
             }
