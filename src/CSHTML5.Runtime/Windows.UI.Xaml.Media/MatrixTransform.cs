@@ -53,28 +53,43 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public static readonly DependencyProperty MatrixProperty =
             DependencyProperty.Register("Matrix", typeof(Matrix), typeof(MatrixTransform), new PropertyMetadata(Matrix.Identity));
-            //{
-            //    GetCSSEquivalent = (instance) =>
-            //    {
-            //        if (((GeneralTransform)instance).INTERNAL_parent != null)
-            //        {
-            //            return new CSSEquivalent()
-            //            {
-            //                DomElement = ((GeneralTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
-            //                Value = (inst, value) =>
-            //                {
-            //                    return "1.06, 1.84, 0.54, 2.8, 466px, 482px";
-            //                },
-            //                Name = new List<string> { "transform" },
-            //                UIElement = ((GeneralTransform)instance).INTERNAL_parent,
-            //                ApplyAlsoWhenThereIsAControlTemplate = true,
-            //                OnlyUseVelocity = false
-            //            };
-            //        }
-            //        else
-            //            return null;
-            //    }
-            //});
+        //{
+        //    GetCSSEquivalent = (instance) =>
+        //    {
+        //        if (((GeneralTransform)instance).INTERNAL_parent != null)
+        //        {
+        //            return new CSSEquivalent()
+        //            {
+        //                DomElement = ((GeneralTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
+        //                Value = (inst, value) =>
+        //                {
+        //                    return "1.06, 1.84, 0.54, 2.8, 466px, 482px";
+        //                },
+        //                Name = new List<string> { "transform" },
+        //                UIElement = ((GeneralTransform)instance).INTERNAL_parent,
+        //                ApplyAlsoWhenThereIsAControlTemplate = true,
+        //                OnlyUseVelocity = false
+        //            };
+        //        }
+        //        else
+        //            return null;
+        //    }
+        //});
+
+        private void ApplyCSSChanges(MatrixTransform matrixTransform)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal override void INTERNAL_ApplyCSSChanges()
+        {
+            ApplyCSSChanges(this);
+        }
+
+        internal override void INTERNAL_UnapplyCSSChanges()
+        {
+            ApplyCSSChanges(this);
+        }
 
         internal override void INTERNAL_ApplyTransform()
         {

@@ -17,22 +17,12 @@
 
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if MIGRATION
-namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
+namespace System.Xml.Linq
 {
-#if WORKINPROGRESS
-    public sealed class TransformCollection : PresentationFrameworkCollection<Transform>
+    /// <summary>
+    /// Represents a node or an attribute in an XML tree.
+    /// </summary>
+    public abstract class XObject
     {
-
     }
-#endif
 }

@@ -26,11 +26,23 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;WORKINPROGRESS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoStdLib>true</NoStdLib>
     <DocumentationFile>bin\Debug\CSHTML5.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug.WorkInProgress\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;WORKINPROGRESS</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Debug.WorkInProgress\CSHTML5.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration|AnyCPU'">
@@ -62,12 +74,13 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Migration\CSHTML5.Migration.xml</DocumentationFile>
+    <DocumentationFile>bin\Migration.WorkInProgress\CSHTML5.Migration.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
     <Compile Include="System.Resources\ResourceManager.cs" />
+    <Compile Include="System.Xml.Linq\XObject.cs" />
     <Compile Include="ToBeReviewed\GroupedEnumerable.cs" />
     <Compile Include="ToBeReviewed\Grouping.cs" />
     <Compile Include="ToBeReviewed\OrderedEnumerable.cs" />
@@ -624,6 +637,7 @@
     <Compile Include="Windows.UI.Xaml.Media.Animation\Transition.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\TransitionCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\Animatable.cs" />
+    <Compile Include="Windows.UI.Xaml.Media.Animation\AnimationTimeline.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\BackEase.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\ColorAnimationUsingKeyFrames.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\ColorKeyFrame.cs" />
@@ -697,8 +711,8 @@
     <Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\GeometryCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\Projection.cs" />
     <Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\RectangleGeometry.cs" />
-    <Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TransformCollection.cs" />
-    <Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TransformGroup.cs" />
+    <Compile Include="Windows.UI.Xaml.Media\TransformCollection.cs" />
+    <Compile Include="Windows.UI.Xaml.Media\TransformGroup.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\NavigatedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\NavigationEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\NavigationFailedEventArgs.cs" />
@@ -819,6 +833,20 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' ">
+    <Reference Include="Bridge, Version=17.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSHTML5.2.0.0-alpha28-043\lib\net40\Bridge.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CSHTML5, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSHTML5.2.0.0-alpha28-043\lib\net40\CSHTML5.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CSHTML5.Stubs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSHTML5.2.0.0-alpha28-043\lib\net40\CSHTML5.Stubs.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">
     <Reference Include="Bridge, Version=17.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CSHTML5.Migration.2.0.0-alpha28-043\lib\net40\Bridge.dll</HintPath>
@@ -926,6 +954,7 @@
     </None>
   </ItemGroup>
   <Import Project="..\packages\CSHTML5.2.0.0-alpha28-043\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
+  <Import Project="..\packages\CSHTML5.2.0.0-alpha28-043\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' " />
   <Import Project="..\packages\CSHTML5.Migration.2.0.0-alpha28-043\build\CSHTML5.Migration.targets" Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' " />
   <Import Project="..\packages\CSHTML5.Migration.2.0.0-alpha28-043\build\CSHTML5.Migration.targets" Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' " />
 </Project>

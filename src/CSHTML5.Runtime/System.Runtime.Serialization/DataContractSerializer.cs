@@ -94,11 +94,11 @@ namespace System.Runtime.Serialization
             }
         }
 
-        public string SerializeToString(object obj, bool indentXml = false)
+        public string SerializeToString(object obj, bool indentXml = false, bool omitXmlDeclaration = false)
         {
             XDocument xdoc = new XDocument();
 
-            string defaultNamespace = DataContractSerializer_Helpers.DATACONTRACTSERIALIZER_OBJECT_DEFAULT_NAMESPACE + _type.Namespace;
+            string defaultNamespace = DataContractSerializer_Helpers.GetDefaultNamespace(_type.Namespace, _useXmlSerializerFormat);
 
             //todo: USEMETHODTOGETTYPE: make a method that returns the actual type of object and replace all USEMETHODTOGETTYPE with a call to this method. (also find other places where we could use it)
             Type objectType = obj.GetType();
@@ -111,16 +111,19 @@ namespace System.Runtime.Serialization
             if (objectType != _type)
             {
                 // Get the type information (namespace, etc.) by reading the DataContractAttribute and similar attributes, if present:
-                typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(_type, defaultNamespace);
+                typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(_type, defaultNamespace, _useXmlSerializerFormat);
             }
 
             // Add the root:
-            List<XNode> xnodesForRoot = DataContractSerializer_Serialization.SerializeToXNodes(obj, _type, _knownTypes, _useXmlSerializerFormat, isRoot: true, isContainedInsideEnumerable: false, parentTypeInformation: typeInformation, nodeDefaultNamespaceIfAny: null);
+            List<XObject> xnodesForRoot = DataContractSerializer_Serialization.SerializeToXObjects(obj, _type, _knownTypes, _useXmlSerializerFormat, isRoot: true, isContainedInsideEnumerable: false, parentTypeInformation: typeInformation, nodeDefaultNamespaceIfAny: null);
             xdoc.Add(xnodesForRoot.First());
             string xml = xdoc.ToString(indentXml);
 
             // Add the header:
-            xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>" + Environment.NewLine + xml;
+            if (!omitXmlDeclaration)
+            {
+                xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>" + Environment.NewLine + xml;
+            }
 
             return xml;
         }
@@ -129,7 +132,7 @@ namespace System.Runtime.Serialization
         {
             XDocument xdoc = new XDocument();
 
-            string defaultNamespace = DataContractSerializer_Helpers.DATACONTRACTSERIALIZER_OBJECT_DEFAULT_NAMESPACE + _type.Namespace;
+            string defaultNamespace = DataContractSerializer_Helpers.GetDefaultNamespace(_type.Namespace, _useXmlSerializerFormat);
 
             //todo: USEMETHODTOGETTYPE: make a method that returns the actual type of object and replace all USEMETHODTOGETTYPE with a call to this method. (also find other places where we could use it)
             Type objectType = obj.GetType();
@@ -142,11 +145,11 @@ namespace System.Runtime.Serialization
             if (objectType != _type)
             {
                 // Get the type information (namespace, etc.) by reading the DataContractAttribute and similar attributes, if present:
-                typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(_type, defaultNamespace);
+                typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(_type, defaultNamespace, _useXmlSerializerFormat);
             }
 
             // Add the root:
-            List<XNode> xnodesForRoot = DataContractSerializer_Serialization.SerializeToXNodes(obj, _type, _knownTypes, _useXmlSerializerFormat, isRoot: true, isContainedInsideEnumerable: false, parentTypeInformation: typeInformation, nodeDefaultNamespaceIfAny: null);
+            List<XObject> xnodesForRoot = DataContractSerializer_Serialization.SerializeToXObjects(obj, _type, _knownTypes, _useXmlSerializerFormat, isRoot: true, isContainedInsideEnumerable: false, parentTypeInformation: typeInformation, nodeDefaultNamespaceIfAny: null);
             xdoc.Add(xnodesForRoot.First());
             return xdoc;
         }
@@ -156,7 +159,7 @@ namespace System.Runtime.Serialization
             XDocument xdoc = XDocument.Parse(xml);
             XElement root = xdoc.Root;
             Type expectedType = this._type;
-            Type actuallyExpectedType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(root, this._type, expectedType, _knownTypes, null);
+            Type actuallyExpectedType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(root, this._type, expectedType, _knownTypes, null, _useXmlSerializerFormat);
             object result = DataContractSerializer_Deserialization.DeserializeToCSharpObject(root.Nodes(), actuallyExpectedType, root, _knownTypes, ignoreErrors: false, useXmlSerializerFormat: _useXmlSerializerFormat);
             return result;
         }
@@ -164,7 +167,7 @@ namespace System.Runtime.Serialization
         public object DeserializeFromXElement(XElement xElement)
         {
             Type expectedType = this._type;
-            Type actuallyExpectedType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(xElement, this._type, expectedType, _knownTypes, null);
+            Type actuallyExpectedType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(xElement, this._type, expectedType, _knownTypes, null, _useXmlSerializerFormat);
             object result = DataContractSerializer_Deserialization.DeserializeToCSharpObject(xElement.Nodes(), actuallyExpectedType, xElement, _knownTypes, ignoreErrors: false, useXmlSerializerFormat: _useXmlSerializerFormat);
             return result;
         }

@@ -34,7 +34,11 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Represents a collection of ObjectKeyFrame objects that can be individually
     /// accessed by index.
     /// </summary>
+#if WORKINPROGRESS
+    public sealed class ObjectKeyFrameCollection : PresentationFrameworkCollection<ObjectKeyFrame>
+#else
     public sealed class ObjectKeyFrameCollection : List<ObjectKeyFrame> //: IList<ObjectKeyFrame>, IEnumerable<ObjectKeyFrame>
+#endif
     {
         //// Summary:
         ////     Initializes a new instance of the ObjectKeyFrameCollection class.

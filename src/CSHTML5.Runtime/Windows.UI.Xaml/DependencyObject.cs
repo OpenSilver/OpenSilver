@@ -46,6 +46,12 @@ namespace Windows.UI.Xaml
         private Dictionary<DependencyProperty, Expression> _expressions;
         internal Expression GetExpression(DependencyProperty dp)
         {
+            if(_expressions == null)
+            {
+                _expressions = new Dictionary<DependencyProperty, Expression>();
+                return null;
+            }
+
             if(_expressions.ContainsKey(dp))
             {
                 return _expressions[dp];

@@ -17,13 +17,11 @@
 
 
 
-using System.Windows.Markup;
-#if MIGRATION
-using System.Windows;
-#else
-using Windows.Foundation;
-#endif
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -32,32 +30,17 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
 #if WORKINPROGRESS
-    [ContentProperty("Children")]
-    public sealed class TransformGroup : Transform
+    public sealed class TransformCollection : PresentationFrameworkCollection<Transform>
+#else
+    public sealed class TransformCollection : List<Transform>
+#endif
     {
-        public TransformCollection Children
+        internal static TransformCollection Empty
         {
-            get { return (TransformCollection)GetValue(TransformGroup.ChildrenProperty); }
-            set { SetValue(ChildrenProperty, value); }
-        }
-
-        public static readonly DependencyProperty ChildrenProperty =
-            DependencyProperty.Register("Children", typeof(TransformCollection), typeof(TransformGroup), new PropertyMetadata(new TransformCollection()));
-
-        protected override Point INTERNAL_TransformPoint(Point point)
-        {
-            return new Point();
-        }
-
-        internal override void INTERNAL_ApplyTransform()
-        {
-
-        }
-
-        internal override void INTERNAL_UnapplyTransform()
-        {
-
+            get
+            {
+                return new TransformCollection();
+            }
         }
     }
-#endif
 }

@@ -191,7 +191,7 @@ namespace System.Runtime.Serialization
                     {
                         IEnumerable<XNode> elementChildNodes = xElement.Nodes();
 
-                        Type childObjectActualType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(xElement, itemsType, itemsType, knownTypes, null); //Note: the two "null" values are used only in the case where we couldn't find the type.
+                        Type childObjectActualType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(xElement, itemsType, itemsType, knownTypes, null, useXmlSerializerFormat); //Note: the two "null" values are used only in the case where we couldn't find the type.
 
 
                         //********** RECURSION **********
@@ -438,7 +438,7 @@ namespace System.Runtime.Serialization
                 CallOnDeserializingMethod(resultInstance, resultType);
 
                 // Get the type information (namespace, etc.) by reading the DataContractAttribute and similar attributes, if present:
-                TypeInformation typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(resultType, null);
+                TypeInformation typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(resultType, null, useXmlSerializerFormat);
 
                 // Read the members of the target type:
                 IEnumerable<MemberInformation> membersInformation = DataContractSerializer_Helpers.GetDataContractMembers(resultType, typeInformation.serializationType, useXmlSerializerFormat);
@@ -495,51 +495,24 @@ namespace System.Runtime.Serialization
                             if (!membersForWhichWeSuccessfullSetTheValue.Contains(memberInformation.Name))
                             {
                                 object memberValue = null;
+                                Type itemsType = null;
                                 Type memberActualType = memberInformation.MemberType; // Note: this is the initial value. It may be modified below.
+                                // Handle "Nil" case:
                                 if (DataContractSerializer_Helpers.IsElementNil(xElement))
                                 {
                                     //----------------------
-                                    // XNode is "Nil", so we return the default value of the result type
+                                    // XNode is "Nil", so we return the default value of the result type.
                                     //----------------------
 
                                     memberValue = DataContractSerializer_Helpers.GetDefault(memberInformation.MemberType);
                                 }
-                                else
+                                // Handle the special case where there is an [XmlElement] attribute on an enumerable member (XmlSerializer compatibility mode only):
+                                else if (useXmlSerializerFormat
+                                    && memberInformation.HasXmlElementAttribute
+                                    && DataContractSerializer_Helpers.IsAssignableToGenericEnumerableOrArray(memberActualType, out itemsType))
                                 {
-                                    bool isNull = false;
-
-                                    //foreach (XAttribute attribute in xElement.Attributes(XNamespace.Get("http://www.w3.org/2001/XMLSchema-instance").GetName("nil"))) //doesn't work...
-                                    //todo: try removing this foreach since it should be handled in the "if(IsElementDefaut(xElement))" above.
-                                    foreach (XAttribute attribute in xElement.Attributes("nil")) //We have to do this here because those usually do not have nodes, which causes problems when doing the recursion.
-                                    {
-                                        isNull = Convert.ToBoolean(attribute.Value);
-                                        if (isNull)
-                                        {
-                                            memberValue = null;
-                                        }
-                                    }
-
-                                    if (!isNull)
-                                    {
-
-                                        memberActualType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(xElement, memberInformation.MemberInfo.DeclaringType, memberActualType, knownTypes, memberInformation);
-
-                                        //if the type is nullable, we get the undelying type:
-                                        Type nonNullableMemberType = memberActualType;
-                                        if (memberActualType.FullName.StartsWith("System.Nullable`1"))
-                                        {
-                                            nonNullableMemberType = Nullable.GetUnderlyingType(memberActualType);
-                                        }
-
-                                        // Recursively create the value for the property:
-                                        IEnumerable<XNode> propertyChildNodes = xElement.Nodes();
-
-                                        //********** RECURSION **********
-                                        memberValue = DeserializeToCSharpObject(propertyChildNodes, nonNullableMemberType, xElement, knownTypes, ignoreErrors, useXmlSerializerFormat);
-                                    }
-
                                     //---------------------------------
-                                    // Handle the special case where there is an [XmlElement] attribute on an enumerable member (XmlSerializer compatibility mode only):
+                                    // Special case where there is an [XmlElement] attribute on an enumerable member (XmlSerializer compatibility mode only):
                                     //
                                     // Example:
                                     //      <MyObject>
@@ -557,26 +530,41 @@ namespace System.Runtime.Serialization
                                     //
                                     // cf. https://docs.microsoft.com/en-us/dotnet/standard/serialization/controlling-xml-serialization-using-attributes
                                     //---------------------------------
-                                    Type itemsType = null;
-                                    bool specialCaseWhereAnEnumerableHasTheXmlElementAttribute =
-                                        (useXmlSerializerFormat
-                                        && memberInformation.HasXmlElementAttribute
-                                        && DataContractSerializer_Helpers.IsAssignableToGenericEnumerableOrArray(memberActualType, out itemsType));
-                                    if (specialCaseWhereAnEnumerableHasTheXmlElementAttribute)
+
+                                    object deserializedEnumerable = DeserializeToCSharpObject_Enumerable_WithRecursion_SpecialCase(
+                                        memberInformation.Name,
+                                        content, memberActualType, knownTypes, ignoreErrors, itemsType, useXmlSerializerFormat);
+                                    memberValue = deserializedEnumerable;
+                                }
+                                // Handle all other cases:
+                                else
+                                {
+                                    //----------------------
+                                    // All other cases: the XElement is not "Nil" and needs to be deserialized.
+                                    //----------------------
+
+                                    memberActualType = DataContractSerializer_KnownTypes.GetCSharpTypeForNode(xElement, memberInformation.MemberInfo.DeclaringType, memberActualType, knownTypes, memberInformation, useXmlSerializerFormat);
+
+                                    //if the type is nullable, we get the undelying type:
+                                    Type nonNullableMemberType = memberActualType;
+                                    if (memberActualType.FullName.StartsWith("System.Nullable`1"))
                                     {
-                                        object deserializedEnumerable = DeserializeToCSharpObject_Enumerable_WithRecursion_SpecialCase(
-                                            memberInformation.Name,
-                                            content, memberActualType, knownTypes, ignoreErrors, itemsType, useXmlSerializerFormat);
-                                        memberValue = deserializedEnumerable;
+                                        nonNullableMemberType = Nullable.GetUnderlyingType(memberActualType);
                                     }
 
-                                    //---------------------------------
-                                    // Set the value of the member:
-                                    //---------------------------------
+                                    // Recursively create the value for the property:
+                                    IEnumerable<XNode> propertyChildNodes = xElement.Nodes();
 
-                                    DataContractSerializer_Helpers.SetMemberValue(resultInstance, memberInformation, memberValue);
-                                    membersForWhichWeSuccessfullSetTheValue.Add(memberInformation.Name);
+                                    //********** RECURSION **********
+                                    memberValue = DeserializeToCSharpObject(propertyChildNodes, nonNullableMemberType, xElement, knownTypes, ignoreErrors, useXmlSerializerFormat);
                                 }
+
+                                //---------------------------------
+                                // Set the value of the member:
+                                //---------------------------------
+
+                                DataContractSerializer_Helpers.SetMemberValue(resultInstance, memberInformation, memberValue);
+                                membersForWhichWeSuccessfullSetTheValue.Add(memberInformation.Name);
                             }
                         }
                         else

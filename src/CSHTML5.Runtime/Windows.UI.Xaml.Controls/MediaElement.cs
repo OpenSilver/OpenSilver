@@ -255,7 +255,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     string tagString = "none";
 
-                    string valueForHtml5SourceProperty = INTERNAL_UriHelper.ConvertToHtml5Path(newValue.ToString(), control._nameOfAssemblyThatSetTheSourceUri);
+                    string valueForHtml5SourceProperty = INTERNAL_UriHelper.ConvertToHtml5Path(newValue.ToString(), control);
 
                     string newExtensionLowercase = GetExtension(newUri).ToLower();
 

@@ -394,7 +394,7 @@ namespace Windows.UI.Xaml.Controls
                         {
                             if (value != null)
                             {
-                                return INTERNAL_FontsHelper.LoadFont(((FontFamily)value).Source);
+                                return INTERNAL_FontsHelper.LoadFont(((FontFamily)value).Source, (UIElement)instance);
                             }
                             else
                             {

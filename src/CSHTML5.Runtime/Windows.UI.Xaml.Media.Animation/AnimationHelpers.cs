@@ -77,15 +77,26 @@ $0.complete = $4;
                 {
                     foreach (string key in additionalOptions.Keys)
                     {
-                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0[$1] = $2;", options, key, additionalOptions[key]);
+                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", options, key, additionalOptions[key]);
                     }
                 }
             }
 
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-Velocity($0, $1, $2);
-Velocity.Utilities.dequeue($0, $3);", domElement, jsFromToValues, options, visualStateGroupName);
+            CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, $1, $2);
+                                                     Velocity.Utilities.dequeue($0, $3);", 
+                                                     domElement, jsFromToValues, options, visualStateGroupName);
+        }
+
+        internal static void ApplyInstantAnimation(DependencyObject target, PropertyPath propertyPath, double to, bool isVisualStateChange)
+        {
+            if (isVisualStateChange)
+            {
+                propertyPath.INTERNAL_PropertySetVisualState(target, to);
+            }
+            else
+            {
+                propertyPath.INTERNAL_PropertySetLocalValue(target, to);
+            }
         }
     }
 }

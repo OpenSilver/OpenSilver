@@ -155,7 +155,7 @@ namespace Windows.UI.Xaml.Controls
                         Uri sourceUri = null;
                         sourceUri = ((BitmapImage)Source).UriSource;
 
-                        string html5Path = INTERNAL_UriHelper.ConvertToHtml5Path(sourceUri.OriginalString, ((BitmapImage)Source).INTERNAL_NameOfAssemblyThatSetTheSourceUri);
+                        string html5Path = INTERNAL_UriHelper.ConvertToHtml5Path(sourceUri.OriginalString, this);
 
                         INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", html5Path);
                     }

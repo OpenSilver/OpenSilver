@@ -7,11 +7,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSHTML5.Runtime", "CSHTML5.
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug.WorkInProgress|Any CPU = Debug.WorkInProgress|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Migration.WorkInProgress|Any CPU = Migration.WorkInProgress|Any CPU
 		Migration|Any CPU = Migration|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{03DFD03A-5639-4523-901A-8310296A4317}.Debug.WorkInProgress|Any CPU.ActiveCfg = Debug.WorkInProgress|Any CPU
+		{03DFD03A-5639-4523-901A-8310296A4317}.Debug.WorkInProgress|Any CPU.Build.0 = Debug.WorkInProgress|Any CPU
 		{03DFD03A-5639-4523-901A-8310296A4317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{03DFD03A-5639-4523-901A-8310296A4317}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03DFD03A-5639-4523-901A-8310296A4317}.Migration.WorkInProgress|Any CPU.ActiveCfg = Migration.WorkInProgress|Any CPU

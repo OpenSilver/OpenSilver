@@ -96,10 +96,9 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
             else
             {
-                string javaScriptCodeToExecute = string.Format(@"
-var element = document.getElementById(""{0}"");
-element.parentNode.removeChild(element);
-", ((INTERNAL_HtmlDomElementReference)domNode).UniqueIdentifier);
+                string javaScriptCodeToExecute = string.Format(@"var element = document.getElementById(""{0}"");
+                                                           element.parentNode.removeChild(element);",
+                                                           ((INTERNAL_HtmlDomElementReference)domNode).UniqueIdentifier);
                 ExecuteJavaScript(javaScriptCodeToExecute, commentForDebugging); // IMPORTANT: This cannot be replaced by "INTERNAL_SimulatorPerformanceOptimizer.QueueJavaScriptCode" because the element may no longer be in the tree when we try to remove it (cf. issues we had with the Grid on 2015.08.26)
                 if (((INTERNAL_HtmlDomElementReference)domNode).Parent != null)
                 {
@@ -179,9 +178,7 @@ element.parentNode.removeChild(element);
                 throw new IndexOutOfRangeException();
             }
 
-            string childNodeId = Interop.ExecuteJavaScript(@"
-var child = $0.childNodes[$1];
-child.id;", domElementRef, index).ToString();
+            string childNodeId = Interop.ExecuteJavaScript(@"var child = $0.childNodes[$1]; child.id;", domElementRef, index).ToString();
             return new INTERNAL_HtmlDomElementReference(childNodeId, domElementRef);
         }
 
@@ -239,12 +236,11 @@ child.id;", domElementRef, index).ToString();
 #endif
         static void SetFocus_SimulatorOnly(dynamic domElementRef)
         {
-            ExecuteJavaScript(string.Format(@"
-var domElement = document.getElementById(""{0}"");
-setTimeout(function() {{ 
-    domElement.focus();
-}}, 1);
-", ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier));
+            ExecuteJavaScript(string.Format(@"var domElement = document.getElementById(""{0}"");
+                                        setTimeout(function() {{ 
+                                            domElement.focus();
+                                        }}, 1);", 
+                                        ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier));
         }
 
         public static void SetContentString(UIElement element, string content, bool removeTextWrapping = false)
@@ -676,8 +672,7 @@ element.remove({1});
                 var value = ConvertToStringToUseInJavaScriptCode(attributeValue);
                 foreach (string propertyName in propertyCSSNames)
                 {
-                    settingProperties += string.Format(@"
-element.style.{0} = {1};", propertyName, value);
+                    settingProperties += string.Format(@"element.style.{0} = {1};", propertyName, value);
                 }
                 string javaScriptCodeToExecute =
                     string.Format(@"var element = document.getElementById(""{0}"");if (element) {{ {1} }};",
@@ -701,11 +696,9 @@ element.style.{0} = {1};", propertyName, value);
 
                     foreach (string csspropertyName in cssPropertyNames)
                     {
-                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0[$1] = $2;", newObj, csspropertyName, cssValue);
+                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", newObj, csspropertyName, cssValue);
                     }
-                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-Velocity($0, $1, {duration:1, queue:false});", domElement, newObj);
+                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, $1, {duration:1, queue:false});", domElement, newObj);
                 }
 
             }

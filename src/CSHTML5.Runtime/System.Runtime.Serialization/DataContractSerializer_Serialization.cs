@@ -45,7 +45,7 @@ namespace System.Runtime.Serialization
         /// <param name="parentTypeInformation">This contains informations on the type that contains the current object; or in the case of the root, on the type expected by the DataContractSerializer</param>
         /// <param name="nodeDefaultNamespaceIfAny">The default namespace that is applied on the node (not sure exactly since it is old stuff for me).</param>
         /// <returns>A List&lt;XNode&gt; of the nodes for the current element (a list in case of an Enumerable I think).</returns>
-        internal static List<XNode> SerializeToXNodes(object obj, Type objExpectedType, IReadOnlyList<Type> knownTypes, bool useXmlSerializerFormat, bool isRoot, bool isContainedInsideEnumerable, TypeInformation parentTypeInformation, string nodeDefaultNamespaceIfAny)
+        internal static List<XObject> SerializeToXObjects(object obj, Type objExpectedType, IReadOnlyList<Type> knownTypes, bool useXmlSerializerFormat, bool isRoot, bool isContainedInsideEnumerable, TypeInformation parentTypeInformation, string nodeDefaultNamespaceIfAny)
         {
             //Note: objExpectedtype was added because we needed to know if obj was a string or a char. It is now also used for when the root is of a child class
             //      of the one expected by the DataContractSerializer. In that case, the DataContractSerializer should add a i:type="XXX" attribute to the root.
@@ -63,7 +63,7 @@ namespace System.Runtime.Serialization
                 // VALUE TYPE OR STRING (more or less a primitive type)
                 //-------------------------
 
-                return SerializeToXNodes_ValueTypeOrString(obj, objExpectedType, objectType, knownTypes, useXmlSerializerFormat, nodeDefaultNamespaceIfAny, isRoot, isContainedInsideEnumerable, parentTypeInformation);
+                return SerializeToXObjects_ValueTypeOrString(obj, objExpectedType, objectType, knownTypes, useXmlSerializerFormat, nodeDefaultNamespaceIfAny, isRoot, isContainedInsideEnumerable, parentTypeInformation);
             }
             else if (obj.GetType() == typeof(Byte[]))
             {
@@ -71,7 +71,7 @@ namespace System.Runtime.Serialization
                 // BYTE ARRAY
                 //-------------------------
 
-                return SerializeToXNodes_ByteArray(obj, isRoot, isContainedInsideEnumerable);
+                return SerializeToXObjects_ByteArray(obj, isRoot, isContainedInsideEnumerable);
             }
             else if (obj is IEnumerable) //todo: should we be more precise and check if it implements IEnumerable<T> or is an Array, like we do during the Deserialization?
             {
@@ -79,7 +79,7 @@ namespace System.Runtime.Serialization
                 // ENUMERABLE (WITH RECURSION)
                 //-------------------------
 
-                return SerializeToXNodes_Enumerable_WithRecursion(obj, objectType, knownTypes, useXmlSerializerFormat, nodeDefaultNamespaceIfAny, isRoot, isContainedInsideEnumerable);
+                return SerializeToXObjects_Enumerable_WithRecursion(obj, objectType, knownTypes, useXmlSerializerFormat, nodeDefaultNamespaceIfAny, isRoot, isContainedInsideEnumerable);
             }
             else
             {
@@ -87,12 +87,12 @@ namespace System.Runtime.Serialization
                 // OTHER OBJECT TYPE (WITH RECURSION)
                 //-------------------------
 
-                return SerializeToXNodes_Object_WithRecursion(obj, objectType, objExpectedType, knownTypes, useXmlSerializerFormat, nodeDefaultNamespaceIfAny, isRoot, isContainedInsideEnumerable, parentTypeInformation);
+                return SerializeToXObjects_Object_WithRecursion(obj, objectType, objExpectedType, knownTypes, useXmlSerializerFormat, nodeDefaultNamespaceIfAny, isRoot, isContainedInsideEnumerable, parentTypeInformation);
             }
         }
 
         //todo: those additional parameter are probably useless now.
-        static List<XNode> SerializeToXNodes_ValueTypeOrString(object obj, Type objExpectedType, Type objectType, IReadOnlyList<Type> knownTypes, bool useXmlSerializerFormat, string nodeDefaultNamespaceIfAny, bool isRoot, bool isContainedInsideEnumerable, TypeInformation parentTypeInformation)
+        static List<XObject> SerializeToXObjects_ValueTypeOrString(object obj, Type objExpectedType, Type objectType, IReadOnlyList<Type> knownTypes, bool useXmlSerializerFormat, string nodeDefaultNamespaceIfAny, bool isRoot, bool isContainedInsideEnumerable, TypeInformation parentTypeInformation)
         {
             string str;
             if (obj is Double)
@@ -123,30 +123,54 @@ namespace System.Runtime.Serialization
 
             XText xtext = new XText(str);
 
-            // If the value is the root or if it is inside an Enumerable, we add an XElement to surround it:
+            // If the value is the root or if it is inside an Enumerable, we add an XElement to surround it.
+            // For example, if it is an integer 45, we surround 45 with <int xmlns="http://schemas.microsoft.com/2003/10/Serialization/">45</int>
             if (isRoot || isContainedInsideEnumerable)
-                return AddSurroundingXElement(xtext, DataContractSerializer_ValueTypesHandler.TypesToNames[obj.GetType()], isRoot, isContainedInsideEnumerable);
+            {
+                // Determine the name of the type to use in the surrounding XElement:
+                Type objType = obj.GetType();
+                string typeName;
+                string typeNamespace;
+                if (DataContractSerializer_ValueTypesHandler.TypesToNames.ContainsKey(objType))
+                {
+                    //-----------
+                    // System built-in value type (int, bool, etc.)
+                    //-----------
+                    typeName = DataContractSerializer_ValueTypesHandler.TypesToNames[objType];
+                    typeNamespace = "http://schemas.microsoft.com/2003/10/Serialization/";
+                }
+                else
+                {
+                    //-----------
+                    // User custom value type or enum
+                    //-----------
+                    typeName = objType.Name;
+                    typeNamespace = DataContractSerializer_Helpers.GetDefaultNamespace(objType.Namespace, useXmlSerializerFormat);
+                }
+                
+                return AddSurroundingXElement(xtext, typeName, typeNamespace, isRoot, isContainedInsideEnumerable);
+            }
             else
-                return new List<XNode>() { xtext };
+                return new List<XObject>() { xtext };
         }
 
-        static List<XNode> SerializeToXNodes_ByteArray(object obj, bool isRoot, bool isContainedInsideEnumerable)
+        static List<XObject> SerializeToXObjects_ByteArray(object obj, bool isRoot, bool isContainedInsideEnumerable)
         {
             XText xtext = new XText(Convert.ToBase64String((Byte[])obj));
 
             // If the value is the root or if it is inside an Enumerable, we add an XElement to surround it:
             if (isRoot || isContainedInsideEnumerable)
-                return AddSurroundingXElement(xtext, "base64Binary", isRoot, isContainedInsideEnumerable);
+                return AddSurroundingXElement(xtext, "base64Binary", "http://schemas.microsoft.com/2003/10/Serialization/", isRoot, isContainedInsideEnumerable);
             else
-                return new List<XNode>() { xtext };
+                return new List<XObject>() { xtext };
         }
 
-        static List<XNode> SerializeToXNodes_Enumerable_WithRecursion(object obj, Type objectType, IReadOnlyList<Type> knownTypes, bool useXmlSerializerFormat, string nodeDefaultNamespaceIfAny, bool isRoot, bool isContainedInsideEnumerable)
+        static List<XObject> SerializeToXObjects_Enumerable_WithRecursion(object obj, Type objectType, IReadOnlyList<Type> knownTypes, bool useXmlSerializerFormat, string nodeDefaultNamespaceIfAny, bool isRoot, bool isContainedInsideEnumerable)
         {
-            List<XNode> result = new List<XNode>();
+            List<XObject> result = new List<XObject>();
 
             // Get the type information (namespace, etc.) by reading the DataContractAttribute and similar attributes, if present:
-            TypeInformation typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(objectType, nodeDefaultNamespaceIfAny);
+            TypeInformation typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(objectType, nodeDefaultNamespaceIfAny, useXmlSerializerFormat);
 
             // Traverse the collection:
             foreach (object item in (IEnumerable)obj)
@@ -160,12 +184,12 @@ namespace System.Runtime.Serialization
 
                 //********** RECURSION **********
                 //WILD GUESS: Since we are going to the content of an IEnumerable, the namespace of the IEnumerable becomes irrelevant for its content so we give them null instead.
-                List<XNode> xnodesForItem = SerializeToXNodes(item, itemType, knownTypes, useXmlSerializerFormat, isRoot: false, isContainedInsideEnumerable: true, parentTypeInformation: typeInformation, nodeDefaultNamespaceIfAny: typeInformation.NamespaceName);
+                List<XObject> xnodesForItem = SerializeToXObjects(item, itemType, knownTypes, useXmlSerializerFormat, isRoot: false, isContainedInsideEnumerable: true, parentTypeInformation: typeInformation, nodeDefaultNamespaceIfAny: typeInformation.NamespaceName);
 
                 // Keep only the first node:
                 if (xnodesForItem.Count > 1)
                     throw new Exception("When serializing an IEnumerable, we do not expect an item of the enumerable to be serialized as multiple XNodes.");
-                XNode nodeForItem = xnodesForItem.First();
+                XObject nodeForItem = xnodesForItem.First();
 
                 // If it's a value type, add an XElement to surround the node:
                 if (nodeForItem is XText)
@@ -211,7 +235,7 @@ namespace System.Runtime.Serialization
                     }
                     XElement xElement = new XElement(XNamespace.Get("http://schemas.microsoft.com/2003/10/Serialization/Arrays").GetName(elementName), result);
                     xElement.Add(new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLNS_NAMESPACE).GetName("xmlns:i"), DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE));
-                    return new List<XNode>() { xElement };
+                    return new List<XObject>() { xElement };
                 }
                 else
                 {
@@ -222,16 +246,16 @@ namespace System.Runtime.Serialization
             return result;
         }
 
-        static List<XNode> SerializeToXNodes_Object_WithRecursion(object obj, Type objectType, Type resultExpectedType, IReadOnlyList<Type> knownTypes, bool useXmlSerializerFormat, string nodeDefaultNamespaceIfAny, bool isRoot, bool isContainedInsideEnumerable, TypeInformation parentTypeInformation)
+        static List<XObject> SerializeToXObjects_Object_WithRecursion(object obj, Type objectType, Type resultExpectedType, IReadOnlyList<Type> knownTypes, bool useXmlSerializerFormat, string nodeDefaultNamespaceIfAny, bool isRoot, bool isContainedInsideEnumerable, TypeInformation parentTypeInformation)
         {
             // Call the "OnSerializing" method if any:
             CallOnSerializingMethod(obj, objectType);
 
             // Get the type information (namespace, etc.) by reading the DataContractAttribute and similar attributes, if present:
-            TypeInformation typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(objectType, nodeDefaultNamespaceIfAny);
+            TypeInformation typeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(objectType, nodeDefaultNamespaceIfAny, useXmlSerializerFormat);
 
             // Process each member of the object:
-            List<XNode> childrenNodes = new List<XNode>();
+            List<XObject> childrenObjects = new List<XObject>();
             IEnumerable<MemberInformationAndValue> membersAndValues = DataContractSerializer_Helpers.GetDataContractMembersAndValues(obj, serializationType: typeInformation.serializationType, useXmlSerializerFormat: useXmlSerializerFormat); //todo: normally, checking if a data contract is present is not enough to know if the type if "marked with attributes". According to the MSND article "Using Data Contracts", we should check for any of the following attributes: "DataContractAttribute, SerializableAttribute, CollectionDataContractAttribute, or EnumMemberAttribute attributes, or marked as serializable by any other means (such as IXmlSerializable)". cf. https://msdn.microsoft.com/en-us/library/ms733127(v=vs.100).aspx
             foreach (MemberInformationAndValue memberInfoAndValue in membersAndValues)
             {
@@ -243,147 +267,140 @@ namespace System.Runtime.Serialization
                 MemberInfo memberInfo = memberInfoAndValue.MemberInformation.MemberInfo;
                 object memberValue = memberInfoAndValue.MemberValue;
                 string memberName = memberInfoAndValue.MemberInformation.Name;
+                bool hasXmlAttributeAttribute = memberInfoAndValue.MemberInformation.HasXmlAttributeAttribute;
 
-                // Create the XNode for the member:
-                XName xnameForMember;
-                if (objectType.FullName.StartsWith("System.Collections.Generic.KeyValuePair"))
+                // If the member has the [XmlAttribute] attribute, we create an attribute for the member, otherwise we create an XNode:
+                if (hasXmlAttributeAttribute && useXmlSerializerFormat)
                 {
-                    if(memberName == "key")
+                    // Create the XAttribute for the member:
+                    if (memberValue != null)
                     {
-                        memberName = "Key";
+                        string memberValueAsString = memberValue.ToString();
+                        XName xnameForMember = GetXNameForMember(objectType, typeInformation, ref memberName);
+                        var xAtttribute = new XAttribute(xnameForMember, memberValueAsString);
+                        childrenObjects.Add(xAtttribute);
                     }
-                    else if (memberName == "value")
-                    {
-                        memberName = "Value";
-                    }
-                    xnameForMember = memberName;
                 }
                 else
                 {
-                    if (typeInformation.NamespaceName == null) //todo: make sure we want to use this typeInformation since it comes from the type that contains of the current member and not the member itself.
-                    {
-                        xnameForMember = memberName;
-                    }
-                    else
-                    {
-                        xnameForMember = XNamespace.Get(typeInformation.NamespaceName).GetName(memberName);
-                    }
-                }
-                XElement xElementForMember = new XElement(xnameForMember);
+                    // Create the XNode for the member:
+                    XName xnameForMember = GetXNameForMember(objectType, typeInformation, ref memberName);
+                    XElement xElementForMember = new XElement(xnameForMember);
 
-                bool isNull = ((memberValue == null) || DataContractSerializer_Helpers.CheckIfObjectIsNullNullable(memberValue));
+                    bool isNull = ((memberValue == null) || DataContractSerializer_Helpers.CheckIfObjectIsNullNullable(memberValue));
 
-                if (!isNull)
-                {
-                    Type expectedType = memberInfoAndValue.MemberInformation.MemberType;
-                    Type memberType = memberValue.GetType();
+                    if (!isNull)
+                    {
+                        Type expectedType = memberInfoAndValue.MemberInformation.MemberType;
+                        Type memberType = memberValue.GetType();
 
-                    // Work around JSIL issues:
-                    if (memberValue is char && expectedType == typeof(char)) //Note: this test is required because JSIL thinks that object testobj = 'c'; testobj.GetType() should return System.String...
-                    {
-                        memberType = typeof(char);
-                    }
-                    else if (expectedType == typeof(double)) //Note: this test is required because, with JSIL, "GetType" on a double returns "int" instead of "double". //todo: see if other workarounds to JSIL bugs like this one are required.
-                    {
-                        memberType = typeof(double);
-                    }
-                    else if(expectedType == typeof(byte)) //same as above.
-                    {
-                        memberType = typeof(byte);
-                    }
-                    else if (expectedType == typeof(float)) //same as above.
-                    {
-                        memberType = typeof(float);
-                    }
-
-                    bool isValueEnumerableDifferentThanString = (memberValue is IEnumerable) && !(memberValue is string);
-
-                    Type nonNullableMemberType = memberType;
-                    if (memberType.FullName.StartsWith("System.Nullable`1"))
-                    {
-                        nonNullableMemberType = Nullable.GetUnderlyingType(memberType);
-                    }
-                    Type nonNullableExpectedType = expectedType;
-                    if (expectedType.FullName.StartsWith("System.Nullable`1"))
-                    {
-                        nonNullableExpectedType = Nullable.GetUnderlyingType(expectedType);
-                    }
-
-                    if (nonNullableMemberType != nonNullableExpectedType && !isValueEnumerableDifferentThanString)
-                    {
-                        //we want to add a type attribute to be able to know when deserializing that this is another type that the property's
-                        if (DataContractSerializer_ValueTypesHandler.TypesToNames.ContainsKey(nonNullableMemberType)) //todo: should we add the nullable versions?
+                        // Work around JSIL issues:
+                        if (memberValue is char && expectedType == typeof(char)) //Note: this test is required because JSIL thinks that object testobj = 'c'; testobj.GetType() should return System.String...
                         {
-                            string prefixForType = xElementForMember.GetPrefixOfNamespace("http://www.w3.org/2001/XMLSchema");
-                            if (string.IsNullOrWhiteSpace(prefixForType))
-                            {
-                                //we need to create a prefix for that
-                                //todo:see if it would be ok to use d2p1 like silverlight seems to do, and if so, replace the following with just that.
-
-                                prefixForType = DataContractSerializer_Helpers.GenerateUniqueNamespacePrefixIfNeeded(xElementForMember, "http://www.w3.org/2001/XMLSchema");
-
-                                //we can finally add the type attribute:
-                                xElementForMember.Add(new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE).GetName("type"), prefixForType + ":" + DataContractSerializer_ValueTypesHandler.TypesToNames[nonNullableMemberType]));
-                            }
-                            else
-                            {
-                                xElementForMember.Add(new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE).GetName("type"), prefixForType + ":" + DataContractSerializer_ValueTypesHandler.TypesToNames[nonNullableMemberType]));
-                            }
+                            memberType = typeof(char);
                         }
-                        else
+                        else if (expectedType == typeof(double)) //Note: this test is required because, with JSIL, "GetType" on a double returns "int" instead of "double". //todo: see if other workarounds to JSIL bugs like this one are required.
                         {
-                            bool isTypeOk = DataContractSerializer_KnownTypes.CheckIfItIsAKnownType(obj, objectType, knownTypes, memberType);
-                            if (isTypeOk)
+                            memberType = typeof(double);
+                        }
+                        else if (expectedType == typeof(byte)) //same as above.
+                        {
+                            memberType = typeof(byte);
+                        }
+                        else if (expectedType == typeof(float)) //same as above.
+                        {
+                            memberType = typeof(float);
+                        }
+
+                        bool isValueEnumerableDifferentThanString = (memberValue is IEnumerable) && !(memberValue is string);
+
+                        Type nonNullableMemberType = memberType;
+                        if (memberType.FullName.StartsWith("System.Nullable`1"))
+                        {
+                            nonNullableMemberType = Nullable.GetUnderlyingType(memberType);
+                        }
+                        Type nonNullableExpectedType = expectedType;
+                        if (expectedType.FullName.StartsWith("System.Nullable`1"))
+                        {
+                            nonNullableExpectedType = Nullable.GetUnderlyingType(expectedType);
+                        }
+
+                        if (nonNullableMemberType != nonNullableExpectedType && !isValueEnumerableDifferentThanString)
+                        {
+                            //we want to add a type attribute to be able to know when deserializing that this is another type that the property's
+                            if (DataContractSerializer_ValueTypesHandler.TypesToNames.ContainsKey(nonNullableMemberType)) //todo: should we add the nullable versions?
                             {
-                                if (memberType.IsEnum) //enums are a special case because JSIL is not capable of handling Custom attributes on them.
+                                string prefixForType = xElementForMember.GetPrefixOfNamespace("http://www.w3.org/2001/XMLSchema");
+                                if (string.IsNullOrWhiteSpace(prefixForType))
                                 {
-                                    xElementForMember.Add(new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE).GetName("type"), memberType.Name));
+                                    //we need to create a prefix for that
+                                    //todo:see if it would be ok to use d2p1 like silverlight seems to do, and if so, replace the following with just that.
+
+                                    prefixForType = DataContractSerializer_Helpers.GenerateUniqueNamespacePrefixIfNeeded(xElementForMember, "http://www.w3.org/2001/XMLSchema");
+
+                                    //we can finally add the type attribute:
+                                    xElementForMember.Add(new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE).GetName("type"), prefixForType + ":" + DataContractSerializer_ValueTypesHandler.TypesToNames[nonNullableMemberType]));
                                 }
                                 else
                                 {
-                                    string defaultNamespace = DataContractSerializer_Helpers.DATACONTRACTSERIALIZER_OBJECT_DEFAULT_NAMESPACE + memberType.Namespace;
-
-                                    // Get the type information (namespace, etc.) by reading the DataContractAttribute and similar attributes, if present:
-                                    TypeInformation childTypeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(memberType, defaultNamespace);
-
-                                    string prefixForTypeName = "";
-                                    if (childTypeInformation.NamespaceName != null) //when the namespaceName is null I guess it means we don't need something like type="sth:ChildTypeName" but type="ChildTypeName" is sufficient.
-                                    {
-                                        prefixForTypeName = DataContractSerializer_Helpers.GenerateUniqueNamespacePrefixIfNeeded(xElementForMember, childTypeInformation.NamespaceName) + ":"; // note: we added : directly because whenever we have a prefix, we have ':' right after.
-                                    }
-
-                                    xElementForMember.Add(new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE).GetName("type"), prefixForTypeName + childTypeInformation.Name));
+                                    xElementForMember.Add(new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE).GetName("type"), prefixForType + ":" + DataContractSerializer_ValueTypesHandler.TypesToNames[nonNullableMemberType]));
                                 }
                             }
                             else
                             {
-                                string namespaceNameToPutInException = "";
-                                if (typeInformation.NamespaceName != null)
+                                bool isTypeOk = DataContractSerializer_KnownTypes.CheckIfItIsAKnownType(obj, objectType, knownTypes, memberType);
+                                if (isTypeOk)
                                 {
-                                    namespaceNameToPutInException = ":" + typeInformation.NamespaceName;
+                                    if (memberType.IsEnum) //enums are a special case because JSIL is not capable of handling Custom attributes on them.
+                                    {
+                                        xElementForMember.Add(new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE).GetName("type"), memberType.Name));
+                                    }
+                                    else
+                                    {
+                                        string defaultNamespace = DataContractSerializer_Helpers.GetDefaultNamespace(memberType.Namespace, useXmlSerializerFormat);
+
+                                        // Get the type information (namespace, etc.) by reading the DataContractAttribute and similar attributes, if present:
+                                        TypeInformation childTypeInformation = DataContractSerializer_Helpers.GetTypeInformationByReadingAttributes(memberType, defaultNamespace, useXmlSerializerFormat);
+
+                                        string prefixForTypeName = "";
+                                        if (childTypeInformation.NamespaceName != null) //when the namespaceName is null I guess it means we don't need something like type="sth:ChildTypeName" but type="ChildTypeName" is sufficient.
+                                        {
+                                            prefixForTypeName = DataContractSerializer_Helpers.GenerateUniqueNamespacePrefixIfNeeded(xElementForMember, childTypeInformation.NamespaceName) + ":"; // note: we added : directly because whenever we have a prefix, we have ':' right after.
+                                        }
+
+                                        xElementForMember.Add(new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE).GetName("type"), prefixForTypeName + childTypeInformation.Name));
+                                    }
                                 }
-                                throw new SerializationException("Type \"" + memberType.FullName + "\" with data contract name \"" + memberType.Name + namespaceNameToPutInException + "\" is not expected. Add any types not known statically to the list of known types - for example, by using the KnownTypeAttribute attribute or by adding them to the list of known types passed to DataContractSerializer.");
+                                else
+                                {
+                                    string namespaceNameToPutInException = "";
+                                    if (typeInformation.NamespaceName != null)
+                                    {
+                                        namespaceNameToPutInException = ":" + typeInformation.NamespaceName;
+                                    }
+                                    throw new SerializationException("Type \"" + memberType.FullName + "\" with data contract name \"" + memberType.Name + namespaceNameToPutInException + "\" is not expected. Add any types not known statically to the list of known types - for example, by using the KnownTypeAttribute attribute or by adding them to the list of known types passed to DataContractSerializer.");
+                                }
                             }
                         }
-                    }
 
-                    //********** RECURSION **********
-                    List<XNode> xnodesForMemberValue = SerializeToXNodes(memberValue, memberType, knownTypes, useXmlSerializerFormat, isRoot: false, isContainedInsideEnumerable: false, parentTypeInformation: typeInformation, nodeDefaultNamespaceIfAny: typeInformation.NamespaceName);
-                    foreach (XNode xnodeForMemberValue in xnodesForMemberValue) // Note: the collection usually contains only 1 node, but there may be multiple nodes if for example we are serializing an Enumerable.
+                        //********** RECURSION **********
+                        List<XObject> xobjectsForMemberValue = SerializeToXObjects(memberValue, memberType, knownTypes, useXmlSerializerFormat, isRoot: false, isContainedInsideEnumerable: false, parentTypeInformation: typeInformation, nodeDefaultNamespaceIfAny: typeInformation.NamespaceName);
+                        foreach (XObject xobjectForMemberValue in xobjectsForMemberValue) // Note: the collection usually contains only 1 node, but there may be multiple nodes if for example we are serializing an Enumerable.
+                        {
+                            xElementForMember.Add(xobjectForMemberValue);
+                        }
+                    }
+                    else
                     {
-                        xElementForMember.Add(xnodeForMemberValue);
-                    }
-                }
-                else
-                {
-                    //------------------------------------
-                    // The value of the member is "null"
-                    //------------------------------------
+                        //------------------------------------
+                        // The value of the member is "null"
+                        //------------------------------------
 
-                    XName nilName = XNamespace.Get(DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE).GetName("nil");
-                    xElementForMember.Add(new XAttribute(nilName, "true"));
+                        XName nilName = XNamespace.Get(DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE).GetName("nil");
+                        xElementForMember.Add(new XAttribute(nilName, "true"));
+                    }
+                    childrenObjects.Add(xElementForMember);
                 }
-                childrenNodes.Add(xElementForMember);
             }
             if (isRoot || isContainedInsideEnumerable)
             {
@@ -411,7 +428,7 @@ namespace System.Runtime.Serialization
                 }
                 else
                 {
-                    objectTypeName = DataContractSerializer_Helpers.GetTypeNameSafeForSerialization(typeExpectedByParentEnumerable); // Note: in case of nested types, this method replaces the '+' with '.', and does other changes to obtain the type name to use in the serialization.
+                    objectTypeName = typeInformation.Name;
                 }
 
                 XName elementName;
@@ -437,24 +454,54 @@ namespace System.Runtime.Serialization
                     xelement.Add(new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE).GetName("type"), prefixForTypeName + ":" + typeInformation.Name));
                 }
 
-                foreach (XNode node in childrenNodes)
+                foreach (XObject child in childrenObjects)
                 {
-                    xelement.Add(node);
+                    xelement.Add(child);
                 }
-                childrenNodes = new List<XNode>() { xelement };
+                childrenObjects = new List<XObject>() { xelement };
             }
 
             // Call the "OnSerialized" method if any:
             CallOnSerializedMethod(obj, objectType);
 
-            return childrenNodes;
+            return childrenObjects;
         }
 
-        static List<XNode> AddSurroundingXElement(XText xtext, string surroundingElementName, bool isRoot, bool isContainedInsideEnumerable)
+        static XName GetXNameForMember(Type objectType, TypeInformation typeInformation, ref string memberName)
         {
-            string elementNamespace = isContainedInsideEnumerable ? "http://schemas.microsoft.com/2003/10/Serialization/Arrays" : "http://schemas.microsoft.com/2003/10/Serialization/";
+            XName xnameForMember;
+            if (objectType.FullName.StartsWith("System.Collections.Generic.KeyValuePair"))
+            {
+                if (memberName == "key")
+                {
+                    memberName = "Key";
+                }
+                else if (memberName == "value")
+                {
+                    memberName = "Value";
+                }
+                xnameForMember = memberName;
+            }
+            else
+            {
+                if (typeInformation.NamespaceName == null) //todo: make sure we want to use this typeInformation since it comes from the type that contains of the current member and not the member itself.
+                {
+                    xnameForMember = memberName;
+                }
+                else
+                {
+                    xnameForMember = XNamespace.Get(typeInformation.NamespaceName).GetName(memberName);
+                }
+            }
+
+            return xnameForMember;
+        }
+
+        static List<XObject> AddSurroundingXElement(XText xtext, string surroundingElementName, string surroundingElementNamespace, bool isRoot, bool isContainedInsideEnumerable)
+        {
+            string elementNamespace = isContainedInsideEnumerable ? "http://schemas.microsoft.com/2003/10/Serialization/Arrays" : surroundingElementNamespace;
             XElement xElement = new XElement(XNamespace.Get(elementNamespace).GetName(surroundingElementName), xtext);
-            return new List<XNode>() { xElement };
+            return new List<XObject>() { xElement };
         }
 
         static void CallOnSerializingMethod(object obj, Type objType)

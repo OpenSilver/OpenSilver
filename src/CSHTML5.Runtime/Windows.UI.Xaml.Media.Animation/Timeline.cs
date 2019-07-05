@@ -52,7 +52,7 @@ namespace Windows.UI.Xaml.Media.Animation
                                                                  "System.Windows.Media.Animation.",
                                                                  "System.Windows.Media.Imaging.",
                                                                  "System.Windows.Shapes.",
-                                                             };
+                                                              };
 #else
         internal static readonly string[] defaultTypesPaths = {
                                                                  "", //keep an empty one to test the type directly.
@@ -113,7 +113,10 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <summary>
         /// Provides base class initialization behavior for Timeline-derived classes.
         /// </summary>
-        protected Timeline() { }
+        protected Timeline()
+        {
+
+        }
 
         //// The default is false.
         ///// <summary>
@@ -166,6 +169,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </summary>
         public static readonly DependencyProperty DurationProperty =
             DependencyProperty.Register("Duration", typeof(Duration), typeof(Timeline), new PropertyMetadata(Duration.Automatic));
+
 
 
         // Returns:
@@ -470,7 +474,7 @@ namespace Windows.UI.Xaml.Media.Animation
         }
 
 
-        
+
 
 
         //Stuff added for loops purposes:
@@ -505,7 +509,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 {
                     _beginTimeTimer = new DispatcherTimer(); //this line is to avoid having more than one callback on the tick (we cannot use "_beginTimeTimer.Tick -= XXX" since we use a anonymous method).
                     _beginTimeTimer.Interval = BeginTime.Value;
-                  
+
                     //Note: anonymous method since it allows us to use simply parameters and isLastLoop.
                     _beginTimeTimer.Tick += (sender, args) =>
                     {
@@ -524,14 +528,23 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal virtual void IterateOnce(IterationParameters parameters, bool isLastLoop)
         {
-            if (Duration.HasTimeSpan && Duration.TimeSpan.TotalMilliseconds > 0)
+            ComputeDuration();
+            if (Duration.HasTimeSpan)
             {
-                _parameters = parameters;
-                _animationTimer.Interval = Duration.TimeSpan;
-                _animationTimer.Tick -= _animationTimer_Tick;
-                _animationTimer.Tick += _animationTimer_Tick;
-                _isAnimationDurationReached = false;
-                _animationTimer.Start();
+                if (Duration.TimeSpan.TotalMilliseconds > 0)
+                {
+                    _parameters = parameters;
+                    _animationTimer.Interval = Duration.TimeSpan;
+                    _animationTimer.Tick -= _animationTimer_Tick;
+                    _animationTimer.Tick += _animationTimer_Tick;
+                    _isAnimationDurationReached = false;
+                    _animationTimer.Start();
+                }
+                else
+                {
+                    _isAnimationDurationReached = true;
+                    //OnIterationCompleted(parameters);
+                }
             }
         }
 
@@ -554,14 +567,12 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-
         DispatcherTimer _animationTimer = new DispatcherTimer();
         internal void OnIterationCompleted(IterationParameters parameters)
         {
-            if (!Duration.HasTimeSpan || Duration.TimeSpan.TotalMilliseconds == 0 || _isAnimationDurationReached) //the default duration is Automatic, which currently has a TimeSpan of 0 ms (which is considered here to be no timespan).
+            if (_isAnimationDurationReached) //the default duration is Automatic, which currently has a TimeSpan of 0 ms (which is considered here to be no timespan).
             {
                 --remainingIterations;
-
                 if (remainingIterations <= 0)
                 {
                     if (this is Storyboard)
@@ -574,7 +585,6 @@ namespace Windows.UI.Xaml.Media.Animation
                     }
 
                     INTERNAL_RaiseCompletedEvent();
-                    _isAnimationDurationReached = false; //for the next time.
                 }
                 else
                 {
@@ -587,11 +597,6 @@ namespace Windows.UI.Xaml.Media.Animation
                         Stop(parameters.Target, revertToFormerValue: true);
                     }
 
-                    if (Duration.HasTimeSpan && Duration.TimeSpan.TotalMilliseconds > 0)
-                    {
-                        _isAnimationDurationReached = false;
-                        _animationTimer.Start();
-                    }
                     IterateOnce(parameters, isLastLoop: remainingIterations == 1);
                 }
             }
@@ -605,10 +610,32 @@ namespace Windows.UI.Xaml.Media.Animation
             _isAnimationDurationReached = true;
             OnIterationCompleted(_parameters);
         }
+
+        /// <summary>
+        /// Implemented by the class author to provide a custom natural Duration
+        /// in the case that the Duration property is set to Automatic.  If the author
+        /// cannot determine the Duration, this method should return Automatic.
+        /// </summary>
+        /// <returns>
+        /// A Duration quantity representing the natural duration.
+        /// </returns>
+        private void ComputeDuration()
+        {
+            if (Duration == Duration.Automatic)
+            {
+                Duration = GetNaturalDurationCore();
+            }
+        }
+
+        protected virtual Duration GetNaturalDurationCore()
+        {
+            return Duration.Automatic;
+        }
 #if WORKINPROGRESS
+
         #region Not supported yet
 
-        public static readonly DependencyProperty SpeedRatioProperty = DependencyProperty.Register("SpeedRatio", typeof(double), typeof(Timeline), null);
+        public static readonly DependencyProperty SpeedRatioProperty = DependencyProperty.Register("SpeedRatio", typeof(double), typeof(Timeline), new PropertyMetadata(1d));
 
         public double SpeedRatio
         {

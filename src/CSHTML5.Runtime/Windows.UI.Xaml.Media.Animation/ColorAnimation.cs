@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Animates the value of a Color property between two target values using linear
     /// interpolation over a specified Duration.
     /// </summary>
-    public sealed class ColorAnimation : Timeline
+    public sealed class ColorAnimation : AnimationTimeline
     {
         ///// <summary>
         ///// Initializes a new instance of the ColorAnimation class.

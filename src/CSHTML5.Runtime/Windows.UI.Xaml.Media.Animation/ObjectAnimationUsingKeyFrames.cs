@@ -42,38 +42,91 @@ namespace Windows.UI.Xaml.Media.Animation
     /// specified Duration.
     /// </summary>
     [ContentProperty("KeyFrames")]
-    public sealed class ObjectAnimationUsingKeyFrames : Timeline
+    public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline
     {
-        Dictionary<ObjectKeyFrame, DispatcherTimer> _keyFramesToObjectTimers = new Dictionary<ObjectKeyFrame,DispatcherTimer>();
-        ///// <summary>
-        ///// Initializes a new instance of the ObjectAnimationUsingKeyFrames class.
-        ///// </summary>
-        //public ObjectAnimationUsingKeyFrames();
+        private DependencyProperty _dp;
+        private PropertyPath _targetProperty;
+        private DependencyObject _target;
+        private IterationParameters _parameters;
 
-        //// Returns:
-        ////     True if the animation can be used for a dependent animation case. False if
-        ////     the animation cannot be used for a dependent animation case.
-        ///// <summary>
-        ///// Gets or sets a value that declares whether animated properties that are considered
-        ///// dependent animations should be permitted to use this animation declaration.
-        ///// </summary>
-        //public bool EnableDependentAnimation { get; set; }
-        ///// <summary>
-        ///// Identifies the EnableDependentAnimation dependency property.
-        ///// </summary>
-        //public static DependencyProperty EnableDependentAnimationProperty { get; }
+        private ObjectKeyFrameCollection _keyFrames;
 
-        private ObjectKeyFrameCollection _keyFrames = new ObjectKeyFrameCollection();
-        // Returns:
-        //     The collection of ObjectKeyFrame objects that define the animation. The default
-        //     is an empty collection.
+        private int _appliedKeyFramesCount;
+
+        private INTERNAL_ResolvedKeyFramesEntries<ObjectKeyFrame> _resolvedKeyFrames;
+
+        Dictionary<ObjectKeyFrame, NullableTimer> _keyFramesToObjectTimers;
+
+        /// The collection of ObjectKeyFrame objects that define the animation. The default
+        /// is an empty collection.
         /// <summary>
         /// Gets the collection of ObjectKeyFrame objects that define the animation.
         /// </summary>
-        public ObjectKeyFrameCollection KeyFrames { get { return _keyFrames; } }
-
-        internal override void Apply(IterationParameters parameters, bool isLastLoop) //Note: visualStateGroupName is useless here. Its point is to allow the definition of queues in velocity so that we can stop the animations before they are finished
+        public ObjectKeyFrameCollection KeyFrames
         {
+            get
+            {
+                if (_keyFrames == null)
+                {
+                    _keyFrames = new ObjectKeyFrameCollection();
+                }
+                return _keyFrames;
+            }
+        }
+
+        /// <summary>
+        /// Returns the largest time span specified key time from all of the key frames.
+        /// If there are not time span key times a time span of one second is returned
+        /// to match the default natural duration of the From/To/By animations.
+        /// </summary>
+        private TimeSpan LargestTimeSpanKeyTime
+        {
+            get
+            {
+                if (_keyFrames == null || _keyFrames.Count == 0)
+                {
+                    return TimeSpan.FromTicks(0);
+                }
+                if (_resolvedKeyFrames != null)
+                {
+                    return _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)].KeyTime.TimeSpan;
+                }
+                else
+                {
+                    throw new Exception("DoubleAnimationUsingKeyFrames has not been setup yet.");
+                }
+            }
+        }
+
+        private void InitializeKeyFramesSet()
+        {
+            _resolvedKeyFrames = new INTERNAL_ResolvedKeyFramesEntries<ObjectKeyFrame>(_keyFrames);
+            _keyFramesToObjectTimers = new Dictionary<ObjectKeyFrame, NullableTimer>();
+            for (int i = 0; i < KeyFrames.Count; i++)
+            {
+                int keyFrameIndex = _resolvedKeyFrames.GetNextKeyFrameIndex(i);
+                ObjectKeyFrame keyFrame = KeyFrames[keyFrameIndex];
+                NullableTimer timer = new NullableTimer(keyFrame.KeyTime.TimeSpan - (i > 0 ? KeyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(i - 1)].KeyTime.TimeSpan : TimeSpan.Zero));
+                timer.Completed -= ApplyNextKeyFrame;
+                timer.Completed += ApplyNextKeyFrame;
+                _keyFramesToObjectTimers.Add(keyFrame, timer);
+            }
+            _appliedKeyFramesCount = 0;
+        }
+
+        private void ApplyNextKeyFrame(object sender, EventArgs e)
+        {
+            ApplyKeyFrame(GetNextKeyFrame());
+            _appliedKeyFramesCount++;
+            if (!CheckTimeLineEndAndRaiseCompletedEvent(_parameters))
+            {
+                StartKeyFrame(GetNextKeyFrame());
+            }
+        }
+
+        private void BeforeApply(IterationParameters parameters, bool isLastLoop)
+        {
+            _parameters = parameters;
             DependencyObject target;
             PropertyPath propertyPath;
             DependencyObject targetBeforePath;
@@ -86,14 +139,13 @@ namespace Windows.UI.Xaml.Media.Animation
                 int? index = element.Item3;
                 if (depObject is ICloneOnAnimation)
                 {
-
                     if (!((ICloneOnAnimation)depObject).IsAlreadyAClone())
                     {
                         object clone = ((ICloneOnAnimation)depObject).Clone();
                         if (index != null)
                         {
 #if BRIDGE
-                            parentElement.GetType().GetProperty("Item").SetValue(parentElement, clone, new object[]{ index });
+                            parentElement.GetType().GetProperty("Item").SetValue(parentElement, clone, new object[] { index });
 #else
                             //JSIL does not support SetValue(object, object, object[])
 #endif
@@ -111,95 +163,105 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
             }
 
-
             GetTargetElementAndPropertyInfo(parameters.Target, out target, out propertyPath);
-            //DependencyObject lastElementBeforeProperty = propertyPath.INTERNAL_AccessPropertyContainer(target);
             DependencyProperty dp = GetProperty(target, propertyPath);
-            _expectedAmountOfKeyFrameEnds = KeyFrames.Count;
-            foreach (ObjectKeyFrame keyFrame in KeyFrames)
+
+            _dp = dp;
+            _target = target;
+            _targetProperty = propertyPath;
+        }
+
+        internal override void Apply(IterationParameters parameters, bool isLastLoop)
+        {
+            StartKeyFrame(GetNextKeyFrame());
+        }
+
+        private void StartKeyFrame(ObjectKeyFrame keyFrame)
+        {
+            if (keyFrame != null)
             {
-                if (keyFrame.KeyTime.TimeSpan.Ticks == 0)
-                {
-                    ApplyKeyFrame(target, parameters, propertyPath, dp.PropertyType, keyFrame, null);
-                }
-                else
-                {
-                    DispatcherTimer timer = new DispatcherTimer();
-                    timer.Interval = keyFrame.KeyTime.TimeSpan;
-                    timer.Tick += (sender, args) =>
-                    {
-                        ApplyKeyFrame(target, parameters, propertyPath, dp.PropertyType, keyFrame, timer);
-                    };
-                    _keyFramesToObjectTimers.Add(keyFrame, timer);
-                    timer.Start();
-                }
+                _keyFramesToObjectTimers[keyFrame].Start();
             }
         }
 
-
-        private void ApplyKeyFrame(DependencyObject target, IterationParameters parameters, PropertyPath propertyPath, Type propertyType, ObjectKeyFrame keyFrame, DispatcherTimer timer)
+        private void ApplyKeyFrame(ObjectKeyFrame keyFrame)
         {
-            if (timer != null)
-            {
-                timer.Stop();
-            }
-            _keyFramesToObjectTimers.Remove(keyFrame);
             object value = keyFrame.Value;
-            if (value is string && propertyType != typeof(string))
+            if (value is string && _dp.PropertyType != typeof(string))
             {
-                if (propertyType.IsEnum)
+                if (_dp.PropertyType.IsEnum)
                 {
-                    value = Enum.Parse(propertyType, (string)value);
+                    value = Enum.Parse(_dp.PropertyType, (string)value);
                 }
                 else
                 {
-                    //we convert the value from the given string:
-                    value = DotNetForHtml5.Core.TypeFromStringConverters.ConvertFromInvariantString(propertyType, (string)value);
+                    value = DotNetForHtml5.Core.TypeFromStringConverters.ConvertFromInvariantString(_dp.PropertyType, (string)value);
                 }
             }
 
-            var castedValue = DynamicCast(value, propertyType); //Note: we put this line here because the Xaml could use a Color gotten from a StaticResource (which was therefore not converted to a SolidColorbrush by the compiler in the .g.cs file) and led to a wrong type set in a property (Color value in a property of type Brush).
+            object castedValue = DynamicCast(value, _dp.PropertyType);
 
-            if (parameters.IsVisualStateChange)
+            if (_parameters.IsVisualStateChange)
             {
-                propertyPath.INTERNAL_PropertySetVisualState(target, castedValue);
+                _targetProperty.INTERNAL_PropertySetVisualState(_target, castedValue);
             }
             else
             {
-                propertyPath.INTERNAL_PropertySetLocalValue(target, castedValue);
+                _targetProperty.INTERNAL_PropertySetLocalValue(_target, castedValue);
             }
-
-            CheckTimeLineEndAndRaiseCompletedEvent(parameters);
-
-            //----------------------------------------
-            //todo:clone required ?
-            //----------------------------------------
         }
 
+        private ObjectKeyFrame GetNextKeyFrame()
+        {
+            int nextKeyFrameIndex = _resolvedKeyFrames.GetNextKeyFrameIndex(_appliedKeyFramesCount);
+            if (nextKeyFrameIndex == -1)
+            {
+                return null;
+            }
+            else
+            {
+                return _keyFrames[nextKeyFrameIndex];
+            }
+        }
 
+        private void ApplyLastKeyFrame(object sender, EventArgs e)
+        {
+            ObjectKeyFrame lastKeyFrame = _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)];
+            ApplyKeyFrame(lastKeyFrame);
+        }
 
         internal override void Stop(FrameworkElement frameworkElement, string groupName, bool revertToFormerValue = false) //frameworkElement is for the animations requiring the use of GetCssEquivalent
         {
             base.Stop(frameworkElement, groupName, revertToFormerValue);
-
-
-            foreach (ObjectKeyFrame keyFrame in _keyFramesToObjectTimers.Keys)
+            StopAllTimers();
+            if(_keyFramesToObjectTimers != null)
             {
-                _keyFramesToObjectTimers[keyFrame].Stop();
+                _keyFramesToObjectTimers.Clear();
             }
-            _keyFramesToObjectTimers.Clear();
+        }
+
+        private void StopAllTimers()
+        {
+            if (_keyFramesToObjectTimers != null)
+            {
+                if (_keyFramesToObjectTimers.Values != null)
+                {
+                    foreach (var frameTimers in _keyFramesToObjectTimers.Values)
+                    {
+                        frameTimers.Stop();
+                    }
+                }
+            }
         }
 
 
-        private int _expectedAmountOfKeyFrameEnds = 0;
         object thisLock = new object();
-        internal void CheckTimeLineEndAndRaiseCompletedEvent(IterationParameters parameters)
+        internal bool CheckTimeLineEndAndRaiseCompletedEvent(IterationParameters parameters)
         {
             bool raiseEvent = false;
             lock (thisLock)
             {
-                --_expectedAmountOfKeyFrameEnds;
-                if (_expectedAmountOfKeyFrameEnds <= 0)
+                if (_appliedKeyFramesCount >= _keyFrames.Count)
                 {
                     raiseEvent = true;
                 }
@@ -208,13 +270,95 @@ namespace Windows.UI.Xaml.Media.Animation
             {
                 OnIterationCompleted(parameters);
             }
+            return raiseEvent;
         }
-
 
         internal override void IterateOnce(IterationParameters parameters, bool isLastLoop)
         {
+            this.Completed -= ApplyLastKeyFrame;
+            this.Completed += ApplyLastKeyFrame;
+            StopAllTimers();
+            BeforeApply(parameters, isLastLoop);
+            InitializeKeyFramesSet();
             base.IterateOnce(parameters, isLastLoop);
             Apply(parameters, isLastLoop);
         }
+
+        protected override Duration GetNaturalDurationCore()
+        {
+            return new Duration(LargestTimeSpanKeyTime);
+        }
+
+        #region Provide a Timer that can be null
+        private class NullableTimer
+        {
+            private bool HasTimer
+            {
+                get
+                {
+                    return _timer != null;
+                }
+            }
+
+            private DispatcherTimer _timer;
+
+            internal event EventHandler Completed;
+ 
+            internal NullableTimer(TimeSpan interval)
+            {
+                if(interval > TimeSpan.Zero)
+                {
+                    _timer = new DispatcherTimer()
+                    {
+                        Interval = interval,
+                    };
+                    _timer.Tick -= Timer_Tick;
+                    _timer.Tick += Timer_Tick;
+                }
+                else
+                {
+                    _timer = null;
+                }
+            }
+
+#if MIGRATION
+            private void Timer_Tick(object sender, EventArgs e)
+#else
+            private void Timer_Tick(object sender, object e)
+#endif
+            {
+                INTERNAL_RaiseCompletedEvent();
+                Stop();
+            }
+
+            private void INTERNAL_RaiseCompletedEvent()
+            {
+                if (Completed != null)
+                    Completed(this, new EventArgs());
+            }
+
+            internal void Start()
+            {
+                if (HasTimer)
+                {
+                    _timer.Start();
+                }
+                else
+                {
+                    INTERNAL_RaiseCompletedEvent();
+                }
+            }
+
+            internal void Stop()
+            {
+                if (HasTimer)
+                {
+                    _timer.Stop();
+                }
+            }
+        }
+#endregion
     }
+
+    
 }

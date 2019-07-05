@@ -71,16 +71,27 @@ namespace Windows.UI.Xaml.Media
                 }
             });
 
+        private void ApplyCSSChanges(RotateTransform rotateTransform, double angle)
+        {
+            CSSEquivalent anglecssEquivalent = AngleProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(rotateTransform);
+            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(anglecssEquivalent.DomElement, anglecssEquivalent.Name, anglecssEquivalent.Value(rotateTransform, angle));
+        }
+
+        internal override void INTERNAL_ApplyCSSChanges()
+        {
+            ApplyCSSChanges(this, this.Angle);
+        }
+
+        internal override void INTERNAL_UnapplyCSSChanges()
+        {
+            ApplyCSSChanges(this, 0);
+        }
+
         void ApplyRotateTransform(double angle)
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-                object parentDom = this.INTERNAL_parent.INTERNAL_OuterDomElement;
-                CSSEquivalent anglecssEquivalent = AngleProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(this);
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(anglecssEquivalent.DomElement, anglecssEquivalent.Name, anglecssEquivalent.Value(this, angle));
-
-
-
+                ApplyCSSChanges(this, angle);
 
                 //dynamic domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this.INTERNAL_parent);
 
@@ -125,9 +136,7 @@ namespace Windows.UI.Xaml.Media
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-                object parentDom = this.INTERNAL_parent.INTERNAL_OuterDomElement;
-                CSSEquivalent anglecssEquivalent = AngleProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(this);
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(anglecssEquivalent.DomElement, anglecssEquivalent.Name, anglecssEquivalent.Value(this, 0));
+                INTERNAL_UnapplyCSSChanges();
             }
         }
 
@@ -136,7 +145,7 @@ namespace Windows.UI.Xaml.Media
             throw new NotImplementedException("Please contact support@cshtml5.com");
         }
 #if WORKINPROGRESS
-        #region Not supported yet
+#region Not supported yet
 
         /// <summary>
         ///     CenterX - double.  Default value is 0.0.
@@ -153,7 +162,7 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        public static readonly DependencyProperty CenterXProperty = DependencyProperty.Register("CenterX", typeof(double), typeof(RotateTransform), null);
+        public static readonly DependencyProperty CenterXProperty = DependencyProperty.Register("CenterX", typeof(double), typeof(RotateTransform), new PropertyMetadata(null));
 
         /// <summary>
         ///     CenterY - double.  Default value is 0.0.
@@ -170,10 +179,10 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        public static readonly DependencyProperty CenterYProperty = DependencyProperty.Register("CenterY", typeof(double), typeof(RotateTransform), null);
+        public static readonly DependencyProperty CenterYProperty = DependencyProperty.Register("CenterY", typeof(double), typeof(RotateTransform), new PropertyMetadata(null));
 
 
-        #endregion
+#endregion
 #endif
     }
 }
