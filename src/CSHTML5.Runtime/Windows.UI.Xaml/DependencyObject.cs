@@ -149,6 +149,26 @@ namespace Windows.UI.Xaml
             INTERNAL_PropertyStore.SetVisualStateValue(storage, value);
         }
 
+#if WORKINPROGRESS
+        public void SetAnimationValue(DependencyProperty dependencyProperty, object value)
+        {
+            if (dependencyProperty == null)
+                throw new ArgumentNullException("No property specified");
+
+            var storage = INTERNAL_PropertyStore.GetStorage(this, dependencyProperty, createAndSaveNewStorageIfNotExists: true);
+            INTERNAL_PropertyStore.SetAnimationValue(storage, value);
+        }
+
+        public object GetAnimationValue(DependencyProperty dependencyProperty)
+        {
+            if (dependencyProperty == null)
+                throw new ArgumentNullException("No property specified");
+
+            var storage = INTERNAL_PropertyStore.GetStorage(this, dependencyProperty, createAndSaveNewStorageIfNotExists: true);
+            return INTERNAL_PropertyStore.GetValue(storage);
+        }
+#endif
+
         /// <summary>
         /// Sets the local value of a dependency property on a DependencyObject.
         /// </summary>
