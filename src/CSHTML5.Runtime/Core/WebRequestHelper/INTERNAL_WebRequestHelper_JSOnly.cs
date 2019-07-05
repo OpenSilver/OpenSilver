@@ -151,7 +151,11 @@ namespace System
                 int currentStatus = GetCurrentStatus((object)_xmlHttpRequest);
                 if (currentReadyState == 4 && currentStatus == 0) //we could replace that "if" with a method since it is used in SetEventArgs.
                 {
-                    throw new Exception("An error occured. Please make sure that the target Url is available.");
+#if BRIDGE
+                    throw new System.ServiceModel.CommunicationException("An error occured. Please make sure that the target URL is available: " + _address.ToString());
+#else
+                    throw new Exception("An error occured. Please make sure that the target URL is available: " + _address.ToString());
+#endif
                 }
             }
 

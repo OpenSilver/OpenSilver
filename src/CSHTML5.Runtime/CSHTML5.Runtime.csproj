@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
     <Compile Include="System.Resources\ResourceManager.cs" />
+    <Compile Include="System.ServiceModel\CommunicationException.cs" />
     <Compile Include="System.Xml.Linq\XObject.cs" />
     <Compile Include="ToBeReviewed\GroupedEnumerable.cs" />
     <Compile Include="ToBeReviewed\Grouping.cs" />
