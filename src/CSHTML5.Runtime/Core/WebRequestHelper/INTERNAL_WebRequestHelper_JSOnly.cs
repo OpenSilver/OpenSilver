@@ -135,13 +135,28 @@ namespace System
                 SendRequest((object)_xmlHttpRequest, address.OriginalString, Method, isAsync, body);
             }
 
+            string result = GetResult((object)_xmlHttpRequest);
+
             if (GetHasError((object)_xmlHttpRequest))
             {
-                throw new Exception("The remote server has returned an error: (" + GetCurrentStatus((object)_xmlHttpRequest) + ") " + GetCurrentStatusText((object)_xmlHttpRequest) + ".");
+                if (result.IndexOf(":Fault>") == -1) // We make a special case to not consider FaultExceptions as a server Internal error. The error will be handled later in CSHTML5_ClientBase.WebMethodsCaller.ReadAndPrepareResponse
+                {
+                    throw new Exception("The remote server has returned an error: (" + GetCurrentStatus((object)_xmlHttpRequest) + ") " + GetCurrentStatusText((object)_xmlHttpRequest) + ".");
+                }
+            }
+            else
+            {
+                //we check whether the server could be found at all. It is not definite that readyState = 4 and status = 0 means that the server could not be found but that's the only example I have met so far and we're a bit poor on informations anyway.
+                int currentReadyState = GetCurrentReadyState((object)_xmlHttpRequest);
+                int currentStatus = GetCurrentStatus((object)_xmlHttpRequest);
+                if (currentReadyState == 4 && currentStatus == 0) //we could replace that "if" with a method since it is used in SetEventArgs.
+                {
+                    throw new Exception("An error occured. Please make sure that the target Url is available.");
+                }
             }
 
             //get the response:
-            return GetResult((object)_xmlHttpRequest);
+            return result;
         }
 
         // special version of sendRequest, it handles some errors and modifies the credentials mode if needed
@@ -265,13 +280,13 @@ namespace System
 #if !BRIDGE
         [JSIL.Meta.JSReplacement("$xmlHttpRequest.onload = $OnDownloadStatusCompleted")]
 #else
-        [Template("{xmlHttpRequest}.onload = {OnDownloadStatusCompleted}")]
+        [Template("{xmlHttpRequest}.onloadend = {OnDownloadStatusCompleted}")] // Note: we  register to the loadend event instead of the load event because the load event is only fired when the request is SUCCESSFULLY completed, while the loadend is triggered after errors and abortions as well. This allows us to handle the error cases in the callback of asynchronous calls.
 #endif
 
         internal static void SetCallbackMethod(object xmlHttpRequest, Action OnDownloadStatusCompleted)
         {
 #if BRIDGE
-            Interop.ExecuteJavaScript("$0.onload = $1", xmlHttpRequest, OnDownloadStatusCompleted);
+            Interop.ExecuteJavaScript("$0.onloadend = $1", xmlHttpRequest, OnDownloadStatusCompleted);
 #endif
         }
 
@@ -363,6 +378,10 @@ namespace System
             else if (currentReadyState == 1 && !e.Cancelled)
             {
                 e.Error = new Exception("An Error occured. Cross-Site Http Request might not be allowed at the target Url. If you own the domain of the Url, consider adding the header \"Access-Control-Allow-Origin\" to enable requests to be done at this Url.");
+            }
+            else if (currentReadyState ==  4 && currentStatus == 0)
+            {
+                e.Error = new Exception("An error occured. Please make sure that the target Url is available.");
             }
             else if (currentReadyState != 4)
             {

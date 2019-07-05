@@ -142,8 +142,14 @@ endOperationDelegate, operationCompletedCallback);
             AsyncOperationContext context = (AsyncOperationContext)((System.ServiceModel.INTERNAL_WebMethodsCaller.WebMethodAsyncResult)result).AsyncState;
             Exception error = null;
             object[] results = null; //todo: fix type?
-            results = context.EndDelegate(result);
-            //todo: fill "error" if error
+            try
+            {
+                results = context.EndDelegate(result);
+            }
+            catch (Exception e)
+            {
+                error = e;
+            }
             CompleteAsyncCall(context, results, error);
         }
 
@@ -870,16 +876,30 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
             private void ReadAndPrepareResponseGeneric<T>(TaskCompletionSource<T> taskCompletionSource, UploadStringCompletedEventArgs e, Type interfaceType, Type requestResponseType, bool isXmlSerializerRatherThanDataContractSerializer)
             {
-                T requestResponse = (T)ReadAndPrepareResponse(e.Result, interfaceType, requestResponseType, faultException => taskCompletionSource.TrySetException(faultException), isXmlSerializerRatherThanDataContractSerializer);
-                //if (requestResponse != null)
-                taskCompletionSource.SetResult(requestResponse);
+                if (e.Error == null)
+                {
+                    T requestResponse = (T)ReadAndPrepareResponse(e.Result, interfaceType, requestResponseType, faultException => taskCompletionSource.TrySetException(faultException), isXmlSerializerRatherThanDataContractSerializer);
+                    if (!taskCompletionSource.Task.IsCompleted) //Note: this Task.IsCompleted can be true if we met an exception which triggered a call to TrySetException (above).
+                        taskCompletionSource.SetResult(requestResponse);
+                }
+                else
+                {
+                    taskCompletionSource.TrySetException(e.Error);
+                }
             }
 
             private void ReadAndPrepareResponseGeneric_JSVersion<T>(TaskCompletionSource<T> taskCompletionSource, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs e, Type interfaceType, Type requestResponseType, bool isXmlSerializerRatherThanDataContractSerializer)
             {
-                T requestResponse = (T)ReadAndPrepareResponse(e.Result, interfaceType, requestResponseType, faultException => taskCompletionSource.TrySetException(faultException), isXmlSerializerRatherThanDataContractSerializer);
-                //if (requestResponse != null)
-                taskCompletionSource.SetResult(requestResponse);
+                if (e.Error == null)
+                {
+                    T requestResponse = (T)ReadAndPrepareResponse(e.Result, interfaceType, requestResponseType, faultException => taskCompletionSource.TrySetException(faultException), isXmlSerializerRatherThanDataContractSerializer);
+                    if (!taskCompletionSource.Task.IsCompleted) //Note: this Task.IsCompleted can be true if we met an exception which triggered a call to TrySetException (above).
+                        taskCompletionSource.SetResult(requestResponse);
+                }
+                else
+                {
+                    taskCompletionSource.TrySetException(e.Error);
+                }
             }
 
             private object ReadAndPrepareResponse(string responseAsString, Type interfaceType, Type requestResponseType, Action<FaultException> raiseFaultException, bool isXmlSerializerRatherThanDataContractSerializer)
