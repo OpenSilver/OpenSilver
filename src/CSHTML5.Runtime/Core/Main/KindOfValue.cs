@@ -25,7 +25,6 @@ using System.Threading.Tasks;
 
 namespace CSHTML5.Internal
 {
-#if WORKINPROGRESS
     internal enum KindOfValue
     {
         Coerced = 0,
@@ -36,15 +35,4 @@ namespace CSHTML5.Internal
         ImplicitStyle = 5,
         Inherited = 6
     }
-#else
-    internal enum KindOfValue
-    {
-        Coerced = 0,
-        VisualState = 1,
-        Local = 2,
-        LocalStyle = 3,
-        ImplicitStyle = 4,
-        Inherited = 5
-    }
-#endif
 }
