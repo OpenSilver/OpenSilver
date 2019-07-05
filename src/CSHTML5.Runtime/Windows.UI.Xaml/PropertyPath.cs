@@ -62,9 +62,7 @@ namespace Windows.UI.Xaml
             INTERNAL_DependencyPropertyName = dependencyProperty.Name;
             INTERNAL_AccessPropertyContainer = defaulAccessVisualStateProperty;
             INTERNAL_PropertySetVisualState = defaultSetVisualStateProperty;
-#if WORKINPROGRESS
             INTERNAL_PropertySetAnimationValue = defaultSetAnimationVisualStateProperty;
-#endif
             INTERNAL_PropertySetLocalValue = defaultSetLocalVisualStateProperty;
             INTERNAL_PropertyGetVisualState = defaultGetVisualStateProperty;
         }
@@ -87,7 +85,6 @@ namespace Windows.UI.Xaml
             }
         }
 
-#if WORKINPROGRESS
         public void defaultSetAnimationVisualStateProperty(DependencyObject finalTargetInstance, object value)
         {
             if (INTERNAL_IsDirectlyDependencyPropertyPath)
@@ -99,7 +96,6 @@ namespace Windows.UI.Xaml
                 throw new InvalidOperationException("The constructor: PropertyPath(string path) for storyboards is not supported yet. Please use PropertyPath(DependencyProperty dependencyProperty) or define your storyboard in the XAML.");
             }
         }
-#endif
 
         public void defaultSetLocalVisualStateProperty(DependencyObject finalTargetInstance, object value)
         {
@@ -139,9 +135,7 @@ namespace Windows.UI.Xaml
         /// <ignore/>
         public PropertyPath(string path, string dependencyPropertyName, Func<DependencyObject, IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>>> accessPropertyContainer,
             Action<DependencyObject, Object> propertySetVisualState,
-#if WORKINPROGRESS
             Action<DependencyObject, Object> propertySetAnimationValue,
-#endif
             Action<DependencyObject, Object> propertySetLocalValue,
             Func<DependencyObject, Object> propertyGetVisualState)
         {
@@ -149,9 +143,7 @@ namespace Windows.UI.Xaml
             INTERNAL_DependencyPropertyName = dependencyPropertyName;
             INTERNAL_AccessPropertyContainer = accessPropertyContainer;
             INTERNAL_PropertySetVisualState = propertySetVisualState;
-#if WORKINPROGRESS
             INTERNAL_PropertySetAnimationValue = propertySetAnimationValue;
-#endif
             INTERNAL_PropertySetLocalValue = propertySetLocalValue;
             INTERNAL_PropertyGetVisualState = propertyGetVisualState;
         }
@@ -168,13 +160,11 @@ namespace Windows.UI.Xaml
         /// </summary>
         /// <ignore/>
         internal Action<DependencyObject, Object> INTERNAL_PropertySetVisualState;
-#if WORKINPROGRESS
         /// <summary>
         /// Sets the Animation value (value is second parameter) of the previously defined property on the DependencyObject (first parameter).
         /// </summary>
         /// <ignore/>
         internal Action<DependencyObject, Object> INTERNAL_PropertySetAnimationValue;
-#endif
         /// <summary>
         /// Sets the Local value (value is second parameter) of the previously defined property on the DependencyObject (first parameter).
         /// </summary>
