@@ -64,11 +64,7 @@ namespace Windows.UI.Xaml.Controls
 
         public DataPager()
         {
-#if WORKINPROGRESS
             this.DefaultStyleKey = typeof(DataPager);
-#else
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultDataPagerStyle.GetDefaultStyle());
-#endif
         }
 
 #region DisplayMode

@@ -56,11 +56,7 @@ namespace Windows.UI.Xaml.Controls
             //DefaultStyleKey = typeof(TabControl);
 
             // Set default style:
-#if WORKINPROGRESS
             this.DefaultStyleKey = typeof(TabControl);
-#else
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultTabControlStyle.GetDefaultStyle());
-#endif
         }
 
         /// <summary>

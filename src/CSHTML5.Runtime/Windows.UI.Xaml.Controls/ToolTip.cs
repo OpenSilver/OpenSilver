@@ -57,11 +57,7 @@ namespace Windows.UI.Xaml.Controls
         public ToolTip()
         {
             // Set default style:
-#if WORKINPROGRESS
             this.DefaultStyleKey = typeof(ToolTip);
-#else
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultToolTipStyle.GetDefaultStyle());
-#endif
         }
 
         /// <summary>

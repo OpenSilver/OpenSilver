@@ -57,11 +57,7 @@ namespace Windows.UI.Xaml.Controls
         public AutoCompleteBox()
         {
             // Set default style: //todo-perfs: verify that this technique does not result in duplicate calls to the setters of the style in case the user then specifies a different style.
-#if WORKINPROGRESS
             this.DefaultStyleKey = typeof(AutoCompleteBox);
-#else
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultAutoCompleteBoxStyle.GetDefaultStyle());
-#endif
 
             //MinimumDelay is a property that set the time before opening the PopUp, so we listen to the Tick event
             _timer.Tick += _timer_Tick;

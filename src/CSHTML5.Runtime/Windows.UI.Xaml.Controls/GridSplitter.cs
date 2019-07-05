@@ -216,11 +216,7 @@ namespace Windows.UI.Xaml.Controls
             DefaultStyleKey = typeof(GridSplitter);
 #else
             // Set default style:
-#if WORKINPROGRESS
             this.DefaultStyleKey = typeof(GridSplitter);
-#else
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultGridSplitterStyle.GetDefaultStyle());
-#endif
 #endif
         }
 

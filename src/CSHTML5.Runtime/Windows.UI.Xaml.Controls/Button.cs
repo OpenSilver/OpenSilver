@@ -55,11 +55,7 @@ namespace Windows.UI.Xaml.Controls
     {
         public Button()
         {
-#if WORKINPROGRESS
             this.DefaultStyleKey = typeof(Button);
-#else
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultButtonStyle.GetDefaultStyle());
-#endif
         }
     }
 }

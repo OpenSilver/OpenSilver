@@ -65,11 +65,7 @@ namespace Windows.UI.Xaml.Controls
         public HyperlinkButton()
         {
             // Set default style:
-#if WORKINPROGRESS
             this.DefaultStyleKey = typeof(HyperlinkButton);
-#else
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultHyperlinkButtonStyle.GetDefaultStyle());
-#endif
 
             Click += HyperlinkButton_Click;
         }

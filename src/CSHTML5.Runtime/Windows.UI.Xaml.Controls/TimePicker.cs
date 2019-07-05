@@ -52,11 +52,7 @@ namespace Windows.UI.Xaml.Controls
             _defaultText = ""; // the text displayed when no time is selected
 
             // Set default style:
-#if WORKINPROGRESS
             this.DefaultStyleKey = typeof(TimePicker);
-#else
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultTimePickerStyle.GetDefaultStyle());
-#endif
         }
 
         protected override INTERNAL_CalendarOrClockBase GenerateCalendarOrClock()

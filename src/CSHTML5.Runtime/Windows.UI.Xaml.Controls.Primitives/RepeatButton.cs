@@ -52,11 +52,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             : base()
         {
             // Set default style:
-#if WORKINPROGRESS
             this.DefaultStyleKey = typeof(RepeatButton);
-#else
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultButtonStyle.GetDefaultStyle());
-#endif
 
 #if UNCOMMENT_WHEN_CLICKMODE_HOVER_WILL_BE_IMPLEMENTED
 

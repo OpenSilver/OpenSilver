@@ -47,11 +47,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         public Thumb()
         {
             // Set default style:
-#if WORKINPROGRESS
             this.DefaultStyleKey = typeof(Thumb);
-#else
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultThumbStyle.GetDefaultStyle());
-#endif
 
             // Register the pointer events of the current control:
 #if MIGRATION

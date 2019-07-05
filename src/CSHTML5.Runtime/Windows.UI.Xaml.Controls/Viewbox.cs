@@ -52,11 +52,7 @@ namespace Windows.UI.Xaml.Controls
         public Viewbox()
         {
             // Set default style:
-#if WORKINPROGRESS
             this.DefaultStyleKey = typeof(Viewbox);
-#else
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultViewboxStyle.GetDefaultStyle());
-#endif
 
             this.Loaded += OnLoaded;
             this.SizeChanged += OnSizeChanged;

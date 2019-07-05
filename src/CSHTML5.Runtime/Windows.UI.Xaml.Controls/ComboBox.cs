@@ -103,11 +103,7 @@ namespace Windows.UI.Xaml.Controls
                 if (!_useNativeComboBox && this.Style == null)
                 {
                     //todo-perfs:
-#if WORKINPROGRESS
                     this.DefaultStyleKey = typeof(ComboBox);
-#else
-                    this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultComboBoxStyle.GetDefaultStyle());
-#endif
                 }
 
                 base._workaroundForComboBox = _useNativeComboBox; //todo: avoid using this workaround.

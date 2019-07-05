@@ -61,11 +61,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         protected virtual void SetDefaultStyle() // Overridden in CheckBox and RadioButton
         {
             // Set default style:
-#if WORKINPROGRESS
             this.DefaultStyleKey = typeof(ToggleButton);
-#else
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultToggleButtonStyle.GetDefaultStyle());
-#endif
         }
 
         /// <summary>

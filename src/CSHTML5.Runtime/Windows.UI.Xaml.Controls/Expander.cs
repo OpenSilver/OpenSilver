@@ -50,11 +50,7 @@ namespace Windows.UI.Xaml.Controls
             //Interaction = new InteractionHelper(this);
 
             // Set default style:
-#if WORKINPROGRESS
             this.DefaultStyleKey = typeof(Expander);
-#else
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultExpanderStyle.GetDefaultStyle());
-#endif
         }
 
 
