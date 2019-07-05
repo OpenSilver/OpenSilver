@@ -62,6 +62,7 @@ namespace Windows.UI.Xaml
             INTERNAL_DependencyPropertyName = dependencyProperty.Name;
             INTERNAL_AccessPropertyContainer = defaulAccessVisualStateProperty;
             INTERNAL_PropertySetVisualState = defaultSetVisualStateProperty;
+            INTERNAL_PropertySetAnimationValue = defaultSetAnimationVisualStateProperty;
             INTERNAL_PropertySetLocalValue = defaultSetLocalVisualStateProperty;
             INTERNAL_PropertyGetVisualState = defaultGetVisualStateProperty;
         }
@@ -77,6 +78,18 @@ namespace Windows.UI.Xaml
             if (INTERNAL_IsDirectlyDependencyPropertyPath)
             {
                 (finalTargetInstance).SetVisualStateValue(INTERNAL_DependencyProperty, value);
+            }
+            else
+            {
+                throw new InvalidOperationException("The constructor: PropertyPath(string path) for storyboards is not supported yet. Please use PropertyPath(DependencyProperty dependencyProperty) or define your storyboard in the XAML.");
+            }
+        }
+
+        public void defaultSetAnimationVisualStateProperty(DependencyObject finalTargetInstance, object value)
+        {
+            if (INTERNAL_IsDirectlyDependencyPropertyPath)
+            {
+                (finalTargetInstance).SetAnimationValue(INTERNAL_DependencyProperty, value);
             }
             else
             {
@@ -112,14 +125,17 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Initializes a new Instance of the PropertyPath class based on methods to access the property from a DependencyObject.
         /// </summary>
+        /// <param name="path"></param>
         /// <param name="dependencyPropertyName">The name of the property (consists only of the last part of the path we would put in the XAML).</param>
         /// <param name="accessPropertyContainer">The function that will access the object on which the property is from the DependencyObject put in its parameters(corresponds to the path in XAML without the last property).</param>
         /// <param name="propertySetVisualState">The function that sets the VisualState value on the given element.</param>
+        /// <param name="propertySetAnimationValue"></param>
         /// <param name="propertySetLocalValue">The function that sets the Local value on the given element.</param>
         /// <param name="propertyGetVisualState">The function that gets the VisualState value on the given element.</param>
         /// <ignore/>
         public PropertyPath(string path, string dependencyPropertyName, Func<DependencyObject, IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>>> accessPropertyContainer,
             Action<DependencyObject, Object> propertySetVisualState,
+            Action<DependencyObject, Object> propertySetAnimationValue,
             Action<DependencyObject, Object> propertySetLocalValue,
             Func<DependencyObject, Object> propertyGetVisualState)
         {
@@ -127,6 +143,7 @@ namespace Windows.UI.Xaml
             INTERNAL_DependencyPropertyName = dependencyPropertyName;
             INTERNAL_AccessPropertyContainer = accessPropertyContainer;
             INTERNAL_PropertySetVisualState = propertySetVisualState;
+            INTERNAL_PropertySetAnimationValue = propertySetAnimationValue;
             INTERNAL_PropertySetLocalValue = propertySetLocalValue;
             INTERNAL_PropertyGetVisualState = propertyGetVisualState;
         }
@@ -143,6 +160,11 @@ namespace Windows.UI.Xaml
         /// </summary>
         /// <ignore/>
         internal Action<DependencyObject, Object> INTERNAL_PropertySetVisualState;
+        /// <summary>
+        /// Sets the Animation value (value is second parameter) of the previously defined property on the DependencyObject (first parameter).
+        /// </summary>
+        /// <ignore/>
+        internal Action<DependencyObject, Object> INTERNAL_PropertySetAnimationValue;
         /// <summary>
         /// Sets the Local value (value is second parameter) of the previously defined property on the DependencyObject (first parameter).
         /// </summary>

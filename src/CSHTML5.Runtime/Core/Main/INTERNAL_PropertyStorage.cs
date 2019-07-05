@@ -44,6 +44,7 @@ namespace CSHTML5.Internal
             }
             CoercedValue = INTERNAL_NoValue.NoValue;
             VisualStateValue = INTERNAL_NoValue.NoValue;
+            AnimationValue = INTERNAL_NoValue.NoValue;
             Local = INTERNAL_NoValue.NoValue;
             LocalStyleValue = INTERNAL_NoValue.NoValue;
             ImplicitStyleValue = INTERNAL_NoValue.NoValue;
@@ -56,6 +57,7 @@ namespace CSHTML5.Internal
         public object CoercedValue { get; set; }
         public object VisualStateValue { get; set; }
         public object Local { get; set; }
+        public object AnimationValue { get; set; }
         public object LocalStyleValue { get; set; }
         public object ImplicitStyleValue { get; set; }
         public object InheritedValue { get; set; }

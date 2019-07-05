@@ -200,6 +200,11 @@ namespace CSHTML5.Internal
             SetSpecificValue(storage, KindOfValue.VisualState, newValue, null);
         }
 
+        public static void SetAnimationValue(INTERNAL_PropertyStorage storage, object newValue)
+        {
+            SetSpecificValue(storage, KindOfValue.Animated, newValue, null);
+        }
+
         public static void SetLocalValue(INTERNAL_PropertyStorage storage, object newValue)
         {
             SetSpecificValue(storage, KindOfValue.Local, newValue, null);
@@ -253,6 +258,7 @@ namespace CSHTML5.Internal
             //todo: remove all comparisons with "null" to leave only the comparisons with "NoValue":
             if ((value = storage.CoercedValue) != INTERNAL_NoValue.NoValue) { }
             else if ((value = storage.VisualStateValue) != INTERNAL_NoValue.NoValue) { }
+            else if ((value = storage.AnimationValue) != INTERNAL_NoValue.NoValue) { }
             else if ((value = storage.Local) != INTERNAL_NoValue.NoValue) { }
             else if ((value = storage.LocalStyleValue) != INTERNAL_NoValue.NoValue) { }
             else if ((value = storage.ImplicitStyleValue) != INTERNAL_NoValue.NoValue) { }
@@ -292,6 +298,7 @@ namespace CSHTML5.Internal
 
             //todo: remove all comparisons with "null" to leave only the comparisons with "NoValue":
             if ((value = storage.VisualStateValue) != INTERNAL_NoValue.NoValue) { }
+            else if ((value = storage.AnimationValue) != INTERNAL_NoValue.NoValue) { }
             else if ((value = storage.Local) != INTERNAL_NoValue.NoValue) { }
             else if ((value = storage.LocalStyleValue) != INTERNAL_NoValue.NoValue) { }
             else if ((value = storage.ImplicitStyleValue) != INTERNAL_NoValue.NoValue) { }
@@ -316,6 +323,7 @@ namespace CSHTML5.Internal
             object value;
             //Note: in KindOfValue, the value attributed to the enum values corresponds to their priority rank so the lower, the more priority.
             if ((kind <= KindOfValue.VisualState || ((value = storage.VisualStateValue) == INTERNAL_NoValue.NoValue)) //means "kind has a higher priority tha VisualState or there is no VisualState value
+                && (kind <= KindOfValue.Animated || ((value = storage.AnimationValue) == INTERNAL_NoValue.NoValue))
                 && (kind <= KindOfValue.Local || ((value = storage.Local) == INTERNAL_NoValue.NoValue))
                 && (kind <= KindOfValue.LocalStyle || ((value = storage.LocalStyleValue) == INTERNAL_NoValue.NoValue))
                 && (kind <= KindOfValue.ImplicitStyle || ((value = storage.ImplicitStyleValue) == INTERNAL_NoValue.NoValue))
@@ -347,6 +355,10 @@ namespace CSHTML5.Internal
                 case KindOfValue.VisualState:
                     //oldValue = (storage.VisualStateValue == INTERNAL_NoValue.NoValue ? (typeMetadata != null ? typeMetadata.DefaultValue : null) : storage.VisualStateValue);
                     storage.VisualStateValue = newValue;
+                    break;
+                case KindOfValue.Animated:
+                    //oldValue = (storage.AnimationValue == INTERNAL_NoValue.NoValue ? (typeMetadata != null ? typeMetadata.DefaultValue : null) : storage.AnimationValue);
+                    storage.AnimationValue = newValue;
                     break;
                 case KindOfValue.Local:
                     //oldValue = (storage.Local == INTERNAL_NoValue.NoValue ? (typeMetadata != null ? typeMetadata.DefaultValue : null) : storage.Local);
