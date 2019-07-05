@@ -580,7 +580,7 @@ namespace Windows.UI.Xaml
             object newValue = e.NewValue;
             if (newValue != null)
             {
-                //Note: the resource shouldn't be defined in another assembly than that of the type since DefaultStyleKey is protected. (???)
+                // we start by looking for the generic.xaml file defined in the assembly where the control is defined.
                 Style newStyle = Application.Current.XamlResourcesHandler.TryFindResourceInGenericXaml(element.GetType().Assembly, newValue) as Style;
                 // if we don't find it in the element assembly then we try to find it in the assembly where newValue is defined (since newValue is supposed to be a Type)
                 if (newStyle == null)
