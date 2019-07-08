@@ -95,7 +95,7 @@ namespace CSHTML5.Internal
                     Local = value;
                     if(value == INTERNAL_NoValue.NoValue)
                     {
-                        ActiveValue = Animated == INTERNAL_NoValue.NoValue ? KindOfValue.Local : KindOfValue.Local;
+                        ActiveValue = Animated == INTERNAL_NoValue.NoValue ? KindOfValue.Local : KindOfValue.Animated;
                     }
                     else
                     {
