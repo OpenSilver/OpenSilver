@@ -134,7 +134,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     {
                         cssEquivalentExists = true;
                         StartAnimation(_propertyContainer, cssEquivalent, From, To, Duration, EasingFunction, specificGroupName,
-                        OnAnimationCompleted(parameters, isLastLoop, To.Value, _propertyContainer, _targetProperty));
+                        OnAnimationCompleted(parameters, isLastLoop, To.Value, _propertyContainer, _targetProperty, Guid.NewGuid()));
 
                     }
                 }
@@ -142,26 +142,32 @@ namespace Windows.UI.Xaml.Media.Animation
                 if (propertyMetadata.GetCSSEquivalents != null)
                 {
                     List<CSSEquivalent> cssEquivalents = propertyMetadata.GetCSSEquivalents(_propertyContainer);
+                    Guid guid = Guid.NewGuid();
                     foreach (CSSEquivalent equivalent in cssEquivalents)
                     {
                         cssEquivalentExists = true;
                         StartAnimation(_propertyContainer, equivalent, From, To, Duration, EasingFunction, specificGroupName,
-                        OnAnimationCompleted(parameters, isLastLoop, To.Value, _propertyContainer, _targetProperty));
+                        OnAnimationCompleted(parameters, isLastLoop, To.Value, _propertyContainer, _targetProperty, guid));
                     }
                 }
 
                 if (!cssEquivalentExists)
                 {
-                    OnAnimationCompleted(parameters, isLastLoop, To.Value, _propertyContainer, _targetProperty)();
+                    OnAnimationCompleted(parameters, isLastLoop, To.Value, _propertyContainer, _targetProperty, Guid.NewGuid())();
                 }
             }
         }
 
-        private Action OnAnimationCompleted(IterationParameters parameters, bool isLastLoop, object value, DependencyObject target, PropertyPath propertyPath)
+        // This guid is used to specifically target a particular call to the animation. It prevents the callback which should be called when velocity's animation end 
+        // to be called when the callback is called from a previous call to the animation. This could happen when the animation was started quickly multiples times in a row. 
+        private Guid _animationGuid;
+
+        private Action OnAnimationCompleted(IterationParameters parameters, bool isLastLoop, object value, DependencyObject target, PropertyPath propertyPath, Guid callBackGuid)
         {
+            _animationGuid = callBackGuid;
             return () =>
             {
-                if (isLastLoop && RectifyWhenAnimationEnds)
+                if (isLastLoop && RectifyWhenAnimationEnds && callBackGuid == _animationGuid)
                 {
                     AnimationHelpers.ApplyValue(target, propertyPath, value, parameters.IsVisualStateChange);
                 }
