@@ -53,6 +53,54 @@ namespace Windows.UI.Xaml.Media.Animation
                 return _keyFrames;
             }
         }
+
+
+        internal override void GetTargetInformation(IterationParameters parameters)
+        {
+            _parameters = parameters;
+            DependencyObject target;
+            PropertyPath propertyPath;
+            DependencyObject targetBeforePath;
+            GetPropertyPathAndTargetBeforePath(parameters.Target, out targetBeforePath, out propertyPath, parameters.IsTargetParentTheTarget);
+            DependencyObject parentElement = targetBeforePath; //this will be the parent of the clonable element (if any).
+            foreach (Tuple<DependencyObject, DependencyProperty, int?> element in GoThroughElementsToAccessProperty(propertyPath, targetBeforePath))
+            {
+                DependencyObject depObject = element.Item1;
+                DependencyProperty depProp = element.Item2;
+                int? index = element.Item3;
+                if (depObject is ICloneOnAnimation)
+                {
+                    if (!((ICloneOnAnimation)depObject).IsAlreadyAClone())
+                    {
+                        object clone = ((ICloneOnAnimation)depObject).Clone();
+                        if (index != null)
+                        {
+#if BRIDGE
+                            parentElement.GetType().GetProperty("Item").SetValue(parentElement, clone, new object[] { index });
+#else
+                            //JSIL does not support SetValue(object, object, object[])
+#endif
+                        }
+                        else
+                        {
+                            parentElement.SetValue(depProp, clone);
+                        }
+                    }
+                    break;
+                }
+                else
+                {
+                    parentElement = depObject;
+                }
+            }
+
+            GetTargetElementAndPropertyInfo(parameters.Target, out target, out propertyPath, parameters.IsTargetParentTheTarget);
+
+            _propertyContainer = target;
+            _targetProperty = propertyPath;
+            _target = Storyboard.GetTarget(this);
+            _targetName = Storyboard.GetTargetName(this);
+        }
     }
 #endif
 }

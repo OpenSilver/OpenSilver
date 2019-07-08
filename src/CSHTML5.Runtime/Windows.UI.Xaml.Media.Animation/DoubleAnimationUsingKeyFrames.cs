@@ -114,7 +114,6 @@ namespace Windows.UI.Xaml.Media.Animation
             }
             _appliedKeyFramesCount = 0;
             _currentKeyFrame = null;
-            _isInitialized = true;
         }
 
         internal override void GetTargetInformation(IterationParameters parameters)
@@ -234,7 +233,7 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             if (_isInitialized)
             {
-                if(_currentKeyFrame != null)
+                if (_currentKeyFrame != null)
                 {
                     StopAllAnimations(groupName);
                 }
@@ -245,6 +244,7 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             foreach(var animation in _keyFrameToDoubleAnimationMap.Values)
             {
+                animation.Completed -= ApplyNextKeyFrame;
                 animation.StopAnimation(groupName);
             }
         }
@@ -277,6 +277,10 @@ namespace Windows.UI.Xaml.Media.Animation
         internal override void RestoreDefaultCore()
         {
             StopAnimation(_parameters.VisualStateGroupName);
+            foreach(var animation in _keyFrameToDoubleAnimationMap.Values)
+            {
+                animation.Completed += ApplyNextKeyFrame;
+            }
             _currentKeyFrame = null;
             _appliedKeyFramesCount = 0;
         }

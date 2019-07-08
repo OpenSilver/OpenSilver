@@ -265,7 +265,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     raiseEvent = true;
                 }
             }
-            if (raiseEvent)
+            if (raiseEvent || _cancelledAnimation)
             {
                 OnIterationCompleted(parameters);
             }
