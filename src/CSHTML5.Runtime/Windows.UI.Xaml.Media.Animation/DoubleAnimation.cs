@@ -233,7 +233,7 @@ namespace Windows.UI.Xaml.Media.Animation
 #if MIGRATION
                     DependencyProperty dp = (global::System.Windows.DependencyProperty)dependencyPropertyField.GetValue(null);
 #else
-                DependencyProperty dp = (global::Windows.UI.Xaml.DependencyProperty)dependencyPropertyField.GetValue(null);
+                    DependencyProperty dp = (global::Windows.UI.Xaml.DependencyProperty)dependencyPropertyField.GetValue(null);
 #endif
                     // - Get the propertyMetadata from the property
                     PropertyMetadata propertyMetadata = dp.GetTypeMetaData(_propertyContainer.GetType());

@@ -52,7 +52,9 @@ namespace Windows.UI.Xaml.Media.Animation
 
         private INTERNAL_ResolvedKeyFramesEntries<ObjectKeyFrame> _resolvedKeyFrames;
 
-        Dictionary<ObjectKeyFrame, NullableTimer> _keyFramesToObjectTimers;
+        private Dictionary<ObjectKeyFrame, NullableTimer> _keyFramesToObjectTimers;
+
+        private ObjectKeyFrame _currentKeyFrame;
 
         /// The collection of ObjectKeyFrame objects that define the animation. The default
         /// is an empty collection.
@@ -107,6 +109,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 timer.Completed += ApplyNextKeyFrame;
                 _keyFramesToObjectTimers.Add(keyFrame, timer);
             }
+            _currentKeyFrame = null;
             _appliedKeyFramesCount = 0;
         }
 
@@ -171,7 +174,8 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal override void Apply(IterationParameters parameters, bool isLastLoop)
         {
-            StartKeyFrame(GetNextKeyFrame());
+            _currentKeyFrame = GetNextKeyFrame();
+            StartKeyFrame(_currentKeyFrame);
         }
 
         private void StartKeyFrame(ObjectKeyFrame keyFrame)
@@ -217,7 +221,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
         private void ApplyLastKeyFrame(object sender, EventArgs e)
         {
-            if (!_isAnimationPaused)
+            if (!_cancelledAnimation)
             {
                 ObjectKeyFrame lastKeyFrame = _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)];
                 ApplyKeyFrame(lastKeyFrame);
@@ -228,7 +232,10 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             if (_isInitialized)
             {
-                StopAllTimers();
+                if(_currentKeyFrame != null)
+                {
+                    StopAllTimers();
+                }
             }
         }
 
@@ -262,7 +269,7 @@ namespace Windows.UI.Xaml.Media.Animation
             {
                 OnIterationCompleted(parameters);
             }
-            return raiseEvent || _isAnimationPaused;
+            return raiseEvent || _cancelledAnimation;
         }
 
         internal override void InitializeCore()
@@ -275,6 +282,7 @@ namespace Windows.UI.Xaml.Media.Animation
         internal override void RestoreDefaultCore()
         {
             ResetAllTimers();
+            _currentKeyFrame = null;
             _appliedKeyFramesCount = 0;
         }
 

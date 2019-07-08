@@ -20,7 +20,7 @@ namespace Windows.UI.Xaml.Media.Animation
         internal DependencyObject _target;
         internal IterationParameters _parameters;
         internal bool _isInitialized = false;
-        internal bool _isAnimationPaused = false;
+        internal bool _cancelledAnimation = false;
         protected override Duration GetNaturalDurationCore()
         {
             return new TimeSpan(0, 0, 1);
@@ -49,7 +49,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
         private void RestoreDefault()
         {
-            _isAnimationPaused = false;
+            _cancelledAnimation = false;
             RestoreDefaultCore();
         }
 
@@ -80,7 +80,7 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             if (_isInitialized)
             {
-                _isAnimationPaused = revertToFormerValue;
+                _cancelledAnimation = revertToFormerValue;
                 base.Stop(frameworkElement, groupName, revertToFormerValue);
                 StopAnimation(groupName);
                 if (revertToFormerValue)

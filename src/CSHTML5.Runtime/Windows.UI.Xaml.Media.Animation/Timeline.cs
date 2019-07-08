@@ -564,8 +564,8 @@ namespace Windows.UI.Xaml.Media.Animation
         DispatcherTimer _animationTimer = new DispatcherTimer();
         internal void OnIterationCompleted(IterationParameters parameters)
         {
-            //if (_isAnimationDurationReached) //the default duration is Automatic, which currently has a TimeSpan of 0 ms (which is considered here to be no timespan).
-            //{
+            if (_isAnimationDurationReached) //the default duration is Automatic, which currently has a TimeSpan of 0 ms (which is considered here to be no timespan).
+            {
                 --remainingIterations;
                 if (remainingIterations <= 0)
                 {
@@ -593,7 +593,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
                     IterateOnce(parameters, isLastLoop: remainingIterations == 1);
                 }
-            //}
+            }
         }
 
         bool _isAnimationDurationReached = false;

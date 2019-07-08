@@ -51,6 +51,8 @@ namespace Windows.UI.Xaml.Media.Animation
 
         private Dictionary<DoubleKeyFrame, DoubleAnimation> _keyFrameToDoubleAnimationMap;
 
+        private DoubleKeyFrame _currentKeyFrame;
+
         //     The collection of DoubleKeyFrame objects that define the animation. The default
         //     is an empty collection.
         /// <summary>
@@ -111,6 +113,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 fromIfAny = keyFrame.Value;
             }
             _appliedKeyFramesCount = 0;
+            _currentKeyFrame = null;
             _isInitialized = true;
         }
 
@@ -163,7 +166,8 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal override void Apply(IterationParameters parameters, bool isLastLoop)
         {
-            ApplyKeyFrame(GetNextKeyFrame());
+            _currentKeyFrame = GetNextKeyFrame();
+            ApplyKeyFrame(_currentKeyFrame);
         }
 
         private void ApplyKeyFrame(DoubleKeyFrame keyFrame)
@@ -219,7 +223,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
         private void ApplyLastKeyFrame(object sender, EventArgs e)
         {
-            if (!_isAnimationPaused)
+            if (!_cancelledAnimation)
             {
                 DoubleKeyFrame lastKeyFrame = _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)];
                 AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, lastKeyFrame.Value, _parameters.IsVisualStateChange);
@@ -230,7 +234,10 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             if (_isInitialized)
             {
-                StopAllAnimations(groupName);
+                if(_currentKeyFrame != null)
+                {
+                    StopAllAnimations(groupName);
+                }
             }
         }
 
@@ -253,11 +260,11 @@ namespace Windows.UI.Xaml.Media.Animation
                     raiseEvent = true;
                 }
             }
-            if (raiseEvent)
+            if (raiseEvent || _cancelledAnimation)
             {
                 OnIterationCompleted(parameters);
             }
-            return raiseEvent || _isAnimationPaused;
+            return raiseEvent || _cancelledAnimation;
         }
 
         internal override void InitializeCore()
@@ -270,6 +277,7 @@ namespace Windows.UI.Xaml.Media.Animation
         internal override void RestoreDefaultCore()
         {
             StopAnimation(_parameters.VisualStateGroupName);
+            _currentKeyFrame = null;
             _appliedKeyFramesCount = 0;
         }
 
