@@ -29,8 +29,8 @@ namespace CSHTML5.Internal
     {
         Coerced = 0,
         VisualState = 1,
-        Animated = 2,
-        Local = 3,
+        Local = 2,
+        Animated = 3,
         LocalStyle = 4,
         ImplicitStyle = 5,
         Inherited = 6

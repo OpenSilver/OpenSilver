@@ -44,8 +44,7 @@ namespace CSHTML5.Internal
             }
             CoercedValue = INTERNAL_NoValue.NoValue;
             VisualStateValue = INTERNAL_NoValue.NoValue;
-            AnimationValue = INTERNAL_NoValue.NoValue;
-            Local = INTERNAL_NoValue.NoValue;
+            ActiveLocalValue = new INTERNAL_LocalValue();
             LocalStyleValue = INTERNAL_NoValue.NoValue;
             ImplicitStyleValue = INTERNAL_NoValue.NoValue;
             InheritedValue = INTERNAL_NoValue.NoValue;
@@ -56,12 +55,82 @@ namespace CSHTML5.Internal
         public DependencyProperty Property { get; private set; }
         public object CoercedValue { get; set; }
         public object VisualStateValue { get; set; }
-        public object Local { get; set; }
-        public object AnimationValue { get; set; }
+
+        public object Local
+        {
+            get { return ActiveLocalValue.Local; }
+            set { ActiveLocalValue.SetValue(value, KindOfValue.Local); }
+        }
+        public object AnimationValue
+        {
+            get { return ActiveLocalValue.Animated; }
+            set { ActiveLocalValue.SetValue(value, KindOfValue.Animated); }
+        }
+        internal INTERNAL_LocalValue ActiveLocalValue { get; set; }
         public object LocalStyleValue { get; set; }
         public object ImplicitStyleValue { get; set; }
         public object InheritedValue { get; set; }
 
         public List<IPropertyChangedListener> PropertyListeners { get; set; }
+
+        internal class INTERNAL_LocalValue
+        {
+            internal INTERNAL_LocalValue()
+            {
+                Local = INTERNAL_NoValue.NoValue;
+                Animated = INTERNAL_NoValue.NoValue;
+                ActiveValue = KindOfValue.Local;
+            }
+
+            internal object Local { get; set; }
+
+            internal object Animated { get; set; }
+
+            internal KindOfValue ActiveValue { get; set; }
+
+            internal void SetValue(object value, KindOfValue kindOfValue)
+            {
+                if(kindOfValue == KindOfValue.Local)
+                {
+                    Local = value;
+                    if(value == INTERNAL_NoValue.NoValue)
+                    {
+                        ActiveValue = Animated == INTERNAL_NoValue.NoValue ? KindOfValue.Local : KindOfValue.Local;
+                    }
+                    else
+                    {
+                        ActiveValue = KindOfValue.Local;
+                    }
+                }
+                else if(kindOfValue == KindOfValue.Animated)
+                {
+                    Animated = value;
+                    if(value == INTERNAL_NoValue.NoValue)
+                    {
+                        ActiveValue = KindOfValue.Local;
+                    }
+                    else
+                    {
+                        ActiveValue = KindOfValue.Animated;
+                    }
+                }
+            }
+
+            internal object GetActiveLocalValue()
+            {
+                if(ActiveValue == KindOfValue.Local)
+                {
+                    return Local;
+                }
+                else if(ActiveValue == KindOfValue.Animated)
+                {
+                    return Animated;
+                }
+                else
+                {
+                    return INTERNAL_NoValue.NoValue;
+                }
+            }
+        }
     }
 }
