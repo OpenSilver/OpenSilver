@@ -49,9 +49,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
         private INTERNAL_ResolvedKeyFramesEntries<DoubleKeyFrame> _resolvedKeyFrames;
 
-        private Dictionary<DoubleKeyFrame, DoubleAnimation> _keyFrameToDoubleAnimationMap;
-
-        private DoubleKeyFrame _currentKeyFrame;
+        private Dictionary<DoubleKeyFrame, Duration> _keyFrameToDurationMap;
 
         //     The collection of DoubleKeyFrame objects that define the animation. The default
         //     is an empty collection.
@@ -102,18 +100,14 @@ namespace Windows.UI.Xaml.Media.Animation
         private void InitializeKeyFramesSet()
         {
             _resolvedKeyFrames = new INTERNAL_ResolvedKeyFramesEntries<DoubleKeyFrame>(_keyFrames);
-            _keyFrameToDoubleAnimationMap = new Dictionary<DoubleKeyFrame, DoubleAnimation>();
-            double? fromIfAny = null;
+            _keyFrameToDurationMap = new Dictionary<DoubleKeyFrame, Duration>();
             DoubleKeyFrame keyFrame;
             for (int i = 0; i < KeyFrames.Count; i++)
             {
                 keyFrame = KeyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(i)];
-                DoubleAnimation db = InstantiateAnimationFromResolvedKeyFrameIndex(i, fromIfAny);
-                _keyFrameToDoubleAnimationMap.Add(keyFrame, db);
-                fromIfAny = keyFrame.Value;
+                _keyFrameToDurationMap.Add(keyFrame, keyFrame.KeyTime.TimeSpan - (i > 0 ? KeyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(i - 1)].KeyTime.TimeSpan : TimeSpan.Zero));
             }
             _appliedKeyFramesCount = 0;
-            _currentKeyFrame = null;
         }
 
         internal override void GetTargetInformation(IterationParameters parameters)
@@ -159,52 +153,79 @@ namespace Windows.UI.Xaml.Media.Animation
 
             _propertyContainer = target;
             _targetProperty = propertyPath;
+            _propDp = GetProperty(_propertyContainer, _targetProperty);
             _target = Storyboard.GetTarget(this);
             _targetName = Storyboard.GetTargetName(this);
         }
 
+        private PropertyMetadata _propertyMetadata;
+
+        // This guid is used to specifically target a particular call to the animation. It prevents the callback which should be called when velocity's animation end 
+        // to be called when the callback is called from a previous call to the animation. This could happen when the animation was started quickly multiples times in a row. 
+        private Guid _animationID;
+
         internal override void Apply(IterationParameters parameters, bool isLastLoop)
         {
-            _currentKeyFrame = GetNextKeyFrame();
-            ApplyKeyFrame(_currentKeyFrame);
+            _animationID = Guid.NewGuid();
+            ApplyKeyFrame(GetNextKeyFrame(), isLastLoop);
         }
 
-        private void ApplyKeyFrame(DoubleKeyFrame keyFrame)
+        private void ApplyKeyFrame(DoubleKeyFrame keyFrame, bool isLastLoop)
         {
             if (keyFrame != null)
             {
-                _keyFrameToDoubleAnimationMap[keyFrame].StartFirstIteration(_parameters, true, null);
+                //we make a specific name for this animation:
+                string specificGroupName = _parameters.VisualStateGroupName + animationInstanceSpecificName.ToString();
+
+                bool cssEquivalentExists = false;
+                if (_propertyMetadata.GetCSSEquivalent != null)
+                {
+                    CSSEquivalent cssEquivalent = _propertyMetadata.GetCSSEquivalent(_propertyContainer);
+                    if (cssEquivalent != null)
+                    {
+                        cssEquivalentExists = true;
+                        StartAnimation(_propertyContainer, cssEquivalent, null, keyFrame.Value, GetKeyFrameDuration(keyFrame), keyFrame.INTERNAL_GetEasingFunction(), specificGroupName,
+                        OnKeyFrameCompleted(_parameters, isLastLoop, keyFrame.Value, _propertyContainer, _targetProperty, _animationID));
+                    }
+                }
+                //todo: use GetCSSEquivalent instead (?)
+                if (_propertyMetadata.GetCSSEquivalents != null)
+                {
+                    List<CSSEquivalent> cssEquivalents = _propertyMetadata.GetCSSEquivalents(_propertyContainer);
+                    foreach (CSSEquivalent equivalent in cssEquivalents)
+                    {
+                        cssEquivalentExists = true;
+                        StartAnimation(_propertyContainer, equivalent, null, keyFrame.Value, Duration, keyFrame.INTERNAL_GetEasingFunction(), specificGroupName,
+                        OnKeyFrameCompleted(_parameters, isLastLoop, keyFrame.Value, _propertyContainer, _targetProperty, _animationID));
+                    }
+                }
+
+                if (!cssEquivalentExists)
+                {
+                    OnKeyFrameCompleted(_parameters, isLastLoop, keyFrame.Value, _propertyContainer, _targetProperty, _animationID)();
+                }
             }
         }
 
-        private DoubleAnimation InstantiateAnimationFromResolvedKeyFrameIndex(int index, double? fromIfAny)
+        private Duration GetKeyFrameDuration(DoubleKeyFrame keyFrame)
         {
-            DoubleKeyFrame keyFrame = KeyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(index)];
-            DoubleAnimation db = new DoubleAnimation()
+            return _keyFrameToDurationMap[keyFrame];
+        }
+
+        private Action OnKeyFrameCompleted(IterationParameters parameters, bool isLastLoop, object value, DependencyObject target, PropertyPath propertyPath, Guid callBackGuid)
+        {
+            return () =>
             {
-                BeginTime = TimeSpan.Zero,
-                From = fromIfAny,
-                To = keyFrame.Value,
-                Duration = keyFrame.KeyTime.TimeSpan - (index > 0 ? KeyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(index - 1)].KeyTime.TimeSpan : TimeSpan.Zero),
-                EasingFunction = keyFrame.INTERNAL_GetEasingFunction(),
-                RectifyWhenAnimationEnds = false,
+                if (_animationID == callBackGuid)
+                {
+                    AnimationHelpers.ApplyValue(target, propertyPath, value, parameters.IsVisualStateChange);
+                    _appliedKeyFramesCount++;
+                    if (!CheckTimeLineEndAndRaiseCompletedEvent(_parameters))
+                    {
+                        ApplyKeyFrame(GetNextKeyFrame(), isLastLoop);
+                    }
+                }
             };
-            Storyboard.SetTargetName(db, _targetName);
-            Storyboard.SetTargetProperty(db, _targetProperty);
-            Storyboard.SetTarget(db, _target);
-            db.InitializeIteration();
-            db.Completed -= ApplyNextKeyFrame;
-            db.Completed += ApplyNextKeyFrame;
-            return db;
-        }
-
-        private void ApplyNextKeyFrame(object sender, EventArgs e)
-        {
-            _appliedKeyFramesCount++;
-            if (!CheckTimeLineEndAndRaiseCompletedEvent(_parameters))
-            {
-                ApplyKeyFrame(GetNextKeyFrame());
-            }
         }
 
         private DoubleKeyFrame GetNextKeyFrame()
@@ -229,23 +250,42 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        internal override void StopAnimation(string groupName) 
+        internal override void StopAnimation(string groupName)
         {
             if (_isInitialized)
             {
-                if (_currentKeyFrame != null)
-                {
-                    StopAllAnimations(groupName);
-                }
-            }
-        }
+                string specificGroupName = groupName + animationInstanceSpecificName.ToString();
 
-        private void StopAllAnimations(string groupName)
-        {
-            foreach(var animation in _keyFrameToDoubleAnimationMap.Values)
-            {
-                animation.Completed -= ApplyNextKeyFrame;
-                animation.StopAnimation(groupName);
+                if (_propertyMetadata.GetCSSEquivalent != null)
+                {
+                    CSSEquivalent cssEquivalent = _propertyMetadata.GetCSSEquivalent(_propertyContainer);
+                    UIElement uiElement = cssEquivalent.UIElement ?? (_propertyContainer as UIElement); // If no UIElement is specified, we assume that the property is intended to be applied to the instance on which the PropertyChanged has occurred.
+
+                    bool hasTemplate = (uiElement is Control) && ((Control)uiElement).HasTemplate;
+
+                    if (!hasTemplate || cssEquivalent.ApplyAlsoWhenThereIsAControlTemplate)
+                    {
+                        if (cssEquivalent.DomElement == null && uiElement != null)
+                        {
+                            cssEquivalent.DomElement = uiElement.INTERNAL_OuterDomElement; // Default value
+                        }
+                        if (cssEquivalent.DomElement != null)
+                        {
+                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", cssEquivalent.DomElement, specificGroupName);
+                        }
+                    }
+                }
+                if (_propertyMetadata.GetCSSEquivalents != null)
+                {
+                    List<CSSEquivalent> cssEquivalents = _propertyMetadata.GetCSSEquivalents(_propertyContainer);
+                    foreach (CSSEquivalent equivalent in cssEquivalents)
+                    {
+                        if (equivalent.DomElement != null)
+                        {
+                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", equivalent.DomElement, specificGroupName);
+                        }
+                    }
+                }
             }
         }
 
@@ -272,22 +312,66 @@ namespace Windows.UI.Xaml.Media.Animation
             this.Completed -= ApplyLastKeyFrame;
             this.Completed += ApplyLastKeyFrame;
             InitializeKeyFramesSet();
+            _propertyMetadata = _propDp.GetTypeMetaData(_propertyContainer.GetType());
         }
 
         internal override void RestoreDefaultCore()
         {
-            StopAnimation(_parameters.VisualStateGroupName);
-            foreach(var animation in _keyFrameToDoubleAnimationMap.Values)
-            {
-                animation.Completed += ApplyNextKeyFrame;
-            }
-            _currentKeyFrame = null;
             _appliedKeyFramesCount = 0;
         }
 
         protected override Duration GetNaturalDurationCore()
         {
             return new Duration(LargestTimeSpanKeyTime);
+        }
+
+
+        static void StartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, double? from, object to, Duration Duration, EasingFunctionBase easingFunction, string visualStateGroupName, Action callbackForWhenfinished = null)
+        {
+            if (cssEquivalent.Name != null && cssEquivalent.Name.Count != 0)
+            {
+                UIElement uiElement = cssEquivalent.UIElement ?? (target as UIElement); // If no UIElement is specified, we assume that the property is intended to be applied to the instance on which the PropertyChanged has occurred.
+
+                bool hasTemplate = (uiElement is Control) && ((Control)uiElement).HasTemplate;
+
+                if (!hasTemplate || cssEquivalent.ApplyAlsoWhenThereIsAControlTemplate)
+                {
+                    if (cssEquivalent.DomElement == null && uiElement != null)
+                    {
+                        cssEquivalent.DomElement = uiElement.INTERNAL_OuterDomElement; // Default value
+                    }
+                    if (cssEquivalent.DomElement != null)
+                    {
+                        if (cssEquivalent.Value == null)
+                        {
+                            cssEquivalent.Value = (finalInstance, value) => { return value ?? ""; }; // Default value
+                        }
+                        object cssValue = cssEquivalent.Value(target, to);
+
+                        object newObj = CSHTML5.Interop.ExecuteJavaScriptAsync(@"new Object()");
+
+                        if (from == null)
+                        {
+                            foreach (string csspropertyName in cssEquivalent.Name)
+                            {
+                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", newObj, csspropertyName, cssValue);
+                            }
+                        }
+                        else
+                        {
+                            foreach (string csspropertyName in cssEquivalent.Name)
+                            {
+                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = [$2, $3];", newObj, csspropertyName, cssValue, from);
+                            }
+                        }
+                        AnimationHelpers.CallVelocity(cssEquivalent.DomElement, Duration, easingFunction, visualStateGroupName, callbackForWhenfinished, newObj);
+                    }
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Please set the Name property of the CSSEquivalent class.");
+            }
         }
     }
 }

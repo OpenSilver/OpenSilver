@@ -19,6 +19,7 @@ namespace Windows.UI.Xaml.Media.Animation
         internal DependencyObject _propertyContainer;
         internal DependencyObject _target;
         internal IterationParameters _parameters;
+        internal DependencyProperty _propDp;
         internal bool _isInitialized = false;
         internal bool _cancelledAnimation = false;
         protected override Duration GetNaturalDurationCore()
@@ -36,19 +37,18 @@ namespace Windows.UI.Xaml.Media.Animation
             {
                 RestoreDefault();
             }
-            base.IterateOnce(parameters, isLastLoop);
-
             // This is a workaround to tell the property the effective value should be the animated value.
-            SetInitialAnimationValue();
+            SetInitialAnimationValue(parameters.IsVisualStateChange);
+            base.IterateOnce(parameters, isLastLoop);
 
             Apply(parameters, isLastLoop);
         }
 
         // todo: find a way to not have to do this.
-        private void SetInitialAnimationValue()
+        private void SetInitialAnimationValue(bool isVisualStateChange)
         {
-            DependencyProperty dp = (DependencyProperty)_propertyContainer.GetType().GetProperty(_targetProperty.INTERNAL_DependencyPropertyName).DeclaringType.GetField(_targetProperty.INTERNAL_DependencyPropertyName + "Property").GetValue(null);
-            _targetProperty.INTERNAL_PropertySetAnimationValue(_propertyContainer, _propertyContainer.GetValue(dp));
+            object initialAnimationValue = _propertyContainer.GetValue(_propDp);
+            AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, initialAnimationValue, isVisualStateChange);
         }
 
         //Note: stateContainerGroupName is useful for allowing us to stop the animations made using velocity: 
@@ -91,12 +91,12 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             if (_isInitialized)
             {
-                _cancelledAnimation = revertToFormerValue;
+                _cancelledAnimation = true;
                 base.Stop(frameworkElement, groupName, revertToFormerValue);
                 StopAnimation(groupName);
                 if (revertToFormerValue)
                 {
-                    UnApply();
+                    UnApply(_parameters.IsVisualStateChange);
                 }
             }
         }
@@ -106,9 +106,10 @@ namespace Windows.UI.Xaml.Media.Animation
             
         }
 
-        private void UnApply()
+        private void UnApply(bool isVisualStateChange)
         {
-            _targetProperty.INTERNAL_PropertySetAnimationValue(_propertyContainer, INTERNAL_NoValue.NoValue);
+            AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, INTERNAL_NoValue.NoValue, isVisualStateChange);
+            //_targetProperty.INTERNAL_PropertySetAnimationValue(_propertyContainer, INTERNAL_NoValue.NoValue);
         }
     }
 }

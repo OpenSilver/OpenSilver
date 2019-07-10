@@ -43,16 +43,6 @@ namespace Windows.UI.Xaml.Media.Animation
     /// </summary>
     public class DoubleAnimation : AnimationTimeline
     {
-        internal bool RectifyWhenAnimationEnds { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the DoubleAnimation class.
-        /// </summary>
-        public DoubleAnimation()
-        {
-            RectifyWhenAnimationEnds = true;
-        }
-
         /// <summary>
         /// Gets or sets the easing function applied to this animation.
         /// </summary>
@@ -111,6 +101,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
             _propertyContainer = target;
             _targetProperty = propertyPath;
+            _propDp = GetProperty(_propertyContainer, _targetProperty);
             _target = Storyboard.GetTarget(this);
             _targetName = Storyboard.GetTargetName(this);
         }
@@ -124,8 +115,7 @@ namespace Windows.UI.Xaml.Media.Animation
             if (To != null)
             {
                 // - Get the propertyMetadata from the property
-                DependencyProperty dp = GetProperty(_propertyContainer, _targetProperty);
-                PropertyMetadata propertyMetadata = dp.GetTypeMetaData(_propertyContainer.GetType());
+                PropertyMetadata propertyMetadata = _propDp.GetTypeMetaData(_propertyContainer.GetType());
 
                 //we make a specific name for this animation:
                 string specificGroupName = parameters.VisualStateGroupName + animationInstanceSpecificName.ToString();
@@ -167,7 +157,7 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             return () =>
             {
-                if (isLastLoop && RectifyWhenAnimationEnds && _animationID == callBackGuid)
+                if (isLastLoop && _animationID == callBackGuid)
                 {
                     AnimationHelpers.ApplyValue(target, propertyPath, value, parameters.IsVisualStateChange);
                 }
@@ -227,27 +217,16 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             if (_isInitialized)
             {
-                Type lastElementType = _propertyContainer.GetType();
-                PropertyInfo propertyInfo = lastElementType.GetProperty(_targetProperty.INTERNAL_DependencyPropertyName);
-
                 //todo: find out why we put the test on target and put it back? (I removed it because id kept ScaleTransform from working properly)
                 if (To != null)// && target is FrameworkElement) //todo: "To" can never be "null", fix this.
                 {
-                    Type dependencyPropertyContainerType = propertyInfo.DeclaringType;
-                    FieldInfo dependencyPropertyField = dependencyPropertyContainerType.GetField(_targetProperty.INTERNAL_DependencyPropertyName + "Property");
-                    // - Get the DependencyProperty
-#if MIGRATION
-                    DependencyProperty dp = (global::System.Windows.DependencyProperty)dependencyPropertyField.GetValue(null);
-#else
-                    DependencyProperty dp = (global::Windows.UI.Xaml.DependencyProperty)dependencyPropertyField.GetValue(null);
-#endif
                     // - Get the propertyMetadata from the property
-                    PropertyMetadata propertyMetadata = dp.GetTypeMetaData(_propertyContainer.GetType());
-                    // - Get the cssPropertyName from the PropertyMetadata
+                    PropertyMetadata propertyMetadata = _propDp.GetTypeMetaData(_propertyContainer.GetType());
 
                     //we make a specific name for this animation:
                     string specificGroupName = groupName + animationInstanceSpecificName.ToString();
 
+                    // - Get the cssPropertyName from the PropertyMetadata
                     if (propertyMetadata.GetCSSEquivalent != null)
                     {
                         CSSEquivalent cssEquivalent = propertyMetadata.GetCSSEquivalent(_propertyContainer);

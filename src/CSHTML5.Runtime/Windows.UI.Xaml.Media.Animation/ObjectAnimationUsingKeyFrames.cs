@@ -44,8 +44,6 @@ namespace Windows.UI.Xaml.Media.Animation
     [ContentProperty("KeyFrames")]
     public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline
     {
-        private DependencyProperty _dp;
-
         private ObjectKeyFrameCollection _keyFrames;
 
         private int _appliedKeyFramesCount;
@@ -53,8 +51,6 @@ namespace Windows.UI.Xaml.Media.Animation
         private INTERNAL_ResolvedKeyFramesEntries<ObjectKeyFrame> _resolvedKeyFrames;
 
         private Dictionary<ObjectKeyFrame, NullableTimer> _keyFramesToObjectTimers;
-
-        private ObjectKeyFrame _currentKeyFrame;
 
         /// The collection of ObjectKeyFrame objects that define the animation. The default
         /// is an empty collection.
@@ -109,7 +105,6 @@ namespace Windows.UI.Xaml.Media.Animation
                 timer.Completed += ApplyNextKeyFrame;
                 _keyFramesToObjectTimers.Add(keyFrame, timer);
             }
-            _currentKeyFrame = null;
             _appliedKeyFramesCount = 0;
         }
 
@@ -167,15 +162,14 @@ namespace Windows.UI.Xaml.Media.Animation
 
             GetTargetElementAndPropertyInfo(parameters.Target, out target, out propertyPath);
 
-            _dp = GetProperty(target, propertyPath);
             _propertyContainer = target;
             _targetProperty = propertyPath;
+            _propDp = GetProperty(_propertyContainer, _targetProperty);
         }
 
         internal override void Apply(IterationParameters parameters, bool isLastLoop)
         {
-            _currentKeyFrame = GetNextKeyFrame();
-            StartKeyFrame(_currentKeyFrame);
+            StartKeyFrame(GetNextKeyFrame());
         }
 
         private void StartKeyFrame(ObjectKeyFrame keyFrame)
@@ -189,19 +183,19 @@ namespace Windows.UI.Xaml.Media.Animation
         private void ApplyKeyFrame(ObjectKeyFrame keyFrame)
         {
             object value = keyFrame.Value;
-            if (value is string && _dp.PropertyType != typeof(string))
+            if (value is string && _propDp.PropertyType != typeof(string))
             {
-                if (_dp.PropertyType.IsEnum)
+                if (_propDp.PropertyType.IsEnum)
                 {
-                    value = Enum.Parse(_dp.PropertyType, (string)value);
+                    value = Enum.Parse(_propDp.PropertyType, (string)value);
                 }
                 else
                 {
-                    value = DotNetForHtml5.Core.TypeFromStringConverters.ConvertFromInvariantString(_dp.PropertyType, (string)value);
+                    value = DotNetForHtml5.Core.TypeFromStringConverters.ConvertFromInvariantString(_propDp.PropertyType, (string)value);
                 }
             }
 
-            object castedValue = DynamicCast(value, _dp.PropertyType);
+            object castedValue = DynamicCast(value, _propDp.PropertyType);
 
             AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, castedValue, _parameters.IsVisualStateChange);
         }
@@ -232,10 +226,7 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             if (_isInitialized)
             {
-                if(_currentKeyFrame != null)
-                {
-                    StopAllTimers();
-                }
+                StopAllTimers();
             }
         }
 
@@ -260,7 +251,7 @@ namespace Windows.UI.Xaml.Media.Animation
             bool raiseEvent = false;
             lock (thisLock)
             {
-                if (_appliedKeyFramesCount >= _keyFrames.Count)
+                if (_appliedKeyFramesCount >= KeyFrames.Count)
                 {
                     raiseEvent = true;
                 }
@@ -282,7 +273,6 @@ namespace Windows.UI.Xaml.Media.Animation
         internal override void RestoreDefaultCore()
         {
             ResetAllTimers();
-            _currentKeyFrame = null;
             _appliedKeyFramesCount = 0;
         }
 

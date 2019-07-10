@@ -98,6 +98,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
             _propertyContainer = target;
             _targetProperty = propertyPath;
+            _propDp = GetProperty(_propertyContainer, _targetProperty);
             _target = Storyboard.GetTarget(this);
             _targetName = Storyboard.GetTargetName(this);
         }

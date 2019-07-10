@@ -84,12 +84,6 @@ namespace Windows.UI.Xaml.Media.Animation
         public static readonly DependencyProperty ToProperty =
             DependencyProperty.Register("To", typeof(Color?), typeof(ColorAnimation), new PropertyMetadata(null));
 
-        //internal override void IterateOnce(IterationParameters parameters, bool isLastLoop)
-        //{
-        //    base.IterateOnce(parameters, isLastLoop);
-        //    Apply(parameters, isLastLoop);
-        //}
-
         internal override void GetTargetInformation(IterationParameters parameters)
         {
             _parameters = parameters;
@@ -133,28 +127,23 @@ namespace Windows.UI.Xaml.Media.Animation
 
             _propertyContainer = target;
             _targetProperty = propertyPath;
+            _propDp = GetProperty(_propertyContainer, _targetProperty);
             _target = Storyboard.GetTarget(this);
             _targetName = Storyboard.GetTargetName(this);
         }
+
+        // This guid is used to specifically target a particular call to the animation. It prevents the callback which should be called when velocity's animation end 
+        // to be called when the callback is called from a previous call to the animation. This could happen when the animation was started quickly multiples times in a row. 
+        private Guid _animationID;
 
         internal override void Apply(IterationParameters parameters, bool isLastLoop)
         {
             if (To != null)
             {
-                PropertyInfo propertyInfo = _propertyContainer.GetType().GetProperty(_targetProperty.INTERNAL_DependencyPropertyName);
-                Type propertyType = propertyInfo.PropertyType;
-                var castedValue = DynamicCast(To, propertyType); //Note: we put this line here because the Xaml could use a Color gotten from a StaticResource (which was therefore not converted to a SolidColorbrush by the compiler in the .g.cs file) and led to a wrong type set in a property (Color value in a property of type Brush).
+                var castedValue = DynamicCast(To, _propDp.PropertyType); //Note: we put this line here because the Xaml could use a Color gotten from a StaticResource (which was therefore not converted to a SolidColorbrush by the compiler in the .g.cs file) and led to a wrong type set in a property (Color value in a property of type Brush).
 
-                Type dependencyPropertyContainerType = propertyInfo.DeclaringType;
-                FieldInfo dependencyPropertyField = dependencyPropertyContainerType.GetField(_targetProperty.INTERNAL_DependencyPropertyName + "Property");
-                // - Get the DependencyProperty
-#if MIGRATION
-                DependencyProperty dp = (global::System.Windows.DependencyProperty)dependencyPropertyField.GetValue(null);
-#else
-                DependencyProperty dp = (global::Windows.UI.Xaml.DependencyProperty)dependencyPropertyField.GetValue(null);
-#endif
                 // - Get the propertyMetadata from the property
-                PropertyMetadata propertyMetadata = dp.GetTypeMetaData(_propertyContainer.GetType());
+                PropertyMetadata propertyMetadata = _propDp.GetTypeMetaData(_propertyContainer.GetType());
                 // - Get the cssPropertyName from the PropertyMetadata
 
                 //we make a specific name for this animation:
@@ -168,7 +157,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     {
                         cssEquivalentExists = true;
                         TryStartAnimation(_propertyContainer, cssEquivalent, From, To, Duration, EasingFunction, specificGroupName,
-                                          OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty));
+                                          OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID));
                     }
                 }
                 if (propertyMetadata.GetCSSEquivalents != null)
@@ -183,7 +172,7 @@ namespace Windows.UI.Xaml.Media.Animation
                             if (isFirst)
                             {
                                 bool updateIsFirst = TryStartAnimation(_propertyContainer, equivalent, From, To, Duration, EasingFunction, specificGroupName,
-                                                                       OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty));
+                                                                       OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID));
                                 if (updateIsFirst)
                                 {
                                     isFirst = false;
@@ -192,31 +181,31 @@ namespace Windows.UI.Xaml.Media.Animation
                             else
                             {
                                 TryStartAnimation(_propertyContainer, equivalent, From, To, Duration, EasingFunction, specificGroupName,
-                                                  OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty));
+                                                  OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID));
                             }
                         }
                         else
                         {
-                            OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty)();
+                            OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID)();
                         }
                     }
                 }
                 if (!cssEquivalentExists)
                 {
-                    OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty)();
+                    OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID)();
                 }
             }
             else
             {
-                OnAnimationCompleted(parameters, isLastLoop, To, _propertyContainer, _targetProperty)();
+                OnAnimationCompleted(parameters, isLastLoop, To, _propertyContainer, _targetProperty, _animationID)();
             }
         }
 
-        private Action OnAnimationCompleted(IterationParameters parameters, bool isLastLoop, object value, DependencyObject target, PropertyPath propertyPath)
+        private Action OnAnimationCompleted(IterationParameters parameters, bool isLastLoop, object value, DependencyObject target, PropertyPath propertyPath, Guid callBackGuid)
         {
             return () =>
             {
-                if (isLastLoop)
+                if (isLastLoop && _animationID == callBackGuid)
                 {
                     AnimationHelpers.ApplyValue(target, propertyPath, value, parameters.IsVisualStateChange);
                 }
