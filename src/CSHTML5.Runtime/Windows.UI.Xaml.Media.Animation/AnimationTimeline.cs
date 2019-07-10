@@ -91,7 +91,7 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             if (_isInitialized)
             {
-                _cancelledAnimation = true;
+                _cancelledAnimation = revertToFormerValue;
                 base.Stop(frameworkElement, groupName, revertToFormerValue);
                 StopAnimation(groupName);
                 if (revertToFormerValue)
