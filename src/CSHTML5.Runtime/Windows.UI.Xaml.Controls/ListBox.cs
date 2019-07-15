@@ -304,6 +304,24 @@ namespace Windows.UI.Xaml.Controls
         }
         #endregion
 
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
+        {
+            base.OnApplyTemplate();
+            List<object> l = new List<object>();
+            foreach (object item in SelectedItems)
+            {
+                l.Add(item);
+            }
+            foreach (object item in l)
+            {
+                SetItemVisualSelectionState(item, true);
+            }
+        }
+
         //// Summary:
         ////     Causes the object to scroll into view.
         ////

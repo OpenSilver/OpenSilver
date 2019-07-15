@@ -406,6 +406,8 @@ namespace Windows.UI.Xaml.Controls
             }
 
             base.OnApplyTemplate();
+
+            ApplySelectedIndex(SelectedIndex);
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
