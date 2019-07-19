@@ -302,6 +302,7 @@ namespace Windows.UI.Xaml.Data
             b._relativeSource = _relativeSource; //I don't think people should use this when trying to make a Binding that will be used in different places but we never know.
             b._source = _source;
             b._updateSourceTrigger = _updateSourceTrigger;
+            b._stringFormat = _stringFormat;
             return b;
         }
 
