@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Media.Animation
     {
         private Dictionary<Tuple<string, string>, Timeline> INTERNAL_propertiesChanged; //todo: change this into a Hashset.
 
-        internal bool isUnApplied = false;
+        internal bool isUnApplied = false; // Note: we set this variable because the animation start is done inside a Dispatcher, so if the user Starts then Stops the animation immediately (in the same thread), we want to cancel the start of the animation.
 
 
         private TimelineCollection _children = new TimelineCollection();
@@ -170,15 +170,16 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal void Begin(FrameworkElement target, bool useTransitions, string visualStateGroupName, bool isVisualStateChange)
         {
-            this.isUnApplied = false;
+            this.isUnApplied = false; // Note: we set this variable because the animation start is done inside a Dispatcher, so if the user synchronously Starts then Stops then Starts an animation, we want it to be in the started state.
 #if MIGRATION
             Dispatcher
 #else
             CoreDispatcher
 #endif
+            // Note: we use a Dispatcher in order to ensure that the page is fully loaded when starting the animation.
             .INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
             {
-                if (!this.isUnApplied)
+                if (!this.isUnApplied) // Note: we use this variable because the animation start is done inside a Dispatcher, so if the user Starts then Stops the animation immediately (in the same thread), we want to cancel the start of the animation.
                 {
                     Guid guid = Guid.NewGuid();
                     IterationParameters parameters = new IterationParameters()
