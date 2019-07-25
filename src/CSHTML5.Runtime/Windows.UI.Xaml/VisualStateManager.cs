@@ -163,6 +163,7 @@ namespace Windows.UI.Xaml
 
                                     }
                                 }
+                                formerState.Storyboard.isUnApplied = true;
                             }
                         }
 

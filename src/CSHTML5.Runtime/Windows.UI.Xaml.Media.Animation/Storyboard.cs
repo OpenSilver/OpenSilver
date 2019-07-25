@@ -43,6 +43,7 @@ namespace Windows.UI.Xaml.Media.Animation
     {
         private Dictionary<Tuple<string, string>, Timeline> INTERNAL_propertiesChanged; //todo: change this into a Hashset.
 
+        internal bool isUnApplied = false;
 
 
         private TimelineCollection _children = new TimelineCollection();
@@ -169,6 +170,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal void Begin(FrameworkElement target, bool useTransitions, string visualStateGroupName, bool isVisualStateChange)
         {
+            this.isUnApplied = false;
 #if MIGRATION
             Dispatcher
 #else
@@ -176,21 +178,24 @@ namespace Windows.UI.Xaml.Media.Animation
 #endif
             .INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
             {
-                Guid guid = Guid.NewGuid();
-                IterationParameters parameters = new IterationParameters()
+                if (!this.isUnApplied)
                 {
-                    Target = target,
-                    Guid = guid,
-                    UseTransitions = useTransitions,
-                    VisualStateGroupName = visualStateGroupName,
-                    IsVisualStateChange = isVisualStateChange
-                };
+                    Guid guid = Guid.NewGuid();
+                    IterationParameters parameters = new IterationParameters()
+                    {
+                        Target = target,
+                        Guid = guid,
+                        UseTransitions = useTransitions,
+                        VisualStateGroupName = visualStateGroupName,
+                        IsVisualStateChange = isVisualStateChange
+                    };
 
-                InitializeIteration();
+                    InitializeIteration();
 
-                bool isThisSingleLoop = RepeatBehavior.Type == RepeatBehaviorType.Count && RepeatBehavior.Count == 1;
+                    bool isThisSingleLoop = RepeatBehavior.Type == RepeatBehaviorType.Count && RepeatBehavior.Count == 1;
 
-                StartFirstIteration(parameters, isThisSingleLoop, new TimeSpan()); //todo: use a parameter instead of just a new TimeSpan since we can have a Storyboard inside a Storyboard.
+                    StartFirstIteration(parameters, isThisSingleLoop, new TimeSpan()); //todo: use a parameter instead of just a new TimeSpan since we can have a Storyboard inside a Storyboard.
+                }
             });
         }
 
