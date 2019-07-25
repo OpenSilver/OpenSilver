@@ -196,6 +196,11 @@ namespace Windows.UI.Xaml.Data
                 // Convert from String or other types to the destination type (eg. binding "ScrollBar.Value" to "TextBox.Text"):
                 value = ConvertValueIfNecessary(value, property.PropertyType);
 
+                if (ParentBinding.StringFormat != null)
+                {
+                    value = String.Format(ParentBinding.StringFormat, value);
+                }
+
                 // If null, apply the "TargetNullValue":
                 if (value == null)
                 {

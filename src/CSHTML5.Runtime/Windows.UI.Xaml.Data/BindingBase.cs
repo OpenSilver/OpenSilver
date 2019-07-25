@@ -73,8 +73,7 @@ namespace Windows.UI.Xaml.Data
             set { _targetNullValue = value; }
         }
 
-#if WORKINPROGRESS
-        string _stringFormat;
+        protected string _stringFormat;
         /// <summary>
         /// Gets or sets a string that specifies how to format the binding if it displays 
         /// the bound value as a string.
@@ -84,7 +83,6 @@ namespace Windows.UI.Xaml.Data
             get { return _stringFormat; }
             set { _stringFormat = value; }
         }
-#endif
 
     }
 }
