@@ -36,6 +36,7 @@ namespace CSHTML5.Internal
     {
         public INTERNAL_PropertyStorage(DependencyObject owner, DependencyProperty property)
         {
+            _defaultValue = INTERNAL_NoValue.NoValue;
             Owner = owner;
             Property = property;
             if (property == FrameworkElement.IsEnabledProperty || property == FrameworkElement.IsHitTestVisibleProperty)
@@ -71,6 +72,32 @@ namespace CSHTML5.Internal
         public object ImplicitStyleValue { get; set; }
         public object InheritedValue { get; set; }
 
+        private object _defaultValue;
+        internal object DefaultValue
+        {
+            get
+            {
+                EnsureDefaultValue();
+                return _defaultValue;
+            }
+        }
+
+        private void EnsureDefaultValue()
+        {
+            if (_defaultValue == INTERNAL_NoValue.NoValue)
+            {
+                PropertyMetadata typeMetadata = Property.GetTypeMetaData(Property.OwnerType);
+                if (typeMetadata != null)
+                {
+                    _defaultValue = typeMetadata.DefaultValue;
+                }
+                else
+                {
+                    _defaultValue = Property.CreateDefaultValue();
+                }
+            }
+        }
+
         public List<IPropertyChangedListener> PropertyListeners { get; set; }
 
         internal class INTERNAL_LocalValue
@@ -90,10 +117,10 @@ namespace CSHTML5.Internal
 
             internal void SetValue(object value, KindOfValue kindOfValue)
             {
-                if(kindOfValue == KindOfValue.Local)
+                if (kindOfValue == KindOfValue.Local)
                 {
                     Local = value;
-                    if(value == INTERNAL_NoValue.NoValue)
+                    if (value == INTERNAL_NoValue.NoValue)
                     {
                         ActiveValue = Animated == INTERNAL_NoValue.NoValue ? KindOfValue.Local : KindOfValue.Animated;
                     }
@@ -102,10 +129,10 @@ namespace CSHTML5.Internal
                         ActiveValue = KindOfValue.Local;
                     }
                 }
-                else if(kindOfValue == KindOfValue.Animated)
+                else if (kindOfValue == KindOfValue.Animated)
                 {
                     Animated = value;
-                    if(value == INTERNAL_NoValue.NoValue)
+                    if (value == INTERNAL_NoValue.NoValue)
                     {
                         ActiveValue = KindOfValue.Local;
                     }
@@ -118,11 +145,11 @@ namespace CSHTML5.Internal
 
             internal object GetActiveLocalValue()
             {
-                if(ActiveValue == KindOfValue.Local)
+                if (ActiveValue == KindOfValue.Local)
                 {
                     return Local;
                 }
-                else if(ActiveValue == KindOfValue.Animated)
+                else if (ActiveValue == KindOfValue.Animated)
                 {
                     return Animated;
                 }

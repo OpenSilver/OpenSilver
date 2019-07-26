@@ -36,10 +36,27 @@ namespace Windows.UI.Xaml
     /// </summary>
     public class PropertyMetadata
     {
+        private object _defaultValue;
+
         /// <summary>
         /// Gets the default value for the dependency property.
         /// </summary>
-        public object DefaultValue { get; private set; }
+        public object DefaultValue
+        {
+            get
+            {
+                return _defaultValue;
+            }
+            set
+            {
+                if (value == INTERNAL_NoValue.NoValue)
+                {
+                    throw new ArgumentException("Default Value may not be Unset");
+                }
+                _defaultValue = value;
+            }
+        }
+
         /// <summary>
         /// Gets the method that is called when the property value changes.
         /// </summary>
@@ -67,6 +84,7 @@ namespace Windows.UI.Xaml
         public PropertyMetadata()
         {
             CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet;
+            this._defaultValue = INTERNAL_NoValue.NoValue;
         }
 
         /// <summary>
@@ -86,6 +104,7 @@ namespace Windows.UI.Xaml
         public PropertyMetadata(PropertyChangedCallback propertyChangedCallback)
         {
             this.PropertyChangedCallback = propertyChangedCallback;
+            this._defaultValue = INTERNAL_NoValue.NoValue;
         }
 
         /// <summary>

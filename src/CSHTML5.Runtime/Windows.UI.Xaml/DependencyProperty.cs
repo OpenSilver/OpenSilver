@@ -44,6 +44,7 @@ namespace Windows.UI.Xaml
 #endif
     public class DependencyProperty
     {
+        public static readonly object UnsetValue = INTERNAL_NoValue.NoValue; 
         //internal INTERNAL_PropertyStore Store { get; set; }
         internal string Name { get; set; }
         internal Type PropertyType { get; set; }
@@ -136,6 +137,54 @@ namespace Windows.UI.Xaml
             return property;
         }
 
+        private static Dictionary<Type, object> _defaultValuesCache;
+        // Cache for default values.
+        private static Dictionary<Type, object> DefaultValuesCache
+        {
+            get
+            {
+                if (_defaultValuesCache == null)
+                {
+                    _defaultValuesCache = new Dictionary<Type, object>();
+                }
+                return _defaultValuesCache;
+            }
+        }
+
+        /// <summary>
+        /// Set the default value of typemetada if it is unset.
+        /// </summary>
+        /// <param name="typeMetadata"></param>
+        /// <param name="propertyType"></param>
+        private static void EnsureDefaultValue(PropertyMetadata typeMetadata, Type propertyType)
+        {
+            if (typeMetadata != null)
+            {
+                if (typeMetadata.DefaultValue == INTERNAL_NoValue.NoValue)
+                {
+                    typeMetadata.DefaultValue = CreateDefaultValue(propertyType);
+                }
+            }
+        }
+
+        private static object CreateDefaultValue(Type propertyType)
+        {
+            object defaultValue;
+            // First we try to find the default value in the cache.
+            if (!DefaultValuesCache.TryGetValue(propertyType, out defaultValue))
+            {
+                // otherwise we compute the default value and store it in the cache.
+                defaultValue = propertyType.IsValueType ? Activator.CreateInstance(propertyType) : null;
+                DefaultValuesCache.Add(propertyType, defaultValue);
+            }
+            return defaultValue;
+        }
+
+        internal object CreateDefaultValue()
+        {
+            return CreateDefaultValue(this.PropertyType);
+        }
+
         /// <summary>
         /// Registers a dependency property with the specified property name, property type, owner type, and property metadata.
         /// </summary>
@@ -149,6 +198,9 @@ namespace Windows.UI.Xaml
 #if PERFSTAT
             var t = Performance.now();
 #endif
+            // Make sure typeMetadata default value is not set to INTERNAL_NoValue.NoValue.
+            EnsureDefaultValue(typeMetadata, propertyType);
+
             var newDependencyProperty = new DependencyProperty()
             {
                 Name = name,
@@ -208,6 +260,9 @@ namespace Windows.UI.Xaml
 
         public void OverrideMetadata(Type newOwnerType, PropertyMetadata typeMetadata)
         {
+            // Make sure typeMetadata default value is not set to INTERNAL_NoValue.NoValue.
+            DependencyProperty.EnsureDefaultValue(typeMetadata, PropertyType);
+
             if (_typesToOverridenMetadatas == null)
             {
                 _typesToOverridenMetadatas = new Dictionary<Type, PropertyMetadata>();

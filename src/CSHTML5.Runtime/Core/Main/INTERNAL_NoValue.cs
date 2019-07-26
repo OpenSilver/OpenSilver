@@ -27,7 +27,7 @@ namespace CSHTML5.Internal
 {
     internal class INTERNAL_NoValue
     {
-        public static readonly INTERNAL_NoValue NoValue; // Singleton
+        internal static readonly INTERNAL_NoValue NoValue; // Singleton
 
         static INTERNAL_NoValue()
         {
