@@ -779,6 +779,7 @@
     <Compile Include="Windows.UI.Xaml\Window.cs" />
     <Compile Include="Windows.UI.Xaml\WindowSizeChangedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationUnhandledExceptionEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DependencyObjectCollection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\EventTrigger.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FlowDirection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontStretch.cs" />
