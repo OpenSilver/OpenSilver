@@ -38,6 +38,12 @@ namespace Windows.UI.Xaml
     {
         private object _defaultValue;
 
+        private bool _isModified;
+        internal bool DefaultValueWasSet()
+        {
+            return _isModified;
+        }
+
         /// <summary>
         /// Gets the default value for the dependency property.
         /// </summary>
@@ -54,6 +60,7 @@ namespace Windows.UI.Xaml
                     throw new ArgumentException("Default Value may not be Unset");
                 }
                 _defaultValue = value;
+                _isModified = true;
             }
         }
 
@@ -84,7 +91,6 @@ namespace Windows.UI.Xaml
         public PropertyMetadata()
         {
             CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet;
-            this._defaultValue = INTERNAL_NoValue.NoValue;
         }
 
         /// <summary>
@@ -92,8 +98,9 @@ namespace Windows.UI.Xaml
         /// default value.
         /// </summary>
         /// <param name="defaultValue">A default value for the property where this PropertyMetadata is applied.</param>
-        public PropertyMetadata(object defaultValue) : base()
+        public PropertyMetadata(object defaultValue)
         {
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet;
             this.DefaultValue = defaultValue;
         }
 
@@ -103,8 +110,8 @@ namespace Windows.UI.Xaml
         /// <param name="propertyChangedCallback">A reference to the callback to call for property changed behavior.</param>
         public PropertyMetadata(PropertyChangedCallback propertyChangedCallback)
         {
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet;
             this.PropertyChangedCallback = propertyChangedCallback;
-            this._defaultValue = INTERNAL_NoValue.NoValue;
         }
 
         /// <summary>
@@ -114,8 +121,9 @@ namespace Windows.UI.Xaml
         /// <param name="defaultValue">A default value for the property where this PropertyMetadata is applied.</param>
         /// <param name="propertyChangedCallback">A reference to the callback to call for property changed behavior.</param>
         public PropertyMetadata(object defaultValue, PropertyChangedCallback propertyChangedCallback)
-            : this (defaultValue)
         {
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet;
+            this.DefaultValue = defaultValue;
             this.PropertyChangedCallback = propertyChangedCallback;
         }
 

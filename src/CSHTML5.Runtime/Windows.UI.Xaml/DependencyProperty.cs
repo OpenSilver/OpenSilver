@@ -44,7 +44,10 @@ namespace Windows.UI.Xaml
 #endif
     public class DependencyProperty
     {
-        public static readonly object UnsetValue = INTERNAL_NoValue.NoValue; 
+        public static readonly object UnsetValue = INTERNAL_NoValue.NoValue;
+
+        internal static INTERNAL_DefaultValueStore DefaultValueStore = INTERNAL_DefaultValueStore.Instance;
+
         //internal INTERNAL_PropertyStore Store { get; set; }
         internal string Name { get; set; }
         internal Type PropertyType { get; set; }
@@ -54,6 +57,7 @@ namespace Windows.UI.Xaml
         {
             get { return _isAttached; }
         }
+
         private PropertyMetadata _typeMetadata { get; set; } //note: this is now private because we now use GetTypeMetadata
 
         Dictionary<Type, PropertyMetadata> _typesToOverridenMetadatas = null; //this is the same as Optimization_typesToOverrides except that this one contains only the types that called the OverrideMetaData method.
@@ -97,7 +101,7 @@ namespace Windows.UI.Xaml
                 {
                     //a parent type has been found in the types overriding the metadata.
                     //we add the types through which we went to the dictionary containing the correspondance between types and metadata:
-                    foreach(Type type in typesWentThrough)
+                    foreach (Type type in typesWentThrough)
                     {
                         Optimization_typesToOverrides.Add(type, Optimization_typesToOverrides[currentType]);
                     }
@@ -137,52 +141,23 @@ namespace Windows.UI.Xaml
             return property;
         }
 
-        private static Dictionary<Type, object> _defaultValuesCache;
-        // Cache for default values.
-        private static Dictionary<Type, object> DefaultValuesCache
-        {
-            get
-            {
-                if (_defaultValuesCache == null)
-                {
-                    _defaultValuesCache = new Dictionary<Type, object>();
-                }
-                return _defaultValuesCache;
-            }
-        }
-
-        /// <summary>
-        /// Set the default value of typemetada if it is unset.
-        /// </summary>
-        /// <param name="typeMetadata"></param>
-        /// <param name="propertyType"></param>
         private static void EnsureDefaultValue(PropertyMetadata typeMetadata, Type propertyType)
         {
             if (typeMetadata != null)
             {
-                if (typeMetadata.DefaultValue == INTERNAL_NoValue.NoValue)
+                if (typeMetadata.DefaultValueWasSet())
                 {
-                    typeMetadata.DefaultValue = CreateDefaultValue(propertyType);
+                    object defaultValue;
+                    if (!DefaultValueStore.EnsureDefaultValueIsValid(typeMetadata.DefaultValue, propertyType, out defaultValue))
+                    {
+                        typeMetadata.DefaultValue = defaultValue;
+                    }
+                }
+                else
+                {
+                    typeMetadata.DefaultValue = DefaultValueStore.CreateDefaultValue(propertyType);
                 }
             }
-        }
-
-        private static object CreateDefaultValue(Type propertyType)
-        {
-            object defaultValue;
-            // First we try to find the default value in the cache.
-            if (!DefaultValuesCache.TryGetValue(propertyType, out defaultValue))
-            {
-                // otherwise we compute the default value and store it in the cache.
-                defaultValue = propertyType.IsValueType ? Activator.CreateInstance(propertyType) : null;
-                DefaultValuesCache.Add(propertyType, defaultValue);
-            }
-            return defaultValue;
-        }
-
-        internal object CreateDefaultValue()
-        {
-            return CreateDefaultValue(this.PropertyType);
         }
 
         /// <summary>
@@ -198,7 +173,7 @@ namespace Windows.UI.Xaml
 #if PERFSTAT
             var t = Performance.now();
 #endif
-            // Make sure typeMetadata default value is not set to INTERNAL_NoValue.NoValue.
+            // Make sure typeMetadata default value is valid.
             EnsureDefaultValue(typeMetadata, propertyType);
 
             var newDependencyProperty = new DependencyProperty()
@@ -221,7 +196,7 @@ namespace Windows.UI.Xaml
 
             //Add the dependencyProperty's name to the dictionary that allows to get the dependencyProperty from its name:
             Dictionary<string, DependencyProperty> stringsToDependencyProperties = INTERNAL_TypeToStringsToDependencyProperties.GetDictionaryForType(ownerType);
-            if(stringsToDependencyProperties.ContainsKey(name))
+            if (stringsToDependencyProperties.ContainsKey(name))
             {
 #if !MIGRATION
                 // THE FOLLOWING CHECK IS DISABLED IN THE SILVERLIGHT COMPATIBLE VERSION
@@ -261,20 +236,20 @@ namespace Windows.UI.Xaml
         public void OverrideMetadata(Type newOwnerType, PropertyMetadata typeMetadata)
         {
             // Make sure typeMetadata default value is not set to INTERNAL_NoValue.NoValue.
-            DependencyProperty.EnsureDefaultValue(typeMetadata, PropertyType);
+            EnsureDefaultValue(typeMetadata, PropertyType);
 
             if (_typesToOverridenMetadatas == null)
             {
                 _typesToOverridenMetadatas = new Dictionary<Type, PropertyMetadata>();
             }
-            _typesToOverridenMetadatas.Add(newOwnerType, typeMetadata); 
+            _typesToOverridenMetadatas.Add(newOwnerType, typeMetadata);
 
             //We add the element in the dictionary used for optimizations:
             if (Optimization_typesToOverrides == null)
             {
                 Optimization_typesToOverrides = new Dictionary<Type, PropertyMetadata>();
             }
-            Optimization_typesToOverrides.Add(newOwnerType, typeMetadata); 
+            Optimization_typesToOverrides.Add(newOwnerType, typeMetadata);
         }
     }
 }

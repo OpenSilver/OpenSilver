@@ -270,7 +270,7 @@ namespace CSHTML5.Internal
 #if PERFSTAT
                 Performance.Counter("INTERNAL_PropertyStore.GetValue", t);
 #endif
-                return storage.DefaultValue;
+                return typeMetadata != null ? typeMetadata.DefaultValue : null;
             }
 
 #if PERFSTAT
@@ -310,7 +310,7 @@ namespace CSHTML5.Internal
 #if PERFSTAT
                 Performance.Counter("INTERNAL_PropertyStore.GetValueWithoutCoerce", t);
 #endif
-                return storage.DefaultValue;
+                return typeMetadata != null ? typeMetadata.DefaultValue : null;
             }
 #if PERFSTAT
             Performance.Counter("INTERNAL_PropertyStore.GetValueWithoutCoerce", t);
@@ -735,8 +735,7 @@ namespace CSHTML5.Internal
             {
                 return; //we should not arrive here in this case but we make sure to not do anything should that happen.
             }
-            object oldValue = storage.Local == INTERNAL_NoValue.NoValue ? storage.DefaultValue : storage.Local;
-
+            object oldValue = storage.Local == INTERNAL_NoValue.NoValue ? (typeMetadata != null ? typeMetadata.DefaultValue : null) : storage.Local;
             object currentValue = GetValueWithoutCoerce(storage, typeMetadata); //Note: we do not need to know where this value comes from (Local, VisualState, etc.) since calling this method means that it has not been modified and we only need to update the coerced value.
             object coercedNewValue = typeMetadata.CoerceValueCallback(storage.Owner, currentValue);
             SetSpecificValue(storage, KindOfValue.Coerced, coercedNewValue, typeMetadata);
