@@ -149,13 +149,20 @@ namespace System
                 //we check whether the server could be found at all. It is not definite that readyState = 4 and status = 0 means that the server could not be found but that's the only example I have met so far and we're a bit poor on informations anyway.
                 int currentReadyState = GetCurrentReadyState((object)_xmlHttpRequest);
                 int currentStatus = GetCurrentStatus((object)_xmlHttpRequest);
-                if (currentReadyState == 4 && currentStatus == 0) //we could replace that "if" with a method since it is used in SetEventArgs.
+                if (currentStatus == 0 && (currentReadyState == 4 || currentReadyState == 1)) //we could replace that "if" with a method since it is used in SetEventArgs.
                 {
+                    if (!isAsync)
+                    {
 #if BRIDGE
-                    throw new System.ServiceModel.CommunicationException("An error occured. Please make sure that the target URL is available: " + _address.ToString());
+                        throw new System.ServiceModel.CommunicationException("An error occured. Please make sure that the target URL is available: " + address.ToString());
 #else
-                    throw new Exception("An error occured. Please make sure that the target URL is available: " + _address.ToString());
+                        throw new Exception("An error occured. Please make sure that the target URL is available: " + address.ToString());
 #endif
+                    }
+                    else
+                    {
+                        //Note: there is no need to call OnDownloadStringCompleted() because it is already called even though there is an error.
+                    }
                 }
             }
 
@@ -282,7 +289,7 @@ namespace System
         }
 
 #if !BRIDGE
-        [JSIL.Meta.JSReplacement("$xmlHttpRequest.onload = $OnDownloadStatusCompleted")]
+        [JSIL.Meta.JSReplacement("$xmlHttpRequest.onloadend = $OnDownloadStatusCompleted")]
 #else
         [Template("{xmlHttpRequest}.onloadend = {OnDownloadStatusCompleted}")] // Note: we  register to the loadend event instead of the load event because the load event is only fired when the request is SUCCESSFULLY completed, while the loadend is triggered after errors and abortions as well. This allows us to handle the error cases in the callback of asynchronous calls.
 #endif
@@ -379,13 +386,13 @@ namespace System
             {
                 e.Error = new Exception("Request not initialized");
             }
+            else if (currentStatus == 0 && (currentReadyState == 4 || currentReadyState == 1))
+            {
+                e.Error = new Exception("An error occured. Please make sure that the target Url is available.");
+            }
             else if (currentReadyState == 1 && !e.Cancelled)
             {
                 e.Error = new Exception("An Error occured. Cross-Site Http Request might not be allowed at the target Url. If you own the domain of the Url, consider adding the header \"Access-Control-Allow-Origin\" to enable requests to be done at this Url.");
-            }
-            else if (currentReadyState ==  4 && currentStatus == 0)
-            {
-                e.Error = new Exception("An error occured. Please make sure that the target Url is available.");
             }
             else if (currentReadyState != 4)
             {
