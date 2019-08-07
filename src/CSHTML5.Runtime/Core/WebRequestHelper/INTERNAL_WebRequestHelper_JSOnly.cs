@@ -151,17 +151,13 @@ namespace System
                 int currentStatus = GetCurrentStatus((object)_xmlHttpRequest);
                 if (currentStatus == 0 && (currentReadyState == 4 || currentReadyState == 1)) //we could replace that "if" with a method since it is used in SetEventArgs.
                 {
-                    if (!isAsync)
+                    if (!isAsync) // Note: we only throw the exception when the call is not asynchronous because it is dealt with in the callback (defined by SetCallbackMethod and automatically called by SendRequest).
                     {
 #if BRIDGE
                         throw new System.ServiceModel.CommunicationException("An error occured. Please make sure that the target URL is available: " + address.ToString());
 #else
                         throw new Exception("An error occured. Please make sure that the target URL is available: " + address.ToString());
 #endif
-                    }
-                    else
-                    {
-                        //Note: there is no need to call OnDownloadStringCompleted() because it is already called even though there is an error.
                     }
                 }
             }
