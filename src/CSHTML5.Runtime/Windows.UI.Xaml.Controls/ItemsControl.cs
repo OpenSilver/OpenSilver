@@ -114,7 +114,10 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty ItemsPanelProperty =
             DependencyProperty.Register("ItemsPanel", typeof(ItemsPanelTemplate), typeof(ItemsControl),
-                new PropertyMetadata(GetDefaultItemsPanel(), OnItemsPanel_Changed));
+                new PropertyMetadata(GetDefaultItemsPanel(), OnItemsPanel_Changed)
+                {
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never
+                });
 
         static ItemsPanelTemplate GetDefaultItemsPanel()
         {
