@@ -23,6 +23,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
+using DotNetForHtml5.Core;
 
 
 #if MIGRATION
@@ -117,9 +118,11 @@ namespace Windows.UI.Xaml.Controls
 
         #region DropDownHandler
 
-        protected void OpenDropDown()
+        protected async void OpenDropDown()
         {
             _popup.IsOpen = true;
+            await Task.Delay(TimeSpan.FromSeconds(0.5));
+            INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(_popup);
         }
 
         protected void CloseDropDown()

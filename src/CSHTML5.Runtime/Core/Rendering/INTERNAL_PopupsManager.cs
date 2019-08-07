@@ -285,10 +285,13 @@ $1.removeChild(popupRoot);
                     && popupActualWidth > 0
                     && popupActualHeight > 0)
                 {
+                    GeneralTransform gt = popup.TransformToVisual(Application.Current.RootVisual);
+                    Point popupPosition = gt.Transform(new Point(0, 0));
+
                     // Determine the size of the window:
                     Rect windowBounds = Window.Current.Bounds;
-                    double popupX = popup.HorizontalOffset;
-                    double popupY = popup.VerticalOffset;
+                    double popupX = popup.HorizontalOffset + popupPosition.X;
+                    double popupY = popup.VerticalOffset + popupPosition.Y;
 
                     // Calculate the area of the popup that is outside the screen bounds:
                     double widthOfAreaOutsideBounds = (popupX + popupActualWidth) - windowBounds.Width;
