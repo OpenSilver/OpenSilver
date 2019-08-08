@@ -23,6 +23,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if !MIGRATION
+using Windows.UI.Xaml.Controls;
+#else
+using System.Windows.Controls;
+#endif
+
 #if MIGRATION
 namespace System.Windows
 #else
@@ -37,7 +43,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// The element that contains the FrameworkTemplate.
         /// </summary>
-        public UIElement TemplateOwner;
+        public Control TemplateOwner;
 
         /// <summary>
         /// The visual subtree that has been generated for the FrameworkTemplate.
