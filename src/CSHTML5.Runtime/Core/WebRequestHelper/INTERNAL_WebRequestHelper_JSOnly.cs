@@ -198,10 +198,13 @@ namespace System
             else
             {
                 // in asynchronous mode, the error callback will directly arrive in errorOnSetting, and it will resend this request
+                _isFirstTryAtSendingUnsafeRequest = true;
                 SendRequest((object)_xmlHttpRequest, address, method, isAsync, body);
                 return GetResult((object)_xmlHttpRequest);
             }
         }
+
+        bool _isFirstTryAtSendingUnsafeRequest = false;
 
         // if the last request was asynchronous, any error will be cought here.
         private void OnError(object sender)
@@ -364,10 +367,14 @@ namespace System
         {
             var e = new INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs();
             SetEventArgs(e);
-            if (DownloadStringCompleted != null)
+            if (e.Error == null || !_isFirstTryAtSendingUnsafeRequest)
             {
-                DownloadStringCompleted(_sender, e);
+                if (DownloadStringCompleted != null)
+                {
+                    DownloadStringCompleted(_sender, e);
+                }
             }
+            _isFirstTryAtSendingUnsafeRequest = false;
         }
 
         private void SetEventArgs(INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs e)
