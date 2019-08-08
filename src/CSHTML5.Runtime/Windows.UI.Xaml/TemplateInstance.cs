@@ -34,27 +34,15 @@ namespace Windows.UI.Xaml
     /// </summary>
     public class TemplateInstance
     {
-        private UIElement _templateOwner;
-
         /// <summary>
-        /// Gets or sets the element that contains the FrameworkTemplate. Do not use this Property.
+        /// The element that contains the FrameworkTemplate.
         /// </summary>
-        /// <exclude/>
-        public UIElement TemplateOwner
-        {
-            get { return _templateOwner; }
-            set { _templateOwner = value; }
-        }
+        public UIElement TemplateOwner;
 
-        private FrameworkElement _templateContent;
         /// <summary>
-        /// Gets or sets the visual subtree that has been generated for the FrameworkTemplate.
+        /// The visual subtree that has been generated for the FrameworkTemplate.
         /// Note: this should only be used inside the methods put as parameter in FrameworkTemplate.SetMethodToInstantiateFrameworkTemplate, to define the root of the Template's generated subtree.
         /// </summary>
-        public FrameworkElement TemplateContent
-        {
-            get { return _templateContent; }
-            set { _templateContent = value; }
-        }
+        public FrameworkElement TemplateContent;
     }
 }
