@@ -34,6 +34,11 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public sealed class TranslateTransform : Transform
     {
+        double _appliedCssX;
+        double _appliedCssY;
+        object _domElementToWhichTheCssXWasApplied;
+        object _domElementToWhichTheCssYWasApplied;
+
         /// <summary>
         /// Gets or sets the distance to translate along the x-axis.
         /// </summary>
@@ -122,10 +127,22 @@ namespace Windows.UI.Xaml.Media
         private void ApplyCSSChanges(TranslateTransform translateTransform, double x, double y)
         {
             CSSEquivalent translateXcssEquivalent = XProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(translateTransform);
-            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(translateXcssEquivalent.DomElement, translateXcssEquivalent.Name, translateXcssEquivalent.Value(translateTransform, x));
+            object domElementX = translateXcssEquivalent.DomElement;
+            if (x != _appliedCssX || (_domElementToWhichTheCssXWasApplied != null && domElementX != _domElementToWhichTheCssXWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
+            {
+                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(domElementX, translateXcssEquivalent.Name, translateXcssEquivalent.Value(translateTransform, x));
+                _appliedCssX = x;
+                _domElementToWhichTheCssXWasApplied = domElementX;
+            }
 
             CSSEquivalent translateYcssEquivalent = YProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(translateTransform);
-            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(translateYcssEquivalent.DomElement, translateYcssEquivalent.Name, translateYcssEquivalent.Value(translateTransform, y));
+            object domElementY = translateYcssEquivalent.DomElement;
+            if (y != _appliedCssY || (_domElementToWhichTheCssYWasApplied != null && domElementY != _domElementToWhichTheCssYWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
+            {
+                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(translateYcssEquivalent.DomElement, translateYcssEquivalent.Name, translateYcssEquivalent.Value(translateTransform, y));
+                _appliedCssY = x;
+                _domElementToWhichTheCssYWasApplied = domElementX;
+            }
         }
 
         internal override void INTERNAL_ApplyCSSChanges()

@@ -36,6 +36,9 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public sealed class RotateTransform : Transform
     {
+        double _appliedCssAngle;
+        object _domElementToWhichTheCssWasApplied;
+
         /// <summary>
         /// Gets or sets the angle, in degrees, of clockwise rotation.
         /// </summary>
@@ -74,7 +77,13 @@ namespace Windows.UI.Xaml.Media
         private void ApplyCSSChanges(RotateTransform rotateTransform, double angle)
         {
             CSSEquivalent anglecssEquivalent = AngleProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(rotateTransform);
-            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(anglecssEquivalent.DomElement, anglecssEquivalent.Name, anglecssEquivalent.Value(rotateTransform, angle));
+            object domElement = anglecssEquivalent.DomElement;
+            if (angle != _appliedCssAngle || (_domElementToWhichTheCssWasApplied != null && domElement != _domElementToWhichTheCssWasApplied)) // Optimization to avoid setting the transform if the value is 0 or if it is the same as the last time.
+            {
+                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(anglecssEquivalent.DomElement, anglecssEquivalent.Name, anglecssEquivalent.Value(rotateTransform, angle));
+                _appliedCssAngle = angle;
+                _domElementToWhichTheCssWasApplied = domElement;
+            }
         }
 
         internal override void INTERNAL_ApplyCSSChanges()
