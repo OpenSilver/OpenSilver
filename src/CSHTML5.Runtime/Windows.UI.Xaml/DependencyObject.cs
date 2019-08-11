@@ -43,18 +43,28 @@ namespace Windows.UI.Xaml
     /// </summary>
     public class DependencyObject
     {
-        private Dictionary<DependencyProperty, Expression> _expressions;
-        internal Expression GetExpression(DependencyProperty dp)
+        private Dictionary<DependencyProperty, BindingExpression> _bindingExpressions;
+
+        /// <summary>
+        /// Returns the System.Windows.Data.BindingExpression that represents the binding
+        /// on the specified property.
+        /// </summary>
+        /// <param name="dp">The target System.Windows.DependencyProperty to get the binding from.</param>
+        /// <returns>
+        /// A System.Windows.Data.BindingExpression if the target property has an active
+        /// binding; otherwise, returns null.
+        /// </returns>
+        public BindingExpression GetBindingExpression(DependencyProperty dp)
         {
-            if(_expressions == null)
+            if(_bindingExpressions == null)
             {
-                _expressions = new Dictionary<DependencyProperty, Expression>();
+                _bindingExpressions = new Dictionary<DependencyProperty, BindingExpression>();
                 return null;
             }
 
-            if(_expressions.ContainsKey(dp))
+            if(_bindingExpressions.ContainsKey(dp))
             {
-                return _expressions[dp];
+                return _bindingExpressions[dp];
             }
             else
             {
@@ -247,13 +257,10 @@ namespace Windows.UI.Xaml
 
         internal Binding INTERNAL_GetBinding(DependencyProperty dependencyProperty)
         {
-            if (_expressions != null && _expressions.ContainsKey(dependencyProperty))
+            if (_bindingExpressions != null && _bindingExpressions.ContainsKey(dependencyProperty))
             {
-                var value = _expressions[dependencyProperty];
-                if (value is BindingExpression)
-                {
-                    return (((BindingExpression)value).ParentBinding).Clone();
-                }
+                var value = _bindingExpressions[dependencyProperty];
+                return value.ParentBinding.Clone();
             }
             return null; //todo: see if an exception would be better
         }
@@ -280,63 +287,60 @@ namespace Windows.UI.Xaml
         void SetValueInternal(DependencyProperty dependencyProperty, object value)
         {
             object computedValue = value;
-            Expression newExpression = null;
-            Expression oldExpression = null;
-            BindingExpression oldExpressionAsBindingExpression = null;
+            BindingExpression newBindingExpression = null;
+            BindingExpression oldBindingExpression = null;
 #if PERFSTAT
             var t = Performance.now();
 #endif
 
-            if (value is Expression)
+            if (value is BindingExpression)
             {
-                newExpression = (Expression)value;
+                newBindingExpression = (BindingExpression)value;
             }
 
-            if (_expressions != null && _expressions.ContainsKey(dependencyProperty))
+            if (_bindingExpressions != null && _bindingExpressions.ContainsKey(dependencyProperty))
             {
-                oldExpression = _expressions[dependencyProperty];
+                oldBindingExpression = _bindingExpressions[dependencyProperty];
             }
 
-            if (newExpression != null)
+            if (newBindingExpression != null)
             {
-                if (newExpression != oldExpression)
+                if (newBindingExpression != oldBindingExpression)
                 {
-                    if (newExpression.IsAttached)
+                    if (newBindingExpression.IsAttached)
                     {
-                        throw new InvalidOperationException("Cannot attach an instance of Windows.UI.Xaml.Data.Expression multiple times");
+                        throw new InvalidOperationException("Cannot attach an instance of Windows.UI.Xaml.Data.BindingExpression multiple times");
                     }
                     else
                     {
-                        if (oldExpression != null)
+                        if (oldBindingExpression != null)
                         {
-                            _expressions.Remove(dependencyProperty);
-                            oldExpression.OnDetached(this);
+                            _bindingExpressions.Remove(dependencyProperty);
+                            oldBindingExpression.OnDetached(this);
                         }
-                        if (_expressions == null)
+                        if (_bindingExpressions == null)
                         {
-                            _expressions = new Dictionary<DependencyProperty, Expression>();
+                            _bindingExpressions = new Dictionary<DependencyProperty, BindingExpression>();
                         }
-                        _expressions.Add(dependencyProperty, newExpression);
-                        newExpression.OnAttached(this);
+                        _bindingExpressions.Add(dependencyProperty, newBindingExpression);
+                        newBindingExpression.OnAttached(this);
                     }
                 }
                 //else (if newExpression == oldExpression) do nothing
 
-                computedValue = newExpression.GetValue(dependencyProperty, this.GetType());
+                computedValue = newBindingExpression.GetValue(dependencyProperty, this.GetType());
             }
-            else if (oldExpression != null)
+            else if (oldBindingExpression != null)
             {
-                if (!oldExpression.IsUpdating
-                    && !(oldExpression is BindingExpression && ((BindingExpression)oldExpression).ParentBinding.Mode == BindingMode.TwoWay)) // If mode is TwoWay, setting the property should not remove the binding. To reproduce: create a TextBox with a TwoWay binding on the property Text, and set textBox.Text = ... => the binding is preserved.
+                if (!oldBindingExpression.IsUpdating && oldBindingExpression.ParentBinding.Mode != BindingMode.TwoWay) // If mode is TwoWay, setting the property should not remove the binding. To reproduce: create a TextBox with a TwoWay binding on the property Text, and set textBox.Text = ... => the binding is preserved.
                 {
-                    oldExpressionAsBindingExpression = oldExpression as BindingExpression;
-                    _expressions.Remove(dependencyProperty);
-                    oldExpression.OnDetached(this);
+                    _bindingExpressions.Remove(dependencyProperty);
+                    oldBindingExpression.OnDetached(this);
                 }
-                else if (oldExpression is BindingExpression && ((BindingExpression)oldExpression).ParentBinding.Mode == BindingMode.OneTime) //todo: if we add the BindingExpressionBase class, change this with BindingExpressionBase.
+                else if (oldBindingExpression.ParentBinding.Mode == BindingMode.OneTime)
                 {
-                    _expressions.Remove(dependencyProperty);
-                    oldExpression.OnDetached(this);
+                    _bindingExpressions.Remove(dependencyProperty);
+                    oldBindingExpression.OnDetached(this);
                 }
             }
 
@@ -346,12 +350,11 @@ namespace Windows.UI.Xaml
             }
 
             //If we use validation, we determine whether the value is Invalid or not.
-            if (newExpression is BindingExpression)
+            if (newBindingExpression != null)
             {
-                BindingExpression bindingExpression = newExpression as BindingExpression;
-                if (bindingExpression.INTERNAL_ForceValidateOnNextSetValue)
+                if (newBindingExpression.INTERNAL_ForceValidateOnNextSetValue)
                 {
-                    bindingExpression.CheckInitialValueValidity(computedValue);
+                    newBindingExpression.CheckInitialValueValidity(computedValue);
                 }
             }
 
@@ -363,29 +366,25 @@ namespace Windows.UI.Xaml
             t = Performance.now();
 #endif
 
-            if (oldExpressionAsBindingExpression != null && oldExpressionAsBindingExpression.ParentBinding.Mode == BindingMode.TwoWay) //note: we know that oldExpressionAsBindingExpression.IsUpdating is false because oldExpressionAsBindingExpression is only set in that case (otherwise, it is null).
+            if (oldBindingExpression != null && oldBindingExpression.ParentBinding.Mode == BindingMode.TwoWay) //note: we know that oldExpression.IsUpdating is false because oldExpression is only set in that case (otherwise, it is null).
             {
-                oldExpressionAsBindingExpression.TryUpdateSourceObject(computedValue);
+                oldBindingExpression.TryUpdateSourceObject(computedValue);
             }
         }
 
         internal void INTERNAL_UpdateBindingsSource()
         {
-            if (_expressions != null)
+            if (_bindingExpressions != null)
             {
-                foreach (Expression expression in
+                foreach (BindingExpression bindingExpression in
 #if BRIDGE
-                    INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(_expressions)
+                    INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(_bindingExpressions)
 #else
                     _expressions.Values
 #endif
                     )
                 {
-                    BindingExpression bindingExpression = expression as BindingExpression;
-                    if (bindingExpression != null)
-                    {
-                        bindingExpression.OnSourceAvailable();
-                    }
+                    bindingExpression.OnSourceAvailable();
                 }
             }
         }

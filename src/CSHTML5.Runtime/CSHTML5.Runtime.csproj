@@ -549,7 +549,6 @@
     <Compile Include="Windows.UI.Xaml.Data\BindingMode.cs" />
     <Compile Include="Windows.UI.Xaml.Data\BindingOperations.cs" />
     <Compile Include="Windows.UI.Xaml.Data\CollectionViewGroupInternal.cs" />
-    <Compile Include="Windows.UI.Xaml.Data\Expression.cs" />
     <Compile Include="Windows.UI.Xaml.Data\FilterEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IDependencyPropertyChangedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IIsAttachedMonitor.cs" />

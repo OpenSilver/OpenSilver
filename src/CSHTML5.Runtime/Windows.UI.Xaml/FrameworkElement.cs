@@ -198,25 +198,6 @@ namespace Windows.UI.Xaml
 
         }
 
-        /// <summary>
-        /// Returns the System.Windows.Data.BindingExpression that represents the binding
-        /// on the specified property.
-        /// </summary>
-        /// <param name="dp">The target System.Windows.DependencyProperty to get the binding from.</param>
-        /// <returns>
-        /// A System.Windows.Data.BindingExpression if the target property has an active
-        /// binding; otherwise, returns null.
-        /// </returns>
-        public BindingExpression GetBindingExpression(DependencyProperty dp)
-        {
-            Expression expression = GetExpression(dp);
-            if (expression != null && expression is BindingExpression)
-            {
-                return (BindingExpression)expression;
-            }
-            return null;
-        }
-
         #region Cursor
 
         // Returns:
