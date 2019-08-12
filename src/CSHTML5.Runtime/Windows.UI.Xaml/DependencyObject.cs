@@ -113,7 +113,7 @@ namespace Windows.UI.Xaml
 #if PERFSTAT
             Performance.Counter("DependencyObject.SetLocalValue", t);
 #endif
-            INTERNAL_PropertyStore.SetLocalValue(storage, value);
+            INTERNAL_PropertyStore.SetSpecificValue(storage, KindOfValue.Local, value, null);
         }
 
         public void CoerceCurrentValue(DependencyProperty dependencyProperty, PropertyMetadata propertyMetadata)
@@ -159,7 +159,7 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException("No property specified");
 
             var storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, dependencyProperty);
-            INTERNAL_PropertyStore.SetVisualStateValue(storage, value);
+            INTERNAL_PropertyStore.SetSpecificValue(storage, KindOfValue.VisualState, value, null);
         }
 
         public void SetAnimationValue(DependencyProperty dependencyProperty, object value)
@@ -168,7 +168,7 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException("No property specified");
 
             var storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, dependencyProperty);
-            INTERNAL_PropertyStore.SetAnimationValue(storage, value);
+            INTERNAL_PropertyStore.SetSpecificValue(storage, KindOfValue.Animated, value, null);
         }
 
         public object GetAnimationValue(DependencyProperty dependencyProperty)

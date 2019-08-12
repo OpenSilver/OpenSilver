@@ -49,11 +49,48 @@ namespace CSHTML5.Internal
             LocalStyleValue = INTERNAL_NoValue.NoValue;
             ImplicitStyleValue = INTERNAL_NoValue.NoValue;
             InheritedValue = INTERNAL_NoValue.NoValue;
+
+            // Make sure the ActualValue is calculated when read, so that the DefaultValue is used:
+            ActualValueIsDirty = true;
         }
         internal bool _isIsEnabledOrIsHitTestVisibleProperty = false;
 
         public DependencyObject Owner { get; private set; }
         public DependencyProperty Property { get; private set; }
+
+        //=================
+        // ACTUAL VALUE
+        //=================
+
+        /// <summary>
+        /// Gets or sets the computed value that has the highest priority among the style, animation, visual state, inherited, etc. values.
+        /// </summary>
+        private object _actualValue;
+        public object ActualValue
+        {
+            get
+            {
+                if (ActualValueIsDirty)
+                {
+                    PropertyMetadata typeMetadata = Property.GetTypeMetaData(Owner.GetType());
+                    _actualValue = INTERNAL_PropertyStore.ComputeActualValue(this, typeMetadata, false);
+                    ActualValueIsDirty = false;
+                }
+
+                return _actualValue;
+            }
+            set { _actualValue = value; }
+        }
+
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the ActualValue needs to be recomputer because it is no longer correct.
+        /// </summary>
+        public bool ActualValueIsDirty { private get; set; }
+
+        //=================
+        // SPECIFIC VALUES
+        //=================
         public object CoercedValue { get; set; }
         public object VisualStateValue { get; set; }
 

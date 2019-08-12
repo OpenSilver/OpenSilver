@@ -210,21 +210,6 @@ namespace CSHTML5.Internal
             #endregion
         }
 
-        public static void SetVisualStateValue(INTERNAL_PropertyStorage storage, object newValue)
-        {
-            SetSpecificValue(storage, KindOfValue.VisualState, newValue, null);
-        }
-
-        public static void SetAnimationValue(INTERNAL_PropertyStorage storage, object newValue)
-        {
-            SetSpecificValue(storage, KindOfValue.Animated, newValue, null);
-        }
-
-        public static void SetLocalValue(INTERNAL_PropertyStorage storage, object newValue)
-        {
-            SetSpecificValue(storage, KindOfValue.Local, newValue, null);
-        }
-
         static void RaisePropertyChangedAndCascadeToChildren(INTERNAL_PropertyStorage storage, object oldValue, object newValue, PropertyMetadata typeMetadata)
         {
             //-----------------------
@@ -274,29 +259,7 @@ namespace CSHTML5.Internal
                 // THE STORAGE EXISTS:
                 //====================
 
-                if (storage._isIsEnabledOrIsHitTestVisibleProperty)
-                {
-                    if ((returnValue = storage.InheritedValue) != INTERNAL_NoValue.NoValue && returnValue != null && ((bool)returnValue) == false)
-                    {
-#if PERFSTAT
-                        Performance.Counter("INTERNAL_PropertyStore.GetValue", t);
-#endif
-                        return false;
-                    }
-                }
-
-                if ((returnValue = storage.CoercedValue) != INTERNAL_NoValue.NoValue) { }
-                else if ((returnValue = storage.VisualStateValue) != INTERNAL_NoValue.NoValue) { }
-                else if (storage.ActiveLocalValue.ActiveValue == KindOfValue.Local && (returnValue = storage.Local) != INTERNAL_NoValue.NoValue) { }
-                else if (storage.ActiveLocalValue.ActiveValue == KindOfValue.Animated && (returnValue = storage.AnimationValue) != INTERNAL_NoValue.NoValue) { }
-                else if ((returnValue = storage.LocalStyleValue) != INTERNAL_NoValue.NoValue) { }
-                else if ((returnValue = storage.ImplicitStyleValue) != INTERNAL_NoValue.NoValue) { }
-                else if ((returnValue = storage.InheritedValue) != INTERNAL_NoValue.NoValue) { }
-                else
-                {
-                    // Return the default value:
-                    returnValue = typeMetadata != null ? typeMetadata.DefaultValue : null;
-                }
+                return storage.ActualValue;
             }
 
 #if PERFSTAT
@@ -306,45 +269,33 @@ namespace CSHTML5.Internal
             return returnValue;
         }
 
-        public static object GetValueWithoutCoerce(INTERNAL_PropertyStorage storage, PropertyMetadata typeMetadata) //todo: remove the "(value = storage.Local) != null" because the user might purposely set it at null OR define a specific value to purposely set something at null
+        public static object ComputeActualValue(INTERNAL_PropertyStorage storage, PropertyMetadata typeMetadata, bool ignoreCoercedValue)
         {
-            object value;
-#if PERFSTAT
-            var t = Performance.now();
-#endif
+            object actualValue;
+
             if (storage._isIsEnabledOrIsHitTestVisibleProperty)
             {
-                if ((value = storage.InheritedValue) != INTERNAL_NoValue.NoValue && value != null && ((bool)value) == false)
+                if ((actualValue = storage.InheritedValue) != INTERNAL_NoValue.NoValue && actualValue != null && ((bool)actualValue) == false)
                 {
-#if PERFSTAT
-                    Performance.Counter("INTERNAL_PropertyStore.GetValueWithoutCoerce", t);
-#endif
                     return false;
                 }
             }
 
-            //todo: remove all comparisons with "null" to leave only the comparisons with "NoValue":
-            if ((value = storage.VisualStateValue) != INTERNAL_NoValue.NoValue) { }
-            else if (storage.ActiveLocalValue.ActiveValue == KindOfValue.Local && (value = storage.Local) != INTERNAL_NoValue.NoValue) { }
-            else if (storage.ActiveLocalValue.ActiveValue == KindOfValue.Animated && (value = storage.AnimationValue) != INTERNAL_NoValue.NoValue) { }
-            else if ((value = storage.LocalStyleValue) != INTERNAL_NoValue.NoValue) { }
-            else if ((value = storage.ImplicitStyleValue) != INTERNAL_NoValue.NoValue) { }
-            else if ((value = storage.InheritedValue) != INTERNAL_NoValue.NoValue) { }
+            if (!ignoreCoercedValue && (actualValue = storage.CoercedValue) != INTERNAL_NoValue.NoValue) { }
+            else if ((actualValue = storage.VisualStateValue) != INTERNAL_NoValue.NoValue) { }
+            else if (storage.ActiveLocalValue.ActiveValue == KindOfValue.Local && (actualValue = storage.Local) != INTERNAL_NoValue.NoValue) { }
+            else if (storage.ActiveLocalValue.ActiveValue == KindOfValue.Animated && (actualValue = storage.AnimationValue) != INTERNAL_NoValue.NoValue) { }
+            else if ((actualValue = storage.LocalStyleValue) != INTERNAL_NoValue.NoValue) { }
+            else if ((actualValue = storage.ImplicitStyleValue) != INTERNAL_NoValue.NoValue) { }
+            else if ((actualValue = storage.InheritedValue) != INTERNAL_NoValue.NoValue) { }
             else
             {
-                if (typeMetadata == null)
-                    typeMetadata = storage.Property.GetTypeMetaData(storage.Owner.GetType());
-#if PERFSTAT
-                Performance.Counter("INTERNAL_PropertyStore.GetValueWithoutCoerce", t);
-#endif
-                return typeMetadata != null ? typeMetadata.DefaultValue : null;
+                // Return the default value:
+                actualValue = typeMetadata != null ? typeMetadata.DefaultValue : null;
             }
-#if PERFSTAT
-            Performance.Counter("INTERNAL_PropertyStore.GetValueWithoutCoerce", t);
-#endif
-            return value;
-        }
 
+            return actualValue;
+        }
         static bool DoesSpecificValueImpactActualValue(INTERNAL_PropertyStorage storage, KindOfValue kind)
         {
             object value;
@@ -361,13 +312,14 @@ namespace CSHTML5.Internal
             return false;
         }
 
-        static void SetSpecificValue(INTERNAL_PropertyStorage storage, KindOfValue kindOfValueToSet, object newValue, PropertyMetadata typeMetadata = null)
+        internal static void SetSpecificValue(INTERNAL_PropertyStorage storage, KindOfValue kindOfValueToSet, object newValue, PropertyMetadata typeMetadata = null)
         {
 #if PERFSTAT
             var t = Performance.now();
 #endif
             if (typeMetadata == null)
                 typeMetadata = storage.Property.GetTypeMetaData(storage.Owner.GetType());
+
             object oldValue = GetValue(storage, typeMetadata);
             bool raisePropertyChangedAndCascadetoChildren = true;
 
@@ -406,22 +358,31 @@ namespace CSHTML5.Internal
                     break;
             }
 
-            if (newValue == INTERNAL_NoValue.NoValue) //we consider that the new value is the one with the highest priority since we removed the former one.
+            // If we remove the value we consider that it impacts the ActualValue //todo-perfs: in reality it only impacts the ActualValue is the value we are removing was the highest ranked.
+            if (newValue == INTERNAL_NoValue.NoValue) //we need to update the ActualValue because the new value is going to be the one with the highest priority.
             {
-                newValue = GetValueWithoutCoerce(storage, typeMetadata);
+                impactsActualValue = true;
             }
 
-            //if the new Value changes the actual value and is coerced, we compute the coerced value and set it.
-            if (coerces && impactsActualValue && kindOfValueToSet != KindOfValue.Coerced)
+            // Update the "ActualValue":
+            if (impactsActualValue)
             {
-                // Compute the coerced value:
-                newValue = typeMetadata.CoerceValueCallback(storage.Owner, newValue);
+                newValue = ComputeActualValue(storage, typeMetadata, true);
 
-                // A coerced value has the highest priority so it does impact the actual value:
-                impactsActualValue = true;
+                //if the new Value changes the actual value and is coerced, we compute the coerced value and set it.
+                if (coerces && kindOfValueToSet != KindOfValue.Coerced)
+                {
+                    // Compute the coerced value:
+                    newValue = typeMetadata.CoerceValueCallback(storage.Owner, newValue);
 
-                // Remember the coerced value:
-                storage.CoercedValue = newValue;
+                    // Remember the coerced value:
+                    storage.CoercedValue = newValue;
+                    storage.ActualValue = newValue;
+                }
+                else
+                {
+                    storage.ActualValue = newValue;
+                }
             }
 
             //we make sure that we don't raise PropertyChanged for IsEnabled if its inherited value is false, because a "false" inherited value has priority over any local value.
@@ -445,8 +406,9 @@ namespace CSHTML5.Internal
 
         internal static void SetInheritedValue(INTERNAL_PropertyStorage storage, object newValue, bool recursively) //the "firePropertyChangedEvent" parameter allows us to only throw the onPropertyChangedEvent when the dependencyObject actually uses the property that is changed.
         {
-            bool impactsActualValue = DoesSpecificValueImpactActualValue(storage, KindOfValue.Inherited);
             PropertyMetadata typeMetadata = storage.Property.GetTypeMetaData(storage.Owner.GetType());
+            bool impactsActualValue = DoesSpecificValueImpactActualValue(storage, KindOfValue.Inherited);
+            bool coerces = typeMetadata != null && typeMetadata.CoerceValueCallback != null;
             object oldValue = GetValue(storage, typeMetadata);
 
             storage.InheritedValue = newValue;
@@ -456,22 +418,35 @@ namespace CSHTML5.Internal
             //-----------------------
             if (impactsActualValue)
             {
-                object actualNewValue = GetValueWithoutCoerce(storage, typeMetadata);
-                object coercedNewValue = ((typeMetadata != null && typeMetadata.CoerceValueCallback != null) ? typeMetadata.CoerceValueCallback(storage.Owner, actualNewValue) : actualNewValue);
+                newValue = ComputeActualValue(storage, typeMetadata, true);
+                if (coerces)
+                {
+                    // Compute the coerced value:
+                    newValue = typeMetadata.CoerceValueCallback(storage.Owner, newValue);
+
+                    // Remember the coerced value:
+                    storage.CoercedValue = newValue;
+                    storage.ActualValue = newValue;
+                }
+                else
+                {
+                    storage.ActualValue = newValue;
+                }
+
                 //-----------------------
                 // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
                 //-----------------------
                 //we only do the following inside the "if" because otherwise, the children's inherithed property would not change anyway
-                if (oldValue != coercedNewValue)
+                if (oldValue != newValue)
                 {
                     if (ShouldRaisePropertyChanged(storage))
                     {
-                        OnPropertyChanged(storage, oldValue, coercedNewValue, typeMetadata: typeMetadata);
+                        OnPropertyChanged(storage, oldValue, newValue, typeMetadata: typeMetadata);
                     }
                     if (recursively)
-                        CascadeInheritedPropertyToChildren(storage, coercedNewValue);
+                        CascadeInheritedPropertyToChildren(storage, newValue);
 
-                    HandleSpecialPropertiesThatShouldInheritDataContext(storage, coercedNewValue);
+                    HandleSpecialPropertiesThatShouldInheritDataContext(storage, newValue);
                 }
             }
             else if (storage._isIsEnabledOrIsHitTestVisibleProperty) //todo: if we decide to make coercion possible on IsHitTestVisible or IsEnabled, change the "newValue" below into "coercedNewValue" (probably)
@@ -538,11 +513,13 @@ namespace CSHTML5.Internal
         internal static void ResetInheritedValue(INTERNAL_PropertyStorage storage)
         {
             storage.InheritedValue = INTERNAL_NoValue.NoValue; //this only occurs when we detach an item so there is no need to care about the propertyChanged event.
+            storage.ActualValueIsDirty = true;
         }
 
         internal static void ResetLocalStyleValue(INTERNAL_PropertyStorage storage)
         {
             storage.LocalStyleValue = INTERNAL_NoValue.NoValue; //this only occurs when we detach an item so there is no need to care about the propertyChanged event.
+            storage.ActualValueIsDirty = true;
         }
 
 
@@ -763,7 +740,7 @@ namespace CSHTML5.Internal
                 return; //we should not arrive here in this case but we make sure to not do anything should that happen.
             }
             object oldValue = storage.Local == INTERNAL_NoValue.NoValue ? (typeMetadata != null ? typeMetadata.DefaultValue : null) : storage.Local;
-            object currentValue = GetValueWithoutCoerce(storage, typeMetadata); //Note: we do not need to know where this value comes from (Local, VisualState, etc.) since calling this method means that it has not been modified and we only need to update the coerced value.
+            object currentValue = ComputeActualValue(storage, typeMetadata, true); //Note: we do not need to know where this value comes from (Local, VisualState, etc.) since calling this method means that it has not been modified and we only need to update the coerced value.
             object coercedNewValue = typeMetadata.CoerceValueCallback(storage.Owner, currentValue);
             SetSpecificValue(storage, KindOfValue.Coerced, coercedNewValue, typeMetadata);
         }
