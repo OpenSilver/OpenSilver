@@ -337,7 +337,7 @@ namespace CSHTML5.Internal
                             childDefaultStyle.SetterValueChanged -= childAsFrameworkElement.StyleSetterValueChanged;
                             childDefaultStyle.SetterValueChanged += childAsFrameworkElement.StyleSetterValueChanged;
 
-                            INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorage(childAsFrameworkElement, setter.Property, createAndSaveNewStorageIfNotExists: true);
+                            INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(childAsFrameworkElement, setter.Property);
                             INTERNAL_PropertyStore.SetLocalStyleValue(storage, setter.Value);
                         }
                     }
@@ -571,7 +571,9 @@ namespace CSHTML5.Internal
                     )
                 {
                     bool recursively = false; // We don't want a recursion here because the "Attach" method is already recursive due to the fact that we raise property changed on the Children property, which causes to reattach the subtree.
-                    child.SetInheritedValue(dependencyProperty, INTERNAL_PropertyStore.GetValue(parent.INTERNAL_AllInheritedProperties[dependencyProperty]), recursively);
+                    INTERNAL_PropertyStorage storage = parent.INTERNAL_AllInheritedProperties[dependencyProperty];
+                    PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(storage.Owner.GetType());
+                    child.SetInheritedValue(dependencyProperty, INTERNAL_PropertyStore.GetValue(storage, typeMetadata), recursively);
                 }
             }
 
@@ -834,7 +836,7 @@ namespace CSHTML5.Internal
                         {
                             if (!valueWasRetrieved)
                             {
-                                value = INTERNAL_PropertyStore.GetValue(storage);
+                                value = INTERNAL_PropertyStore.GetValue(storage, propertyMetadata);
                                 valueWasRetrieved = true;
                             }
 
@@ -848,7 +850,7 @@ namespace CSHTML5.Internal
                         {
                             if (!valueWasRetrieved)
                             {
-                                value = INTERNAL_PropertyStore.GetValue(storage);
+                                value = INTERNAL_PropertyStore.GetValue(storage, propertyMetadata);
                                 valueWasRetrieved = true;
                             }
 
@@ -864,7 +866,7 @@ namespace CSHTML5.Internal
                         {
                             if (!valueWasRetrieved)
                             {
-                                value = INTERNAL_PropertyStore.GetValue(storage);
+                                value = INTERNAL_PropertyStore.GetValue(storage, propertyMetadata);
                                 valueWasRetrieved = true;
                             }
 

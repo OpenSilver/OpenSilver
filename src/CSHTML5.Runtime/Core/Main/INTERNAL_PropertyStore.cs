@@ -40,36 +40,50 @@ namespace CSHTML5.Internal
 {
     internal static class INTERNAL_PropertyStore
     {
-        public static INTERNAL_PropertyStorage GetStorage(DependencyObject dependencyObject, DependencyProperty dependencyProperty, bool createAndSaveNewStorageIfNotExists = false)
+        public static INTERNAL_PropertyStorage GetStorageIfExists(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
         {
-            // Create the dictionary of it does not already exist:
-            if (dependencyObject.INTERNAL_PropertyStorageDictionary == null)
-                dependencyObject.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
-
-            // Create the Storage if it does not already exist, and if "createAndSaveNewStorageIfNotExists" is True:
-            INTERNAL_PropertyStorage storage;
-            if (!dependencyObject.INTERNAL_PropertyStorageDictionary.TryGetValue(dependencyProperty, out storage))
+            if (dependencyObject.INTERNAL_PropertyStorageDictionary != null)
             {
-                storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty);
-                if (createAndSaveNewStorageIfNotExists)
+                INTERNAL_PropertyStorage storage;
+                if (dependencyObject.INTERNAL_PropertyStorageDictionary.TryGetValue(dependencyProperty, out storage))
                 {
-                    dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
+                    return storage;
+                }
+            }
+            return null;
+        }
+        public static INTERNAL_PropertyStorage GetStorageOrCreateNewIfNotExists(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
+        {
+            // Check if the storage exists:
+            INTERNAL_PropertyStorage storage;
+            if (dependencyObject.INTERNAL_PropertyStorageDictionary == null
+                || !dependencyObject.INTERNAL_PropertyStorageDictionary.TryGetValue(dependencyProperty, out storage))
+            {
+                // Create the dictionary of it does not already exist:
+                if (dependencyObject.INTERNAL_PropertyStorageDictionary == null)
+                    dependencyObject.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
 
-                    //-----------------------
-                    // CHECK IF THE PROPERTY IS INHERITABLE:
-                    //-----------------------
-                    PropertyMetadata typeMetadata = storage.Property.GetTypeMetaData(storage.Owner.GetType());
-                    if (typeMetadata != null && typeMetadata.Inherits)
-                    {
-                        //-----------------------
-                        // ADD THE STORAGE TO "INTERNAL_AllInheritedProperties" IF IT IS NOT ALREADY THERE:
-                        //-----------------------
-                        if (dependencyObject.INTERNAL_AllInheritedProperties == null)
-                            dependencyObject.INTERNAL_AllInheritedProperties = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
+                //----------------------
+                // CREATE A NEW STORAGE:
+                //----------------------
 
-                        if (!dependencyObject.INTERNAL_AllInheritedProperties.ContainsKey(dependencyProperty))
-                            dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);
-                    }
+                storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty);
+                dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
+
+                //-----------------------
+                // CHECK IF THE PROPERTY IS INHERITABLE:
+                //-----------------------
+                PropertyMetadata typeMetadata = storage.Property.GetTypeMetaData(storage.Owner.GetType());
+                if (typeMetadata != null && typeMetadata.Inherits)
+                {
+                    //-----------------------
+                    // ADD THE STORAGE TO "INTERNAL_AllInheritedProperties" IF IT IS NOT ALREADY THERE:
+                    //-----------------------
+                    if (dependencyObject.INTERNAL_AllInheritedProperties == null)
+                        dependencyObject.INTERNAL_AllInheritedProperties = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
+
+                    if (!dependencyObject.INTERNAL_AllInheritedProperties.ContainsKey(dependencyProperty))
+                        dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);
                 }
             }
 
@@ -237,46 +251,58 @@ namespace CSHTML5.Internal
             }
         }
 
-        //about the todo below, make sure we don't want a specific value to purposely set it at null
-        public static object GetValue(INTERNAL_PropertyStorage storage, PropertyMetadata typeMetadata = null) //todo: remove the "(value = storage.Local) != null" because the user might purposely set it at null OR define a specific value to purposely set something at null
+        public static object GetValue(INTERNAL_PropertyStorage storage, PropertyMetadata typeMetadata = null)
         {
 #if PERFSTAT
             var t = Performance.now();
 #endif
-            object value;
-            if (storage._isIsEnabledOrIsHitTestVisibleProperty)
-            {
-                if ((value = storage.InheritedValue) != INTERNAL_NoValue.NoValue && value != null && ((bool)value) == false)
-                {
-#if PERFSTAT
-                    Performance.Counter("INTERNAL_PropertyStore.GetValue", t);
-#endif
-                    return false;
-                }
-            }
+            object returnValue;
 
-            //todo: remove all comparisons with "null" to leave only the comparisons with "NoValue":
-            if ((value = storage.CoercedValue) != INTERNAL_NoValue.NoValue) { }
-            else if ((value = storage.VisualStateValue) != INTERNAL_NoValue.NoValue) { }
-            else if (storage.ActiveLocalValue.ActiveValue == KindOfValue.Local && (value = storage.Local) != INTERNAL_NoValue.NoValue) { }
-            else if (storage.ActiveLocalValue.ActiveValue == KindOfValue.Animated && (value = storage.AnimationValue) != INTERNAL_NoValue.NoValue) { }
-            else if ((value = storage.LocalStyleValue) != INTERNAL_NoValue.NoValue) { }
-            else if ((value = storage.ImplicitStyleValue) != INTERNAL_NoValue.NoValue) { }
-            else if ((value = storage.InheritedValue) != INTERNAL_NoValue.NoValue) { }
+            if (storage == null)
+            {
+                //===================
+                // NO STORAGE EXISTS:
+                //===================
+
+                // Return the default value:
+                returnValue = typeMetadata != null ? typeMetadata.DefaultValue : null;
+            }
             else
             {
-                if (typeMetadata == null)
-                    typeMetadata = storage.Property.GetTypeMetaData(storage.Owner.GetType());
+                //====================
+                // THE STORAGE EXISTS:
+                //====================
+
+                if (storage._isIsEnabledOrIsHitTestVisibleProperty)
+                {
+                    if ((returnValue = storage.InheritedValue) != INTERNAL_NoValue.NoValue && returnValue != null && ((bool)returnValue) == false)
+                    {
 #if PERFSTAT
-                Performance.Counter("INTERNAL_PropertyStore.GetValue", t);
+                        Performance.Counter("INTERNAL_PropertyStore.GetValue", t);
 #endif
-                return typeMetadata != null ? typeMetadata.DefaultValue : null;
+                        return false;
+                    }
+                }
+
+                if ((returnValue = storage.CoercedValue) != INTERNAL_NoValue.NoValue) { }
+                else if ((returnValue = storage.VisualStateValue) != INTERNAL_NoValue.NoValue) { }
+                else if (storage.ActiveLocalValue.ActiveValue == KindOfValue.Local && (returnValue = storage.Local) != INTERNAL_NoValue.NoValue) { }
+                else if (storage.ActiveLocalValue.ActiveValue == KindOfValue.Animated && (returnValue = storage.AnimationValue) != INTERNAL_NoValue.NoValue) { }
+                else if ((returnValue = storage.LocalStyleValue) != INTERNAL_NoValue.NoValue) { }
+                else if ((returnValue = storage.ImplicitStyleValue) != INTERNAL_NoValue.NoValue) { }
+                else if ((returnValue = storage.InheritedValue) != INTERNAL_NoValue.NoValue) { }
+                else
+                {
+                    // Return the default value:
+                    returnValue = typeMetadata != null ? typeMetadata.DefaultValue : null;
+                }
             }
 
 #if PERFSTAT
             Performance.Counter("INTERNAL_PropertyStore.GetValue", t);
 #endif
-            return value;
+
+            return returnValue;
         }
 
         public static object GetValueWithoutCoerce(INTERNAL_PropertyStorage storage, PropertyMetadata typeMetadata) //todo: remove the "(value = storage.Local) != null" because the user might purposely set it at null OR define a specific value to purposely set something at null
@@ -334,7 +360,7 @@ namespace CSHTML5.Internal
             return false;
         }
 
-        static void SetSpecificValue(INTERNAL_PropertyStorage storage, KindOfValue kindOfValueToSet, object newValue, PropertyMetadata typeMetadata)
+        static void SetSpecificValue(INTERNAL_PropertyStorage storage, KindOfValue kindOfValueToSet, object newValue, PropertyMetadata typeMetadata = null)
         {
 #if PERFSTAT
             var t = Performance.now();
@@ -366,7 +392,7 @@ namespace CSHTML5.Internal
                     break;
                 case KindOfValue.LocalStyle:
                     //oldValue = (storage.LocalStyleValue == INTERNAL_NoValue.NoValue ? (typeMetadata != null ? typeMetadata.DefaultValue : null) : storage.LocalStyleValue);
-                    storage.LocalStyleValue= newValue;
+                    storage.LocalStyleValue = newValue;
                     break;
                 case KindOfValue.ImplicitStyle:
                     //oldValue = (storage.ImplicitStyleValue == INTERNAL_NoValue.NoValue ? (typeMetadata != null ? typeMetadata.DefaultValue : null) : storage.ImplicitStyleValue);
@@ -451,7 +477,7 @@ namespace CSHTML5.Internal
             {
                 if (((bool)newValue == true))
                 {
-                    newValue = GetValue(GetStorage(storage.Owner, storage.Property)); //we need newValue to be the value that will be active afterwards.
+                    newValue = GetValue(GetStorageIfExists(storage.Owner, storage.Property), typeMetadata); //we need newValue to be the value that will be active afterwards.
                 }
                 if (oldValue != newValue)
                 {
@@ -713,7 +739,7 @@ namespace CSHTML5.Internal
 
         internal static IPropertyChangedListener ListenToChanged(DependencyObject target, DependencyProperty property, Action<object, IDependencyPropertyChangedEventArgs> updateSourceCallback)
         {
-            var storage = GetStorage(target, property, createAndSaveNewStorageIfNotExists: true);
+            var storage = GetStorageOrCreateNewIfNotExists(target, property);
             List<IPropertyChangedListener> listeners = storage.PropertyListeners;
             if (listeners == null)
             {

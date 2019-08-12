@@ -87,16 +87,15 @@ namespace Windows.UI.Xaml
         /// <returns>Returns the current effective value.</returns>
         public object GetValue(DependencyProperty dependencyProperty)
         {
-            //#if PERFSTAT
-            //            var t = Performance.now();
-            //#endif
-            var storage = INTERNAL_PropertyStore.GetStorage(this, dependencyProperty);
-            //return dependencyProperty.Store.GetValue(storage);
-
-            var tmp = INTERNAL_PropertyStore.GetValue(storage);
-            //#if PERFSTAT
-            //            Performance.Counter("DependencyObject.GetValue [" + dependencyProperty.Name + "]", t);
-            //#endif
+//#if PERFSTAT
+//          var t = Performance.now();
+//#endif
+            var storage = INTERNAL_PropertyStore.GetStorageIfExists(this, dependencyProperty);
+            PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(this.GetType());
+            var tmp = INTERNAL_PropertyStore.GetValue(storage, typeMetadata);
+//#if PERFSTAT
+//          Performance.Counter("DependencyObject.GetValue [" + dependencyProperty.Name + "]", t);
+//#endif
             return tmp;
         }
 
@@ -110,7 +109,7 @@ namespace Windows.UI.Xaml
 #if PERFSTAT
             var t = Performance.now();
 #endif
-            var storage = INTERNAL_PropertyStore.GetStorage(this, dependencyProperty, createAndSaveNewStorageIfNotExists: true);
+            var storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, dependencyProperty);
 #if PERFSTAT
             Performance.Counter("DependencyObject.SetLocalValue", t);
 #endif
@@ -119,7 +118,7 @@ namespace Windows.UI.Xaml
 
         public void CoerceCurrentValue(DependencyProperty dependencyProperty, PropertyMetadata propertyMetadata)
         {
-            var storage = INTERNAL_PropertyStore.GetStorage(this, dependencyProperty, createAndSaveNewStorageIfNotExists: true);
+            var storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, dependencyProperty);
             INTERNAL_PropertyStore.CoerceCurrentValue(storage, propertyMetadata);
         }
 
@@ -136,9 +135,12 @@ namespace Windows.UI.Xaml
         /// </returns>
         public object ReadLocalValue(DependencyProperty dependencyProperty)
         {
-            var storage = INTERNAL_PropertyStore.GetStorage(this, dependencyProperty);
-            //return dependencyProperty.Store.GetValue(storage);
-            return storage.Local;
+            var storage = INTERNAL_PropertyStore.GetStorageIfExists(this, dependencyProperty);
+
+            if (storage != null)
+                return storage.Local;
+            else
+                return INTERNAL_NoValue.NoValue;
         }
 
         public object GetVisualStateValue(DependencyProperty dependencyProperty) //todo: see if this is actually useful (to get specifically the VisualStateValue) and if so, change the GetValue into a GetVisualStateValue at the "return" line.
@@ -146,7 +148,8 @@ namespace Windows.UI.Xaml
             if (dependencyProperty == null)
                 throw new ArgumentNullException("No property specified");
 
-            var storage = INTERNAL_PropertyStore.GetStorage(this, dependencyProperty, createAndSaveNewStorageIfNotExists: true);
+            var storage = INTERNAL_PropertyStore.GetStorageIfExists(this, dependencyProperty);
+            PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(this.GetType());
             return INTERNAL_PropertyStore.GetValue(storage);
         }
 
@@ -155,7 +158,7 @@ namespace Windows.UI.Xaml
             if (dependencyProperty == null)
                 throw new ArgumentNullException("No property specified");
 
-            var storage = INTERNAL_PropertyStore.GetStorage(this, dependencyProperty, createAndSaveNewStorageIfNotExists: true);
+            var storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, dependencyProperty);
             INTERNAL_PropertyStore.SetVisualStateValue(storage, value);
         }
 
@@ -164,7 +167,7 @@ namespace Windows.UI.Xaml
             if (dependencyProperty == null)
                 throw new ArgumentNullException("No property specified");
 
-            var storage = INTERNAL_PropertyStore.GetStorage(this, dependencyProperty, createAndSaveNewStorageIfNotExists: true);
+            var storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, dependencyProperty);
             INTERNAL_PropertyStore.SetAnimationValue(storage, value);
         }
 
@@ -173,7 +176,8 @@ namespace Windows.UI.Xaml
             if (dependencyProperty == null)
                 throw new ArgumentNullException("No property specified");
 
-            var storage = INTERNAL_PropertyStore.GetStorage(this, dependencyProperty, createAndSaveNewStorageIfNotExists: true);
+            var storage = INTERNAL_PropertyStore.GetStorageIfExists(this, dependencyProperty);
+            PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(this.GetType());
             return INTERNAL_PropertyStore.GetValue(storage);
         }
 
