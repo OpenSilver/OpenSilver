@@ -184,10 +184,45 @@ namespace Windows.UI.Xaml
         /// <param name="value">The new local value.</param>
         public void SetValue(DependencyProperty dependencyProperty, object value)
         {
-                if (dependencyProperty == null)
-                    throw new ArgumentNullException("No property specified");
+            // Verify the arguments:
+            if (dependencyProperty == null)
+                throw new ArgumentNullException("No property specified");
 
-                SetValueInternal(dependencyProperty, value);
+            // Convert the value to String if the property is of type String:
+            object computedValue = value;
+            if (dependencyProperty.PropertyType == typeof(string) && computedValue != null)
+            {
+                computedValue = computedValue.ToString();
+            }
+
+            // Get the previous BindingExpression in case the previous value of a property was a Binding, and detach the Binding:
+            BindingExpression oldBindingExpression = null;
+            if (_bindingExpressions != null
+                && _bindingExpressions.ContainsKey(dependencyProperty))
+            {
+                oldBindingExpression = _bindingExpressions[dependencyProperty];
+
+                if (!oldBindingExpression.IsUpdating && oldBindingExpression.ParentBinding.Mode != BindingMode.TwoWay) // If mode is TwoWay, setting the property should not remove the binding. To reproduce: create a TextBox with a TwoWay binding on the property Text, and set textBox.Text = ... => the binding is preserved.
+                {
+                    _bindingExpressions.Remove(dependencyProperty);
+                    oldBindingExpression.OnDetached(this);
+                }
+                else if (oldBindingExpression.ParentBinding.Mode == BindingMode.OneTime)
+                {
+                    _bindingExpressions.Remove(dependencyProperty);
+                    oldBindingExpression.OnDetached(this);
+                }
+            }
+
+            // Set the value and raise the PropertyChanged event if necessary:
+            SetLocalValue(dependencyProperty, computedValue);
+
+            // Update the source of the Binding, in case the previous value of a property was a Binding and the Mode was "TwoWay":
+            if (oldBindingExpression != null
+                && oldBindingExpression.ParentBinding.Mode == BindingMode.TwoWay) //note: we know that oldBindingExpression.IsUpdating is false because oldBindingExpression is only set in that case (otherwise, it is null).
+            {
+                oldBindingExpression.TryUpdateSourceObject(computedValue);
+            }
         }
 
         /// <summary>
@@ -273,103 +308,71 @@ namespace Windows.UI.Xaml
         /// <returns>The BindingExpression created.</returns>
         public BindingExpression SetBinding(DependencyProperty dependencyProperty, Binding binding)
         {
-#if PERFSTAT
-            var t = Performance.now();
-#endif
-            BindingExpression bindingExpression = new BindingExpression(binding, this, dependencyProperty);
-            SetValueInternal(dependencyProperty, bindingExpression);
-#if PERFSTAT
-            Performance.Counter("DependencyObject.SetBinding", t);
-#endif
-            return bindingExpression;
-        }
+            // Verify the arguments:
+            if (dependencyProperty == null)
+                throw new ArgumentNullException("No property specified");
+            if (binding == null)
+                throw new ArgumentNullException("No binding specified");
 
-        void SetValueInternal(DependencyProperty dependencyProperty, object value)
-        {
-            object computedValue = value;
-            BindingExpression newBindingExpression = null;
+            // Create the BindingExpression from the Binding:
+            BindingExpression newBindingExpression = new BindingExpression(binding, this, dependencyProperty);
+
+            // Get the previous BindingExpression in case we are replacing an existing Binding:
             BindingExpression oldBindingExpression = null;
-#if PERFSTAT
-            var t = Performance.now();
-#endif
-
-            if (value is BindingExpression)
-            {
-                newBindingExpression = (BindingExpression)value;
-            }
-
             if (_bindingExpressions != null && _bindingExpressions.ContainsKey(dependencyProperty))
             {
                 oldBindingExpression = _bindingExpressions[dependencyProperty];
             }
 
-            if (newBindingExpression != null)
+            // Detach the previous Binding, in case there was any:
+            if (newBindingExpression != oldBindingExpression)
             {
-                if (newBindingExpression != oldBindingExpression)
+                if (newBindingExpression.IsAttached)
                 {
-                    if (newBindingExpression.IsAttached)
-                    {
-                        throw new InvalidOperationException("Cannot attach an instance of Windows.UI.Xaml.Data.BindingExpression multiple times");
-                    }
-                    else
-                    {
-                        if (oldBindingExpression != null)
-                        {
-                            _bindingExpressions.Remove(dependencyProperty);
-                            oldBindingExpression.OnDetached(this);
-                        }
-                        if (_bindingExpressions == null)
-                        {
-                            _bindingExpressions = new Dictionary<DependencyProperty, BindingExpression>();
-                        }
-                        _bindingExpressions.Add(dependencyProperty, newBindingExpression);
-                        newBindingExpression.OnAttached(this);
-                    }
+                    throw new InvalidOperationException("Cannot attach an instance of Windows.UI.Xaml.Data.BindingExpression multiple times");
                 }
-                //else (if newExpression == oldExpression) do nothing
-
-                computedValue = newBindingExpression.GetValue(dependencyProperty, this.GetType());
-            }
-            else if (oldBindingExpression != null)
-            {
-                if (!oldBindingExpression.IsUpdating && oldBindingExpression.ParentBinding.Mode != BindingMode.TwoWay) // If mode is TwoWay, setting the property should not remove the binding. To reproduce: create a TextBox with a TwoWay binding on the property Text, and set textBox.Text = ... => the binding is preserved.
+                else
                 {
-                    _bindingExpressions.Remove(dependencyProperty);
-                    oldBindingExpression.OnDetached(this);
-                }
-                else if (oldBindingExpression.ParentBinding.Mode == BindingMode.OneTime)
-                {
-                    _bindingExpressions.Remove(dependencyProperty);
-                    oldBindingExpression.OnDetached(this);
+                    if (oldBindingExpression != null)
+                    {
+                        _bindingExpressions.Remove(dependencyProperty);
+                        oldBindingExpression.OnDetached(this);
+                    }
+                    if (_bindingExpressions == null)
+                    {
+                        _bindingExpressions = new Dictionary<DependencyProperty, BindingExpression>();
+                    }
+                    _bindingExpressions.Add(dependencyProperty, newBindingExpression);
+                    newBindingExpression.OnAttached(this);
                 }
             }
 
+            // Get the actual value using the property path specified in the Binding:
+            object computedValue = newBindingExpression.GetValue(dependencyProperty, this.GetType());
+
+            // Convert the value to String if the property is of type String:
             if (dependencyProperty.PropertyType == typeof(string) && computedValue != null)
             {
                 computedValue = computedValue.ToString();
             }
 
-            //If we use validation, we determine whether the value is Invalid or not.
-            if (newBindingExpression != null)
+            // If validation is used, determine whether the value is valid or not:
+            if (newBindingExpression.INTERNAL_ForceValidateOnNextSetValue)
             {
-                if (newBindingExpression.INTERNAL_ForceValidateOnNextSetValue)
-                {
-                    newBindingExpression.CheckInitialValueValidity(computedValue);
-                }
+                newBindingExpression.CheckInitialValueValidity(computedValue);
             }
 
-#if PERFSTAT
-            Performance.Counter("DependencyObject.SetValueInternal", t);
-#endif
+            // Set the value and raise the PropertyChanged event if necessary:
             SetLocalValue(dependencyProperty, computedValue);
-#if PERFSTAT
-            t = Performance.now();
-#endif
 
-            if (oldBindingExpression != null && oldBindingExpression.ParentBinding.Mode == BindingMode.TwoWay) //note: we know that oldExpression.IsUpdating is false because oldExpression is only set in that case (otherwise, it is null).
+            // Update the source of the Binding, in case the previous value of a property was a Binding and the Mode was "TwoWay":
+            if (oldBindingExpression != null && oldBindingExpression.ParentBinding.Mode == BindingMode.TwoWay) //note: we know that oldBindingExpression.IsUpdating is false because oldBindingExpression is only set in that case (otherwise, it is null).
             {
                 oldBindingExpression.TryUpdateSourceObject(computedValue);
             }
+
+            // Return the newly created BindingExpression:
+            return newBindingExpression;
         }
 
         internal void INTERNAL_UpdateBindingsSource()
