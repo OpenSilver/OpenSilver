@@ -90,7 +90,7 @@ namespace CSHTML5.Internal
             return storage;
         }
 
-        internal static INTERNAL_PropertyStorage GetInheritedPropertyStorage(DependencyObject dependencyObject, DependencyProperty dependencyProperty, bool createAndSaveNewStorageIfNotExists)
+        internal static INTERNAL_PropertyStorage GetInheritedPropertyStorageOrCreateNewIfNotFound(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
         {
             // Create the dictionary of it does not already exist:
             if (dependencyObject.INTERNAL_AllInheritedProperties == null)
@@ -100,6 +100,11 @@ namespace CSHTML5.Internal
             INTERNAL_PropertyStorage storage;
             if (!dependencyObject.INTERNAL_AllInheritedProperties.TryGetValue(dependencyProperty, out storage))
             {
+                // Create the dictionary of it does not already exist:
+                if (dependencyObject.INTERNAL_PropertyStorageDictionary == null)
+                    dependencyObject.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
+
+                // Get the storage or create a new one:
                 if (dependencyObject.INTERNAL_PropertyStorageDictionary.ContainsKey(dependencyProperty))
                 {
                     storage = dependencyObject.INTERNAL_PropertyStorageDictionary[dependencyProperty];
@@ -108,30 +113,26 @@ namespace CSHTML5.Internal
                 {
                     storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty);
                 }
-                if (createAndSaveNewStorageIfNotExists)
+                dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);
+
+                //-----------------------
+                // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
+                //-----------------------
+                //below: we check if the property is useful to the current DependencyObject, in which case we set it as its inheritedValue in "PropertyStorageDictionary"
+                if (dependencyProperty.OwnerType.IsAssignableFrom(dependencyObject.GetType()))
                 {
-                    dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);
-
                     //-----------------------
-                    // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
+                    // ADD THE STORAGE TO "INTERNAL_PropertyStorageDictionary" IF IT IS NOT ALREADY THERE:
                     //-----------------------
-                    //below: we check if the property is useful to the current DependencyObject, in which case we set it as its inheritedValue in "PropertyStorageDictionary"
-                    if (dependencyProperty.OwnerType.IsAssignableFrom(dependencyObject.GetType()))
-                    {
-                        //-----------------------
-                        // ADD THE STORAGE TO "INTERNAL_PropertyStorageDictionary" IF IT IS NOT ALREADY THERE:
-                        //-----------------------
-                        if (dependencyObject.INTERNAL_PropertyStorageDictionary == null)
-                            dependencyObject.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
+                    if (dependencyObject.INTERNAL_PropertyStorageDictionary == null)
+                        dependencyObject.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
 
-                        if (!dependencyObject.INTERNAL_PropertyStorageDictionary.ContainsKey(dependencyProperty))
-                            dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
-                    }
+                    if (!dependencyObject.INTERNAL_PropertyStorageDictionary.ContainsKey(dependencyProperty))
+                        dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
                 }
             }
 
             return storage;
-
 
 
             #region OldStuff

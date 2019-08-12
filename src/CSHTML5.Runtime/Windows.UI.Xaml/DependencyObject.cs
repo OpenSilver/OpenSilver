@@ -240,7 +240,7 @@ namespace Windows.UI.Xaml
             //-----------------------
             // CALL "SET INHERITED VALUE" ON THE STORAGE:
             //-----------------------
-            var storage = INTERNAL_PropertyStore.GetInheritedPropertyStorage(this, dependencyProperty, createAndSaveNewStorageIfNotExists: true);
+            var storage = INTERNAL_PropertyStore.GetInheritedPropertyStorageOrCreateNewIfNotFound(this, dependencyProperty);
             INTERNAL_PropertyStore.SetInheritedValue(storage, value, recursively);
         }
 
