@@ -56,13 +56,13 @@ namespace Windows.UI.Xaml
         /// </returns>
         public BindingExpression GetBindingExpression(DependencyProperty dp)
         {
-            if(_bindingExpressions == null)
+            if (_bindingExpressions == null)
             {
                 _bindingExpressions = new Dictionary<DependencyProperty, BindingExpression>();
                 return null;
             }
 
-            if(_bindingExpressions.ContainsKey(dp))
+            if (_bindingExpressions.ContainsKey(dp))
             {
                 return _bindingExpressions[dp];
             }
@@ -87,16 +87,16 @@ namespace Windows.UI.Xaml
         /// <returns>Returns the current effective value.</returns>
         public object GetValue(DependencyProperty dependencyProperty)
         {
-//#if PERFSTAT
-//            var t = Performance.now();
-//#endif
+            //#if PERFSTAT
+            //            var t = Performance.now();
+            //#endif
             var storage = INTERNAL_PropertyStore.GetStorage(this, dependencyProperty);
             //return dependencyProperty.Store.GetValue(storage);
 
             var tmp = INTERNAL_PropertyStore.GetValue(storage);
-//#if PERFSTAT
-//            Performance.Counter("DependencyObject.GetValue [" + dependencyProperty.Name + "]", t);
-//#endif
+            //#if PERFSTAT
+            //            Performance.Counter("DependencyObject.GetValue [" + dependencyProperty.Name + "]", t);
+            //#endif
             return tmp;
         }
 
@@ -122,7 +122,7 @@ namespace Windows.UI.Xaml
             var storage = INTERNAL_PropertyStore.GetStorage(this, dependencyProperty, createAndSaveNewStorageIfNotExists: true);
             INTERNAL_PropertyStore.CoerceCurrentValue(storage, propertyMetadata);
         }
- 
+
         /// <summary>
         /// Returns the local value of a dependency property, if a local value is set.
         /// </summary>
@@ -288,7 +288,7 @@ namespace Windows.UI.Xaml
         }
 
 
-#region Binding related elements
+        #region Binding related elements
 
         internal Binding INTERNAL_GetBinding(DependencyProperty dependencyProperty)
         {
@@ -317,6 +317,15 @@ namespace Windows.UI.Xaml
             // Create the BindingExpression from the Binding:
             BindingExpression newBindingExpression = new BindingExpression(binding, this, dependencyProperty);
 
+            // Apply the BindingExpression:
+            ApplyBindingExpression(dependencyProperty, newBindingExpression);
+
+            // Return the newly created BindingExpression:
+            return newBindingExpression;
+        }
+
+        internal void ApplyBindingExpression(DependencyProperty dependencyProperty, BindingExpression newBindingExpression)
+        {
             // Get the previous BindingExpression in case we are replacing an existing Binding:
             BindingExpression oldBindingExpression = null;
             if (_bindingExpressions != null && _bindingExpressions.ContainsKey(dependencyProperty))
@@ -324,7 +333,7 @@ namespace Windows.UI.Xaml
                 oldBindingExpression = _bindingExpressions[dependencyProperty];
             }
 
-            // Detach the previous Binding, in case there was any:
+            // Detach the previous BindingExpression, in case there was any, and remember the new BindingExpression:
             if (newBindingExpression != oldBindingExpression)
             {
                 if (newBindingExpression.IsAttached)
@@ -370,9 +379,6 @@ namespace Windows.UI.Xaml
             {
                 oldBindingExpression.TryUpdateSourceObject(computedValue);
             }
-
-            // Return the newly created BindingExpression:
-            return newBindingExpression;
         }
 
         internal void INTERNAL_UpdateBindingsSource()
@@ -403,6 +409,6 @@ namespace Windows.UI.Xaml
             // This is particularly useful for elements to clear any references they have to DOM elements. For example, the Grid will use it to set its _tableDiv to null.
         }
 
-#endregion
+        #endregion
     }
 }

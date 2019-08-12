@@ -710,7 +710,7 @@ namespace Windows.UI.Xaml.Data
             {
                 bool oldIsUpdating = IsUpdating;
                 IsUpdating = true;
-                Target.SetValue(Property, this);
+                Target.ApplyBindingExpression(Property, this);
 
                 IsUpdating = oldIsUpdating;
             }
