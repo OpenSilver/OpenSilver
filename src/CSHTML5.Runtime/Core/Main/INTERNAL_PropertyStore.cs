@@ -358,16 +358,14 @@ namespace CSHTML5.Internal
                     break;
             }
 
-            // If we remove the value we consider that it impacts the ActualValue //todo-perfs: in reality it only impacts the ActualValue is the value we are removing was the highest ranked.
-            if (newValue == INTERNAL_NoValue.NoValue) //we need to update the ActualValue because the new value is going to be the one with the highest priority.
-            {
-                impactsActualValue = true;
-            }
-
             // Update the "ActualValue":
             if (impactsActualValue)
             {
-                newValue = ComputeActualValue(storage, typeMetadata, true);
+                // If we are removing the value by setting it to "NoValue", we need to recompute the ActualValue:
+                if (newValue == INTERNAL_NoValue.NoValue) //we need to update the ActualValue because the new value is going to be the one with the highest priority.
+                {
+                    newValue = ComputeActualValue(storage, typeMetadata, true);
+                }
 
                 //if the new Value changes the actual value and is coerced, we compute the coerced value and set it.
                 if (coerces && kindOfValueToSet != KindOfValue.Coerced)
