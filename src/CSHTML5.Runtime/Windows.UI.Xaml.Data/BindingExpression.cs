@@ -49,7 +49,7 @@ namespace Windows.UI.Xaml.Data
     /// <summary>
     /// Contains information about a single instance of a System.Windows.Data.Binding.
     /// </summary>
-    public class BindingExpression : Expression, IPropertyPathWalkerListener
+    public class BindingExpression : IPropertyPathWalkerListener
     {
 
         //we are not allowed to change the following in BindingExpression because it is used:
@@ -57,6 +57,9 @@ namespace Windows.UI.Xaml.Data
         //  - ParentBinding.Converter
         //  - ParentBinding.ConverterLanguage
         //  - ParentBinding.ConverterParameter
+
+        internal bool IsUpdating;
+        internal bool IsAttached;
 
         /// <summary>
         /// The binding target property of this binding expression.
@@ -135,7 +138,7 @@ namespace Windows.UI.Xaml.Data
         void IPropertyPathWalkerListener.ValueChanged() { ValueChanged(); } //this is so that we don't have a compilation error while still are able to give valueChanged() as internal (interfaces do not allow implementation with other access than public...)
 
 
-        internal override object GetValue(DependencyProperty property, Type OwnerType = null)
+        internal object GetValue(DependencyProperty property, Type OwnerType = null)
         {
             object value;
 
@@ -320,13 +323,24 @@ namespace Windows.UI.Xaml.Data
 
         internal bool INTERNAL_ForceValidateOnNextSetValue = false; //This boolean is set to true in OnAttached to force Validation at the next UpdateSourceObject. Its purpose is to force the Validation only once to avoid hindering performances.
 
-        internal override void OnAttached(DependencyObject target)
+        internal void OnAttached(DependencyObject target)
         {
             if (IsAttached)
             {
                 return;
             }
-            base.OnAttached(target);
+
+            IsAttached = true;
+            //get the DataContextProperty.
+            string dataContextPropertyName = "DataContext";
+            Type type = target.GetType();
+            DependencyProperty dataContextDependencyProperty = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(type, dataContextPropertyName);
+            if (dataContextDependencyProperty != null)
+            {
+                object dataContext = target.GetValue(dataContextDependencyProperty);
+                this.OnDataContextChanged(dataContext);
+            }
+
             var source = FindSource();
 
             PropertyPathWalker.Update(source); //FindSource should find the source now. Otherwise, the PropertyPathNodes shoud do the work (their properties will change when the source will become available)
@@ -377,11 +391,13 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-        internal override void OnDetached(DependencyObject element)
+        internal void OnDetached(DependencyObject element)
         {
             if (IsAttached)
             {
-                base.OnDetached(element);
+                this.IsAttached = false;
+                this.OnDataContextChanged(null);
+
                 if (PropertyListener != null)
                 {
                     PropertyListener.Detach();
@@ -672,7 +688,7 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-        internal override void OnDataContextChanged(object newDataContext)
+        internal void OnDataContextChanged(object newDataContext)
         {
             if (_DataContext != newDataContext)
             {
@@ -694,7 +710,7 @@ namespace Windows.UI.Xaml.Data
             {
                 bool oldIsUpdating = IsUpdating;
                 IsUpdating = true;
-                Target.SetValue(Property, this);
+                Target.ApplyBindingExpression(Property, this);
 
                 IsUpdating = oldIsUpdating;
             }

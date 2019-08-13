@@ -198,25 +198,6 @@ namespace Windows.UI.Xaml
 
         }
 
-        /// <summary>
-        /// Returns the System.Windows.Data.BindingExpression that represents the binding
-        /// on the specified property.
-        /// </summary>
-        /// <param name="dp">The target System.Windows.DependencyProperty to get the binding from.</param>
-        /// <returns>
-        /// A System.Windows.Data.BindingExpression if the target property has an active
-        /// binding; otherwise, returns null.
-        /// </returns>
-        public BindingExpression GetBindingExpression(DependencyProperty dp)
-        {
-            Expression expression = GetExpression(dp);
-            if (expression != null && expression is BindingExpression)
-            {
-                return (BindingExpression)expression;
-            }
-            return null;
-        }
-
         #region Cursor
 
         // Returns:
@@ -484,8 +465,11 @@ namespace Windows.UI.Xaml
                     {
                         if (!newStyleDictionary.ContainsKey(oldSetter.Property))
                         {
-                            INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorage(d, oldSetter.Property, createAndSaveNewStorageIfNotExists: false); //the createAndSaveNewStorageIfNotExists's value should have no actual meaning here because the PropertyStorage should have been created when applying the style.
-                            INTERNAL_PropertyStore.ResetLocalStyleValue(storage);
+                            INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorageIfExists(d, oldSetter.Property);
+                            if (storage != null)
+                            {
+                                INTERNAL_PropertyStore.ResetLocalStyleValue(storage);
+                            }
                         }
                     }
 
@@ -505,7 +489,7 @@ namespace Windows.UI.Xaml
                     {
                         if (!oldStyleDictionary.ContainsKey(newSetter.Property) || oldStyleDictionary[newSetter.Property] != newSetter.Value)
                         {
-                            INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorage(frameworkElement, newSetter.Property, createAndSaveNewStorageIfNotExists: true); //the createAndSaveNewStorageIfNotExists's value should have no actual meaning here because the PropertyStorage should have been created when applying the style.
+                            INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(frameworkElement, newSetter.Property);
                             INTERNAL_PropertyStore.SetLocalStyleValue(storage, newSetter.Value);
                         }
                     }
@@ -546,7 +530,7 @@ namespace Windows.UI.Xaml
             Setter setter = (Setter)sender;
             if (setter.Property != null) // Note: it can be null for example in the XAML text editor during design time, because the "DependencyPropertyConverter" class returns "null".
             {
-                INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorage(this, setter.Property, createAndSaveNewStorageIfNotExists: true); //the createAndSaveNewStorageIfNotExists's value should have no actual meaning here because the PropertyStorage should have been created when applying the style.
+                INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, setter.Property);
                 HashSet2<Style> stylesAlreadyVisited = new HashSet2<Style>(); // Note: "stylesAlreadyVisited" is here to prevent an infinite recursion.
                 INTERNAL_PropertyStore.SetLocalStyleValue(storage, Style.GetActiveValue(setter.Property, stylesAlreadyVisited));
             }
