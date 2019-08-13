@@ -51,6 +51,21 @@ namespace Windows.UI.Xaml.Media.Animation
             _timeSpan = timeSpan;
         }
 
+        /// <summary>
+        /// Creates a new System.Windows.Media.Animation.KeyTime instance, with the System.Windows.Media.Animation.KeyTimeType
+        /// property initialized to the value of the specified parameter.
+        /// </summary>
+        /// <param name="timeSpan">The value of the new System.Windows.Media.Animation.KeyTime.</param>
+        /// <returns>
+        /// A new System.Windows.Media.Animation.KeyTime instance, initialized to the value
+        /// of timeSpan.
+        /// </returns>
+        public static KeyTime FromTimeSpan(TimeSpan timeSpan)
+        {
+            return new KeyTime(timeSpan);
+        }
+
+
         internal static object INTERNAL_ConvertFromString(string keyTimeCode)
         {
             try
