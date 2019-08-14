@@ -113,13 +113,13 @@ namespace Windows.UI.Xaml
 #if PERFSTAT
             Performance.Counter("DependencyObject.SetLocalValue", t);
 #endif
-            INTERNAL_PropertyStore.SetSpecificValue(storage, KindOfValue.Local, value, null);
+            INTERNAL_PropertyStore.SetSpecificValue(storage, KindOfValue.Local, value);
         }
 
         public void CoerceCurrentValue(DependencyProperty dependencyProperty, PropertyMetadata propertyMetadata)
         {
             var storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, dependencyProperty);
-            INTERNAL_PropertyStore.CoerceCurrentValue(storage, propertyMetadata);
+            INTERNAL_PropertyStore.CoerceCurrentValue(storage);
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace Windows.UI.Xaml
 
             var storage = INTERNAL_PropertyStore.GetStorageIfExists(this, dependencyProperty);
             PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(this.GetType());
-            return INTERNAL_PropertyStore.GetValue(storage);
+            return INTERNAL_PropertyStore.GetValue(storage, typeMetadata);
         }
 
         public void SetVisualStateValue(DependencyProperty dependencyProperty, object value)
@@ -159,7 +159,7 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException("No property specified");
 
             var storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, dependencyProperty);
-            INTERNAL_PropertyStore.SetSpecificValue(storage, KindOfValue.VisualState, value, null);
+            INTERNAL_PropertyStore.SetSpecificValue(storage, KindOfValue.VisualState, value);
         }
 
         public void SetAnimationValue(DependencyProperty dependencyProperty, object value)
@@ -168,7 +168,7 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException("No property specified");
 
             var storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, dependencyProperty);
-            INTERNAL_PropertyStore.SetSpecificValue(storage, KindOfValue.Animated, value, null);
+            INTERNAL_PropertyStore.SetSpecificValue(storage, KindOfValue.Animated, value);
         }
 
         public object GetAnimationValue(DependencyProperty dependencyProperty)
@@ -178,7 +178,7 @@ namespace Windows.UI.Xaml
 
             var storage = INTERNAL_PropertyStore.GetStorageIfExists(this, dependencyProperty);
             PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(this.GetType());
-            return INTERNAL_PropertyStore.GetValue(storage);
+            return INTERNAL_PropertyStore.GetValue(storage, typeMetadata);
         }
 
         /// <summary>

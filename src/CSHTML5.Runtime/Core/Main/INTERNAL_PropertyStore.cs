@@ -19,10 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
@@ -63,17 +59,19 @@ namespace CSHTML5.Internal
                 if (dependencyObject.INTERNAL_PropertyStorageDictionary == null)
                     dependencyObject.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
 
+                // Get the type metadata (if any):
+                PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(dependencyObject.GetType());
+
                 //----------------------
                 // CREATE A NEW STORAGE:
                 //----------------------
 
-                storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty);
+                storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty, typeMetadata);
                 dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
 
                 //-----------------------
                 // CHECK IF THE PROPERTY IS INHERITABLE:
                 //-----------------------
-                PropertyMetadata typeMetadata = storage.Property.GetTypeMetaData(storage.Owner.GetType());
                 if (typeMetadata != null && typeMetadata.Inherits)
                 {
                     //-----------------------
@@ -111,7 +109,11 @@ namespace CSHTML5.Internal
                 }
                 else
                 {
-                    storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty);
+                    // Get the type metadata (if any):
+                    PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(dependencyObject.GetType());
+
+                    // Create the storage:
+                    storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty, typeMetadata);
                 }
                 dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);
 
@@ -210,7 +212,7 @@ namespace CSHTML5.Internal
             #endregion
         }
 
-        static void RaisePropertyChangedAndCascadeToChildren(INTERNAL_PropertyStorage storage, object oldValue, object newValue, PropertyMetadata typeMetadata)
+        static void RaisePropertyChangedAndCascadeToChildren(INTERNAL_PropertyStorage storage, object oldValue, object newValue)
         {
             //-----------------------
             // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
@@ -218,14 +220,13 @@ namespace CSHTML5.Internal
             if (ShouldRaisePropertyChanged(storage))
             {
                 // Raise Property Changed:
-                OnPropertyChanged(storage, oldValue, newValue, typeMetadata: typeMetadata);
+                OnPropertyChanged(storage, oldValue, newValue);
             }
 
             //-----------------------
             // CHECK IF THE PROPERTY IS INHERITABLE:
             //-----------------------
-            if (typeMetadata == null)
-                typeMetadata = storage.Property.GetTypeMetaData(storage.Owner.GetType());
+            var typeMetadata = storage.TypeMetadata;
             if (typeMetadata != null && typeMetadata.Inherits)
             {
                 //-----------------------
@@ -237,7 +238,7 @@ namespace CSHTML5.Internal
             }
         }
 
-        public static object GetValue(INTERNAL_PropertyStorage storage, PropertyMetadata typeMetadata = null)
+        public static object GetValue(INTERNAL_PropertyStorage storage, PropertyMetadata typeMetadata)
         {
 #if PERFSTAT
             var t = Performance.now();
@@ -312,13 +313,12 @@ namespace CSHTML5.Internal
             return false;
         }
 
-        internal static void SetSpecificValue(INTERNAL_PropertyStorage storage, KindOfValue kindOfValueToSet, object newValue, PropertyMetadata typeMetadata = null)
+        internal static void SetSpecificValue(INTERNAL_PropertyStorage storage, KindOfValue kindOfValueToSet, object newValue)
         {
 #if PERFSTAT
             var t = Performance.now();
 #endif
-            if (typeMetadata == null)
-                typeMetadata = storage.Property.GetTypeMetaData(storage.Owner.GetType());
+            var typeMetadata = storage.TypeMetadata;
 
             object oldValue = GetValue(storage, typeMetadata);
             bool raisePropertyChangedAndCascadetoChildren = true;
@@ -398,13 +398,13 @@ namespace CSHTML5.Internal
 #if PERFSTAT
                 Performance.Counter("INTERNAL_PropertyStore.SetSpecificValue", t);
 #endif
-                RaisePropertyChangedAndCascadeToChildren(storage, oldValue, newValue, typeMetadata); //Note: in the case of a value that has no CoerceCallBack, this is equal to newValue.
+                RaisePropertyChangedAndCascadeToChildren(storage, oldValue, newValue); //Note: in the case of a value that has no CoerceCallBack, this is equal to newValue.
             }
         }
 
         internal static void SetInheritedValue(INTERNAL_PropertyStorage storage, object newValue, bool recursively) //the "firePropertyChangedEvent" parameter allows us to only throw the onPropertyChangedEvent when the dependencyObject actually uses the property that is changed.
         {
-            PropertyMetadata typeMetadata = storage.Property.GetTypeMetaData(storage.Owner.GetType());
+            var typeMetadata = storage.TypeMetadata;
             bool impactsActualValue = DoesSpecificValueImpactActualValue(storage, KindOfValue.Inherited);
             bool coerces = typeMetadata != null && typeMetadata.CoerceValueCallback != null;
             object oldValue = GetValue(storage, typeMetadata);
@@ -439,7 +439,7 @@ namespace CSHTML5.Internal
                 {
                     if (ShouldRaisePropertyChanged(storage))
                     {
-                        OnPropertyChanged(storage, oldValue, newValue, typeMetadata: typeMetadata);
+                        OnPropertyChanged(storage, oldValue, newValue);
                     }
                     if (recursively)
                         CascadeInheritedPropertyToChildren(storage, newValue);
@@ -457,7 +457,7 @@ namespace CSHTML5.Internal
                 {
                     if (ShouldRaisePropertyChanged(storage))
                     {
-                        OnPropertyChanged(storage, oldValue, newValue, typeMetadata: typeMetadata);
+                        OnPropertyChanged(storage, oldValue, newValue);
                     }
                     if (recursively)
                     {
@@ -487,7 +487,7 @@ namespace CSHTML5.Internal
 
         internal static void SetLocalStyleValue(INTERNAL_PropertyStorage storage, object newValue)
         {
-            SetSpecificValue(storage, KindOfValue.LocalStyle, newValue, null);
+            SetSpecificValue(storage, KindOfValue.LocalStyle, newValue);
         }
 
         internal static void CascadeInheritedPropertyToChildren(INTERNAL_PropertyStorage storage, object newValue)
@@ -521,12 +521,11 @@ namespace CSHTML5.Internal
         }
 
 
-        internal static void OnPropertyChanged(INTERNAL_PropertyStorage storage, object oldValue, object newValue, PropertyMetadata typeMetadata = null) // "raiseEvenIfNewValueIsSameAsOldValue" is used to force refresh.
+        internal static void OnPropertyChanged(INTERNAL_PropertyStorage storage, object oldValue, object newValue) // "raiseEvenIfNewValueIsSameAsOldValue" is used to force refresh.
         {
             DependencyObject sender = storage.Owner;
 
-            if (typeMetadata == null)
-                typeMetadata = storage.Property.GetTypeMetaData(storage.Owner.GetType());
+            var typeMetadata = storage.TypeMetadata;
 
             //---------------------
             // Ensure tha the value knows in which properties it is used (this is useful for example so that a SolidColorBrush knows in which properties it is used):
@@ -728,11 +727,9 @@ namespace CSHTML5.Internal
             return listener;
         }
 
-        internal static void CoerceCurrentValue(INTERNAL_PropertyStorage storage, PropertyMetadata typeMetadata)
+        internal static void CoerceCurrentValue(INTERNAL_PropertyStorage storage)
         {
-            if (typeMetadata == null)
-                typeMetadata = storage.Property.GetTypeMetaData(storage.Owner.GetType());
-
+            var typeMetadata = storage.TypeMetadata;
             if (typeMetadata == null || typeMetadata.CoerceValueCallback == null)
             {
                 return; //we should not arrive here in this case but we make sure to not do anything should that happen.
@@ -740,7 +737,7 @@ namespace CSHTML5.Internal
             object oldValue = storage.Local == INTERNAL_NoValue.NoValue ? (typeMetadata != null ? typeMetadata.DefaultValue : null) : storage.Local;
             object currentValue = ComputeActualValue(storage, typeMetadata, true); //Note: we do not need to know where this value comes from (Local, VisualState, etc.) since calling this method means that it has not been modified and we only need to update the coerced value.
             object coercedNewValue = typeMetadata.CoerceValueCallback(storage.Owner, currentValue);
-            SetSpecificValue(storage, KindOfValue.Coerced, coercedNewValue, typeMetadata);
+            SetSpecificValue(storage, KindOfValue.Coerced, coercedNewValue);
         }
     }
 }

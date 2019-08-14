@@ -34,11 +34,12 @@ namespace CSHTML5.Internal
 {
     internal class INTERNAL_PropertyStorage
     {
-        public INTERNAL_PropertyStorage(DependencyObject owner, DependencyProperty property)
+        public INTERNAL_PropertyStorage(DependencyObject owner, DependencyProperty property, PropertyMetadata typeMetadata)
         {
             //_defaultValue = INTERNAL_NoValue.NoValue;
             Owner = owner;
             Property = property;
+            TypeMetadata = typeMetadata;
             if (property == FrameworkElement.IsEnabledProperty || property == FrameworkElement.IsHitTestVisibleProperty)
             {
                 _isIsEnabledOrIsHitTestVisibleProperty = true;
@@ -50,13 +51,15 @@ namespace CSHTML5.Internal
             ImplicitStyleValue = INTERNAL_NoValue.NoValue;
             InheritedValue = INTERNAL_NoValue.NoValue;
 
-            // Make sure the ActualValue is calculated when read, so that the DefaultValue is used:
-            ActualValueIsDirty = true;
+            // The default value is used initially for the Actual Value:
+            ActualValue = typeMetadata != null ? typeMetadata.DefaultValue : null;
         }
         internal bool _isIsEnabledOrIsHitTestVisibleProperty = false;
 
         public DependencyObject Owner { get; private set; }
         public DependencyProperty Property { get; private set; }
+
+        public PropertyMetadata TypeMetadata { get; set; }
 
         //=================
         // ACTUAL VALUE
@@ -72,8 +75,7 @@ namespace CSHTML5.Internal
             {
                 if (ActualValueIsDirty)
                 {
-                    PropertyMetadata typeMetadata = Property.GetTypeMetaData(Owner.GetType());
-                    _actualValue = INTERNAL_PropertyStore.ComputeActualValue(this, typeMetadata, false);
+                    _actualValue = INTERNAL_PropertyStore.ComputeActualValue(this, TypeMetadata, false);
                     ActualValueIsDirty = false;
                 }
 
