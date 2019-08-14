@@ -23,12 +23,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net;
-
+using CSHTML5.Internal;
 
 namespace System
 {
     public class Settings
     {
+        private bool _EnablePerformanceLogging;
+
         public Settings()
         {
             // Default values:
@@ -37,10 +39,21 @@ namespace System
             EnableBindingErrorsThrowing = false;
         }
 
-        public CredentialsMode DefaultSoapCredentialsMode {get; set;}
+        public CredentialsMode DefaultSoapCredentialsMode { get; set; }
 
         public bool EnableBindingErrorsLogging { get; set; }
 
         public bool EnableBindingErrorsThrowing { get; set; }
+
+        public bool EnablePerformanceLogging
+        {
+            get { return _EnablePerformanceLogging; }
+            set
+            {
+                _EnablePerformanceLogging = value;
+                INTERNAL_VisualTreeManager.EnablePerformanceLogging = true;
+
+            }
+        }
     }
 }

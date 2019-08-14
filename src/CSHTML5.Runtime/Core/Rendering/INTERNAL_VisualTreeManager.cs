@@ -50,6 +50,7 @@ namespace CSHTML5.Internal
 {
     public static class INTERNAL_VisualTreeManager
     {
+        internal static bool EnablePerformanceLogging;
 
         public static void DetachVisualChildIfNotNull(UIElement child, UIElement parent)
         {
@@ -181,7 +182,19 @@ namespace CSHTML5.Internal
 #if OLD_CODE_TO_OPTIMIZE_SIMULATOR_PERFORMANCE && !BRIDGE // Obsolete since Beta 13.4 on 2018.01.31 because we now use the Dispatcher instead (cf. the class "INTERNAL_SimulatorExecuteJavaScript")
                     StartTransactionToOptimizeSimulatorPerformance();
 #endif
+                    string label = "";
+                    if (EnablePerformanceLogging)
+                    {
+                        label = "Attach" + " - " + child.GetType().Name + " - " + child.GetHashCode().ToString();
+                        Profiler.ConsoleTime(label);
+                    }
+
                     AttachVisualChild_Private(child, parent);
+
+                    if (EnablePerformanceLogging)
+                    {
+                        Profiler.ConsoleTimeEnd(label);
+                    }
 
 #if OLD_CODE_TO_OPTIMIZE_SIMULATOR_PERFORMANCE && !BRIDGE // Obsolete since Beta 13.4 on 2018.01.31 because we now use the Dispatcher instead (cf. the class "INTERNAL_SimulatorExecuteJavaScript")
                     EndTransactionToOptimizeSimulatorPerformance();

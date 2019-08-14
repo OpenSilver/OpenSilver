@@ -65,5 +65,32 @@ namespace CSHTML5
         public static void StopMeasuringTime(string measureDescription, double numberReturnedByTheStartMeasuringTimeMethod)
         {
         }
+
+#if !BRIDGE
+        [JSReplacement("console.time($label)")]
+#else
+        [Template("console.time({label})")]
+#endif
+        public static void ConsoleTime(string label)
+        {
+        }
+
+#if !BRIDGE
+        [JSReplacement("console.timeEnd($label)")]
+#else
+        [Template("console.timeEnd({label})")]
+#endif
+        public static void ConsoleTimeEnd(string label)
+        {
+        }
+
+#if !BRIDGE
+        [JSReplacement("console.timeLog($label)")]
+#else
+        [Template("console.timeLog({label})")]
+#endif
+        public static void ConsoleTimeLog(string label)
+        {
+        }
     }
 }
