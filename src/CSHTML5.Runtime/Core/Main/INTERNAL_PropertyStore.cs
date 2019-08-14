@@ -212,32 +212,6 @@ namespace CSHTML5.Internal
             #endregion
         }
 
-        static void RaisePropertyChangedAndCascadeToChildren(INTERNAL_PropertyStorage storage, object oldValue, object newValue)
-        {
-            //-----------------------
-            // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
-            //-----------------------
-            if (ShouldRaisePropertyChanged(storage))
-            {
-                // Raise Property Changed:
-                OnPropertyChanged(storage, oldValue, newValue);
-            }
-
-            //-----------------------
-            // CHECK IF THE PROPERTY IS INHERITABLE:
-            //-----------------------
-            var typeMetadata = storage.TypeMetadata;
-            if (typeMetadata != null && typeMetadata.Inherits)
-            {
-                //-----------------------
-                // PROPAGATE TO CHILDREN:
-                //-----------------------
-                CascadeInheritedPropertyToChildren(storage, newValue);
-
-                HandleSpecialPropertiesThatShouldInheritDataContext(storage, newValue);
-            }
-        }
-
         public static object GetValue(INTERNAL_PropertyStorage storage, PropertyMetadata typeMetadata)
         {
 #if PERFSTAT
@@ -315,16 +289,52 @@ namespace CSHTML5.Internal
 
         internal static void SetSpecificValue(INTERNAL_PropertyStorage storage, KindOfValue kindOfValueToSet, object newValue)
         {
-#if PERFSTAT
-            var t = Performance.now();
-#endif
             var typeMetadata = storage.TypeMetadata;
-
-            object oldValue = GetValue(storage, typeMetadata);
-            bool raisePropertyChangedAndCascadetoChildren = true;
 
             bool impactsActualValue = DoesSpecificValueImpactActualValue(storage, kindOfValueToSet);
             bool coerces = typeMetadata != null && typeMetadata.CoerceValueCallback != null;
+
+            //-----------------------
+            // DETERMINE IF WE SHOULD RAISE THE "PROPERTYCHANGED" EVENT AND CASCADE THE PROPERTY TO THE CHILDREN:
+            //-----------------------
+
+            bool raisePropertyChanged =
+                impactsActualValue
+                && ShouldRaisePropertyChanged(storage);
+
+            bool cascadetoChildren =
+                impactsActualValue
+                && typeMetadata != null
+                && typeMetadata.Inherits;
+
+            //we make sure that we don't raise PropertyChanged for IsEnabled if its inherited value is false, because a "false" inherited value has priority over any local value.
+            if (storage._isIsEnabledOrIsHitTestVisibleProperty)
+            {
+                object value;
+                if ((value = storage.InheritedValue) != INTERNAL_NoValue.NoValue && value != null && (((bool)value) == false))
+                {
+                    raisePropertyChanged = false; //we don't want to call RaisePropertyChanged... because the inherited value overrides the local value if it is false.
+                    cascadetoChildren = false;
+                }
+            }
+
+            //-----------------------
+            // GET THE OLD VALUE IF NECESSARY:
+            //-----------------------
+
+            object oldValue;
+            if (raisePropertyChanged)
+            {
+                oldValue = GetValue(storage, typeMetadata);
+            }
+            else
+            {
+                oldValue = null;
+            }
+
+            //-----------------------
+            // SET THE VALUE IN THE STORAGE:
+            //-----------------------
 
             switch (kindOfValueToSet)
             {
@@ -358,7 +368,7 @@ namespace CSHTML5.Internal
                     break;
             }
 
-            // Update the "ActualValue":
+            // Update the "ActualValue" and the "CoercedValue":
             if (impactsActualValue)
             {
                 // If we are removing the value by setting it to "NoValue", we need to recompute the ActualValue:
@@ -383,22 +393,24 @@ namespace CSHTML5.Internal
                 }
             }
 
-            //we make sure that we don't raise PropertyChanged for IsEnabled if its inherited value is false, because a "false" inherited value has priority over any local value.
-            if (storage._isIsEnabledOrIsHitTestVisibleProperty)
+            //-----------------------
+            // RAISE THE "PROPERTYCHANGED" EVENT:
+            //-----------------------
+
+            if (raisePropertyChanged)
             {
-                object value;
-                if ((value = storage.InheritedValue) != INTERNAL_NoValue.NoValue && value != null && (((bool)value) == false))
-                {
-                    raisePropertyChangedAndCascadetoChildren = false; //we don't want to call RaisePropertyChanged... because the inherited value overrides the local value if it is false.
-                }
+                OnPropertyChanged(storage, oldValue, newValue);
             }
 
-            if (raisePropertyChangedAndCascadetoChildren && impactsActualValue)
+            //-----------------------
+            // PROPAGATE TO CHILDREN (INHERITED PROPERTIES ONLY):
+            //-----------------------
+
+            if (cascadetoChildren)
             {
-#if PERFSTAT
-                Performance.Counter("INTERNAL_PropertyStore.SetSpecificValue", t);
-#endif
-                RaisePropertyChangedAndCascadeToChildren(storage, oldValue, newValue); //Note: in the case of a value that has no CoerceCallBack, this is equal to newValue.
+                CascadeInheritedPropertyToChildren(storage, newValue);
+
+                HandleSpecialPropertiesThatShouldInheritDataContext(storage, newValue);
             }
         }
 
