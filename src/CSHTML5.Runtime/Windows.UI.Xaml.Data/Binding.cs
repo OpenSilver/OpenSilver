@@ -219,7 +219,7 @@ namespace Windows.UI.Xaml.Data
             Binding b =  new Binding(Path.Path);
             b.Converter = Converter;
 #if MIGRATION
-            b._converterCulture = _converterCulture;
+            b.ConverterCulture = ConverterCulture;
 #else
             b.ConverterLanguage = ConverterLanguage;
 #endif
