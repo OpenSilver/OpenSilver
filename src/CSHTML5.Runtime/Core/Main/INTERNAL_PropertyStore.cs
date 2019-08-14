@@ -290,7 +290,7 @@ namespace CSHTML5.Internal
         internal static void SetSpecificValue(INTERNAL_PropertyStorage storage, KindOfValue kindOfValueToSet, object newValue)
         {
             var typeMetadata = storage.TypeMetadata;
-
+            bool inherits = typeMetadata != null && typeMetadata.Inherits;
             bool impactsActualValue = DoesSpecificValueImpactActualValue(storage, kindOfValueToSet);
             bool coerces = typeMetadata != null && typeMetadata.CoerceValueCallback != null;
 
@@ -300,12 +300,12 @@ namespace CSHTML5.Internal
 
             bool raisePropertyChanged =
                 impactsActualValue
-                && ShouldRaisePropertyChanged(storage);
+                && (!inherits || storage.Property.OwnerType.IsAssignableFrom(storage.Owner.GetType()) || storage.Property == FrameworkElement.DataContextProperty); // If the property is inherited, we should only raise the PropertyChanged event on the types that the property is compatible with (unless it's the DataContext property, in which case we always raise the PropertyChanged event).
+            //todo: are attached properties properly handled?
 
             bool cascadetoChildren =
                 impactsActualValue
-                && typeMetadata != null
-                && typeMetadata.Inherits;
+                && inherits;
 
             //we make sure that we don't raise PropertyChanged for IsEnabled if its inherited value is false, because a "false" inherited value has priority over any local value.
             if (storage._isIsEnabledOrIsHitTestVisibleProperty)
