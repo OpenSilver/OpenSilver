@@ -388,10 +388,10 @@ namespace CSHTML5.Internal
 #endif
 
             //--------------------------------------------------------
-            // CONTINUE WITH THE OTHER STEPS (ONLY IF THE CONTROL IS VISIBLE, IF OPTIMIZATION IS ENABLED):
+            // CONTINUE WITH THE OTHER STEPS (OR DEFER TO WHEN THE ELEMENT IS VISIBLE, IF THE OPTIMIZATION TO NOT LOAD COLLAPSED CONTROLS IS ENABLED):
             //--------------------------------------------------------
 
-            if (EnableOptimizationWhereCollapsedControlsAreNotLoaded && child.Visibility != Visibility.Collapsed)
+            if (!EnableOptimizationWhereCollapsedControlsAreNotLoaded || child.Visibility != Visibility.Collapsed)
             {
                 AttachVisualChild_Private_FinalStepsOnlyIfControlIsVisible(
                     child,
