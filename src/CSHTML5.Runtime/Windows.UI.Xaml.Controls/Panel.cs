@@ -47,6 +47,8 @@ namespace Windows.UI.Xaml.Controls
     {
         UIElementCollection _children;
 
+        public bool INTERNAL_EnableProgressiveLoading;
+
         void Children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
 #if PERFSTAT
@@ -207,10 +209,18 @@ namespace Windows.UI.Xaml.Controls
                     }
                     if (newChildren != null)
                     {
-                        foreach (UIElement child in newChildren)
+                        // Note: we attach all the children (regardless of whether they are in the oldChildren collection or not) to make it work when the item is first added to the Visual Tree (at that moment, all the properties are refreshed by calling their "Changed" method).
+
+                        if (parent.INTERNAL_EnableProgressiveLoading)
                         {
-                            // Note: we do this for all items (regardless of whether they are in the oldChildren collection or not) to make it work when the item is first added to the Visual Tree (at that moment, all the properties are refreshed by calling their "Changed" method).
-                            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, parent);
+                            parent.ProgressivelyAttachChildren(newChildren);
+                        }
+                        else
+                        {
+                            foreach (UIElement child in newChildren)
+                            {
+                                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, parent);
+                            }
                         }
                     }
 
@@ -222,6 +232,19 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        private async void ProgressivelyAttachChildren(UIElementCollection newChildren)
+        {
+            foreach (UIElement child in newChildren)
+            {
+                await Task.Delay(1);
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
+                INTERNAL_OnChildProgressivelyLoaded();
+            }
+        }
+
+        protected virtual void INTERNAL_OnChildProgressivelyLoaded()
+        {
+        }
 
         //internal override void INTERNAL_Render()
         //{
