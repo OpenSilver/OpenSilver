@@ -34,7 +34,7 @@ namespace System
         public Settings()
         {
             // Default values:
-            DefaultSoapCredentialsMode = CredentialsMode.Auto;
+            DefaultSoapCredentialsMode = CredentialsMode.Disabled;
             EnableBindingErrorsLogging = false;
             EnableBindingErrorsThrowing = false;
         }
