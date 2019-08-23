@@ -393,7 +393,7 @@ namespace Windows.UI.Xaml
 #if BRIDGE
                     INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(_bindingExpressions)
 #else
-                    _expressions.Values
+                    _bindingExpressions.Values
 #endif
                     )
                 {
