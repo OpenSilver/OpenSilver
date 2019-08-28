@@ -145,7 +145,8 @@ var radioButtonDomElement = document.getElementById(""{1}"");
         internal void ChangedEventReceived()
         {
             bool newIsChecked = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.checked", INTERNAL_OptionalSpecifyDomElementConcernedByFocus)); //Note: this should be sufficient since a RadioButton cannot be in an indeterminate state.
-            if(IsChecked != newIsChecked)
+            bool oldIsChecked = IsChecked == null ? false : (bool)IsChecked;
+            if (oldIsChecked != newIsChecked)
             {
                 IsChecked = newIsChecked;
             }
@@ -214,7 +215,6 @@ var radios = document.getElementsByName( $0 );
                     ", groupName, INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
 #endif
             }
-#if !BRIDGE
             else
             {
                 string javaScriptCodeToExecute = string.Format(@"
@@ -233,7 +233,6 @@ var radios = document.getElementsByName( $0 );
                         ", groupName, ((INTERNAL_HtmlDomElementReference)INTERNAL_OptionalSpecifyDomElementConcernedByFocus).UniqueIdentifier);
                 INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javaScriptCodeToExecute);
             }
-#endif
         }
 
         protected override void UpdateDomBasedOnCheckedState(bool? isChecked)
