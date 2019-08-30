@@ -397,7 +397,7 @@ namespace CSHTML5.Internal
             // RAISE THE "PROPERTYCHANGED" EVENT:
             //-----------------------
 
-            if (raisePropertyChanged)
+            if (raisePropertyChanged && ShouldRaisePropertyChanged(storage))
             {
                 OnPropertyChanged(storage, oldValue, newValue);
             }

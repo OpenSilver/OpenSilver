@@ -41,7 +41,10 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Initializes a new instance of the SelectionChangedEventArgs class.
         /// </summary>
-        public SelectionChangedEventArgs() { }
+        public SelectionChangedEventArgs() : this(new List<object>(), new List<object>())
+        {
+
+        }
         /// <summary>
         /// Initializes a new instance of the SelectionChangedEventArgs class with the specified removed and added items.
         /// </summary>

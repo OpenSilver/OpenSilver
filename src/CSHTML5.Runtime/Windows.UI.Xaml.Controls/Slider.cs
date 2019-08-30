@@ -20,6 +20,7 @@
 #if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Shapes;
+using System.Windows.Input;
 
 namespace System.Windows.Controls
 #else
@@ -173,7 +174,21 @@ public class Slider : RangeBase
             _horizontalThumb.KeyDown += Thumb_KeyDown;
         }
 
+#if MIGRATION
+        private void Thumb_KeyDown(object sender, Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Right || e.Key == Key.Up)
+            {
+                OnClickOnSmallOrLargeDecreaseIncreaseButtons(SmallChange, ScrollEventType.SmallIncrement);
+            }
+            else if (e.Key == Key.Left || e.Key == Key.Down)
+            {
+                OnClickOnSmallOrLargeDecreaseIncreaseButtons(-SmallChange, ScrollEventType.SmallDecrement);
+            }
+        }
+#else
         private void Thumb_KeyDown(object sender, Input.KeyRoutedEventArgs e)
+
         {
             if(e.Key == System.VirtualKey.Right || e.Key == System.VirtualKey.Up)
             {
@@ -184,7 +199,7 @@ public class Slider : RangeBase
                 OnClickOnSmallOrLargeDecreaseIncreaseButtons(-SmallChange, ScrollEventType.SmallDecrement);
             }
         }
-
+#endif
         protected override void OnValueChanged(double oldValue, double newValue)
         {
             base.OnValueChanged(oldValue, newValue);
