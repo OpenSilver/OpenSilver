@@ -47,7 +47,11 @@ namespace Windows.UI.Xaml.Data
     /// <remarks>
     /// <p>the order of the operations is: Filtering, Sorting, Grouping</p>
     /// </remarks>
+#if WORKINPROGRESS
+    public class PagedCollectionView : IPagedCollectionView, IEnumerable, INotifyCollectionChanged, INotifyPropertyChanged
+#else
     public class PagedCollectionView : IEnumerable, INotifyCollectionChanged
+#endif
     {
         // the child views
         List<CollectionViewGroupInternal> _views = new List<CollectionViewGroupInternal>();
@@ -77,7 +81,8 @@ namespace Windows.UI.Xaml.Data
 
             Init();
 
-            ScheduleRefresh();
+            //ScheduleRefresh();
+            Refresh();
         }
 
         #region Internal and Private Methods
@@ -309,6 +314,18 @@ namespace Windows.UI.Xaml.Data
 
         public event EventHandler<EventArgs> PageChanged;
 
+#if WORKINPROGRESS
+        public event EventHandler<PageChangingEventArgs> PageChanging;
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+#endif
         // old version 
         /*
         void ChangeOutputColletion()
@@ -354,6 +371,9 @@ namespace Windows.UI.Xaml.Data
                     //Note: we make two calls because "replace" does not work in the DataGrid at the time of writing.
                     CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
                     CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _collectionInteface, 0));
+#if WORKINPROGRESS
+                    this.OnPropertyChanged("Count");
+#endif
                 }
             }
         }
@@ -379,9 +399,9 @@ namespace Windows.UI.Xaml.Data
             ScheduleRefresh();
         }
 
-        #endregion
+#endregion
 
-        #region Public Methods
+#region Public Methods
 
         // refresh all the sub-group, this method is used only to refresh the filtering, but since an external method is used to filter, 
         // we should not run the method multiple times with the same element
@@ -426,7 +446,7 @@ namespace Windows.UI.Xaml.Data
             return _collectionInteface.GetEnumerator();
         }
 
-        #region Public methods to navigate
+#region Public methods to navigate
 
         public void MoveToFirstPage()
         {
@@ -453,7 +473,7 @@ namespace Windows.UI.Xaml.Data
             PageIndex--;
         }
 
-        #endregion
+#endregion
 
         //Returns a value that indicates if a specified item has passed the filter
         public bool PassesFilter(object item)
@@ -465,6 +485,38 @@ namespace Windows.UI.Xaml.Data
             }
             return true; // if no filter, we consider the filter as passed
         }
+
+#if WORKINPROGRESS
+        bool IPagedCollectionView.MoveToFirstPage()
+        {
+            MoveToFirstPage();
+            return true;
+        }
+
+        bool IPagedCollectionView.MoveToLastPage()
+        {
+            MoveToLastPage();
+            return true;
+        }
+
+        bool IPagedCollectionView.MoveToNextPage()
+        {
+            MoveToNextPage();
+            return true;
+        }
+
+        bool IPagedCollectionView.MoveToPreviousPage()
+        {
+            MoveToPreviousPage();
+            return true;
+        }
+
+        bool IPagedCollectionView.MoveToPage(int pageIndex)
+        {
+            MoveToPage(pageIndex);
+            return true;
+        }
+#endif
 
         // Gets the top-level groups, constructed according to the descriptions specified in the GroupDescriptions property.
         public Collection<IEnumerable> Groups
@@ -482,9 +534,9 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         // Gets the number of elements in the view after filtering, sorting, and paging.
         public int Count { get { return _pages[_PageIndex].Count; } }
@@ -515,16 +567,48 @@ namespace Windows.UI.Xaml.Data
 
             private set
             {
-                if (value != _PageIndex) // ChangeOutputColletion can take lot of time, because it refreshes the controls that use this as source
+                int newPageIndex = VerifyPageIndex(value);
+                if (newPageIndex != _PageIndex) // ChangeOutputColletion can take lot of time, because it refreshes the controls that use this as source
                 {
-                    _PageIndex = VerifyPageIndex(value);
+                    int oldCount = this.Count;
+#if WORKINPROGRESS
+                    OnPageChanging(newPageIndex);
+#endif
+                    _PageIndex = newPageIndex;
+#if WORKINPROGRESS
+                    OnPropertyChanged("PageIndex");
+#endif
+                    OnPageChanged();
 
-                    if (PageChanged != null)
-                        PageChanged(this, new EventArgs());
-
-                    ChangeOutputColletion();
+#if WORKINPROGRESS
+                    if (this.Count != oldCount)
+                    {
+                        OnPropertyChanged("Count");
+                    }
+#endif
                 }
             }
+        }
+
+#if WORKINPROGRESS
+        private void OnPageChanging(int newPageIndex)
+        {
+            _isPageChanging = true;
+            if (PageChanging != null)
+            {
+                PageChanging(this, new PageChangingEventArgs(newPageIndex));
+            }
+        }
+#endif
+
+        private void OnPageChanged()
+        {
+            if (PageChanged != null)
+            {
+                PageChanged(this, new EventArgs());
+            }
+            ChangeOutputColletion();
+            _isPageChanging = false;
         }
 
         // Gets or sets the number of items to display on a page.
@@ -535,10 +619,20 @@ namespace Windows.UI.Xaml.Data
             get { return _pageSize; }
             set
             {
+                int oldCount = this.Count;
                 _pageSize = value;
-
+#if WORKINPROGRESS
+                OnPropertyChanged("PageSize");
+#endif
                 if (_views.Count != 0)
                     CreatePages();
+#if WORKINPROGRESS
+                // if the count has changed
+                if (this.Count != oldCount)
+                {
+                    this.OnPropertyChanged("Count");
+                }
+#endif
             }
         }
 
@@ -551,6 +645,31 @@ namespace Windows.UI.Xaml.Data
         // get or set the list of sorting operations
         public ObservableCollection<PropertySortDescription> SortDescriptions { get; set; }
 
-        #endregion
+        public bool CanChangePage
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        private bool _isPageChanging;
+        public bool IsPageChanging
+        {
+            get
+            {
+                return _isPageChanging;
+            }
+        }
+
+        public int ItemCount
+        {
+            get
+            {
+                return TotalItemCount;
+            }
+        }
+
+#endregion
     }
 }
