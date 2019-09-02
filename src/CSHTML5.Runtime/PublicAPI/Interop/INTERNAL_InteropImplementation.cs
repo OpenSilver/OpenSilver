@@ -32,9 +32,9 @@ using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 #if MIGRATION
 using System.Windows;
-using System.Linq;
 #else
 using Windows.UI.Xaml;
 #endif
