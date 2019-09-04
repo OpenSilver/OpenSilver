@@ -1137,18 +1137,21 @@ namespace Windows.UI.Xaml.Controls
         {
             if (_currentCell != null)
             {
-                object temp = _currentCell.DataContext;
-                _currentCell.DataContext = null;
-                _currentCell.DataContext = temp;
-                _currentCell.Visibility = Visibility.Visible;
-                _currentCell.IsEditing = false;
-
-                if (_currentEditionElement != null)
+                if (!IsReadOnly && IsEnabled && !_currentCell.Column.IsReadOnly) //note: this test is particularly useful to avoid setting _currentCell.IsEditing to false, which sets its content.isEnabled to false (and thus disables HyperlinkButtons for example, or any Button for that matter...)
                 {
-                    ((FrameworkElement)_currentEditionElement).DataContext = null; //Note: this is here because we had to set the DataContext locally for this element (since it is directly put in the grid and not in a DataGridCell)
-                    _grid.Children.Remove(_currentEditionElement);
-                }
+                    //todo: Do we want to do this when IsEnabled is false? Test the case where a cell is in edition mode when we set IsEnabled to false on the DataGrid, then set it back to true (and variants).
+                    object temp = _currentCell.DataContext;
+                    _currentCell.DataContext = null;
+                    _currentCell.DataContext = temp;
+                    _currentCell.Visibility = Visibility.Visible;
+                    _currentCell.IsEditing = false;
 
+                    if (_currentEditionElement != null)
+                    {
+                        ((FrameworkElement)_currentEditionElement).DataContext = null; //Note: this is here because we had to set the DataContext locally for this element (since it is directly put in the grid and not in a DataGridCell)
+                        _grid.Children.Remove(_currentEditionElement);
+                    }
+                }
                 _currentCell = null;
                 _currentEditionElement = null;
             }
