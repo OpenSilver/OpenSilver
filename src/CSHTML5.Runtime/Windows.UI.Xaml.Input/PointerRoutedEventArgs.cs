@@ -46,7 +46,7 @@ namespace Windows.UI.Xaml.Input
     /// </summary>
 #if MIGRATION
     public class MouseEventArgs : RoutedEventArgs
-    
+
 #else
     public class PointerRoutedEventArgs : RoutedEventArgs
 #endif
@@ -169,20 +169,38 @@ namespace Windows.UI.Xaml.Input
             else
             {
                 dynamic jsEventArgDynamic = (dynamic)jsEventArg;
-                if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(jsEventArgDynamic.pageX))
+                //todo - removeJSIL: once we stop supporting the JSIL version, remove the bools like the following and put the thing directly in the if (3x in this method for now).
+                bool isArgsPageXDefined = INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(jsEventArgDynamic.pageX); // Using a temporary variable to conatin the tests's result (this line and the following) because in JSIL, trying to do both tests in the if results in an UntranslatableMethod for some reason.
+                bool isArgsPageXNotNull = jsEventArgDynamic.pageX != 0;
+                if (isArgsPageXDefined && isArgsPageXNotNull)
                 {
                     _pointerAbsoluteX = (double)jsEventArgDynamic.pageX;
                     _pointerAbsoluteY = (double)jsEventArgDynamic.pageY;
                 }
-                else if (jsEventArgDynamic.touches.length != 0) //Chrome for Android uses different ways to access the pointer's position.
+                else
                 {
-                    _pointerAbsoluteX = (double)jsEventArgDynamic.touches[0].pageX;
-                    _pointerAbsoluteY = (double)jsEventArgDynamic.touches[0].pageY;
-                }
-                else //this is for the PointerRelease event on Chrome for Android
-                {
-                    _pointerAbsoluteX = (double)jsEventArgDynamic.changedTouches[0].pageX;
-                    _pointerAbsoluteY = (double)jsEventArgDynamic.changedTouches[0].pageY;
+                    bool isArgsTouchesDefined = INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(jsEventArgDynamic.touches); // Using a temporary variable to conatin the tests's result (this line and the following) because in JSIL, trying to do both tests in the if results in an UntranslatableMethod for some reason.
+                    bool isArgsTouchesNotEmpty = jsEventArgDynamic.touches.length != 0;
+                    if (isArgsTouchesDefined && isArgsTouchesNotEmpty) //Chrome for Android uses different ways to access the pointer's position.
+                    {
+                        _pointerAbsoluteX = (double)jsEventArgDynamic.touches[0].pageX;
+                        _pointerAbsoluteY = (double)jsEventArgDynamic.touches[0].pageY;
+                    }
+                    else
+                    {
+                        bool isArgsChangedTouchesDefined = INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(jsEventArgDynamic.changedTouches); // Using a temporary variable to conatin the tests's result (this line and the following) because in JSIL, trying to do both tests in the if results in an UntranslatableMethod for some reason.
+                        bool isArgsChangedTouchesNotEmpty = jsEventArgDynamic.changedTouches.length != 0;
+                        if (isArgsChangedTouchesDefined && isArgsChangedTouchesNotEmpty) //this is for the PointerRelease event on Chrome for Android
+                        {
+                            _pointerAbsoluteX = (double)jsEventArgDynamic.changedTouches[0].pageX;
+                            _pointerAbsoluteY = (double)jsEventArgDynamic.changedTouches[0].pageY;
+                        }
+                        else
+                        {
+                            _pointerAbsoluteX = 0d;
+                            _pointerAbsoluteY = 0d;
+                        }
+                    }
                 }
             }
 
