@@ -53,6 +53,7 @@ namespace CSHTML5.Internal
             }
             else
             {
+                //todo: verify value's type is compatible with "type".
                 return true;
             }
         }

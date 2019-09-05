@@ -576,12 +576,16 @@ namespace CSHTML5.Internal
                 INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement).position = "absolute"; //todo: test if this works properly
             }
 
+#if REVAMPPOINTEREVENTS
+            UIElement.INTERNAL_UpdateCssPointerEvents(child);
+#else
             // If the current element is inside a Grid, we need to explicitly set its CSS property "PointerEvents=auto" because its parent child wrapper has "PointerEvents=none" in order to prevent its child wrappers from overlapping each other and thus preventing clicks on some children.
             if (parent is Grid && child is FrameworkElement) //todo: generalize this code so that we have no hard-reference on the Grid control, and third-party controls can use the same mechanics.
             {
                 var frameworkElement = ((FrameworkElement)child);
                 FrameworkElement.INTERNAL_UpdateCssPointerEventsPropertyBasedOnIsHitTestVisibleAndIsEnabled(frameworkElement, frameworkElement.IsHitTestVisible, frameworkElement.IsEnabled);
             }
+#endif
 
             // Reset the flag that tells if we have already applied the RenderTransformOrigin (this is useful to ensure that the default RenderTransformOrigin is (0,0) like in normal XAML, instead of (0.5,0.5) like in CSS):
             child.INTERNAL_RenderTransformOriginHasBeenApplied = false;
