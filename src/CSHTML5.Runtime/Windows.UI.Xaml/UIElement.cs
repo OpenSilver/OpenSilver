@@ -426,6 +426,9 @@ namespace Windows.UI.Xaml
                 // Set the CSS to make the DOM element visible/collapsed:
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
                 {
+#if REVAMPPOINTEREVENTS
+                    INTERNAL_UpdateCssPointerEvents(uiElement);
+#endif
                     // Get a reference to the most outer DOM element to show/hide:
                     dynamic mostOuterDomElement = null;
                     if (uiElement.INTERNAL_VisualParent is UIElement)
@@ -583,12 +586,35 @@ namespace Windows.UI.Xaml
         private static void IsHitTestVisible_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             UIElement element = (UIElement)d;
-            INTERNAL_UpdateCssPointerEventsPropertyBasedOnIsHitTestVisibleAndIsEnabled(element,
+#if REVAMPPOINTEREVENTS
+            INTERNAL_UpdateCssPointerEvents(element);
+#else
+             INTERNAL_UpdateCssPointerEventsPropertyBasedOnIsHitTestVisibleAndIsEnabled(element,
                 isHitTestVisible: (bool)newValue,
                 isEnabled: element is FrameworkElement ? ((FrameworkElement)element).IsEnabled : true);
+#endif
+
         }
 
         #endregion
+
+#if REVAMPPOINTEREVENTS
+        internal static void INTERNAL_UpdateCssPointerEvents(UIElement element)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
+            {
+                dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
+                if (element.INTERNAL_ArePointerEventsEnabled)
+                {
+                    style.pointerEvents = "auto";
+                }
+                else
+                {
+                    style.pointerEvents = "none";
+                }
+            }
+        }
+#else
 
         internal static void INTERNAL_UpdateCssPointerEventsPropertyBasedOnIsHitTestVisibleAndIsEnabled(UIElement element, bool isHitTestVisible, bool isEnabled)
         {
@@ -607,6 +633,7 @@ namespace Windows.UI.Xaml
                 }
             }
         }
+#endif
 
 
         internal bool INTERNAL_IsChildOf(UIElement element)
@@ -949,7 +976,7 @@ namespace Windows.UI.Xaml
  document.oncontextmenu = null;
  document.ondblclick = null;
 ");
-#else                   
+#else
                     Script.Write(@"
  document.onmousedown = null;
  document.onmouseup = null;

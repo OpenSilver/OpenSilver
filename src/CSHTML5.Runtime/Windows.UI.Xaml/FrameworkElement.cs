@@ -78,6 +78,20 @@ namespace Windows.UI.Xaml
         {
         }
 
+#if REVAMPPOINTEREVENTS
+        internal virtual bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        {
+            return false;
+        }
+
+        internal sealed override bool INTERNAL_ManagePointerEventsAvailability()
+        {
+            return INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+                && Visibility == Visibility.Visible
+                && IsEnabled  //todo: at the moment, the "IsEnabled" property is implemented with the CSS property "PointerEvents=none" (just like "IsHitTestVisible"). However, this is not good because "PointerEvents=none" makes the element transparent to click, meaning that the user's click will go to the element that is under it. Instead, the click event should be "absorbed" and lost (or bubbled up? but not go behind).
+                && IsHitTestVisible;
+        }
+#endif
 
         #region Resources
 
@@ -268,9 +282,13 @@ namespace Windows.UI.Xaml
         private static void IsEnabled_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             FrameworkElement element = (FrameworkElement)d;
+#if REVAMPPOINTEREVENTS
+            UIElement.INTERNAL_UpdateCssPointerEvents(element);
+#else
             INTERNAL_UpdateCssPointerEventsPropertyBasedOnIsHitTestVisibleAndIsEnabled(element,
                 isHitTestVisible: element.IsHitTestVisible,
                 isEnabled: (bool)newValue);
+#endif
             element.ManageIsEnabled(newValue != null ? (bool)newValue : true);
         }
 
@@ -290,9 +308,9 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
-        #region Names handling
+#region Names handling
 
         /// <summary>
         /// Retrieves an object that has the specified identifier name.
@@ -334,9 +352,9 @@ namespace Windows.UI.Xaml
         public static readonly DependencyProperty NameProperty =
             DependencyProperty.Register("Name", typeof(string), typeof(FrameworkElement), new PropertyMetadata(string.Empty));
 
-        #endregion
+#endregion
 
-        #region DataContext
+#region DataContext
 
         /// <summary>
         /// Gets or sets the data context for a FrameworkElement when it participates
@@ -353,10 +371,10 @@ namespace Windows.UI.Xaml
         public static readonly DependencyProperty DataContextProperty =
             DependencyProperty.Register("DataContext", typeof(object), typeof(FrameworkElement), new PropertyMetadata() { Inherits = true });
 
-        #endregion
+#endregion
 
 #if WORKINPROGRESS
-        #region Triggers (not implemented)
+#region Triggers (not implemented)
 
         public TriggerCollection Triggers
         {
@@ -368,10 +386,10 @@ namespace Windows.UI.Xaml
 
         public static DependencyProperty TriggersProperty = DependencyProperty.Register("Triggers", typeof(TriggerCollection), typeof(FrameworkElement), new PropertyMetadata(new TriggerCollection()));
 
-        #endregion
+#endregion
 #endif
 
-        #region Tag
+#region Tag
 
         /// <summary>
         /// Gets or sets an arbitrary object value that can be used to store custom information
@@ -388,9 +406,9 @@ namespace Windows.UI.Xaml
         public static readonly DependencyProperty TagProperty =
             DependencyProperty.Register("Tag", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null, null));
 
-        #endregion
+#endregion
 
-        #region Handling Styles
+#region Handling Styles
 
         protected void INTERNAL_SetDefaultStyle(Style defaultStyle)
         {
@@ -536,7 +554,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #region DefaultStyleKey
+#region DefaultStyleKey
 
         // Returns:
         //     The key that references the default style for the control. To work correctly
@@ -584,11 +602,11 @@ namespace Windows.UI.Xaml
         }
 
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region Loaded/Unloaded events
+#region Loaded/Unloaded events
 
         /// <summary>
         /// Occurs when a FrameworkElement has been constructed and added to the object tree.
@@ -612,9 +630,9 @@ namespace Windows.UI.Xaml
                 Unloaded(this, new RoutedEventArgs());
         }
 
-        #endregion
+#endregion
 
-        #region BindingValidationError event
+#region BindingValidationError event
 
         internal bool INTERNAL_AreThereAnyBindingValidationErrorHandlers = false;
 
@@ -666,12 +684,12 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-        #endregion
+#endregion
 
 
 
 
-        #region ContextMenu
+#region ContextMenu
 
         /// <summary>
         /// Gets or sets the context menu element that should appear whenever the context menu is requested through user interface (UI) from within this element.
@@ -707,10 +725,10 @@ namespace Windows.UI.Xaml
                 ContextMenuOpening(this, new ContextMenuEventArgs(pointerLeft, pointerTop));
         }
 
-        #endregion
+#endregion
 
 #if WORKINPROGRESS
-        #region Not supported yet
+#region Not supported yet
 
         public event EventHandler LayoutUpdated;
 
@@ -734,7 +752,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 #endif
     }
 }

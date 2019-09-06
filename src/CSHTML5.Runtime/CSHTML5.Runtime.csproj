@@ -68,7 +68,7 @@
     <AssemblyName>CSHTML5.Migration</AssemblyName>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Migration.WorkInProgress\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;SILVERLIGHTCOMPATIBLEVERSION;SLMIGRATION;MIGRATION;WORKINPROGRESS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;SILVERLIGHTCOMPATIBLEVERSION;SLMIGRATION;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
