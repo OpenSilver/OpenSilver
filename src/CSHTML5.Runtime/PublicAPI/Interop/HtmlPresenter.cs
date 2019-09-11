@@ -40,6 +40,13 @@ namespace CSHTML5.Native.Html.Controls
         private object _jsDiv;
         private string _htmlContent;
 
+#if REVAMPPOINTEREVENTS
+        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        {
+            return true;
+        }
+#endif
+
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             _jsDiv = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);

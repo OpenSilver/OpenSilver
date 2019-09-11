@@ -31,8 +31,8 @@ using Windows.UI.Xaml.Shapes;
 
 namespace Windows.UI.Xaml.Controls
 #endif
-{ 
-public class Slider : RangeBase
+{
+    public class Slider : RangeBase
     {
         //todo: Clean up this class (even functionality-wise): It was quickly made by copy-pasting the code from ScrollBar.cs and making minor changes.
         //      Changes to do:  - change _horizontal/_verticalRoot into Grids so we can position stuff in it more easily OR keep them as Canvas but programatically position their children depending on their Horizontal/VerticalAlignment. This is to allow templating because as it is, what the user can do is VERY limited.
@@ -244,7 +244,7 @@ public class Slider : RangeBase
                     this.Scroll(this, new ScrollEventArgs(newValue, scrollEventType));
             }
 
-            if(Orientation == Orientation.Horizontal)
+            if (Orientation == Orientation.Horizontal)
             {
                 _horizontalThumb.Focus();
             }
@@ -540,7 +540,7 @@ public class Slider : RangeBase
             double maxMinusMin = maxValue - minValue;
 
             double thumbCenterPosition = (maxMinusMin > 0 ? (thumbSize / 2) + (scrollableSize * (value - Minimum) / maxMinusMin) : trackSize / 2); // This is the X or Y position of the thumb (respectively for horizontal or vertical orientation).
-            if(Orientation ==  Orientation.Vertical)
+            if (Orientation == Orientation.Vertical)
             {
                 thumbCenterPosition = trackSize - thumbCenterPosition;
             }
