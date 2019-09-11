@@ -276,7 +276,7 @@ public class Slider : RangeBase
 
         void VerticalThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            ChangeValueBasedOnPointerMovement(e.VerticalChange);
+            ChangeValueBasedOnPointerMovement(-e.VerticalChange);
         }
 
         void HorizontalThumb_DragDelta(object sender, DragDeltaEventArgs e)
