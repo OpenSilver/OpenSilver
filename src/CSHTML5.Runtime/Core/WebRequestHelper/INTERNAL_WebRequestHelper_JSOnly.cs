@@ -149,7 +149,7 @@ namespace System
                 //we check whether the server could be found at all. It is not definite that readyState = 4 and status = 0 means that the server could not be found but that's the only example I have met so far and we're a bit poor on informations anyway.
                 int currentReadyState = GetCurrentReadyState((object)_xmlHttpRequest);
                 int currentStatus = GetCurrentStatus((object)_xmlHttpRequest);
-                if (currentStatus == 0 && (currentReadyState == 4 || currentReadyState == 1)) //we could replace that "if" with a method since it is used in SetEventArgs.
+                if ((currentStatus == 0 && !GetIsFileProtocol()) && (currentReadyState == 4 || currentReadyState == 1)) //we could replace that "if" with a method since it is used in SetEventArgs. //Note: see note on the same test in SetEventArgs
                 {
                     if (!isAsync) // Note: we only throw the exception when the call is not asynchronous because it is dealt with in the callback (defined by SetCallbackMethod and automatically called by SendRequest).
                     {
@@ -259,6 +259,18 @@ namespace System
             _isAsync = isAsync;
             _callback = callback;
             _requester = this;
+        }
+
+#if !BRIDGE
+        [JSIL.Meta.JSReplacement("document.location.protocol === \"file:\"")]
+#else
+        [Template("document.location.protocol === \"file:\"")]
+#endif
+        private static bool GetIsFileProtocol()
+        {
+#if BRIDGE
+            return Convert.ToBoolean(Interop.ExecuteJavaScript(@"document.location.protocol === ""file:"""));
+#endif
         }
 
 #if !BRIDGE
@@ -389,7 +401,7 @@ namespace System
             {
                 e.Error = new Exception("Request not initialized");
             }
-            else if (currentStatus == 0 && (currentReadyState == 4 || currentReadyState == 1))
+            else if ((currentStatus == 0 && !GetIsFileProtocol()) && (currentReadyState == 4 || currentReadyState == 1)) //Note: we check whether the file protocol is file: because apparently, browsers return 0 as the status on a successful call.
             {
                 e.Error = new Exception("An error occured. Please make sure that the target Url is available.");
             }
