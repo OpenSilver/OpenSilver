@@ -262,14 +262,14 @@ namespace System
         }
 
 #if !BRIDGE
-        [JSIL.Meta.JSReplacement("document.location.protocol === \"file:\"")]
+        [JSIL.Meta.JSReplacement("(document.location.protocol === \"file:\")")]
 #else
-        [Template("document.location.protocol === \"file:\"")]
+        [Template("(document.location.protocol === \"file:\")")]
 #endif
         private static bool GetIsFileProtocol()
         {
 #if BRIDGE
-            return Convert.ToBoolean(Interop.ExecuteJavaScript(@"document.location.protocol === ""file:"""));
+            return Convert.ToBoolean(Interop.ExecuteJavaScript(@"(document.location.protocol === ""file:"")"));
 #endif
         }
 
