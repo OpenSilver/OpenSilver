@@ -463,10 +463,12 @@ namespace CSHTML5.Internal
             {
                 if (((bool)newValue == true))
                 {
+                    storage.ActualValueIsDirty = true; //The actual value is Dirty because it didn't take into consideration the values that usually have priority over the inherited value (i.e: local) and since the newValue is "true", it now needs to take them into consideration.
                     newValue = GetValue(GetStorageIfExists(storage.Owner, storage.Property), typeMetadata); //we need newValue to be the value that will be active afterwards.
                 }
                 if (oldValue != newValue)
                 {
+                    storage.ActualValue = newValue; // Make sure Storage.ActualValue is up to date.
                     if (ShouldRaisePropertyChanged(storage))
                     {
                         OnPropertyChanged(storage, oldValue, newValue);
