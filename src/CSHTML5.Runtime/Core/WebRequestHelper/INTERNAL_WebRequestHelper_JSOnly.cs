@@ -270,6 +270,8 @@ namespace System
         {
 #if BRIDGE
             return Convert.ToBoolean(Interop.ExecuteJavaScript(@"(document.location.protocol === ""file:"")"));
+#else
+            throw new InvalidOperationException();//we should never arrive here
 #endif
         }
 
