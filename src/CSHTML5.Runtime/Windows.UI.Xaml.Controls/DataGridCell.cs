@@ -130,11 +130,11 @@ namespace Windows.UI.Xaml.Controls
 
                         if (RowIndex % 2 == 0 && RowIndex != 0) // gray color
                         {
-                            dataGridCell.Background = dataGridCell.Column._parent.UnselectedItemAlternateBackground ?? dataGridCell.Column._parent.Background;
+                            dataGridCell.Background = dataGridCell.Column._parent.AlternatingRowBackground ?? dataGridCell.Column._parent.Background;
                         }
                         else // white color
                         {
-                            dataGridCell.Background = dataGridCell.Column._parent.UnselectedItemBackground ?? dataGridCell.Column._parent.Background;
+                            dataGridCell.Background = dataGridCell.Column._parent.RowBackground ?? dataGridCell.Column._parent.Background;
                         }
                         dataGridCell.Foreground = dataGridCell.Column._parent.UnselectedItemForeground ?? dataGridCell.Column._parent.Foreground;
 

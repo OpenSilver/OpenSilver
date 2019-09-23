@@ -344,11 +344,11 @@ namespace Windows.UI.Xaml.Controls
             set { SelectedItemForeground = value; }
         }
 
-        [Obsolete("Use UnselectedItemBackground instead.")]
+        [Obsolete("Use RowBackground instead.")]
         public Brush UnselectedItemBackgroundBrush
         {
-            get { return UnselectedItemBackground; }
-            set { UnselectedItemBackground = value; }
+            get { return RowBackground; }
+            set { RowBackground = value; }
         }
 
         [Obsolete("Use UnselectedItemForeground instead.")]

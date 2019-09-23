@@ -125,19 +125,29 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        [Obsolete("Use AlternatingRowBackground instead")]
+        public Brush UnselectedItemAlternateBackground
+        {
+            get { return AlternatingRowBackground; }
+            set { AlternatingRowBackground = value; }
+        }
+       
         /// <summary>
         /// Gets or sets the alternative bakground color of the Items that are not selected.
         /// </summary>
-        public Brush UnselectedItemAlternateBackground
+        public Brush AlternatingRowBackground
         {
-            get { return (Brush)GetValue(UnselectedItemAlternateBackgroundProperty); }
-            set { SetValue(UnselectedItemAlternateBackgroundProperty, value); }
+            get { return (Brush)GetValue(AlternatingRowBackgroundProperty); }
+            set { SetValue(AlternatingRowBackgroundProperty, value); }
         }
         /// <summary>
-        /// Identifies the UnselectedItemAlternateBackground dependency property
+        /// Identifies the AlternatingRowBackground dependency property
         /// </summary>
-        public static readonly DependencyProperty UnselectedItemAlternateBackgroundProperty =
-            DependencyProperty.Register("UnselectedItemAlternateBackground", typeof(Brush), typeof(DataGrid), new PropertyMetadata(new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString("#f0f0e9"))));  //todo: move the default value to a default DataGrid style instead of here?
+        public static readonly DependencyProperty AlternatingRowBackgroundProperty =
+            DependencyProperty.Register("AlternatingRowBackground", typeof(Brush), typeof(DataGrid), new PropertyMetadata(new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString("#f0f0e9"))));
+
+
+
 
         /// <summary>
         /// Gets or sets the vertical padding in all cells
@@ -668,7 +678,7 @@ namespace Windows.UI.Xaml.Controls
                     columnHeader.HorizontalContentAlignment = HorizontalAlignment.Center;
                     columnHeader.VerticalContentAlignment = VerticalAlignment.Center;
                     columnHeader.FontWeight = FontWeights.Bold;
-
+                   
                     // If a local column style is defined, we use it, otherwise we use the global one:
                     if (column.HeaderStyle != null)
                     {
@@ -885,11 +895,11 @@ namespace Windows.UI.Xaml.Controls
 
                     if (elementRow % 2 == 0 && elementRow != 0)//todo: we assumed that the cell was not selected, if it can be selected at the moment where we add it (programatically for example), add the management of the case where it is selected.
                     {
-                        cell.Background = UnselectedItemAlternateBackground;
+                        cell.Background = AlternatingRowBackground;
                     }
                     else
                     {
-                        cell.Background = UnselectedItemBackground;
+                        cell.Background = RowBackground;
                     }
                     cell.Foreground = UnselectedItemForeground;
 
