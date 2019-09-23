@@ -1237,7 +1237,10 @@ namespace Windows.UI.Xaml.Controls
                     _currentCell.DataContext = null;
                     _currentCell.DataContext = temp;
                     _currentCell.Visibility = Visibility.Visible;
-                    _currentCell.IsEditing = false;
+                    if (!(_currentCell.Column is DataGridTemplateColumn))
+                    {
+                        _currentCell.IsEditing = false;
+                    }
 
                     if (_currentEditionElement != null)
                     {
