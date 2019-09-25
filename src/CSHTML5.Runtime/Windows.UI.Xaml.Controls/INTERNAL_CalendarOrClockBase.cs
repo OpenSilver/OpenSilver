@@ -94,7 +94,7 @@ namespace Windows.UI.Xaml.Controls
                     newSelectedDate.SetDate(newDate); // calls OnSelectedDatesCollectionChanged
 
                     // when we set the default date of the picker before it exists, we don't try to set the date in JS
-                    if(calendarOrClock._flatpickrInstance != null) 
+                    if (calendarOrClock._flatpickrInstance != null)
                     {
                         // Convert from C# DateTime to JS Date:
                         var newDateJS = Interop.ExecuteJavaScript("new Date($0, $1, $2, $3, $4)", newDate.Year, newDate.Month - 1, newDate.Day, newDate.Hour, newDate.Minute);
@@ -110,18 +110,22 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        [Obsolete("Use the SelectedDatesChanged event instead.")]
+        public event EventHandler<SelectionChangedEventArgs> SelectionChanged;
         /// <summary>
         /// Occurs when the collection returned by the property has changed.
         /// </summary>
-        public event EventHandler<SelectionChangedEventArgs> SelectionChanged;
+        public event EventHandler<SelectionChangedEventArgs> SelectedDatesChanged;
 
         internal void OnSelectedDatesCollectionChanged(SelectionChangedEventArgs e)
         {
-            EventHandler<SelectionChangedEventArgs> handler = SelectionChanged;
-
-            if (null != handler)
+            if (SelectionChanged != null)
             {
-                handler(this, e);
+                SelectionChanged(this, e);
+            }
+            if (SelectedDatesChanged != null)
+            {
+                SelectedDatesChanged(this, e);
             }
         }
 
