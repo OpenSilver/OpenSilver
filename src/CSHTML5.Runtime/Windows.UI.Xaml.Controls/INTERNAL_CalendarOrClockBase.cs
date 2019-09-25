@@ -48,6 +48,8 @@ namespace Windows.UI.Xaml.Controls
 {
     public abstract class INTERNAL_CalendarOrClockBase : FrameworkElement
     {
+        //Note: if we want to allow customization of the day cells: see event "onDayCreate" at https://flatpickr.js.org/events/
+
         protected object _flatpickrInstance;
 
         public INTERNAL_CalendarOrClockBase()
@@ -105,7 +107,10 @@ namespace Windows.UI.Xaml.Controls
                 }
                 else
                 {
-                    //todo: implement this
+                    if (calendarOrClock._flatpickrInstance != null)
+                    {
+                        Interop.ExecuteJavaScript("$0.setDate(undefined)", calendarOrClock._flatpickrInstance);
+                    }
                 }
             }
         }
