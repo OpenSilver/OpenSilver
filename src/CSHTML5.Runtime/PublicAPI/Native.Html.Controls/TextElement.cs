@@ -27,6 +27,7 @@ using System.Windows;
 using System.Windows.Media;
 #else
 using Windows.UI;
+using Windows.UI.Text;
 using Windows.UI.Xaml;
 #endif
 
@@ -60,6 +61,9 @@ namespace CSHTML5.Native.Html.Controls
     public class TextElement : HtmlCanvasElement
     {
         static private object _jsCanvasForMeasuringTextWidth;
+
+        private const double DEFAULT_FONT_HEIGHT = 12;
+
         /// <summary>
         /// Text value
         /// </summary>
@@ -72,13 +76,15 @@ namespace CSHTML5.Native.Html.Controls
 
         public double FontHeight;
 
-        public double ActualWidth
+        public FontWeight FontWeight;
+
+        public virtual double ActualWidth
         {
             get
             {
                 if (_jsCanvasForMeasuringTextWidth == null)
                     _jsCanvasForMeasuringTextWidth = Interop.ExecuteJavaScriptAsync("document.createElement('canvas').getContext('2d')");
-                return Convert.ToDouble(Interop.ExecuteJavaScript("$0.measureText($1).width", _jsCanvasForMeasuringTextWidth, this.Text));
+                return Convert.ToDouble(Interop.ExecuteJavaScript("$0.measureText($1).width", _jsCanvasForMeasuringTextWidth, this.Text)) * FontHeight / DEFAULT_FONT_HEIGHT;
             }
         }
 
@@ -88,7 +94,8 @@ namespace CSHTML5.Native.Html.Controls
         public TextElement() : base()
         {
             this.FillColor = Color.FromArgb(255, 0, 0, 0);
-            this.FontHeight = 12;
+            this.FontWeight = FontWeights.Normal;
+            this.FontHeight = DEFAULT_FONT_HEIGHT;
             this.Font = "Georgia";
         }
 
@@ -106,7 +113,7 @@ namespace CSHTML5.Native.Html.Controls
             {
                 currentDrawingStyle = this.ApplyStyle(currentDrawingStyle, jsContext2d);
 
-                Interop.ExecuteJavaScriptAsync("$0.font = $1", jsContext2d, this.FontHeight.ToString() + "px " + this.Font); //todo: use "InvariantCulture" in the ToString() when supported.
+                Interop.ExecuteJavaScriptAsync("$0.font = $1", jsContext2d, this.FontWeight.ToString() + " " + this.FontHeight.ToString() + "px " + this.Font); //todo: use "InvariantCulture" in the ToString() when supported.
                 Interop.ExecuteJavaScriptAsync("$0.fillText($1, $2, $3)", jsContext2d, this.Text, this.X + xParent, this.Y + yParent + this.FontHeight);
             }
 
