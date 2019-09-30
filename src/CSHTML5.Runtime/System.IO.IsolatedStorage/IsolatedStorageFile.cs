@@ -42,8 +42,7 @@ namespace System.IO.IsolatedStorage
         public void DeleteFile(string fileName)
         {
             string filePath_lower = GetFilePath(_assemblyName, fileName).ToLower();
-            Interop.ExecuteJavaScript("localStorage.removeItem($0)", filePath_lower + "ǀǀCaseSensitivePath");
-            Interop.ExecuteJavaScript("localStorage.removeItem($0)", filePath_lower);
+            Interop.ExecuteJavaScript("localStorage.removeItem($0); localStorage.removeItem($1);", filePath_lower + "ǀǀCaseSensitivePath", filePath_lower);
         }
 
         public bool FileExists(string fileName)

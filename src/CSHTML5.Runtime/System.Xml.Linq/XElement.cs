@@ -22,6 +22,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,8 +40,22 @@ namespace System.Xml.Linq
             INTERNAL_jsnode = jsNode;
             XName xName = new XName();
             //todo: add the namespaceName.
-            xName.LocalName = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.localName", INTERNAL_jsnode));
-            xName.Namespace = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.namespaceURI", INTERNAL_jsnode));
+
+            // Hack to improve the Simulator performance by making only one interop call rather than two:
+            string concatenated = CSHTML5.Interop.ExecuteJavaScript("$0.localName + '|' + $0.namespaceURI", INTERNAL_jsnode).ToString();
+            int sepIndex = concatenated.IndexOf('|');
+            if (sepIndex > -1)
+            {
+                xName.LocalName = concatenated.Substring(0, sepIndex);
+                xName.Namespace = concatenated.Substring(sepIndex + 1);
+            }
+            else
+            {
+                xName.LocalName = String.Empty;
+                xName.Namespace = String.Empty;
+            }
+
+
             _name = xName;
         }
 
@@ -253,10 +268,28 @@ namespace System.Xml.Linq
 
         private static XAttribute GetAttributeFromJSAttribute(object jsAttribute)
         {
-            XNamespace ns = XNamespace.Get(Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.namespaceURI", jsAttribute)));
-            XName nameWithPrefix = ns.GetName(Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.name", jsAttribute)));
-            XName name = ns.GetName(Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.localName", jsAttribute)));
-            string value = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.value", jsAttribute));
+            XNamespace ns;
+            XName nameWithPrefix;
+            XName name;
+            string value;
+            string concatenated = CSHTML5.Interop.ExecuteJavaScript( "$0.namespaceURI + '|' + $0.name + '|' + $0.localName + '|' + $0.value", jsAttribute).ToString();
+
+            string[] attributeDatas = concatenated.Split('|');
+            if (attributeDatas.Length == 4)
+            {
+                ns = XNamespace.Get(attributeDatas[0]);
+                nameWithPrefix = ns.GetName(attributeDatas[1]);
+                name = ns.GetName(attributeDatas[2]);
+                value = attributeDatas[3];
+            }
+            else
+            {
+                ns = XNamespace.Get(Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.namespaceURI", jsAttribute)));
+                nameWithPrefix = ns.GetName(Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.name", jsAttribute)));
+                name = ns.GetName(Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.localName", jsAttribute)));
+                value = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.value", jsAttribute));
+            }
+
             return new XAttribute(name, value, nameWithPrefix);
         }
 

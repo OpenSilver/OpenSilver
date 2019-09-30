@@ -152,8 +152,25 @@ namespace Windows.UI.Xaml
 
         void ProcessOnWindowSizeChanged(object jsEventArg)
         {
-            double width = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.offsetWidth", this.INTERNAL_OuterDomElement)); //(double)INTERNAL_HtmlDomManager.GetRawHtmlBody().clientWidth;
-            double height = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.offsetHeight", this.INTERNAL_OuterDomElement)); //(double)INTERNAL_HtmlDomManager.GetRawHtmlBody().clientHeight;
+            double width;
+            double height;
+            
+            // Hack to improve the Simulator performance by making only one interop call rather than two:
+            string concatenated = CSHTML5.Interop.ExecuteJavaScript("$0.offsetWidth + '|' + $0.offsetHeight", this.INTERNAL_OuterDomElement).ToString();
+            int sepIndex = concatenated.IndexOf('|');
+            if (sepIndex > -1)
+            {
+                string widthAsString = concatenated.Substring(0, sepIndex);
+                string heightAsString = concatenated.Substring(sepIndex + 1);
+                width = double.Parse(widthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                height = double.Parse(heightAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
+            }
+            else
+            {
+                width = Double.NaN;
+                height = Double.NaN;
+            }
+
             var eventArgs = new WindowSizeChangedEventArgs()
             {
                 Size = new Size(width, height)

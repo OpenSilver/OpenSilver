@@ -163,8 +163,21 @@ namespace Windows.UI.Xaml.Input
         {
             if (Interop.IsRunningInTheSimulator)
             {
-                _pointerAbsoluteX = Convert.ToDouble(Interop.ExecuteJavaScript("$0.pageX", jsEventArg));
-                _pointerAbsoluteY = Convert.ToDouble(Interop.ExecuteJavaScript("$0.pageY", jsEventArg));
+                // Hack to improve the Simulator performance by making only one interop call rather than two:
+                string concatenated = CSHTML5.Interop.ExecuteJavaScript("$0.pageX + '|' + $0.pageY", jsEventArg).ToString();
+                int sepIndex = concatenated.IndexOf('|');
+                if (sepIndex > -1)
+                {
+                    string pointerAbsoluteXAsString = concatenated.Substring(0, sepIndex);
+                    string pointerAbsoluteYAsString = concatenated.Substring(sepIndex + 1);
+                    _pointerAbsoluteX = double.Parse(pointerAbsoluteXAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                    _pointerAbsoluteY = double.Parse(pointerAbsoluteYAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
+                }
+                else
+                {
+                    _pointerAbsoluteX = Double.NaN;
+                    _pointerAbsoluteY = Double.NaN;
+                }
             }
             else
             {
@@ -213,8 +226,25 @@ namespace Windows.UI.Xaml.Input
                 object windowRootDomElement = window.INTERNAL_OuterDomElement;
                 object windowBoundingClientRect = Interop.ExecuteJavaScript("$0.getBoundingClientRect()", windowRootDomElement);
                 object pageBodyBoundingClientRect = Interop.ExecuteJavaScript("document.body.getBoundingClientRect()"); // This is to take into account the scrolling.
-                double windowRootLeft = Convert.ToDouble(Interop.ExecuteJavaScript("$0.left - $1.left", windowBoundingClientRect, pageBodyBoundingClientRect));
-                double windowRootTop = Convert.ToDouble(Interop.ExecuteJavaScript("$0.top - $1.top", windowBoundingClientRect, pageBodyBoundingClientRect));
+
+                double windowRootLeft;
+                double windowRootTop;
+
+                // Hack to improve the Simulator performance by making only one interop call rather than two:
+                string concatenated = CSHTML5.Interop.ExecuteJavaScript("($0.left - $1.left) + '|' + ($0.top - $1.top)", windowBoundingClientRect, pageBodyBoundingClientRect).ToString();
+                int sepIndex = concatenated.IndexOf('|');
+                if (sepIndex > -1)
+                {
+                    string windowRootLeftAsString = concatenated.Substring(0, sepIndex);
+                    string windowRootTopAsString = concatenated.Substring(sepIndex + 1);
+                    windowRootLeft = double.Parse(windowRootLeftAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                    windowRootTop = double.Parse(windowRootTopAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
+                }
+                else
+                {
+                    windowRootLeft = Double.NaN;
+                    windowRootTop = Double.NaN;
+                }
 
                 // Substract the XAML Window position, to get the pointer position relative to the XAML Window root:
                 _pointerAbsoluteX = _pointerAbsoluteX - windowRootLeft;

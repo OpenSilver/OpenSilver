@@ -25,6 +25,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSHTML5.Internal;
+using DotNetBrowser;
 
 #if MIGRATION
 using System.Windows.Navigation;
@@ -609,7 +610,17 @@ namespace Windows.UI.Xaml.Controls
 
         static bool IsNullOrUndefined(object jsObject)
         {
-            return Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
+            if (CSHTML5.Interop.IsRunningInTheSimulator)
+            {
+                if (jsObject == null)
+                    return true;
+                if (!(jsObject is JSValue))
+                    return false;
+                JSValue value = ((JSValue)jsObject);
+                return value.IsNull() || value.IsUndefined();
+            }
+            else
+                return Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("(tyeof $0 === 'undefined' || $0 === null)", jsObject));
         }
 
         static void GetXamlFileAssociatedClassInstancierName(Uri uri, out string assemblyName, out string instancierName)
