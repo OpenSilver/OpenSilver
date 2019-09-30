@@ -176,7 +176,7 @@ $0.parseFromString($1, ""application/xml"")
                             break;
                     }
                     XDocument.INTERNAL_idsToXNodes.Add(newId, result);
-                    Interop.ExecuteJavaScript("$0.nodeId = $1", node, newId);
+                    Interop.ExecuteJavaScriptAsync("$0.nodeId = $1", node, newId);
                 }
             }
             else
@@ -223,7 +223,10 @@ $0.parseFromString($1, ""application/xml"")
 
         public static bool IsNullOrUndefined(object jsObject)
         {
-            return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
+            if (Interop.IsRunningInTheSimulator)
+                return Interop.IsUndefined(jsObject) || Interop.IsNull(jsObject);
+            else
+                return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
         }
 
 

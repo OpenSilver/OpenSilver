@@ -66,7 +66,6 @@ namespace CSHTML5
 #endif
         public static object ExecuteJavaScript(string javascript, params object[] variables)
         {
-            
             return INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: false, variables: variables);
         }
 
@@ -266,6 +265,24 @@ namespace CSHTML5
             {
                 return INTERNAL_InteropImplementation.IsRunningInTheSimulator();
             }
+        }
+
+        /// <summary>
+        /// Check if the given jsnode is undefined
+        /// </summary>
+        [Template("typeof({jsObject}) === 'undefined'")]
+        public static bool IsUndefined(object jsObject)
+        {
+            return ((CSHTML5.Types.INTERNAL_JSObjectReference)jsObject).IsUndefined();
+        }
+
+        /// <summary>
+        /// Check if the given jsnode is undefined
+        /// </summary>
+        [Template("{jsObject} === null")]
+        public static bool IsNull(object jsObject)
+        {
+            return ((CSHTML5.Types.INTERNAL_JSObjectReference)jsObject).IsNull();
         }
 
         public class ResourceFile

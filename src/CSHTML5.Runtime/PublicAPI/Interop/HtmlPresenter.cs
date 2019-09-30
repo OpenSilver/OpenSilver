@@ -23,6 +23,7 @@ using System.Windows.Markup;
 
 #if MIGRATION
 using System.Windows;
+using DotNetBrowser;
 #else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -106,7 +107,17 @@ namespace CSHTML5.Native.Html.Controls
 
         static bool IsNullOrUndefined(object jsObject)
         {
-            return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
+            if (Interop.IsRunningInTheSimulator)
+            {
+                if (jsObject == null)
+                    return true;
+                if (!(jsObject is JSValue))
+                    return false;
+                JSValue value = ((JSValue)jsObject);
+                return value.IsNull() || value.IsUndefined();
+            }
+            else
+                return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
         }
     }
 }

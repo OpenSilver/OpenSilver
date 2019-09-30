@@ -190,9 +190,21 @@ namespace Windows.UI.Xaml.Controls
             double parentWidth = ((FrameworkElement)Parent).ActualWidth;
             double parentHeight = ((FrameworkElement)Parent).ActualHeight;
 
-
-            imgHeight = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.naturalHeight", _imageDiv));
-            imgWidth = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.naturalWidth", _imageDiv));
+            // Hack to improve the Simulator performance by making only one interop call rather than two:
+            string concatenated = CSHTML5.Interop.ExecuteJavaScript("$0.naturalWidth + '|' + $0.naturalHeight", _imageDiv).ToString();
+            int sepIndex = concatenated.IndexOf('|');
+            if (sepIndex > -1)
+            {
+                string imgWidthAsString = concatenated.Substring(0, sepIndex);
+                string imgHeightAsString = concatenated.Substring(sepIndex + 1);
+                imgWidth = double.Parse(imgWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                imgHeight = double.Parse(imgHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
+            }
+            else
+            {
+                imgWidth = double.NaN;
+                imgHeight = double.NaN;
+            }
 
             double currentWidth = ActualWidth;
             double currentHeight = ActualHeight;
