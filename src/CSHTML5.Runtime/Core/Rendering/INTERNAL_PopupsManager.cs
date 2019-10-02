@@ -285,8 +285,11 @@ $1.removeChild(popupRoot);
                     && popupActualWidth > 0
                     && popupActualHeight > 0)
                 {
-                    GeneralTransform gt = popup.TransformToVisual(Application.Current.RootVisual);
-                    Point popupPosition = gt.Transform(new Point(0, 0));
+                    Point popupPosition = new Point(0, 0);
+                    if(popup.INTERNAL_VisualParent != null)
+                    {
+                        popupPosition = popup.TransformToVisual(Application.Current.RootVisual).Transform(popupPosition);
+                    }
 
                     // Determine the size of the window:
                     Rect windowBounds = Window.Current.Bounds;
