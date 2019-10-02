@@ -603,14 +603,11 @@ namespace Windows.UI.Xaml
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
-                dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
-                if (element.INTERNAL_ArePointerEventsEnabled)
+                bool pointerEventsAreEnabled = element.INTERNAL_ArePointerEventsEnabled;
+                if (element.INTERNAL_VisualParent == null || pointerEventsAreEnabled != element.INTERNAL_VisualParent.INTERNAL_ArePointerEventsEnabled)
                 {
-                    style.pointerEvents = "auto";
-                }
-                else
-                {
-                    style.pointerEvents = "none";
+                    dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
+                    style.pointerEvents = pointerEventsAreEnabled ? "auto" : "none";
                 }
             }
         }
