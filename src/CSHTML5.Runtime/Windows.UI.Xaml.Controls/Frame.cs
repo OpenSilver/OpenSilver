@@ -620,7 +620,7 @@ namespace Windows.UI.Xaml.Controls
                 return value.IsNull() || value.IsUndefined();
             }
             else
-                return Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("(tyeof $0 === 'undefined' || $0 === null)", jsObject));
+                return Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
         }
 
         static void GetXamlFileAssociatedClassInstancierName(Uri uri, out string assemblyName, out string instancierName)

@@ -30,6 +30,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using System.ComponentModel;
+using System.Globalization;
+
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
@@ -44,8 +48,6 @@ using Windows.UI.Xaml.Markup;
 using Windows.UI.Core;
 using Windows.Foundation;
 #endif
-using System.Diagnostics;
-using System.ComponentModel;
 
 
 #if MIGRATION
@@ -129,7 +131,7 @@ namespace Windows.UI.Xaml
             this.INTERNAL_RaiseLoadedEvent();
         }
 
-#region Bounds and SizeChanged event
+        #region Bounds and SizeChanged event
 
         INTERNAL_EventManager<WindowSizeChangedEventHandler, WindowSizeChangedEventArgs> _windowSizeChangedEventManager;
         /// <summary>
@@ -154,21 +156,20 @@ namespace Windows.UI.Xaml
         {
             double width;
             double height;
-            
-            // Hack to improve the Simulator performance by making only one interop call rather than two:
-            string concatenated = CSHTML5.Interop.ExecuteJavaScript("$0.offsetWidth + '|' + $0.offsetHeight", this.INTERNAL_OuterDomElement).ToString();
-            int sepIndex = concatenated.IndexOf('|');
-            if (sepIndex > -1)
+            if (Interop.IsRunningInTheSimulator)
             {
+                // Hack to improve the Simulator performance by making only one interop call rather than two:
+                string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.offsetWidth + '|' + $0.offsetHeight", this.INTERNAL_OuterDomElement));
+                int sepIndex = concatenated.IndexOf('|');
                 string widthAsString = concatenated.Substring(0, sepIndex);
                 string heightAsString = concatenated.Substring(sepIndex + 1);
-                width = double.Parse(widthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
-                height = double.Parse(heightAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
+                width = double.Parse(widthAsString, CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                height = double.Parse(heightAsString, CultureInfo.InvariantCulture); //todo: read note above
             }
             else
             {
-                width = Double.NaN;
-                height = Double.NaN;
+                width = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.offsetWidth", this.INTERNAL_OuterDomElement)); //(double)INTERNAL_HtmlDomManager.GetRawHtmlBody().clientWidth;
+                height = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.offsetHeight", this.INTERNAL_OuterDomElement)); //(double)INTERNAL_HtmlDomManager.GetRawHtmlBody().clientHeight;
             }
 
             var eventArgs = new WindowSizeChangedEventArgs()
@@ -203,7 +204,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        #endregion
 
 #if RECURSIVE_CONSTRUCTION_FIXED
         protected override void OnContentChanged(object oldContent, object newContent)
@@ -220,7 +221,7 @@ namespace Windows.UI.Xaml
                 // then gets passed to the children recursively:
                 this.INTERNAL_ParentWindow = this;
 
-                if(Application.Current.Resources.INTERNAL_HasImplicitStyles)
+                if (Application.Current.Resources.INTERNAL_HasImplicitStyles)
                 {
                     this.INTERNAL_InheritedImplicitStyles = new List<ResourceDictionary>();
                     this.INTERNAL_InheritedImplicitStyles.Add(Application.Current.Resources);
@@ -274,7 +275,7 @@ namespace Windows.UI.Xaml
 
 #if RECURSIVE_CONSTRUCTION_FIXED
 #else
-#region ---------- INameScope implementation ----------
+        #region ---------- INameScope implementation ----------
 
         Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
 
@@ -307,7 +308,7 @@ namespace Windows.UI.Xaml
             _nameScopeDictionary.Remove(name);
         }
 
-#endregion
+        #endregion
 #endif
 
 #if !BRIDGE
@@ -335,7 +336,7 @@ namespace Windows.UI.Xaml
         }
 
 
-#region Closing event
+        #region Closing event
 
         INTERNAL_EventManager<EventHandler<ClosingEventArgs>, ClosingEventArgs> _closingEventManager;
         INTERNAL_EventManager<EventHandler<ClosingEventArgs>, ClosingEventArgs> ClosingEventManager
@@ -396,7 +397,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        #endregion
 
     }
 }

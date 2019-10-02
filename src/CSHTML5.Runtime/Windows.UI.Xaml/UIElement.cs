@@ -1095,22 +1095,13 @@ namespace Windows.UI.Xaml
                 // ------- SIMULATOR -------
 
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string concatenated = CSHTML5.Interop.ExecuteJavaScript("($0.getBoundingClientRect().left - $1.getBoundingClientRect().left) + '|' + ($0.getBoundingClientRect().top - $1.getBoundingClientRect().top)", 
-                                                                        outerDivOfThisControl, outerDivOfReferenceVisual).ToString();
+                string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("($0.getBoundingClientRect().left - $1.getBoundingClientRect().left) + '|' + ($0.getBoundingClientRect().top - $1.getBoundingClientRect().top)",
+                                                                        outerDivOfThisControl, outerDivOfReferenceVisual));
                 int sepIndex = concatenated.IndexOf('|');
-
-                if (sepIndex > - 1)
-                {
-                    string offsetLeftAsString = concatenated.Substring(0, sepIndex);
-                    string offsetTopAsString = concatenated.Substring(sepIndex + 1);
-                    offsetLeft = Convert.ToDouble(offsetLeftAsString);
-                    offsetTop = Convert.ToDouble(offsetTopAsString);
-                }
-                else
-                {
-                    offsetLeft = Double.NaN;
-                    offsetTop = Double.NaN;
-                }
+                string offsetLeftAsString = concatenated.Substring(0, sepIndex);
+                string offsetTopAsString = concatenated.Substring(sepIndex + 1);
+                offsetLeft = Convert.ToDouble(offsetLeftAsString);
+                offsetTop = Convert.ToDouble(offsetTopAsString);
             }
             //#endif
 

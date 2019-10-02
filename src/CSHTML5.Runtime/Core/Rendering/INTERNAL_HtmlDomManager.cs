@@ -34,10 +34,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSHTML5;
 using DotNetForHtml5.Core;
+using DotNetBrowser;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
-using DotNetBrowser;
 #else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;

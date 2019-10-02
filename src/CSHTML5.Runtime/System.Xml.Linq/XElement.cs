@@ -40,22 +40,19 @@ namespace System.Xml.Linq
             INTERNAL_jsnode = jsNode;
             XName xName = new XName();
             //todo: add the namespaceName.
-
-            // Hack to improve the Simulator performance by making only one interop call rather than two:
-            string concatenated = CSHTML5.Interop.ExecuteJavaScript("$0.localName + '|' + $0.namespaceURI", INTERNAL_jsnode).ToString();
-            int sepIndex = concatenated.IndexOf('|');
-            if (sepIndex > -1)
+            if (CSHTML5.Interop.IsRunningInTheSimulator)
             {
+                // Hack to improve the Simulator performance by making only one interop call rather than two:
+                string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.localName + '|' + $0.namespaceURI", INTERNAL_jsnode));
+                int sepIndex = concatenated.IndexOf('|');
                 xName.LocalName = concatenated.Substring(0, sepIndex);
                 xName.Namespace = concatenated.Substring(sepIndex + 1);
             }
             else
             {
-                xName.LocalName = String.Empty;
-                xName.Namespace = String.Empty;
+                xName.LocalName = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.localName", INTERNAL_jsnode));
+                xName.Namespace = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.namespaceURI", INTERNAL_jsnode));
             }
-
-
             _name = xName;
         }
 
@@ -182,9 +179,9 @@ namespace System.Xml.Linq
         {
             if (nodeElement is XNode)
             {
-                    //we'll consider that it is a XNode for now:
-                    XNode contentAsXNode = ((XNode)nodeElement);
-                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.appendChild($1)", destinationNode, contentAsXNode.INTERNAL_jsnode);
+                //we'll consider that it is a XNode for now:
+                XNode contentAsXNode = ((XNode)nodeElement);
+                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.appendChild($1)", destinationNode, contentAsXNode.INTERNAL_jsnode);
             }
             else if (nodeElement is XAttribute)
             {
@@ -272,7 +269,7 @@ namespace System.Xml.Linq
             XName nameWithPrefix;
             XName name;
             string value;
-            string concatenated = CSHTML5.Interop.ExecuteJavaScript( "$0.namespaceURI + '|' + $0.name + '|' + $0.localName + '|' + $0.value", jsAttribute).ToString();
+            string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.namespaceURI + '|' + $0.name + '|' + $0.localName + '|' + $0.value", jsAttribute));
 
             string[] attributeDatas = concatenated.Split('|');
             if (attributeDatas.Length == 4)
@@ -500,7 +497,7 @@ namespace System.Xml.Linq
         //    }
         //    throw new FormatException("Could not convert element to DateTimeOffset.");
         //}
-        
+
 
         /// <summary>
         /// Cast the value of this System.Xml.Linq.XElement to an System.Int64.
@@ -665,7 +662,7 @@ namespace System.Xml.Linq
             throw new FormatException("Could not convert element to float.");
         }
 
-        public static explicit operator bool?(XElement element)
+        public static explicit operator bool? (XElement element)
         {
             if (element == null)
             {
@@ -692,7 +689,7 @@ namespace System.Xml.Linq
             }
             throw new FormatException("Could not convert element to bool.");
         }
-        public static explicit operator DateTime?(XElement element)
+        public static explicit operator DateTime? (XElement element)
         {
             if (element == null)
             {
@@ -773,7 +770,7 @@ namespace System.Xml.Linq
         //    }
         //    throw new FormatException("Could not convert element to decimal.");
         //}
-        public static explicit operator double?(XElement element)
+        public static explicit operator double? (XElement element)
         {
             if (element == null)
             {
@@ -800,7 +797,7 @@ namespace System.Xml.Linq
             }
             throw new FormatException("Could not convert element to double.");
         }
-        public static explicit operator Guid?(XElement element)
+        public static explicit operator Guid? (XElement element)
         {
             if (element == null)
             {
@@ -827,7 +824,7 @@ namespace System.Xml.Linq
             }
             throw new FormatException("Could not convert element to Guid.");
         }
-        public static explicit operator int?(XElement element)
+        public static explicit operator int? (XElement element)
         {
             if (element == null)
             {
@@ -854,7 +851,7 @@ namespace System.Xml.Linq
             }
             throw new FormatException("Could not convert element to int.");
         }
-        public static explicit operator long?(XElement element)
+        public static explicit operator long? (XElement element)
         {
             if (element == null)
             {
@@ -881,7 +878,7 @@ namespace System.Xml.Linq
             }
             throw new FormatException("Could not convert element to long.");
         }
-        public static explicit operator float?(XElement element)
+        public static explicit operator float? (XElement element)
         {
             if (element == null)
             {
@@ -908,7 +905,7 @@ namespace System.Xml.Linq
             }
             throw new FormatException("Could not convert element to float.");
         }
-        public static explicit operator TimeSpan?(XElement element)
+        public static explicit operator TimeSpan? (XElement element)
         {
             if (element == null)
             {
@@ -940,7 +937,7 @@ namespace System.Xml.Linq
             }
             throw new FormatException("Could not convert element to TimeSpan.");
         }
-        public static explicit operator uint?(XElement element)
+        public static explicit operator uint? (XElement element)
         {
             if (element == null)
             {
@@ -967,7 +964,7 @@ namespace System.Xml.Linq
             }
             throw new FormatException("Could not convert element to uint.");
         }
-        public static explicit operator ulong?(XElement element)
+        public static explicit operator ulong? (XElement element)
         {
             if (element == null)
             {

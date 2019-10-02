@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 #if MIGRATION
 using System.Windows.Media;
 #else
@@ -164,20 +165,12 @@ namespace Windows.UI.Xaml.Input
             if (Interop.IsRunningInTheSimulator)
             {
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string concatenated = CSHTML5.Interop.ExecuteJavaScript("$0.pageX + '|' + $0.pageY", jsEventArg).ToString();
+                string concatenated = Convert.ToString(Interop.ExecuteJavaScript("$0.pageX + '|' + $0.pageY", jsEventArg));
                 int sepIndex = concatenated.IndexOf('|');
-                if (sepIndex > -1)
-                {
-                    string pointerAbsoluteXAsString = concatenated.Substring(0, sepIndex);
-                    string pointerAbsoluteYAsString = concatenated.Substring(sepIndex + 1);
-                    _pointerAbsoluteX = double.Parse(pointerAbsoluteXAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
-                    _pointerAbsoluteY = double.Parse(pointerAbsoluteYAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
-                }
-                else
-                {
-                    _pointerAbsoluteX = Double.NaN;
-                    _pointerAbsoluteY = Double.NaN;
-                }
+                string pointerAbsoluteXAsString = concatenated.Substring(0, sepIndex);
+                string pointerAbsoluteYAsString = concatenated.Substring(sepIndex + 1);
+                _pointerAbsoluteX = double.Parse(pointerAbsoluteXAsString, CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                _pointerAbsoluteY = double.Parse(pointerAbsoluteYAsString, CultureInfo.InvariantCulture); //todo: read note above
             }
             else
             {

@@ -190,11 +190,11 @@ namespace Windows.UI.Xaml.Controls
             double parentWidth = ((FrameworkElement)Parent).ActualWidth;
             double parentHeight = ((FrameworkElement)Parent).ActualHeight;
 
-            // Hack to improve the Simulator performance by making only one interop call rather than two:
-            string concatenated = CSHTML5.Interop.ExecuteJavaScript("$0.naturalWidth + '|' + $0.naturalHeight", _imageDiv).ToString();
-            int sepIndex = concatenated.IndexOf('|');
-            if (sepIndex > -1)
+            if (CSHTML5.Interop.IsRunningInTheSimulator)
             {
+                // Hack to improve the Simulator performance by making only one interop call rather than two:
+                string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.naturalWidth + '|' + $0.naturalHeight", _imageDiv));
+                int sepIndex = concatenated.IndexOf('|');
                 string imgWidthAsString = concatenated.Substring(0, sepIndex);
                 string imgHeightAsString = concatenated.Substring(sepIndex + 1);
                 imgWidth = double.Parse(imgWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
@@ -202,8 +202,8 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                imgWidth = double.NaN;
-                imgHeight = double.NaN;
+                imgHeight = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.naturalHeight", _imageDiv));
+                imgWidth = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.naturalWidth", _imageDiv));
             }
 
             double currentWidth = ActualWidth;
@@ -314,9 +314,9 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
 
             }
         }
-        
 
-        
+
+
         #region Image failed event
 
         INTERNAL_EventManager<ExceptionRoutedEventHandler, ExceptionRoutedEventArgs> _imageFailedEventManager = null;
@@ -344,7 +344,7 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
                 {
                     _imageFailedEventManager.Remove(value);
                 }
-                
+
             }
         }
 
@@ -406,7 +406,7 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
             }
         }
 
-       
+
         /// <summary>
         /// Raises the ImageOpened event
         /// </summary>
@@ -447,7 +447,7 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
                 _imageOpenedEventManager.AttachToDomEvents();
             }
             if (_imageFailedEventManager != null)
-            {         
+            {
                 _imageFailedEventManager.AttachToDomEvents();
             }
         }

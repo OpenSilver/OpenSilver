@@ -20,10 +20,10 @@
 using CSHTML5.Internal;
 using System;
 using System.Windows.Markup;
+using DotNetBrowser;
 
 #if MIGRATION
 using System.Windows;
-using DotNetBrowser;
 #else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
