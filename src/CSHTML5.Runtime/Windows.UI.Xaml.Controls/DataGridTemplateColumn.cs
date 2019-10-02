@@ -109,7 +109,8 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                return GenerateElement(childData);
+                return null;
+                //return GenerateElement(childData);
             }
         }
     }

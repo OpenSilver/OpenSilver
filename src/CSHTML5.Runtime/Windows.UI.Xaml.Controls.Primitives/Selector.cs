@@ -416,19 +416,31 @@ namespace Windows.UI.Xaml.Controls.Primitives
         public static readonly DependencyProperty SelectedItemForegroundProperty =
             DependencyProperty.Register("SelectedItemForeground", typeof(Brush), typeof(Selector), new PropertyMetadata(new SolidColorBrush(Colors.White)));
 
+
+        [Obsolete("Use RowBackground instead.")]
         /// <summary>
         /// Gets or sets the bakground color of the Items that are not selected.
         /// </summary>
         public Brush UnselectedItemBackground
         {
-            get { return (Brush)GetValue(UnselectedItemBackgroundProperty); }
-            set { SetValue(UnselectedItemBackgroundProperty, value); }
+            get { return RowBackground; }
+            set { RowBackground = value; }
+        }
+       
+        /// <summary>
+        /// Gets or sets the bakground color of the Items that are not selected.
+        /// </summary>
+        public Brush RowBackground
+        {
+            get { return (Brush)GetValue(RowBackgroundProperty); }
+            set { SetValue(RowBackgroundProperty, value); }
         }
         /// <summary>
-        /// Identifies the UnselectedItemBackground dependency property
+        /// Identifies the RowBackground dependency property
         /// </summary>
-        public static readonly DependencyProperty UnselectedItemBackgroundProperty =
-            DependencyProperty.Register("UnselectedItemBackground", typeof(Brush), typeof(Selector), new PropertyMetadata(new SolidColorBrush(Colors.White))); //todo: move the default value to a default style instead of here?
+        public static readonly DependencyProperty RowBackgroundProperty =
+            DependencyProperty.Register("RowBackground", typeof(Brush), typeof(Selector), new PropertyMetadata(new SolidColorBrush(Colors.White)));
+
 
         /// <summary>
         /// Gets or sets the foreground color of the Items that are not selected.

@@ -24,12 +24,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using CSHTML5.Internal;
+#if MIGRATION
+using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Controls;
+#endif
 
 namespace System
 {
     public class Settings
     {
-        private bool _EnablePerformanceLogging;
 
         public Settings()
         {
@@ -45,26 +49,39 @@ namespace System
 
         public bool EnableBindingErrorsThrowing { get; set; }
 
+
+        private bool _enablePerformanceLogging;
         public bool EnablePerformanceLogging
         {
-            get { return _EnablePerformanceLogging; }
+            get { return _enablePerformanceLogging; }
             set
             {
-                _EnablePerformanceLogging = value;
-                INTERNAL_VisualTreeManager.EnablePerformanceLogging = true;
+                _enablePerformanceLogging = value;
+                INTERNAL_VisualTreeManager.EnablePerformanceLogging = value;
 
             }
         }
 
         private bool _enableOptimizationWhereCollapsedControlsAreNotLoaded;
-
         public bool EnableOptimizationWhereCollapsedControlsAreNotLoaded
         {
             get { return _enableOptimizationWhereCollapsedControlsAreNotLoaded; }
             set
             {
                 _enableOptimizationWhereCollapsedControlsAreNotLoaded = value;
-                INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreNotLoaded = true;
+                INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreNotLoaded = value;
+            }
+        }
+
+        private bool _enableProgressiveRendering;
+        public bool EnableProgressiveRendering
+        {
+            get { return _enableProgressiveRendering; }
+            set
+            {
+                _enableProgressiveRendering = value;
+                Panel.EnableProgressiveRendering = value;
+
             }
         }
 

@@ -48,15 +48,15 @@ namespace Windows.UI.Xaml.Controls
         Canvas _horizontalRoot;
         Thumb _horizontalThumb;
         Rectangle _horizontalRail;
-        Button _horizontalLargeDecrease;
-        Button _horizontalLargeIncrease;
+        ButtonBase _horizontalLargeDecrease;
+        ButtonBase _horizontalLargeIncrease;
 
         // Vertical elements:
         Canvas _verticalRoot;
         Thumb _verticalThumb;
         Rectangle _verticalRail;
-        Button _verticalLargeDecrease;
-        Button _verticalLargeIncrease;
+        ButtonBase _verticalLargeDecrease;
+        ButtonBase _verticalLargeIncrease;
 
         /// <summary>
         /// Initializes a new instance of the Slider class.
@@ -100,14 +100,14 @@ namespace Windows.UI.Xaml.Controls
             _horizontalRoot = this.GetTemplateChild("HorizontalRoot") as Canvas;
             _horizontalThumb = this.GetTemplateChild("HorizontalThumb") as Thumb;
             _horizontalRail = this.GetTemplateChild("HorizontalRail") as Rectangle;
-            _horizontalLargeDecrease = this.GetTemplateChild("HorizontalLargeDecrease") as Button;
-            _horizontalLargeIncrease = this.GetTemplateChild("HorizontalLargeIncrease") as Button;
+            _horizontalLargeDecrease = this.GetTemplateChild("HorizontalLargeDecrease") as ButtonBase;
+            _horizontalLargeIncrease = this.GetTemplateChild("HorizontalLargeIncrease") as ButtonBase;
 
             _verticalRoot = this.GetTemplateChild("VerticalRoot") as Canvas;
             _verticalThumb = this.GetTemplateChild("VerticalThumb") as Thumb;
             _verticalRail = this.GetTemplateChild("VerticalRail") as Rectangle;
-            _verticalLargeDecrease = this.GetTemplateChild("VerticalLargeDecrease") as Button;
-            _verticalLargeIncrease = this.GetTemplateChild("VerticalLargeIncrease") as Button;
+            _verticalLargeDecrease = this.GetTemplateChild("VerticalLargeDecrease") as ButtonBase;
+            _verticalLargeIncrease = this.GetTemplateChild("VerticalLargeIncrease") as ButtonBase;
 
             //----------------------------
             // Register the events:
@@ -276,7 +276,7 @@ namespace Windows.UI.Xaml.Controls
 
         void VerticalThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            ChangeValueBasedOnPointerMovement(e.VerticalChange);
+            ChangeValueBasedOnPointerMovement(-e.VerticalChange);
         }
 
         void HorizontalThumb_DragDelta(object sender, DragDeltaEventArgs e)
