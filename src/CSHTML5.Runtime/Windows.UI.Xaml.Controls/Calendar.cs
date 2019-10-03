@@ -16,8 +16,9 @@
 //===============================================================================
 
 
-
+#if BRIDGE
 using Bridge;
+#endif
 using CSHTML5;
 using System;
 using System.Collections.Generic;

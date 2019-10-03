@@ -270,7 +270,9 @@ namespace CSHTML5
         /// <summary>
         /// Check if the given jsnode is undefined
         /// </summary>
+#if BRIDGE
         [Template("typeof({jsObject}) === 'undefined'")]
+#endif
         public static bool IsUndefined(object jsObject)
         {
             return ((CSHTML5.Types.INTERNAL_JSObjectReference)jsObject).IsUndefined();
@@ -279,7 +281,9 @@ namespace CSHTML5
         /// <summary>
         /// Check if the given jsnode is undefined
         /// </summary>
+#if BRIDGE
         [Template("{jsObject} === null")]
+#endif
         public static bool IsNull(object jsObject)
         {
             return ((CSHTML5.Types.INTERNAL_JSObjectReference)jsObject).IsNull();
