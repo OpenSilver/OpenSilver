@@ -50,6 +50,7 @@ namespace System.Xml.Linq
             INTERNAL_jsDocument = CSHTML5.Interop.ExecuteJavaScript(@"document.implementation.createDocument(null, ""root"", null)"); //called "root" for now, we'll need a proper name (like the name of the class that is going to be serialized).
             INTERNAL_jsnode = CSHTML5.Interop.ExecuteJavaScript(@"$0.documentElement", INTERNAL_jsDocument);
 
+#if RECYCLE_XNODES //This is useful for example when comparing two identical XNodes, so that it says that it is the same node. We commented it for performance reasons when running in the Simulator, to reduce the number if Interop calls.
             //add a way to get the c# Document from the js Document:
             if (Interop.IsRunningInTheSimulator)
             {
@@ -61,6 +62,7 @@ namespace System.Xml.Linq
             {
                 Interop.ExecuteJavaScriptAsync("$0.associatedXNode = $1", INTERNAL_jsDocument, this);
             }
+#endif
         }
 
         /// <summary>
@@ -114,7 +116,7 @@ $0.parseFromString($1, ""application/xml"")
         }
 
 
-        #region should probaly be moved to a helper class
+#region should probaly be moved to a helper class
 
         static XDocument()
         {
@@ -137,6 +139,7 @@ $0.parseFromString($1, ""application/xml"")
             {
                 // In the Simulator, we get the CSharp object associated to a DOM element by searching for the DOM element ID in the "INTERNAL_idsToUIElements" dictionary.
 
+#if RECYCLE_XNODES //This is useful for example when comparing two identical XNodes, so that it says that it is the same node. We commented it for performance reasons when running in the Simulator, to reduce the number if Interop calls.
                 object jsId = Interop.ExecuteJavaScript("$0.nodeId", node);
                 if (!IsNullOrUndefined(jsId))
                 {
@@ -149,38 +152,42 @@ $0.parseFromString($1, ""application/xml"")
                 else
                 {
                     // generate a new id for the node
-                    // get the type of the node (probably through node.nodeType, see the comment at the beginning of the XContainer class).
-                    // create the node
-                    // add the whole thing to the dictionary
-                    // result = nodeCreated
+#endif
+                // get the type of the node (probably through node.nodeType, see the comment at the beginning of the XContainer class).
+                // create the node
+                // add the whole thing to the dictionary
+                // result = nodeCreated
 
-                    string newId = Guid.NewGuid().ToString();
-                    int nodeType = Convert.ToInt32(Interop.ExecuteJavaScript("$0.nodeType", node));
-                    //nodeType = : 1 is XElement, 3 is XText, 8 is XComment, 9 is XDocument but is useless I think
+                string newId = Guid.NewGuid().ToString();
+                int nodeType = Convert.ToInt32(Interop.ExecuteJavaScript("$0.nodeType", node));
+                //nodeType = : 1 is XElement, 3 is XText, 8 is XComment, 9 is XDocument but is useless I think
 
 
-                    switch (nodeType)
-                    {
-                        case 1: //XElement
-                            result = new XElement(node);
-                            break;
-                        case 3: //Xtext
-                            result = new XText(node);
-                            result.INTERNAL_jsnode = node;
-                            break;
-                        case 8: //XComment
-                            break;
-                        case 9: //XDocument
-                            break;
-                        default:
-                            break;
-                    }
+                switch (nodeType)
+                {
+                    case 1: //XElement
+                        result = new XElement(node);
+                        break;
+                    case 3: //Xtext
+                        result = new XText(node);
+                        result.INTERNAL_jsnode = node;
+                        break;
+                    case 8: //XComment
+                        break;
+                    case 9: //XDocument
+                        break;
+                    default:
+                        break;
+                }
+#if RECYCLE_XNODES //This is useful for example when comparing two identical XNodes, so that it says that it is the same node. We commented it for performance reasons when running in the Simulator, to reduce the number if Interop calls.
                     XDocument.INTERNAL_idsToXNodes.Add(newId, result);
                     Interop.ExecuteJavaScriptAsync("$0.nodeId = $1", node, newId);
                 }
+#endif
             }
             else
             {
+#if RECYCLE_XNODES //This is useful for example when comparing two identical XNodes, so that it says that it is the same node. We commented it for performance reasons when running in the Simulator, to reduce the number if Interop calls.
                 // In JavaScript, we get the CSharp object associated to a DOM element by reading the "associatedUIElement" property:
 
                 object associatedXNode = Interop.ExecuteJavaScript("$0.associatedXNode", node);
@@ -190,33 +197,37 @@ $0.parseFromString($1, ""application/xml"")
                 }
                 else
                 {
-                    // get the type of the node (probably through node.nodeType, see the comment at the beginning of the XContainer class).
-                    // create the Xnode
-                    // set the XNode to node.associatedXNode
-                    //result = nodeCreated
+#endif
+                // get the type of the node (probably through node.nodeType, see the comment at the beginning of the XContainer class).
+                // create the Xnode
+                // set the XNode to node.associatedXNode
+                //result = nodeCreated
 
-                    int nodeType = Convert.ToInt32(Interop.ExecuteJavaScript("$0.nodeType", node));
-                    //nodeType = : 1 is XElement, 3 is XText, 8 is XComment, 9 is XDocument but is useless I think
+                int nodeType = Convert.ToInt32(Interop.ExecuteJavaScript("$0.nodeType", node));
+                //nodeType = : 1 is XElement, 3 is XText, 8 is XComment, 9 is XDocument but is useless I think
 
 
-                    switch (nodeType)
-                    {
-                        case 1: //XElement
-                            result = new XElement(node);
-                            break;
-                        case 3: //Xtext
-                            result = new XText(node);
-                            result.INTERNAL_jsnode = node;
-                            break;
-                        case 8: //XComment
-                            break;
-                        case 9: //XDocument
-                            break;
-                        default:
-                            break;
-                    }
+                switch (nodeType)
+                {
+                    case 1: //XElement
+                        result = new XElement(node);
+                        break;
+                    case 3: //Xtext
+                        result = new XText(node);
+                        result.INTERNAL_jsnode = node;
+                        break;
+                    case 8: //XComment
+                        break;
+                    case 9: //XDocument
+                        break;
+                    default:
+                        break;
+                }
+#if RECYCLE_XNODES //This is useful for example when comparing two identical XNodes, so that it says that it is the same node. We commented it for performance reasons when running in the Simulator, to reduce the number if Interop calls.
+                    //todo: shouldn't it be ".associatedXNode" instead of ".nodeId" below?
                     Interop.ExecuteJavaScript("$0.nodeId = $1", node, result);
                 }
+#endif
             }
             return result;
         }
@@ -230,7 +241,7 @@ $0.parseFromString($1, ""application/xml"")
         }
 
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Creates an <see cref="XmlWriter"/> used to add either nodes 
@@ -248,7 +259,7 @@ $0.parseFromString($1, ""application/xml"")
             return new Cshtml5_XmlReader(this, _text);
         }
 
-        #region not implemented
+#region not implemented
 
         ///// <summary>
         ///// Initializes a new instance of the System.Xml.Linq.XDocument class with the
@@ -459,6 +470,6 @@ $0.parseFromString($1, ""application/xml"")
         ///// </summary>
         ///// <param name="writer">An System.Xml.XmlWriter into which this method will write.</param>
         //public override void WriteTo(XmlWriter writer);
-        #endregion
+#endregion
     }
 }
