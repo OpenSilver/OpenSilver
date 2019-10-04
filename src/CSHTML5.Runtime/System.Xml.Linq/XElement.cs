@@ -214,7 +214,8 @@ namespace System.Xml.Linq
             while (true)
             {
                 object currentJsAttribute = CSHTML5.Interop.ExecuteJavaScript("$0[$1]", jsAttributes, i);
-                if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0 == undefined || $0 == null", currentJsAttribute)))
+                if ((CSHTML5.Interop.IsRunningInTheSimulator && (CSHTML5.Interop.IsUndefined(currentJsAttribute) || CSHTML5.Interop.IsNull(currentJsAttribute))) // Performance optimization when running in the Simulator by reducing the number of Interop calls
+                    || Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0 == undefined || $0 == null", currentJsAttribute)))
                 {
                     yield break;
                 }
@@ -241,26 +242,19 @@ namespace System.Xml.Linq
             //same as the previous one but while filtering the results (see if we can directly filter in the js).
             //OK, I don't know how we could have multiple results here and the js only provides a method to get a single element with the given name so we'll only return one element.
             object jsAttribute;
-            if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.attributes.length > 0", INTERNAL_jsnode)))
+            if (!string.IsNullOrWhiteSpace(name.NamespaceName))
             {
-
-                if (!string.IsNullOrWhiteSpace(name.NamespaceName))
-                {
-
-                    jsAttribute = CSHTML5.Interop.ExecuteJavaScript("$0.attributes.getNamedItemNS($1,$2)", INTERNAL_jsnode, name.NamespaceName, name.LocalName);
-                }
-                else
-                {
-                    jsAttribute = CSHTML5.Interop.ExecuteJavaScript("$0.attributes.getNamedItem($1)", INTERNAL_jsnode, name.LocalName);
-                }
-                if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0 != null && $0 != undefined", jsAttribute)))
-                    yield return GetAttributeFromJSAttribute(jsAttribute);
-                yield break;
+                jsAttribute = CSHTML5.Interop.ExecuteJavaScript("$0.attributes.getNamedItemNS($1,$2)", INTERNAL_jsnode, name.NamespaceName, name.LocalName);
             }
             else
             {
-                yield break;
+                jsAttribute = CSHTML5.Interop.ExecuteJavaScript("$0.attributes.getNamedItem($1)", INTERNAL_jsnode, name.LocalName);
             }
+            if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0 != null && $0 != undefined", jsAttribute)))
+            {
+                yield return GetAttributeFromJSAttribute(jsAttribute);
+            }
+            yield break;
         }
 
         private static XAttribute GetAttributeFromJSAttribute(object jsAttribute)

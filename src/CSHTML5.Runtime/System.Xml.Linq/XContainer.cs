@@ -50,7 +50,7 @@ namespace System.Xml.Linq
             while (true)
             {
                 object nodeAtI = CSHTML5.Interop.ExecuteJavaScript("$0.childNodes[$1]", INTERNAL_jsnode, i);
-                if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0 == undefined", nodeAtI)))
+                if (CSHTML5.Interop.IsUndefined(nodeAtI))
                 {
                     break;
                 }
@@ -170,7 +170,7 @@ namespace System.Xml.Linq
             while (true)
             {
                 object nodeAtI = CSHTML5.Interop.ExecuteJavaScript("$0[$1]", jsNodesForElement, i);
-                if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0 == undefined", nodeAtI)))
+                if (CSHTML5.Interop.IsUndefined(nodeAtI))
                 {
                     break;
                 }
@@ -220,7 +220,7 @@ namespace System.Xml.Linq
             while (true)
             {
                 object nodeAtI = CSHTML5.Interop.ExecuteJavaScript("$0[$1]", jsNodesForElement, i);
-                if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0 == undefined", nodeAtI)))
+                if (CSHTML5.Interop.IsUndefined(nodeAtI))
                 {
                     break;
                 }
@@ -302,7 +302,7 @@ namespace System.Xml.Linq
             while (true)
             {
                 object nodeAtI = CSHTML5.Interop.ExecuteJavaScript("$0[$1]", jsNodesForElement, i);
-                if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0 == undefined", nodeAtI)))
+                if (CSHTML5.Interop.IsUndefined(nodeAtI))
                 {
                     break;
                 }
