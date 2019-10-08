@@ -16,8 +16,9 @@
 //===============================================================================
 
 
-
+#if BRIDGE
 using Bridge;
+#endif
 using CSHTML5;
 using System;
 using System.Collections.Generic;
@@ -168,16 +169,16 @@ namespace Windows.UI.Xaml.Controls
         {
             if (isLoaded)
             {
-                object div = Interop.GetDiv(this);
                 string c = "transparent";
                 if (isTodayHighlighted)
                 {
                     c = "";
                 }
-                Interop.ExecuteJavaScript(@"var todaySpan = $0.calendarContainer.querySelector('span.today')
-if(todaySpan !== null) {
-    todaySpan.style.borderColor = $1
-}", this._flatpickrInstance, c);
+                var todaySpan = Interop.ExecuteJavaScript(@"$0.calendarContainer.querySelector('span.today')", this._flatpickrInstance);
+                if (todaySpan != null)
+                {
+                    Interop.ExecuteJavaScript(@"$0.style.borderColor = $1", todaySpan, c);
+                }
             }
         }
 

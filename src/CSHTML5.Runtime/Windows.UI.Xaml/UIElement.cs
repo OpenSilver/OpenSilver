@@ -603,14 +603,11 @@ namespace Windows.UI.Xaml
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
-                dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
-                if (element.INTERNAL_ArePointerEventsEnabled)
+                bool pointerEventsAreEnabled = element.INTERNAL_ArePointerEventsEnabled;
+                if (element.INTERNAL_VisualParent == null || pointerEventsAreEnabled != element.INTERNAL_VisualParent.INTERNAL_ArePointerEventsEnabled)
                 {
-                    style.pointerEvents = "auto";
-                }
-                else
-                {
-                    style.pointerEvents = "none";
+                    dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
+                    style.pointerEvents = pointerEventsAreEnabled ? "auto" : "none";
                 }
             }
         }
@@ -1099,8 +1096,15 @@ namespace Windows.UI.Xaml
             else
             {
                 // ------- SIMULATOR -------
-                offsetLeft = Convert.ToDouble(Interop.ExecuteJavaScript("$0.getBoundingClientRect().left - $1.getBoundingClientRect().left", outerDivOfThisControl, outerDivOfReferenceVisual));
-                offsetTop = Convert.ToDouble(Interop.ExecuteJavaScript("$0.getBoundingClientRect().top - $1.getBoundingClientRect().top", outerDivOfThisControl, outerDivOfReferenceVisual));
+
+                // Hack to improve the Simulator performance by making only one interop call rather than two:
+                string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("($0.getBoundingClientRect().left - $1.getBoundingClientRect().left) + '|' + ($0.getBoundingClientRect().top - $1.getBoundingClientRect().top)",
+                                                                        outerDivOfThisControl, outerDivOfReferenceVisual));
+                int sepIndex = concatenated.IndexOf('|');
+                string offsetLeftAsString = concatenated.Substring(0, sepIndex);
+                string offsetTopAsString = concatenated.Substring(sepIndex + 1);
+                offsetLeft = Convert.ToDouble(offsetLeftAsString);
+                offsetTop = Convert.ToDouble(offsetTopAsString);
             }
             //#endif
 

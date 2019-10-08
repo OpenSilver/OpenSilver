@@ -34,6 +34,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSHTML5;
 using DotNetForHtml5.Core;
+using DotNetBrowser;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
@@ -1253,7 +1254,17 @@ parentElement.appendChild(child);
 
         public static bool IsNullOrUndefined(object jsObject)
         {
-            return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
+            if (Interop.IsRunningInTheSimulator)
+            {
+                if (jsObject == null)
+                    return true;
+                if (!(jsObject is JSValue))
+                    return false;
+                JSValue value = ((JSValue)jsObject);
+                return value.IsNull() || value.IsUndefined();
+            }
+            else
+                return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
         }
 
         static HashSet2<Type> NumericTypes;
