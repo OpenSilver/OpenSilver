@@ -1053,11 +1053,14 @@ namespace Windows.UI.Xaml
             // We make sure an element that is detached cannot have the cursor captured, which causes bugs.
             // For example in a DataGrid, if we had a column with two focusable elements in its edition mode, clicking one then the other one would leave the edition mode and detach the elements
             // but the second element that was clicked would still have captured the pointer events, preventing the user to click on anything until the capture is released (if it does ever happen).
+            if (Pointer.INTERNAL_captured == this)
+            {
 #if MIGRATION
-            ReleaseMouseCapture();
+                ReleaseMouseCapture();
 #else
-            ReleasePointerCapture();
+                ReleasePointerCapture();
 #endif
+            }
         }
 
 
