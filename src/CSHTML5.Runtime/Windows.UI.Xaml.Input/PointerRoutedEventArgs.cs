@@ -177,8 +177,12 @@ namespace Windows.UI.Xaml.Input
                 dynamic jsEventArgDynamic = (dynamic)jsEventArg;
                 //todo - removeJSIL: once we stop supporting the JSIL version, remove the bools like the following and put the thing directly in the if (3x in this method for now).
                 bool isArgsPageXDefined = INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(jsEventArgDynamic.pageX); // Using a temporary variable to conatin the tests's result (this line and the following) because in JSIL, trying to do both tests in the if results in an UntranslatableMethod for some reason.
-                bool isArgsPageXNotNull = jsEventArgDynamic.pageX != 0;
-                if (isArgsPageXDefined && isArgsPageXNotNull)
+                bool isArgsPageXNotNull = isArgsPageXDefined;
+                if(isArgsPageXDefined) //Note: apparently, JSIL is really bad at translating things like "bool isArgsPageXNotNull = isArgsPageXDefined && (jsEventArgDynamic.pageX != 0) and ends up commiting seppuku by trying to cast 0 to a boolean.
+                {
+                    isArgsPageXNotNull = jsEventArgDynamic.pageX != 0;
+                }
+                if (isArgsPageXNotNull)
                 {
                     _pointerAbsoluteX = (double)jsEventArgDynamic.pageX;
                     _pointerAbsoluteY = (double)jsEventArgDynamic.pageY;
@@ -186,8 +190,12 @@ namespace Windows.UI.Xaml.Input
                 else
                 {
                     bool isArgsTouchesDefined = INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(jsEventArgDynamic.touches); // Using a temporary variable to conatin the tests's result (this line and the following) because in JSIL, trying to do both tests in the if results in an UntranslatableMethod for some reason.
-                    bool isArgsTouchesNotEmpty = jsEventArgDynamic.touches.length != 0;
-                    if (isArgsTouchesDefined && isArgsTouchesNotEmpty) //Chrome for Android uses different ways to access the pointer's position.
+                    bool isArgsTouchesNotEmpty = isArgsTouchesDefined;
+                    if(isArgsTouchesDefined)
+                    {
+                        isArgsTouchesNotEmpty = jsEventArgDynamic.touches.length != 0;
+                    }
+                    if (isArgsTouchesNotEmpty) //Chrome for Android uses different ways to access the pointer's position.
                     {
                         _pointerAbsoluteX = (double)jsEventArgDynamic.touches[0].pageX;
                         _pointerAbsoluteY = (double)jsEventArgDynamic.touches[0].pageY;
@@ -195,8 +203,12 @@ namespace Windows.UI.Xaml.Input
                     else
                     {
                         bool isArgsChangedTouchesDefined = INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(jsEventArgDynamic.changedTouches); // Using a temporary variable to conatin the tests's result (this line and the following) because in JSIL, trying to do both tests in the if results in an UntranslatableMethod for some reason.
-                        bool isArgsChangedTouchesNotEmpty = jsEventArgDynamic.changedTouches.length != 0;
-                        if (isArgsChangedTouchesDefined && isArgsChangedTouchesNotEmpty) //this is for the PointerRelease event on Chrome for Android
+                        bool isArgsChangedTouchesNotEmpty = isArgsChangedTouchesDefined;
+                        if (isArgsChangedTouchesDefined)
+                        {
+                            isArgsChangedTouchesNotEmpty = jsEventArgDynamic.changedTouches.length != 0;
+                        }
+                        if (isArgsChangedTouchesNotEmpty) //this is for the PointerRelease event on Chrome for Android
                         {
                             _pointerAbsoluteX = (double)jsEventArgDynamic.changedTouches[0].pageX;
                             _pointerAbsoluteY = (double)jsEventArgDynamic.changedTouches[0].pageY;
@@ -230,8 +242,14 @@ namespace Windows.UI.Xaml.Input
                 {
                     string windowRootLeftAsString = concatenated.Substring(0, sepIndex);
                     string windowRootTopAsString = concatenated.Substring(sepIndex + 1);
+#if BRIDGE
                     windowRootLeft = double.Parse(windowRootLeftAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
                     windowRootTop = double.Parse(windowRootTopAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
+#else
+                    //JSIL doesn't have a double.Parse with localization:
+                    windowRootLeft = double.Parse(windowRootLeftAsString); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                    windowRootTop = double.Parse(windowRootTopAsString); //todo: read note above
+#endif
                 }
                 else
                 {
