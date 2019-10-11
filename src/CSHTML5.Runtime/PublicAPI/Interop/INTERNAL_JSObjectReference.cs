@@ -24,8 +24,9 @@ using JSIL.Meta;
 #endif
 
 #if !BUILDINGDOCUMENTATION && !CSHTML5NETSTANDARD// We don't have the references to the "DotNetBrowser" web browser control when building the documentation.
-using DotNetBrowser;
+//using DotNetBrowser;
 #endif
+using DotNetBrowser;
 
 using System;
 
