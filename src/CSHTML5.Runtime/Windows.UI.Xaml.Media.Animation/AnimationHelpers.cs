@@ -22,6 +22,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+#if BRIDGE
+using Bridge;
+#endif
 #if !MIGRATION
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media.Animation;
@@ -83,7 +86,7 @@ $0.complete = $4;
             }
 
             CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, $1, $2);
-                                                     Velocity.Utilities.dequeue($0, $3);", 
+                                                     Velocity.Utilities.dequeue($0, $3);",
                                                      domElement, jsFromToValues, options, visualStateGroupName);
         }
 
@@ -97,6 +100,37 @@ $0.complete = $4;
             {
                 propertyPath.INTERNAL_PropertySetAnimationValue(target, value);
             }
+        }
+
+        //Note: this method is needed because JSIL doesn't know that a nullable whose value is null is equal to null. (Color? v = null; if(v == null) ...)
+        internal static bool IsValueNull(object from)
+        {
+            return from == null || CheckIfObjectIsNullNullable(from);
+        }
+
+        //Note: CheckIfObjectIsNullNullable and CheckIfNullableIsNotNull below come from DataContractSerializer_Helpers.cs
+        internal static bool CheckIfObjectIsNullNullable(object obj)
+        {
+            Type type = obj.GetType();
+            if (type.FullName.StartsWith("System.Nullable`1"))
+            {
+                //I guess we'll have to use reflection here
+                return !CheckIfNullableIsNotNull(obj);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+#if !BRIDGE
+        [JSIL.Meta.JSReplacement("$obj.hasValue")]
+#else
+        [Template("{obj}.hasValue")]
+#endif
+        internal static bool CheckIfNullableIsNotNull(object obj)
+        {
+            return (obj != null);
         }
     }
 }

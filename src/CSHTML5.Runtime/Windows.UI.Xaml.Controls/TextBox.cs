@@ -489,7 +489,7 @@ $0.addEventListener('keydown', function(e) {
 
     if((e.keyCode == 13 || e.keyCode == 32 || e.keyCode > 47) && instance['get_MaxLength']() != 0)
     {
-        var textLength = document.getTextLengthIncludingNewLineCompensation(instance);
+        var textLength = instance.GetTextLengthIncludingNewLineCompensation();
 
         if (e.keyCode == 13)
         {
@@ -604,7 +604,7 @@ $0.addEventListener('paste', function(e) {
     {
         var isSingleLine = (instance['get_AcceptsReturn']() !== true); // This is the current value at the time when the event is raised.
         var maxLength = instance['get_MaxLength']();
-        var textBoxTextLength = document.getTextLengthIncludingNewLineCompensation(instance);
+        var textBoxTextLength = instance.GetTextLengthIncludingNewLineCompensation();
 
         // Chrome supports setting ContentEditable to PlainText-Only, so we try this first:
         $0.setAttribute('contenteditable', 'PLAINTEXT-ONLY');
@@ -980,7 +980,7 @@ sel.addRange(range);
             //todo: fix the that happens (at least in chrome) that makes the index returned be 0 when the caret is on the last line when it's empty
             //what I think happens: the range gives the index of the <br> in the childNodes of _contentEditableDiv which makes it not find the range.startContainer, which is actually _contentEditableDiv.
             //todo: (probably in the documant.getRangeStartAndEnd and document.getRangeGlobalStartAndEndIndexes methods), fix the bad count of characters in the simulator when copy/pasting a multiline text.
-            
+
             var globalIndexes = CSHTML5.Interop.ExecuteJavaScript(@"
 (function(domElement){
 var sel = window.getSelection();
@@ -998,13 +998,9 @@ else
 return globalIndexes;
 }($0))
 ", _contentEditableDiv);
-//#if !BRIDGE
+
             selectionStartIndex = CastToInt(CSHTML5.Interop.ExecuteJavaScript("($0.isStartFound ? $0.startIndex : 0)", globalIndexes)); //todo: if not "isStartFound", should we raise an exception? (eg. running "STAR" app in the Simulator and clicking the TextBox in the "Products and key performance measures" screen)
             selectionLength = CastToInt(CSHTML5.Interop.ExecuteJavaScript("($0.isEndFound ? $0.endIndex : ($0.isStartFound ? $0.startIndex : 0))", globalIndexes)); //todo: if not "isEndFound", should we raise an exception? (eg. running "STAR" app in the Simulator and clicking the TextBox in the "Products and key performance measures" screen)
-//#else
-//            selectionStartIndex = CastToInt(CSHTML5.Interop.ExecuteJavaScript("{0}.startIndex", globalIndexes));
-//            selectionLength = CastToInt(CSHTML5.Interop.ExecuteJavaScript("{0}.enIndex", globalIndexes));
-//#endif
         }
 
 #if !BRIDGE
