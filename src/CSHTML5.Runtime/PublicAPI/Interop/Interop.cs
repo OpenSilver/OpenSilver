@@ -286,7 +286,9 @@ namespace CSHTML5
         /// Check if the given jsnode is undefined
         /// </summary>
 #if BRIDGE
-        [Template("typeof({jsObject}) === 'undefined'")]
+        [Template("(typeof({jsObject}) === 'undefined')")]
+#else
+        [JSReplacement("(typeof($jsObject) === 'undefined')")]
 #endif
         public static bool IsUndefined(object jsObject)
         {
@@ -297,7 +299,9 @@ namespace CSHTML5
         /// Check if the given jsnode is undefined
         /// </summary>
 #if BRIDGE
-        [Template("{jsObject} === null")]
+        [Template("({jsObject} === null)")]
+#else
+        [JSReplacement("($jsObject === null)")]
 #endif
         public static bool IsNull(object jsObject)
         {
