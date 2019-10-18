@@ -604,11 +604,9 @@ namespace Windows.UI.Xaml
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
                 bool pointerEventsAreEnabled = element.INTERNAL_ArePointerEventsEnabled;
-                if (element.INTERNAL_VisualParent == null || pointerEventsAreEnabled != element.INTERNAL_VisualParent.INTERNAL_ArePointerEventsEnabled)
-                {
-                    dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
-                    style.pointerEvents = pointerEventsAreEnabled ? "auto" : "none";
-                }
+
+                dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
+                style.pointerEvents = pointerEventsAreEnabled ? "auto" : "none"; //Note: MDN lies: pointer-events: "auto" is not the same as pointer-event not set.
             }
         }
 #else
