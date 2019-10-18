@@ -395,9 +395,26 @@ namespace System
         {
             int currentReadyState = GetCurrentReadyState((object)_xmlHttpRequest);
             int currentStatus = GetCurrentStatus((object)_xmlHttpRequest);
-            if (currentStatus == 404)
+            if (currentStatus == 400)
             {
-                e.Error = new Exception("Page not found");
+                e.Error = new Exception("400 - Bad Request");
+            }
+            
+            else if (currentStatus == 401)
+            {
+                e.Error = new Exception("401 - Unauthorized ");
+            }
+            else if (currentStatus == 403)
+            {
+                e.Error = new Exception("403 - Forbidden");
+            }
+            else if (currentStatus == 404)
+            {
+                e.Error = new Exception("404 - Page not found");
+            }
+            else if (currentStatus == 500)
+            {
+                e.Error = new Exception("500 - Internal Server Error");
             }
             else if (currentReadyState == 0 && !e.Cancelled)
             {
