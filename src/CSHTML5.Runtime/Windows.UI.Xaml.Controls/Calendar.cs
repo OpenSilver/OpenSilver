@@ -16,7 +16,9 @@
 //===============================================================================
 
 
-
+#if BRIDGE
+using Bridge;
+#endif
 using CSHTML5;
 using System;
 using System.Collections.Generic;
@@ -39,6 +41,7 @@ namespace Windows.UI.Xaml.Controls
 {
     public class Calendar : INTERNAL_CalendarOrClockBase
     {
+        bool isLoaded = false;
         public Calendar()
         {
             this.Loaded += DatePicker_Loaded;
@@ -48,6 +51,8 @@ namespace Windows.UI.Xaml.Controls
         {
             DateTime defaultDate = SelectedValue == null ? DateTime.Today : SelectedValue.Value;
 
+            isLoaded = true;
+
             // Get a reference to the HTML DOM representation of the control (must be in the Visual Tree):
             object div = Interop.GetDiv(this);
 
@@ -55,19 +60,28 @@ namespace Windows.UI.Xaml.Controls
             _flatpickrInstance = Interop.ExecuteJavaScript(@"flatpickr($0, {
                 inline: true, 
                 dateFormat: ""YYYY-MM-DD HH:MM"",
-                defaultDate: new Date($1, $2, $3)
-                })", div, defaultDate.Year, defaultDate.Month - 1, defaultDate.Day);
+                defaultDate: $1
+                })", div, GetJsDate(defaultDate));
 
             // Register the JS events:
             if (Interop.IsRunningInTheSimulator)
             {
                 Interop.ExecuteJavaScript(@"$0.config.onChange.push(function(args) {
                     var date = args[0];
-                    var month = date.getMonth() + 1;
-                    var day = date.getDate();
-                    var year = date.getFullYear();
-                    $1(year, month, day);
+                    if(date !== undefined)
+                    {
+                        var month = date.getMonth() + 1;
+                        var day = date.getDate();
+                        var year = date.getFullYear();
+                        $1(year, month, day);
+                    }
                 });", _flatpickrInstance, (Action<object, object, object>)OnJavaScriptEvent_Change);
+
+                Interop.ExecuteJavaScript(@"$0.config.onMonthChange.push(function(args) {
+                    $1();
+                });", _flatpickrInstance, (Action)OnMonthChange);
+
+
             }
             else
             {
@@ -79,12 +93,21 @@ namespace Windows.UI.Xaml.Controls
                 // Register the JS events:
                 Interop.ExecuteJavaScript(@"$0.config.onChange.push(function(args) {
                     var date = args[0];
-                    var month = date.getMonth() + 1;
-                    var day = date.getDate();
-                    var year = date.getFullYear();
-                    $1($2, year, month, day);
+                    if(date !== undefined)
+                    {
+                        var month = date.getMonth() + 1;
+                        var day = date.getDate();
+                        var year = date.getFullYear();
+                        $1($2, year, month, day);
+                    }
                 });", _flatpickrInstance, (Action<object, object, object, object>)WorkaroundJSILBug, calendar);
+
+                Interop.ExecuteJavaScript(@"$0.config.onMonthChange.push(function(args) {
+                    $1($2);
+                });", _flatpickrInstance, (Action<object>)WorkaroundJSILBugForOnMonthChange, calendar);
             }
+
+            RefreshTodayHighlight(IsTodayHighlighted);
 
             // Hide the input area:
             Interop.ExecuteJavaScript(@"$0.style.display = 'none'", div);
@@ -107,6 +130,143 @@ namespace Windows.UI.Xaml.Controls
             var dateTime = new DateTime(intYear, intMonth, intDay);
 
             this.SelectedValue = (DateTime?)dateTime;
+            RefreshTodayHighlight(IsTodayHighlighted);
+        }
+
+        static void WorkaroundJSILBugForOnMonthChange(object calendarInstance)
+        {
+            // We're doing like in WorkaroundJSILBug for the "onChange" event
+            ((Calendar)calendarInstance).OnMonthChange();
+        }
+
+        private void OnMonthChange()
+        {
+            RefreshTodayHighlight(IsTodayHighlighted);
+        }
+
+        bool _isTodayHighlighted = true;
+        /// <summary>
+        /// Gets or sets a value indicating whether the current date is highlighted.
+        /// </summary>
+        public bool IsTodayHighlighted
+        {
+            get
+            {
+                return _isTodayHighlighted;
+            }
+            set
+            {
+                RefreshTodayHighlight(value);
+                _isTodayHighlighted = value;
+            }
+        }
+
+        /// <summary>
+        /// This method hides or displays the highlighting around the date of today.
+        /// </summary>
+        /// <param name="isTodayHighlighted">True if there should be a circle highlighting the date of today in the calendar, False otherwise</param>
+        void RefreshTodayHighlight(bool isTodayHighlighted)
+        {
+            if (isLoaded)
+            {
+                string c = "transparent";
+                if (isTodayHighlighted)
+                {
+                    c = "";
+                }
+                var todaySpan = Interop.ExecuteJavaScript(@"$0.calendarContainer.querySelector('span.today')", this._flatpickrInstance);
+                if (todaySpan != null)
+                {
+                    Interop.ExecuteJavaScript(@"$0.style.borderColor = $1", todaySpan, c);
+                }
+            }
+        }
+
+        private DateTime? _displayDateStart;
+        /// <summary>
+        /// Gets or sets the first date to be displayed (enabled)
+        /// </summary>
+        public DateTime? DisplayDateStart
+        {
+            get { return _displayDateStart; }
+            set { SetDisplayDateStart(value); _displayDateStart = value; }
+        }
+
+        private DateTime? _displayDateEnd;
+        /// <summary>
+        /// Gets or sets the last date to be displayed (enabled)
+        /// </summary>
+        public DateTime? DisplayDateEnd
+        {
+            get { return _displayDateEnd; }
+            set { SetDisplayDateEnd(value); _displayDateEnd = value; }
+        }
+
+        private DateTime? _displayDate;
+        /// <summary>
+        /// Gets or sets the date to display
+        /// </summary>
+        // Exceptions:
+        //   System.ArgumentOutOfRangeException:
+        //     The given date is not in the range specified by System.Windows.Controls.Calendar.DisplayDateStart
+        //     and System.Windows.Controls.Calendar.DisplayDateEnd.
+        public DateTime? DisplayDate
+        {
+            get { return _displayDate; }
+            set { SetDisplayDate(value); _displayDate = value; }
+        }
+
+        void SetDisplayDateStart(DateTime? dateStart)
+        {
+            if (dateStart == null)
+            {
+                Interop.ExecuteJavaScript(@"$0.config.minDate = undefined", this._flatpickrInstance);
+            }
+            else
+            {
+                DateTime nonNullDateStart = (DateTime)dateStart;
+                Interop.ExecuteJavaScript(@"$0.config.minDate = $1", this._flatpickrInstance, GetJsDate(nonNullDateStart));
+            }
+        }
+
+        void SetDisplayDateEnd(DateTime? dateEnd)
+        {
+            if (dateEnd == null)
+            {
+                Interop.ExecuteJavaScript(@"$0.config.maxDate = undefined", this._flatpickrInstance);
+            }
+            else
+            {
+                DateTime nonNullDateEnd = (DateTime)dateEnd;
+                Interop.ExecuteJavaScript(@"$0.config.maxDate = $1", this._flatpickrInstance, GetJsDate(nonNullDateEnd));
+            }
+        }
+
+        void SetDisplayDate(DateTime? dateTime)
+        {
+            if (dateTime == null)
+            {
+                Interop.ExecuteJavaScript(@"$0.config.maxDate = undefined", this._flatpickrInstance);
+            }
+            else
+            {
+                DateTime nonNullDate = (DateTime)dateTime;
+                if ((DisplayDateStart != null && dateTime < DisplayDateStart) || (DisplayDateEnd != null && dateTime > DisplayDateEnd))
+                {
+                    throw new ArgumentOutOfRangeException("The given date is not in the range specified by System.Windows.Controls.Calendar.DisplayDateStart and System.Windows.Controls.Calendar.DisplayDateEnd");
+                }
+                Interop.ExecuteJavaScript(@"$0.jumpToDate($1)", this._flatpickrInstance, GetJsDate(nonNullDate));
+            }
+        }
+
+        //todo: could be nice to have the same as the Bridge.Template for JSIL
+#if BRIDGE
+        [Template("new Date(System.DateTime.getYear({dateTime}), ((System.DateTime.getMonth({dateTime}) - 1) | 0), System.DateTime.getDay({dateTime}))")]
+#endif
+        static object GetJsDate(DateTime dateTime)
+        {
+            var date = Interop.ExecuteJavaScript("new Date($0,$1,$2)", dateTime.Year, dateTime.Month - 1, dateTime.Day);
+            return date;
         }
 
     }

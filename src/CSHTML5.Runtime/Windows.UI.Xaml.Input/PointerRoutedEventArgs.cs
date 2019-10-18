@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 #if MIGRATION
 using System.Windows.Media;
 #else
@@ -46,7 +47,7 @@ namespace Windows.UI.Xaml.Input
     /// </summary>
 #if MIGRATION
     public class MouseEventArgs : RoutedEventArgs
-    
+
 #else
     public class PointerRoutedEventArgs : RoutedEventArgs
 #endif
@@ -163,26 +164,61 @@ namespace Windows.UI.Xaml.Input
         {
             if (Interop.IsRunningInTheSimulator)
             {
-                _pointerAbsoluteX = Convert.ToDouble(Interop.ExecuteJavaScript("$0.pageX", jsEventArg));
-                _pointerAbsoluteY = Convert.ToDouble(Interop.ExecuteJavaScript("$0.pageY", jsEventArg));
+                // Hack to improve the Simulator performance by making only one interop call rather than two:
+                string concatenated = Convert.ToString(Interop.ExecuteJavaScript("$0.pageX + '|' + $0.pageY", jsEventArg));
+                int sepIndex = concatenated.IndexOf('|');
+                string pointerAbsoluteXAsString = concatenated.Substring(0, sepIndex);
+                string pointerAbsoluteYAsString = concatenated.Substring(sepIndex + 1);
+                _pointerAbsoluteX = double.Parse(pointerAbsoluteXAsString, CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                _pointerAbsoluteY = double.Parse(pointerAbsoluteYAsString, CultureInfo.InvariantCulture); //todo: read note above
             }
             else
             {
                 dynamic jsEventArgDynamic = (dynamic)jsEventArg;
-                if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(jsEventArgDynamic.pageX))
+                //todo - removeJSIL: once we stop supporting the JSIL version, remove the bools like the following and put the thing directly in the if (3x in this method for now).
+                bool isArgsPageXDefined = INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(jsEventArgDynamic.pageX); // Using a temporary variable to conatin the tests's result (this line and the following) because in JSIL, trying to do both tests in the if results in an UntranslatableMethod for some reason.
+                bool isArgsPageXNotNull = isArgsPageXDefined;
+                if(isArgsPageXDefined) //Note: apparently, JSIL is really bad at translating things like "bool isArgsPageXNotNull = isArgsPageXDefined && (jsEventArgDynamic.pageX != 0) and ends up commiting seppuku by trying to cast 0 to a boolean.
+                {
+                    isArgsPageXNotNull = jsEventArgDynamic.pageX != 0;
+                }
+                if (isArgsPageXNotNull)
                 {
                     _pointerAbsoluteX = (double)jsEventArgDynamic.pageX;
                     _pointerAbsoluteY = (double)jsEventArgDynamic.pageY;
                 }
-                else if (jsEventArgDynamic.touches.length != 0) //Chrome for Android uses different ways to access the pointer's position.
+                else
                 {
-                    _pointerAbsoluteX = (double)jsEventArgDynamic.touches[0].pageX;
-                    _pointerAbsoluteY = (double)jsEventArgDynamic.touches[0].pageY;
-                }
-                else //this is for the PointerRelease event on Chrome for Android
-                {
-                    _pointerAbsoluteX = (double)jsEventArgDynamic.changedTouches[0].pageX;
-                    _pointerAbsoluteY = (double)jsEventArgDynamic.changedTouches[0].pageY;
+                    bool isArgsTouchesDefined = INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(jsEventArgDynamic.touches); // Using a temporary variable to conatin the tests's result (this line and the following) because in JSIL, trying to do both tests in the if results in an UntranslatableMethod for some reason.
+                    bool isArgsTouchesNotEmpty = isArgsTouchesDefined;
+                    if(isArgsTouchesDefined)
+                    {
+                        isArgsTouchesNotEmpty = jsEventArgDynamic.touches.length != 0;
+                    }
+                    if (isArgsTouchesNotEmpty) //Chrome for Android uses different ways to access the pointer's position.
+                    {
+                        _pointerAbsoluteX = (double)jsEventArgDynamic.touches[0].pageX;
+                        _pointerAbsoluteY = (double)jsEventArgDynamic.touches[0].pageY;
+                    }
+                    else
+                    {
+                        bool isArgsChangedTouchesDefined = INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(jsEventArgDynamic.changedTouches); // Using a temporary variable to conatin the tests's result (this line and the following) because in JSIL, trying to do both tests in the if results in an UntranslatableMethod for some reason.
+                        bool isArgsChangedTouchesNotEmpty = isArgsChangedTouchesDefined;
+                        if (isArgsChangedTouchesDefined)
+                        {
+                            isArgsChangedTouchesNotEmpty = jsEventArgDynamic.changedTouches.length != 0;
+                        }
+                        if (isArgsChangedTouchesNotEmpty) //this is for the PointerRelease event on Chrome for Android
+                        {
+                            _pointerAbsoluteX = (double)jsEventArgDynamic.changedTouches[0].pageX;
+                            _pointerAbsoluteY = (double)jsEventArgDynamic.changedTouches[0].pageY;
+                        }
+                        else
+                        {
+                            _pointerAbsoluteX = 0d;
+                            _pointerAbsoluteY = 0d;
+                        }
+                    }
                 }
             }
 
@@ -195,8 +231,31 @@ namespace Windows.UI.Xaml.Input
                 object windowRootDomElement = window.INTERNAL_OuterDomElement;
                 object windowBoundingClientRect = Interop.ExecuteJavaScript("$0.getBoundingClientRect()", windowRootDomElement);
                 object pageBodyBoundingClientRect = Interop.ExecuteJavaScript("document.body.getBoundingClientRect()"); // This is to take into account the scrolling.
-                double windowRootLeft = Convert.ToDouble(Interop.ExecuteJavaScript("$0.left - $1.left", windowBoundingClientRect, pageBodyBoundingClientRect));
-                double windowRootTop = Convert.ToDouble(Interop.ExecuteJavaScript("$0.top - $1.top", windowBoundingClientRect, pageBodyBoundingClientRect));
+
+                double windowRootLeft;
+                double windowRootTop;
+
+                // Hack to improve the Simulator performance by making only one interop call rather than two:
+                string concatenated = CSHTML5.Interop.ExecuteJavaScript("($0.left - $1.left) + '|' + ($0.top - $1.top)", windowBoundingClientRect, pageBodyBoundingClientRect).ToString();
+                int sepIndex = concatenated.IndexOf('|');
+                if (sepIndex > -1)
+                {
+                    string windowRootLeftAsString = concatenated.Substring(0, sepIndex);
+                    string windowRootTopAsString = concatenated.Substring(sepIndex + 1);
+#if BRIDGE
+                    windowRootLeft = double.Parse(windowRootLeftAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                    windowRootTop = double.Parse(windowRootTopAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
+#else
+                    //JSIL doesn't have a double.Parse with localization:
+                    windowRootLeft = double.Parse(windowRootLeftAsString); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                    windowRootTop = double.Parse(windowRootTopAsString); //todo: read note above
+#endif
+                }
+                else
+                {
+                    windowRootLeft = Double.NaN;
+                    windowRootTop = Double.NaN;
+                }
 
                 // Substract the XAML Window position, to get the pointer position relative to the XAML Window root:
                 _pointerAbsoluteX = _pointerAbsoluteX - windowRootLeft;

@@ -50,6 +50,8 @@ namespace CSHTML5.Internal
 {
     public static class INTERNAL_VisualTreeManager
     {
+        internal static bool EnablePerformanceLogging;
+        internal static bool EnableOptimizationWhereCollapsedControlsAreNotLoaded;
 
         public static void DetachVisualChildIfNotNull(UIElement child, UIElement parent)
         {
@@ -165,6 +167,7 @@ namespace CSHTML5.Internal
             element.INTERNAL_VisualParent = null;
             element.INTERNAL_VisualChildrenInformation = null;
             element.INTERNAL_AdditionalOutsideDivForMargins = null;
+            element.INTERNAL_DeferredLoadingWhenControlBecomesVisible = null;
         }
 
         public static void AttachVisualChildIfNotAlreadyAttached(UIElement child, UIElement parent)
@@ -181,7 +184,19 @@ namespace CSHTML5.Internal
 #if OLD_CODE_TO_OPTIMIZE_SIMULATOR_PERFORMANCE && !BRIDGE // Obsolete since Beta 13.4 on 2018.01.31 because we now use the Dispatcher instead (cf. the class "INTERNAL_SimulatorExecuteJavaScript")
                     StartTransactionToOptimizeSimulatorPerformance();
 #endif
+                    string label = "";
+                    if (EnablePerformanceLogging)
+                    {
+                        label = "Attach" + " - " + child.GetType().Name + " - " + child.GetHashCode().ToString();
+                        Profiler.ConsoleTime(label);
+                    }
+
                     AttachVisualChild_Private(child, parent);
+
+                    if (EnablePerformanceLogging)
+                    {
+                        Profiler.ConsoleTimeEnd(label);
+                    }
 
 #if OLD_CODE_TO_OPTIMIZE_SIMULATOR_PERFORMANCE && !BRIDGE // Obsolete since Beta 13.4 on 2018.01.31 because we now use the Dispatcher instead (cf. the class "INTERNAL_SimulatorExecuteJavaScript")
                     EndTransactionToOptimizeSimulatorPerformance();
@@ -315,7 +330,7 @@ namespace CSHTML5.Internal
                     //get the list of setters of the currently applied style on the element and of the default style:
                     Dictionary<DependencyProperty, Setter> normalStyleDictionary = null;
                     bool childHasStyle = childAsFrameworkElement.Style != null;
-                    if(childHasStyle)
+                    if (childHasStyle)
                     {
                         normalStyleDictionary = childAsFrameworkElement.Style.GetDictionaryOfSettersFromStyle();
                     }
@@ -330,14 +345,14 @@ namespace CSHTML5.Internal
 #endif
                         )
                     {
-                        if(!childHasStyle || !normalStyleDictionary.ContainsKey(prop))
+                        if (!childHasStyle || !normalStyleDictionary.ContainsKey(prop))
                         {
                             Setter setter = defaultStyleDictionary[prop];
 
                             childDefaultStyle.SetterValueChanged -= childAsFrameworkElement.StyleSetterValueChanged;
                             childDefaultStyle.SetterValueChanged += childAsFrameworkElement.StyleSetterValueChanged;
 
-                            INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorage(childAsFrameworkElement, setter.Property, createAndSaveNewStorageIfNotExists: true);
+                            INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(childAsFrameworkElement, setter.Property);
                             INTERNAL_PropertyStore.SetLocalStyleValue(storage, setter.Value);
                         }
                     }
@@ -371,6 +386,44 @@ namespace CSHTML5.Internal
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Prepare the parent", t0);
 #endif
+
+            //--------------------------------------------------------
+            // CONTINUE WITH THE OTHER STEPS (OR DEFER TO WHEN THE ELEMENT IS VISIBLE, IF THE OPTIMIZATION TO NOT LOAD COLLAPSED CONTROLS IS ENABLED):
+            //--------------------------------------------------------
+
+            if (!EnableOptimizationWhereCollapsedControlsAreNotLoaded || child.Visibility != Visibility.Collapsed)
+            {
+                AttachVisualChild_Private_FinalStepsOnlyIfControlIsVisible(
+                    child,
+                    parent,
+                    doesParentRequireToCreateAWrapperForEachChild,
+                    innerDivOfWrapperForChild,
+                    domElementWhereToPlaceChildStuff,
+                    wrapperForChild);
+            }
+            else
+            {
+                child.INTERNAL_DeferredLoadingWhenControlBecomesVisible = () =>
+                {
+                    AttachVisualChild_Private_FinalStepsOnlyIfControlIsVisible(
+                        child,
+                        parent,
+                        doesParentRequireToCreateAWrapperForEachChild,
+                        innerDivOfWrapperForChild,
+                        domElementWhereToPlaceChildStuff,
+                        wrapperForChild);
+                };
+            }
+        }
+        static void AttachVisualChild_Private_FinalStepsOnlyIfControlIsVisible(
+            UIElement child,
+            UIElement parent,
+            bool doesParentRequireToCreateAWrapperForEachChild,
+            object innerDivOfWrapperForChild,
+            object domElementWhereToPlaceChildStuff,
+            object wrapperForChild
+            )
+        {
 
             //--------------------------------------------------------
             // CREATE THE DIV FOR THE MARGINS (OPTIONAL):
@@ -523,12 +576,16 @@ namespace CSHTML5.Internal
                 INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement).position = "absolute"; //todo: test if this works properly
             }
 
+#if REVAMPPOINTEREVENTS
+            UIElement.INTERNAL_UpdateCssPointerEvents(child);
+#else
             // If the current element is inside a Grid, we need to explicitly set its CSS property "PointerEvents=auto" because its parent child wrapper has "PointerEvents=none" in order to prevent its child wrappers from overlapping each other and thus preventing clicks on some children.
             if (parent is Grid && child is FrameworkElement) //todo: generalize this code so that we have no hard-reference on the Grid control, and third-party controls can use the same mechanics.
             {
                 var frameworkElement = ((FrameworkElement)child);
                 FrameworkElement.INTERNAL_UpdateCssPointerEventsPropertyBasedOnIsHitTestVisibleAndIsEnabled(frameworkElement, frameworkElement.IsHitTestVisible, frameworkElement.IsEnabled);
             }
+#endif
 
             // Reset the flag that tells if we have already applied the RenderTransformOrigin (this is useful to ensure that the default RenderTransformOrigin is (0,0) like in normal XAML, instead of (0.5,0.5) like in CSS):
             child.INTERNAL_RenderTransformOriginHasBeenApplied = false;
@@ -571,7 +628,9 @@ namespace CSHTML5.Internal
                     )
                 {
                     bool recursively = false; // We don't want a recursion here because the "Attach" method is already recursive due to the fact that we raise property changed on the Children property, which causes to reattach the subtree.
-                    child.SetInheritedValue(dependencyProperty, INTERNAL_PropertyStore.GetValue(parent.INTERNAL_AllInheritedProperties[dependencyProperty]), recursively);
+                    INTERNAL_PropertyStorage storage = parent.INTERNAL_AllInheritedProperties[dependencyProperty];
+                    PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(storage.Owner.GetType());
+                    child.SetInheritedValue(dependencyProperty, INTERNAL_PropertyStore.GetValue(storage, typeMetadata), recursively);
                 }
             }
 
@@ -669,122 +728,6 @@ namespace CSHTML5.Internal
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Raise Loaded event", t11);
 #endif
-
-#region PREVIOUS VERSION
-            //// Prepare the parent DOM structure so that it is ready to contain the child (for example, in case of a grid, we need to (re)create the rows and columns where to place the elements):
-            //parent.INTERNAL_UpdateDomStructureIfNecessary();
-            //dynamic domElementWhereToPlaceChildStuff = (parent.GetDomElementWhereToPlaceChild(child) ?? parent.INTERNAL_InnerDomElement);
-            //dynamic innerDivOfWrapperForChild;
-            //dynamic wrapperForChild = parent.CreateDomChildWrapper(out innerDivOfWrapperForChild);
-
-            //// Set the "Parent" property of the Child (note: we need to do that before child.CreateDomElement because the type of the parent is used to display the child correctly):
-            //child.INTERNAL_VisualParent = parent;
-
-            //// Create the DOM structure for the Child:
-            //dynamic domElementWhereToPlaceGrandChildren = null;
-            //dynamic additionalOutsideDivForMargins = null;
-            //dynamic outerDomElement;
-            //if (child.INTERNAL_HtmlRepresentation == null)
-            //    outerDomElement = child.CreateDomElement(out domElementWhereToPlaceGrandChildren);
-            //else
-            //    outerDomElement = INTERNAL_HtmlDomManager.CreateDomFromString(child.INTERNAL_HtmlRepresentation);
-
-            //// Initialize the "Width" and "Height" of the child DOM structure:
-            //if (child is FrameworkElement)
-            //    FrameworkElement.INTERNAL_InitializeOuterDomElementWidthAndHeight(((FrameworkElement)child), outerDomElement);
-
-            //// Surround the "outerDomElement" with an additional DIV to handle the "Margin" property of a control (unless we are in a Canvas):
-            //if (!(parent is Canvas))
-            //{
-            //    additionalOutsideDivForMargins = INTERNAL_HtmlDomManager.CreateDomElement("div");
-            //    additionalOutsideDivForMargins.style.boxSizing = "border-box";
-            //    if (child is FrameworkElement && ((FrameworkElement)child).HorizontalAlignment == HorizontalAlignment.Stretch)
-            //        additionalOutsideDivForMargins.style.width = "100%";
-            //    if (child is FrameworkElement && ((FrameworkElement)child).VerticalAlignment == VerticalAlignment.Stretch)
-            //        additionalOutsideDivForMargins.style.height = "100%";
-            //    INTERNAL_HtmlDomManager.AppendChild(additionalOutsideDivForMargins, outerDomElement);
-            //}
-            //else
-            //{
-            //    // In a Canvas, we don't want to add the additional DIV because there are no margins and we don't want to interfere with the pointer events by creating an additional DIV.
-            //    // So we don't create an additional DIV: we use the outer element directly.
-            //    additionalOutsideDivForMargins = outerDomElement;
-
-            //    // We make sure the childDomElement.style.position = absolute
-            //    additionalOutsideDivForMargins.style.position = "absolute"; //todo: test if this works properly
-            //}
-
-            //// Update the DOM structure of the Child (for example, if the child is a Grid, this will render its rows and columns):
-            //child.INTERNAL_UpdateDomStructureIfNecessary();
-
-            //// Remember all information:
-            //child.INTERNAL_OuterDomElement = outerDomElement;
-            //child.INTERNAL_InnerDomElement = domElementWhereToPlaceGrandChildren;
-            //child.INTERNAL_AdditionalOutsideDivForMargins = additionalOutsideDivForMargins;
-
-            //// Add the child DOM structure to the parent DOM structure:
-            //bool isWrapperForChildNull = (wrapperForChild == null);
-            //bool isInnerDivOfWrapperForChildNull = (innerDivOfWrapperForChild == null);
-            //bool doesParentRequireToCreateAWrapperForEachChild = (!isWrapperForChildNull && !isInnerDivOfWrapperForChildNull); // Note: this is "True" for complex structures such as tables, false otherwise (cf. documentation in "INTERNAL_VisualChildInformation" class).
-            //if (doesParentRequireToCreateAWrapperForEachChild)
-            //{
-            //    // Add the wrapper to the parent's children placeholder:
-            //    INTERNAL_HtmlDomManager.AppendChild(domElementWhereToPlaceChildStuff, wrapperForChild);
-
-            //    // Add the child itself:
-            //    INTERNAL_HtmlDomManager.AppendChild(innerDivOfWrapperForChild, additionalOutsideDivForMargins);
-            //}
-            //else
-            //{
-            //    // Add the child directly to the parent's children placeholder:
-            //    //INTERNAL_HtmlDomManager.AppendChild(domElementWhereToPlaceChildStuff, newDiv);
-            //    INTERNAL_HtmlDomManager.AppendChild(domElementWhereToPlaceChildStuff, additionalOutsideDivForMargins);
-            //}
-            //if (!(parent is Canvas)) //this test is here because when parent is a Canvas, outsideDomElementForMargins = newdiv; see #OUTSIDEDOMELEMENTFORMARGINS
-            //{
-            //    //Add the child to the additional Div used for the margins:
-            //    INTERNAL_HtmlDomManager.AppendChild(additionalOutsideDivForMargins, outerDomElement);
-            //}
-
-            //// Remember the information about the "VisualChildren":
-            //if (parent.INTERNAL_VisualChildrenInformation == null)
-            //    parent.INTERNAL_VisualChildrenInformation = new Dictionary<UIElement, INTERNAL_VisualChildInformation>();
-            //parent.INTERNAL_VisualChildrenInformation.Add(child,
-            //    new INTERNAL_VisualChildInformation()
-            //    {
-            //        INTERNAL_UIElement = child,
-            //        INTERNAL_OptionalChildWrapper_OuterDomElement = wrapperForChild,
-            //        INTERNAL_OptionalChildWrapper_ChildWrapperInnerDomElement = innerDivOfWrapperForChild
-            //    });
-
-            //// Register events if any:
-            //child.INTERNAL_AttachToDomEvents();
-
-            //// Get the Inherited properties and pass them to the direct children:
-            //if (parent.INTERNAL_AllInheritedProperties != null)
-            //{
-            //    foreach (DependencyProperty dependencyProperty in parent.INTERNAL_AllInheritedProperties.Keys)
-            //    {
-            //        bool recursively = false; // We don't want a recursion here because the "Attach" method is already recursive due to the fact that we raise property changed on the Children property, which causes to reattach the subtree.
-            //        child.SetInheritedValue(dependencyProperty, INTERNAL_PropertyStore.GetValue(parent.INTERNAL_AllInheritedProperties[dependencyProperty]), recursively);
-            //    }
-            //}
-
-            //// For debugging purposes (to better read the output html), add a class to the outer DIV that tells us the corresponding type of the element (Border, StackPanel, etc.):
-            //INTERNAL_HtmlDomManager.SetDomElementClassAttribute(outerDomElement, child.GetType().ToString());
-
-            //child.INTERNAL_OnAttachedToVisualTree(); // IMPORTANT: Must be done BEFORE "RaiseChangedEventOnAllDependencyProperties" (for example, the ItemsControl uses this to initialize its visual)
-
-            //// Render the control:
-            //RaiseChangedEventOnAllDependencyProperties(child); // Note: this causes a recursion of the AttachVisualChild method because the "Children" properties of the controls get refreshed.
-            ////element.INTERNAL_Render();
-
-            //child.INTERNAL_UpdateBindingsSource();
-
-            //// Call the "Loaded" event: (note: in XAML, the "loaded" event of the children is called before the loaded" event of the parent)
-            //if (child is FrameworkElement)
-            //    ((FrameworkElement)child).INTERNAL_RaiseLoadedEvent();
-#endregion
         }
 
         public static bool IsElementInVisualTree(UIElement child)
@@ -834,7 +777,7 @@ namespace CSHTML5.Internal
                         {
                             if (!valueWasRetrieved)
                             {
-                                value = INTERNAL_PropertyStore.GetValue(storage);
+                                value = INTERNAL_PropertyStore.GetValue(storage, propertyMetadata);
                                 valueWasRetrieved = true;
                             }
 
@@ -848,7 +791,7 @@ namespace CSHTML5.Internal
                         {
                             if (!valueWasRetrieved)
                             {
-                                value = INTERNAL_PropertyStore.GetValue(storage);
+                                value = INTERNAL_PropertyStore.GetValue(storage, propertyMetadata);
                                 valueWasRetrieved = true;
                             }
 
@@ -864,7 +807,7 @@ namespace CSHTML5.Internal
                         {
                             if (!valueWasRetrieved)
                             {
-                                value = INTERNAL_PropertyStore.GetValue(storage);
+                                value = INTERNAL_PropertyStore.GetValue(storage, propertyMetadata);
                                 valueWasRetrieved = true;
                             }
 

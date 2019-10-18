@@ -12,6 +12,7 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultHyperlinkButtonStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultMenuItemStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultNumericUpDownStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultSliderStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultScrollBarStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTabControlStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTabItemStyle.xaml" />

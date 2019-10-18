@@ -32,6 +32,7 @@ using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 #if MIGRATION
 using System.Windows;
 #else
@@ -88,6 +89,8 @@ namespace CSHTML5
 #endif
                 IsJavaScriptCSharpInteropSetUp = true;
             }
+
+            string unmodifiedJavascript = javascript;
 
             // If the javascript code has references to previously obtained JavaScript objects, we replace those references with calls to the "document.jsSimulatorObjectReferences" dictionary.
             for (int i = variables.Length - 1; i >= 0; i--) // Note: we iterate in reverse order because, when we replace ""$" + i.ToString()", we need to replace "$10" before replacing "$1", otherwise it thinks that "$10" is "$1" followed by the number "0". To reproduce the issue, call "ExecuteJavaScript" passing 10 arguments and using "$10".
@@ -180,13 +183,42 @@ namespace CSHTML5
                 }
             }
 
+            UnmodifiedJavascriptCalls.Add(unmodifiedJavascript);
+            // Add the callback to the document:
+            if (!CallbacksDictionary.ContainsKey(0))
+            {
+                CallbacksDictionary.Add(0, (Action<string, int>)ShowErrorMessage);
+            }
+
+#if CSHTML5NETSTANDARD
+                    //Console.WriteLine("Added ID: " + callbackId.ToString());
+#endif
+
+            // Change the JS code to call ShowErrorMessage in case of error:
+            string errorCallBack = string.Format(
+            @"var idWhereErrorCallbackArgsAreStored = ""callback_args_"" + Math.floor(Math.random() * 1000000);
+                document.jsSimulatorObjectReferences[idWhereErrorCallbackArgsAreStored] = {0};
+                var argsArr = [];
+                argsArr[0] = error.message;
+                argsArr[1] = {0};
+window.onCallBack.OnCallbackFromJavaScript(0, idWhereErrorCallbackArgsAreStored, argsArr);", IndexOfNextUnmodifiedJSCallInList
+            );
+            ++IndexOfNextUnmodifiedJSCallInList;
+
             // Surround the javascript code with some code that will store the result into the "document.jsSimulatorObjectReferences" for later use in subsequent calls to this method:
             int referenceId = ReferenceIDGenerator.GenerateId();
             javascript = string.Format(
-@"var result = eval(""{0}"");
+@"
+try {{
+var result = eval(""{0}"");
 document.jsSimulatorObjectReferences[""{1}""] = result;
 result;
-", INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript), referenceId);
+}}
+catch (error) {{
+    eval(""{2}"");
+}}
+result;
+", INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript), referenceId, INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(errorCallBack));
 
             // Execute the javascript code:
             object value = null;
@@ -209,6 +241,22 @@ result;
 #else
                     return null;
 #endif
+        }
+
+        static List<string> UnmodifiedJavascriptCalls = new List<string>();
+        static int IndexOfNextUnmodifiedJSCallInList = 0;
+        static void ShowErrorMessage(string errorMessage, int indexOfCallInList)
+        {
+            string str = UnmodifiedJavascriptCalls.ElementAt(indexOfCallInList);
+            string message = string.Format(@"Error in the following javascript code:
+
+{0}
+
+----- Error: -----
+
+{1}
+", str, errorMessage);
+            MessageBox.Show(message);
         }
 
 #if !BRIDGE
@@ -279,7 +327,7 @@ result;
 #endif
         internal static class ReferenceIDGenerator
         {
-            static int NextFreeId = 0;
+            static int NextFreeId = 1;
             internal static int GenerateId()
             {
                 int freeId = NextFreeId;

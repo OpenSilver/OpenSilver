@@ -149,13 +149,16 @@ namespace System
                 //we check whether the server could be found at all. It is not definite that readyState = 4 and status = 0 means that the server could not be found but that's the only example I have met so far and we're a bit poor on informations anyway.
                 int currentReadyState = GetCurrentReadyState((object)_xmlHttpRequest);
                 int currentStatus = GetCurrentStatus((object)_xmlHttpRequest);
-                if (currentReadyState == 4 && currentStatus == 0) //we could replace that "if" with a method since it is used in SetEventArgs.
+                if ((currentStatus == 0 && !GetIsFileProtocol()) && (currentReadyState == 4 || currentReadyState == 1)) //we could replace that "if" with a method since it is used in SetEventArgs. //Note: see note on the same test in SetEventArgs
                 {
+                    if (!isAsync) // Note: we only throw the exception when the call is not asynchronous because it is dealt with in the callback (defined by SetCallbackMethod and automatically called by SendRequest).
+                    {
 #if BRIDGE
-                    throw new System.ServiceModel.CommunicationException("An error occured. Please make sure that the target URL is available: " + _address.ToString());
+                        throw new System.ServiceModel.CommunicationException("An error occured. Please make sure that the target URL is available: " + address.ToString());
 #else
-                    throw new Exception("An error occured. Please make sure that the target URL is available: " + _address.ToString());
+                        throw new Exception("An error occured. Please make sure that the target URL is available: " + address.ToString());
 #endif
+                    }
                 }
             }
 
@@ -195,10 +198,13 @@ namespace System
             else
             {
                 // in asynchronous mode, the error callback will directly arrive in errorOnSetting, and it will resend this request
+                _isFirstTryAtSendingUnsafeRequest = true;
                 SendRequest((object)_xmlHttpRequest, address, method, isAsync, body);
                 return GetResult((object)_xmlHttpRequest);
             }
         }
+
+        bool _isFirstTryAtSendingUnsafeRequest = false;
 
         // if the last request was asynchronous, any error will be cought here.
         private void OnError(object sender)
@@ -256,6 +262,20 @@ namespace System
         }
 
 #if !BRIDGE
+        [JSIL.Meta.JSReplacement("(document.location.protocol === \"file:\")")]
+#else
+        [Template("(document.location.protocol === \"file:\")")]
+#endif
+        private static bool GetIsFileProtocol()
+        {
+#if BRIDGE
+            return Convert.ToBoolean(Interop.ExecuteJavaScript(@"(document.location.protocol === ""file:"")"));
+#else
+            throw new InvalidOperationException();//we should never arrive here
+#endif
+        }
+
+#if !BRIDGE
         [JSIL.Meta.JSReplacement("$xmlHttpRequest.setRequestHeader($key,$header)")]
 #else
         [Template("{xmlHttpRequest}.setRequestHeader({key},{header})")]
@@ -282,7 +302,7 @@ namespace System
         }
 
 #if !BRIDGE
-        [JSIL.Meta.JSReplacement("$xmlHttpRequest.onload = $OnDownloadStatusCompleted")]
+        [JSIL.Meta.JSReplacement("$xmlHttpRequest.onloadend = $OnDownloadStatusCompleted")]
 #else
         [Template("{xmlHttpRequest}.onloadend = {OnDownloadStatusCompleted}")] // Note: we  register to the loadend event instead of the load event because the load event is only fired when the request is SUCCESSFULLY completed, while the loadend is triggered after errors and abortions as well. This allows us to handle the error cases in the callback of asynchronous calls.
 #endif
@@ -361,10 +381,14 @@ namespace System
         {
             var e = new INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs();
             SetEventArgs(e);
-            if (DownloadStringCompleted != null)
+            if (e.Error == null || !_isFirstTryAtSendingUnsafeRequest)
             {
-                DownloadStringCompleted(_sender, e);
+                if (DownloadStringCompleted != null)
+                {
+                    DownloadStringCompleted(_sender, e);
+                }
             }
+            _isFirstTryAtSendingUnsafeRequest = false;
         }
 
         private void SetEventArgs(INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs e)
@@ -379,13 +403,13 @@ namespace System
             {
                 e.Error = new Exception("Request not initialized");
             }
+            else if ((currentStatus == 0 && !GetIsFileProtocol()) && (currentReadyState == 4 || currentReadyState == 1)) //Note: we check whether the file protocol is file: because apparently, browsers return 0 as the status on a successful call.
+            {
+                e.Error = new Exception("An error occured. Please make sure that the target Url is available.");
+            }
             else if (currentReadyState == 1 && !e.Cancelled)
             {
                 e.Error = new Exception("An Error occured. Cross-Site Http Request might not be allowed at the target Url. If you own the domain of the Url, consider adding the header \"Access-Control-Allow-Origin\" to enable requests to be done at this Url.");
-            }
-            else if (currentReadyState ==  4 && currentStatus == 0)
-            {
-                e.Error = new Exception("An error occured. Please make sure that the target Url is available.");
             }
             else if (currentReadyState != 4)
             {

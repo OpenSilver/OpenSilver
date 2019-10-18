@@ -44,7 +44,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a cell of a System.Windows.Controls.DataGrid control.
     /// </summary>
-    internal class DataGridCell : ButtonBase
+    public class DataGridCell : ButtonBase
     {
         //For some reason in the wpf comments, below was "Gets or sets the column that the cell is in." although the set part is internal.
         /// <summary>
@@ -116,8 +116,6 @@ namespace Windows.UI.Xaml.Controls
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(dataGridCell))
             {
                 bool newValue = (bool)e.NewValue;
-                if (newValue != (bool)e.OldValue)
-                {
                     if (newValue)
                     {
                         dataGridCell.Background = dataGridCell.Column._parent.SelectedItemBackground;
@@ -130,17 +128,16 @@ namespace Windows.UI.Xaml.Controls
 
                         if (RowIndex % 2 == 0 && RowIndex != 0) // gray color
                         {
-                            dataGridCell.Background = dataGridCell.Column._parent.UnselectedItemAlternateBackground ?? dataGridCell.Column._parent.Background;
+                            dataGridCell.Background = dataGridCell.Column._parent.AlternatingRowBackground ?? dataGridCell.Column._parent.Background;
                         }
                         else // white color
                         {
-                            dataGridCell.Background = dataGridCell.Column._parent.UnselectedItemBackground ?? dataGridCell.Column._parent.Background;
+                            dataGridCell.Background = dataGridCell.Column._parent.RowBackground ?? dataGridCell.Column._parent.Background;
                         }
                         dataGridCell.Foreground = dataGridCell.Column._parent.UnselectedItemForeground ?? dataGridCell.Column._parent.Foreground;
 
                         //todo: event. (inside or outside of this if?)
                     }
-                }
             }
         }
 

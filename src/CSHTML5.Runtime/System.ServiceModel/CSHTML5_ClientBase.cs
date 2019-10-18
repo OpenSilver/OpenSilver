@@ -1012,8 +1012,9 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 #endif
                         knownTypes.Add(((ServiceKnownTypeAttribute)attribute).Type);
                     }
-                    DataContractSerializer deSerializer = new DataContractSerializer(typeToDeserialize, knownTypes);
+                    DataContractSerializer deSerializer = new DataContractSerializer(typeToDeserialize, knownTypes); 
                     XDocument xDoc = XDocument.Parse(responseAsString);
+                    responseAsString = RemoveUnparsableStrings(responseAsString);
                     XElement xElement = xDoc.Root;
 
                     //exclude the parts that are <Enveloppe><Body>... since they are useless and would keep the deserialization from working properly:
@@ -1107,6 +1108,22 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 }
 
                 return requestResponse;
+            }
+
+            // Now that we use the javascript function ParseFromString we need to remove unsparable strings from the response
+            // To Do : replace the encoding of the soap response so there are no unparsable strings
+            private string RemoveUnparsableStrings(string str)
+            {
+                string[] unparsableStrings = new string[]
+                {
+                    "&#x1A;"
+                };
+
+                foreach (string unparsableString in unparsableStrings)
+                {
+                    str = str.Replace(unparsableString, "");
+                }
+                return str;
             }
 
         }

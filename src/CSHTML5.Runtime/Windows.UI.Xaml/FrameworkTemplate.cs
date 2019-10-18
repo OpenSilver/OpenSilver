@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml
     [ContentProperty("ContentPropertyUsefulOnlyDuringTheCompilation")]
     public class FrameworkTemplate : DependencyObject
     {
-        internal Func<FrameworkElement, TemplateInstance> _methodToInstantiateFrameworkTemplate;
+        internal Func<Control, TemplateInstance> _methodToInstantiateFrameworkTemplate;
 
         /// <summary>
         /// Creates an instance of the Template. Intented to be called for templates that have no owner, such as DataTemplates (not ControlTemplates).
@@ -95,7 +95,7 @@ namespace Windows.UI.Xaml
         /// Sets the method that will create the tree of elements.
         /// </summary>
         /// <param name="methodToInstantiateFrameworkTemplate">The method that will create the tree of elements.</param>
-        public void SetMethodToInstantiateFrameworkTemplate(Func<FrameworkElement, TemplateInstance> methodToInstantiateFrameworkTemplate)
+        public void SetMethodToInstantiateFrameworkTemplate(Func<Control, TemplateInstance> methodToInstantiateFrameworkTemplate)
         {
             if (_isSealed)
             {

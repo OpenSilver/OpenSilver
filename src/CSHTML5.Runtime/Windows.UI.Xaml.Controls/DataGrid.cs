@@ -125,19 +125,29 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        [Obsolete("Use AlternatingRowBackground instead")]
+        public Brush UnselectedItemAlternateBackground
+        {
+            get { return AlternatingRowBackground; }
+            set { AlternatingRowBackground = value; }
+        }
+       
         /// <summary>
         /// Gets or sets the alternative bakground color of the Items that are not selected.
         /// </summary>
-        public Brush UnselectedItemAlternateBackground
+        public Brush AlternatingRowBackground
         {
-            get { return (Brush)GetValue(UnselectedItemAlternateBackgroundProperty); }
-            set { SetValue(UnselectedItemAlternateBackgroundProperty, value); }
+            get { return (Brush)GetValue(AlternatingRowBackgroundProperty); }
+            set { SetValue(AlternatingRowBackgroundProperty, value); }
         }
         /// <summary>
-        /// Identifies the UnselectedItemAlternateBackground dependency property
+        /// Identifies the AlternatingRowBackground dependency property
         /// </summary>
-        public static readonly DependencyProperty UnselectedItemAlternateBackgroundProperty =
-            DependencyProperty.Register("UnselectedItemAlternateBackground", typeof(Brush), typeof(DataGrid), new PropertyMetadata(new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString("#f0f0e9"))));  //todo: move the default value to a default DataGrid style instead of here?
+        public static readonly DependencyProperty AlternatingRowBackgroundProperty =
+            DependencyProperty.Register("AlternatingRowBackground", typeof(Brush), typeof(DataGrid), new PropertyMetadata(new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString("#f0f0e9"))));
+
+
+
 
         /// <summary>
         /// Gets or sets the vertical padding in all cells
@@ -219,6 +229,59 @@ namespace Windows.UI.Xaml.Controls
                     foreach (DataGridColumn column in dataGrid.Columns)
                     {
                         column.SetHeaderStyleIfColumnsStyleNotSet((Style)e.NewValue);
+                    }
+                }
+            }
+        }
+
+        public double ColumnHeaderHeight
+        {
+            get { return (double)GetValue(ColumnHeaderHeightProperty); }
+            set { SetValue(ColumnHeaderHeightProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ColumnHeaderHeight.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ColumnHeaderHeightProperty =
+            DependencyProperty.Register("ColumnHeaderHeight", typeof(double), typeof(DataGrid), new PropertyMetadata(double.NaN));
+
+        /// <summary>
+        /// Gets or sets the style applied to all cells in the System.Windows.Controls.DataGrid.
+        /// </summary>
+        public Style CellStyle
+        {
+            get { return (Style)GetValue(CellStyleProperty); }
+            set { SetValue(CellStyleProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the System.Windows.Controls.DataGrid.CellStyle dependency
+        /// property.
+        /// </summary>
+        public static readonly DependencyProperty CellStyleProperty =
+            DependencyProperty.Register("CellStyle", typeof(Style), typeof(DataGrid), new PropertyMetadata(null, CellStyle_Changed));
+
+        private static void CellStyle_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is DataGrid)
+            {
+                DataGrid dataGrid = (DataGrid)d;
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(dataGrid))
+                {
+                    foreach (FrameworkElement cell in dataGrid._grid.Children)
+                    {
+                        if (cell is DataGridCell) //Note: it can also be DataGridColumnHeader
+                        {
+                            DataGridCell cellAsDataGridCell = (DataGridCell)cell;
+                            DataGridColumn column = cellAsDataGridCell.Column;
+                            if (column.CellStyle != null)
+                            {
+                                cellAsDataGridCell.Style = column.CellStyle;
+                            }
+                            else if (dataGrid.CellStyle != null)
+                            {
+                                cellAsDataGridCell.Style = dataGrid.CellStyle;
+                            }
+                        }
                     }
                 }
             }
@@ -668,6 +731,11 @@ namespace Windows.UI.Xaml.Controls
                     columnHeader.HorizontalContentAlignment = HorizontalAlignment.Center;
                     columnHeader.VerticalContentAlignment = VerticalAlignment.Center;
                     columnHeader.FontWeight = FontWeights.Bold;
+                    if(!double.IsNaN(ColumnHeaderHeight))
+                    {
+                        columnHeader.Height = ColumnHeaderHeight;
+                    }
+
 
                     // If a local column style is defined, we use it, otherwise we use the global one:
                     if (column.HeaderStyle != null)
@@ -885,14 +953,22 @@ namespace Windows.UI.Xaml.Controls
 
                     if (elementRow % 2 == 0 && elementRow != 0)//todo: we assumed that the cell was not selected, if it can be selected at the moment where we add it (programatically for example), add the management of the case where it is selected.
                     {
-                        cell.Background = UnselectedItemAlternateBackground;
+                        cell.Background = AlternatingRowBackground;
                     }
                     else
                     {
-                        cell.Background = UnselectedItemBackground;
+                        cell.Background = RowBackground;
                     }
                     cell.Foreground = UnselectedItemForeground;
 
+                    if (column.CellStyle != null)
+                    {
+                        cell.Style = column.CellStyle;
+                    }
+                    else if(CellStyle != null)
+                    {
+                        cell.Style = CellStyle;
+                    }
                     currentColumnIndex++;
                 }
 
@@ -1100,11 +1176,28 @@ namespace Windows.UI.Xaml.Controls
             {
                 object item = cell.Item;
                 int cellColumn = Grid.GetColumn(cell);
-                DataGridColumn column = Columns.ElementAt(cellColumn - 1);
+                DataGridColumn column = Columns.ElementAt(cellColumn - 1); //todo: replace this by cell.Column ?
                 //we add the editable version of the cell:
                 UIElement editableVersionOfCell = column.GenerateEditingElement(item);
                 if (editableVersionOfCell != null) //it is null when we use the same element as the one during non-edition time.
                 {
+                    //We add a DataGridCell to contain the generated element so we can apply the cellSyle on it:
+                    DataGridCell editableVersionOfCellContainer = new DataGridCell();
+                    editableVersionOfCellContainer.Column = column;
+                    editableVersionOfCellContainer.IsSelected = true;
+                    if (column.CellStyle != null)
+                    {
+                        editableVersionOfCellContainer.Style = column.CellStyle;
+                    }
+                    else if (column._parent.CellStyle != null)
+                    {
+                        editableVersionOfCellContainer.Style = column._parent.CellStyle;
+                    }
+                    editableVersionOfCellContainer.Content = editableVersionOfCell;
+                    editableVersionOfCell = editableVersionOfCellContainer;
+
+
+
                     //We hide the element formerly displayed:
                     cell.Visibility = Visibility.Collapsed;
 
@@ -1137,18 +1230,24 @@ namespace Windows.UI.Xaml.Controls
         {
             if (_currentCell != null)
             {
-                object temp = _currentCell.DataContext;
-                _currentCell.DataContext = null;
-                _currentCell.DataContext = temp;
-                _currentCell.Visibility = Visibility.Visible;
-                _currentCell.IsEditing = false;
-
-                if (_currentEditionElement != null)
+                if (!IsReadOnly && IsEnabled && !_currentCell.Column.IsReadOnly) //note: this test is particularly useful to avoid setting _currentCell.IsEditing to false, which sets its content.isEnabled to false (and thus disables HyperlinkButtons for example, or any Button for that matter...)
                 {
-                    ((FrameworkElement)_currentEditionElement).DataContext = null; //Note: this is here because we had to set the DataContext locally for this element (since it is directly put in the grid and not in a DataGridCell)
-                    _grid.Children.Remove(_currentEditionElement);
-                }
+                    //todo: Do we want to do this when IsEnabled is false? Test the case where a cell is in edition mode when we set IsEnabled to false on the DataGrid, then set it back to true (and variants).
+                    object temp = _currentCell.DataContext;
+                    _currentCell.DataContext = null;
+                    _currentCell.DataContext = temp;
+                    _currentCell.Visibility = Visibility.Visible;
+                    if (!(_currentCell.Column is DataGridTemplateColumn))
+                    {
+                        _currentCell.IsEditing = false;
+                    }
 
+                    if (_currentEditionElement != null)
+                    {
+                        ((FrameworkElement)_currentEditionElement).DataContext = null; //Note: this is here because we had to set the DataContext locally for this element (since it is directly put in the grid and not in a DataGridCell)
+                        _grid.Children.Remove(_currentEditionElement);
+                    }
+                }
                 _currentCell = null;
                 _currentEditionElement = null;
             }

@@ -36,6 +36,7 @@ using System.Xml.Serialization;
 using System.Collections;
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
+using DotNetBrowser;
 
 namespace System.Runtime.Serialization
 {
@@ -1298,7 +1299,12 @@ namespace System.Runtime.Serialization
         {
             if (Interop.IsRunningInTheSimulator)
             {
-                return obj == null;
+                if (obj == null)
+                    return true;
+                if (!(obj is JSValue))
+                    return false;
+                JSValue value = ((JSValue)obj);
+                return value.IsNull() || value.IsUndefined();
             }
             else
             {
@@ -1306,7 +1312,6 @@ namespace System.Runtime.Serialization
             }
         }
 
-#endregion
-
+        #endregion
     }
 }

@@ -68,7 +68,7 @@ namespace Windows.UI.Xaml.Controls
         protected INTERNAL_DateTimePickerBase()
         {
             _calendarOrClock = GenerateCalendarOrClock();
-            _calendarOrClock.SelectionChanged += new EventHandler<SelectionChangedEventArgs>(CalendarOrClock_SelectionChanged);
+            _calendarOrClock.SelectedDatesChanged += new EventHandler<SelectionChangedEventArgs>(CalendarOrClock_SelectionChanged);
             INTERNAL_SelectedDate = null;
         }
 

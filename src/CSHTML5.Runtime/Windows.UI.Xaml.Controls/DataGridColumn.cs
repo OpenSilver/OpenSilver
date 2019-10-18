@@ -125,6 +125,29 @@ namespace Windows.UI.Xaml.Controls
         }
 
 
+        public Style CellStyle
+        {
+            get { return (Style)GetValue(CellStyleProperty); }
+            set { SetValue(CellStyleProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the System.Windows.Controls.DataGridColumn.CellStyle dependency
+        /// property.
+        /// </summary>
+        public static readonly DependencyProperty CellStyleProperty =
+            DependencyProperty.Register("CellStyle", typeof(Style), typeof(DataGridColumn), new PropertyMetadata(null, CellStyle_Changed));
+
+        private static void CellStyle_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is DataGridColumn)
+            {
+                DataGridColumn column = (DataGridColumn)d;
+                //todo: apply the style to all the cells of the column currently in the DataGrid
+            }
+        }
+
+
         // Returns:
         //     true if the column is auto-generated; otherwise, false. The registered default
         //     is false. For information about what can influence the value, see System.Windows.DependencyProperty.

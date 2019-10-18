@@ -29,16 +29,16 @@ namespace System.Net
     public enum CredentialsMode
     {
         /// <summary>
-        /// The first request will attempt to use cookies. If it fails, the first request and all the subsequent ones are done without cookies.
-        /// </summary>
-        Auto,
-        /// <summary>
         /// Cookies are not passed
         /// </summary>
         Disabled,
         /// <summary>
         /// Cookies are passed
         /// </summary>
-        Enabled
+        Enabled,
+        /// <summary>
+        /// The first request will attempt to use cookies. If it fails, the first request and all the subsequent ones are done without cookies.
+        /// </summary>
+        Auto
     }
 }

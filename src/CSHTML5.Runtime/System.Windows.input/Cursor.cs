@@ -45,6 +45,8 @@ namespace System.Windows.Input
             
         }
 
+        //todo: When we will add different constructors for Cursor, we will need to modify ConvertingStringToValue.PrepareStringForCursor in the compiler accordingly.
+
         //// Exceptions:
         ////   System.ArgumentNullException:
         ////     cursorStream is null.

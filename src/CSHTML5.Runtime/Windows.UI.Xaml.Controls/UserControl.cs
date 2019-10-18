@@ -46,6 +46,20 @@ namespace Windows.UI.Xaml.Controls
             IsTabStop = false; //we want to avoid stopping on this element's div when pressing tab.
         }
 
+#if REVAMPPOINTEREVENTS
+        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        {
+#if MIGRATION
+            // In Silverlight, it appears that UserControl does not support mouse events because its Background property is ignored.
+            return false;
+#else
+            // We only check the Background property even if BorderBrush not null + BorderThickness > 0 is a sufficient condition to enable pointer events on the borders of the control.
+            // There is no way right now to differentiate the Background and BorderBrush as they are both defined on the same DOM element.
+            return Background != null;
+#endif
+        }
+#endif
+
         /// <summary>
         /// Gets or sets the content that is contained within a user control.
         /// </summary>

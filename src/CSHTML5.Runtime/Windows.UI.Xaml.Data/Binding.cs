@@ -100,94 +100,39 @@ namespace Windows.UI.Xaml.Data
                 Path = new PropertyPath(path);
         }
 
-        IValueConverter _converter;
         /// <summary>
         /// Gets or sets the converter object that is called by the binding engine to
         /// modify the data as it is passed between the source and target, or vice versa.
         /// Returns the IValueConverter object that modifies the data.
         /// </summary>
-        public IValueConverter Converter
-        {
-            get
-            {
-                return _converter;
-            }
-            set
-            {
-                _converter = value;
-            }
-        }
+        public IValueConverter Converter { get; set; }
 
 #if MIGRATION
-        CultureInfo _converterCulture;
         /// <summary>
         /// Gets or sets the culture to be used by the Binding.Converter.
         /// Returns the System.Globalization.CultureInfo used by the Binding.Converter.
         /// </summary>
-        public CultureInfo ConverterCulture
-        {
-            get
-            {
-                return _converterCulture;
-            }
-            set
-            {
-                _converterCulture = value;
-            }
-        }
+        public CultureInfo ConverterCulture { get; set; }
 #else
-        string _converterLanguage;
         /// <summary>
         /// Gets or sets a value that names the language to pass to any converter specified
         /// by the Converter property.
         /// Returns a string that names a language. Interpretation of this value is ultimately up to the converter logic.
         /// </summary>
-        public string ConverterLanguage
-        {
-            get
-            {
-                return _converterLanguage;
-            }
-            set
-            {
-                _converterLanguage = value;
-            }
-        }
+        public string ConverterLanguage { get; set; }
 #endif
 
-        object _converterParameter = null;
         /// <summary>
         /// Gets or sets a parameter that can be used in the Converter logic.
         /// Returns a parameter to be passed to the Converter. This can be used in the conversion logic. The default is null.
         /// </summary>
-        public object ConverterParameter
-        {
-            get
-            {
-                return _converterParameter;
-            }
-            set
-            {
-                _converterParameter = value;
-            }
-        }
+        public object ConverterParameter { get; set; }
 
-        string _elementName;
         /// <summary>
         /// Gets or sets the name of the element to use as the binding source for the Binding.
         /// Returns the value of the Name property or x:Name attribute for the element to bind to. The default is null.
         /// </summary>
-        public string ElementName
-        {
-            get
-            {
-                return _elementName;
-            }
-            set
-            {
-                _elementName = value;
-            }
-        }
+        public string ElementName { get; set; }
 
         BindingMode _mode = BindingMode.OneWay;
         /// <summary>
@@ -237,22 +182,11 @@ namespace Windows.UI.Xaml.Data
 
         internal PropertyPath INTERNAL_ComputedPath; // If the Source is not specified, it means that we want to bind to the DataContext (eg. <TextBox Text={Binding}/>, so we automatically add "DataContext." to the Path (the result is called "ComputedPath") and we automatically set the Source to the Target of the Binding (the new source is called "ComputedSource") when calling SetBinding.
 
-        RelativeSource _relativeSource;
         /// <summary>
         /// Gets or sets the binding source by specifying its location relative to the position of the binding target.
         /// Returns the relative location of the binding source to use. The default is null.
         /// </summary>
-        public RelativeSource RelativeSource
-        {
-            get
-            {
-                return _relativeSource;
-            }
-            set
-            {
-                _relativeSource = value;
-            }
-        }
+        public RelativeSource RelativeSource { get; set; }
 
         object _source;
         /// <summary>
@@ -274,79 +208,53 @@ namespace Windows.UI.Xaml.Data
 
         internal object INTERNAL_ComputedSource; // If the Source is not specified, it means that we want to bind to the DataContext (eg. <TextBox Text={Binding}/>, so we automatically add "DataContext." to the Path (the result is called "ComputedPath") and we automatically set the Source to the Target of the Binding (the new source is called "ComputedSource") when calling SetBinding.
 
-        private UpdateSourceTrigger _updateSourceTrigger;
-
         /// <summary>
         /// Update type
         /// </summary>
-        public UpdateSourceTrigger UpdateSourceTrigger
-        {
-            get { return _updateSourceTrigger; }
-            set { _updateSourceTrigger = value; }
-        }
+        public UpdateSourceTrigger UpdateSourceTrigger { get; set; }
 
 
         internal Binding Clone()
         {
             Binding b =  new Binding(Path.Path);
-            b._converter = _converter;
+            b.Converter = Converter;
 #if MIGRATION
-            b._converterCulture = _converterCulture;
+            b.ConverterCulture = ConverterCulture;
 #else
-            b._converterLanguage = _converterLanguage;
+            b.ConverterLanguage = ConverterLanguage;
 #endif
-            b._converterParameter = _converterParameter;
-            b._elementName = _elementName; //I don't think people should use this when trying to make a Binding that will be used in different places but we never know.
+            b.ConverterParameter = ConverterParameter;
+            b.ElementName = ElementName; //I don't think people should use this when trying to make a Binding that will be used in different places but we never know.
             b._mode = _mode;
             b._wasModeSetByUserRatherThanDefaultValue = _wasModeSetByUserRatherThanDefaultValue;
-            b._relativeSource = _relativeSource; //I don't think people should use this when trying to make a Binding that will be used in different places but we never know.
-            b._source = _source;
-            b._updateSourceTrigger = _updateSourceTrigger;
-            b._stringFormat = _stringFormat;
+            b.RelativeSource = RelativeSource; //I don't think people should use this when trying to make a Binding that will be used in different places but we never know.
+            b.Source = Source;
+            b.UpdateSourceTrigger = UpdateSourceTrigger;
+            b.StringFormat = StringFormat;
             return b;
         }
 
-        private TemplateInstance _templateOwner = null;
         /// <summary>
         /// Do not use this property.
         /// </summary>
         /// <exclude/>
-        public TemplateInstance TemplateOwner
-        {
-            get { return _templateOwner; }
-            set { _templateOwner = value; }
-        }
+        public TemplateInstance TemplateOwner { get; set; }
 
         #region Validation
 
 #if WORKINPROGRESS
-        private bool _validatesOnDataErrors;
 
         /// <summary>Gets or sets a value that indicates whether the binding engine will report validation errors from an <see cref="T:System.ComponentModel.IDataErrorInfo" /> implementation on the bound data entity.</summary>
         /// <returns>true if the binding engine will report <see cref="T:System.ComponentModel.IDataErrorInfo" /> validation errors; otherwise, false. The default is false.</returns>
-        public bool ValidatesOnDataErrors
-        {
-            get { return this._validatesOnDataErrors; }
-            set { this._validatesOnDataErrors = value; }
-        }
+        public bool ValidatesOnDataErrors { get; set; }
 #endif
-
-        private bool _validatesOnExceptions;
 
         /// <summary>
         /// Gets or sets a value that indicates whether the binding engine will report
         /// exception validation errors.
         /// </summary>
-        public bool ValidatesOnExceptions
-        {
-            get { return _validatesOnExceptions; }
-            set { _validatesOnExceptions = value; }
-        }
+        public bool ValidatesOnExceptions { get; set; }
 
-
-        private bool _notifyOnValidationError;
-
-     
         // Exceptions:
         //   System.InvalidOperationException:
         //     The System.Windows.Data.Binding has already been attached to a target element,
@@ -355,38 +263,24 @@ namespace Windows.UI.Xaml.Data
         /// Gets or sets a value that indicates whether the System.Windows.FrameworkElement.BindingValidationError
         /// event is raised on validation errors.
         /// </summary>
-        public bool NotifyOnValidationError
-        {
-            get { return _notifyOnValidationError; }
-            set { _notifyOnValidationError = value; }
-        }
+        public bool NotifyOnValidationError { get; set; }
 
-        private bool _validatesOnLoad = false;
         /// <summary>
         /// True to force the property to go through the Validation process when the Binding is set or when the Target is added in the Visual tree.
         /// This way, if the source property has an Invalid value when setting the Binding, it will immediately be marked as Invalid instead of waiting
         /// for a value change that keeps/makes it Invalid (which is what happens on Silverlight).
         /// Defaults to False since it is the behaviour of Silverlight and WPF.
         /// </summary>
-        public bool ValidatesOnLoad
-        {
-            get { return _validatesOnLoad; }
-            set { _validatesOnLoad = value; }
-        }
+        public bool ValidatesOnLoad { get; set; }
 
         #endregion
 
 #if WORKINPROGRESS
-        private bool _bindsDirectlyToSource;
         /// <summary>
         /// Gets or sets a value that indicates whether the binding ignores any System.ComponentModel.ICollectionView
         /// settings on the data source.
         /// </summary>
-        public bool BindsDirectlyToSource
-        {
-            get { return _bindsDirectlyToSource; }
-            set { _bindsDirectlyToSource = value; }
-        }
+        public bool BindsDirectlyToSource { get; set; }
 #endif
     }
 }

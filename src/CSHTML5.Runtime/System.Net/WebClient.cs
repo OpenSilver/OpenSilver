@@ -175,7 +175,7 @@ namespace System.Net
             {
                 throw new ArgumentNullException("The address parameter in DownloadString cannot be null");
             }
-         
+
             _webRequestHelper.DownloadStringCompleted -= OnDownloadStringCompleted;
             _webRequestHelper.DownloadStringCompleted += OnDownloadStringCompleted;
 
@@ -277,11 +277,18 @@ namespace System.Net
 
         private void TriggerDownloadStringTaskCompleted(TaskCompletionSource<string> taskCompletionSource, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs e)
         {
-            taskCompletionSource.SetResult(e.Result);
+            if (e.Error == null)
+            {
+                taskCompletionSource.SetResult(e.Result);
+            }
+            else
+            {
+                taskCompletionSource.TrySetException(e.Error);
+            }
         }
 
 
-// TODOBRIDGE: Remove static on the two next method to allow credentials to works properly
+        // TODOBRIDGE: Remove static on the two next method to allow credentials to works properly
 #if !BRIDGE
         [JSIL.Meta.JSReplacement("$e.set_Result($xmlHttpRequest.responseText)")]
 #else
@@ -316,11 +323,11 @@ namespace System.Net
 
             Reflection.PropertyInfo credentialMode = this.GetType().GetProperty("CredentialsMode");
 
-            if(credentialMode != null)
+            if (credentialMode != null)
             {
                 object mode = credentialMode.GetValue(this);
 
-                 return (CredentialsMode)mode;
+                return (CredentialsMode)mode;
             }
 
             return CredentialsMode.Disabled;
@@ -350,7 +357,7 @@ namespace System.Net
             return UploadString(new Uri(address), "POST", data);
 
         }
-  
+
         // Exceptions:
         //   System.ArgumentNullException:
         //     The address parameter is null.-or-The data parameter is null.
@@ -372,7 +379,7 @@ namespace System.Net
         {
             return UploadString(address, "POST", data);
         }
-     
+
         // Exceptions:
         //   System.ArgumentNullException:
         //     The address parameter is null.-or-The data parameter is null.
@@ -399,7 +406,7 @@ namespace System.Net
         {
             return UploadString(new Uri(address), method, data);
         }
-       
+
         // Exceptions:
         //   System.ArgumentNullException:
         //     The address parameter is null.-or-The data parameter is null.
@@ -443,7 +450,7 @@ namespace System.Net
             return _webRequestHelper.MakeRequest(address, method, this, headers, data, onCompleted, isAsync, GetCredentialsMode());
         }
 
-      
+
         // Exceptions:
         //   System.ArgumentNullException:
         //     data is null.
@@ -468,7 +475,7 @@ namespace System.Net
         {
             UploadStringAsync(address, "POST", data);
         }
-        
+
         // Exceptions:
         //   System.ArgumentNullException:
         //     The address parameter is null.-or-The data parameter is null.
@@ -585,8 +592,8 @@ namespace System.Net
             // Don't add the content-length we get the error :Refused to set unsafe header "Content-Length"
             //if (data != null && data.Length > 0)
             //{
-                // headers.Add("Content-Length", data.Length.ToString());
-                //headers["Content-Type"] = ContentType; //todo: determine content type
+            // headers.Add("Content-Length", data.Length.ToString());
+            //headers["Content-Type"] = ContentType; //todo: determine content type
             //}
             foreach (string key in _headers.AllKeys)
             {
@@ -601,7 +608,14 @@ namespace System.Net
 
         private void TriggerUploadStringTaskCompleted(TaskCompletionSource<string> taskCompletionSource, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs e)
         {
-            taskCompletionSource.SetResult(e.Result);
+            if (e.Error == null)
+            {
+                taskCompletionSource.SetResult(e.Result);
+            }
+            else
+            {
+                taskCompletionSource.TrySetException(e.Error);
+            }
         }
 
 
@@ -691,7 +705,7 @@ namespace System.Net
         ////     An System.Net.ICredentials containing the authentication credentials for
         ////     the request. The default is null.
         //public ICredentials Credentials { get; set; }
-        
+
         ////
         //// Summary:
         ////     Gets whether a Web request is in progress.
@@ -785,7 +799,7 @@ namespace System.Net
         ////     Occurs when an asynchronous upload operation successfully transfers some
         ////     or all of the data.
         //public event UploadProgressChangedEventHandler UploadProgressChanged;
-        
+
         ////
         //// Summary:
         ////     Occurs when an asynchronous upload of a name/value collection completes.
@@ -999,7 +1013,7 @@ namespace System.Net
 
 
 
-       
+
         ////
         //// Summary:
         ////     Returns a System.Net.WebRequest object for the specified resource.
@@ -1804,8 +1818,8 @@ namespace System.Net
         ////     Returns System.Threading.Tasks.Task<TResult>.
         //public Task<byte[]> UploadFileTaskAsync(Uri address, string method, string fileName);
 
-        
-        
+
+
         ////
         //// Summary:
         ////     Uploads the specified name/value collection to the resource identified by

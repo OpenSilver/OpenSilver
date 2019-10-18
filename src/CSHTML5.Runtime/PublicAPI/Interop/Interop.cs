@@ -66,7 +66,6 @@ namespace CSHTML5
 #endif
         public static object ExecuteJavaScript(string javascript, params object[] variables)
         {
-            
             return INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: false, variables: variables);
         }
 
@@ -93,6 +92,21 @@ namespace CSHTML5
         public static object ExecuteJavaScriptAsync(string javascript, params object[] variables)
         {
             return INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: true, variables: variables);
+        }
+
+        /// <summary>
+        /// Unboxes the value passed as a parameter. It is particularly useful for the variables of the ExecuteJavaScript Methods calls aimed at using third party libraries.
+        /// </summary>
+        /// <param name="value">The value to unbox.</param>
+        /// <returns>the unboxed value if the value was boxed, the value itself otherwise.</returns>
+#if !BRIDGE
+        [JSIL.Meta.JSReplacement("$value")]
+#else
+        [Bridge.Template("({value}.v != undefined ? {value}.v : {value})")]
+#endif
+        public static object Unbox(object value)
+        {
+            return value;
         }
 
         /// <summary>
@@ -266,6 +280,32 @@ namespace CSHTML5
             {
                 return INTERNAL_InteropImplementation.IsRunningInTheSimulator();
             }
+        }
+
+        /// <summary>
+        /// Check if the given jsnode is undefined
+        /// </summary>
+#if BRIDGE
+        [Template("(typeof({jsObject}) === 'undefined')")]
+#else
+        [JSReplacement("(typeof($jsObject) === 'undefined')")]
+#endif
+        public static bool IsUndefined(object jsObject)
+        {
+            return ((CSHTML5.Types.INTERNAL_JSObjectReference)jsObject).IsUndefined();
+        }
+
+        /// <summary>
+        /// Check if the given jsnode is undefined
+        /// </summary>
+#if BRIDGE
+        [Template("({jsObject} === null)")]
+#else
+        [JSReplacement("($jsObject === null)")]
+#endif
+        public static bool IsNull(object jsObject)
+        {
+            return ((CSHTML5.Types.INTERNAL_JSObjectReference)jsObject).IsNull();
         }
 
         public class ResourceFile

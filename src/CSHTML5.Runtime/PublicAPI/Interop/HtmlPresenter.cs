@@ -20,6 +20,7 @@
 using CSHTML5.Internal;
 using System;
 using System.Windows.Markup;
+using DotNetBrowser;
 
 #if MIGRATION
 using System.Windows;
@@ -39,6 +40,13 @@ namespace CSHTML5.Native.Html.Controls
     {
         private object _jsDiv;
         private string _htmlContent;
+
+#if REVAMPPOINTEREVENTS
+        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        {
+            return true;
+        }
+#endif
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
@@ -99,7 +107,17 @@ namespace CSHTML5.Native.Html.Controls
 
         static bool IsNullOrUndefined(object jsObject)
         {
-            return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
+            if (Interop.IsRunningInTheSimulator)
+            {
+                if (jsObject == null)
+                    return true;
+                if (!(jsObject is JSValue))
+                    return false;
+                JSValue value = ((JSValue)jsObject);
+                return value.IsNull() || value.IsUndefined();
+            }
+            else
+                return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
         }
     }
 }

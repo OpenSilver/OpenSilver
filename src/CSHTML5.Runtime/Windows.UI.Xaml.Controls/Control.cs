@@ -61,6 +61,12 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         protected bool DisableBaseControlHandlingOfVisualStates = false;
 
+#if REVAMPPOINTEREVENTS
+        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        {
+            return true;
+        }
+#endif
 
         //-----------------------
         // ISENABLED (OVERRIDE)
@@ -69,6 +75,8 @@ namespace Windows.UI.Xaml.Controls
         protected internal override void ManageIsEnabled(bool isEnabled)
         {
             base.ManageIsEnabled(isEnabled); // Useful for setting the "disabled" attribute on the DOM element.
+
+            TabIndexProperty_MethodToUpdateDom(this, TabIndex);
 
             _isDisabled = !isEnabled; // We remember the value so that when we update the visual states, we know whether we should go to the "Disabled" state or not.
             UpdateVisualStates();
@@ -91,7 +99,11 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Background dependency property.
         /// </summary>
         public static readonly DependencyProperty BackgroundProperty =
-            DependencyProperty.Register("Background", typeof(Brush), typeof(Control), new PropertyMetadata(null)
+            DependencyProperty.Register("Background", typeof(Brush), typeof(Control), new PropertyMetadata(null
+#if REVAMPPOINTEREVENTS
+                , Background_Changed
+#endif
+                )
             {
                 GetCSSEquivalent = (instance) =>
                     {
@@ -185,6 +197,19 @@ namespace Windows.UI.Xaml.Controls
                     //    }
             }
             );
+
+#if REVAMPPOINTEREVENTS
+        internal virtual void OnBackgroundPropertyChanged(Brush background)
+        {
+            INTERNAL_UpdateCssPointerEvents(this);
+        }
+
+        private static void Background_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Control control = (Control)d;
+            control.OnBackgroundPropertyChanged(e.NewValue as Brush);
+        }
+#endif
 
         //-----------------------
         // BORDERBRUSH
@@ -667,7 +692,7 @@ namespace Windows.UI.Xaml.Controls
 
 
 
-            if (!control.IsTabStop)
+            if (!control.IsTabStop || !control.IsEnabled)
             {
                 control.PreventFocusEvents();
 
