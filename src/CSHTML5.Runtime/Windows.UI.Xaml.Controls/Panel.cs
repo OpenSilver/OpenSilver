@@ -56,8 +56,11 @@ namespace Windows.UI.Xaml.Controls
 
         UIElementCollection _children;
 
-        public bool INTERNAL_EnableProgressiveLoading;
-        internal static bool EnableProgressiveRendering;
+        [Obsolete]
+        public bool INTERNAL_EnableProgressiveLoading; // Obsolete, now replaced with "EnableProgressiveRendering"
+
+        public bool EnableProgressiveRendering;
+        internal static bool INTERNAL_ApplicationWideEnableProgressiveRendering;
 
         void Children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -233,7 +236,7 @@ namespace Windows.UI.Xaml.Controls
                     {
                         // Note: we attach all the children (regardless of whether they are in the oldChildren collection or not) to make it work when the item is first added to the Visual Tree (at that moment, all the properties are refreshed by calling their "Changed" method).
 
-                        if (parent.INTERNAL_EnableProgressiveLoading || EnableProgressiveRendering)
+                        if (parent.EnableProgressiveRendering || parent.INTERNAL_EnableProgressiveLoading || INTERNAL_ApplicationWideEnableProgressiveRendering)
                         {
                             parent.ProgressivelyAttachChildren(newChildren);
                         }

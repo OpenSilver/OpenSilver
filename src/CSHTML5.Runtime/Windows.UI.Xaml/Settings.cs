@@ -80,7 +80,7 @@ namespace System
             set
             {
                 _enableProgressiveRendering = value;
-                Panel.EnableProgressiveRendering = value;
+                Panel.INTERNAL_ApplicationWideEnableProgressiveRendering = value;
 
             }
         }
