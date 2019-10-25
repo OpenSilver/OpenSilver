@@ -165,24 +165,36 @@ namespace Windows.UI.Xaml
 #endif
         StartTimer(Action action, long intervalInMilliseconds)
         {
+#if !CSHTML5NETSTANDARD
             object dispatcherTimer = INTERNAL_Simulator.SimulatorProxy.StartDispatcherTimer(action, intervalInMilliseconds);
             return dispatcherTimer;
-//            global::System.Threading.Timer timer = new global::System.Threading.Timer(
-//                delegate(object state)
-//                {
-//#if !CSHTML5NETSTANDARD
-//                    INTERNAL_Simulator.WebControl.Dispatcher.BeginInvoke((Action)(() =>
-//                    {
-//#endif
-//                        action();
-//#if !CSHTML5NETSTANDARD
-//                    }));
-//#endif
-//                },
-//                null,
-//                intervalInMilliseconds,
-//                intervalInMilliseconds);
-//            return timer;
+#else
+            global::System.Threading.Timer timer = new global::System.Threading.Timer(
+                delegate (object state)
+                { 
+                    action(); 
+                },
+                null,
+                intervalInMilliseconds,
+                intervalInMilliseconds);
+            return timer;
+#endif
+            //            global::System.Threading.Timer timer = new global::System.Threading.Timer(
+            //                delegate(object state)
+            //                {
+            //#if !CSHTML5NETSTANDARD
+            //                    INTERNAL_Simulator.WebControl.Dispatcher.BeginInvoke((Action)(() =>
+            //                    {
+            //#endif
+            //                        action();
+            //#if !CSHTML5NETSTANDARD
+            //                    }));
+            //#endif
+            //                },
+            //                null,
+            //                intervalInMilliseconds,
+            //                intervalInMilliseconds);
+            //            return timer;
         }
 
 #if !BRIDGE
@@ -193,8 +205,11 @@ namespace Windows.UI.Xaml
 #endif
         static void StopTimer(object timer) //Note: "timer" is of type "object" because otherwise JSIL is unable to do the "JSReplacement" of the "StopTimer" method.
         {
+#if !CSHTML5NETSTANDARD
             INTERNAL_Simulator.SimulatorProxy.StopDispatcherTimer(timer);
-            //((global::System.Threading.Timer)timer).Dispose();
+#else
+            ((global::System.Threading.Timer)timer).Dispose();
+#endif
         }
     }
 }

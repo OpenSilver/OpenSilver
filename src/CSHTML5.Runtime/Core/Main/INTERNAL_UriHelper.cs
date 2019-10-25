@@ -355,6 +355,8 @@ namespace CSHTML5.Internal
                 return fullName.Substring(0, tmpIndex);
         }
 
+#if !CSHTML5NETSTANDARD
+
 #if !BRIDGE
         [JSReplacement("$relativePath")]
 #else
@@ -382,6 +384,8 @@ namespace CSHTML5.Internal
             finalAbsolutePath = @"file:///" + finalAbsolutePath.Replace('\\', '/');
             return finalAbsolutePath;
         }
+#endif
+
 
 #if WORKINPROGRESS
         public static Uri EnsureAbsoluteUri(string uriString)

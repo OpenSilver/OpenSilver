@@ -27,6 +27,7 @@ using JSIL.Meta;
 using DotNetBrowser;
 #endif
 
+
 using CSHTML5.Types;
 using CSHTML5.Internal;
 using System;
@@ -36,6 +37,9 @@ using System.Linq;
 #if MIGRATION
 using System.Windows;
 #else
+#if CSHTML5NETSTANDARD
+using System.Text.Json;
+#endif
 using Windows.UI.Xaml;
 #endif
 
@@ -267,7 +271,33 @@ result;
         internal static object CastFromJsValue(object obj)
         {
 #if CSHTML5NETSTANDARD
-            return obj;
+            JsonElement jsonElement = (JsonElement)obj;
+            object res;
+            switch (jsonElement.ValueKind)
+            {
+                case JsonValueKind.Object:
+                case JsonValueKind.Array:
+                    res = obj;
+                    break;
+                case JsonValueKind.String:
+                    res = jsonElement.GetString();
+                    break;
+                case JsonValueKind.Number:
+                    res = jsonElement.GetSingle();
+                    break;
+                case JsonValueKind.True:
+                case JsonValueKind.False:
+                    res = jsonElement.GetBoolean();
+                    break;
+                case JsonValueKind.Undefined:
+                case JsonValueKind.Null:
+                    res = null;
+                    break;
+                default:
+                    res = null;
+                    break;
+            }
+            return res;
 #else
 #if !BUILDINGDOCUMENTATION
             var res = (JSValue)obj;
