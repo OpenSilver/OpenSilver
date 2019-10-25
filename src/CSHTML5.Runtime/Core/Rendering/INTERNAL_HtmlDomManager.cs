@@ -34,7 +34,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSHTML5;
 using DotNetForHtml5.Core;
+#if !CSHTML5NETSTANDARD
 using DotNetBrowser;
+#endif
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
@@ -240,7 +242,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             ExecuteJavaScript(string.Format(@"var domElement = document.getElementById(""{0}"");
                                         setTimeout(function() {{ 
                                             domElement.focus();
-                                        }}, 1);", 
+                                        }}, 1);",
                                         ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier));
         }
 
@@ -1258,10 +1260,14 @@ parentElement.appendChild(child);
             {
                 if (jsObject == null)
                     return true;
+#if !CSHTML5NETSTANDARD
                 if (!(jsObject is JSValue))
                     return false;
                 JSValue value = ((JSValue)jsObject);
                 return value.IsNull() || value.IsUndefined();
+#else
+            return false;
+#endif
             }
             else
                 return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));

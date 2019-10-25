@@ -36,7 +36,9 @@ using System.Xml.Serialization;
 using System.Collections;
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
+#if !CSHTML5NETSTANDARD
 using DotNetBrowser;
+#endif
 
 namespace System.Runtime.Serialization
 {
@@ -1301,10 +1303,14 @@ namespace System.Runtime.Serialization
             {
                 if (obj == null)
                     return true;
+#if CSHTML5NETSTANDARD
+                return false;
+#else
                 if (!(obj is JSValue))
                     return false;
                 JSValue value = ((JSValue)obj);
                 return value.IsNull() || value.IsUndefined();
+#endif
             }
             else
             {
@@ -1312,6 +1318,6 @@ namespace System.Runtime.Serialization
             }
         }
 
-        #endregion
+#endregion
     }
 }

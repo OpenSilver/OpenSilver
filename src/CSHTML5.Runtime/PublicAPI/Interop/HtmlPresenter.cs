@@ -20,7 +20,9 @@
 using CSHTML5.Internal;
 using System;
 using System.Windows.Markup;
+#if !CSHTML5NETSTANDARD
 using DotNetBrowser;
+#endif
 
 #if MIGRATION
 using System.Windows;
@@ -111,10 +113,14 @@ namespace CSHTML5.Native.Html.Controls
             {
                 if (jsObject == null)
                     return true;
+#if CSHTML5NETSTANDARD
+                return false;
+#else
                 if (!(jsObject is JSValue))
                     return false;
                 JSValue value = ((JSValue)jsObject);
                 return value.IsNull() || value.IsUndefined();
+#endif
             }
             else
                 return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
