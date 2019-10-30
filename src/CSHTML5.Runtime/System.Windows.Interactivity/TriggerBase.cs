@@ -9,7 +9,7 @@ using System.Windows.Markup;
 using Windows.UI.Xaml;
 #endif
 
-namespace System.Windows.Interactivity //Windows.UI.Interactivity
+namespace System.Windows.Interactivity
 {
     /// <summary>
     /// Represents an object that can invoke Actions conditionally.
@@ -22,7 +22,10 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
     [ContentProperty(Name = "Actions")]
     public abstract class TriggerBase : DependencyObject, IAttachedObject//InteractivityBase
     {
-#region added because we changed heritage
+        //Note on this file: see commit 58c52131 of October 30th, 2019 for comments on the modifications from the original source.
+        //Based on the code that can be found at https://github.com/jlaanstra/Windows.UI.Interactivity/tree/master/Windows.UI.Interactivity.
+
+        #region added because we changed heritage
         internal DependencyObject _associatedObject = null;
         /// <summary>
         /// Gets the object to which this behavior is attached.
@@ -43,15 +46,8 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
             {
                 throw new InvalidOperationException("The Behavior is already hosted on a different element.");
             }
-            //if (AssociatedType != null && !AssociatedType.IsAssignableFrom(dependencyObject.GetType()))
-            //{
-            //    throw new InvalidOperationException("dependencyObject does not satisfy the Behavior type constraint.");
-            //}
-            //else
-            //{
             _associatedObject = dependencyObject;
             OnAttached();
-            //}
         }
 
         protected virtual void OnAttached()
@@ -84,18 +80,6 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
             }
         }
 
-        ///// <summary>
-        ///// Event handler for registering to PreviewInvoke.
-        ///// </summary>
-        //public event EventHandler<PreviewInvokeEventArgs> PreviewInvoke;
-
-        //internal TriggerBase(Type associatedObjectTypeConstraint)
-        //{
-        //    this.AssociatedObjectTypeConstraint = associatedObjectTypeConstraint;
-        //    TriggerActionCollection actionCollection = new TriggerActionCollection();
-        //    this.SetValue(TriggerBase.ActionsProperty, actionCollection);
-        //}
-
         /// <summary>
         /// Invoke all actions associated with this trigger.
         /// </summary>
@@ -105,15 +89,6 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
         /// </remarks>
         protected void InvokeActions(object parameter)
         {
-            //if (this.PreviewInvoke != null)
-            //{
-            //    PreviewInvokeEventArgs e = new PreviewInvokeEventArgs();
-            //    this.PreviewInvoke((object)this, e);
-            //    if (e.Cancelling)
-            //    {
-            //        return;
-            //    }
-            //}
             foreach (TriggerAction triggerAction in this.Actions)
             {
                 triggerAction.CallInvoke(parameter);
@@ -128,7 +103,6 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
         {
             //Note: I don't think this method is ever called.
 
-
             if (frameworkElement == this.AssociatedObject)
             {
                 return;
@@ -137,21 +111,11 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
             {
                 throw new InvalidOperationException("Cannot Host Trigger Multiple Times");
             }
-            //if (frameworkElement != null && !this.AssociatedObjectTypeConstraint.GetTypeInfo().IsAssignableFrom(frameworkElement.GetType().GetTypeInfo()))
-            //{
-            //    throw new InvalidOperationException("Type Constraint Violated");
-            //}
-            //else
-            //{
-            //this.AssociatedObject = frameworkElement;
-            this._associatedObject = frameworkElement;//CSHTML5 Added: replacement for the line above.
-            //this.OnAssociatedObjectChanged(); //Note: this might be to go and look for the Trigger (event for example) that causes the InvokeActions
-            //Attach handles the DataContext
-            //base.Attach(frameworkElement);
-            Attach((DependencyObject)frameworkElement); //CSHTML5 Added to replace the base.Attach on the line above
+           
+            this._associatedObject = frameworkElement;
+            Attach((DependencyObject)frameworkElement);
             this.Actions.Attach(frameworkElement);
             this.OnAttached();
-            //}
         }
 
         /// <summary>
@@ -159,12 +123,8 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
         /// </summary>
         public void Detach()//should be an override but we changed the heritage
         {
-            //base.Detach();
-            //this.OnDetaching();
-            //this.AssociatedObject = null;
-            this._associatedObject = null;//CSHTML5 Added: replacement for the line above.
+            this._associatedObject = null;
             this.Actions.Detach();
-            //this.OnAssociatedObjectChanged(); //Note: see note in Attach(FrameworkElement)
         }
     }
 }

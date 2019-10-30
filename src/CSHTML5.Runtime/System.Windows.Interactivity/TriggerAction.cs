@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml;
 #endif
 
-namespace System.Windows.Interactivity //Windows.UI.Interactivity
+namespace System.Windows.Interactivity
 {
     /// <summary>
     /// Represents an attachable object that encapsulates a unit of functionality.
@@ -19,8 +19,10 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
     /// </remarks>
     public abstract class TriggerAction : FrameworkElement, IAttachedObject //DependencyObject, IAttachedObject //InteractivityBase
     {
+        //Note on this file: see commit 58c52131 of October 30th, 2019 for comments on the modifications from the original source.
+        //Based on the code that can be found at https://github.com/jlaanstra/Windows.UI.Interactivity/tree/master/Windows.UI.Interactivity.
 
-#region added because we changed heritage
+        #region added because we changed heritage
         internal DependencyObject _associatedObject = null;
         /// <summary>
         /// Gets the object to which this behavior is attached.
@@ -37,15 +39,7 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
             {
                 throw new InvalidOperationException("The Behavior is already hosted on a different element.");
             }
-            //if (AssociatedType != null && !AssociatedType.IsAssignableFrom(dependencyObject.GetType()))
-            //{
-            //    throw new InvalidOperationException("dependencyObject does not satisfy the Behavior type constraint.");
-            //}
-            //else
-            //{
             _associatedObject = dependencyObject;
-            //    OnAttached();
-            //}
         }
 #endregion
 
@@ -133,20 +127,8 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
             {
                 throw new InvalidOperationException("Cannot Host TriggerAction Multiple Times");
             }
-            //if (frameworkElement != null && !this.AssociatedObjectTypeConstraint.GetTypeInfo().IsAssignableFrom(frameworkElement.GetType().GetTypeInfo()))
-            //{
-            //    throw new InvalidOperationException("Type Constraint Violated");
-            //}
-            //else
-            //{
-                //this.AssociatedObject = frameworkElement;
-            this._associatedObject = frameworkElement;//CSHTML5 Added: replacement for the line above.
-                //this.OnAssociatedObjectChanged(); //Note: this might be to go and look for the Trigger (event for example) that causes the InvokeActions
-            //Attach handles the DataContext
-            //base.Attach(frameworkElement);
-            Attach((DependencyObject)frameworkElement); //CSHTML5 Added to replace the base.Attach on the line above
-                //this.OnAttached();
-            //}
+            this._associatedObject = frameworkElement;
+            Attach((DependencyObject)frameworkElement);
         }
 
         /// <summary>
@@ -155,11 +137,7 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
         /// </summary>
         public void Detach() //should be an override but we changed the heritage
         {
-            //base.Detach();
-            //this.OnDetaching();
-            //this.AssociatedObject = null;
-            this._associatedObject = null;//CSHTML5 Added: replacement for the line above.
-            //this.OnAssociatedObjectChanged(); //Note: see note in Attach(FrameworkElement)
+            this._associatedObject = null;
         }
     }
 }

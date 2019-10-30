@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml;
 #endif
 
-namespace System.Windows.Interactivity //Windows.UI.Interactivity
+namespace System.Windows.Interactivity
 {
     /// <summary>
     /// Represents a collection of actions with a shared AssociatedObject and provides change notifications to its contents when that AssociatedObject changes.
@@ -15,6 +15,9 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
     /// </summary>
     public class TriggerActionCollection : AttachableCollection<TriggerAction>
     {
+        //Note on this file: see commit 58c52131 of October 30th, 2019 for comments on the modifications from the original source.
+        //Based on the code that can be found at https://github.com/jlaanstra/Windows.UI.Interactivity/tree/master/Windows.UI.Interactivity.
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Interactivity.TriggerActionCollection"/> class.
         /// 
@@ -26,19 +29,6 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
         internal TriggerActionCollection()
         {
         }
-
-        //protected override void AttachInternal(FrameworkElement frameworkElement)
-        //{
-        //    base.AttachInternal(frameworkElement);
-        //    if (this.AssociatedObject == null)
-        //    {
-        //        if (!Windows.ApplicationModel.DesignMode.DesignModeEnabled)
-        //        {
-        //            this.AssociatedObject = frameworkElement;
-        //        }
-        //        this.OnAttached();
-        //    }
-        //}
 
         /// <summary>
         /// Called immediately after the collection is attached to an AssociatedObject.

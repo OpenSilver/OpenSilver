@@ -12,7 +12,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Input;
 #endif
 
-namespace System.Windows.Interactivity //Windows.UI.Interactivity
+namespace System.Windows.Interactivity
 {
     /// <summary>
     /// A trigger that listens for a specified event on its source and fires when that event is fired.
@@ -20,6 +20,8 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
     /// </summary>
     public class EventTrigger : TriggerBase //EventTriggerBase<object> For simplicity's sake, we inherited directly from TriggerBase and will currently only support the properties EventName and Actions directly here.
     {
+        //Based on the code that can be found at https://github.com/jlaanstra/Windows.UI.Interactivity/tree/master/Windows.UI.Interactivity.
+
         public static readonly DependencyProperty EventNameProperty =
             DependencyProperty.Register("EventName", typeof(string), typeof(EventTrigger), new PropertyMetadata("Loaded", new PropertyChangedCallback(EventTrigger.OnEventNameChanged)));
 
@@ -70,9 +72,6 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
 
         private static void OnEventNameChanged(object sender, DependencyPropertyChangedEventArgs args)
         {
-            //Note: this method originally only had the following line but we removed the EventTriggerBase type.
-            //((EventTriggerBase)sender).OnEventNameChanged((string)args.OldValue, (string)args.NewValue);
-            //todo: unregister from the former event and register to the new one.
             EventTrigger eventTrigger = (EventTrigger)sender;
             if (eventTrigger.AssociatedObject != null) //Making sure the source of the event is set. Note: The source can apparently be something other than the AssociatedObject but we ignore this case for now.
             {
