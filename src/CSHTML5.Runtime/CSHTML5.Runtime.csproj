@@ -85,6 +85,12 @@
     <Compile Include="System.ComponentModel\ReadOnlyAttribute.cs" />
     <Compile Include="System.Resources\ResourceManager.cs" />
     <Compile Include="System.ServiceModel\CommunicationException.cs" />
+    <Compile Include="System.Windows.Interactivity\EventTrigger.cs" />
+    <Compile Include="System.Windows.Interactivity\InvokeCommandAction.cs" />
+    <Compile Include="System.Windows.Interactivity\TriggerAction.cs" />
+    <Compile Include="System.Windows.Interactivity\TriggerActionCollection.cs" />
+    <Compile Include="System.Windows.Interactivity\TriggerBase.cs" />
+    <Compile Include="System.Windows.Interactivity\TriggerCollection.cs" />
     <Compile Include="System.Xml.Linq\XObject.cs" />
     <Compile Include="ToBeReviewed\GroupedEnumerable.cs" />
     <Compile Include="ToBeReviewed\Grouping.cs" />
