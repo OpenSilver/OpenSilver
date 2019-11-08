@@ -4,7 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// Extension methods for Enumerable.

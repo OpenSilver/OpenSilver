@@ -6,7 +6,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// A set of extension methods for manipulating collections.
@@ -23,7 +27,7 @@ namespace System.Windows.Controls
         {
             return
                 collection.GetType().IsArray
-                    || System.Windows.Controls.EnumerableExtensions
+                    || EnumerableExtensions
                         .Iterate(collection.GetType(), type => type.BaseType)
                         .TakeWhile(type => type != null)
                         .Any(type => type.FullName.StartsWith("System.Collections.ObjectModel.ReadOnlyCollection`1", StringComparison.Ordinal));
@@ -118,7 +122,7 @@ namespace System.Windows.Controls
                     return list.Count;
                 }
 
-                return System.Linq.Enumerable.Count(collection.OfType<object>());
+                return Enumerable.Count(collection.OfType<object>());
             //}
         }
 
