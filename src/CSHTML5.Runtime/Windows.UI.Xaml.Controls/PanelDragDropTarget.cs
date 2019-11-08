@@ -133,5 +133,10 @@ namespace Windows.UI.Xaml.Controls
                     Orientation = Orientation.Horizontal
                 };
         }
+
+        internal override int INTERNAL_GetNumberOfElementsBetweenItemsRootAndDragDropTarget()
+        {
+            return 2;
+        }
     }
 }

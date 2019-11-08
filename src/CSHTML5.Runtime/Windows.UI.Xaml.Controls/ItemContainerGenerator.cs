@@ -40,6 +40,7 @@ namespace Windows.UI.Xaml.Controls
     public class ItemContainerGenerator
     {
         Dictionary<object, List<object>> _itemsToContainers = new Dictionary<object, List<object>>(); // Note: this maps each item (for example a string or a business object) to the corresponding element that is added to the visual tree (such a datatemplate) or to the native DOM element in case of native combo box for example. The reason why each single element can be associated to multiple objects is because of Strings and other value types: for example, if two identical strings are added to the ItemsControl, they will be the same key of the dictionary.
+        List<object> _containers = new List<object>(); //this list is kept to get the index from the container (with minimum work to keep it updated, it might not be the most efficient method perf-wise).
 
         /// <summary>
         /// Returns the container corresponding to the specified item, or null if no container was found.
@@ -65,6 +66,26 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
+        /// Returns the container at the given index, or null if the index is negative or above the amount of containers.
+        /// </summary>
+        /// <param name="index">The index at which the container is located.</param>
+        /// <returns>The container at the given index, or null if the index is negative or above the amount of containers.</returns>
+        public object ContainerFromIndex(int index)
+        {
+            if (index > -1 && _containers.Count > index)
+            {
+                return _containers[index];
+            }
+            else
+                return null;
+        }
+
+        public int IndexFromContainer(object container)
+        {
+            return _containers.IndexOf(container);
+        }
+
+        /// <summary>
         /// Removes the container associated to the item.
         /// </summary>
         /// <param name="container">The container to remove.</param>
@@ -72,6 +93,11 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>True if found and removed, false otherwise.</returns>
         public bool INTERNAL_TryUnregisterContainer(object container, object correspondingItem)
         {
+            int indexOfContainerInContainerList = _containers.IndexOf(container);
+            if (indexOfContainerInContainerList != -1)
+            {
+                _containers.Remove(container);
+            }
             if (_itemsToContainers.ContainsKey(correspondingItem))
             {
                 List<object> containersAssociatedToTheItem = _itemsToContainers[correspondingItem];
@@ -87,9 +113,34 @@ namespace Windows.UI.Xaml.Controls
                     }
                 }
             }
-
+            
             return false;
         }
+
+        ///// <summary>
+        ///// Removes the container at the given position. IMPORTANT NOTE: Contrary to expectations, this method is not as efficient as INTERNAL_TryUnregisterContainer so if given the choice, use that one instead.
+        ///// </summary>
+        ///// <param name="index">The index of the Container to remove.</param>
+        ///// <returns>True if found and removed, false otherwise</returns>
+        //public bool INTERNAL_TryUnregisterContainerAt(int index)
+        //{
+        //    //Note: this method has not been tested yet.
+        //    var container = ContainerFromIndex(index);
+        //    foreach(object item in _itemsToContainers.Keys)
+        //    {
+        //        List<object> containersAssociatedToTheItem = _itemsToContainers[item];
+        //        if (containersAssociatedToTheItem.Remove(container))
+        //        {
+
+        //            if (containersAssociatedToTheItem.Count == 0)
+        //                _itemsToContainers.Remove(item);
+
+        //            _containers.Remove(container);
+        //            return true;
+        //        }
+        //    }
+        //    return false;
+        //}
 
 
         /// <summary>
@@ -98,6 +149,7 @@ namespace Windows.UI.Xaml.Controls
         public void INTERNAL_Clear()
         {
             _itemsToContainers.Clear();
+            _containers.Clear();
         }
 
 
@@ -119,6 +171,7 @@ namespace Windows.UI.Xaml.Controls
                 _itemsToContainers.Add(correspondingItem, containersAssociatedToTheItem);
             }
             containersAssociatedToTheItem.Add(container);
+            _containers.Add(container);
         }
 
         /// <summary>

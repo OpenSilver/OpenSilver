@@ -317,8 +317,12 @@
     <Compile Include="Windows.UI.Xaml.Controls\DockPanel.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Frame.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\INavigate.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ItemsControlDragDropTarget.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Label.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Slider.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\Toolkit\CollectionHelpers.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\Toolkit\EnumerableExtensions.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\Toolkit\ItemsControlExtensions.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Validation.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ValidationError.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ValidationErrorEventAction.cs" />

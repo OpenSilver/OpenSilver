@@ -21,6 +21,8 @@ using CSHTML5;
 using CSHTML5.Internal;
 using System.Windows;
 using DotNetForHtml5.Core;
+using System.Collections.Generic;
+using System.Linq;
 #if MIGRATION
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
@@ -621,11 +623,10 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public event DragEventHandler ItemDroppedOnSource;
 
-#endregion
+        #endregion
 
 
-#region Private helper methods
-
+        #region Private helper methods
         /// <summary>
         /// This method returns null if no DragDropTarget is under the pointer, else it returns the DragDropTarget under it (the first Parent found)
         /// </summary>
@@ -636,30 +637,53 @@ namespace Windows.UI.Xaml.Controls
         static DragDropTarget<TItemsControlType, TItemContainerType> GetDragDropTargetUnderPointer(double x, double y, out TItemContainerType itemContainerUnderPointer)
         {
             UIElement element = VisualTreeHelper.FindElementInHostCoordinates(new Point(x, y));
-            UIElement childElement = null;
-            UIElement childOfChildElement = null;
+            List<object> ElementsBetweenClickedElementAndDragDropTarget = new List<object>(); //This list will contain all the elements we go through when going from the clicked element to the DragDropTarget (both included)
+            DragDropTarget<TItemsControlType, TItemContainerType> dragDropTargetUnder = null;
+            // 1) Walk up the visual tree from the clicked element until we find the DragDropTarget:
             while (element != null)
             {
+                ElementsBetweenClickedElementAndDragDropTarget.Add(element);
                 if (element is DragDropTarget<TItemsControlType, TItemContainerType>)
                 {
                     //------------------
                     // FOUND
                     //------------------
-                    DragDropTarget<TItemsControlType, TItemContainerType> dragDropTargetUnder = (DragDropTarget<TItemsControlType, TItemContainerType>)element;
-                    itemContainerUnderPointer = childOfChildElement as TItemContainerType;
-                    return dragDropTargetUnder;
+                    dragDropTargetUnder = (DragDropTarget<TItemsControlType, TItemContainerType>)element;
+                    break;
                 }
 
                 //Move up to the parent
-                childOfChildElement = childElement;
-                childElement = element;
                 element = (UIElement)element.INTERNAL_VisualParent;
             }
 
-            // Not found:
-            itemContainerUnderPointer = null;
-            return null;
+            if (dragDropTargetUnder != null)
+            {
+                //We found the DragDropTarget:
+                // 2) Find the item to move from the list of the children of the DragDropTarget
+                int indexOfLastElementInList = ElementsBetweenClickedElementAndDragDropTarget.Count - 1;
+                int amoutOfElementsBetweenItemsRootAndDragDropTarget = dragDropTargetUnder.INTERNAL_GetNumberOfElementsBetweenItemsRootAndDragDropTarget();
+                if(indexOfLastElementInList < amoutOfElementsBetweenItemsRootAndDragDropTarget) //Note: this can happen while dragging: the element under the pointer can be closer to the DragDropTarget than the root of the item we are dragging.
+                {
+                    itemContainerUnderPointer = null;
+                    return dragDropTargetUnder;
+                }
+                object elementToMove = ElementsBetweenClickedElementAndDragDropTarget.ElementAt(indexOfLastElementInList - amoutOfElementsBetweenItemsRootAndDragDropTarget);
+                itemContainerUnderPointer = (TItemContainerType)elementToMove;
+                return dragDropTargetUnder;
+            }
+            else
+            {
+                // Not found:
+                itemContainerUnderPointer = null;
+                return null;
+            }
         }
+
+        /// <summary>
+        /// Returns the amount of times we have to get the parent of the Root of an Item to reach the DragDropTarget.
+        /// </summary>
+        /// <returns>The amount of times we have to get the parent of the Root of an Item to have the DragDropTarget.</returns>
+        internal abstract int INTERNAL_GetNumberOfElementsBetweenItemsRootAndDragDropTarget();
 
         static StackPanel GeneratePopupContent(UIElement sourceItemContainer, out UIElement iconStop, out UIElement iconArrow)
         {
