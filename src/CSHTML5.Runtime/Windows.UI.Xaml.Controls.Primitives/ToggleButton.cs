@@ -167,11 +167,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 this.MouseEnter += Control_MouseEnter;
                 this.MouseLeave -= Control_MouseLeave;
                 this.MouseLeave += Control_MouseLeave;
+                this.LostMouseCapture -= Control_LostMouseCapture;
+                this.LostMouseCapture += Control_LostMouseCapture;
 #else
                 this.PointerEntered -= Control_PointerEntered;
                 this.PointerEntered += Control_PointerEntered;
                 this.PointerExited -= Control_PointerExited;
                 this.PointerExited += Control_PointerExited;
+                this.PointerCaptureLost -= Control_PointerCaptureLost;
+                this.PointerCaptureLost += Control_PointerCaptureLost;
 #endif
             }
 
@@ -196,6 +200,18 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         bool _isPointerOver = false;
         bool _isPressed = false;
+
+#if MIGRATION
+        void Control_LostMouseCapture(object sender, MouseEventArgs e)
+
+#else
+        void Control_PointerCaptureLost(object sender, Input.PointerRoutedEventArgs e)
+#endif
+        {
+            _isPressed = false;
+            UpdateVisualStates();
+        }
+
 #if MIGRATION
         void Control_MouseEnter(object sender, Input.MouseEventArgs e)
 #else
