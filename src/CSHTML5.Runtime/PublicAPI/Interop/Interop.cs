@@ -102,7 +102,7 @@ namespace CSHTML5
 #if !BRIDGE
         [JSIL.Meta.JSReplacement("$value")]
 #else
-        [Bridge.Template("({value}.v != undefined ? {value}.v : {value})")]
+        [Bridge.Template("({value} == undefined ? {value} : ({value}.v != undefined ? {value}.v : {value}))")]
 #endif
         public static object Unbox(object value)
         {
