@@ -102,6 +102,15 @@ namespace Windows.UI.Xaml.Controls
             return listBoxItem;
         }
 
+        protected override DependencyObject GetContainerFromItem(object item)
+        {
+            ListBoxItem listBoxItem = item as ListBoxItem ?? new ListBoxItem();
+            listBoxItem.INTERNAL_CorrespondingItem = item;
+            listBoxItem.INTERNAL_ParentSelectorControl = this;
+            listBoxItem.Click += listBoxItem_Click;
+            return listBoxItem;
+        }
+
 
         #region selection related elements
 

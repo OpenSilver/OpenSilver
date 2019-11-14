@@ -26,6 +26,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
+using System.Windows.Media;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls.Primitives;
@@ -122,9 +123,9 @@ namespace Windows.UI.Xaml.Controls
         static ItemsPanelTemplate GetDefaultItemsPanel()
         {
             ItemsPanelTemplate template = new ItemsPanelTemplate()
-                {
-                    _methodToInstantiateFrameworkTemplate = (Control templateOwner) => new TemplateInstance() { TemplateContent = new StackPanel() }, // Default items panel. Note: the parameter templateOwner is made necessary for the ControlTemplates but can be kept null for DataTemplates.
-                };
+            {
+                _methodToInstantiateFrameworkTemplate = (Control templateOwner) => new TemplateInstance() { TemplateContent = new StackPanel() }, // Default items panel. Note: the parameter templateOwner is made necessary for the ControlTemplates but can be kept null for DataTemplates.
+            };
             template.Seal();
             //Note: We seal the template in order to avoid letting the user modify the default template itself since it is the same instance that is used as the default value for all ItemsControls.
             //      This would bring issues such as a user modifying the default template for one element then modifying it again for another one and both would have the last one's template.
@@ -238,47 +239,64 @@ namespace Windows.UI.Xaml.Controls
         {
             if (!_disableDefaultRendering)
             {
-                if (_placeWhereItemsPanelWillBeRendered != null
-                    //&& INTERNAL_VisualTreeManager.IsElementInVisualTree(_placeWhereItemsPanelWillBeRendered))
-                    && _placeWhereItemsPanelWillBeRendered._isLoaded) //Note: we replaced "IsElementInVisualTree" with _isLoaded on on March 22, 2017 to fix an issue where a "Binding" on ListBox.ItemsSource caused the selection to not work properly. This change can be reverted the day that the implementation of the "IsElementInVisualTree" method becomes based on the "_isLoaded" property (at the time of writing, it was implemented by checking if the visual parent is null).
+                //if (_placeWhereItemsPanelWillBeRendered != null
+                //    //&& INTERNAL_VisualTreeManager.IsElementInVisualTree(_placeWhereItemsPanelWillBeRendered))
+                //    && _placeWhereItemsPanelWillBeRendered._isLoaded) //Note: we replaced "IsElementInVisualTree" with _isLoaded on on March 22, 2017 to fix an issue where a "Binding" on ListBox.ItemsSource caused the selection to not work properly. This change can be reverted the day that the implementation of the "IsElementInVisualTree" method becomes based on the "_isLoaded" property (at the time of writing, it was implemented by checking if the visual parent is null).
+                if(this._placeWhereItemsPanelWillBeRendered != null)
                 {
-                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(this._renderedItemsPanel, _placeWhereItemsPanelWillBeRendered);
-
-                    if (newTemplate != null)
+                    if (this._placeWhereItemsPanelWillBeRendered.IsLoaded)
                     {
-                        // Create an instance of the Panel:
-                        _renderedItemsPanel = newTemplate.INTERNAL_InstantiateFrameworkTemplate();
+                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(this._renderedItemsPanel, _placeWhereItemsPanelWillBeRendered);
 
-                        // Make sure the panel derives from the type "Panel":
-                        if (!(_renderedItemsPanel is Panel))
+                        if (newTemplate != null)
                         {
-                            throw new InvalidOperationException("ItemsControl.ItemsPanelTemplate must derive from Panel.");
+                            // Create an instance of the Panel:
+                            _renderedItemsPanel = newTemplate.INTERNAL_InstantiateFrameworkTemplate();
+
+                            // Make sure the panel derives from the type "Panel":
+                            if (!(_renderedItemsPanel is Panel))
+                            {
+                                throw new InvalidOperationException("ItemsControl.ItemsPanelTemplate must derive from Panel.");
+                            }
+
+                            // Make sure that the panel contains no children:
+                            if (((Panel)_renderedItemsPanel).Children != null && ((Panel)_renderedItemsPanel).Children.Count > 0)
+                            {
+                                throw new InvalidOperationException("Cannot explicitly modify Children collection of Panel used as ItemsPanel for ItemsControl. ItemsControl generates child elements for Panel.");
+                            }
+
+                            // Attach the panel:
+                            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_renderedItemsPanel, _placeWhereItemsPanelWillBeRendered);
+
+                            // Update the children:
+                            if (_actualItemsSource != null)
+                            {
+                                OnItemsChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                                UpdateChildrenInVisualTree(_actualItemsSource, _actualItemsSource, forceUpdateAllChildren: true);
+                            }
                         }
-
-                        // Make sure that the panel contains no children:
-                        if (((Panel)_renderedItemsPanel).Children != null && ((Panel)_renderedItemsPanel).Children.Count > 0)
+                        else
                         {
-                            throw new InvalidOperationException("Cannot explicitly modify Children collection of Panel used as ItemsPanel for ItemsControl. ItemsControl generates child elements for Panel.");
-                        }
-
-                        // Attach the panel:
-                        INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_renderedItemsPanel, _placeWhereItemsPanelWillBeRendered);
-
-                        // Update the children:
-                        if (_actualItemsSource != null)
-                        {
-                            OnItemsChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-                            UpdateChildrenInVisualTree(_actualItemsSource, _actualItemsSource, forceUpdateAllChildren: true);
+                            // The ItemsPanel is null, so we display nothing (like in WPF):
+                            _renderedItemsPanel = null;
+                            _itemContainerGenerator.INTERNAL_Clear();
                         }
                     }
                     else
                     {
-                        // The ItemsPanel is null, so we display nothing (like in WPF):
-                        _renderedItemsPanel = null;
-                        _itemContainerGenerator.INTERNAL_Clear();
+                        this._newItemsPanelTemplate = newTemplate;
+                        this._placeWhereItemsPanelWillBeRendered.Loaded += new RoutedEventHandler(this.UpdateItemsPanelOnContainerLoaded);
                     }
                 }
             }
+        }
+
+        private ItemsPanelTemplate _newItemsPanelTemplate;
+        private void UpdateItemsPanelOnContainerLoaded(object sender, RoutedEventArgs e)
+        {
+            this._placeWhereItemsPanelWillBeRendered.Loaded -= new RoutedEventHandler(this.UpdateItemsPanelOnContainerLoaded);
+            this.UpdateItemsPanel(_newItemsPanelTemplate);
+            this._newItemsPanelTemplate = null;
         }
 
         protected virtual void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
@@ -307,7 +325,7 @@ namespace Windows.UI.Xaml.Controls
                 if (newValue != null)
                 {
                     // Remember the new ItemsSource:
-                    this._actualItemsSource = (IEnumerable)newValue;
+                    this._actualItemsSource = newValue;
                 }
                 else
                 {
@@ -324,7 +342,7 @@ namespace Windows.UI.Xaml.Controls
                     ((INotifyCollectionChanged)this._actualItemsSource).CollectionChanged += this.ItemCollection_CollectionChanged;
                 }
 
-                OnItemsSourceChanged_BeforeVisualUpdate((IEnumerable)oldValue, (IEnumerable)newValue);
+                OnItemsSourceChanged_BeforeVisualUpdate(oldValue, newValue);
 
                 if (_renderedItemsPanel == null && ItemsPanel != null && !_workaroundForComboBox)
                 {
@@ -550,7 +568,7 @@ namespace Windows.UI.Xaml.Controls
                         }
                     }
                 }
-                else if(containerIfAny is FrameworkElement)
+                else if (containerIfAny is FrameworkElement)
                 {
                     FrameworkElement containerAsFrameworkElement = (FrameworkElement)containerIfAny;
                     if ((UIElement)((FrameworkElement)containerIfAny).INTERNAL_VisualParent != null)
@@ -582,7 +600,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     if (newContent != null) //otherwise, we are not in the Visual tree
                     {
-                        var containerIfAny = INTERNAL_GenerateContainer(newContent);
+                        var containerIfAny = (GetContainerFromItem(item) ?? INTERNAL_GenerateContainer(newContent)) as ContentControl; //todo: Remove INTERNAL_GenerateContainer()
 
                         if (containerIfAny == null)
                         {
@@ -601,7 +619,7 @@ namespace Windows.UI.Xaml.Controls
                             //-----------------------------
                             // If we arrive here, it means that either the newContent is already a container (of the correct type), or a new container was generated.
                             //-----------------------------
-
+                            
                             //if the user defined a style for the container, we apply it:
                             if (ItemContainerStyle != null)
                             {
@@ -611,12 +629,14 @@ namespace Windows.UI.Xaml.Controls
                             // We register the container so that later we can find it back, given the "item":
                             _itemContainerGenerator.INTERNAL_RegisterContainer(containerIfAny, item);
 
-                            // We remember the item associated to the container:
-                            containerIfAny.INTERNAL_CorrespondingItem = item;
-
+                            //TODO: remove this and do it directly in selector controls.
                             // We keep a reference from the SelectorItem to the Selector:
                             if (this is Selector)
-                                containerIfAny.INTERNAL_ParentSelectorControl = (Selector)this;
+                            {
+                                // We remember the item associated to the container:
+                                ((SelectorItem)containerIfAny).INTERNAL_CorrespondingItem = item;
+                                ((SelectorItem)containerIfAny).INTERNAL_ParentSelectorControl = (Selector)this;
+                            }
 
                             // We attach the container to the visual tree:
                             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(containerIfAny, _renderedItemsPanel);
@@ -693,10 +713,21 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="item">The item to generate the container with.</param>
         /// <returns>Returns the item itself if the item is already a container of the correct type, otherwise it returns null if no container is to be created, or it returns the new container otherwise.</returns>
+        [Obsolete("Use GetContainerFromItem(object item) instead.")]
         protected virtual SelectorItem INTERNAL_GenerateContainer(object item)
         {
             return null; // In a simple ItemsControl, not container is to be generated. Derived classes may want to generate a ListBoxItem, a ComboBoxItem, etc.
         }
+
+        /// <summary>
+        /// Create or identify the element used to display the given item.
+        /// </summary>
+        /// <returns>The element that is used to display the given item.</returns>
+        protected virtual DependencyObject GetContainerFromItem(object item)
+        {
+            return null;
+        }
+
 
         protected static List<object> ConvertToListOfObjectsOrNull(IEnumerable enumerable)
         {
@@ -921,7 +952,7 @@ namespace Windows.UI.Xaml.Controls
         {
             throw new NotImplementedException();
         }
-        ////
+
         //// Summary:
         ////     Returns the ItemsControl that owns the specified container element.
         ////
@@ -978,7 +1009,7 @@ namespace Windows.UI.Xaml.Controls
         ////   newItemTemplateSelector:
         ////     The current value of the ItemTemplateSelector property.
         //protected virtual void OnItemTemplateSelectorChanged(DataTemplateSelector oldItemTemplateSelector, DataTemplateSelector newItemTemplateSelector);
-        
+
         // Summary:
         //     Prepares the specified element to display the specified item.
         //

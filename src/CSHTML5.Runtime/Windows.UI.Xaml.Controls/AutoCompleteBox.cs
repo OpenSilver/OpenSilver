@@ -466,6 +466,16 @@ namespace Windows.UI.Xaml.Controls
             return comboBoxItem;
         }
 
+        protected override DependencyObject GetContainerFromItem(object item)
+        {
+            ComboBoxItem comboBoxItem = item as ComboBoxItem ?? new ComboBoxItem();
+            comboBoxItem.INTERNAL_CorrespondingItem = item;
+            comboBoxItem.INTERNAL_ParentSelectorControl = this;
+            comboBoxItem.Click += ComboBoxItem_Click;
+            return comboBoxItem;
+        }
+
+
         void ComboBoxItem_Click(object sender, RoutedEventArgs e)
         {
             var selectedContainer = (SelectorItem)sender;
