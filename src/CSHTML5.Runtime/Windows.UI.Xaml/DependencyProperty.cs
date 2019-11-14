@@ -64,6 +64,11 @@ namespace Windows.UI.Xaml
         Dictionary<Type, bool> Optimization_typesWithoutOverride = null; //todo: replace with a hashset when possible.
         Dictionary<Type, PropertyMetadata> Optimization_typesToOverrides = null; //note: see comment on _typesToOverridenMetadatas
 
+        public PropertyMetadata GetMetadata(Type type)
+        {
+            return this.GetTypeMetaData(type);
+        }
+
         internal PropertyMetadata GetTypeMetaData(Type typeOfOwner)
         {
 #if PERFSTAT
