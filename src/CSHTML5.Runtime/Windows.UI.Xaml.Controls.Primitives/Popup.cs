@@ -56,7 +56,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         Border _outerBorder; // Used for positioning and alignment.
         bool _isVisible;
         Point _referencePosition = new Point(); // This is the (X,Y) position of the reference point defined in the "Note for proper placement of the popup" above.
-        
+
 
 
         ControlToWatch _controlToWatch; //Note: this is set when the popup is attached to an UIElement, so that we can remove it from the timer for refreshing the position of the popup when needed.
@@ -64,7 +64,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         internal event EventHandler INTERNAL_PopupMoved;
 
 
-        internal Popup ParentPopup {get; private set;}
+        internal Popup ParentPopup { get; private set; }
 
 
         internal PopupRoot PopupRoot
@@ -496,10 +496,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         internal void CloseFromAnOutsideClick()
         {
-            if(ClosedDueToOutsideClick != null)
+            if (ClosedDueToOutsideClick != null)
                 ClosedDueToOutsideClick(this, new EventArgs());
 
-            if(IsOpen)
+            if (IsOpen)
                 this.IsOpen = false;
         }
 
@@ -529,14 +529,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     ParentPopup = ((PopupRoot)element).INTERNAL_LinkedPopup;
                     return;
                 }
-                        
+
                 DependencyObject obj = VisualTreeHelper.GetParent(element);
                 if (obj is UIElement)
                     element = (UIElement)obj;
                 else
                     break;
             }
-            
+
         }
 
 

@@ -1017,7 +1017,7 @@ context.restore();
         //
         // Returns:
         //     The identifier for the StrokeDashCap dependency property.
-        public static readonly DependencyProperty StrokeDashCapProperty = DependencyProperty.Register("StrokeDashCap", typeof(PenLineCap), typeof(Shape), null);
+        public static readonly DependencyProperty StrokeDashCapProperty = DependencyProperty.Register("StrokeDashCap", typeof(PenLineCap), typeof(Shape), new PropertyMetadata(PenLineCap.Flat));
         
         
         #endregion
