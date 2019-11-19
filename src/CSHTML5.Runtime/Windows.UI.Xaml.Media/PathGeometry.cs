@@ -655,6 +655,10 @@ namespace Windows.UI.Xaml.Media
             {
                 ++currentIndex;
             }
+            while (currentIndex < stringContainingNumber.Length && (stringContainingNumber[currentIndex] == ' '))
+            {
+                ++currentIndex;
+            }
             actualStartIndex = currentIndex; //(got rid of useless spaces and the comma splitting this number and the previous one.)
             int dotIndex = -1; //apparently, when two numbers follow each other, it is authorized to have no space between them if there is no questionning if they are the same number or not (something like 10..5 is authorized and is the same as 10.0 0.5)
             //if we find a character that does not belong to a number, then the string cannot be parsed (?)
@@ -758,7 +762,23 @@ namespace Windows.UI.Xaml.Media
             {
                 ++index;
             }
-            if (index >= stringContainingPoint.Length || stringContainingPoint[index] != ',')
+
+            //Note: The possibilities here without a badly formatted string are:
+            //      ',' --> "5,10" (normal syntax)
+            //      '.' --> "10..2" means "10.0, 0.2"
+            //      '+' --> "4+5"   means "4, +5"
+            //      '-' --> "4-5"   means "4, -5"
+            //      'e' --> "1e10e5 means "1e10, e5"
+            //      'E' --> "1E10E5 means "1E10, E5"
+            //Note: Any number should also be allowed: "5 10" --> "5, 10"
+            if (index >= stringContainingPoint.Length
+                || (stringContainingPoint[index] != ','
+                && stringContainingPoint[index] != '.'
+                && stringContainingPoint[index] != '+'
+                && stringContainingPoint[index] != '-'
+                && stringContainingPoint[index] != 'e'
+                && stringContainingPoint[index] != 'E')
+                )
             {
                 throw new FormatException("Could not create Path, input string badly formatted");
             }
