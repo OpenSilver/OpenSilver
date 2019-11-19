@@ -1498,12 +1498,12 @@ if ($0.tagName.toLowerCase() != 'span')
 
                 if (!INTERNAL_SizeComparisonHelpers.AreSizesEqual(currentSize, _valueOfLastSizeChanged))
                 {
+                    _valueOfLastSizeChanged = currentSize;
+
                     // Raise the "SizeChanged" event of all the listeners:
                     foreach (var sizeChangedEventHandler in _sizeChangedEventHandlers)
                         sizeChangedEventHandler(this, new SizeChangedEventArgs(currentSize));
                 }
-
-                _valueOfLastSizeChanged = currentSize;
             }
         }
 
