@@ -124,7 +124,8 @@ namespace Windows.UI.Xaml
                         },
                         CallbackMethod = Height_Changed,
                         UIElement = (UIElement)instance,
-                        Name = new List<string> { "height" }
+                        Name = new List<string> { "height" },
+                        ApplyAlsoWhenThereIsAControlTemplate = true
                     };
                 }
             });
@@ -210,7 +211,8 @@ namespace Windows.UI.Xaml
                         },
                         CallbackMethod = Width_Changed,
                         UIElement = (UIElement)instance,
-                        Name = new List<string> { "width" }
+                        Name = new List<string> { "width" },
+                        ApplyAlsoWhenThereIsAControlTemplate = true
                     };
                 }
             });
