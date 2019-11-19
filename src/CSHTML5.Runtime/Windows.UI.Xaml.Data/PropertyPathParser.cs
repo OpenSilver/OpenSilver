@@ -117,7 +117,7 @@ namespace CSHTML5.Internal.Windows.UI.Xaml.Data
                 propertyName = null;
                 index = Int32.Parse(path.Substring(1, end - 1));
                 path = path.Substring(end + 1);
-                if (path[0] == '.')
+                if (path.Length > 0 && path[0] == '.')
                     path = path.Substring(1);
             }
             else
