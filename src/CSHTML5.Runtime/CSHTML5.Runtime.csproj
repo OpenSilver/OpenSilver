@@ -665,6 +665,7 @@
     <Compile Include="Windows.UI.Xaml.Media\Geometry.cs" />
     <Compile Include="Windows.UI.Xaml.Media\GeometryConverter.cs" />
     <Compile Include="Windows.UI.Xaml.Media\GeometryGroup.cs" />
+    <Compile Include="Windows.UI.Xaml.Media\GeometryParser.cs" />
     <Compile Include="Windows.UI.Xaml.Media\GradientBrush.cs" />
     <Compile Include="Windows.UI.Xaml.Media\GradientSpreadMethod.cs" />
     <Compile Include="Windows.UI.Xaml.Media\GradientStop.cs" />
