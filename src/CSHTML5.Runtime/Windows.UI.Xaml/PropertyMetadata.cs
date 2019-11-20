@@ -38,11 +38,7 @@ namespace Windows.UI.Xaml
     {
         private object _defaultValue;
 
-        private bool _isModified;
-        internal bool DefaultValueWasSet()
-        {
-            return _isModified;
-        }
+        internal bool IsDefaultValueModified { get; private set; }
 
         /// <summary>
         /// Gets the default value for the dependency property.
@@ -60,7 +56,7 @@ namespace Windows.UI.Xaml
                     throw new ArgumentException("Default Value may not be Unset");
                 }
                 _defaultValue = value;
-                _isModified = true;
+                IsDefaultValueModified = true;
             }
         }
 

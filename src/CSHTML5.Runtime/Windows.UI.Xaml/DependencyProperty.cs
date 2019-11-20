@@ -148,20 +148,16 @@ namespace Windows.UI.Xaml
 
         private static void EnsureDefaultValue(PropertyMetadata typeMetadata, Type propertyType)
         {
-            if (typeMetadata != null)
+            if (typeMetadata.IsDefaultValueModified)
             {
-                if (typeMetadata.DefaultValueWasSet())
+                if (!DefaultValueStore.ValidateDefaultValue(typeMetadata.DefaultValue, propertyType))
                 {
-                    object defaultValue;
-                    if (!DefaultValueStore.EnsureDefaultValueIsValid(typeMetadata.DefaultValue, propertyType, out defaultValue))
-                    {
-                        typeMetadata.DefaultValue = defaultValue;
-                    }
+                    throw new ArgumentException("TypeMetadata default value is incorrect.");
                 }
-                else
-                {
-                    typeMetadata.DefaultValue = DefaultValueStore.CreateDefaultValue(propertyType);
-                }
+            }
+            else
+            {
+                typeMetadata.DefaultValue = DefaultValueStore.CreateDefaultValue(propertyType);
             }
         }
 
@@ -178,15 +174,21 @@ namespace Windows.UI.Xaml
 #if PERFSTAT
             var t = Performance.now();
 #endif
+            PropertyMetadata defaultMetadata = typeMetadata;
+            if (defaultMetadata == null)
+            {
+                //Create metadata if not set
+                defaultMetadata = new PropertyMetadata();
+            }
             // Make sure typeMetadata default value is valid.
-            EnsureDefaultValue(typeMetadata, propertyType);
+            EnsureDefaultValue(defaultMetadata, propertyType);
 
             var newDependencyProperty = new DependencyProperty()
             {
                 Name = name,
                 PropertyType = propertyType,
                 OwnerType = ownerType,
-                _typeMetadata = typeMetadata
+                _typeMetadata = defaultMetadata
                 //Store = INTERNAL_PropertyStore.Instance
             };
 
@@ -238,10 +240,40 @@ namespace Windows.UI.Xaml
                 return base.ToString();
         }
 
+        private void PrepareOverrideMetadata(Type newOwnerType, PropertyMetadata typeMetadata)
+        {
+            if (newOwnerType == null)
+            {
+                throw new ArgumentNullException("newOwnerType");
+            }
+            if (typeMetadata == null)
+            {
+                throw new ArgumentNullException("typeMetadata");
+            }
+            //Default value has been specified when creating the typeMetadata.
+            //We need to make sure it's type is correct.
+            if (typeMetadata.IsDefaultValueModified)
+            {
+                if (!DefaultValueStore.ValidateDefaultValue(typeMetadata.DefaultValue, PropertyType))
+                {
+                    throw new ArgumentException("TypeMetadata default value is incorrect.");
+                }
+            }
+            //todo: check that newOnwerType inherit from the base metadata owner type.
+        }
+
+
         public void OverrideMetadata(Type newOwnerType, PropertyMetadata typeMetadata)
         {
-            // Make sure typeMetadata default value is not set to INTERNAL_NoValue.NoValue.
-            EnsureDefaultValue(typeMetadata, PropertyType);
+            // Validate parameters.
+            PrepareOverrideMetadata(newOwnerType, typeMetadata);
+
+            // Make sure typeMetadata default value is set.
+            if (!typeMetadata.IsDefaultValueModified)
+            {
+                typeMetadata.DefaultValue = DefaultValueStore.CreateDefaultValue(PropertyType);
+            }
+            //EnsureDefaultValue(typeMetadata, PropertyType);
 
             if (_typesToOverridenMetadatas == null)
             {
