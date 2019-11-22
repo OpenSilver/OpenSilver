@@ -34,24 +34,24 @@ namespace Windows.UI.Xaml.Data
         {
             if (_setMethod != null)
             {
-                bool attemptParsedIndex = false;
+                bool attemptParsedIndex = false; //todo-perf: keep attemptParsedIndex, parsedIndex, as well as a boolean saying whether we should use the parsedIndex. That way we will only call TryInvokeMethod once when needed and won't need to retry to parse the index.
                 int parsedIndex = -1;
                 if (int.TryParse(_index, out parsedIndex))
                 {
                     attemptParsedIndex = true;
                 }
-                if (!TryInvokeMethod(parsedIndex, value)) //we attempt to invoke the method with an int as parameter but there is no guarantee that what is expected is an int so we keep the option of a string as a Backup.
+                if (!TryInvokeSetMethod(parsedIndex, value)) //we attempt to invoke the method with an int as parameter but there is no guarantee that what is expected is an int so we keep the option of a string as a Backup.
                 {
-                    TryInvokeMethod(_index, value);
+                    TryInvokeSetMethod(_index, value);
                 }
             }
         }
 
-        bool TryInvokeMethod(object index, object value)
+        bool TryInvokeSetMethod(object index, object value)
         {
             try
             {
-                _setMethod.Invoke(this.Source, _index, value);
+                _setMethod.Invoke(this.Source, index, value);
                 return true;
             }
             catch
@@ -63,22 +63,46 @@ namespace Windows.UI.Xaml.Data
         internal override void UpdateValue()
         {
             if (_getMethod != null)
-                this.UpdateValueAndIsBroken(_getMethod.Invoke(Source, _index), CheckIsBroken(true));
+            {
+                bool getMethodInvokedSuccessfully = false;
+                bool attemptParsedIndex = false; //todo-perf: keep attemptParsedIndex, parsedIndex, as well as a boolean saying whether we should use the parsedIndex. That way we will only call TryInvokeMethod once when needed and won't need to retry to parse the index.
+                int parsedIndex = -1;
+                object result;
+                if (int.TryParse(_index, out parsedIndex))
+                {
+                    attemptParsedIndex = true;
+                }
+                getMethodInvokedSuccessfully = TryInvokeGetMethod(parsedIndex, out result);
+                if (!getMethodInvokedSuccessfully) //we attempt to invoke the method with an int as parameter but there is no guarantee that what is expected is an int so we keep the option of a string as a Backup.
+                {
+                    getMethodInvokedSuccessfully = TryInvokeGetMethod(_index, out result);
+                }
+
+                if (getMethodInvokedSuccessfully)
+                {
+                    this.UpdateValueAndIsBroken(result, CheckIsBroken(true));
+                }
+                // else should we do something to say it is broken ?
+
+            }
+        }
+
+        bool TryInvokeGetMethod(object index, out object result)
+        {
+            try
+            {
+                result = _getMethod.Invoke(this.Source, index);
+                return true;
+            }
+            catch
+            {
+                result = null;
+                return false;
+            }
         }
 
         internal override void OnSourceChanged(object oldvalue, object newValue)
         {
-            DependencyObject oldSource = null;
-            DependencyObject newSource = null;
-            if (oldvalue is DependencyObject)
-            {
-                oldSource = (DependencyObject)oldvalue;
-            }
-            if (newValue is DependencyObject)
-            {
-                newSource = (DependencyObject)newValue;
-            }
-
             //todo: (?) find out how to have a listener here since it is a method and not a DependencyProperty (get_Item and set_Item). I guess it would be nice to be able to attach to calls on set_item and handle it from there.
 
             //var listener = _dependencyPropertyListener;
@@ -91,10 +115,9 @@ namespace Windows.UI.Xaml.Data
             if (Source == null)
                 return;
 
-            if (newSource != null)
+            if (newValue != null)
             {
-                Type sourceType = newSource.GetType();
-                //todo: try/catch around the following line because there can be errors (for example if the source type defines both: public int this[int index] and public int this[int index1, int index2])
+                Type sourceType = newValue.GetType();
 
                 _getMethod = GetMethod(sourceType, "get_Item");
                 _setMethod = GetMethod(sourceType, "set_Item");
