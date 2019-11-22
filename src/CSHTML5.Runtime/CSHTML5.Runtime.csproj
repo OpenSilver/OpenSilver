@@ -83,6 +83,8 @@
     <Compile Include="System.ComponentModel\IPagedCollectionView.cs" />
     <Compile Include="System.ComponentModel\PageChangingEventArgs.cs" />
     <Compile Include="System.ComponentModel\ReadOnlyAttribute.cs" />
+    <Compile Include="System.Net\WORKINPROGRESS\HttpWebRequest.cs" />
+    <Compile Include="System.Net\WORKINPROGRESS\WebRequest.cs" />
     <Compile Include="System.Resources\ResourceManager.cs" />
     <Compile Include="System.ServiceModel\CommunicationException.cs" />
     <Compile Include="System.Windows.Interactivity\EventTrigger.cs" />
@@ -565,6 +567,7 @@
     <Compile Include="Windows.UI.Xaml.Data\FilterEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IDependencyPropertyChangedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IIsAttachedMonitor.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\IndexedPropertyPathNode.cs" />
     <Compile Include="Windows.UI.Xaml.Data\INTERNAL_DataOperations.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IPropertyChangedListener.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IPropertyPathNode.cs" />
@@ -665,6 +668,7 @@
     <Compile Include="Windows.UI.Xaml.Media\Geometry.cs" />
     <Compile Include="Windows.UI.Xaml.Media\GeometryConverter.cs" />
     <Compile Include="Windows.UI.Xaml.Media\GeometryGroup.cs" />
+    <Compile Include="Windows.UI.Xaml.Media\GeometryParser.cs" />
     <Compile Include="Windows.UI.Xaml.Media\GradientBrush.cs" />
     <Compile Include="Windows.UI.Xaml.Media\GradientSpreadMethod.cs" />
     <Compile Include="Windows.UI.Xaml.Media\GradientStop.cs" />

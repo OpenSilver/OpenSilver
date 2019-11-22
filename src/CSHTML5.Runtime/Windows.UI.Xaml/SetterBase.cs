@@ -34,24 +34,33 @@ namespace Windows.UI.Xaml
     /// </summary>
     public class SetterBase : DependencyObject
     {
-        /// <summary>
-        /// Gets a value that indicates whether this object is in an immutable state.
-        /// </summary>
+        private bool _isSealed;
+
         public bool IsSealed
         {
-            get { return (bool)GetValue(IsSealedProperty); }
-            internal set { SetValue(IsSealedProperty, value); }
+            get
+            {
+                return this._isSealed;
+            }
         }
-        /// <summary>
-        /// Identifies the IsSealed dependency property.
-        /// </summary>
-        public static readonly DependencyProperty IsSealedProperty =
-            DependencyProperty.Register("IsSealed", typeof(bool), typeof(SetterBase), new PropertyMetadata(null, IsSealed_Changed));
+        ///// <summary>
+        ///// Gets a value that indicates whether this object is in an immutable state.
+        ///// </summary>
+        //public bool IsSealed
+        //{
+        //    get { return (bool)GetValue(IsSealedProperty); }
+        //    internal set { SetValue(IsSealedProperty, value); }
+        //}
+        ///// <summary>
+        ///// Identifies the IsSealed dependency property.
+        ///// </summary>
+        //public static readonly DependencyProperty IsSealedProperty =
+        //    DependencyProperty.Register("IsSealed", typeof(bool), typeof(SetterBase), new PropertyMetadata(null, IsSealed_Changed));
 
 
-        static void IsSealed_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            //todo: fill this
-        }
+        //static void IsSealed_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    //todo: fill this
+        //}
     }
 }

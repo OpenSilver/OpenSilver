@@ -77,25 +77,27 @@ namespace Windows.UI.Xaml
         }
 
 
-        /// <summary>
-        /// Gets a value that indicates whether the style is read-only and cannot be changed.
-        /// Returns true if the style is read-only; otherwise, false.
-        /// </summary>
-        public bool IsSealed
-        {
-            get { return (bool)GetValue(IsSealedProperty); }
-            internal set { SetValue(IsSealedProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the IsSealed dependency property.
-        /// </summary>
-        public static readonly DependencyProperty IsSealedProperty =
-            DependencyProperty.Register("IsSealed", typeof(bool), typeof(DependencyObject), new PropertyMetadata(null, IsSealed_Changed));
+        public bool IsSealed { get; private set; }
 
-        static void IsSealed_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            //todo: fill this
-        }
+        ///// <summary>
+        ///// Gets a value that indicates whether the style is read-only and cannot be changed.
+        ///// Returns true if the style is read-only; otherwise, false.
+        ///// </summary>
+        //public bool IsSealed
+        //{
+        //    get { return (bool)GetValue(IsSealedProperty); }
+        //    internal set { SetValue(IsSealedProperty, value); }
+        //}
+        ///// <summary>
+        ///// Identifies the IsSealed dependency property.
+        ///// </summary>
+        //public static readonly DependencyProperty IsSealedProperty =
+        //    DependencyProperty.Register("IsSealed", typeof(bool), typeof(DependencyObject), new PropertyMetadata(false, IsSealed_Changed));
+
+        //static void IsSealed_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    //todo: fill this
+        //}
 
 
 #if FOR_DESIGN_TIME

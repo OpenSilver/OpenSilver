@@ -47,7 +47,7 @@ namespace CSHTML5.Internal.Windows.UI.Xaml.Data
             this.Path = path;
         }
 
-        internal PropertyNodeType Step(out string typeName, out string propertyName, out int index)
+        internal PropertyNodeType Step(out string typeName, out string propertyName, out string index) //Note: index can be considered a string or an int, or even a list of "parameters" (for example [20,30] can be two int)
         {
             var type = PropertyNodeType.None;
             var path = this.Path;
@@ -55,7 +55,7 @@ namespace CSHTML5.Internal.Windows.UI.Xaml.Data
             {
                 typeName = null;
                 propertyName = null;
-                index = -1;
+                index = null;
                 return type;
             }
 
@@ -103,7 +103,7 @@ namespace CSHTML5.Internal.Windows.UI.Xaml.Data
                 typeName = path.Substring(typeOpen, typeClose - typeOpen);
                 propertyName = path.Substring(propOpen, propClose - propOpen);
 
-                index = -1;
+                index = null;
                 if (path.Length > (end + 1) && path[end + 1] == '.')
                     end++;
                 path = path.Substring(end + 1);
@@ -115,9 +115,9 @@ namespace CSHTML5.Internal.Windows.UI.Xaml.Data
 
                 typeName = null;
                 propertyName = null;
-                index = Int32.Parse(path.Substring(1, end - 1));
+                index = path.Substring(1, end - 1);
                 path = path.Substring(end + 1);
-                if (path[0] == '.')
+                if (path.Length > 0 && path[0] == '.')
                     path = path.Substring(1);
             }
             else
@@ -140,7 +140,7 @@ namespace CSHTML5.Internal.Windows.UI.Xaml.Data
                 }
 
                 typeName = null;
-                index = -1;
+                index = null;
             }
             Path = path;
 

@@ -71,11 +71,11 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
                         listOfPopupThatMustBeClosed.Add(root.INTERNAL_LinkedPopup);
                 }
             }
-            
+
             // We determine which popup needs to stay open after this click
             foreach (PopupRoot popupRoot in popupRootList)
             {
-                if(popupRoot.INTERNAL_LinkedPopup != null)
+                if (popupRoot.INTERNAL_LinkedPopup != null)
                 {
                     // We must prevent all the parents of a popup to be closed when:
                     // - this popup is set to StayOpen
@@ -132,7 +132,7 @@ $1.appendChild(popupRoot);
             //--------------------------------------
             // Get the PopupRoot DIV:
             //--------------------------------------
-            
+
             object popupRootDiv;
 
             if (Interop.IsRunningInTheSimulator)
@@ -286,7 +286,7 @@ $1.removeChild(popupRoot);
                     && popupActualHeight > 0)
                 {
                     Point popupPosition = new Point(0, 0);
-                    if(popup.INTERNAL_VisualParent != null)
+                    if (popup.INTERNAL_VisualParent != null)
                     {
                         popupPosition = popup.TransformToVisual(Application.Current.RootVisual).Transform(popupPosition);
                     }

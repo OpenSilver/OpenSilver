@@ -65,27 +65,14 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public Point EndPoint
         {
-            get
-            {
-                Point point;
-                if (GetValue(EndPointProperty) == null)
-                {
-                    point = new Point(1, 1);
-                    SetValue(EndPointProperty, point);
-                }
-                else
-                {
-                    point = (Point)GetValue(EndPointProperty);
-                }
-                return point;
-            }
+            get { return (Point)GetValue(EndPointProperty); }
             set { SetValue(EndPointProperty, value); }
         }
         /// <summary>
         /// Identifies the EndPoint dependency property.
         /// </summary>
         public static readonly DependencyProperty EndPointProperty =
-            DependencyProperty.Register("EndPoint", typeof(Point), typeof(LinearGradientBrush), new PropertyMetadata(null, EndPoint_Changed));
+            DependencyProperty.Register("EndPoint", typeof(Point), typeof(LinearGradientBrush), new PropertyMetadata(new Point(1, 1), EndPoint_Changed));
 
         private static void EndPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -98,27 +85,14 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public Point StartPoint
         {
-            get
-            {
-                Point point;
-                if (GetValue(StartPointProperty) == null)
-                {
-                    point = new Point();
-                    SetValue(StartPointProperty, point);
-                }
-                else
-                {
-                    point = (Point)GetValue(StartPointProperty);
-                }
-                return point;
-            }
+            get { return (Point)GetValue(StartPointProperty); }
             set { SetValue(StartPointProperty, value); }
         }
         /// <summary>
         /// Identifies the StartPoint dependency property.
         /// </summary>
         public static readonly DependencyProperty StartPointProperty =
-            DependencyProperty.Register("StartPoint", typeof(Point), typeof(LinearGradientBrush), new PropertyMetadata(null, StartPoint_Changed));
+            DependencyProperty.Register("StartPoint", typeof(Point), typeof(LinearGradientBrush), new PropertyMetadata(new Point(), StartPoint_Changed));
 
         private static void StartPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -318,7 +292,7 @@ namespace Windows.UI.Xaml.Media
 
                 D = Math.Sqrt(2); //length of the diagonal = sqrt(width ^ 2 + height ^ 2) and we ignore the actual size of the element since we want relative sizes anyway
 
-                if(m > 0)
+                if (m > 0)
                 //if (m != -1)
                 {
                     // now we want the intersection between these lines and the diagonal (which has the equation Y = X since it goes from (0,0) to (1,1))
@@ -426,13 +400,13 @@ namespace Windows.UI.Xaml.Media
             {
 
                 //in IE and FireFox, it uses an angle in the opposite direction of that of the other browsers and 0deg is up while in other browsers it is right (or something like that).
-                if(Convert.ToBoolean(Interop.ExecuteJavaScript("(window.IE_VERSION || window.FIREFOX_VERSION)")))
+                if (Convert.ToBoolean(Interop.ExecuteJavaScript("(window.IE_VERSION || window.FIREFOX_VERSION)")))
                 {
                     angle = 360 - angle + 90;
                 }
-                  
+
             }
-            
+
 
             string gradientType = this.SpreadMethod == GradientSpreadMethod.Repeat ? "repeating-linear-gradient" : "linear-gradient";
             string baseString = gradientType + "(" + ((double)angle).ToString() + "deg, " + gradientStopsString + ")"; //todo: we cast the angle to "int" to avoid issues with the decimal separator that must be "." instead of ",". When the InvariantCulture will be supported, do not cast to int and, instead, use ToString(InvariantCulture).

@@ -211,16 +211,7 @@ namespace Windows.UI.Xaml.Data
 
         internal override void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            string propertyName = e.PropertyName;
-#if BRIDGE
-            if (propertyName == null)
-            {
-                // Workaroung Bridge issue where e.propertyName is set but not e.PropertyName (cf. "CategoryView" in Client_AS in the browser)
-                //todo: find out how to remove this workaround.
-                propertyName = (CSHTML5.Interop.ExecuteJavaScript("e.propertyName") ?? "").ToString();
-            }
-#endif
-            if (propertyName == _propertyName && (PropertyInfo != null || FieldInfo != null))
+            if ((e.PropertyName == _propertyName || string.IsNullOrEmpty(e.PropertyName)) && (PropertyInfo != null || FieldInfo != null))
             {
                 this.UpdateValue();
                 var next = this.Next;

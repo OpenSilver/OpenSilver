@@ -42,11 +42,22 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public sealed class PathSegmentCollection : List<PathSegment>// IList<PathSegment>, IEnumerable<PathSegment>
     {
-        ///// <summary>
-        ///// Initializes a new instance of the PathSegmentCollection class.
-        ///// </summary>
-        //public PathSegmentCollection() { }
+        /// <summary>
+        /// Initializes a new instance of the PathSegmentCollection class.
+        /// </summary>
+        public PathSegmentCollection()
+        {
 
+        }
+
+        /// <summary>
+        /// Initializes a new instance that is empty and has the specified initial capacity.
+        /// </summary>
+        /// <param name="capacity"> int - The number of elements that the new list is initially capable of storing. </param>
+        public PathSegmentCollection(int capacity) : base(capacity)
+        {
+
+        }
 
         internal void SetParentPath(Path path)
         {

@@ -97,7 +97,11 @@ namespace Windows.UI.Xaml.Controls
                 }
                 AddToTabPanel(tabItem);
             }
-            if (SelectedIndex >= 0)
+            if (this.SelectedIndex < 0)
+            {
+                this.SelectedIndex = 0;
+            }
+            else //(SelectedIndex >= 0)
             {
                 UpdateSelectedContent(SelectedContent);
             }

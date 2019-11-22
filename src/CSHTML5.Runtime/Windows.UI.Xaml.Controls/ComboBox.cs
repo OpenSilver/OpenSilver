@@ -245,6 +245,15 @@ namespace Windows.UI.Xaml.Controls
             return comboBoxItem;
         }
 
+        protected override DependencyObject GetContainerFromItem(object item)
+        {
+            ComboBoxItem comboBoxItem = item as ComboBoxItem ?? new ComboBoxItem();
+            comboBoxItem.INTERNAL_CorrespondingItem = item;
+            comboBoxItem.INTERNAL_ParentSelectorControl = this;
+            comboBoxItem.Click += ComboBoxItem_Click;
+            return comboBoxItem;
+        }
+
         void ComboBoxItem_Click(object sender, RoutedEventArgs e)
         {
             var selectedContainer = (SelectorItem)sender;
@@ -571,9 +580,10 @@ namespace Windows.UI.Xaml.Controls
                             comboBox._popup.IsOpen = false;
 
                         // Put the selected item back into the ContentPresenter if it was removed when the ToggleButton was checked:
-                        if (comboBox._contentPresenter != null
-                            && comboBox._contentPresenter.Content == null)
+                        if (comboBox._contentPresenter != null && comboBox._contentPresenter.Content == null)
+                        {
                             comboBox._contentPresenter.Content = comboBox._selectedContent;
+                        }
 
                         // Workaround for the fact that IsHitTestVisible does not propagate properly //todo: fix the propagation (which comes from the ComboBox style), and remove this block of code. Current issue when removing this code: if we click multiple times on the ComboBox (selecting and deselecting items), at one point the item in the ContentPresenter does not inherit "transparency to click", meaning that it is no longer possible to click the underlying ToggleButton when clicking on the item.
                         if (comboBox._contentPresenter != null)
@@ -583,8 +593,7 @@ namespace Windows.UI.Xaml.Controls
                         }
 
                         // Ensure that the toggle button is unchecked:
-                        if (comboBox._dropDownToggle != null
-                            && comboBox._dropDownToggle.IsChecked == true)
+                        if (comboBox._dropDownToggle != null && comboBox._dropDownToggle.IsChecked == true)
                         {
                             comboBox._dropDownToggle.IsChecked = false;
                         }
@@ -621,8 +630,31 @@ namespace Windows.UI.Xaml.Controls
             // The user clicked outside the combo box, so the Popup closed itself. We now need to reflect this on the ComboBox appearance (drop-down toggle...).
             //------------------
 
-            if (_dropDownToggle != null)
-                _dropDownToggle.IsChecked = false; // Note: this has other effects as well: see the "IsDropDownOpen_Changed" method
+            if (this._dropDownToggle != null)
+            {
+#if MIGRATION
+                // See comment below
+                if (this._dropDownToggle.IsMouseCaptured)
+                {
+                    this._dropDownToggle.ReleaseMouseCapture();
+                }
+
+#else
+                // In case the pointer is captured by the toggle button, we need to release it because the Click event would be triggered right after the popup was closed, 
+                // resulting in the popup to reopen right away.
+                // To reproduce the issue that happens if we remove the "if" block of code below: create a ComboBox with items, click the ToggleButton of the ComboBox to
+                // open the drop -down popup, then click it again to close the drop-down. Expected result: the drop-down is closed. Actual result: the popup closes and re-opens.
+                // The issue was due to the fact that, when we clicked on the ToggleButton to close the drop-down, the toggle button became Unchecked due to the
+                // "Popup.ClosedDueToOutsideClick" event (resulting in the popup being successfully closed), but then it reopened because the "PointerReleased" event of the
+                // ToggleButton was raised, which re-checked the unchecked ToggleButton. By releasing the capture, we prevent the "PointerReleased" event of the ToggleButton
+                // to be raised.
+                if (this._dropDownToggle.IsPointerCaptured)
+                {
+                    this._dropDownToggle.ReleasePointerCapture();
+                }
+#endif
+                this._dropDownToggle.IsChecked = false; // Note: this has other effects as well: see the "IsDropDownOpen_Changed" method
+            }
         }
 
         ////
@@ -671,8 +703,5 @@ namespace Windows.UI.Xaml.Controls
         //// Returns:
         ////     An object that provides calculated values for templates.
         //public ComboBoxTemplateSettings TemplateSettings { get; }
-
-
-
     }
 }

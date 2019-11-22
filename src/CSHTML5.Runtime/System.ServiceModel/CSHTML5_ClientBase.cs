@@ -672,7 +672,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 bool doesRequestContainNonEmptyDictionnary = originalRequestObject != null ? (((Dictionary<string, Tuple<Type, object>>)originalRequestObject).Count > 0 ? true : false) : false;
 
                 if ((methodReturnType.Name == methodName + "Response" && methodReturnType.GetField("Body") != null)
-                    || (methodReturnType.Name == "IAsyncResult" && doesRequestContainNonEmptyDictionnary ? ((Dictionary<string, Tuple<Type, object>>)originalRequestObject).ElementAt(0).Value.Item2.GetType().Name == methodName + "Request" : false))
+                    || (methodReturnType.Name == "IAsyncResult" && doesRequestContainNonEmptyDictionnary ? ((Dictionary<string, Tuple<Type, object>>)originalRequestObject).First().Value.Item1.Name == methodName + "Request" : false))
                 {
                     return true;
                 }

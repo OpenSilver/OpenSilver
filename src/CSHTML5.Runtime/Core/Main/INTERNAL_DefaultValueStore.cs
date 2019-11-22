@@ -8,6 +8,7 @@ namespace CSHTML5.Internal
 {
     internal class INTERNAL_DefaultValueStore
     {
+        private readonly Type nullableType;
 
         // Singleton
         internal static readonly INTERNAL_DefaultValueStore Instance;
@@ -19,18 +20,12 @@ namespace CSHTML5.Internal
 
         private INTERNAL_DefaultValueStore()
         {
-            _defaultValuesCache = new Dictionary<Type, object>();
+            DefaultValuesCache = new Dictionary<Type, object>();
+            nullableType = typeof(Nullable<>);
         }
 
-        private Dictionary<Type, object> _defaultValuesCache;
         // Cache for default values.
-        private Dictionary<Type, object> DefaultValuesCache
-        {
-            get
-            {
-                return _defaultValuesCache;
-            }
-        }
+        private Dictionary<Type, object> DefaultValuesCache { get; set; }
 
         private object CreateDefaultValueOfType(Type propertyType)
         {
@@ -45,7 +40,7 @@ namespace CSHTML5.Internal
             return defaultValue;
         }
 
-        private bool ValidateDefaultValue(object value, Type type)
+        internal bool ValidateDefaultValue(object value, Type type)
         {
             if (value == INTERNAL_NoValue.NoValue)
             {
@@ -53,23 +48,23 @@ namespace CSHTML5.Internal
             }
             else
             {
-                //todo: verify value's type is compatible with "type".
+                if (value == null)
+                {
+                    // Null values are invalid for value-types
+                    if (type.IsValueType && !(type.IsGenericType && type.GetGenericTypeDefinition() == nullableType))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    // Non-null default value, ensure its the correct type
+                    if (!type.IsInstanceOfType(value))
+                    {
+                        return false;
+                    }
+                }
                 return true;
-            }
-        }
-
-
-        internal bool EnsureDefaultValueIsValid(object unCheckedDefaultValue, Type defaultValueType, out object defaultValue)
-        {
-            if (ValidateDefaultValue(unCheckedDefaultValue, defaultValueType))
-            {
-                defaultValue = unCheckedDefaultValue;
-                return true;
-            }
-            else
-            {
-                defaultValue = CreateDefaultValueOfType(defaultValueType);
-                return false;
             }
         }
 
