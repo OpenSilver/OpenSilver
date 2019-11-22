@@ -35,11 +35,11 @@ namespace System.Net
     [Serializable]
     public class HttpWebResponse : WebResponse//, ISerializable
     {
-        dynamic _xmlHttpRequest;
+        private dynamic _xmlHttpRequest;
 
         internal HttpWebResponse(object xmlHttpRequest)
         {
-            _xmlHttpRequest = xmlHttpRequest;
+            this._xmlHttpRequest = xmlHttpRequest;
         }
 
         // Exceptions:
@@ -77,20 +77,29 @@ namespace System.Net
         /// Gets the stream that is used to read the body of the response from the server.
         /// </summary>
         /// <returns>A System.IO.Stream containing the body of the response.</returns>
-        public Stream GetResponseStream()//todo: this is supposed to be an override
+        public override Stream GetResponseStream()
         {
-            return null; //todo: fix this
-            //return new MemoryStream(GetResponseAsString((object)_xmlHttpRequest));
+            MemoryStream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.Write(this.GetResponseAsString((object)this._xmlHttpRequest));
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("$xmlHttpRequest.responseText")]
-#else
-        [Bridge.Template("{xmlHttpRequest}.responseText")]
-#endif
+//#if !BRIDGE
+//        [JSIL.Meta.JSReplacement("$xmlHttpRequest.responseText")]
+//#else
+//        [Bridge.Template("{xmlHttpRequest}.responseText")]
+//#endif
         private string GetResponseAsString(object xmlHttpRequest)
         {
-            //do nothing
+            ////do nothing
+            //return null;
+            if(!CSHTML5.Interop.IsRunningInTheSimulator)
+            {
+                return Convert.ToString(CSHTML5.Interop.ExecuteJavaScript(@"$0.responseText", (dynamic)xmlHttpRequest));
+            }
             return null;
         }
 

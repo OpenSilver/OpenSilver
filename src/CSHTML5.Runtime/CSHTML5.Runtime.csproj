@@ -83,6 +83,8 @@
     <Compile Include="System.ComponentModel\IPagedCollectionView.cs" />
     <Compile Include="System.ComponentModel\PageChangingEventArgs.cs" />
     <Compile Include="System.ComponentModel\ReadOnlyAttribute.cs" />
+    <Compile Include="System.Net\WORKINPROGRESS\HttpWebRequest.cs" />
+    <Compile Include="System.Net\WORKINPROGRESS\WebRequest.cs" />
     <Compile Include="System.Resources\ResourceManager.cs" />
     <Compile Include="System.ServiceModel\CommunicationException.cs" />
     <Compile Include="System.Windows.Interactivity\EventTrigger.cs" />
