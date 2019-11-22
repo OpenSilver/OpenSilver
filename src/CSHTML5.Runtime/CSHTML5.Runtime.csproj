@@ -567,6 +567,7 @@
     <Compile Include="Windows.UI.Xaml.Data\FilterEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IDependencyPropertyChangedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IIsAttachedMonitor.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\IndexedPropertyPathNode.cs" />
     <Compile Include="Windows.UI.Xaml.Data\INTERNAL_DataOperations.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IPropertyChangedListener.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IPropertyPathNode.cs" />

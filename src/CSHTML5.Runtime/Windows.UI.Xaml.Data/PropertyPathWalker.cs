@@ -63,7 +63,7 @@ namespace Windows.UI.Xaml.Data
                 var parser = new PropertyPathParser(path);
                 string typeName;
                 string propertyName;
-                int index;
+                string index;
                 //IPropertyPathNode node;
                 while ((type = parser.Step(out typeName, out propertyName, out index)) != PropertyNodeType.None)
                 {
@@ -87,9 +87,9 @@ namespace Windows.UI.Xaml.Data
                             }
                             break;
                         case PropertyNodeType.Indexed:
-                            throw new NotImplementedException("Indexed properties are not supported yet.");
+                            //throw new NotImplementedException("Indexed properties are not supported yet.");
                             //todo: when we will handle the indexed properties, uncomment the following
-                            //node.Next = new IndexedPropertyPathNode(index);
+                            FinalNode.Next = new IndexedPropertyPathNode(index);
                             break;
                         default:
                             break;
