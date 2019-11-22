@@ -146,13 +146,13 @@ namespace Windows.UI.Xaml
             return property;
         }
 
-        private static void EnsureDefaultValue(PropertyMetadata typeMetadata, Type propertyType)
+        private static void EnsureDefaultValue(PropertyMetadata typeMetadata, Type propertyType, string name, Type ownerType)
         {
             if (typeMetadata.IsDefaultValueModified)
             {
                 if (!DefaultValueStore.ValidateDefaultValue(typeMetadata.DefaultValue, propertyType))
                 {
-                    throw new ArgumentException("TypeMetadata default value is incorrect.");
+                    throw new ArgumentException(string.Format("Default value type does not match type of property. To fix this issue, please change the default value of the dependency property named '{0}' in the type '{1}' so that it matches the type of the property.", name, ownerType.ToString()));
                 }
             }
             else
@@ -181,7 +181,7 @@ namespace Windows.UI.Xaml
                 defaultMetadata = new PropertyMetadata();
             }
             // Make sure typeMetadata default value is valid.
-            EnsureDefaultValue(defaultMetadata, propertyType);
+            EnsureDefaultValue(defaultMetadata, propertyType, name, ownerType);
 
             var newDependencyProperty = new DependencyProperty()
             {
@@ -256,7 +256,7 @@ namespace Windows.UI.Xaml
             {
                 if (!DefaultValueStore.ValidateDefaultValue(typeMetadata.DefaultValue, PropertyType))
                 {
-                    throw new ArgumentException("TypeMetadata default value is incorrect.");
+                    throw new ArgumentException(string.Format("Default value type does not match type of property. To fix this issue, please change the default value of the dependency property named '{0}' in the type '{1}' so that it matches the type of the property.", this.Name, this.OwnerType.ToString()));
                 }
             }
             //todo: check that newOnwerType inherit from the base metadata owner type.
