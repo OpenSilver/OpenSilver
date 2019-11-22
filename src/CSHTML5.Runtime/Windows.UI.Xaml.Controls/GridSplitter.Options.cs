@@ -107,7 +107,7 @@ namespace Windows.UI.Xaml.Controls
         public static readonly DependencyProperty GripperCursorProperty =
             DependencyProperty.RegisterAttached(
                 "GripperCursor",
-                typeof(Cursor), //typeof(CoreCursorType?),
+                typeof(GripperCursorType), //typeof(CoreCursorType?),
                 typeof(GridSplitter),
                 new PropertyMetadata(GripperCursorType.Default, OnGripperCursorPropertyChanged));
 
@@ -117,7 +117,7 @@ namespace Windows.UI.Xaml.Controls
         public static readonly DependencyProperty GripperCustomCursorResourceProperty =
             DependencyProperty.RegisterAttached(
                 "GripperCustomCursorResource",
-                typeof(uint),
+                typeof(int),
                 typeof(GridSplitter),
                 new PropertyMetadata(GripperCustomCursorDefaultResource, GripperCustomCursorResourcePropertyChanged));
 
