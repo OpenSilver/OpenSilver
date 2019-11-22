@@ -6,6 +6,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+#if !MIGRATION
+using Windows.Foundation;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -400,7 +403,7 @@ namespace Windows.UI.Xaml.Media
 
             // From original code
             // This is only used in call to Double.Parse
-            this._formatProvider = System.Globalization.CultureInfo.InvariantCulture;
+            this._formatProvider = global::System.Globalization.CultureInfo.InvariantCulture;
 
             this._context = context;
             this._pathString = pathString;
