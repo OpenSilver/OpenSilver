@@ -124,7 +124,8 @@ namespace Windows.UI.Xaml
                         },
                         CallbackMethod = Height_Changed,
                         UIElement = (UIElement)instance,
-                        Name = new List<string> { "height" }
+                        Name = new List<string> { "height" },
+                        ApplyAlsoWhenThereIsAControlTemplate = true
                     };
                 }
             });
@@ -210,7 +211,8 @@ namespace Windows.UI.Xaml
                         },
                         CallbackMethod = Width_Changed,
                         UIElement = (UIElement)instance,
-                        Name = new List<string> { "width" }
+                        Name = new List<string> { "width" },
+                        ApplyAlsoWhenThereIsAControlTemplate = true
                     };
                 }
             });
@@ -1498,12 +1500,12 @@ if ($0.tagName.toLowerCase() != 'span')
 
                 if (!INTERNAL_SizeComparisonHelpers.AreSizesEqual(currentSize, _valueOfLastSizeChanged))
                 {
+                    _valueOfLastSizeChanged = currentSize;
+
                     // Raise the "SizeChanged" event of all the listeners:
                     foreach (var sizeChangedEventHandler in _sizeChangedEventHandlers)
                         sizeChangedEventHandler(this, new SizeChangedEventArgs(currentSize));
                 }
-
-                _valueOfLastSizeChanged = currentSize;
             }
         }
 
