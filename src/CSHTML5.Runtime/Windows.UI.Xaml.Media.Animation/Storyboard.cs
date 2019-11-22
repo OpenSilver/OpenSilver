@@ -362,6 +362,11 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
+        public void Stop()
+        {
+            this.Stop(null);
+        }
+
         //todo: make a Stop method with no arguments that actually stops the Storyboard (at least when the storyboard was started programatically).
         //Note: in WPF, Stop(FrameworkElement parentElement) does NOT stop the Storyboard (at least when it was started through Storyboard.Begin())
 
