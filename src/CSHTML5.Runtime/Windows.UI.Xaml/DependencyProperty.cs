@@ -152,7 +152,17 @@ namespace Windows.UI.Xaml
             {
                 if (!DefaultValueStore.ValidateDefaultValue(typeMetadata.DefaultValue, propertyType))
                 {
-                    throw new ArgumentException(string.Format("Default value type does not match type of property. To fix this issue, please change the default value of the dependency property named '{0}' in the type '{1}' so that it matches the type of the property.", name, ownerType.ToString()));
+                    string message = string.Format("Default value type does not match type of property. To fix this issue, please change the default value of the dependency property named '{0}' in the type '{1}' so that it matches the type of the property.", name, ownerType.ToString());
+                    if (Application.Current.Host.Settings.EnableInvalidPropertyMetadataDefaultValueExceptions)
+                    {
+                        throw new ArgumentException(message);
+                    }
+                    else
+                    {
+                        var defaultValue = DefaultValueStore.CreateDefaultValue(propertyType);
+                        typeMetadata.DefaultValue = defaultValue;
+                        Console.WriteLine(message + Environment.NewLine + string.Format("The default value has been automatically set to '{0}'.", defaultValue));
+                    }
                 }
             }
             else

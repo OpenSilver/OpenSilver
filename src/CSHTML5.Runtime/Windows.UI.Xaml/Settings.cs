@@ -41,6 +41,7 @@ namespace System
             DefaultSoapCredentialsMode = CredentialsMode.Disabled;
             EnableBindingErrorsLogging = false;
             EnableBindingErrorsThrowing = false;
+            EnableInvalidPropertyMetadataDefaultValueExceptions = true;
         }
 
         public CredentialsMode DefaultSoapCredentialsMode { get; set; }
@@ -58,7 +59,6 @@ namespace System
             {
                 _enablePerformanceLogging = value;
                 INTERNAL_VisualTreeManager.EnablePerformanceLogging = value;
-
             }
         }
 
@@ -84,6 +84,8 @@ namespace System
 
             }
         }
+
+        public bool EnableInvalidPropertyMetadataDefaultValueExceptions { get; set; }
 
     }
 }
