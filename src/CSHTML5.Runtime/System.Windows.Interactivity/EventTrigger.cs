@@ -7,7 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 #if MIGRATION
 using System.Windows.Input;
+using Microsoft.Windows;
 #else
+using System.Windows;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Input;
 #endif
@@ -141,6 +143,12 @@ namespace System.Windows.Interactivity
                 else if(eventHandlerType == typeof(RoutedEventHandler))
                 {
                     RoutedEventHandler eventHandler = OnEventImpl; //Note: Bridge doesn't care about the type of the Delegate so we can do this. In the Simulator, it causes an exception on the lines below.
+                    eventInfo.RemoveEventHandler(associatedObject, eventHandler);
+                    eventInfo.AddEventHandler(associatedObject, eventHandler);
+                }
+                else if (eventHandlerType == typeof(DragEventHandler))
+                {
+                    DragEventHandler eventHandler = OnEventImpl; //Note: Bridge doesn't care about the type of the Delegate so we can do this. In the Simulator, it causes an exception on the lines below.
                     eventInfo.RemoveEventHandler(associatedObject, eventHandler);
                     eventInfo.AddEventHandler(associatedObject, eventHandler);
                 }
