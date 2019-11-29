@@ -58,6 +58,19 @@ namespace System.Windows
         }
 
         /// <summary>
+        /// Initializes a new instance of the DragEventArgs class.
+        /// </summary>
+#if MIGRATION
+        internal DragEventArgs(IDataObject data, MouseEventArgs e) //todo: check whether this should be "MouseButtonEventArgs"
+#else
+        internal DragEventArgs(IDataObject data, PointerRoutedEventArgs e)
+#endif
+        {
+            this.Data = data;
+            this.PointerRoutedEventArgs = e;
+        }
+
+        /// <summary>
         /// Gets or sets the target drop-and-drop operation.
         /// </summary>
         public DragDropEffects Effects { get; set; }

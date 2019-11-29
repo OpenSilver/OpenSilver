@@ -374,11 +374,15 @@ namespace Windows.UI.Xaml.Controls
                 this.ReleasePointerCapture(_capturedPointer);
 #endif
                 // Handle the drop:
-                OnDropped();
+                OnDropped(e);
             }
         }
 
-        void OnDropped()
+#if MIGRATION
+        void OnDropped(MouseButtonEventArgs e)
+#else
+        void OnDropped(PointerRoutedEventArgs e)
+#endif
         {
 
             _popup.IsOpen = false;
@@ -424,7 +428,7 @@ namespace Windows.UI.Xaml.Controls
                             dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
 
 #if !(BRIDGE && MIGRATION)
-                            dragDropTargetUnderPointer.ItemDroppedOnSource(dragDropTargetUnderPointer, new DragEventArgs(dataObject));
+                            dragDropTargetUnderPointer.ItemDroppedOnSource(dragDropTargetUnderPointer, new DragEventArgs(dataObject, e));
 #endif
                         }
                     }
@@ -447,7 +451,7 @@ namespace Windows.UI.Xaml.Controls
 
                             // Raise the Drop event:
 #if !(BRIDGE && MIGRATION)
-                            dragDropTargetUnderPointer.Drop(dragDropTargetUnderPointer, new DragEventArgs(dataObject));
+                            dragDropTargetUnderPointer.Drop(dragDropTargetUnderPointer, new DragEventArgs(dataObject, e));
 #endif
                         }
 
@@ -623,10 +627,10 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public event DragEventHandler ItemDroppedOnSource;
 
-        #endregion
+#endregion
 
 
-        #region Private helper methods
+#region Private helper methods
         /// <summary>
         /// This method returns null if no DragDropTarget is under the pointer, else it returns the DragDropTarget under it (the first Parent found)
         /// </summary>
