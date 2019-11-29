@@ -15,10 +15,6 @@
 //
 //===============================================================================
 
-
-
-#if !CSHTML5NETSTANDARD
-
 #if (!FOR_DESIGN_TIME) && CORE
 extern alias ToBeReplacedAtRuntime;
 #endif
@@ -95,7 +91,7 @@ namespace System.ServiceModel
     /// await soapClient.AddOrUpdateToDoAsync(todo);
     /// </code>
     /// </example>
-#if WORKINPROGRESS
+#if WORKINPROGRESS && !CSHTML5BLAZOR
     public abstract class CSHTML5_ClientBase<TChannel> : ICommunicationObject where TChannel : class
 #else
     public abstract class CSHTML5_ClientBase<TChannel> /*: ICommunicationObject, IDisposable*/ where TChannel : class
@@ -308,7 +304,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         break;
                     }
                 }
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
                 if (attribute is ServiceContractAttribute)
                 {
                     contractConfigurationName = ((ServiceContractAttribute)attribute).ConfigurationName;
@@ -487,8 +483,9 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         {
             string _addressOfService;
 
+#if !CSHTML5BLAZOR
             INTERNAL_WebRequestHelper_SimulatorOnly _webRequestHelper = new INTERNAL_WebRequestHelper_SimulatorOnly();
-
+#endif
             INTERNAL_WebRequestHelper_JSOnly _webRequestHelper_JSVersion = new INTERNAL_WebRequestHelper_JSOnly();
 
             /// <summary>
@@ -511,7 +508,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 // Make the actual web service call:
                 if (CSHTML5.Interop.IsRunningInTheSimulator)
                 {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
                     _webRequestHelper_JSVersion.MakeRequest(
 #if WORKINPROGRESS
                         INTERNAL_UriHelper.EnsureAbsoluteUri(_addressOfService)
@@ -584,7 +581,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 var taskCompletionSource = new TaskCompletionSource<T>(); //todo: here we need to change object to the return type
                 if (CSHTML5.Interop.IsRunningInTheSimulator)
                 {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
                     response = _webRequestHelper_JSVersion.MakeRequest(new Uri(_addressOfService), "POST", this, headers, request, (sender, args2) => ReadAndPrepareResponseGeneric_JSVersion(taskCompletionSource, args2, interfaceType, methodReturnType, isXmlSerializerRatherThanDataContractSerializer), true, Application.Current.Host.Settings.DefaultSoapCredentialsMode);
 #else
                     _webRequestHelper.MakeRequestAsync_CSharpVersion(new Uri(_addressOfService), headers, request, (sender, args2) => ReadAndPrepareResponseGeneric(taskCompletionSource, args2, interfaceType, methodReturnType, isXmlSerializerRatherThanDataContractSerializer));
@@ -651,7 +648,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
                 if (CSHTML5.Interop.IsRunningInTheSimulator)
                 {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
                     response = _webRequestHelper_JSVersion.MakeRequest(new Uri(_addressOfService), "POST", this, headers, request, null, false, Application.Current.Host.Settings.DefaultSoapCredentialsMode);
 #else
 
@@ -708,7 +705,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 string interfaceTypeNamespace = "http://tempuri.org/";
                 string soapActionPrefix = string.Empty; // initial value // This is used to determine the SOAPAction header to send to the server, by concatenating the soapActionPrefix and the method name.
 
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
                 foreach (Attribute attribute in interfaceType.GetCustomAttributes(typeof(ServiceContract2Attribute), true))
 #else
                 foreach (Attribute attribute in interfaceType.GetCustomAttributes(true))
@@ -724,11 +721,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         interfaceTypeNamespace = attributeAsDataContractAttribute.Namespace;
                         break;
                     }
-#if !BRIDGE
-                    }
-#endif
+#if !BRIDGE && !CSHTML5BLAZOR
                 }
-#if BRIDGE
+#endif
+            }
+#if BRIDGE || CSHTML5BLAZOR
                 if (string.IsNullOrEmpty(soapActionPrefix))
                 {
                     foreach (Attribute attribute in interfaceType.GetCustomAttributes(typeof(ServiceContractAttribute), true))
@@ -787,8 +784,13 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                             //    }
                             //}
 
+#if CSHTML5BLAZOR
+                            DataContractSerializer_CSHTML5Ver dataContractSerializer = new DataContractSerializer_CSHTML5Ver(requestBodyType, knownTypes, isXmlSerializerRatherThanDataContractSerializer);
+                            XDocument xdoc = dataContractSerializer.SerializeToXDocument(requestBody);
+#else
                             DataContractSerializer dataContractSerializer = new DataContractSerializer(requestBodyType, knownTypes, isXmlSerializerRatherThanDataContractSerializer);
                             XDocument xdoc = dataContractSerializer.SerializeToXDocument(requestBody);
+#endif
 
                             XElement paramNameElement = new XElement(XNamespace.Get(interfaceTypeNamespace).GetName(parameterName));
                             if (!isXmlSerializerRatherThanDataContractSerializer)
@@ -834,8 +836,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     }
                 }
 
+#if CSHTML5NETSTANDARD
+                request += methodNameElement.ToString(SaveOptions.DisableFormatting); //this adds everything we want. "false" means that we do not want the result to be indented.
+#else
                 request += methodNameElement.ToString(false); //this adds everything we want. "false" means that we do not want the result to be indented.
-
+#endif
 
                 //we add the parameters to the method:
                 request += "</s:Body></s:Envelope>";
@@ -1001,19 +1006,25 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
                     //get the known types from the interface type:
                     List<Type> knownTypes = new List<Type>();
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
                     foreach (Attribute attribute in interfaceType.GetCustomAttributes(typeof(ServiceKnownTypeAttribute), true))
 #else
                     foreach (Attribute attribute in interfaceType.GetCustomAttributes(true))
 #endif
                     {
-#if !BRIDGE
+#if !BRIDGE && !CSHTML5BLAZOR
                         if (attribute is ServiceKnownTypeAttribute)
 #endif
                         knownTypes.Add(((ServiceKnownTypeAttribute)attribute).Type);
                     }
+
+#if CSHTML5BLAZOR
+                    DataContractSerializer_CSHTML5Ver deSerializer = new DataContractSerializer_CSHTML5Ver(typeToDeserialize, knownTypes);
+                    XDocument xDoc = XDocument.Parse(responseAsString);
+#else
                     DataContractSerializer deSerializer = new DataContractSerializer(typeToDeserialize, knownTypes); 
                     XDocument xDoc = XDocument.Parse(responseAsString);
+#endif
                     responseAsString = RemoveUnparsableStrings(responseAsString);
                     XElement xElement = xDoc.Root;
 
@@ -1129,8 +1140,8 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         }
 #endif
 
-#if WORKINPROGRESS
-        #region Not Supported Stuff
+#if WORKINPROGRESS && !CSHTML5BLAZOR
+                    #region Not Supported Stuff
 
         //    /// <summary>
         //    /// Gets the underlying System.ServiceModel.ChannelFactory<TChannel> object.
@@ -1228,11 +1239,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         }
 
 
-        #endregion
+                    #endregion
 #endif
 
-#if WORKINPROGRESS
-        #region ICommunicationObject methods
+#if WORKINPROGRESS && !CSHTML5BLAZOR
+                    #region ICommunicationObject methods
 
         CommunicationState ICommunicationObject.State
         {
@@ -1328,9 +1339,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         //{
 
         //}
-        #endregion
+                    #endregion
 #endif
-    }
-}
-
-#endif
+                }
+            }

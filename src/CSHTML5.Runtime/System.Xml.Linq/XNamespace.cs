@@ -14,6 +14,8 @@
 //
 //===============================================================================
 
+#if !CSHTML5NETSTANDARD
+// already defined in .NET Standard
 namespace System.Xml.Linq
 {
     /// <summary>
@@ -200,3 +202,4 @@ namespace System.Xml.Linq
         #endregion
     }
 }
+#endif

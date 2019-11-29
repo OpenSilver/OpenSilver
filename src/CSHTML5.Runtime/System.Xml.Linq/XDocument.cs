@@ -31,6 +31,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
+#if !CSHTML5NETSTANDARD
+// already defined in .NET Standard
 namespace System.Xml.Linq
 {
     /// <summary>
@@ -473,3 +475,4 @@ $0.parseFromString($1, ""application/xml"")
 #endregion
     }
 }
+#endif

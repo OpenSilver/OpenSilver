@@ -17,7 +17,7 @@
 
 
 
-#if WCF_STACK || BRIDGE
+#if WCF_STACK || BRIDGE || CSHTML5BLAZOR
 
 using System;
 using System.Collections.Generic;
@@ -33,7 +33,7 @@ namespace System.ServiceModel
     /// by client applications.
     /// </summary>
     public interface IClientChannel : IDisposable
-#if WORKINPROGRESS
+#if WORKINPROGRESS && !CSHTML5BLAZOR
         , IChannel
 #endif
 #if UNIMPLEMENTED_MEMBERS

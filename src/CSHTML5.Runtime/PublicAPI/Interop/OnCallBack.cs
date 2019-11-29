@@ -108,12 +108,24 @@ namespace CSHTML5.Internal
                 //----------------------------------
                 // Get the C# callback from its ID:
                 //----------------------------------
-//#if CSHTML5NETSTANDARD
-//                Console.WriteLine("CallbackID: " + callbackId.ToString());
-//                Console.WriteLine("idWhereCallbackArgsAreStored: " + idWhereCallbackArgsAreStored.ToString());
-//                Console.WriteLine("Dictionary.Count: " + _dictionary.Count.ToString());
-//#endif
                 Delegate callback = _dictionary[callbackId];
+//#if CSHTML5NETSTANDARD
+//                try
+//                {
+//                    Console.WriteLine(
+//                        "CallbackID: " + callbackId.ToString() + "\n" +
+//                        "Callback Method Name: " + callback.Method.Name + "\n" +
+//                        "Callback Method Body: " + callback.Method.GetMethodBody().ToString() + "\n" +
+//                        "Callback Target: " + callback.Target.ToString() + "\n" +
+//                        "idWhereCallbackArgsAreStored: " + idWhereCallbackArgsAreStored.ToString() + "\n" +
+//                        "Dictionary.Count: " + _dictionary.Count.ToString());
+//                }
+//                catch (Exception e)
+//                {
+
+//                }
+//#endif
+
                 Type callbackType = callback.GetType();
                 Type[] callbackGenericArgs = null;
                 if (callbackType.IsGenericType)
@@ -181,7 +193,7 @@ namespace CSHTML5.Internal
                     //    DelegateDynamicInvoke(callback);
                     //}
                 }
-                catch(global::System.Reflection.TargetInvocationException ex)
+                catch (global::System.Reflection.TargetInvocationException ex)
                 {
 #if CSHTML5NETSTANDARD
                     throw;

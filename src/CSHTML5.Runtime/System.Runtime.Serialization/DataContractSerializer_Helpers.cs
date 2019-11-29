@@ -752,7 +752,7 @@ namespace System.Runtime.Serialization
 
         internal static string GetTypeNameSafeForSerialization(Type type)
         {
-#if !BRIDGE
+#if !BRIDGE && !CSHTML5NETSTANDARD
             bool isRunningUnderJSIL = !CSHTML5.Interop.IsRunningInTheSimulator; //todowasm: fix this when running in WebAssembly
 #else
             bool isRunningUnderJSIL = false;

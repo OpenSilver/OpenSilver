@@ -113,7 +113,7 @@ namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is cal
             }
             else
             {
-#if WORKINPROGRESS
+#if WORKINPROGRESS && !CSHTML5NETSTANDARD
                 if (Interop.IsRunningInTheSimulator) // this is usefull if we need to call a static constructor of a type that is defined outside of core assembly, so that it registers the type's converter.
                 {
                     INTERNAL_Simulator.SimulatorProxy.RunClassConstructor(type);

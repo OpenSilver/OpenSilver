@@ -34,12 +34,12 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
-#if MIGRATION
-using System.Windows;
-#else
 #if CSHTML5NETSTANDARD
 using System.Text.Json;
 #endif
+#if MIGRATION
+using System.Windows;
+#else
 using Windows.UI.Xaml;
 #endif
 

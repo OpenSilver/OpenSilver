@@ -17,6 +17,8 @@
 
 
 
+//already defined in .NET Standard
+#if !CSHTML5NETSTANDARD
 namespace System.Xml.Linq
 {
     /// <summary>
@@ -26,3 +28,4 @@ namespace System.Xml.Linq
     {
     }
 }
+#endif
