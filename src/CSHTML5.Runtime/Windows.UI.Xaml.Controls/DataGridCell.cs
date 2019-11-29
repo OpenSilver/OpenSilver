@@ -60,7 +60,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.DataGridCell.Column dependency property.
         /// </summary>
         public static readonly DependencyProperty ColumnProperty =
-            DependencyProperty.Register("Column", typeof(DataGridColumn), typeof(DataGridCell), new PropertyMetadata(false));
+            DependencyProperty.Register("Column", typeof(DataGridColumn), typeof(DataGridCell), new PropertyMetadata(null));
 
         /// <summary>
         /// Gets or sets a value that indicates whether the cell is in edit mode.
