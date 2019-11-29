@@ -67,7 +67,11 @@ namespace System.Windows
 #endif
         {
             this.Data = data;
+#if MIGRATION
+            this.MouseEventArgs = e;
+#else
             this.PointerRoutedEventArgs = e;
+#endif
         }
 
         /// <summary>
