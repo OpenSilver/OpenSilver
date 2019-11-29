@@ -82,7 +82,6 @@ namespace Windows.UI.Xaml.Controls
             UpdateVisualStates();
         }
 
-
         //-----------------------
         // BACKGROUND
         //-----------------------
@@ -210,6 +209,14 @@ namespace Windows.UI.Xaml.Controls
             control.OnBackgroundPropertyChanged(e.NewValue as Brush);
         }
 #endif
+
+        internal bool INTERNAL_IsLegacyVisualStates
+        {
+            get
+            {
+                return this.INTERNAL_GetVisualStateGroups().ContainsVisualState(VisualStates.StateMouseOver);
+            }
+        }
 
         //-----------------------
         // BORDERBRUSH
@@ -1183,7 +1190,6 @@ namespace Windows.UI.Xaml.Controls
             get { return (FontStretch)GetValue(FontStretchProperty); }
             set { SetValue(FontStretchProperty, value); }
         }
-
         #endregion
 #endif
     }
