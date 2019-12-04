@@ -236,22 +236,22 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        internal void ManageChildrenChanged(UIElementCollection oldChildren, UIElementCollection newChildren)
+        internal override void ManageChildrenChanged(UIElementCollection oldChildren, UIElementCollection newChildren)
         {
             if (oldChildren != null)
             {
                 foreach (UIElement oldChild in oldChildren)
                 {
-                    _grid.Children.Remove(oldChild);
+                    this._grid.Children.Remove(oldChild);
                 }
             }
-            MakeUIStructure();
+            this.MakeUIStructure();
 
             if (newChildren != null)
             {
                 foreach (UIElement newChild in newChildren)
                 {
-                    _grid.Children.Add(newChild);
+                    this._grid.Children.Add(newChild);
                 }
             }
         }

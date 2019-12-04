@@ -56,10 +56,19 @@ namespace Windows.UI.Xaml.Controls
 
         UIElementCollection _children;
 
-        [Obsolete]
-        public bool INTERNAL_EnableProgressiveLoading; // Obsolete, now replaced with "EnableProgressiveRendering"
+        [Obsolete("Replaced by 'EnableProgressiveRendering'")]
+        public bool INTERNAL_EnableProgressiveLoading
+        {
+            get { return this.EnableProgressiveRendering; }
+            set { this.EnableProgressiveRendering = value; }
+        }
 
-        public bool EnableProgressiveRendering;
+        private bool _enableProgressiveRendering;
+        public bool EnableProgressiveRendering
+        {
+            get { return this._enableProgressiveRendering || INTERNAL_ApplicationWideEnableProgressiveRendering; }
+            set { this._enableProgressiveRendering = value; }
+        }
         internal static bool INTERNAL_ApplicationWideEnableProgressiveRendering;
 
         void Children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -95,7 +104,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 
             //we put "this" below because the sender is directly the colection and we need to have an access to the control
-            ManageChildrenChanged(this, oldItems, newItems);
+            this.ManageChildrenChanged(oldItems, newItems);
         }
 
         /// <summary>
@@ -162,7 +171,7 @@ namespace Windows.UI.Xaml.Controls
                 _children.CollectionChanged += Children_CollectionChanged;
             }
 
-            ManageChildrenChanged(this, _children, _children);
+            this.ManageChildrenChanged(this._children, this._children);
         }
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
@@ -171,87 +180,44 @@ namespace Windows.UI.Xaml.Controls
                 _children.CollectionChanged -= Children_CollectionChanged;
         }
 
-        static void ManageChildrenChanged(DependencyObject d, UIElementCollection oldChildren, UIElementCollection newChildren)
+        internal virtual void ManageChildrenChanged(UIElementCollection oldChildren, UIElementCollection newChildren)
         {
-#if PERFSTAT
-            var t1 = Performance.now();
-#endif
-
-            Panel parent = (Panel)d;
-            if (parent is DockPanel)
+            if (oldChildren != null)
             {
-                ((DockPanel)parent).ManageChildrenChanged(oldChildren, newChildren);
-            }
-            else
-            {
-                bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-                if (!isCSSGrid && parent is Grid)
+                // Detach old children only if they are not in the "newChildren" collection:
+                foreach (UIElement child in oldChildren) //note: there is no setter for Children so the user cannot change the order of the elements in one step --> we cannot have the same children in another order (which would keep the former order with the way it is handled now) --> no problem here
                 {
-                    ((Grid)parent).ManageChildrenChanged(oldChildren, newChildren);
-                }
-                else
-                {
-                    if (oldChildren != null)
-                    {
-                        //// Put the list in a HashSet for performant lookup:
-                        //HashSet<UIElement> newChidrenHashSet = new HashSet<UIElement>();
-                        //if (newChildren != null)
-                        //{
-                        //    foreach (UIElement child in newChildren)
-                        //        newChidrenHashSet.Add(child);
-                        //}
-                        //// Detach old children only if they are not in the "newChildren" collection:
-                        //foreach (UIElement child in oldChildren)
-                        //{
-                        //    if (newChildren == null || !newChidrenHashSet.Contains(child)) //todo: verify that in the produced JavaScript, "newChidrenHashSet.Contains" has still a O(1) complexity.
-                        //    {
-                        //        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, parent);
-                        //    }
-                        //}
-
-                        //todo: use HashSet version.
-
-                        // Detach old children only if they are not in the "newChildren" collection:
-                        foreach (UIElement child in oldChildren) //note: there is no setter for Children so the user cannot change the order of the elements in one step --> we cannot have the same children in another order (which would keep the former order with the way it is handled now) --> no problem here
-                        {
 #if PERFSTAT
                     var t2 = Performance.now();
 #endif
-                            if (newChildren == null || !newChildren.Contains(child))
-                            {
+                    if (newChildren == null || !newChildren.Contains(child))
+                    {
 #if PERFSTAT
                         Performance.Counter("Panel.ManageChildrenChanged 'Contains'", t2);
 #endif
-                                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, parent);
-                            }
-                            else
-                            {
+                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, this);
+                    }
+                    else
+                    {
 #if PERFSTAT
                         Performance.Counter("Panel.ManageChildrenChanged 'Contains'", t2);
 #endif
-                            }
-                        }
                     }
-                    if (newChildren != null)
-                    {
-                        // Note: we attach all the children (regardless of whether they are in the oldChildren collection or not) to make it work when the item is first added to the Visual Tree (at that moment, all the properties are refreshed by calling their "Changed" method).
+                }
+            }
+            if (newChildren != null)
+            {
+                // Note: we attach all the children (regardless of whether they are in the oldChildren collection or not) to make it work when the item is first added to the Visual Tree (at that moment, all the properties are refreshed by calling their "Changed" method).
 
-                        if (parent.EnableProgressiveRendering || parent.INTERNAL_EnableProgressiveLoading || INTERNAL_ApplicationWideEnableProgressiveRendering)
-                        {
-                            parent.ProgressivelyAttachChildren(newChildren);
-                        }
-                        else
-                        {
-                            foreach (UIElement child in newChildren)
-                            {
-                                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, parent);
-                            }
-                        }
-                    }
-
-                    if (parent is Grid)
+                if (this.EnableProgressiveRendering)
+                {
+                    this.ProgressivelyAttachChildren(newChildren);
+                }
+                else
+                {
+                    foreach (UIElement child in newChildren)
                     {
-                        ((Grid)parent).LocallyManageChildrenChanged();
+                        INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
                     }
                 }
             }

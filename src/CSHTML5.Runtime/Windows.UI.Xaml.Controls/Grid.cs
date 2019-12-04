@@ -752,47 +752,28 @@ namespace Windows.UI.Xaml.Controls
 #endif
         }
 
-        internal void ManageChildrenChanged(UIElementCollection oldChildren, UIElementCollection newChildren)
+        internal override void ManageChildrenChanged(UIElementCollection oldChildren, UIElementCollection newChildren)
         {
             //todo: remove this method? I'm not sure that it's called anymore
-            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-            if (!isCSSGrid)
+            if (!Grid_InternalHelpers.isCSSGridSupported())
             {
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 {
 #if PERFSTAT
-            var t1 = Performance.now();
+                    var t1 = Performance.now();
 #endif
                     if (oldChildren != null)
                     {
-                        //// Put the list in a HashSet for performant lookup:
-                        //HashSet<UIElement> newChidrenHashSet = new HashSet<UIElement>();
-                        //if (newChildren != null)
-                        //{
-                        //    foreach (UIElement child in newChildren)
-                        //        newChidrenHashSet.Add(child);
-                        //}
-                        //// Detach old children only if they are not in the "newChildren" collection:
-                        //foreach (UIElement child in oldChildren)
-                        //{
-                        //    if (newChildren == null || !newChidrenHashSet.Contains(child)) //todo: verify that in the produced JavaScript, "newChidrenHashSet.Contains" has still a O(1) complexity.
-                        //    {
-                        //        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, parent);
-                        //    }
-                        //}
-
-                        //todo: use HashSet version.
-
                         // Detach old children only if they are not in the "newChildren" collection:
                         foreach (UIElement child in oldChildren) //note: there is no setter for Children so the user cannot change the order of the elements in one step --> we cannot have the same children in another order (which would keep the former order with the way it is handled now) --> no problem here
                         {
 #if PERFSTAT
-                    var t2 = Performance.now();
+                            var t2 = Performance.now();
 #endif
                             if (newChildren == null || !newChildren.Contains(child))
                             {
 #if PERFSTAT
-                        Performance.Counter("Grid.ManageChildrenChanged 'Contains'", t2);
+                                Performance.Counter("Grid.ManageChildrenChanged 'Contains'", t2);
 #endif
                                 UpdateStructureWhenRemovingChild(child);
                                 INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, this);
@@ -800,7 +781,7 @@ namespace Windows.UI.Xaml.Controls
                             else
                             {
 #if PERFSTAT
-                        Performance.Counter("Grid.ManageChildrenChanged 'Contains'", t2);
+                                Performance.Counter("Grid.ManageChildrenChanged 'Contains'", t2);
 #endif
                             }
                         }
@@ -814,10 +795,13 @@ namespace Windows.UI.Xaml.Controls
                             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
                         }
                     }
-
-
-                    LocallyManageChildrenChanged();
+                    this.LocallyManageChildrenChanged();
                 }
+            }
+            else
+            {
+                base.ManageChildrenChanged(oldChildren, newChildren);
+                this.LocallyManageChildrenChanged();
             }
         }
 
