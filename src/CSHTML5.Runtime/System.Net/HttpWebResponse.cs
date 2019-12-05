@@ -87,11 +87,13 @@ namespace System.Net
             return stream;
         }
 
-//#if !BRIDGE
-//        [JSIL.Meta.JSReplacement("$xmlHttpRequest.responseText")]
-//#else
-//        [Bridge.Template("{xmlHttpRequest}.responseText")]
-//#endif
+#if !BRIDGE && !NETSTANDARD // This is the JSIL version, which doesn't have access to the "CSHTML5.Interop" class because we are in the project "DotNetForHtml5.System.dll".
+        [JSIL.Meta.JSReplacement("$xmlHttpRequest.responseText")]
+        private string GetResponseAsString(object xmlHttpRequest)
+        {
+            return null; // Simulator
+        }
+#else
         private string GetResponseAsString(object xmlHttpRequest)
         {
             ////do nothing
@@ -102,6 +104,8 @@ namespace System.Net
             }
             return null;
         }
+#endif
+
 
 
 

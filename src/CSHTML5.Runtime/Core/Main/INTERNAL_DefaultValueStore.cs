@@ -59,7 +59,11 @@ namespace CSHTML5.Internal
                 else
                 {
                     // Non-null default value, ensure its the correct type
+#if !BRIDGE && !NETSTANDARD // This is the JSIL version
+                    if (!value.GetType().IsAssignableFrom(type))
+#else
                     if (!type.IsInstanceOfType(value))
+#endif
                     {
                         return false;
                     }
