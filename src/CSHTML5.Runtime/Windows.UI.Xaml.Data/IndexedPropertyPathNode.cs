@@ -51,7 +51,7 @@ namespace Windows.UI.Xaml.Data
         {
             try
             {
-                _setMethod.Invoke(this.Source, index, value);
+                _setMethod.Invoke(this.Source, new object[] { index, value });
                 return true;
             }
             catch
@@ -91,7 +91,7 @@ namespace Windows.UI.Xaml.Data
         {
             try
             {
-                result = _getMethod.Invoke(this.Source, index);
+                result = _getMethod.Invoke(this.Source, new object[] { index });
                 return true;
             }
             catch
