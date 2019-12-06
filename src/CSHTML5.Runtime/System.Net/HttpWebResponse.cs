@@ -35,7 +35,7 @@ namespace System.Net
     [Serializable]
     public class HttpWebResponse : WebResponse//, ISerializable
     {
-        private dynamic _xmlHttpRequest;
+        private object _xmlHttpRequest;
 
         internal HttpWebResponse(object xmlHttpRequest)
         {
@@ -49,21 +49,15 @@ namespace System.Net
         /// Gets the status of the response.
         /// </summary>
         /// 
-#if !BRIDGE
+#if !BRIDGE && !NETSTANDARD // This is the JSIL version, which doesn't have access to the "CSHTML5.Interop" class because we are in the project "DotNetForHtml5.System.dll".
         [JSIL.Meta.JSReplacement("$xmlHttpRequest.status")]
         public virtual HttpStatusCode StatusCode { get { throw new NotImplementedException(); } } //todo: maybe implement this in another way?
         
 #else
-
-        // In Bridge.Meta the following code: [Bridge.Template("return {xmlHttpRequest}.status")] 
-        // cause to generate: "function () { return this.return xmlHttpRequest.status; }"
-        // to avoid this double return we use Script to generate a sub-function instead of inline code.
-        // BRIDGE TODO: find how Bridge.Script can translate variables because {xmlHttpRequest} is translated as "{xmlHttpRequest}" and not as "this._xmlHttpRequest" like when we use Template.
-        // BRIDGE TODO: verify if [Bridge.Template("{xmlHttpRequest}.status")] will still working in all case (but probably not). 
-        [Bridge.Script("return this._xmlHttpRequest.status")]
         public virtual HttpStatusCode StatusCode()
         {
-            return HttpStatusCode.Forbidden;
+            int statusCode = Convert.ToInt32(CSHTML5.Interop.ExecuteJavaScript("$0.status", _xmlHttpRequest));
+            return (HttpStatusCode)statusCode;
         }
 #endif
 
@@ -96,13 +90,7 @@ namespace System.Net
 #else
         private string GetResponseAsString(object xmlHttpRequest)
         {
-            ////do nothing
-            //return null;
-            if(!CSHTML5.Interop.IsRunningInTheSimulator)
-            {
-                return Convert.ToString(CSHTML5.Interop.ExecuteJavaScript(@"$0.responseText", (dynamic)xmlHttpRequest));
-            }
-            return null;
+            return Convert.ToString(CSHTML5.Interop.ExecuteJavaScript(@"$0.responseText", xmlHttpRequest));
         }
 #endif
 
