@@ -99,7 +99,7 @@ namespace System.Windows.Browser
 #if !BRIDGE
         [JSReplacement("eval($code)")]
 #else
-        [Template("eval({code})")]
+        [Bridge.Script("eval(code)")]
 #endif
         public object Eval(string code)
         {

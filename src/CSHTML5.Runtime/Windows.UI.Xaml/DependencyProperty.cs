@@ -148,6 +148,7 @@ namespace Windows.UI.Xaml
 
         private static void EnsureDefaultValue(PropertyMetadata typeMetadata, Type propertyType, string name, Type ownerType)
         {
+#if BRIDGE || NETSTANDARD // We exclude the following code in the JSIL version, because of issues in JSIL comparing "1.0" and "System.Double" (it says that they are not the same type when running in the browser)
             if (typeMetadata.IsDefaultValueModified)
             {
                 if (!DefaultValueStore.ValidateDefaultValue(typeMetadata.DefaultValue, propertyType))
@@ -169,6 +170,7 @@ namespace Windows.UI.Xaml
             {
                 typeMetadata.DefaultValue = DefaultValueStore.CreateDefaultValue(propertyType);
             }
+#endif
         }
 
         /// <summary>
