@@ -233,7 +233,18 @@ namespace CSHTML5.Internal
                 + "//---- END INTEROP (" + reasonForPerformingTheCallNow + ") ----";
             try
             {
-                return INTERNAL_Simulator.JavaScriptExecutionHandler.ExecuteJavaScriptWithResult(javaScriptToExecute);
+#if CSHTML5BLAZOR
+                // OpenSilver Version has two distincts JavaScriptExecutionHandler:
+                // - DynamicJavaScriptExecutionHandler is a dynamic typed JavaScriptExecutionHandler setted by the Emulator  
+                // - JavaScriptExecutionHandler        is a static typed JavaScriptExecutionHandler used in the browser version
+                if (Interop.IsRunningInTheSimulator_WorkAround) // this is the JavaScriptHandler injected by the Emulator
+                    return INTERNAL_Simulator.DynamicJavaScriptExecutionHandler.ExecuteJavaScriptWithResult(javaScriptToExecute);
+                else
+                    return INTERNAL_Simulator.JavaScriptExecutionHandler.ExecuteJavaScriptWithResult(javaScriptToExecute);
+
+#else
+                return ((dynamic)INTERNAL_Simulator.JavaScriptExecutionHandler).ExecuteJavaScriptWithResult(javaScriptToExecute);
+#endif
             }
             catch (InvalidOperationException ex)
             {

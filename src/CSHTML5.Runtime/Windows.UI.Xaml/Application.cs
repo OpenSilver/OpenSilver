@@ -70,6 +70,10 @@ namespace Windows.UI.Xaml
 
         public Application()
         {
+#if CSHTML5BLAZOR
+            // we change the resource manager for every resource registered
+            ClientSideResourceRegister.Startup();
+#endif
             // Keep a reference to the startup assembly:
             StartupAssemblyInfo.StartupAssembly = this.GetType().Assembly;
 
@@ -143,7 +147,7 @@ namespace Windows.UI.Xaml
             }));
         }
 
-        #region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
+#region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
 
 #if !CSHTML5NETSTANDARD
         DispatcherTimer _timerForWorkaroundFireFoxIssue = new DispatcherTimer();
@@ -181,7 +185,7 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Injects the "DataContractSerializer" into the "XmlSerializer" (read note in the "XmlSerializer" implementation to understand why).
@@ -444,7 +448,7 @@ namespace Windows.UI.Xaml
         }
 
 
-        #region Exit event
+#region Exit event
 
         INTERNAL_EventManager<EventHandler, EventArgs> _ExitEventManager;
         INTERNAL_EventManager<EventHandler, EventArgs> ExitEventManager
@@ -496,10 +500,10 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
 #if WORKINPROGRESS
-        #region UnhandledException event (Not supported yet)
+#region UnhandledException event (Not supported yet)
 
         /// <summary>
         /// Occurs when an exception that is raised is not handled.
@@ -515,7 +519,7 @@ namespace Windows.UI.Xaml
         //#endif
         //        }
 
-        #endregion
+#endregion
 #endif
 
         static Host _host;

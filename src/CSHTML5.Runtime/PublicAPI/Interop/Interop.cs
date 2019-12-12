@@ -271,9 +271,16 @@ namespace CSHTML5
                 return frameworkElement.INTERNAL_OuterDomElement;
         }
 
+#if CSHTML5BLAZOR
+        /// <summary>
+        /// Returns True is the app is running in C#, and False otherwise. 
+        /// To know if you're in the simulator use IsRunningInTheSimulator_WorkAround.
+        /// </summary>
+#else
         /// <summary>
         /// Returns True is the app is running in C# inside the Simulator, and False otherwise.
         /// </summary>
+#endif
         public static bool IsRunningInTheSimulator
         {
             get
@@ -281,6 +288,20 @@ namespace CSHTML5
                 return INTERNAL_InteropImplementation.IsRunningInTheSimulator();
             }
         }
+
+#if CSHTML5BLAZOR
+        /// <summary>
+        /// Returns True is the app is running inside the Simulator, and False otherwise.
+        /// </summary>
+        public static bool IsRunningInTheSimulator_WorkAround
+        {
+            get
+            {
+                return INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround();
+            }
+        }
+#endif
+
 
         /// <summary>
         /// Check if the given jsnode is undefined
