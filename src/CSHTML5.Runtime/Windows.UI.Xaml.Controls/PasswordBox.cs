@@ -55,14 +55,14 @@ namespace Windows.UI.Xaml.Controls
         object _passwordInputField; //todo: use this
 
         private string[] TextAreaContainerNames = { "ContentElement", "PART_ContentHost" };
-        
+
 
 
         public PasswordBox()
         {
             UseSystemFocusVisuals = true;
         }
-        
+
         // Returns:
         //     An integer that specifies the maximum number of characters for passwords
         //     to be handled by this PasswordBox. A value of zero (0) means no limit. The
@@ -91,7 +91,7 @@ namespace Windows.UI.Xaml.Controls
 
 
 
-        
+
         /// <summary>
         /// Gets or sets the password currently held by the PasswordBox.
         /// </summary>
@@ -147,7 +147,7 @@ namespace Windows.UI.Xaml.Controls
                 //we get the value:
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 {
-                    string text = (string)CSHTML5.Interop.ExecuteJavaScript("$0['value'] || ''", this.INTERNAL_OuterDomElement);
+                    string text = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0['value'].toString() || ''", this.INTERNAL_InnerDomElement));
                     _isUserChangingPassword = true; //To prevent reentrance (infinite loop) when user types some text.
                     //Text = text;
                     SetLocalValue(PasswordProperty, text); //we call SetLocalvalue directly to avoid replacing the BindingExpression
