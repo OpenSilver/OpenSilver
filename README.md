@@ -25,7 +25,7 @@ CSHTML5 version 2.x is powered by [Bridge.NET](https://bridge.net/)
 ### How to test the changes that I make to the source code?
 1. Create a new Visual Studio project of type CSHTML5 version 2.x. To do so, you can install the VSIX available at http://forums.cshtml5.com/viewforum.php?f=6 (look for the latest version 2.x), which will add new project templates to the Visual Studio "New Project" dialog.
 2. Build the CSHTML5 source code (cf. previous question)
-3. Copy the file "CSHTML5.dll" from the "bin/Debug/" folder of the CSHTML5 source code (ie. the source code in this repository) into the "packages/CSHTML5(...)/lib/net40/" folder of the project that you created at step 1, overwriting the existing file
+3. Copy the 3 files "CSHTML5.dll", "CSHTML5.pdb", and "CSHTML5.xml" from the "bin/Debug/" folder of the CSHTML5 source code (ie. the source code in this repository) into the folder "packages/CSHTML5(...)/lib/net40/" of the project that you created at step 1, overwriting the existing files
 4. Build and run the project that you created at step 1
 
 ### Where is the rest of the source code?
