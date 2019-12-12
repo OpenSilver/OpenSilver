@@ -85,6 +85,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 string end = splittedPath[splittedPath.Length - 1];
                 string[] splittedEnd = end.Split('.'); //with the example above: --> ["Canvas", "Left)"]
                 string parentTypeString = end.Substring(0, end.Length - splittedEnd[splittedEnd.Length - 1].Length - 1); // -1 to remove the dot that wasn't counted due to the split.
+                parentTypeString = parentTypeString.StartsWith("global::") ? parentTypeString.Substring(8) : parentTypeString;
                 int i = 0;
                 //todo: find a way to handle user defined types
                 //todo: find a better way to do the following
@@ -101,12 +102,7 @@ namespace Windows.UI.Xaml.Media.Animation
             FieldInfo dependencyPropertyField = dependencyPropertyContainerType.GetField(propertyPath.INTERNAL_DependencyPropertyName + "Property");
 
             // - Get the DependencyProperty (since Bridge, the GetValue parameter must be null because DependencyProperties are always static)
-#if MIGRATION
-            DependencyProperty dp = (global::System.Windows.DependencyProperty)dependencyPropertyField.GetValue(null);
-#else
-            DependencyProperty dp = (global::Windows.UI.Xaml.DependencyProperty)dependencyPropertyField.GetValue(null);
-#endif
-
+            DependencyProperty dp = (DependencyProperty)dependencyPropertyField.GetValue(null);
             return dp;
         }
 
@@ -401,11 +397,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 Type dependencyPropertyContainerType = propertyInfo.DeclaringType;
                 FieldInfo dependencyPropertyField = dependencyPropertyContainerType.GetField(propertyPath.INTERNAL_DependencyPropertyName + "Property");
                 // - Get the DependencyProperty
-#if MIGRATION
-                DependencyProperty dp = (global::System.Windows.DependencyProperty)dependencyPropertyField.GetValue(null);
-#else
-                DependencyProperty dp = (global::Windows.UI.Xaml.DependencyProperty)dependencyPropertyField.GetValue(null);
-#endif
+                DependencyProperty dp = (DependencyProperty)dependencyPropertyField.GetValue(null);
                 // - Get the propertyMetadata from the property
                 PropertyMetadata propertyMetadata = dp.GetTypeMetaData(target.GetType());
                 // - Get the cssPropertyName from the PropertyMetadata
