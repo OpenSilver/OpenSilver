@@ -426,7 +426,21 @@ namespace Windows.UI.Xaml.Controls
                         {
                             if (value != null)
                             {
-                                return INTERNAL_FontsHelper.LoadFont(((FontFamily)value).Source, (UIElement)instance);
+                                if (value is FontFamily)
+                                {
+                                    return INTERNAL_FontsHelper.LoadFont(((FontFamily)value).Source, (UIElement)instance);
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        return INTERNAL_FontsHelper.LoadFont(value.ToString(), (UIElement)instance);
+                                    }
+                                    catch
+                                    {
+                                        return "";
+                                    }
+                                }
                             }
                             else
                             {
