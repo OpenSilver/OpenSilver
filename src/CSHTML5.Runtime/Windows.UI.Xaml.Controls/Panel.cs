@@ -237,6 +237,63 @@ namespace Windows.UI.Xaml.Controls
         {
         }
 
+
+        /// <summary>
+        /// Retrieves the named element in the instantiated ControlTemplate visual tree.
+        /// </summary>
+        /// <param name="childName">The name of the element to find.</param>
+        /// <returns>
+        /// The named element from the template, if the element is found. Can return
+        /// null if no element with name childName was found in the template.
+        /// </returns>
+        protected internal DependencyObject GetTemplateChild(string childName)
+        {
+            return (DependencyObject)this.TryFindTemplateChildFromName(childName);
+        }
+        #region ---------- INameScope implementation ----------
+        //note: copy from UserControl
+        Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
+
+        /// <summary>
+        /// Finds the UIElement with the specified name. Returns null if not found.
+        /// </summary>
+        /// <param name="name">The name to look for.</param>
+        /// <returns>The object with the specified name if any; otherwise null.</returns>
+        private object TryFindTemplateChildFromName(string name)
+        {
+            //todo: see if this fits to the behaviour it should have.
+            if (_nameScopeDictionary.ContainsKey(name))
+                return _nameScopeDictionary[name];
+            else
+                return null;
+        }
+
+        public void RegisterName(string name, object scopedElement)
+        {
+            if (_nameScopeDictionary.ContainsKey(name) && _nameScopeDictionary[name] != scopedElement)
+                throw new ArgumentException(string.Format("Cannot register duplicate name '{0}' in this scope.", name));
+
+            _nameScopeDictionary[name] = scopedElement;
+        }
+
+        public void UnregisterName(string name)
+        {
+            if (!_nameScopeDictionary.ContainsKey(name))
+                throw new ArgumentException(string.Format("Name '{0}' was not found.", name));
+
+            _nameScopeDictionary.Remove(name);
+        }
+
+        void ClearRegisteredNames()
+        {
+            _nameScopeDictionary.Clear();
+        }
+
+
+        #endregion
+
+
+
         //internal override void INTERNAL_Render()
         //{
         //    base.INTERNAL_Render();
