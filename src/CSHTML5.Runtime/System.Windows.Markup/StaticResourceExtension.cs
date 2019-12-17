@@ -18,6 +18,7 @@
 
 
 using CSHTML5.Internal;
+using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,72 +66,96 @@ namespace System.Windows.Markup
         //}
 
 
-        
+
         /// <summary>
         /// returns an object that is provided as the value of the target property for this StaticResource.
         /// </summary>
         /// <param name="serviceProvider">A service provider helper that can provide services for the StaticResource.</param>
         /// <returns>An object that is provided as the value of the target property for this StaticResource.</returns>
-        
+
 #if BRIDGE
         public override object ProvideValue(ServiceProvider serviceProvider)
 #else
         public override object ProvideValue(IServiceProvider serviceProvider) 
 #endif
         {
-            
-            if (serviceProvider is ServiceProvider)
+            ServiceProvider serviceProviderAsServiceProvider = (ServiceProvider)serviceProvider;
+            Type targetType;
+            if(serviceProviderAsServiceProvider.TargetProperty as DependencyProperty != null)
             {
-                ServiceProvider serviceProviderAsServiceProvider = (ServiceProvider)serviceProvider;
-                bool isFirst = true;
-                object elementItself = null;
-                foreach (Object parentElement in serviceProviderAsServiceProvider.Parents)
-                {
-                    if (isFirst)
-                    {
-                        elementItself = parentElement;
-                    }
-                    else
-                    {
-                        ResourceDictionary resourceDictionary = null;
-                        if (parentElement is ResourceDictionary)
-                        {
-                            resourceDictionary = (ResourceDictionary)parentElement;
-                        }
-                        else if (parentElement is FrameworkElement)
-                        {
-                            resourceDictionary = ((FrameworkElement)parentElement).Resources;
-                        }
-                        if (resourceDictionary != null && resourceDictionary.ContainsKey(ResourceKey))
-                        {
-                            object returnElement = resourceDictionary[ResourceKey];
-                            if (returnElement != elementItself)
-                            {
-                                return returnElement;
-                            }
-                        }
-                    }
-                    isFirst = false;
-                }
-                if (Application.Current.Resources != null && Application.Current.Resources.ContainsKey(ResourceKey))
-                {
-                    return Application.Current.Resources[ResourceKey];
-                }
-            else
-            {
-                    // Look in the built-in resources (eg. "SystemAccentColor"):
-                    object result = Application.Current.TryFindResource(ResourceKey);
-                    if (result == null)
-                    {
-                        throw new XamlParseException(string.Format("StaticResource resolve failed: cannot find resource named '{0}' (Note: resource names are case sensitive)", ResourceKey));
-                    }
-                    return result;
-                }
-                throw new XamlParseException(string.Format("StaticResource resolve failed: cannot find resource named '{0}' (Note: resource names are case sensitive)", ResourceKey));
+                targetType = ((DependencyProperty)serviceProviderAsServiceProvider.TargetProperty).PropertyType;
             }
             else
             {
-                throw new SystemException("StaticResourceExtension.ProvideValue failed: the service provider is not of the expected type. Please contact support.");
+                targetType = null;
+            }
+            bool isFirst = true;
+            object elementItself = null;
+            foreach (object parentElement in serviceProviderAsServiceProvider.Parents)
+            {
+                if (isFirst)
+                {
+                    elementItself = parentElement;
+                }
+                else
+                {
+                    ResourceDictionary resourceDictionary = null;
+                    if (parentElement is ResourceDictionary)
+                    {
+                        resourceDictionary = (ResourceDictionary)parentElement;
+                    }
+                    else if (parentElement is FrameworkElement)
+                    {
+                        resourceDictionary = ((FrameworkElement)parentElement).Resources;
+                    }
+                    if (resourceDictionary != null && resourceDictionary.ContainsKey(ResourceKey))
+                    {
+                        object returnElement = resourceDictionary[ResourceKey];
+                        if (returnElement != elementItself)
+                        {
+                            return this.EnsurePropertyType(returnElement, targetType);
+                        }
+                    }
+                }
+                isFirst = false;
+            }
+            if (Application.Current.Resources.ContainsKey(ResourceKey))
+            {
+                return this.EnsurePropertyType(Application.Current.Resources[ResourceKey], targetType);
+            }
+            else
+            {
+                // Look in the built-in resources (eg. "SystemAccentColor"):
+                object result = Application.Current.TryFindResource(ResourceKey);
+                if (result == null)
+                {
+                    throw new XamlParseException(string.Format("StaticResource resolve failed: cannot find resource named '{0}' (Note: resource names are case sensitive)", ResourceKey));
+                }
+                return this.EnsurePropertyType(result, targetType);
+            }
+            throw new XamlParseException(string.Format("StaticResource resolve failed: cannot find resource named '{0}' (Note: resource names are case sensitive)", ResourceKey));
+        }
+
+        private object EnsurePropertyType(object item, Type targetType)
+        {
+            if(targetType == null || item == null)
+            {
+                return item;
+            }
+
+            Type itemType = item.GetType();
+            if (targetType.IsAssignableFrom(itemType))
+            {
+                return item;
+            }
+            else if (itemType == typeof(string) && TypeFromStringConverters.CanTypeBeConverted(targetType))
+            {
+                return TypeFromStringConverters.ConvertFromInvariantString(targetType, (string)item);
+            }
+            else
+            {
+                //note: can crash
+                return Convert.ChangeType(item, targetType);
             }
         }
     }
