@@ -1057,6 +1057,9 @@ namespace Windows.UI.Xaml.Controls
 
         protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
         {
+            //Reset the Page index in case the new source has less pages than the old one
+            DataPager.CurrentPage = 1;
+
             if (newValue == null)
             {
                 //--------------
