@@ -340,11 +340,12 @@ if (element)
 #if !CSHTML5NETSTANDARD
             if (IsRunningInJavaScript())
             {
-                uiElement.INTERNAL_OuterDomElement.value = newText;
+                CSHTML5.Interop.ExecuteJavaScript("$0['value'] = newText", uiElement.INTERNAL_InnerDomElement);
             }
             else
             {
-                string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)uiElement.INTERNAL_OuterDomElement).UniqueIdentifier;
+                string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)uiElement.INTERNAL_InnerDomElement).UniqueIdentifier;
+
                 //below: workaround for a bug in Awesomium in which the text was not refreshed inside the <input type="text"/> elements when set programatically. 
                 //element.style.visibility=""collapse"";
                 //setTimeout(function(){ element.style.visibility=""visible""; }, 10);
@@ -352,7 +353,7 @@ if (element)
                 // Note: in the "setTimeout", we must call "document.getElementById" otherwise it does not work.
                 string javaScriptCodeToExecute = string.Format(@"
 var element = document.getElementById(""{0}"");
-if (element)
+if (element) 
 {{
     element.value = ""{1}"";
     element.style.visibility=""collapse"";
