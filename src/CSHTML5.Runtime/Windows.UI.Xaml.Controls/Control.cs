@@ -824,10 +824,6 @@ namespace Windows.UI.Xaml.Controls
                 if (controlTemplate != null && !control.INTERNAL_DoNotApplyControlTemplate)
                 {
                     // Apply the control template:
-
-#if CSHTML5BLAZOR && DEBUG
-                    Console.WriteLine("OPENSILVER DEBUG: Control: Template_Changed: " + controlIdentity + "template is applied");
-#endif
                     generatedControl = controlTemplate.INTERNAL_InstantiateAndAttachControlTemplate(templateOwner: control);
                     control._renderedControlTemplate = generatedControl;
                 }
