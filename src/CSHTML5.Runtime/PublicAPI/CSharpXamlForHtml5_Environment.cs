@@ -47,7 +47,11 @@ public static partial class CSharpXamlForHtml5
         {
             get
             {
+#if CSHTML5BLAZOR
+                return false;
+#else
                 return !INTERNAL_InteropImplementation.IsRunningInTheSimulator();
+#endif
             }
         }
     }

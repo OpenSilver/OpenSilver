@@ -24,7 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 
-#if MIGRATION
+#if MIGRATION 
 namespace System.Windows.Data
 #else
 namespace Windows.UI.Xaml.Data
@@ -42,7 +42,7 @@ namespace Windows.UI.Xaml.Data
 
         /// <exclude/>
         ///
-#if BRIDGE
+#if BRIDGE && !CSHTML5BLAZOR
         public override object ProvideValue(ServiceProvider serviceProvider)
 #else
         public override object ProvideValue(IServiceProvider serviceProvider)

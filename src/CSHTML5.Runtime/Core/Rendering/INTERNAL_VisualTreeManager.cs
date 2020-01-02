@@ -424,6 +424,11 @@ namespace CSHTML5.Internal
             object wrapperForChild
             )
         {
+            //#if CSHTML5BLAZOR && DEBUG
+            //            string childIndentity = child + (child != null ? " (" + child.GetHashCode() + ")" : "");
+            //            string parentIndentity = parent + (parent != null ? " (" + parent.GetHashCode() + ")" : "");
+            //            Console.WriteLine("OPEN SILVER DEBUG: VisualTreeManager : AttachVisualChild_Private_FinalStepsOnlyIfControlIsVisible: " + childIndentity + " attached to " + parentIndentity);
+            //#endif
 
             //--------------------------------------------------------
             // CREATE THE DIV FOR THE MARGINS (OPTIONAL):
@@ -737,6 +742,12 @@ namespace CSHTML5.Internal
 
         static void RenderElementsAndRaiseChangedEventOnAllDependencyProperties(DependencyObject dependencyObject)
         {
+
+            //#if CSHTML5BLAZOR && DEBUG
+            //            string prettyPrintDependencyObject = dependencyObject + (dependencyObject != null ? "(" + dependencyObject.GetHashCode().ToString() +")" : "");
+            //            Console.WriteLine("OPENSILVER DEBUG: VisualTreeManager: RenderElementsAndRaiseChangedEventOnAllDependencyProperties: dependencyObject:" + prettyPrintDependencyObject);
+            //#endif
+
             // To prevent raising the property multiple times, we keep track of the properties for which we already raised the "PropertyChanged" event:
             //Dictionary<DependencyProperty, DependencyProperty> propertiesForWhichTheEventHasAlreadyBeenRaised = new Dictionary<DependencyProperty, DependencyProperty>(); //todo: replace with HashSet<DependencyProperty> when available.
 
@@ -764,6 +775,13 @@ namespace CSHTML5.Internal
 #endif
 
                     PropertyMetadata propertyMetadata = property.GetTypeMetaData(dependencyObject.GetType());
+                    //#if CSHTML5BLAZOR && DEBUG
+                    //                    string prettyPrintProperty = property.Name + (property != null ? "(" + property.GetHashCode().ToString() + ")" : "");
+                    //                    Console.WriteLine("OPENSILVER DEBUG: VisualTreeManager: RenderElementsAndRaiseChangedEventOnAllDependencyProperties:"
+                    //                        + " dependencyObject:" + prettyPrintDependencyObject
+                    //                        + " property:" + prettyPrintProperty
+                    //                        + " MSG: " + (propertyMetadata != null ? "has" : "has not") + " a propertyMetadata");
+                    //#endif
                     if (propertyMetadata != null)
                     {
                         INTERNAL_PropertyStorage storage = propertiesAndTheirStorage.Value;
@@ -802,6 +820,14 @@ namespace CSHTML5.Internal
                         //--------------------
                         // Call PropertyChanged:
                         //--------------------
+                        //#if CSHTML5BLAZOR && DEBUG
+                        //                        string prettyPrintPropertyMetadata = propertyMetadata + (propertyMetadata != null ? propertyMetadata.GetHashCode().ToString() : "");
+                        //                        Console.WriteLine("OPENSILVER DEBUG: VisualTreeManager: RenderElementsAndRaiseChangedEventOnAllDependencyProperties:"
+                        //                            + " dependencyObject:" + prettyPrintDependencyObject
+                        //                            + " property:" + prettyPrintProperty
+                        //                            + " propertyMetadata:" + propertyMetadata
+                        //                            + " MSG: " + (propertyMetadata.PropertyChangedCallback != null ? "has" : "has not") + " a PropertyChangedCallback" );
+                        //#endif
                         if (propertyMetadata.PropertyChangedCallback != null
                             && propertyMetadata.CallPropertyChangedWhenLoadedIntoVisualTree != WhenToCallPropertyChangedEnum.Never)
                         {
@@ -811,6 +837,13 @@ namespace CSHTML5.Internal
                                 valueWasRetrieved = true;
                             }
 
+                            //#if CSHTML5BLAZOR && DEBUG
+                            //                            Console.WriteLine("OPENSILVER DEBUG: VisualTreeManager: RenderElementsAndRaiseChangedEventOnAllDependencyProperties:" 
+                            //                                + " dependencyObject:" + prettyPrintDependencyObject 
+                            //                                + " property:" + prettyPrintProperty 
+                            //                                + " propertyMetadata:" + propertyMetadata
+                            //                                + " MSG: is raising PropertyChangedCallback)");
+                            //#endif
                             // Raise the "PropertyChanged" event:
                             propertyMetadata.PropertyChangedCallback(storage.Owner, new DependencyPropertyChangedEventArgs(value, value, property));
 

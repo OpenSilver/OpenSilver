@@ -213,7 +213,14 @@ namespace System.Runtime.Serialization
                     prefix = "Prefix" + namespaceName.GetHashCode().ToString() + index.ToString();
 
                     // Check if the prefix is already used or if it is available for use:
-                    if (string.IsNullOrWhiteSpace(element.GetNamespaceOfPrefix(prefix).NamespaceName))
+                    XNamespace namespaceOfPrefix = element.GetNamespaceOfPrefix(prefix);
+
+#if CSHTML5NETSTANDARD
+                    if (namespaceOfPrefix == null || string.IsNullOrWhiteSpace(namespaceOfPrefix.NamespaceName))
+#else
+                    if (string.IsNullOrWhiteSpace(namespaceOfPrefix.NamespaceName))
+#endif
+
                     {
                         //we found an unused prefix:
                         //we add the prefix definition to the XElement:
@@ -752,7 +759,7 @@ namespace System.Runtime.Serialization
 
         internal static string GetTypeNameSafeForSerialization(Type type)
         {
-#if !BRIDGE
+#if !BRIDGE && !CSHTML5NETSTANDARD
             bool isRunningUnderJSIL = !CSHTML5.Interop.IsRunningInTheSimulator; //todowasm: fix this when running in WebAssembly
 #else
             bool isRunningUnderJSIL = false;

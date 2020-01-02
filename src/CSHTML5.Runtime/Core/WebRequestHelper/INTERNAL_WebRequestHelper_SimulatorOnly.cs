@@ -21,7 +21,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+#if CSHTML5BLAZOR
+using System.Net.Http;
+#else
 using System.Net;
+#endif
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,7 +35,7 @@ using System.Windows;
 using Windows.UI.Xaml;
 #endif
 
-
+#if !CSHTML5BLAZOR
 namespace System
 {
     /// <summary>
@@ -119,3 +123,4 @@ namespace System
         }
     }
 }
+#endif

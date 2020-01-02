@@ -27,6 +27,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if !CSHTML5NETSTANDARD
+// already defined in .NET Standard
 namespace System.Xml.Linq
 {
     /// <summary>
@@ -37,7 +39,7 @@ namespace System.Xml.Linq
 
         internal XElement(object jsNode)
         {
-            INTERNAL_jsnode = jsNode;
+            INTERNAL_jsnode = jsNode; 
             XName xName = new XName();
             //todo: add the namespaceName.
             if (CSHTML5.Interop.IsRunningInTheSimulator)
@@ -1349,3 +1351,4 @@ namespace System.Xml.Linq
         #endregion
     }
 }
+#endif
