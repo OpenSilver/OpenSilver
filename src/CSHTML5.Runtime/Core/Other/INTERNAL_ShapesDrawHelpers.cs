@@ -97,8 +97,9 @@ namespace CSHTML5.Internal
                     sizeY = maxY - minY;
                 }
             }
+
             //todo: (?) for the line below, replace the "+ 1" with the StrokeThickness/LineWidth
-            Size sizeToApply = new Size(sizeX + 1, sizeY + 1); //example: a vertical line still needs 1 pixel width
+            Size sizeToApply = new Size(Math.Max(sizeX + 1, 0), Math.Max(sizeY + 1, 0)); //example: a vertical line still needs 1 pixel width
 
             //we apply the possible defined size of the outerDomElement of the shape:
             dynamic style = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement);
