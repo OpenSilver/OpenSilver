@@ -347,7 +347,7 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             string targetName = Storyboard.GetTargetName(this);
             propertyPath = Storyboard.GetTargetProperty(this);
-            if (!isTargetParentTheTarget)
+            if (!isTargetParentTheTarget && targetName != null) //If the targetName is null, the target has to be the targetParent.
             {
                 if (targetParent is Control)
                 {
