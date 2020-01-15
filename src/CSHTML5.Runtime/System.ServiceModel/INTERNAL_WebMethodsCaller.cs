@@ -15,10 +15,6 @@
 //
 //===============================================================================
 
-
-
-#if !CSHTML5NETSTANDARD
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -149,5 +145,3 @@ namespace System.ServiceModel
         }
     }
 }
-
-#endif

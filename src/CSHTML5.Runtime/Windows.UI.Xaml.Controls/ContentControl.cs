@@ -57,7 +57,10 @@ namespace Windows.UI.Xaml.Controls
         static internal void Content_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var contentControl = (ContentControl)d;
-
+#if CSHTML5BLAZOR && DEBUG
+            string prettyPrintContentControl = contentControl +  "(" + (contentControl != null ? contentControl.GetHashCode().ToString() + ")" : "");
+            Console.WriteLine("OPENSILVER DEBUG: ContentControl: Content_Changed: contentControl:" + prettyPrintContentControl + " MSG: " + (contentControl.HasTemplate ? "has" : "has not") + " template");
+#endif
             //we may want to throw the event here instead of in OnContentChanged since we throw the event every time and OnContentChanged can be overriden.
             if (!contentControl.HasTemplate)
             {
@@ -104,6 +107,15 @@ namespace Windows.UI.Xaml.Controls
         {
             if (!this.HasTemplate)
             {
+#if CSHTML5BLAZOR && DEBUG
+                string prettyPrintContentControl = this + "(" + this.GetHashCode().ToString() + ")";
+                string prettyPrintOldContent = oldContent + (oldContent != null ?  "(" +   oldContent.GetHashCode().ToString() + ")" :"");
+                string prettyPrintNewContent = newContent + (newContent != null ? "(" + newContent.GetHashCode().ToString() + ")" : "");
+                Console.WriteLine("OPENSILVER DEBUG: ContentControl: OnContentChanged:" 
+                    + " contentControl: " + prettyPrintContentControl
+                    + " oldContent: " + prettyPrintOldContent
+                    + " newContent: " + newContent);
+#endif
 
                 //-----------------------------
                 // DETACH PREVIOUS CONTENT
@@ -125,6 +137,9 @@ namespace Windows.UI.Xaml.Controls
 
                 if (newContent is UIElement)
                 {
+#if CSHTML5BLAZOR && DEBUG
+                    Console.WriteLine("OPENSILVER DEBUG: ContentControl: OnContentChanged: contentControl:" + prettyPrintContentControl + " MSG: new content is UIElement, attaching child");
+#endif
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached((UIElement)newContent, this);
                 }
                 else if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
@@ -132,6 +147,11 @@ namespace Windows.UI.Xaml.Controls
                     if (ContentTemplate != null)
                     {
                         // Apply the data template:
+
+#if CSHTML5BLAZOR && DEBUG
+                        Console.WriteLine("OPENSILVER DEBUG: ContentControl: OnContentChanged: contentControl:" + prettyPrintContentControl + " MSG: ContentTemplate is not null, applying data template");
+#endif
+
                         _dataTemplateRenderedContent = ContentTemplate.INTERNAL_InstantiateFrameworkTemplate();
                         _dataTemplateRenderedContent.DataContext = newContent;
                         INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_dataTemplateRenderedContent, this);

@@ -113,7 +113,7 @@ namespace CSHTML5.Native.Html.Controls
             {
                 if (jsObject == null)
                     return true;
-#if CSHTML5NETSTANDARD
+#if CSHTML5NETSTANDARD 
                 return false;
 #else
                 if (!(jsObject is JSValue))

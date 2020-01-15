@@ -47,7 +47,6 @@ namespace DotNetForHtml5.Core
             }
         }
 
-#if !CSHTML5NETSTANDARD
         // Here we get the Document from DotNetBrowser
         static dynamic domDocument;
         public static dynamic DOMDocument
@@ -61,9 +60,7 @@ namespace DotNetForHtml5.Core
                 return domDocument;
             }
         }
-#endif
 
-#if !CSHTML5NETSTANDARD
         static dynamic webControl;
         public static dynamic WebControl
         {
@@ -76,26 +73,45 @@ namespace DotNetForHtml5.Core
                 return webControl;
             }
         }
+
+#if CSHTML5NETSTANDARD
+        public static IJavaScriptExecutionHandler JavaScriptExecutionHandler 
+        { 
+            get;
+            set; 
+        } // Intended to be injected when the app is initialized.
 #endif
 
 #if CSHTML5NETSTANDARD
-        public static IJavaScriptExecutionHandler JavaScriptExecutionHandler { get; set; } // Intended to be injected when the app is initialized.
+        static dynamic dynamicJavaScriptExecutionHandler;
 #else
         static dynamic javaScriptExecutionHandler;
+#endif
+
+#if CSHTML5NETSTANDARD
+        public static dynamic DynamicJavaScriptExecutionHandler
+#else
         public static dynamic JavaScriptExecutionHandler
+#endif
         {
             set // Intended to be called by the "Emulator" project to inject the JavaScriptExecutionHandler.
             {
+#if CSHTML5NETSTANDARD
+                dynamicJavaScriptExecutionHandler = value;
+#else
                 javaScriptExecutionHandler = value;
+#endif
             }
             internal get
             {
+#if CSHTML5NETSTANDARD
+                return dynamicJavaScriptExecutionHandler;
+#else
                 return javaScriptExecutionHandler;
+#endif
             }
         }
-#endif
 
-#if !CSHTML5NETSTANDARD
         static dynamic wpfMediaElementFactory;
         public static dynamic WpfMediaElementFactory
         {
@@ -108,9 +124,7 @@ namespace DotNetForHtml5.Core
                 return wpfMediaElementFactory;
             }
         }
-#endif
 
-#if !CSHTML5NETSTANDARD
         static dynamic clipboardHandler;
         public static dynamic ClipboardHandler
         {
@@ -123,9 +137,7 @@ namespace DotNetForHtml5.Core
                 return clipboardHandler;
             }
         }
-#endif
 
-#if !CSHTML5NETSTANDARD
         static dynamic simulatorProxy;
         public static dynamic SimulatorProxy
         {
@@ -136,6 +148,22 @@ namespace DotNetForHtml5.Core
             internal get
             {
                 return simulatorProxy;
+            }
+        }
+
+#if CSHTML5BLAZOR
+        // In OpenSilver Version, we use this work-around to know if we're in the simulator
+        static bool isRunningInTheSimulator_WorkAround = false;
+
+        public static bool IsRunningInTheSimulator_WorkAround
+        {
+            set // Intended to be setted by the "Emulator" project.
+            {
+                isRunningInTheSimulator_WorkAround = value; 
+            }
+            get 
+            { 
+                return isRunningInTheSimulator_WorkAround; 
             }
         }
 #endif

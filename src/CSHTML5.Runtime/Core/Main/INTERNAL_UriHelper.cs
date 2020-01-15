@@ -332,7 +332,9 @@ namespace CSHTML5.Internal
             }
             else
             {
-#if !BRIDGE
+#if CSHTML5NETSTANDARD
+                listOfAssemblies = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetName().Name).ToArray();
+#elif !BRIDGE
                 listOfAssemblies = JSIL.Verbatim.Expression("Object.keys(JSIL.AssemblyShortNames)");
 #else
                 listOfAssemblies = AppDomain.CurrentDomain.GetAssemblies().Select(a => GetAssemblyName(a.FullName)).ToArray();//Script.Write<string[]>("Object.keys(JSIL.AssemblyShortNames);");

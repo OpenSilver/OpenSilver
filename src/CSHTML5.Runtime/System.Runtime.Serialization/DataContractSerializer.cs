@@ -35,11 +35,18 @@ using Bridge;
 
 namespace System.Runtime.Serialization
 {
+
     /// <summary>
     /// Serializes and deserializes an instance of a type into an XML stream or document
     /// using a supplied data contract. This class cannot be inherited.
     /// </summary>
+
+#if CSHTML5NETSTANDARD
+    // already defined in .NET Standard we need another name for the class
+    public class DataContractSerializer_CSHTML5Ver
+#else
     public class DataContractSerializer
+#endif
     {
         Type _type;
         bool _useXmlSerializerFormat;
@@ -62,7 +69,12 @@ namespace System.Runtime.Serialization
         /// </summary>
         /// <param name="type">The type of the instances that are serialized or deserialized.</param>
         /// <param name="useXmlSerializerFormat"></param>
+
+#if CSHTML5NETSTANDARD        
+        public DataContractSerializer_CSHTML5Ver(Type type, bool useXmlSerializerFormat = false)
+#else
         public DataContractSerializer(Type type, bool useXmlSerializerFormat = false)
+#endif
         {
             DataContractSerializer_ValueTypesHandler.EnsureInitialized();
 
@@ -81,7 +93,11 @@ namespace System.Runtime.Serialization
         /// the types that may be present in the object graph.
         /// </param>
         /// <param name="useXmlSerializerFormat"></param>
+#if CSHTML5NETSTANDARD
+        public DataContractSerializer_CSHTML5Ver(Type type, IEnumerable<Type> knownTypes, bool useXmlSerializerFormat = false)
+#else
         public DataContractSerializer(Type type, IEnumerable<Type> knownTypes, bool useXmlSerializerFormat = false)
+#endif
         {
             DataContractSerializer_ValueTypesHandler.EnsureInitialized();
 
@@ -117,8 +133,11 @@ namespace System.Runtime.Serialization
             // Add the root:
             List<XObject> xnodesForRoot = DataContractSerializer_Serialization.SerializeToXObjects(obj, _type, _knownTypes, _useXmlSerializerFormat, isRoot: true, isContainedInsideEnumerable: false, parentTypeInformation: typeInformation, nodeDefaultNamespaceIfAny: null);
             xdoc.Add(xnodesForRoot.First());
+#if CSHTML5NETSTANDARD
+            string xml = xdoc.ToString(indentXml ? SaveOptions.None : SaveOptions.DisableFormatting);
+#else
             string xml = xdoc.ToString(indentXml);
-
+#endif
             // Add the header:
             if (!omitXmlDeclaration)
             {

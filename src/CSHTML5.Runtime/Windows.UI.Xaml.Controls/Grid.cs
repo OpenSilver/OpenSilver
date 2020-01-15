@@ -971,7 +971,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty RowSpanProperty =
-            DependencyProperty.Register("RowSpan", typeof(int), typeof(UIElement), new PropertyMetadata(1, RowSpan_Changed));
+            DependencyProperty.RegisterAttached("RowSpan", typeof(int), typeof(UIElement), new PropertyMetadata(1, RowSpan_Changed));
 
         static void RowSpan_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1066,7 +1066,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty ColumnSpanProperty =
-            DependencyProperty.Register("ColumnSpan", typeof(int), typeof(UIElement), new PropertyMetadata(1, ColumnSpan_Changed));
+            DependencyProperty.RegisterAttached("ColumnSpan", typeof(int), typeof(UIElement), new PropertyMetadata(1, ColumnSpan_Changed));
 
         static void ColumnSpan_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

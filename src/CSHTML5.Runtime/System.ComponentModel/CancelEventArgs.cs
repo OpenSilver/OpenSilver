@@ -19,6 +19,7 @@
 
 using System;
 
+#if !CSHTML5BLAZOR
 namespace System.ComponentModel
 {
     /// <summary>
@@ -63,3 +64,4 @@ namespace System.ComponentModel
         }
     }
 }
+#endif

@@ -25,6 +25,8 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
+#if !CSHTML5NETSTANDARD
+// already defined in .NET Standard
 namespace System.Xml.Linq
 {
     /// <summary>
@@ -201,14 +203,14 @@ namespace System.Xml.Linq
             //jsNodesForElement = CSHTML5.Interop.ExecuteJavaScript("Array.from($0.childNodes).filter(node => node.tagName == $1)", INTERNAL_jsnode, name.ToString());
             //todo: if IE learns that => isn't a syntax error (which breaks the whole file) and can use it properly, use the line above instead of the following because it seems to be more efficient.
             object jsNodesForElement = CSHTML5.Interop.ExecuteJavaScript("Array.from($0.childNodes).filter(document.functionToCompareWordForFilter($1))", INTERNAL_jsnode, name.ToString());
-            #region explanation of the line above
+#region explanation of the line above
             //note: normal use of filter: myArray.filter( function(node) { return testOnNode; })
             //problem here: testOnNode depends on the name than node and we cannot put $1 in there because JSIL changes it to "this.$name", but "this" does not exist where "testOnNode" is.
             //solution: document.functionToCompareWordForFilter(name) returns A FUNCTION that takes a node and compares its tagName to name (see in cshtml5.js)
             //          when calling document.functionToCompareWordForFilter, this.$name exists
             //          and the created method that is used by filter can use it normally.
             //in short: the function created by document.functionToCompareWordForFilter provides the name, filter provides the node.
-            #endregion
+#endregion
 
             if (XDocument.IsNullOrUndefined(jsNodesForElement)) //nothing fits the request.
             {
@@ -315,7 +317,7 @@ namespace System.Xml.Linq
             yield break;
         }
 
-        #region not implemented
+#region not implemented
 
         ///// <summary>
         ///// Get the last child node of this node.
@@ -384,7 +386,8 @@ namespace System.Xml.Linq
         ///// <param name="content">A parameter list of content objects.</param>
         //public void ReplaceNodes(params object[] content);
 
-        #endregion
+#endregion
 
     }
 }
+#endif

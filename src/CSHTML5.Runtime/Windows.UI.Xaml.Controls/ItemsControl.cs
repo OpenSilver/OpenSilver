@@ -242,7 +242,7 @@ namespace Windows.UI.Xaml.Controls
                 //if (_placeWhereItemsPanelWillBeRendered != null
                 //    //&& INTERNAL_VisualTreeManager.IsElementInVisualTree(_placeWhereItemsPanelWillBeRendered))
                 //    && _placeWhereItemsPanelWillBeRendered._isLoaded) //Note: we replaced "IsElementInVisualTree" with _isLoaded on on March 22, 2017 to fix an issue where a "Binding" on ListBox.ItemsSource caused the selection to not work properly. This change can be reverted the day that the implementation of the "IsElementInVisualTree" method becomes based on the "_isLoaded" property (at the time of writing, it was implemented by checking if the visual parent is null).
-                if(this._placeWhereItemsPanelWillBeRendered != null)
+                if (this._placeWhereItemsPanelWillBeRendered != null)
                 {
                     if (this._placeWhereItemsPanelWillBeRendered.IsLoaded)
                     {
@@ -284,19 +284,17 @@ namespace Windows.UI.Xaml.Controls
                     }
                     else
                     {
-                        this._newItemsPanelTemplate = newTemplate;
+                        this._placeWhereItemsPanelWillBeRendered.Loaded -= new RoutedEventHandler(this.UpdateItemsPanelOnContainerLoaded);
                         this._placeWhereItemsPanelWillBeRendered.Loaded += new RoutedEventHandler(this.UpdateItemsPanelOnContainerLoaded);
                     }
                 }
             }
         }
 
-        private ItemsPanelTemplate _newItemsPanelTemplate;
         private void UpdateItemsPanelOnContainerLoaded(object sender, RoutedEventArgs e)
         {
             this._placeWhereItemsPanelWillBeRendered.Loaded -= new RoutedEventHandler(this.UpdateItemsPanelOnContainerLoaded);
-            this.UpdateItemsPanel(_newItemsPanelTemplate);
-            this._newItemsPanelTemplate = null;
+            this.UpdateItemsPanel(this.ItemsPanel);
         }
 
         protected virtual void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
@@ -619,7 +617,7 @@ namespace Windows.UI.Xaml.Controls
                             //-----------------------------
                             // If we arrive here, it means that either the newContent is already a container (of the correct type), or a new container was generated.
                             //-----------------------------
-                            
+
                             //if the user defined a style for the container, we apply it:
                             if (ItemContainerStyle != null)
                             {
@@ -697,14 +695,16 @@ namespace Windows.UI.Xaml.Controls
                     // Show as string:
                     //result = new TextBlock() { Text = displayElement.ToString() };
 
-                    TextBlock t = new TextBlock();
-                    Binding b = new Binding(DisplayMemberPath);
-                    t.SetBinding(TextBlock.TextProperty, b);
-                    t.DataContext = item;
-                    result = t;
+                    ContentPresenter container = new ContentPresenter();
+                    Binding b = new Binding(this.DisplayMemberPath);
+                    container.SetBinding(ContentControl.ContentProperty, b);
+                    container.DataContext = item;
+                    result = container;
                 }
             }
-
+#if WORKINPROGRESS
+            this.PrepareContainerForItemOverride(result, item);
+#endif
             return result;
         }
 
@@ -1021,7 +1021,8 @@ namespace Windows.UI.Xaml.Controls
         //     The item to display.
         protected virtual void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            //todo: implement this
         }
 
         #endregion

@@ -24,9 +24,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if !CSHTML5BLAZOR
+// Web client does not work with client side blazor.
 namespace System.Net
 {
-
     // it is impossible to override the webclient methods from the c# version, so WebClientWithCredentials became
     // a class that can handle both behaviours, with and without credentials. just set CredentialsMode to Auto.
     public class WebClientWithCredentials : WebClient
@@ -215,3 +216,4 @@ namespace System.Net
 
     }
 }
+#endif

@@ -40,9 +40,20 @@ namespace Windows.Foundation
 #endif
     public struct Size
     {
+        private static Size emptySize;
+
         double _width;
         double _height;
-        bool _isEmpty;
+
+        static Size()
+        {
+            emptySize = new Size
+            {
+                _width = double.NegativeInfinity,
+                _height = double.NegativeInfinity
+            };
+            TypeFromStringConverters.RegisterConverter(typeof(Size), INTERNAL_ConvertFromString);
+        }
 
         /// <summary>
         /// Initializes a new instance of the Windows.Foundation.Size
@@ -52,12 +63,12 @@ namespace Windows.Foundation
         /// <param name="height">The initial height of the instance of Windows.Foundation.Size.</param>
         public Size(double width, double height)
         {
-            _width = 0;
-            _height = 0;
-            _isEmpty = false;
-
-            Width = width;
-            Height = height;
+            if(width < 0 || height < 0)
+            {
+                throw new ArgumentException("Width and Height cannot be negative.");
+            }
+            this._width = width;
+            this._height = height;
         }
 
         /// <summary>
@@ -96,11 +107,7 @@ namespace Windows.Foundation
         {
             get
             {
-                Size size = new Size();
-                size.IsEmpty = true;
-                size.Width = double.NegativeInfinity;
-                size.Height = double.NegativeInfinity;
-                return size;
+                return emptySize;
             }
         }
 
@@ -111,18 +118,19 @@ namespace Windows.Foundation
         {
             get
             {
-                return _height;
+                return this._height;
             }
             set
             {
-                if (!IsEmpty && value < 0 && !double.IsNaN(value))
+                if (this.IsEmpty)
                 {
-                    throw new ArgumentException("Height cannot be lower than 0");
+                    throw new InvalidOperationException("Cannot modify Empty size.");
                 }
-                else
+                if(value < 0)
                 {
-                    _height = value;
+                    throw new ArgumentException("Height cannot be negative.");
                 }
+                this._height = value;
             }
         }
       
@@ -134,11 +142,7 @@ namespace Windows.Foundation
         {
             get
             {
-                return _isEmpty;
-            }
-            internal set
-            {
-                _isEmpty = value;
+                return this._width < 0;
             }
         }
       
@@ -149,18 +153,31 @@ namespace Windows.Foundation
         {
             get
             {
-                return _width;
+                return this._width;
             }
             set
             {
-                if (!IsEmpty && value < 0 && !double.IsNaN(value))
+                if (this.IsEmpty)
                 {
-                    throw new ArgumentException("Width cannot be lower than 0");
+                    throw new InvalidOperationException("Cannot modify Empty size.");
                 }
-                else
+                if(value < 0)
                 {
-                    _width = value;
+                    throw new ArgumentException("Width cannot be negative.");
                 }
+                this._width = value;
+            }
+        }
+
+        public static bool Equals(Size size1, Size size2)
+        {
+            if (size1.IsEmpty)
+            {
+                return size2.IsEmpty;
+            }
+            else
+            {
+                return size1.Width.Equals(size2.Width) && size1.Height.Equals(size2.Height);
             }
         }
 
@@ -172,14 +189,13 @@ namespace Windows.Foundation
         /// <returns>true if the sizes are equal; otherwise, false.</returns>
         public override bool Equals(object o)
         {
-            if (o is Size)
-            {
-                return ((Size)o) == this;
-            }
-            else
+            if ((null == o) || !(o is Size))
             {
                 return false;
             }
+
+            Size value = (Size)o;
+            return Size.Equals(this, value);
         }
 
 
@@ -191,7 +207,7 @@ namespace Windows.Foundation
         /// <returns>true if the instances of Windows.Foundation.Size are equal; otherwise, false.</returns>
         public bool Equals(Size value)
         {
-            return value == this;
+            return Size.Equals(this, value);
         }
 
         /// <summary>
@@ -200,8 +216,15 @@ namespace Windows.Foundation
         /// <returns>The hash code for this instance of Windows.Foundation.Size.</returns>
         public override int GetHashCode()
         {
-            throw new NotImplementedException();
-            //todo
+            if (this.IsEmpty)
+            {
+                return 0;
+            }
+            else
+            {
+                // Perform field-by-field XOR of HashCodes
+                return this.Width.GetHashCode() ^ this.Height.GetHashCode();
+            }
         }
 
         /// <summary>
@@ -210,12 +233,11 @@ namespace Windows.Foundation
         /// <returns>A string representation of this Windows.Foundation.Size.</returns>
         public override string ToString()
         {
+            if (this.IsEmpty)
+            {
+                return "Empty";
+            }
             return Width + "," + Height;
-        }
-
-        static Size()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(Size), INTERNAL_ConvertFromString);
         }
 
         internal static object INTERNAL_ConvertFromString(string sizeAsString)
