@@ -695,14 +695,16 @@ namespace Windows.UI.Xaml.Controls
                     // Show as string:
                     //result = new TextBlock() { Text = displayElement.ToString() };
 
-                    TextBlock t = new TextBlock();
-                    Binding b = new Binding(DisplayMemberPath);
-                    t.SetBinding(TextBlock.TextProperty, b);
-                    t.DataContext = item;
-                    result = t;
+                    ContentPresenter container = new ContentPresenter();
+                    Binding b = new Binding(this.DisplayMemberPath);
+                    container.SetBinding(ContentControl.ContentProperty, b);
+                    container.DataContext = item;
+                    result = container;
                 }
             }
-
+#if WORKINPROGRESS
+            this.PrepareContainerForItemOverride(result, item);
+#endif
             return result;
         }
 
@@ -1019,7 +1021,8 @@ namespace Windows.UI.Xaml.Controls
         //     The item to display.
         protected virtual void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            //todo: implement this
         }
 
         #endregion
