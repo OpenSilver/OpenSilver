@@ -279,7 +279,14 @@ public class INTERNAL_BridgeWorkarounds
         // The following alternative cannot be used either, because it works in Bridge but not in the Simulator due to the fact that the Mscorlib version of int.Parse lacks the overload that takes the radix as argument:
         // return colorAsInt = int.Parse(colorcode, radix: 16);
 
-        return (int)INTERNAL_Simulator.SimulatorProxy.HexToInt(hexString);
+        if (INTERNAL_Simulator.SimulatorProxy != null)
+        {
+            return (int)INTERNAL_Simulator.SimulatorProxy.HexToInt(hexString);
+        }
+        else
+        {
+            return 0; //We only arrive here during compilation because the Simulatorproxy is never set.
+        }
     }
 
     [Bridge.Template("false")]
