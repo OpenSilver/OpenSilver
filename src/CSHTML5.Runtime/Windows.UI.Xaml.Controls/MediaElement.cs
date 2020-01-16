@@ -289,11 +289,17 @@ namespace Windows.UI.Xaml.Controls
                         {
                             object element = null;
                             object outerDiv = control.INTERNAL_OuterDomElement;
-                            INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle(tagString, outerDiv, control, out element);
+                            var elementStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle(tagString, outerDiv, control, out element);
 
                             control._mediaElement_ForAudioOnly_ForSimulatorOnly = null;
 
                             control._mediaElement = element;
+
+                            if (tagString == "video")
+                            {
+                                elementStyle.width = "100%";
+                                elementStyle.height = "100%";
+                            }
 
                             control.Refresh(); //we refresh all the values of the element in the visual tree
                         }
