@@ -43,21 +43,6 @@ namespace Windows.UI.Xaml
     /// </summary>
     public class DependencyObject
     {
-#if REVAMPPOINTEREVENTS
-        internal bool INTERNAL_ArePointerEventsEnabled
-        {
-            get
-            {
-                return INTERNAL_ManagePointerEventsAvailability();
-            }
-        }
-
-        internal virtual bool INTERNAL_ManagePointerEventsAvailability()
-        {
-            return false;
-        }
-#endif
-
         private Dictionary<DependencyProperty, BindingExpression> _bindingExpressions;
 
         /// <summary>

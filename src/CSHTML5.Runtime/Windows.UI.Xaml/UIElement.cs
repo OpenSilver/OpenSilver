@@ -596,6 +596,21 @@ namespace Windows.UI.Xaml
 
         }
 
+#if REVAMPPOINTEREVENTS
+        internal bool INTERNAL_ArePointerEventsEnabled
+        {
+            get
+            {
+                return INTERNAL_ManagePointerEventsAvailability();
+            }
+        }
+
+        internal virtual bool INTERNAL_ManagePointerEventsAvailability()
+        {
+            return false;
+        }
+#endif
+
         #endregion
 
 #if REVAMPPOINTEREVENTS
