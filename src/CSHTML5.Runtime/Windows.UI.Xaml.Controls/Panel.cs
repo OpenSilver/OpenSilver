@@ -228,6 +228,11 @@ namespace Windows.UI.Xaml.Controls
             foreach (UIElement child in newChildren)
             {
                 await Task.Delay(1);
+                if(!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+                {
+                    //this can happen if the Panel is detached during the delay.
+                    break;
+                }
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
                 INTERNAL_OnChildProgressivelyLoaded();
             }
