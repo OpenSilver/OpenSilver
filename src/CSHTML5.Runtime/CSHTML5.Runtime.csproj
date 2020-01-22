@@ -587,7 +587,6 @@
     <Compile Include="Windows.UI.Xaml.Documents\Bold.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Hyperlink.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Inline.cs" />
-    <Compile Include="Windows.UI.Xaml.Documents\InlineCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\InlineUIContainer.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Italic.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Line​Break.cs" />
@@ -595,6 +594,12 @@
     <Compile Include="Windows.UI.Xaml.Documents\Span.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\TextElement.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Underline.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\InlineCollection.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainer.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerHelper.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerSpan.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerTextBlock.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\TextElementCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Input\KeyEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Input\KeyRoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Input\Pointer.cs" />

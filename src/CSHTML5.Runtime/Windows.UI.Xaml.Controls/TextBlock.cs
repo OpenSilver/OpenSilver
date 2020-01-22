@@ -24,6 +24,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
+using System.Collections;
 
 #if MIGRATION
 using System.Windows.Documents;
@@ -53,31 +54,42 @@ namespace Windows.UI.Xaml.Controls
     [ContentProperty("Inlines")]
     public class TextBlock : Control //todo: this is supposed to inherit from FrameworkElement but Control has the implementations of FontSize, FontWeight, Foreground, etc. Maybe use an intermediate class between FrameworkElement and Control or add the implementation here too.
     {
-        InlineCollection _inlines;
+        private readonly InlineCollection _inlines;
+        private bool _isTextChanging;
 
         public TextBlock()
         {
-            IsTabStop = false; //we want to avoid stopping on this element's div when pressing tab.
+            this.IsTabStop = false; //we want to avoid stopping on this element's div when pressing tab.
+            this._inlines = new InlineCollection(this);
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            dynamic innerDiv = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
-            dynamic innerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDiv);
-
+            object outerDiv;
+            object middleDiv;
+            object childrenContainerDiv;
+            dynamic outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
+            dynamic middleDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out middleDiv);
+            dynamic childrenContainerDivDtyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", middleDiv, this, out childrenContainerDiv);
             if (TextWrapping == TextWrapping.NoWrap)
             {
-                innerDivStyle.whiteSpace = "nowrap";
+                outerDivStyle.whiteSpace = "pre"; //nowrap + preserve whitespaces
             }
             else //so that we are sure that it will behave the same on all browsers
             {
-                innerDivStyle.whiteSpace = "normal";
+                outerDivStyle.whiteSpace = "pre-wrap"; //wrap and preserve whitespaces
             }
-            innerDivStyle.overflow = "hidden"; //keeps the text from overflowing despite the TextBlock's size limitations.
-            innerDivStyle.textAlign = "left"; // this is the default value.
-            domElementWhereToPlaceChildren = innerDiv;
+            outerDivStyle.overflow = "hidden"; //keeps the text from overflowing despite the TextBlock's size limitations.
+            outerDivStyle.textAlign = "left"; // this is the default value.
+            middleDivStyle.width = "inherit";
+            middleDivStyle.height = "inherit";
+            childrenContainerDivDtyle.width = "inherit";
+            childrenContainerDivDtyle.height = "inherit";
+            childrenContainerDivDtyle.overflowX = "hidden";
+            childrenContainerDivDtyle.overflowY = "hidden";
+            domElementWhereToPlaceChildren = childrenContainerDiv;
 
-            return innerDiv;
+            return outerDiv;
         }
 
         /// <summary>
@@ -88,19 +100,32 @@ namespace Windows.UI.Xaml.Controls
             get { return (string)GetValue(TextProperty); }
             set { SetValue(TextProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Text dependency property.
         /// </summary>
-        public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof(string), typeof(TextBlock), new PropertyMetadata(string.Empty) { MethodToUpdateDom = Text_MethodToUpdateDom });
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(TextBlock), new PropertyMetadata(string.Empty, OnTextPropertyChanged) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
 
-        static void Text_MethodToUpdateDom(DependencyObject d, object newValue)
+        private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var textBlock = (TextBlock)d;
-            string newText = newValue as string;
-            if (newText == null || newText == string.Empty)
-                newText = "\u00A0"; // We put a non-breaking space here because otherwise with string.Empty the Height of the TextBlock in HTML becomes 0.
-            INTERNAL_HtmlDomManager.SetContentString(textBlock, newText);
+            TextBlock textBlock = (TextBlock)d;
+            if (!textBlock._isTextChanging)
+            {
+                textBlock._isTextChanging = true;
+                textBlock.Inlines.Clear();
+                textBlock.Inlines.Add(new Run() { Text = (string)e.NewValue });
+                textBlock._isTextChanging = false;
+            }
+        }
+
+        internal void SetTextPropertyNoCallBack(string text)
+        {
+            if (!this._isTextChanging)
+            {
+                this._isTextChanging = true;
+                this.SetLocalValue(TextProperty, text);
+                this._isTextChanging = false;
+            }
         }
 
         #region Properties for formatting (TextAlignment, TextWrapping)
@@ -175,12 +200,11 @@ namespace Windows.UI.Xaml.Controls
                                 TextWrapping newTextWrapping = (TextWrapping)value;
                                 switch (newTextWrapping)
                                 {
-                                    case TextWrapping.NoWrap:
-                                        return "nowrap";
                                     case TextWrapping.Wrap:
-                                        return "normal";
+                                        return "pre-wrap"; //wrap + preserve whitespaces
+                                    case TextWrapping.NoWrap:
                                     default:
-                                        return "";
+                                        return "pre"; //nowrap + preserve whitespaces
                                 }
                             },
                         Name = new List<string> { "whiteSpace" },
@@ -191,25 +215,19 @@ namespace Windows.UI.Xaml.Controls
 
         #endregion
 
-
         public InlineCollection Inlines
         {
             get
             {
-                if (_inlines == null)
-                    _inlines = new InlineCollection();
-                return _inlines;
+                return this._inlines;
             }
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
-            if (_inlines != null)
+            foreach (Inline child in this._inlines)
             {
-                foreach (Inline child in _inlines)
-                {
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
-                }
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
             }
         }
 #if WORKINPROGRESS
@@ -223,8 +241,8 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public TextTrimming TextTrimming
         {
-            get { return (TextTrimming)GetValue(TextBlock.TextTrimmingProperty); }
-            set { SetValue(TextBlock.TextTrimmingProperty, value); }
+            get { return (TextTrimming)GetValue(TextTrimmingProperty); }
+            set { SetValue(TextTrimmingProperty, value); }
         }
 
         #endregion
