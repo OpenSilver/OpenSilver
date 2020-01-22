@@ -41,5 +41,14 @@ namespace Windows.UI.Xaml
         /// Initializes a new instance of the DataTemplate class.
         /// </summary>
         public DataTemplate() : base() { }
+
+        /// <summary>
+        /// Creates the System.Windows.UIElement objects in the System.Windows.DataTemplate.
+        /// </summary>
+        /// <returns>The root System.Windows.UIElement of the System.Windows.DataTemplate.</returns>
+        public DependencyObject LoadContent()
+        {
+            return this.INTERNAL_InstantiateFrameworkTemplate();
+        }
     }
 }
