@@ -123,6 +123,20 @@ namespace Windows.UI.Xaml
             this.PropertyChangedCallback = propertyChangedCallback;
         }
 
+        /// <summary>
+        ///     Type meta construction
+        /// </summary>
+        /// <param name="defaultValue">Default value of property</param>
+        /// <param name="propertyChangedCallback">Called when the property has been changed</param>
+        /// <param name="coerceValueCallback">Called on update of value</param>
+        public PropertyMetadata(object defaultValue, PropertyChangedCallback propertyChangedCallback, CoerceValueCallback coerceValueCallback)
+        {
+            this.CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet;
+            this.DefaultValue = defaultValue;
+            this.PropertyChangedCallback = propertyChangedCallback;
+            this.CoerceValueCallback = coerceValueCallback;
+        }
+
         internal CSSEquivalentGetter GetCSSEquivalent;
         internal CSSEquivalentsGetter GetCSSEquivalents;
     }
