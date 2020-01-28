@@ -39,8 +39,8 @@ namespace Windows.UI.Xaml.Controls
 
     public class ItemContainerGenerator
     {
-        Dictionary<object, List<object>> _itemsToContainers = new Dictionary<object, List<object>>(); // Note: this maps each item (for example a string or a business object) to the corresponding element that is added to the visual tree (such a datatemplate) or to the native DOM element in case of native combo box for example. The reason why each single element can be associated to multiple objects is because of Strings and other value types: for example, if two identical strings are added to the ItemsControl, they will be the same key of the dictionary.
-        List<object> _containers = new List<object>(); //this list is kept to get the index from the container (with minimum work to keep it updated, it might not be the most efficient method perf-wise).
+        Dictionary<object, List<DependencyObject>> _itemsToContainers = new Dictionary<object, List<DependencyObject>>(); // Note: this maps each item (for example a string or a business object) to the corresponding element that is added to the visual tree (such a datatemplate) or to the native DOM element in case of native combo box for example. The reason why each single element can be associated to multiple objects is because of Strings and other value types: for example, if two identical strings are added to the ItemsControl, they will be the same key of the dictionary.
+        List<DependencyObject> _containers = new List<DependencyObject>(); //this list is kept to get the index from the container (with minimum work to keep it updated, it might not be the most efficient method perf-wise).
 
         /// <summary>
         /// Returns the container corresponding to the specified item, or null if no container was found.
@@ -48,14 +48,14 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="item">The item to retrieve the container for.</param>
         /// <returns>A container that corresponds to the specified item, if the item has a container
         /// and exists in the collection; otherwise, null.</returns>
-        public object ContainerFromItem(object item)
+        public DependencyObject ContainerFromItem(object item)
         {
             if (_itemsToContainers.ContainsKey(item))
             {
-                List<object> containersAssociatedToTheItem = _itemsToContainers[item];
+                List<DependencyObject> containersAssociatedToTheItem = _itemsToContainers[item];
                 if (containersAssociatedToTheItem != null && containersAssociatedToTheItem.Count > 0)
                 {
-                    object container = containersAssociatedToTheItem[0];
+                    DependencyObject container = containersAssociatedToTheItem[0];
                     return container;
                 }
                 else
@@ -65,12 +65,13 @@ namespace Windows.UI.Xaml.Controls
                 return null;
         }
 
+
         /// <summary>
         /// Returns the container at the given index, or null if the index is negative or above the amount of containers.
         /// </summary>
         /// <param name="index">The index at which the container is located.</param>
         /// <returns>The container at the given index, or null if the index is negative or above the amount of containers.</returns>
-        public object ContainerFromIndex(int index)
+        public DependencyObject ContainerFromIndex(int index)
         {
             if (index > -1 && _containers.Count > index)
             {
@@ -80,7 +81,7 @@ namespace Windows.UI.Xaml.Controls
                 return null;
         }
 
-        public int IndexFromContainer(object container)
+        public int IndexFromContainer(DependencyObject container)
         {
             return _containers.IndexOf(container);
         }
@@ -91,7 +92,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="container">The container to remove.</param>
         /// <param name="correspondingItem">The item that corresponds to the container to remove.</param>
         /// <returns>True if found and removed, false otherwise.</returns>
-        public bool INTERNAL_TryUnregisterContainer(object container, object correspondingItem)
+        public bool INTERNAL_TryUnregisterContainer(DependencyObject container, object correspondingItem)
         {
             int indexOfContainerInContainerList = _containers.IndexOf(container);
             if (indexOfContainerInContainerList != -1)
@@ -100,7 +101,7 @@ namespace Windows.UI.Xaml.Controls
             }
             if (_itemsToContainers.ContainsKey(correspondingItem))
             {
-                List<object> containersAssociatedToTheItem = _itemsToContainers[correspondingItem];
+                List<DependencyObject> containersAssociatedToTheItem = _itemsToContainers[correspondingItem];
                 if (containersAssociatedToTheItem != null)
                 {
                     if (containersAssociatedToTheItem.Remove(container))
@@ -113,7 +114,7 @@ namespace Windows.UI.Xaml.Controls
                     }
                 }
             }
-            
+
             return false;
         }
 
@@ -158,16 +159,16 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="container">The container to add.</param>
         /// <param name="correspondingItem">The item that corresponds to the container to add.</param>
-        public void INTERNAL_RegisterContainer(object container, object correspondingItem)
+        public void INTERNAL_RegisterContainer(DependencyObject container, object correspondingItem)
         {
-            List<object> containersAssociatedToTheItem;
+            List<DependencyObject> containersAssociatedToTheItem;
             if (_itemsToContainers.ContainsKey(correspondingItem))
             {
                 containersAssociatedToTheItem = _itemsToContainers[correspondingItem];
             }
             else
             {
-                containersAssociatedToTheItem = new List<object>();
+                containersAssociatedToTheItem = new List<DependencyObject>();
                 _itemsToContainers.Add(correspondingItem, containersAssociatedToTheItem);
             }
             containersAssociatedToTheItem.Add(container);
@@ -177,11 +178,11 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Gets all the containers associated to all the items.
         /// </summary>
-        public IEnumerable<object> INTERNAL_AllContainers
+        public IEnumerable<DependencyObject> INTERNAL_AllContainers
         {
             get
             {
-                foreach (List<object> containers in
+                foreach (List<DependencyObject> containers in
 #if BRIDGE
                     INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(_itemsToContainers)
 #else
@@ -190,7 +191,7 @@ namespace Windows.UI.Xaml.Controls
 
                     )
                 {
-                    foreach (object container in containers)
+                    foreach (DependencyObject container in containers)
                     {
                         yield return container;
                     }
@@ -199,3 +200,4 @@ namespace Windows.UI.Xaml.Controls
         }
     }
 }
+
