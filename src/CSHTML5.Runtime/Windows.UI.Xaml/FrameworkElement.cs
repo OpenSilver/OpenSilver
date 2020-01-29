@@ -386,10 +386,46 @@ namespace Windows.UI.Xaml
 
         public static DependencyProperty TriggersProperty = DependencyProperty.Register("Triggers", typeof(TriggerCollection), typeof(FrameworkElement), new PropertyMetadata(new TriggerCollection()));
 
-#endregion
+        #endregion
+
+        //
+        // Summary:
+        //     Provides the behavior for the Arrange pass of Silverlight layout. Classes can
+        //     override this method to define their own Arrange pass behavior.
+        //
+        // Parameters:
+        //   finalSize:
+        //     The final area within the parent that this object should use to arrange itself
+        //     and its children.
+        //
+        // Returns:
+        //     The actual size that is used after the element is arranged in layout.
+        protected virtual Size ArrangeOverride(Size finalSize)
+        {
+            return new Size();
+        }
+        //
+        // Summary:
+        //     Provides the behavior for the Measure pass of Silverlight layout. Classes can
+        //     override this method to define their own Measure pass behavior.
+        //
+        // Parameters:
+        //   availableSize:
+        //     The available size that this object can give to child objects. Infinity (System.Double.PositiveInfinity)
+        //     can be specified as a value to indicate that the object will size to whatever
+        //     content is available.
+        //
+        // Returns:
+        //     The size that this object determines it needs during layout, based on its calculations
+        //     of the allocated sizes for child objects; or based on other considerations, such
+        //     as a fixed container size.
+        protected virtual Size MeasureOverride(Size availableSize)
+        {
+            return new Size();
+        }
 #endif
 
-#region Tag
+        #region Tag
 
         /// <summary>
         /// Gets or sets an arbitrary object value that can be used to store custom information

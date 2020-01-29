@@ -65,9 +65,29 @@ namespace System.Windows.Browser
         //     attempts to return the error text that is associated with the error.
         public virtual object Invoke(string name, params object[] args)
         {
-            return null;
+            return default(object);
         }
-    #endregion
+        public object GetProperty(int @index)
+        {
+            return default(object);
+        }
+        public void SetProperty(int @index, object @value)
+        {
+
+        }
+        public virtual object GetProperty(string @name)
+        {
+            return default(object);
+        }
+        public virtual void SetProperty(string @name, object @value)
+        {
+
+        }
+        public virtual object InvokeSelf(Object[] @args)
+        {
+            return default(object);
+        }
+        #endregion
     }
 #endif
 }

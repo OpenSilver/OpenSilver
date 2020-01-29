@@ -96,7 +96,7 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        internal override void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
+        internal protected override void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
         {
             double maxAbs = StartPoint.X > EndPoint.X ? StartPoint.X : EndPoint.X;
             double minAbs = StartPoint.X < EndPoint.X ? StartPoint.X : EndPoint.X;
@@ -120,7 +120,7 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        internal override void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize) //note: we only define the line. Erasing the previous one (if any) and actually drawing the new one should be made directly by the container.
+        internal protected override void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize) //note: we only define the line. Erasing the previous one (if any) and actually drawing the new one should be made directly by the container.
         {
             string strokeAsString = string.Empty;
             //if (path.Stroke == null || path.Stroke is SolidColorBrush) //todo: make sure we want the same behaviour when it is null and when it is a SolidColorBrush (basically, check if null means default value)

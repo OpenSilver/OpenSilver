@@ -163,6 +163,18 @@ namespace Windows.UI.Xaml
         public static readonly RoutedEvent PointerPressedEvent = new RoutedEvent("PointerPressedEvent");
 #endif
 
+#if WORKINPROGRESS
+#if MIGRATION
+        //
+        // Summary:
+        //     Identifies the System.Windows.UIElement.MouseRightButtonDown routed event.
+        //
+        // Returns:
+        //     The identifier for the System.Windows.UIElement.MouseRightButtonDown routed event.
+        public static readonly RoutedEvent MouseRightButtonDownEvent;
+#endif
+#endif
+
 #if MIGRATION
         INTERNAL_EventManager<MouseButtonEventHandler, MouseButtonEventArgs> _pointerPressedEventManager;
         INTERNAL_EventManager<MouseButtonEventHandler, MouseButtonEventArgs> PointerPressedEventManager
@@ -635,6 +647,23 @@ namespace Windows.UI.Xaml
             }
         }
 
+
+        #endregion
+
+
+        #region Wheel event
+
+#if WORKINPROGRESS
+#if MIGRATION
+        //
+        // Summary:
+        //     Identifies the System.Windows.UIElement.MouseWheel routed event.
+        //
+        // Returns:
+        //     The identifier for the System.Windows.UIElement.MouseWheel routed event.
+        public static readonly RoutedEvent MouseWheelEvent;
+#endif
+#endif
 
         #endregion
 
@@ -1216,6 +1245,7 @@ namespace Windows.UI.Xaml
         }
 
         #endregion
+
 
         #region Handle keyboard events when focused
 

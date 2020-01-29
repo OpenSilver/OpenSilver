@@ -28,6 +28,19 @@ namespace System.Windows.Browser
     #if WORKINPROGRESS
     public abstract class HtmlObject : ScriptObject
     {
+        #region Methods
+        protected HtmlObject()
+        {
+        }
+        public bool AttachEvent(string @eventName, EventHandler @handler)
+        {
+            return false;
+        }
+        public bool AttachEvent(string @eventName, EventHandler<HtmlEventArgs> @handler)
+        {
+            return false;
+        }
+        #endregion
     }
-    #endif
+#endif
 }

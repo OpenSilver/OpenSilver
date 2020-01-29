@@ -264,6 +264,23 @@ namespace Windows.UI.Xaml
             }
         }
 
+#if WORKINPROGRESS
+        //
+        // Summary:
+        //     Gets a collection of the System.Windows.Window instances that have been created.
+        //
+        // Returns:
+        //     A collection of the windows used by the application.
+        //
+        // Exceptions:
+        //   T:System.NotSupportedException:
+        //     The application is not running outside the browser.
+        //
+        //   T:System.UnauthorizedAccessException:
+        //     The current thread is not the user interface (UI) thread.
+        public WindowCollection Windows { get; }
+#endif
+
         /// <summary>
         /// Occurs just before an application shuts down and cannot be canceled.
         /// </summary>

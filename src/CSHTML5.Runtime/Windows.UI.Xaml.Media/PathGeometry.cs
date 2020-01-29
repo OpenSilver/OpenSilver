@@ -195,7 +195,7 @@ namespace Windows.UI.Xaml.Media
             _strokeThickness = newStrokeThickness;
         }
 
-        internal override void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
+        internal protected override void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
         {
             foreach (PathFigure figure in Figures)
             {
@@ -214,7 +214,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Applies FillStyle, StrokeStyle + Adds the figures to the canvas' context, then calls the Fill method.
         /// </summary>
-        internal override void DefineInCanvas(Shapes.Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize)
+        internal protected override void DefineInCanvas(Shapes.Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize)
         {
             //we define the Fillstyle and StrokeStyle:
             //StrokeStyle:

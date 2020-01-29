@@ -87,6 +87,8 @@
     <Compile Include="System.Net\WORKINPROGRESS\WebRequest.cs" />
     <Compile Include="System.Resources\ResourceManager.cs" />
     <Compile Include="System.ServiceModel\CommunicationException.cs" />
+    <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlEventArgs.cs" />
+    <Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptObjectCollection.cs" />
     <Compile Include="System.Windows.Interactivity\EventTrigger.cs" />
     <Compile Include="System.Windows.Interactivity\InvokeCommandAction.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerAction.cs" />
@@ -315,6 +317,9 @@
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlElement.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlObject.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptObject.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\GeneratorPosition.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\ItemsChangedEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\ItemsChangedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Dock.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DockPanel.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Frame.cs" />
@@ -609,8 +614,10 @@
     <Compile Include="Windows.UI.Xaml.Input\RightTappedRoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Input\TappedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Input\TappedRoutedEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TextComposition.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\KeyboardNavigationMode.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\MouseWheelEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TextCompositionEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\AnimationHelpers.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\CircleEase.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\ClockState.cs" />
@@ -816,6 +823,7 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerBase.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerCollection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\VisualTransition.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\WindowCollection.cs" />
     <Compile Include="Windows.UI\Color.cs" />
     <Compile Include="Windows.UI\ColorConverter.cs" />
     <Compile Include="Windows.UI\Colors.cs" />
@@ -870,7 +878,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Page Include="DefaultStyles\INTERNAL_DefaultAutoCompleteBoxStyle.xaml">
       <Generator>MSBuild:Compile</Generator>

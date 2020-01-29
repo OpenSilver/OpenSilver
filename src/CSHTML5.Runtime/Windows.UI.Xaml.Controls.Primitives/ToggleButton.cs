@@ -479,12 +479,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         }
 
-        ///// <summary>
-        ///// Called when the ToggleButton receives toggle stimulus.
-        ///// </summary>
-        //protected virtual void OnToggle() //todo: see what it is supposed to do and implement it
-        //{
-        //}
+#if WORKINPROGRESS
+        /// <summary>
+        /// Called when the ToggleButton receives toggle stimulus.
+        /// </summary>
+        protected virtual void OnToggle() //todo: see what it is supposed to do and implement it
+        {
+
+        }
+#endif
 
         //-----------------------
         // ISENABLED (OVERRIDE)

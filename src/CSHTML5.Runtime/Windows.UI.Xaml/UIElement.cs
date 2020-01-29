@@ -564,6 +564,14 @@ namespace Windows.UI.Xaml
 
 
         #endregion
+
+        //
+        // Summary:
+        //     Invalidates the measurement state (layout) for a System.Windows.UIElement.
+        public void InvalidateMeasure()
+        {
+
+        }
 #endif
 
         #region IsHitTestVisible

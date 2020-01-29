@@ -385,6 +385,13 @@ namespace Windows.Foundation
             return X.GetHashCode() ^ Y.GetHashCode() ^ Width.GetHashCode() ^ Height.GetHashCode();
         }
 
+#if WORKINPROGRESS
+        public void Intersect(Rect rect)
+        {
+
+        }
+#endif
+
         public static Rect Parse(string rectAsString)
         {
             Rect rect = new Rect();

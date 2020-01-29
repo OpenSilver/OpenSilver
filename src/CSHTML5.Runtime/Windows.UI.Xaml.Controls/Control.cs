@@ -1177,11 +1177,23 @@ namespace Windows.UI.Xaml.Controls
 #if WORKINPROGRESS
         #region Not supported yet
 
+        //
+        // Summary:
+        //     Called before the System.Windows.UIElement.MouseRightButtonDown event occurs.
+        //
+        // Parameters:
+        //   e:
+        //     A System.Windows.Input.MouseButtonEventArgs that contains the event data.
+        protected virtual void OnMouseRightButtonDown(MouseButtonEventArgs e)
+        {
+
+        }
+
         /// <summary>Called before the <see cref="E:System.Windows.UIElement.MouseWheel" /> event occurs to provide handling for the event in a derived class without attaching a delegate. </summary>
         /// <param name="e">A <see cref="T:System.Windows.Input.MouseWheelEventArgs" /> that contains the event data.</param>
         protected virtual void OnMouseWheel(MouseWheelEventArgs e)
         {
-            throw new NotImplementedException();
+            
         }
 
         public static readonly DependencyProperty TabNavigationProperty = DependencyProperty.Register("TabNavigation", typeof(KeyboardNavigationMode), typeof(Control), new PropertyMetadata(KeyboardNavigationMode.Local));
@@ -1203,6 +1215,18 @@ namespace Windows.UI.Xaml.Controls
         {
             get { return (FontStretch)GetValue(FontStretchProperty); }
             set { SetValue(FontStretchProperty, value); }
+        }
+
+        //
+        // Summary:
+        //     Called before the System.Windows.UIElement.TextInput event occurs.
+        //
+        // Parameters:
+        //   e:
+        //     A System.Windows.Input.TextCompositionEventArgs that contains the event data.
+        protected virtual void OnTextInput(TextCompositionEventArgs e)
+        {
+
         }
         #endregion
 #endif

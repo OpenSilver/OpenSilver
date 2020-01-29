@@ -35,12 +35,12 @@ namespace Windows.UI.Xaml.Media
 #if WORKINPROGRESS
     public sealed class RectangleGeometry : Geometry
     {
-        internal override void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize)
+        internal protected override void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize)
         {
             throw new NotImplementedException();
         }
 
-        internal override void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
+        internal protected override void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
         {
             throw new NotImplementedException();
         }
@@ -59,6 +59,26 @@ namespace Windows.UI.Xaml.Media
                 SetValue(RectProperty, value);
             }
         }
+
+#if WORKINPROGRESS
+        // Summary:
+        //     Gets or sets the x-radius of the ellipse that is used to round the corners of
+        //     the rectangle.
+        //
+        // Returns:
+        //     The x-radius of the ellipse used to round the corners of the rectangle geometry.
+        //     The default is 0.
+        public double RadiusX { get; set; }
+        //
+        // Summary:
+        //     Gets or sets the y-radius of the ellipse that is used to round the corners of
+        //     the rectangle.
+        //
+        // Returns:
+        //     The y-radius of the ellipse used to round the corners of the rectangle geometry.
+        //     The default is 0.
+        public double RadiusY { get; set; }
+#endif
 
         public static readonly DependencyProperty RectProperty = DependencyProperty.Register("Rect", typeof(Rect), typeof(RectangleGeometry), null);
 

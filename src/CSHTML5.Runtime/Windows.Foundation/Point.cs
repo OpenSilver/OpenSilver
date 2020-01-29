@@ -37,7 +37,11 @@ namespace Windows.Foundation
     [TypeConverter(typeof(PointConverter))]
 #endif
     [SupportsDirectContentViaTypeFromStringConverters]
+#if WORKINPROGRESS
+    public struct Point : IFormattable
+#else
     public struct Point //: IFormattable
+#endif
     {
         //todo: Add the interface IFormattable
 
@@ -219,6 +223,11 @@ namespace Windows.Foundation
             }
             
             throw new FormatException(pointAsString + " is not an eligible value for a Point");
+        }
+
+        public string ToString(string format, IFormatProvider formatProvider)
+        {
+            return null;
         }
     }
 }

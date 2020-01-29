@@ -402,6 +402,21 @@ namespace Windows.UI.Xaml
             }
         }
 
+#if WORKINPROGRESS
+        //
+        // Summary:
+        //     Clears the local value of a dependency property.
+        //
+        // Parameters:
+        //   dp:
+        //     The System.Windows.DependencyProperty identifier of the property to clear the
+        //     value for.
+        public void ClearValue(DependencyProperty dp)
+        {
+
+        }
+#endif
+
         /// <exclude/>
         internal protected virtual void INTERNAL_OnAttachedToVisualTree()
         {

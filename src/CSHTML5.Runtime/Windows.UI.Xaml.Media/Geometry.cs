@@ -96,9 +96,11 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Draws the Geometry on the canvas.
         /// </summary>
-        internal abstract void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize);
+        internal protected abstract void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize);
+        internal protected abstract void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY);
 
-        internal abstract void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY);
+        //internal abstract void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize);
+        //internal abstract void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY);
 
         static Geometry()
         {

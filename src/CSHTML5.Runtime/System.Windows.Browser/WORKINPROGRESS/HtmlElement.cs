@@ -25,7 +25,18 @@ namespace System.Windows.Browser
     #if WORKINPROGRESS
     public sealed class HtmlElement : HtmlObject
     {
-        #region Not supported yet
+        #region Fields
+        private ScriptObjectCollection _children;
+        #endregion
+
+        #region Properties
+        public ScriptObjectCollection Children
+        {
+            get { return _children; }
+        }
+        #endregion
+
+        #region Methods
         // Summary:
         //     Sets the browser focus to the current HTML element.
         //
@@ -37,7 +48,31 @@ namespace System.Windows.Browser
         {
 
         }
+
+        internal HtmlElement()
+        {
+            _children = null;
+        }
+        public void AppendChild(HtmlElement @element)
+        {
+        }
+        public void AppendChild(HtmlElement @element, HtmlElement @referenceElement)
+        {
+        }
+        public void RemoveChild(HtmlElement @element)
+        {
+        }
+        public void SetAttribute(string @name, string @value)
+        {
+        }
+        public string GetStyleAttribute(string @name)
+        {
+            return default(string);
+        }
+        public void SetStyleAttribute(string @name, string @value)
+        {
+        }
         #endregion
     }
-    #endif
+#endif
 }
