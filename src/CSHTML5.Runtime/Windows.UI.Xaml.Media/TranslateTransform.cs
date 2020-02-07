@@ -206,5 +206,23 @@ namespace Windows.UI.Xaml.Media
         {
             return new Point(point.X + X, point.Y + Y);
         }
+
+#if WORKINPROGRESS
+        public override GeneralTransform Inverse
+        {
+            get { return null; }
+        }
+
+        public override Rect TransformBounds(Rect rect)
+        {
+            return Rect.Empty;
+        }
+
+        public override bool TryTransform(Point inPoint, out Point outPoint)
+        {
+            outPoint = new Point();
+            return false;
+        }
+#endif
     }
 }

@@ -396,5 +396,14 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
             }
         }
+
+#if WORKINPROGRESS
+        public static readonly DependencyProperty ByProperty = DependencyProperty.Register("By", typeof(Color?), typeof(ColorAnimation), null);
+        public Color? By
+        {
+            get { return (Color?)this.GetValue(ByProperty); }
+            set { this.SetValue(ByProperty, value); }
+        }
+#endif
     }
 }

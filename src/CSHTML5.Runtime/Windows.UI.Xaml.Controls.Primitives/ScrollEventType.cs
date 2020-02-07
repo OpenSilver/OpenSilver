@@ -84,5 +84,21 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// being dragged by the user.
         /// </summary>
         EndScroll = 8,
+
+#if WORKINPROGRESS
+        /// <summary>
+        /// Specifies that the Thumb moved to a new position because the user selected
+        /// Scroll Here in the shortcut menu of the ScrollBar.
+        /// </summary>
+        ThumbPosition = 4,
+        /// <summary>
+        /// Specifies that the Thumb moved to the Minimum position of the ScrollBar.
+        /// </summary>
+        First = 6,
+        /// <summary>
+        /// Specifies that the Thumb moved to the Minimum position of the ScrollBar.
+        /// </summary>
+        Last = 7,
+#endif
     }
 }

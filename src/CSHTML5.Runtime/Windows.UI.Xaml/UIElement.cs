@@ -564,14 +564,6 @@ namespace Windows.UI.Xaml
 
 
         #endregion
-
-        //
-        // Summary:
-        //     Invalidates the measurement state (layout) for a System.Windows.UIElement.
-        public void InvalidateMeasure()
-        {
-
-        }
 #endif
 
         #region IsHitTestVisible
@@ -1140,5 +1132,35 @@ namespace Windows.UI.Xaml
         //internal virtual void INTERNAL_Render()
         //{
         //}
+
+#if WORKINPROGRESS
+        public Size DesiredSize { get; private set; }
+        public Size RenderSize { get; private set; }
+
+        public void Arrange(Rect finalRect)
+        {
+
+        }
+
+        public void Measure(Size availableSize)
+        {
+
+        }
+
+        public void InvalidateArrange()
+        {
+
+        }
+
+        public void InvalidateMeasure()
+        {
+
+        }
+
+        public void UpdateLayout()
+        {
+
+        }
+#endif
     }
 }

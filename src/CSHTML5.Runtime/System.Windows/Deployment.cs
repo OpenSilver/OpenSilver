@@ -51,6 +51,12 @@ namespace System.Windows
             }
         }
 
+#if WORKINPROGRESS
+        public OutOfBrowserSettings OutOfBrowserSettings { get; private set; }
+
+        public AssemblyPartCollection Parts { get; private set; }
+#endif
+
         #region not implemented
 
         //// Summary:
@@ -126,7 +132,7 @@ namespace System.Windows
         ////     The System.Windows.Deployment.Current property has already been initialized.
         //public Deployment();
 
-        
+
         ////
         //// Summary:
         ////     Gets a string name that identifies which part in the System.Windows.Deployment

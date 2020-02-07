@@ -24,7 +24,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Threading;
+#else
 using Windows.UI.Core;
 #endif
 
@@ -435,6 +437,27 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
+#if WORKINPROGRESS
+        public ClockState GetCurrentState()
+        {
+            return ClockState.Active;
+        }
+
+        public void SkipToFill()
+        {
+
+        }
+
+        public void Seek(TimeSpan offset)
+        {
+
+        }
+
+        public void Pause()
+        {
+
+        }
+#endif
 
     }
 

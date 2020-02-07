@@ -26,7 +26,11 @@ using CSHTML5;
 
 namespace System.Windows.Browser
 {
+#if WORKINPROGRESS
+    public sealed class HtmlDocument : HtmlObject
+#else
     public sealed class HtmlDocument
+#endif
     {
         public HtmlDocument()
         {
@@ -41,7 +45,7 @@ namespace System.Windows.Browser
         {
             get
             {
-                return new Uri(Interop.ExecuteJavaScript("window.location.href").ToString());
+                return new Uri(CSHTML5.Interop.ExecuteJavaScript("window.location.href").ToString());
             }
         }
 
@@ -58,7 +62,7 @@ namespace System.Windows.Browser
                 //split it using '&'
                 //for each element of the array we obtained, split it (with '=') and put the first element in the "key" and the second in the "value"
                 Dictionary<string, string> returnValue = new Dictionary<string, string>();
-                string url = Interop.ExecuteJavaScript("document.URL").ToString();
+                string url = CSHTML5.Interop.ExecuteJavaScript("document.URL").ToString();
                 int index = url.IndexOf('?');
                 if (index != -1)
                 {
@@ -73,5 +77,14 @@ namespace System.Windows.Browser
                 return returnValue;
             }
         }
+
+#if WORKINPROGRESS
+        public HtmlElement Body { get; private set; }
+
+        public HtmlElement CreateElement(string tagName)
+        {
+            return null;
+        }
+#endif
     }
 }

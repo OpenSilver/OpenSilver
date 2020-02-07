@@ -56,5 +56,15 @@ namespace Windows.UI.Xaml.Controls
 
             _suppressCollectionChanged = false;
         }
+
+#if WORKINPROGRESS
+        public object SyncRoot
+        {
+            get
+            {
+                return this;
+            }
+        }
+#endif
     }
 }

@@ -307,28 +307,6 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             });
         #endregion
 
-#if WORKINPROGRESS
-        #region SelectionBackground
-        public Brush SelectionBackground
-        {
-            get { return (Brush)GetValue(SelectionBackgroundProperty); }
-            set { SetValue(SelectionBackgroundProperty, value); }
-        }
-
-        //public static readonly DependencyProperty SelectionBackgroundProperty =
-        //    DependencyProperty.Register("SelectionBackground", typeof(Brush), typeof(TextBox), new PropertyMetadata(new SolidColorBrush(Colors.Blue))
-        //    {
-        //        //TODO : Change CSSEquivalent
-        //        GetCSSEquivalent = (instance) =>
-        //        {
-        //            return new CSSEquivalent();
-        //        }
-        //    });
-        public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register("SelectionBackground", typeof(Brush), typeof(TextBox), null);
-
-        #endregion
-#endif
-
         public override void INTERNAL_AttachToDomEvents()
         {
             base.INTERNAL_AttachToDomEvents();
@@ -1250,11 +1228,52 @@ element.setAttribute(""data-maxlength"", ""{1}"");
 
 
         #region TextDecorations
-
+#if MIGRATION
         /// <summary>
         /// Gets or sets the text decorations (underline, strikethrough...).
         /// </summary>
-        public TextDecorations? TextDecorations
+        public new TextDecorationCollection TextDecorations
+        {
+            get { return (TextDecorationCollection)GetValue(TextDecorationsProperty); }
+            set { SetValue(TextDecorationsProperty, value); }
+        }
+        /// <summary>
+        /// Identifies the TextDecorations dependency property.
+        /// </summary>
+        public new static readonly DependencyProperty TextDecorationsProperty = DependencyProperty.Register("TextDecorations",
+                                                                                                        typeof(TextDecorationCollection),
+                                                                                                        typeof(TextBox),
+                                                                                                        new PropertyMetadata(null) { MethodToUpdateDom = TextDecorations_MethodToUpdateDom });
+
+        static void TextDecorations_MethodToUpdateDom(DependencyObject d, object newValue)
+        {
+            var textBox = (TextBox)d;
+            TextDecorationCollection newTextDecorations = (TextDecorationCollection)newValue;
+
+            string cssValue;
+            if (newTextDecorations == System.Windows.TextDecorations.OverLine)
+            {
+                cssValue = "overline";
+            }
+            else if (newTextDecorations == System.Windows.TextDecorations.Strikethrough)
+            {
+                cssValue = "line-through";
+            }
+            else if (newTextDecorations == System.Windows.TextDecorations.Underline)
+            {
+                cssValue = "underline";
+            }
+            else
+            {
+                cssValue = string.Empty; // Note: this will reset the value.
+            }
+            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBox.INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
+        }
+#else
+        /// <summary>
+        /// Gets or sets the text decorations (underline, strikethrough...).
+        /// </summary>
+        public new TextDecorations? TextDecorations
         {
             get { return (TextDecorations?)GetValue(TextDecorationsProperty); }
             set { SetValue(TextDecorationsProperty, value); }
@@ -1262,7 +1281,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
         /// <summary>
         /// Identifies the TextDecorations dependency property.
         /// </summary>
-        public static readonly DependencyProperty TextDecorationsProperty =
+        public new static readonly DependencyProperty TextDecorationsProperty =
             DependencyProperty.Register("TextDecorations", typeof(TextDecorations?), typeof(TextBox), new PropertyMetadata(null) { MethodToUpdateDom = TextDecorations_MethodToUpdateDom });
 
         static void TextDecorations_MethodToUpdateDom(DependencyObject d, object newValue)
@@ -1275,42 +1294,28 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             {
                 switch (newTextDecorations.Value)
                 {
-#if MIGRATION
-                    case global::System.Windows.TextDecorations.OverLine:
+                    case Windows.UI.Text.TextDecorations.OverLine:
                         cssValue = "overline";
                         break;
-                    case global::System.Windows.TextDecorations.Strikethrough:
+                    case Windows.UI.Text.TextDecorations.Strikethrough:
                         cssValue = "line-through";
                         break;
-                    case global::System.Windows.TextDecorations.Underline:
+                    case Windows.UI.Text.TextDecorations.Underline:
                         cssValue = "underline";
                         break;
-                    case global::System.Windows.TextDecorations.None:
+                    case Windows.UI.Text.TextDecorations.None:
                     default:
                         cssValue = ""; // Note: this will reset the value.
                         break;
-#else
-                    case global::Windows.UI.Text.TextDecorations.OverLine:
-                        cssValue = "overline";
-                        break;
-                    case global::Windows.UI.Text.TextDecorations.Strikethrough:
-                        cssValue = "line-through";
-                        break;
-                    case global::Windows.UI.Text.TextDecorations.Underline:
-                        cssValue = "underline";
-                        break;
-                    case global::Windows.UI.Text.TextDecorations.None:
-                    default:
-                        cssValue = ""; // Note: this will reset the value.
-                        break;
-#endif
                 }
             }
             else
+            {
                 cssValue = ""; // Note: this will reset the value.
+            }
             INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBox.INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
         }
-
+#endif
         #endregion
 
 
@@ -1413,7 +1418,7 @@ element.setAttribute(""data-isreadonly"",""{1}"");
             }
         }
 
-        #region Not implemented yet
+        #region Not implemented yet (should we move this in WORKINPROGRESS ?)
 
         public event RoutedEventHandler SelectionChanged;
 
@@ -1426,6 +1431,25 @@ element.setAttribute(""data-isreadonly"",""{1}"");
         }
 
         #endregion
+
+#if WORKINPROGRESS
+        #region SelectionBackground
+        public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register("SelectionBackground", typeof(Brush), typeof(TextBox), null);
+
+        public Brush SelectionBackground
+        {
+            get { return (Brush)GetValue(SelectionBackgroundProperty); }
+            set { SetValue(SelectionBackgroundProperty, value); }
+        }
+        #endregion
+
+        public void Select(int start, int length)
+        {
+
+        }
+
+        public string SelectedText { get; set; }
+#endif
 
     }
 }

@@ -24,6 +24,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 #if MIGRATION
+using System.Windows.Threading;
 using System.Windows.Data;
 #else
 using Windows.UI.Core;
@@ -402,6 +403,19 @@ namespace Windows.UI.Xaml
             }
         }
 
+        /// <exclude/>
+        internal protected virtual void INTERNAL_OnAttachedToVisualTree()
+        {
+        }
+
+        /// <exclude/>
+        internal protected virtual void INTERNAL_OnDetachedFromVisualTree()
+        {
+            // This is particularly useful for elements to clear any references they have to DOM elements. For example, the Grid will use it to set its _tableDiv to null.
+        }
+
+        #endregion
+
 #if WORKINPROGRESS
         //
         // Summary:
@@ -415,19 +429,11 @@ namespace Windows.UI.Xaml
         {
 
         }
+
+        public bool CheckAccess()
+        {
+            return false;
+        }
 #endif
-
-        /// <exclude/>
-        internal protected virtual void INTERNAL_OnAttachedToVisualTree()
-        {
-        }
-
-        /// <exclude/>
-        internal protected virtual void INTERNAL_OnDetachedFromVisualTree()
-        {
-            // This is particularly useful for elements to clear any references they have to DOM elements. For example, the Grid will use it to set its _tableDiv to null.
-        }
-
-        #endregion
     }
 }

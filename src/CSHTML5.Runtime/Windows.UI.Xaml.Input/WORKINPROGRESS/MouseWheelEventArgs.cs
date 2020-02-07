@@ -37,6 +37,7 @@ namespace Windows.UI.Xaml.Input
     public class MouseWheelEventArgs
 #endif
     {
+        public int Delta { get; private set; }
     }
 #endif
 }

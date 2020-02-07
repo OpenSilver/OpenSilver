@@ -27,8 +27,10 @@ using System.Windows.Markup;
 
 #if MIGRATION
 using System.Windows;
+using System.Windows.Controls.Primitives;
 #else
 using Windows.Foundation;
+using Windows.UI.Xaml.Controls.Primitives;
 #endif
 
 #if MIGRATION
@@ -318,5 +320,22 @@ namespace Windows.UI.Xaml.Media
             }
             return null; // no attribute found
         }
+
+#if WORKINPROGRESS
+        public static IEnumerable<Popup> GetOpenPopups()
+        {
+            return null;
+        }
+
+        public static IEnumerable<Popup> GetOpenPopups(Window window)
+        {
+            return null;
+        }
+
+        public static IEnumerable<UIElement> FindElementsInHostCoordinates(Rect intersectingRect, UIElement subtree)
+        {
+            return null;
+        }
+#endif
     }
 }

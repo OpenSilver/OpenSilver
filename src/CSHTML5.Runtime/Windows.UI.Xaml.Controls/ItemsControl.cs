@@ -810,8 +810,6 @@ namespace Windows.UI.Xaml.Controls
 
 
 #if WORKINPROGRESS
-        #region not supported stuff
-
         //// Returns:
         ////     The name or path of the property that is displayed for each the data item
         ////     in the control. The default is an empty string ("").
@@ -1025,7 +1023,15 @@ namespace Windows.UI.Xaml.Controls
             //todo: implement this
         }
 
-        #endregion
+        public static ItemsControl GetItemsOwner(DependencyObject element)
+        {
+            return null;
+        }
+
+        public static ItemsControl ItemsControlFromItemContainer(DependencyObject container)
+        {
+            return null;
+        }
 #endif
 
     }

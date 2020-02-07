@@ -54,19 +54,19 @@ namespace Windows.UI.Xaml.Controls
             isLoaded = true;
 
             // Get a reference to the HTML DOM representation of the control (must be in the Visual Tree):
-            object div = Interop.GetDiv(this);
+            object div = CSHTML5.Interop.GetDiv(this);
 
             // Render the control: Calendar only
-            _flatpickrInstance = Interop.ExecuteJavaScript(@"flatpickr($0, {
+            _flatpickrInstance = CSHTML5.Interop.ExecuteJavaScript(@"flatpickr($0, {
                 inline: true, 
                 dateFormat: ""YYYY-MM-DD HH:MM"",
                 defaultDate: $1
                 })", div, GetJsDate(defaultDate));
 
             // Register the JS events:
-            if (Interop.IsRunningInTheSimulator)
+            if (CSHTML5.Interop.IsRunningInTheSimulator)
             {
-                Interop.ExecuteJavaScript(@"$0.config.onChange.push(function(args) {
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.config.onChange.push(function(args) {
                     var date = args[0];
                     if(date !== undefined)
                     {
@@ -77,7 +77,7 @@ namespace Windows.UI.Xaml.Controls
                     }
                 });", _flatpickrInstance, (Action<object, object, object>)OnJavaScriptEvent_Change);
 
-                Interop.ExecuteJavaScript(@"$0.config.onMonthChange.push(function(args) {
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.config.onMonthChange.push(function(args) {
                     $1();
                 });", _flatpickrInstance, (Action)OnMonthChange);
 
@@ -88,10 +88,10 @@ namespace Windows.UI.Xaml.Controls
                 // In JS there is a bug that prevents us from using the exact same code as the Simulator. The bug has to do with the "this" keyword when used inside the callback from the JS interop: it returns the "onChange" array because the callback was added with "onChange.push".
 
                 // Force capturing the "this" instance now because in JS "this" keyword has a different meaning when retrieved later:
-                var calendar = Interop.ExecuteJavaScript(@"$0", this);
+                var calendar = CSHTML5.Interop.ExecuteJavaScript(@"$0", this);
 
                 // Register the JS events:
-                Interop.ExecuteJavaScript(@"$0.config.onChange.push(function(args) {
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.config.onChange.push(function(args) {
                     var date = args[0];
                     if(date !== undefined)
                     {
@@ -102,7 +102,7 @@ namespace Windows.UI.Xaml.Controls
                     }
                 });", _flatpickrInstance, (Action<object, object, object, object>)WorkaroundJSILBug, calendar);
 
-                Interop.ExecuteJavaScript(@"$0.config.onMonthChange.push(function(args) {
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.config.onMonthChange.push(function(args) {
                     $1($2);
                 });", _flatpickrInstance, (Action<object>)WorkaroundJSILBugForOnMonthChange, calendar);
             }
@@ -110,7 +110,7 @@ namespace Windows.UI.Xaml.Controls
             RefreshTodayHighlight(IsTodayHighlighted);
 
             // Hide the input area:
-            Interop.ExecuteJavaScript(@"$0.style.display = 'none'", div);
+            CSHTML5.Interop.ExecuteJavaScript(@"$0.style.display = 'none'", div);
         }
 
         static void WorkaroundJSILBug(object calendarInstance, object year, object month, object day)
@@ -174,10 +174,10 @@ namespace Windows.UI.Xaml.Controls
                 {
                     c = "";
                 }
-                var todaySpan = Interop.ExecuteJavaScript(@"$0.calendarContainer.querySelector('span.today')", this._flatpickrInstance);
+                var todaySpan = CSHTML5.Interop.ExecuteJavaScript(@"$0.calendarContainer.querySelector('span.today')", this._flatpickrInstance);
                 if (todaySpan != null)
                 {
-                    Interop.ExecuteJavaScript(@"$0.style.borderColor = $1", todaySpan, c);
+                    CSHTML5.Interop.ExecuteJavaScript(@"$0.style.borderColor = $1", todaySpan, c);
                 }
             }
         }
@@ -220,12 +220,12 @@ namespace Windows.UI.Xaml.Controls
         {
             if (dateStart == null)
             {
-                Interop.ExecuteJavaScript(@"$0.config.minDate = undefined", this._flatpickrInstance);
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.config.minDate = undefined", this._flatpickrInstance);
             }
             else
             {
                 DateTime nonNullDateStart = (DateTime)dateStart;
-                Interop.ExecuteJavaScript(@"$0.config.minDate = $1", this._flatpickrInstance, GetJsDate(nonNullDateStart));
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.config.minDate = $1", this._flatpickrInstance, GetJsDate(nonNullDateStart));
             }
         }
 
@@ -233,12 +233,12 @@ namespace Windows.UI.Xaml.Controls
         {
             if (dateEnd == null)
             {
-                Interop.ExecuteJavaScript(@"$0.config.maxDate = undefined", this._flatpickrInstance);
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.config.maxDate = undefined", this._flatpickrInstance);
             }
             else
             {
                 DateTime nonNullDateEnd = (DateTime)dateEnd;
-                Interop.ExecuteJavaScript(@"$0.config.maxDate = $1", this._flatpickrInstance, GetJsDate(nonNullDateEnd));
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.config.maxDate = $1", this._flatpickrInstance, GetJsDate(nonNullDateEnd));
             }
         }
 
@@ -246,7 +246,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (dateTime == null)
             {
-                Interop.ExecuteJavaScript(@"$0.config.maxDate = undefined", this._flatpickrInstance);
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.config.maxDate = undefined", this._flatpickrInstance);
             }
             else
             {
@@ -255,7 +255,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     throw new ArgumentOutOfRangeException("The given date is not in the range specified by System.Windows.Controls.Calendar.DisplayDateStart and System.Windows.Controls.Calendar.DisplayDateEnd");
                 }
-                Interop.ExecuteJavaScript(@"$0.jumpToDate($1)", this._flatpickrInstance, GetJsDate(nonNullDate));
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.jumpToDate($1)", this._flatpickrInstance, GetJsDate(nonNullDate));
             }
         }
 
@@ -265,7 +265,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
         static object GetJsDate(DateTime dateTime)
         {
-            var date = Interop.ExecuteJavaScript("new Date($0,$1,$2)", dateTime.Year, dateTime.Month - 1, dateTime.Day);
+            var date = CSHTML5.Interop.ExecuteJavaScript("new Date($0,$1,$2)", dateTime.Year, dateTime.Month - 1, dateTime.Day);
             return date;
         }
 

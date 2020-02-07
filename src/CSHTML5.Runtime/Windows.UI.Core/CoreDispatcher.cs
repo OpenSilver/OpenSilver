@@ -31,7 +31,11 @@ using Windows.Foundation;
 #endif
 
 #if MIGRATION
+#if WORKINPROGRESS
+namespace System.Windows.Threading
+#else
 namespace System.Windows
+#endif
 #else
 namespace Windows.UI.Core
 #endif
@@ -93,12 +97,21 @@ namespace Windows.UI.Core
         /// The delegate to a method, which is
         /// pushed onto the System.Windows.Threading.Dispatcher event queue.
         /// </param>
+#if WORKINPROGRESS
+        public DispatcherOperation BeginInvoke(Action method)
+#else
         public void BeginInvoke(Action method)
+#endif
         {
             if (method == null)
                 throw new ArgumentNullException("method");
-
+#if WORKINPROGRESS
+            DispatcherOperation dispatcherOperation = new DispatcherOperation();
             BeginInvokeInternal(method);
+            return dispatcherOperation;
+#else
+            BeginInvokeInternal(method);
+#endif
         }
 
 #if !BRIDGE
@@ -155,5 +168,17 @@ namespace Windows.UI.Core
                 global::System.Threading.Timeout.Infinite);
              */
         }
+
+#if WORKINPROGRESS
+        public DispatcherOperation BeginInvoke(Delegate d, params object[] args)
+        {
+            return null;
+        }
+
+        public bool CheckAccess()
+        {
+            return false;
+        }
+#endif
     }
 }

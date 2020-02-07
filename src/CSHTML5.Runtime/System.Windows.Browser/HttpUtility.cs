@@ -33,14 +33,12 @@ namespace System.Windows.Browser
     //[SecuritySafeCritical]
     public static class HttpUtility
     {
-        static Dictionary<string,string> _codeNamesToChars;
-        static Dictionary<string,string> CodeNamesToChars
+        private static readonly Dictionary<string, string> codeNamesToChars;
+
+        static HttpUtility()
         {
-            get
+            codeNamesToChars = new Dictionary<string, string>()
             {
-                if(_codeNamesToChars == null)
-                {
-                    _codeNamesToChars = new Dictionary<string, string>() {
                 { "&nbsp;", " " },
                 {"&quot;", "\""},
                 {"&amp;", "&"},
@@ -203,10 +201,7 @@ namespace System.Windows.Browser
                 {"&Chi;", "Χ"},
                 {"&Psi;", "Ψ"},
                 {"&Omega;", "Ω"}
-        };
-                }
-                return _codeNamesToChars;
-            }
+            };
         }
 
 
@@ -234,10 +229,10 @@ namespace System.Windows.Browser
 
 
             //Initial decoding:
-            decodedHtml = Convert.ToString(Interop.ExecuteJavaScript(@"$0.replace(/&#\d+;/gim, function(i) { return String.fromCharCode(i.substring(2,i.length-1));} )", decodedHtml));
+            decodedHtml = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript(@"$0.replace(/&#\d+;/gim, function(i) { return String.fromCharCode(i.substring(2,i.length-1));} )", decodedHtml));
 
             //Decoding hexadecimal-style encoding:
-            decodedHtml = Convert.ToString(Interop.ExecuteJavaScript(@"$0.replace(/&#x[a-fA-F0-9]+;/gim, function(i) { return String.fromCharCode(parseInt(i.substring(3,i.length-1), 16));} )", decodedHtml));
+            decodedHtml = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript(@"$0.replace(/&#x[a-fA-F0-9]+;/gim, function(i) { return String.fromCharCode(parseInt(i.substring(3,i.length-1), 16));} )", decodedHtml));
             #region line above explained:
             //decodedHtml.replace(/&#x[a-fA-F0-9]+;/gim, //regex that accepts anything that starts with &#x followed by an hexadecimal number, followed by ';'
             //    function(i) //the function to apply on each match of the regex and that returns the string with which to replace it
@@ -252,18 +247,18 @@ namespace System.Windows.Browser
 
             //Now we want to decode the elements that have been encoded with their named codes:
             int i = 0;
-            while(i != -1 && i < decodedHtml.Length)
+            while (i != -1 && i < decodedHtml.Length)
             {
-                i = decodedHtml.IndexOf('&',i);
+                i = decodedHtml.IndexOf('&', i);
                 if (i != -1)
                 {
                     int j = decodedHtml.IndexOf(';', i + 1);
                     if (j != -1)
                     {
                         string sub = decodedHtml.Substring(i, j - i + 1);
-                        if (CodeNamesToChars.ContainsKey(sub))
+                        if (codeNamesToChars.ContainsKey(sub))
                         {
-                            decodedHtml = decodedHtml.Replace(sub, CodeNamesToChars[sub]);
+                            decodedHtml = decodedHtml.Replace(sub, codeNamesToChars[sub]);
                         }
                         ++i;
                     }
@@ -292,7 +287,7 @@ namespace System.Windows.Browser
             //brutal way but dealing with each case separately seems like it might be a lot:
             // Here, we will replace all non-alphanumeric characters with their html character (so '&' => "&#38;" for example)
             //Regex regex = new Regex("[^a-zA-Z0-9]");
-            string encodedHtml = Convert.ToString(Interop.ExecuteJavaScript(@"$0.replace(/[^a-zA-Z0-9]/gim, function(i) { return '&#' + i.charCodeAt(0) + ';'} )", html));
+            string encodedHtml = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript(@"$0.replace(/[^a-zA-Z0-9]/gim, function(i) { return '&#' + i.charCodeAt(0) + ';'} )", html));
             return encodedHtml;
 
             ////very limited way (for html, a lot more cases need to be handled than for xml apparently: https://owasp.org/www-project-cheat-sheets/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
@@ -316,7 +311,7 @@ namespace System.Windows.Browser
 #endif
         public static string UrlDecode(string url)
         {
-            return Interop.ExecuteJavaScript("decodeURIComponent($0)", url).ToString();
+            return CSHTML5.Interop.ExecuteJavaScript("decodeURIComponent($0)", url).ToString();
         }
 
         /// <summary>
@@ -331,7 +326,7 @@ namespace System.Windows.Browser
 #endif
         public static string UrlEncode(string url)
         {
-            return Interop.ExecuteJavaScript("encodeURIComponent($0)", url).ToString();
+            return CSHTML5.Interop.ExecuteJavaScript("encodeURIComponent($0)", url).ToString();
         }
     }
 }

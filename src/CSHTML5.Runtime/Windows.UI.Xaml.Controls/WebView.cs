@@ -20,6 +20,13 @@
 using CSHTML5;
 using CSHTML5.Internal;
 using System;
+#if WORKINPROGRESS
+#if MIGRATION 
+using System.Windows.Navigation;
+#else
+using Windows.UI.Xaml.Navigation;
+#endif
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -56,15 +63,15 @@ namespace Windows.UI.Xaml.Controls
             var source = this.Source;
             if (source != null && !string.IsNullOrEmpty(source.OriginalString))
             {
-                Interop.ExecuteJavaScriptAsync("$0.src = $1", _iFrame, source.OriginalString);
+                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.src = $1", _iFrame, source.OriginalString);
             }
             else if (_htmlString != null)
             {
-                Interop.ExecuteJavaScriptAsync("srcDoc.set($0, $1)", _iFrame, _htmlString);
+                CSHTML5.Interop.ExecuteJavaScriptAsync("srcDoc.set($0, $1)", _iFrame, _htmlString);
             }
             else
             {
-                Interop.ExecuteJavaScriptAsync("$0.src = 'about:blank'", _iFrame);
+                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.src = 'about:blank'", _iFrame);
             }
 
             domElementWhereToPlaceChildren = _iFrame;
@@ -108,11 +115,11 @@ namespace Windows.UI.Xaml.Controls
                 if (source != null && !string.IsNullOrEmpty(source.OriginalString))
                 {
                     string uri = INTERNAL_UriHelper.ConvertToHtml5Path(source.OriginalString, null);
-                    Interop.ExecuteJavaScriptAsync("$0.src = $1", webView._iFrame, uri);
+                    CSHTML5.Interop.ExecuteJavaScriptAsync("$0.src = $1", webView._iFrame, uri);
                 }
                 else
                 {
-                    Interop.ExecuteJavaScriptAsync("$0.src = 'about:blank'", webView._iFrame);
+                    CSHTML5.Interop.ExecuteJavaScriptAsync("$0.src = 'about:blank'", webView._iFrame);
                 }
             }
         }
@@ -141,13 +148,17 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (_htmlString != null)
                 {
-                    Interop.ExecuteJavaScriptAsync("srcDoc.set($0, $1)", _iFrame, _htmlString);
+                    CSHTML5.Interop.ExecuteJavaScriptAsync("srcDoc.set($0, $1)", _iFrame, _htmlString);
                 }
                 else
                 {
-                    Interop.ExecuteJavaScriptAsync("$0.src = 'about:blank'", _iFrame);
+                    CSHTML5.Interop.ExecuteJavaScriptAsync("$0.src = 'about:blank'", _iFrame);
                 }
             }
         }
+
+#if WORKINPROGRESS
+        public event LoadCompletedEventHandler LoadCompleted;
+#endif
     }
 }

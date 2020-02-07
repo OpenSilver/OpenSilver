@@ -178,7 +178,7 @@ namespace Windows.UI.Xaml
         {
             get
             {
-                return (object)this;
+                return this;
             }
         }
 

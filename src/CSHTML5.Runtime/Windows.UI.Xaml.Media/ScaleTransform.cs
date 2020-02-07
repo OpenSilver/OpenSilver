@@ -197,5 +197,38 @@ namespace Windows.UI.Xaml.Media
         {
             throw new NotImplementedException("Please contact support@cshtml5.com");
         }
+
+#if WORKINPROGRESS
+        public static readonly DependencyProperty CenterXProperty = DependencyProperty.Register("CenterX", typeof(double), typeof(ScaleTransform), null);
+        public double CenterX
+        {
+            get { return (double)this.GetValue(CenterXProperty); }
+            set { this.SetValue(CenterXProperty, value); }
+        }
+
+        public static readonly DependencyProperty CenterYProperty = DependencyProperty.Register("CenterY", typeof(double), typeof(ScaleTransform), null);
+
+        public double CenterY
+        {
+            get { return (double)this.GetValue(CenterYProperty); }
+            set { this.SetValue(CenterYProperty, value); }
+        }
+
+        public override GeneralTransform Inverse
+        {
+            get { return null; }
+        }
+
+        public override Rect TransformBounds(Rect rect)
+        {
+            return Rect.Empty;
+        }
+
+        public override bool TryTransform(Point inPoint, out Point outPoint)
+        {
+            outPoint = new Point();
+            return false;
+        }
+#endif
     }
 }

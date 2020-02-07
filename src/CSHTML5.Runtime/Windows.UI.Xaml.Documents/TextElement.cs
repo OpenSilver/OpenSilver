@@ -36,5 +36,13 @@ namespace Windows.UI.Xaml.Documents
     /// </summary>
     public abstract class TextElement : Control
     {
+#if WORKINPROGRESS
+        public static readonly DependencyProperty CharacterSpacingProperty = DependencyProperty.Register("CharacterSpacing", typeof(int), typeof(TextElement), null);
+        public int CharacterSpacing
+        {
+            get { return (int)this.GetValue(CharacterSpacingProperty); }
+            set { this.SetValue(CharacterSpacingProperty, value); }
+        }
+#endif
     }
 }

@@ -366,5 +366,12 @@ namespace Windows.UI.Xaml.Controls
             get { return UnselectedItemForeground; }
             set { UnselectedItemForeground = value; }
         }
+
+#if WORKINPROGRESS
+        public void ScrollIntoView(object item)
+        {
+
+        }
+#endif
     }
 }

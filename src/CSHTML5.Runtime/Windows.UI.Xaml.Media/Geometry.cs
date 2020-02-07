@@ -121,5 +121,16 @@ namespace Windows.UI.Xaml.Media
         {
             return "evenodd";
         }
+
+#if WORKINPROGRESS
+        public static readonly DependencyProperty TransformProperty = DependencyProperty.Register("Transform", typeof(Transform), typeof(Geometry), null);
+        public Transform Transform
+        {
+            get { return (Transform)this.GetValue(TransformProperty); }
+            set { this.SetValue(TransformProperty, value); }
+        }
+
+        public Rect Bounds { get; private set; }
+#endif
     }
 }

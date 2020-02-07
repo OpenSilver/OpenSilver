@@ -154,8 +154,6 @@ namespace Windows.UI.Xaml.Media
             throw new NotImplementedException("Please contact support@cshtml5.com");
         }
 #if WORKINPROGRESS
-#region Not supported yet
-
         /// <summary>
         ///     CenterX - double.  Default value is 0.0.
         /// </summary>
@@ -190,8 +188,21 @@ namespace Windows.UI.Xaml.Media
 
         public static readonly DependencyProperty CenterYProperty = DependencyProperty.Register("CenterY", typeof(double), typeof(RotateTransform), new PropertyMetadata(null));
 
+        public override GeneralTransform Inverse
+        {
+            get { return null; }
+        }
 
-#endregion
+        public override Rect TransformBounds(Rect rect)
+        {
+            return Rect.Empty;
+        }
+
+        public override bool TryTransform(Point inPoint, out Point outPoint)
+        {
+            outPoint = new Point();
+            return false;
+        }
 #endif
     }
 }

@@ -1212,5 +1212,76 @@ namespace Windows.UI.Xaml.Controls
         public void ZoomToFactor(float factor);
 
         */
+
+#if WORKINPROGRESS
+        public static readonly DependencyProperty ScrollableHeightProperty = DependencyProperty.Register("ScrollableHeight", typeof(double), typeof(ScrollViewer), null);
+
+        public double ScrollableHeight
+        {
+            get { return (double)this.GetValue(ScrollableHeightProperty); }
+            private set { this.SetValue(ScrollableHeightProperty, value); }
+        }
+
+        public static readonly DependencyProperty ScrollableWidthProperty = DependencyProperty.Register("ScrollableWidth", typeof(double), typeof(ScrollViewer), null);
+
+        public double ScrollableWidth
+        {
+            get { return (double)this.GetValue(ScrollableWidthProperty); }
+            private set { this.SetValue(ScrollableWidthProperty, value); }
+        }
+
+        public static readonly DependencyProperty ViewportHeightProperty = DependencyProperty.Register("ViewportHeight", typeof(double), typeof(ScrollViewer), null);
+
+        public double ViewportHeight
+        {
+            get { return (double)this.GetValue(ViewportHeightProperty); }
+            private set { this.SetValue(ViewportHeightProperty, value); }
+        }
+
+        public static readonly DependencyProperty ViewportWidthProperty = DependencyProperty.Register("ViewportWidth", typeof(double), typeof(ScrollViewer), null);
+
+        public double ViewportWidth
+        {
+            get { return (double)this.GetValue(ViewportWidthProperty); }
+            private set { this.SetValue(ViewportWidthProperty, value); }
+        }
+
+        public static readonly DependencyProperty ComputedHorizontalScrollBarVisibilityProperty = DependencyProperty.Register("ComputedHorizontalScrollBarVisibility", typeof(Visibility), typeof(ScrollViewer), null);
+
+        public Visibility ComputedHorizontalScrollBarVisibility
+        {
+            get { return (Visibility)this.GetValue(ComputedHorizontalScrollBarVisibilityProperty); }
+            private set { this.SetValue(ComputedHorizontalScrollBarVisibilityProperty, value); }
+        }
+
+        public static readonly DependencyProperty ComputedVerticalScrollBarVisibilityProperty = DependencyProperty.Register("ComputedVerticalScrollBarVisibility", typeof(Visibility), typeof(ScrollViewer), null);
+
+        public Visibility ComputedVerticalScrollBarVisibility
+        {
+            get { return (Visibility)this.GetValue(ComputedVerticalScrollBarVisibilityProperty); }
+            private set { this.SetValue(ComputedVerticalScrollBarVisibilityProperty, value); }
+        }
+
+        public static readonly DependencyProperty ExtentHeightProperty = DependencyProperty.Register("ExtentHeight", typeof(double), typeof(ScrollViewer), null);
+
+        public double ExtentHeight
+        {
+            get { return (double)this.GetValue(ExtentHeightProperty); }
+            private set { this.SetValue(ExtentHeightProperty, value); }
+        }
+
+        public static readonly DependencyProperty ExtentWidthProperty = DependencyProperty.Register("ExtentWidth", typeof(double), typeof(ScrollViewer), null);
+
+        public double ExtentWidth
+        {
+            get { return (double)this.GetValue(ExtentWidthProperty); }
+            private set { this.SetValue(ExtentWidthProperty, value); }
+        }
+
+        public void InvalidateScrollInfo()
+        {
+
+        }
+#endif
     }
 }

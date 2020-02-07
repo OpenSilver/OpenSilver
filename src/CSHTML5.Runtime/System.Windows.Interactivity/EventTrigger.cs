@@ -106,7 +106,7 @@ namespace System.Windows.Interactivity
 
         private void RegisterEvent(DependencyObject associatedObject, string eventName)
         {
-            if (Interop.IsRunningInTheSimulator)
+            if (CSHTML5.Interop.IsRunningInTheSimulator)
             {
                 RegisterEvent_SimulatorOnly(associatedObject, eventName);
             }

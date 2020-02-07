@@ -87,5 +87,9 @@ namespace System
 
         public bool EnableInvalidPropertyMetadataDefaultValueExceptions { get; set; }
 
+#if WORKINPROGRESS
+        public bool EnableAutoZoom { get; set; }
+        public bool Windowless { get; private set; }
+#endif
     }
 }

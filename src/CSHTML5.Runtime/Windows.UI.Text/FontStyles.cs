@@ -33,10 +33,25 @@ namespace Windows.UI.Text
     /// Represents the style of a font face (for example, normal or italic).
     /// </summary>
 #if MIGRATION
-    public enum FontStyles
+    public static class FontStyles
+    {
+        public static FontStyle Normal
+        {
+            get { return new FontStyle(0); }
+        }
+
+        public static FontStyle Oblique
+        {
+            get { return new FontStyle(1); }
+        }
+
+        public static FontStyle Italic
+        {
+            get { return new FontStyle(2); }
+        }
+    }
 #else
     public enum FontStyle
-#endif
     {
         /// <summary>
         /// Represents a normal font style.
@@ -51,4 +66,5 @@ namespace Windows.UI.Text
         /// </summary>
         Italic = 2,
     }
+#endif
 }

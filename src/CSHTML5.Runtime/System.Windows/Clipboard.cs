@@ -73,5 +73,17 @@ namespace System.Windows
             }
 #endif
         }
+
+#if WORKINPROGRESS
+        public static string GetText()
+        {
+            return string.Empty;
+        }
+
+        public static bool ContainsText()
+        {
+            return false;
+        }
+#endif
     }
 }

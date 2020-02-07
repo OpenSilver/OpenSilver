@@ -1230,5 +1230,15 @@ namespace Windows.UI.Xaml.Controls
         //            return double.NaN;
         //    }
         //}
+
+#if WORKINPROGRESS
+        public static readonly DependencyProperty ShowGridLinesProperty = DependencyProperty.Register("ShowGridLines", typeof(bool), typeof(Grid), new PropertyMetadata(false));
+
+        public bool ShowGridLines
+        {
+            get { return (bool)this.GetValue(ShowGridLinesProperty); }
+            set { this.SetValue(ShowGridLinesProperty, value); }
+        }
+#endif
     }
 }

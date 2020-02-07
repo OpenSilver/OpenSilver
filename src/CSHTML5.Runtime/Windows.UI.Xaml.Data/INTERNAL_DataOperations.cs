@@ -20,6 +20,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -133,9 +134,22 @@ namespace Windows.UI.Xaml.Data
     /// <summary>
     /// Description of grouping based on a property value.
     /// </summary>
+#if WORKINPROGRESS
+    public class PropertyGroupDescription : GroupDescription
+#else
     public class PropertyGroupDescription
+#endif
     {
+#if WORKINPROGRESS
+        public string PropertyName { get; set; }
+#else
         public string PropertyName { get; private set; }
+#endif
+
+        public PropertyGroupDescription()
+        {
+
+        }
 
         public PropertyGroupDescription(string propertyName)
         {

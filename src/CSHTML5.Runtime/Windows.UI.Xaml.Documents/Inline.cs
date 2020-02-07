@@ -43,10 +43,29 @@ namespace Windows.UI.Xaml.Documents
             return new Run() { Text = s };
         }
 
+#if MIGRATION
         /// <summary>
         /// Gets or sets the text decorations (underline, strikethrough...).
         /// </summary>
-        public TextDecorations? TextDecorations
+        public new TextDecorationCollection TextDecorations
+        {
+            get { return (TextDecorationCollection)GetValue(TextDecorationsProperty); }
+            set { SetValue(TextDecorationsProperty, value); }
+        }
+        /// <summary>
+        /// Identifies the TextDecorations dependency property.
+        /// </summary>
+        public new static readonly DependencyProperty TextDecorationsProperty = DependencyProperty.Register("TextDecorations", 
+                                                                                                            typeof(TextDecorationCollection), 
+                                                                                                            typeof(Inline), 
+                                                                                                            new PropertyMetadata(System.Windows.TextDecorations.None) {
+                                                                                                                GetCSSEquivalent = Control.INTERNAL_GetCSSEquivalentForTextDecorations 
+                                                                                                            });
+#else
+                /// <summary>
+        /// Gets or sets the text decorations (underline, strikethrough...).
+        /// </summary>
+        public new TextDecorations? TextDecorations
         {
             get { return (TextDecorations?)GetValue(TextDecorationsProperty); }
             set { SetValue(TextDecorationsProperty, value); }
@@ -54,11 +73,12 @@ namespace Windows.UI.Xaml.Documents
         /// <summary>
         /// Identifies the TextDecorations dependency property.
         /// </summary>
-        public static readonly DependencyProperty TextDecorationsProperty =
+        public new static readonly DependencyProperty TextDecorationsProperty =
             DependencyProperty.Register("TextDecorations", typeof(TextDecorations?), typeof(Inline), new PropertyMetadata(null)
             {
-                GetCSSEquivalent = TextBlock.INTERNAL_GetCSSEquivalentForTextDecorations
+                GetCSSEquivalent = Control.INTERNAL_GetCSSEquivalentForTextDecorations
             }
             );
+#endif
     }
 }

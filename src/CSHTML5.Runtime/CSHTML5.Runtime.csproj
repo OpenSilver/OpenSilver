@@ -83,10 +83,14 @@
     <Compile Include="System.ComponentModel\IPagedCollectionView.cs" />
     <Compile Include="System.ComponentModel\PageChangingEventArgs.cs" />
     <Compile Include="System.ComponentModel\ReadOnlyAttribute.cs" />
+    <Compile Include="System.ComponentModel\WORKINPROGRESS\GroupDescription.cs" />
+    <Compile Include="System.ComponentModel\WORKINPROGRESS\IEditableCollectionView.cs" />
+    <Compile Include="System.ComponentModel\WORKINPROGRESS\NewItemPlaceholderPosition.cs" />
     <Compile Include="System.Net\WORKINPROGRESS\HttpWebRequest.cs" />
     <Compile Include="System.Net\WORKINPROGRESS\WebRequest.cs" />
     <Compile Include="System.Resources\ResourceManager.cs" />
     <Compile Include="System.ServiceModel\CommunicationException.cs" />
+    <Compile Include="System.Windows.Browser\WORKINPROGRESS\BrowserInformation.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlEventArgs.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptObjectCollection.cs" />
     <Compile Include="System.Windows.Interactivity\EventTrigger.cs" />
@@ -95,6 +99,10 @@
     <Compile Include="System.Windows.Interactivity\TriggerActionCollection.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerBase.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerCollection.cs" />
+    <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
+    <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
+    <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\LoadCompletedEventHandler.cs" />
     <Compile Include="System.Xml.Linq\XObject.cs" />
     <Compile Include="ToBeReviewed\GroupedEnumerable.cs" />
     <Compile Include="ToBeReviewed\Grouping.cs" />
@@ -317,6 +325,7 @@
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlElement.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlObject.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptObject.cs" />
+    <Compile Include="Windows.UI.Core\WORKINPROGRESS\DispatcherOperation.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\GeneratorPosition.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\ItemsChangedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\ItemsChangedEventHandler.cs" />
@@ -417,7 +426,7 @@
     <Compile Include="Windows.UI.Core\CoreDispatcher.cs" />
     <Compile Include="Windows.UI.Core\WindowSizeChangedEventArgs.cs" />
     <Compile Include="Windows.UI.Input\PointerPoint.cs" />
-    <Compile Include="Windows.UI.Text\FontStyle.cs" />
+    <Compile Include="Windows.UI.Text\FontStyles.cs" />
     <Compile Include="Windows.UI.Text\FontWeight.cs" />
     <Compile Include="Windows.UI.Text\FontWeightConverter.cs" />
     <Compile Include="Windows.UI.Text\FontWeights.cs" />
@@ -614,6 +623,8 @@
     <Compile Include="Windows.UI.Xaml.Input\RightTappedRoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Input\TappedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Input\TappedRoutedEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\MouseWheelEventHandler.cs" />
+    <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\StylusDevice.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TextComposition.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\KeyboardNavigationMode.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\MouseWheelEventArgs.cs" />
@@ -649,6 +660,7 @@
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\Animatable.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\AnimationTimeline.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\BackEase.cs" />
+    <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\ClockState.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\ColorAnimationUsingKeyFrames.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\ColorKeyFrame.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\ColorKeyFrameCollection.cs" />
@@ -656,6 +668,7 @@
     <Compile Include="Windows.UI.Xaml.Media.Animation\DoubleKeyFrame.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\DoubleKeyFrameCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\EasingDoubleKeyFrame.cs" />
+    <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\FillBehavior.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\IAnimatable.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\IEasingFunction.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\IKeyFrame.cs" />
@@ -665,6 +678,7 @@
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\SplineDoubleKeyFrame.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Imaging\BitmapImage.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Imaging\BitmapSource.cs" />
+    <Compile Include="Windows.UI.Xaml.Media.Imaging\WORKINPROGRESS\BitmapCreateOptions.cs" />
     <Compile Include="Windows.UI.Xaml.Media\ArcSegment.cs" />
     <Compile Include="Windows.UI.Xaml.Media\BezierSegment.cs" />
     <Compile Include="Windows.UI.Xaml.Media\Brush.cs" />
@@ -751,6 +765,7 @@
     <Compile Include="Windows.UI.Xaml\DurationConverter.cs" />
     <Compile Include="Windows.UI.Xaml\ExceptionRoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\ExceptionRoutedEventHandler.cs" />
+    <Compile Include="Windows.UI.Xaml\FontStyle.cs" />
     <Compile Include="Windows.UI.Xaml\FrameworkElement.cs" />
     <Compile Include="Windows.UI.Xaml\FrameworkElement_HandlingSizeAndAlignment.cs" />
     <Compile Include="Windows.UI.Xaml\FrameworkTemplate.cs" />
@@ -808,13 +823,20 @@
     <Compile Include="Windows.UI.Xaml\Window.cs" />
     <Compile Include="Windows.UI.Xaml\WindowSizeChangedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationUnhandledExceptionEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\AssemblyPart.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\AssemblyPartCollection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DependencyObjectCollection.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\EventTrigger.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FlowDirection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontStretch.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\Freezable.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\HierarchicalDataTemplate.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\IDataObject.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\OutOfBrowserSettings.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\PresentationFrameworkCollection.cs" />
+    <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TabletDeviceType.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TemplateBindingExpression.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextDecoration.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextDecorationCollection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextTrimming.cs" />
@@ -824,6 +846,10 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerCollection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\VisualTransition.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\WindowCollection.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\WindowResizeEdge.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\WindowSettings.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\WindowState.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\WindowStyle.cs" />
     <Compile Include="Windows.UI\Color.cs" />
     <Compile Include="Windows.UI\ColorConverter.cs" />
     <Compile Include="Windows.UI\Colors.cs" />

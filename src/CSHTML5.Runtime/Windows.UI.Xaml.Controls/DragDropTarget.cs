@@ -30,6 +30,7 @@ using System.Windows.Media;
 using Microsoft.Windows;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
+using MS = Microsoft.Windows;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
@@ -39,6 +40,7 @@ using System.Windows.Controls;
 using System;
 using Windows.UI.Xaml.Shapes;
 using Windows.UI.Xaml.Controls;
+using MS = System.Windows;
 #endif
 
 #if MIGRATION
@@ -278,7 +280,7 @@ namespace Windows.UI.Xaml.Controls
             SelectionCollection selectionCollection = SelectionCollection.ToSelectionCollection(selection);
             DataObject dataObject = new DataObject();
             dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
-            DragEventArgs dragOverEventArgs = new DragEventArgs(dataObject);
+            MS.DragEventArgs dragOverEventArgs = new MS.DragEventArgs(dataObject);
 
             // Get the DragDropTarget element that is under the pointer, if any:
             TItemContainerType targetItemContainer;
@@ -294,7 +296,7 @@ namespace Windows.UI.Xaml.Controls
                 // Raise the DragLeave event of the element that was under the pointer before:
                 if (_previousdragDropTargetUnderPointer != null && _previousdragDropTargetUnderPointer.DragLeave != null)
                 {
-                    _previousdragDropTargetUnderPointer.DragLeave(_previousdragDropTargetUnderPointer, new DragEventArgs(dataObject));
+                    _previousdragDropTargetUnderPointer.DragLeave(_previousdragDropTargetUnderPointer, new MS.DragEventArgs(dataObject));
 
                     // Reset the value of "_isDragCancelled" when leaving a control. This variable lets the user prevent a Drop on an element when the user sets e.Handled=true in the "DragOver" event of that element.
                     _isDragCancelled = false;
@@ -304,7 +306,7 @@ namespace Windows.UI.Xaml.Controls
 
                 // Raise the DragEnter event of the new element that is under the pointer:
                 if (dragDropTargetUnderPointer != null && dragDropTargetUnderPointer.DragEnter != null)
-                    dragDropTargetUnderPointer.DragEnter(dragDropTargetUnderPointer, new DragEventArgs(dataObject));
+                    dragDropTargetUnderPointer.DragEnter(dragDropTargetUnderPointer, new MS.DragEventArgs(dataObject));
             }
 
             if (dragDropTargetUnderPointer != null)
@@ -428,7 +430,7 @@ namespace Windows.UI.Xaml.Controls
                             dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
 
 #if !(BRIDGE && MIGRATION)
-                            dragDropTargetUnderPointer.ItemDroppedOnSource(dragDropTargetUnderPointer, new DragEventArgs(dataObject, e));
+                            dragDropTargetUnderPointer.ItemDroppedOnSource(dragDropTargetUnderPointer, new MS.DragEventArgs(dataObject, e));
 #endif
                         }
                     }
@@ -451,7 +453,7 @@ namespace Windows.UI.Xaml.Controls
 
                             // Raise the Drop event:
 #if !(BRIDGE && MIGRATION)
-                            dragDropTargetUnderPointer.Drop(dragDropTargetUnderPointer, new DragEventArgs(dataObject, e));
+                            dragDropTargetUnderPointer.Drop(dragDropTargetUnderPointer, new MS.DragEventArgs(dataObject, e));
 #endif
                         }
 
@@ -516,7 +518,7 @@ namespace Windows.UI.Xaml.Controls
         /// Raises the DragOver event.
         /// </summary>
         /// <param name="dragOverEventArgs">Information about the event.</param>
-        protected virtual void OnDragOver(DragEventArgs dragOverEventArgs)
+        protected virtual void OnDragOver(MS.DragEventArgs dragOverEventArgs)
         {
             if (this.DragOver != null)
             {
@@ -530,10 +532,10 @@ namespace Windows.UI.Xaml.Controls
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            if (!Interop.IsRunningInTheSimulator)
+            if (!CSHTML5.Interop.IsRunningInTheSimulator)
             {
                 // Prevent the selection of text while dragging from the DragDropTarget
-                Interop.ExecuteJavaScriptAsync("$0.onselectstart = function() { return false; }", this.INTERNAL_OuterDomElement);
+                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.onselectstart = function() { return false; }", this.INTERNAL_OuterDomElement);
             }
         }
 

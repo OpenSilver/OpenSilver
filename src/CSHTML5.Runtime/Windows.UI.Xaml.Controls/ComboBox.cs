@@ -170,8 +170,13 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (!ChangingSelectionProgrammatically)
                 {
+#if WORKINPROGRESS
+                    IList oldItems = GetListOfSelectedItemsInCSharp();
+                    IList newItems = GetListOfNewlySelectedItems_InCaseOfNativeComboBox(element);
+#else
                     IList<object> oldItems = GetListOfSelectedItemsInCSharp();
                     IList<object> newItems = GetListOfNewlySelectedItems_InCaseOfNativeComboBox(element);
+#endif
                     //todo: remove the items present in both oldItems and newItems ?
                     var eventArgs = new SelectionChangedEventArgs(oldItems, newItems)
                     {
@@ -267,9 +272,13 @@ namespace Windows.UI.Xaml.Controls
                 _dropDownToggle.IsChecked = false;
         }
 
-#endregion
+        #endregion
 
+#if WORKINPROGRESS
+        IList GetListOfSelectedItemsInCSharp()
+#else
         IList<object> GetListOfSelectedItemsInCSharp()
+#endif
         {
             List<object> selectedItems = new List<object>();
             selectedItems.Add(SelectedItem);

@@ -308,5 +308,9 @@ namespace Windows.UI.Xaml.Controls
         //        INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this).backgroundColor = ((SolidColorBrush)Background).Color.INTERNAL_ToHtmlString();
         //    }
         //}
+
+#if WORKINPROGRESS
+        public bool IsItemsHost { get; private set; }
+#endif
     }
 }

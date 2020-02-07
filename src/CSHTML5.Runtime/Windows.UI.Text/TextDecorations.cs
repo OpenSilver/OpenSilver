@@ -15,13 +15,45 @@
 //
 //===============================================================================
 
-
-
 #if MIGRATION
 namespace System.Windows
+{
+    public static class TextDecorations
+    {
+        private static readonly TextDecorationCollection none = new TextDecorationCollection(new TextDecoration(0));
+        //private static readonly TextDecorationCollection baseline = new TextDecorationCollection(new TextDecoration(1));
+        private static readonly TextDecorationCollection overline = new TextDecorationCollection(new TextDecoration(2));
+        private static readonly TextDecorationCollection strikethrough = new TextDecorationCollection(new TextDecoration(3));
+        private static readonly TextDecorationCollection underline = new TextDecorationCollection(new TextDecoration(4));
+
+        //public static TextDecorationCollection Baseline
+        //{
+        //    get { return baseline; }
+        //}
+
+        public static TextDecorationCollection OverLine
+        {
+            get { return overline; }
+        }
+
+        public static TextDecorationCollection Strikethrough
+        {
+            get { return strikethrough; }
+        }
+
+        public static TextDecorationCollection Underline
+        {
+            get { return underline; }
+        }
+
+        internal static TextDecorationCollection None
+        {
+            get { return none; }
+        }
+    }
+}
 #else
 namespace Windows.UI.Text
-#endif
 {
     /// <summary>
     /// Provides a set of predefined text decorations.
@@ -54,3 +86,4 @@ namespace Windows.UI.Text
         Underline = 4
     }
 }
+#endif

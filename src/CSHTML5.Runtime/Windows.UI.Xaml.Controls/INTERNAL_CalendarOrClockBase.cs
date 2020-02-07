@@ -99,17 +99,17 @@ namespace Windows.UI.Xaml.Controls
                     if (calendarOrClock._flatpickrInstance != null)
                     {
                         // Convert from C# DateTime to JS Date:
-                        var newDateJS = Interop.ExecuteJavaScript("new Date($0, $1, $2, $3, $4)", newDate.Year, newDate.Month - 1, newDate.Day, newDate.Hour, newDate.Minute);
+                        var newDateJS = CSHTML5.Interop.ExecuteJavaScript("new Date($0, $1, $2, $3, $4)", newDate.Year, newDate.Month - 1, newDate.Day, newDate.Hour, newDate.Minute);
 
                         // Set the current date in the JS instance of the calendar:
-                        Interop.ExecuteJavaScript("$0.setDate($1)", calendarOrClock._flatpickrInstance, newDateJS);
+                        CSHTML5.Interop.ExecuteJavaScript("$0.setDate($1)", calendarOrClock._flatpickrInstance, newDateJS);
                     }
                 }
                 else
                 {
                     if (calendarOrClock._flatpickrInstance != null)
                     {
-                        Interop.ExecuteJavaScript("$0.setDate(undefined)", calendarOrClock._flatpickrInstance);
+                        CSHTML5.Interop.ExecuteJavaScript("$0.setDate(undefined)", calendarOrClock._flatpickrInstance);
                     }
                 }
             }

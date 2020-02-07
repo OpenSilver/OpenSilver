@@ -58,5 +58,10 @@ namespace Windows.UI.Xaml
             NewValue = newValue;
             Property = property;
         }
+
+        public DependencyPropertyChangedEventArgs()
+        {
+
+        }
     }
 }

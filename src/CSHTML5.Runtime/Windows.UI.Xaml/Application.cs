@@ -79,7 +79,7 @@ namespace Windows.UI.Xaml
 
             // Remember whether we are in "SL Migration" mode or not:
 #if MIGRATION
-            Interop.ExecuteJavaScript(@"document.isSLMigration = true");
+            CSHTML5.Interop.ExecuteJavaScript(@"document.isSLMigration = true");
 #else
             Interop.ExecuteJavaScript(@"document.isSLMigration = false");
 #endif
@@ -88,14 +88,14 @@ namespace Windows.UI.Xaml
 
 
             // Inject the "DataContractSerializer" into the "XmlSerializer" (read note in the "XmlSerializer" implementation to understand why):
-            if (!Interop.IsRunningInTheSimulator) //Note: in case of the Simulator, we reference the .NET Framework version of "System.xml.dll", so we cannot inject stuff because the required members of XmlSerializer would be missing.
+            if (!CSHTML5.Interop.IsRunningInTheSimulator) //Note: in case of the Simulator, we reference the .NET Framework version of "System.xml.dll", so we cannot inject stuff because the required members of XmlSerializer would be missing.
             {
                 InjectDataContractSerializerIntoXmlSerializer();
             }
 
 #if !CSHTML5NETSTANDARD
             // Fix the freezing of the Simulator when calling 'alert' using the "Interop.ExecuteJavaScript()" method by redirecting the JavaScript "alert" to the Simulator message box:
-            if (Interop.IsRunningInTheSimulator)
+            if (CSHTML5.Interop.IsRunningInTheSimulator)
             {
                 RedirectAlertToMessageBox_SimulatorOnly();
             }
@@ -208,7 +208,7 @@ namespace Windows.UI.Xaml
         static void RedirectAlertToMessageBox_SimulatorOnly()
         {
             // Fix the freezing of the Simulator when calling 'alert' using the "Interop.ExecuteJavaScript()" method by redirecting the JavaScript "alert" to the Simulator message box:
-            Interop.ExecuteJavaScript(@"window.alert =  function(msg){ $0(msg); }", (Action<object>)((msg) => { MessageBox.Show(msg.ToString()); }));
+            CSHTML5.Interop.ExecuteJavaScript(@"window.alert =  function(msg){ $0(msg); }", (Action<object>)((msg) => { MessageBox.Show(msg.ToString()); }));
         }
 #endif
 
@@ -256,11 +256,19 @@ namespace Windows.UI.Xaml
         {
             get
             {
+#if WORKINPROGRESS
+                return Window.Current.Content;
+#else
                 return (Window.Current.Content as UIElement);
+#endif
             }
             set
             {
+#if WORKINPROGRESS
+                Window.Current.Content = value as FrameworkElement;
+#else
                 Window.Current.Content = value;
+#endif
             }
         }
 
@@ -352,31 +360,31 @@ namespace Windows.UI.Xaml
             uris.Add(uriAsString + ".g.js");
             if (uriResource.OriginalString.ToLower() == "ms-appx://app.config")
             {
-                Interop.LoadJavaScriptFilesAsync(
+                CSHTML5.Interop.LoadJavaScriptFilesAsync(
                     uris,
                     (Action)(() =>
                     {
-                        tcs.SetResult(Convert.ToString(Interop.ExecuteJavaScript("window.AppConfig")));
+                        tcs.SetResult(Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("window.AppConfig")));
                     })
                     );
             }
             else if (uriResource.OriginalString.ToLower() == "ms-appx://servicereferences.clientconfig")
             {
-                Interop.LoadJavaScriptFilesAsync(
+                CSHTML5.Interop.LoadJavaScriptFilesAsync(
                     uris,
                     (Action)(() =>
                     {
-                        tcs.SetResult(Convert.ToString(Interop.ExecuteJavaScript("window.ServiceReferencesClientConfig")));
+                        tcs.SetResult(Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("window.ServiceReferencesClientConfig")));
                     })
                     );
             }
             else
             {
-                Interop.LoadJavaScriptFilesAsync(
+                CSHTML5.Interop.LoadJavaScriptFilesAsync(
                     uris,
                     (Action)(() =>
                     {
-                        string result = Convert.ToString(Interop.ExecuteJavaScript("window.FileContent"));
+                        string result = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("window.FileContent"));
                         _resourcesCache.Add(uriResource.OriginalString.ToLower(), result);
                         tcs.SetResult(result);
                     })
@@ -568,6 +576,15 @@ namespace Windows.UI.Xaml
                 entryPoint
                 );
         }
+#endif
+
+#if WORKINPROGRESS
+        public bool IsRunningOutOfBrowser
+        {
+            get { return false; }
+        }
+
+        public bool HasElevatedPermissions { get; set; }
 #endif
     }
 }

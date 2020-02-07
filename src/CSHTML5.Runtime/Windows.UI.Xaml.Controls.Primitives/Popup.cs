@@ -539,6 +539,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         }
 
+#if WORKINPROGRESS
+        public event EventHandler Closed;
 
+        public event EventHandler Opened;
+
+        public void SetWindow(Window associatedWindow)
+        {
+
+        }
+#endif
     }
 }

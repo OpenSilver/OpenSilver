@@ -349,7 +349,7 @@ $0.focus()
         /// </summary>
         public void SelectAll()
         {
-            Interop.ExecuteJavaScriptAsync(@"$0.setSelectionRange(0, $0.value.length)", this.INTERNAL_InnerDomElement);
+            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.setSelectionRange(0, $0.value.length)", this.INTERNAL_InnerDomElement);
         }
 #if WORKINPROGRESS
         #region Not supported yet

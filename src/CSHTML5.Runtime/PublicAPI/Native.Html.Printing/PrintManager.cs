@@ -24,6 +24,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 #if MIGRATION
+#if WORKINPROGRESS
+using System.Windows.Threading;
+#endif
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;

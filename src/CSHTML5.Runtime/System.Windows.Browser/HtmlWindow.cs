@@ -64,7 +64,7 @@ namespace System.Windows.Browser
                 {
 #if !CSHTML5NETSTANDARD
                     // The Simulator cannot open a URL in another window/tab:
-                    if (target == "_blank" && Interop.IsRunningInTheSimulator)
+                    if (target == "_blank" && CSHTML5.Interop.IsRunningInTheSimulator)
                     {
                         INTERNAL_Simulator.SimulatorProxy.NavigateToUrlInNewBrowserWindow(navigateToUri.ToString());
                     }
@@ -103,7 +103,7 @@ namespace System.Windows.Browser
 #endif
         public object Eval(string code)
         {
-            return Interop.ExecuteJavaScript(string.Format("eval(\"{0}\")", code)); //Note: this probably doesn't work on multiline code 
+            return CSHTML5.Interop.ExecuteJavaScript(string.Format("eval(\"{0}\")", code)); //Note: this probably doesn't work on multiline code 
         }
     }
 }

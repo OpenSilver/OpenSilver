@@ -216,6 +216,11 @@ namespace Windows.UI.Xaml.Data
 
         internal Binding Clone()
         {
+#if WORKINPROGRESS
+            Binding b = new Binding();
+            this.CopyTo(b);
+            return b;
+#else
             Binding b =  new Binding(Path.Path);
             b.Converter = Converter;
 #if MIGRATION
@@ -232,6 +237,26 @@ namespace Windows.UI.Xaml.Data
             b.UpdateSourceTrigger = UpdateSourceTrigger;
             b.StringFormat = StringFormat;
             return b;
+#endif
+        }
+
+        private void CopyTo(Binding target)
+        {
+            target.Path = new PropertyPath(this.Path == null ? string.Empty : this.Path.Path);
+            target.Converter = this.Converter;
+#if MIGRATION
+            target.ConverterCulture = this.ConverterCulture;
+#else
+            target.ConverterLanguage = this.ConverterLanguage;
+#endif
+            target.ConverterParameter = this.ConverterParameter;
+            target.ElementName = this.ElementName; //I don't think people should use this when trying to make a Binding that will be used in different places but we never know.
+            target._mode = this._mode;
+            target._wasModeSetByUserRatherThanDefaultValue = this._wasModeSetByUserRatherThanDefaultValue;
+            target.RelativeSource = this.RelativeSource; //I don't think people should use this when trying to make a Binding that will be used in different places but we never know.
+            target.Source = this.Source;
+            target.UpdateSourceTrigger = this.UpdateSourceTrigger;
+            target.StringFormat = this.StringFormat;
         }
 
         /// <summary>
@@ -240,7 +265,7 @@ namespace Windows.UI.Xaml.Data
         /// <exclude/>
         public TemplateInstance TemplateOwner { get; set; }
 
-        #region Validation
+#region Validation
 
 #if WORKINPROGRESS
 
@@ -273,14 +298,24 @@ namespace Windows.UI.Xaml.Data
         /// </summary>
         public bool ValidatesOnLoad { get; set; }
 
-        #endregion
+#endregion
 
 #if WORKINPROGRESS
+        public Binding(Binding original)
+        {
+            if(original != null)
+            {
+                original.CopyTo(this);
+            }
+        }
+
         /// <summary>
         /// Gets or sets a value that indicates whether the binding ignores any System.ComponentModel.ICollectionView
         /// settings on the data source.
         /// </summary>
         public bool BindsDirectlyToSource { get; set; }
+
+        public bool ValidatesOnNotifyDataErrors { get; set; }
 #endif
     }
 }

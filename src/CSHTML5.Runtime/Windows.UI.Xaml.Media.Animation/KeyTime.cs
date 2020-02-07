@@ -192,5 +192,19 @@ namespace Windows.UI.Xaml.Media.Animation
         ///// </summary>
         ///// <returns>A string representation of this Windows.UI.Xaml.Media.Animation.KeyTime.</returns>
         //public override string ToString();
+
+        #region Implicit Converters
+
+        /// <summary>
+        /// Implicitly creates a KeyTime value from a Time value.
+        /// </summary>
+        /// <param name="timeSpan">The Time value.</param>
+        /// <returns>A new KeyTime.</returns>
+        public static implicit operator KeyTime(TimeSpan timeSpan)
+        {
+            return KeyTime.FromTimeSpan(timeSpan);
+        }
+
+        #endregion
     }
 }

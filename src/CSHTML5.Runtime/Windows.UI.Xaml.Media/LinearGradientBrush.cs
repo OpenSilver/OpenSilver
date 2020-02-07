@@ -400,7 +400,7 @@ namespace Windows.UI.Xaml.Media
             {
 
                 //in IE and FireFox, it uses an angle in the opposite direction of that of the other browsers and 0deg is up while in other browsers it is right (or something like that).
-                if (Convert.ToBoolean(Interop.ExecuteJavaScript("(window.IE_VERSION || window.FIREFOX_VERSION)")))
+                if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("(window.IE_VERSION || window.FIREFOX_VERSION)")))
                 {
                     angle = 360 - angle + 90;
                 }

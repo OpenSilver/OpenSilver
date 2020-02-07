@@ -30,10 +30,9 @@ namespace System.Windows.Browser
 #if WORKINPROGRESS
     public class ScriptObject : IDynamicMetaObjectProvider
     {
-    #region Not supported yet
         DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression parameter)
         {
-            return default(DynamicMetaObject);
+            return null;
         }
 
         //
@@ -65,11 +64,11 @@ namespace System.Windows.Browser
         //     attempts to return the error text that is associated with the error.
         public virtual object Invoke(string name, params object[] args)
         {
-            return default(object);
+            return null;
         }
         public object GetProperty(int @index)
         {
-            return default(object);
+            return null;
         }
         public void SetProperty(int @index, object @value)
         {
@@ -77,17 +76,17 @@ namespace System.Windows.Browser
         }
         public virtual object GetProperty(string @name)
         {
-            return default(object);
+            return null;
         }
         public virtual void SetProperty(string @name, object @value)
         {
 
         }
-        public virtual object InvokeSelf(Object[] @args)
+
+        public virtual object InvokeSelf(params object[] args)
         {
-            return default(object);
+            return null;
         }
-        #endregion
     }
 #endif
 }

@@ -91,12 +91,12 @@ namespace Windows.UI.Xaml
             this.INTERNAL_RootDomElement = rootDomElement;
 
             // Reset the content of the root DIV:
-            Interop.ExecuteJavaScriptAsync(@"$0.innerHTML = ''", rootDomElement);
+            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.innerHTML = ''", rootDomElement);
 
             // In case of XAML view hosted inside an HTML app, we usually set the "position" of the window root to "relative" rather than "absolute" (via external JavaScript code) in order to display it inside a specific DIV. However, in this case, the layers that contain the Popups are placed under the window DIV instead of over it. To work around this issue, we set the root element display to "grid". See the sample app "IntegratingACshtml5AppInAnSPA".
             if (Grid_InternalHelpers.isCSSGridSupported()) //todo: what about the old browsers where "CSS Grid" is not supported?
             {
-                Interop.ExecuteJavaScriptAsync("$0.style.display = 'grid'", rootDomElement);
+                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.style.display = 'grid'", rootDomElement);
             }
 
             // Create the DIV that will correspond to the root of the window visual tree:
@@ -156,7 +156,7 @@ namespace Windows.UI.Xaml
         {
             double width;
             double height;
-            if (Interop.IsRunningInTheSimulator)
+            if (CSHTML5.Interop.IsRunningInTheSimulator)
             {
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
                 string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.offsetWidth + '|' + $0.offsetHeight", this.INTERNAL_OuterDomElement));
@@ -252,6 +252,27 @@ namespace Windows.UI.Xaml
 
 #if RECURSIVE_CONSTRUCTION_FIXED
 #else
+#if WORKINPROGRESS
+        /// <summary>
+        /// Gets or sets the content of the Window.
+        /// </summary>
+        public FrameworkElement Content
+        {
+            get { return (FrameworkElement)GetValue(ContentProperty); }
+            set { SetValue(ContentProperty, value); }
+        }
+        /// <summary>
+        /// Identifies the Content dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContentProperty =
+            DependencyProperty.Register("Content", typeof(FrameworkElement), typeof(Window), new PropertyMetadata(null, Content_Changed));
+
+        static internal void Content_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var window = (Window)d;
+            window.OnContentChanged(e.OldValue, e.NewValue);
+        }
+#else
         /// <summary>
         /// Gets or sets the content of the Window.
         /// </summary>
@@ -271,6 +292,7 @@ namespace Windows.UI.Xaml
             var window = (Window)d;
             window.OnContentChanged(e.OldValue, e.NewValue);
         }
+#endif
 #endif
 
 #if RECURSIVE_CONSTRUCTION_FIXED
@@ -399,5 +421,33 @@ namespace Windows.UI.Xaml
 
         #endregion
 
+#if WORKINPROGRESS
+        public bool IsActive { get; private set; }
+        public bool IsVisible { get; private set; }
+
+        public WindowStyle WindowStyle { get; set; }
+
+        public static Window GetWindow(DependencyObject dependencyObject)
+        {
+            return null;
+        }
+
+        public WindowState WindowState { get; set; }
+
+        public void Close()
+        {
+
+        }
+
+        public void DragMove()
+        {
+
+        }
+
+        public void DragResize(WindowResizeEdge resizeEdge)
+        {
+
+        }
+#endif
     }
 }

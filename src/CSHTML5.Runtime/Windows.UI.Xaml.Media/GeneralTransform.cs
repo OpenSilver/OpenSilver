@@ -171,5 +171,13 @@ namespace Windows.UI.Xaml.Media
         // Returns:
         //     True if inPoint was transformed; otherwise, false.
         //protected virtual bool TryTransformCore(Point inPoint, out Point outPoint);
+
+#if WORKINPROGRESS
+        public abstract GeneralTransform Inverse { get; }
+
+        public abstract Rect TransformBounds(Rect rect);
+
+        public abstract bool TryTransform(Point inPoint, out Point outPoint);
+#endif
     }
 }

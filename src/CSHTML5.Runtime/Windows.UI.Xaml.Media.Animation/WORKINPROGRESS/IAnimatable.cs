@@ -31,15 +31,9 @@ namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
 #if WORKINPROGRESS
-    #region Not supported yet
     public interface IAnimatable
     {
-        //void ApplyAnimationClock(DependencyProperty dp, AnimationClock clock);
-        //void ApplyAnimationClock(DependencyProperty dp, AnimationClock clock, HandoffBehavior handoffBehavior);
-        //void BeginAnimation(DependencyProperty dp, AnimationTimeline animation);
-        //void BeginAnimation(DependencyProperty dp, AnimationTimeline animation, HandoffBehavior handoffBehavior);
-        //object GetAnimationBaseValue(DependencyProperty dp);
+
     }
-    #endregion
 #endif
 }

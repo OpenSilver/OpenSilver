@@ -62,7 +62,7 @@ namespace System.Windows.Browser
                 return _initDocument;
             }
         }
-        #if WORKINPROGRESS
+#if WORKINPROGRESS
         //
         // Summary:
         //     Gets a reference to the Silverlight plug-in that is defined within an <object>
@@ -81,7 +81,11 @@ namespace System.Windows.Browser
                 return _initPlugin;
             }
         }
-        #endif
+
+        public static bool IsEnabled { get; private set; }
+
+        public static BrowserInformation BrowserInformation { get; private set; }
+#endif
 
     }
 }

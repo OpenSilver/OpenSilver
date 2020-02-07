@@ -26,13 +26,45 @@ using Windows.UI.Xaml.Media.Animation;
 
 #if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
-#if WORKINPROGRESS
+    internal sealed class TextDecoration
+    {
+        internal TextDecoration(int decoration)
+        {
+            this.Decoration = decoration;
+        }
+
+        internal int Decoration { get; private set; }
+
+        public override bool Equals(object o)
+        {
+            if (o is TextDecoration td)
+            {
+                return this.Decoration == td.Decoration;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Decoration;
+        }
+
+        internal static bool Equals(TextDecoration left, TextDecoration right)
+        {
+            if (left == null)
+            {
+                return right == null;
+            }
+            return left.Equals(right);
+        }
+    }
+
+
+#if no
     public sealed class TextDecoration : Animatable
     {
     }
 #endif
 }
+#endif

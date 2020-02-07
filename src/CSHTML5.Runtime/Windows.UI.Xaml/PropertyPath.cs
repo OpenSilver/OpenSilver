@@ -198,5 +198,12 @@ namespace Windows.UI.Xaml
             return new PropertyPath(path);
         }
 
+#if WORKINPROGRESS
+        public PropertyPath(string path, params object[] pathParameters)
+        {
+
+        }
+#endif
+
     }
 }

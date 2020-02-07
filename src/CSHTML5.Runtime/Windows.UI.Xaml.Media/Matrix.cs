@@ -383,6 +383,13 @@ namespace Windows.UI.Xaml.Media
         //{
         //    throw new NotImplementedException();
         //}
+
+#if WORKINPROGRESS
+        public Point Transform(Point point)
+        {
+            return new Point();
+        }
+#endif
     }
 
 }

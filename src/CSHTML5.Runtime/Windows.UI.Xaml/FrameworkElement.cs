@@ -29,11 +29,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Markup;
 
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Markup;
 using System.Windows.Data;
 #else
 using Windows.Foundation;
@@ -724,7 +724,6 @@ namespace Windows.UI.Xaml
 
 
 #if WORKINPROGRESS
-#region Not supported yet
 
         public event EventHandler LayoutUpdated;
 
@@ -748,7 +747,13 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        public static readonly DependencyProperty LanguageProperty = DependencyProperty.Register("Language", typeof(XmlLanguage), typeof(FrameworkElement), null);
+
+        public XmlLanguage Language
+        {
+            get { return (XmlLanguage)this.GetValue(LanguageProperty); }
+            set { this.SetValue(LanguageProperty, value); }
+        }
 #endif
     }
 }

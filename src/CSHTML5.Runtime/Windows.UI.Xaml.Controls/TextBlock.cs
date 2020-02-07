@@ -231,7 +231,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 #if WORKINPROGRESS
-        #region Not supported yet
 
         // There is an implementation for TextTrimming in the shelvesheets
         public static readonly DependencyProperty TextTrimmingProperty = DependencyProperty.Register("TextTrimming", typeof(TextTrimming), typeof(TextBlock), new PropertyMetadata(TextTrimming.None));
@@ -245,7 +244,14 @@ namespace Windows.UI.Xaml.Controls
             set { SetValue(TextTrimmingProperty, value); }
         }
 
-        #endregion
+        public double BaselineOffset { get; private set; }
+
+        public static readonly DependencyProperty CharacterSpacingProperty = DependencyProperty.Register("CharacterSpacing", typeof(int), typeof(TextBlock), null);
+        public int CharacterSpacing
+        {
+            get { return (int)this.GetValue(CharacterSpacingProperty); }
+            set { this.SetValue(CharacterSpacingProperty, value); }
+        }
 #endif
     }
 }

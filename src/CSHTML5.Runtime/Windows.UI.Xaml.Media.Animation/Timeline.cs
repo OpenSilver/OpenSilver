@@ -619,8 +619,6 @@ namespace Windows.UI.Xaml.Media.Animation
         }
 #if WORKINPROGRESS
 
-        #region Not supported yet
-
         public static readonly DependencyProperty SpeedRatioProperty = DependencyProperty.Register("SpeedRatio", typeof(double), typeof(Timeline), new PropertyMetadata(1d));
 
         public double SpeedRatio
@@ -629,7 +627,19 @@ namespace Windows.UI.Xaml.Media.Animation
             set { this.SetValue(Timeline.SpeedRatioProperty, value); }
         }
 
-        #endregion
+        public static readonly DependencyProperty AutoReverseProperty = DependencyProperty.Register("AutoReverse", typeof(bool), typeof(Timeline), null);
+        public bool AutoReverse
+        {
+            get { return (bool)this.GetValue(AutoReverseProperty); }
+            set { this.SetValue(AutoReverseProperty, value); }
+        }
+
+        public static readonly DependencyProperty FillBehaviorProperty = DependencyProperty.Register("FillBehavior", typeof(FillBehavior), typeof(Timeline), null);
+        public FillBehavior FillBehavior
+        {
+            get { return (FillBehavior)this.GetValue(FillBehaviorProperty); }
+            set { this.SetValue(FillBehaviorProperty, value); }
+        }
 #endif
     }
 }
