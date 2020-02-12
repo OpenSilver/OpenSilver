@@ -97,6 +97,11 @@ namespace System.ServiceModel
     public abstract class CSHTML5_ClientBase<TChannel> /*: ICommunicationObject, IDisposable*/ where TChannel : class
 #endif
     {
+#if OPENSILVER
+        //Note: Adding this because they are in the file generated when adding a Service Reference through the "Add Connected Service" for OpenSilver.
+        public System.ServiceModel.Description.ServiceEndpoint Endpoint { get; } = new Description.ServiceEndpoint(new Description.ContractDescription("none"));
+        public System.ServiceModel.Description.ClientCredentials ClientCredentials { get; } = new Description.ClientCredentials();
+#endif
         string _remoteAddressAsString;
 
         private TChannel channel;
@@ -710,21 +715,21 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 #else
                 foreach (Attribute attribute in interfaceType.GetCustomAttributes(true))
                 {
-                    if(attribute is ServiceContract2Attribute)
-                    
+                    if (attribute is ServiceContract2Attribute)
+
 #endif
-                {
-                    ServiceContract2Attribute attributeAsDataContractAttribute = (ServiceContract2Attribute)attribute;
-                    soapActionPrefix = attributeAsDataContractAttribute.SOAPActionPrefix;
-                    if (!string.IsNullOrWhiteSpace(attributeAsDataContractAttribute.Namespace))
                     {
-                        interfaceTypeNamespace = attributeAsDataContractAttribute.Namespace;
-                        break;
-                    }
+                        ServiceContract2Attribute attributeAsDataContractAttribute = (ServiceContract2Attribute)attribute;
+                        soapActionPrefix = attributeAsDataContractAttribute.SOAPActionPrefix;
+                        if (!string.IsNullOrWhiteSpace(attributeAsDataContractAttribute.Namespace))
+                        {
+                            interfaceTypeNamespace = attributeAsDataContractAttribute.Namespace;
+                            break;
+                        }
 #if !BRIDGE && !CSHTML5BLAZOR
-                }
+                    }
 #endif
-            }
+                }
 #if BRIDGE || CSHTML5BLAZOR
                 if (string.IsNullOrEmpty(soapActionPrefix))
                 {
@@ -956,7 +961,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         responseAsString = responseAsString.Remove(0, m + 1);
                         m = responseAsString.IndexOf("</faultstring");
                         responseAsString = responseAsString.Remove(m);
+#if OPENSILVER
+                        FaultException fe = new FaultException(); //todo: Add the message that is in responseAsString.
+#else
                         FaultException fe = new FaultException(responseAsString);
+#endif
                         raiseFaultException(fe);
                         return null;
                     }
@@ -1015,14 +1024,14 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 #if !BRIDGE && !CSHTML5BLAZOR
                         if (attribute is ServiceKnownTypeAttribute)
 #endif
-                        knownTypes.Add(((ServiceKnownTypeAttribute)attribute).Type);
+                            knownTypes.Add(((ServiceKnownTypeAttribute)attribute).Type);
                     }
 
 #if CSHTML5BLAZOR
                     DataContractSerializer_CSHTML5Ver deSerializer = new DataContractSerializer_CSHTML5Ver(typeToDeserialize, knownTypes);
                     XDocument xDoc = XDocument.Parse(responseAsString);
 #else
-                    DataContractSerializer deSerializer = new DataContractSerializer(typeToDeserialize, knownTypes); 
+                    DataContractSerializer deSerializer = new DataContractSerializer(typeToDeserialize, knownTypes);
                     XDocument xDoc = XDocument.Parse(responseAsString);
 #endif
                     responseAsString = RemoveUnparsableStrings(responseAsString);
@@ -1141,7 +1150,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 #endif
 
 #if WORKINPROGRESS && !CSHTML5BLAZOR
-                    #region Not Supported Stuff
+#region Not Supported Stuff
 
         //    /// <summary>
         //    /// Gets the underlying System.ServiceModel.ChannelFactory<TChannel> object.
@@ -1239,11 +1248,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         }
 
 
-                    #endregion
+#endregion
 #endif
 
 #if WORKINPROGRESS && !CSHTML5BLAZOR
-                    #region ICommunicationObject methods
+#region ICommunicationObject methods
 
         CommunicationState ICommunicationObject.State
         {
@@ -1339,7 +1348,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         //{
 
         //}
-                    #endregion
+#endregion
 #endif
-                }
-            }
+    }
+}

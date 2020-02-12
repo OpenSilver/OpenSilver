@@ -16,6 +16,7 @@
 //===============================================================================
 
 
+#if !OPENSILVER
 
 #if WCF_STACK || BRIDGE || CSHTML5BLAZOR
 
@@ -40,4 +41,5 @@ namespace System.ServiceModel.Channels
     }
 }
 
+#endif
 #endif
