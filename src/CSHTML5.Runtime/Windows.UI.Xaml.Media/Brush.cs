@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
 #if FOR_DESIGN_TIME
     [TypeConverter(typeof(BrushConverter))]
 #endif
-    public class Brush : DependencyObject, IHasAccessToPropertiesWhereItIsUsed
+    public partial class Brush : DependencyObject, IHasAccessToPropertiesWhereItIsUsed
     {
         static Brush()
         {

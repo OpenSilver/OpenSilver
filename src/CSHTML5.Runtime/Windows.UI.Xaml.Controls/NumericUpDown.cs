@@ -66,7 +66,7 @@ namespace Windows.UI.Xaml.Controls
     [TemplateVisualState(GroupName = "IncrementalButtonStates", Name = "IncrementDisabled")]
     [TemplateVisualState(GroupName = "DecrementalButtonStates", Name = "DecrementEnabled")]
     [TemplateVisualState(GroupName = "DecrementalButtonStates", Name = "DecrementDisabled")]
-    public class NumericUpDown : RangeBase
+    public partial class NumericUpDown : RangeBase
     {
         private const string DecrementButtonName = "PART_DecrementButton";
         private const string IncrementButtonName = "PART_IncrementButton";

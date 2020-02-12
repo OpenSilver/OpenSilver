@@ -34,7 +34,7 @@ namespace Windows.UI.Xaml
     /// Do not use this class
     /// </summary>
     /// <exclude/>
-    public class INTERNAL_VisualStateGroupCollection : IList<VisualStateGroup>
+    public partial class INTERNAL_VisualStateGroupCollection : IList<VisualStateGroup>
     {
         Dictionary<string, VisualStateGroup> _visualStateGroups = new Dictionary<string,VisualStateGroup>();
         Dictionary<string, VisualState> _visualStates = new Dictionary<string,VisualState>();

@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Applies multiple transform operations to an object.
     /// </summary>
-    public sealed class CompositeTransform : Transform
+    public sealed partial class CompositeTransform : Transform
     {
 
         /// <summary>

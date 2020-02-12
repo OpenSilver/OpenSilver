@@ -33,7 +33,7 @@ namespace System.Xml.Serialization
     /// enables you to control how objects are encoded into XML.
     /// </summary>
     //[JSIL.Meta.JSStubOnly]
-    public class XmlSerializer
+    public partial class XmlSerializer
     {
         //---------------------------------------------------------
         // Starting on Oct 6, 2017, the XmlSerializer was replaced

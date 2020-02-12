@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Documents
     /// Represents a discrete section of formatted or unformatted text.
     /// </summary>
     [ContentProperty("Text")]
-    public sealed class Run : Inline
+    public sealed partial class Run : Inline
     {
         private const string defaultText = "\u00A0"; // We add a space at the end of the text so that two <Run> tags do not appear to touch each other (eg. <Run>This is a</Run><Run>test.</Run>).
 

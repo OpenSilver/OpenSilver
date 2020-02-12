@@ -29,7 +29,7 @@
 //    /// <summary>
 //    /// Provides data for the CurrentStateChanging and CurrentStateChanged events.
 //    /// </summary>
-//    public sealed class VisualStateChangedEventArgs
+//    public sealed partial class VisualStateChangedEventArgs
 //    {
 //        /// <summary>
 //        /// Initializes a new instance of the VisualStateChangedEventArgs class.

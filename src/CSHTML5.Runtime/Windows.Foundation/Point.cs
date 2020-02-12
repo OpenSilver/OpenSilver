@@ -38,9 +38,9 @@ namespace Windows.Foundation
 #endif
     [SupportsDirectContentViaTypeFromStringConverters]
 #if WORKINPROGRESS
-    public struct Point : IFormattable
+    public partial struct Point : IFormattable
 #else
-    public struct Point //: IFormattable
+    public partial struct Point //: IFormattable
 #endif
     {
         //todo: Add the interface IFormattable

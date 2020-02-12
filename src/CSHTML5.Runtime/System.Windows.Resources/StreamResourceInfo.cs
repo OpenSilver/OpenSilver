@@ -31,7 +31,7 @@ namespace System.Windows.Resources
     /// obtained through the System.Windows.Application.GetResourceStream(System.Windows.Resources.StreamResourceInfo,System.Uri)
     /// method.
     /// </summary>
-    public class StreamResourceInfo
+    public partial class StreamResourceInfo
     {
         /// <summary>
         /// Initializes a new instance of the System.Windows.Resources.StreamResourceInfo

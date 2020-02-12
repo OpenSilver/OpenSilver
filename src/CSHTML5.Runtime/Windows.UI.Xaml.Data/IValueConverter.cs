@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Data
     /// <summary>
     /// Exposes methods that allow the data to be modified as it passes through the binding engine.
     /// </summary>
-    public interface IValueConverter
+    public partial interface IValueConverter
     {
        
         

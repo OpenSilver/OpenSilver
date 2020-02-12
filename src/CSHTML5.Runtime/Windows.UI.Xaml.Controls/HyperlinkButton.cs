@@ -57,7 +57,7 @@ namespace Windows.UI.Xaml.Controls
     /// MyStackPanel.Children.Add(hyperlinkButton);
     /// </code>
     /// </example>
-    public class HyperlinkButton : ButtonBase
+    public partial class HyperlinkButton : ButtonBase
     {
         /// <summary>
         /// Initializes a new instance of the HyperlinkButton class.

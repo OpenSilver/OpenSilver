@@ -13,7 +13,7 @@ namespace System.Resources
     /// <summary>
     /// Provides convenient access to culture-specific resources at run time.
     /// </summary>
-    public class ResourceManager
+    public partial class ResourceManager
     {
         /// <summary>
         /// Indicates the root name of the resource files that the System.Resources.ResourceManager

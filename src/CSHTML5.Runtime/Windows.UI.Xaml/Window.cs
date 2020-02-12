@@ -61,9 +61,9 @@ namespace Windows.UI.Xaml
     /// </summary>
     [global::System.Windows.Markup.ContentProperty("Content")]
 #if RECURSIVE_CONSTRUCTION_FIXED
-    public class Window : ContentControl
+    public partial class Window : ContentControl
 #else
-    public class Window : FrameworkElement, INameScope
+    public partial class Window : FrameworkElement, INameScope
 #endif
     {
         /// <summary>

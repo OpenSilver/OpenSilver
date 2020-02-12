@@ -12,7 +12,7 @@ namespace System.Windows.Input
 namespace Windows.UI.Xaml.Input
 #endif
 {
-    public sealed class StylusDevice
+    public sealed partial class StylusDevice
     {
         public TabletDeviceType DeviceType { get; private set; }
     }

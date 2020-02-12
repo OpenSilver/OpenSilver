@@ -30,7 +30,7 @@ namespace System.Net
     /// <summary>
     /// Provides data for the System.Net.WebClient.UploadStringCompleted event.
     /// </summary>
-    public class UploadStringCompletedEventArgs //: AsyncCompletedEventArgs //todo: AsyncCompletedEventArgs() is obsolete, see what we should do (it might be that it is only obsolete for use by the user, but not for us)
+    public partial class UploadStringCompletedEventArgs //: AsyncCompletedEventArgs //todo: AsyncCompletedEventArgs() is obsolete, see what we should do (it might be that it is only obsolete for use by the user, but not for us)
     {
         
         //[EditorBrowsable(EditorBrowsableState.Never)]

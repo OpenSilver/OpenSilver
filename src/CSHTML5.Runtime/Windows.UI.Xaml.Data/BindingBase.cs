@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Data
     /// <summary>
     /// Provides an abstract base class for the Binding class.
     /// </summary>
-    public class BindingBase : MarkupExtension
+    public partial class BindingBase : MarkupExtension
     {
         /// <summary>
         /// Initializes a new instance of the BindingBase class.

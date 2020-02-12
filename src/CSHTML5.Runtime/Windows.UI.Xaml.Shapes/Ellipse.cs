@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Shapes
     /// Draws an ellipse.
     /// </summary>
     /// <exclude/>
-    public class Ellipse : Shape
+    public partial class Ellipse : Shape
     {
         //dynamic canvasDomElement;
 

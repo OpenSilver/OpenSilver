@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml.Controls
     /// Provides information for the System.Windows.Controls.Validation.Error attached
     /// event.
     /// </summary>
-    public class ValidationErrorEventArgs : RoutedEventArgs
+    public partial class ValidationErrorEventArgs : RoutedEventArgs
     {
         private ValidationErrorEventAction _action;
 

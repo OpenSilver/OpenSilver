@@ -22,7 +22,7 @@
 #if UNIMPLEMENTED_MEMBERS
 namespace System.ServiceModel
 {
-    public sealed class OperationContextScope : IDisposable
+    public sealed partial class OperationContextScope : IDisposable
     {
         private readonly OperationContext _originalContext = OperationContext.Current;
         private readonly OperationContextScope _originalScope = _currentScope;

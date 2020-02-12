@@ -27,7 +27,7 @@ using Windows.UI.Xaml.Media.Animation;
 #if MIGRATION
 namespace System.Windows
 {
-    internal sealed class TextDecoration
+    internal sealed partial class TextDecoration
     {
         internal TextDecoration(int decoration)
         {
@@ -62,7 +62,7 @@ namespace System.Windows
 
 
 #if no
-    public sealed class TextDecoration : Animatable
+    public sealed partial class TextDecoration : Animatable
     {
     }
 #endif

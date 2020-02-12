@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
     /// Provides generalized transformation support for objects, such as points and
     /// rectangles.
     /// </summary>
-    public abstract class GeneralTransform : DependencyObject
+    public abstract partial class GeneralTransform : DependencyObject
     {
         internal UIElement INTERNAL_parent;
 

@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a System.Windows.Controls.DataGrid column.
     /// </summary>
-    public abstract class DataGridColumn : DependencyObject
+    public abstract partial class DataGridColumn : DependencyObject
     {
         internal ColumnDefinition _gridColumn;
         private DataGridColumnHeader _header;

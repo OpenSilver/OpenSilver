@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Controls
     /// Encapsulates a page of content that can be navigated to.
     /// </summary>
     [ContentProperty("Content")]
-    public class Page : UserControl
+    public partial class Page : UserControl
     {
       
         /// <summary>

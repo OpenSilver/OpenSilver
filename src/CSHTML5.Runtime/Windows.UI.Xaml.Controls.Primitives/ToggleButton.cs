@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Base class for controls that can switch states, such as CheckBox and RadioButton.
     /// </summary>
-    public class ToggleButton : ButtonBase
+    public partial class ToggleButton : ButtonBase
     {
         public ToggleButton()
         {

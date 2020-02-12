@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 
 namespace System.IO.IsolatedStorage
 {
-    public class IsolatedStorageFileStream : FileStream, IDisposable
+    public partial class IsolatedStorageFileStream : FileStream, IDisposable
     {
         internal string _filePath;
         MemoryStream _fs;

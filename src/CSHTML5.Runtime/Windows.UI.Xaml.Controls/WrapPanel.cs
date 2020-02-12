@@ -61,7 +61,7 @@ namespace Windows.UI.Xaml.Controls
     /// //Do not forget to add the WrapPanel itself to the visual tree.
     /// </code>
     /// </example>
-    public class WrapPanel : Panel
+    public partial class WrapPanel : Panel
     {
         
         /// <summary>

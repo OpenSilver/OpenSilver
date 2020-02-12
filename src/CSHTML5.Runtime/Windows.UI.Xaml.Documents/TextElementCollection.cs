@@ -11,7 +11,7 @@ namespace System.Windows.Documents
 namespace Windows.UI.Xaml.Documents
 #endif
 {
-    public class TextElementCollection<T> : IList, ICollection<T> where T : TextElement
+    public partial class TextElementCollection<T> : IList, ICollection<T> where T : TextElement
     {
         #region Data
         private readonly DependencyObject _owner;

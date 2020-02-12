@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Represents an easing function that creates an animation that accelerates
     /// and/or decelerates using a sine formula.
     /// </summary>
-    public sealed class SineEase : EasingFunctionBase
+    public sealed partial class SineEase : EasingFunctionBase
     {
         const string FUNCTION_TYPE_STRING = "Sine";
 

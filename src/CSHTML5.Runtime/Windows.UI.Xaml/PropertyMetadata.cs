@@ -34,7 +34,7 @@ namespace Windows.UI.Xaml
     /// Defines behavior aspects of a dependency property, including conditions it
     /// was registered with.
     /// </summary>
-    public class PropertyMetadata
+    public partial class PropertyMetadata
     {
         private object _defaultValue;
 

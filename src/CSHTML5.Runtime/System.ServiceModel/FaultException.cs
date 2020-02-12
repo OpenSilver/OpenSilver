@@ -34,7 +34,7 @@ namespace System.ServiceModel
     //[KnownType(typeof(FaultException.FaultCodeData))]
     //[KnownType(typeof(FaultException.FaultReasonData))]
         //todo: remove the inheritance from Exception and inherit from CommunicationException instead.
-    public class FaultException :Exception //: CommunicationException
+    public partial class FaultException :Exception //: CommunicationException
     {
         /// <summary>
         /// Initializes a new instance of the System.ServiceModel.FaultException class.

@@ -30,7 +30,7 @@ namespace System.Runtime.Serialization
     /// a data contract and is serializable by the DataContractSerializer.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    public sealed class CollectionDataContract2Attribute : Attribute
+    public sealed partial class CollectionDataContract2Attribute : Attribute
     {
         public CollectionDataContract2Attribute() { }
 

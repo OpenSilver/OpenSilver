@@ -28,7 +28,7 @@ namespace System.Xml
 #if !BRIDGE
     [JSIL.Meta.JSStubOnly]
 #endif
-    public class XmlConvert
+    public partial class XmlConvert
     {
         /// <summary>
         /// Initializes a new instance of the System.Xml.XmlConvert class.

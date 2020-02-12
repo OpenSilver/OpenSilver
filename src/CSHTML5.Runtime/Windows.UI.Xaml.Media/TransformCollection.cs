@@ -30,9 +30,9 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
 #if WORKINPROGRESS
-    public sealed class TransformCollection : PresentationFrameworkCollection<Transform>
+    public sealed partial class TransformCollection : PresentationFrameworkCollection<Transform>
 #else
-    public sealed class TransformCollection : List<Transform>
+    public sealed partial class TransformCollection : List<Transform>
 #endif
     {
         internal static TransformCollection Empty

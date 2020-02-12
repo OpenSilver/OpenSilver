@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Media.Imaging
     /// <summary>
     /// Provides the practical object source type for the Source and ImageSource properties.
     /// </summary>
-    public class BitmapImage : BitmapSource
+    public partial class BitmapImage : BitmapSource
     {
 
         /// <summary>

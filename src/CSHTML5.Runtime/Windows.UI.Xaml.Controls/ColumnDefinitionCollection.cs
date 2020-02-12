@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <exclude/>
-    public sealed class ColumnDefinitionCollection : ObservableCollection<ColumnDefinition> //IList<ColumnDefinition>, IEnumerable<ColumnDefinition>
+    public sealed partial class ColumnDefinitionCollection : ObservableCollection<ColumnDefinition> //IList<ColumnDefinition>, IEnumerable<ColumnDefinition>
     {
         //Collection<ColumnDefinition> _collection;
 

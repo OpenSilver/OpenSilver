@@ -59,7 +59,7 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     /// <typeparam name="TItemsControlType">The type of the items control.</typeparam>
     /// <typeparam name="TItemContainerType">The type of the item container.</typeparam>
-    public abstract class DragDropTarget<TItemsControlType, TItemContainerType> : ContentControl
+    public abstract partial class DragDropTarget<TItemsControlType, TItemContainerType> : ContentControl
         where TItemsControlType : UIElement
         where TItemContainerType : UIElement
     {

@@ -28,7 +28,7 @@ using System.Linq.Expressions;
 namespace System.Windows.Browser
 {
 #if WORKINPROGRESS
-    public class ScriptObject : IDynamicMetaObjectProvider
+    public partial class ScriptObject : IDynamicMetaObjectProvider
     {
         DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression parameter)
         {

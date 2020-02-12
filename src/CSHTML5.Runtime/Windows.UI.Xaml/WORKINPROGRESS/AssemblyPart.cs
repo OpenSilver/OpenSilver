@@ -10,7 +10,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    public sealed class AssemblyPart : DependencyObject
+    public sealed partial class AssemblyPart : DependencyObject
     {
         //
         // Summary:

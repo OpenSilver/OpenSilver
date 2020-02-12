@@ -44,7 +44,7 @@ namespace System.ServiceModel
         DONE,               //4: The operation is complete.
     }
 
-    public class HttpRequest
+    public partial class HttpRequest
     {
         private const int _defaultTimeOut = 2000;
 

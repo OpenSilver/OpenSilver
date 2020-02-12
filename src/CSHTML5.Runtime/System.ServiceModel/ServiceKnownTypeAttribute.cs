@@ -22,7 +22,7 @@
 namespace System.ServiceModel
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Interface, Inherited = true, AllowMultiple = true)]
-    public sealed class ServiceKnownTypeAttribute : Attribute
+    public sealed partial class ServiceKnownTypeAttribute : Attribute
     {
         Type declaringType;
         string methodName;

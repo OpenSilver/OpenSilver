@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Provides data for the SelectionChanged event.
     /// </summary>
-    public class SelectionChangedEventArgs : RoutedEventArgs
+    public partial class SelectionChangedEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the SelectionChangedEventArgs class.

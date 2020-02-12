@@ -31,9 +31,9 @@ namespace Windows.UI.Xaml.Media
     /// accessed by index.
     /// </summary>
 #if WORKINPROGRESS
-    public sealed class GradientStopCollection : PresentationFrameworkCollection<GradientStop>
+    public sealed partial class GradientStopCollection : PresentationFrameworkCollection<GradientStop>
 #else
-    public sealed class GradientStopCollection : List<GradientStop>
+    public sealed partial class GradientStopCollection : List<GradientStop>
 #endif
     {
 #if WORKINPROGRESS

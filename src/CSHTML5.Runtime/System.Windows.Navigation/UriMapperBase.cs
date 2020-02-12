@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Navigation
     /// Represents the base class for classes that convert a requested uniform resource
     /// identifier (URI) into a new URI based on mapping rules.
     /// </summary>
-    public abstract class UriMapperBase
+    public abstract partial class UriMapperBase
     {
         ///// <summary>
         ///// Initializes a new instance of the System.Windows.Navigation.UriMapperBase

@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// Represents the base class for all button controls, such as Button, RepeatButton,
     /// and HyperlinkButton.
     /// </summary>
-    public class ButtonBase : ContentControl
+    public partial class ButtonBase : ContentControl
     {
         public ButtonBase()
         {

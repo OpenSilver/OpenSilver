@@ -39,7 +39,7 @@ namespace Windows.UI.Xaml.Media
     /// Represents a collection of PathFigure objects that collectively make up the
     /// geometry of a PathGeometry.
     /// </summary>
-    public sealed class PathFigureCollection : List<PathFigure> // : IList<PathFigure>, IEnumerable<PathFigure>
+    public sealed partial class PathFigureCollection : List<PathFigure> // : IList<PathFigure>, IEnumerable<PathFigure>
     {
         /// <summary>
         /// Initializes a new instance of the PathFigureCollection class.

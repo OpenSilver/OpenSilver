@@ -46,7 +46,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a control for entering passwords.
     /// </summary>
-    public class PasswordBox : Control
+    public partial class PasswordBox : Control
     {
         private bool _isUserChangingPassword = false;
         private bool _isCodeProgrammaticallyChangingPassword = false;

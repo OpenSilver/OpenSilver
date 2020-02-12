@@ -27,7 +27,7 @@ namespace System.Windows.Markup
     /// used to wrap foreign content.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
-    public sealed class ContentWrapperAttribute : Attribute
+    public sealed partial class ContentWrapperAttribute : Attribute
     {
         Type _contentWrapper;
 

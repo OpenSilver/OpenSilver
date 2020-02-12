@@ -29,7 +29,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    internal interface ICloneOnAnimation //todo: make it public?
+    internal partial interface ICloneOnAnimation //todo: make it public?
     {
         /// <summary>
         /// Returns a clone of this object. Note: make sure to add a boolean to say that the clone is already a clone (for its future uses).

@@ -39,7 +39,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public class Calendar : INTERNAL_CalendarOrClockBase
+    public partial class Calendar : INTERNAL_CalendarOrClockBase
     {
         bool isLoaded = false;
         public Calendar()

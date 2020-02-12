@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Defines a flexible grid area that consists of columns and rows. Child elements
     /// of the Grid are measured and arranged according to their row/column assignments
-    /// and internal class logic.
+    /// and internal partial class logic.
     /// </summary>
     /// <example>
     /// You can add a Grid with two rows and columns to the XAML as follows:

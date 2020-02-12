@@ -42,7 +42,7 @@ namespace Windows.UI.Xaml.Controls
     /// Represents the lengths of elements within the System.Windows.Controls.DataGrid
     /// control.
     /// </summary>
-    public struct DataGridLength : IEquatable<DataGridLength>
+    public partial struct DataGridLength : IEquatable<DataGridLength>
     {
         //todo: add SizeToCell and SizeToHeader everywhere when we'll know how to handle them (idea: add in the grid's cell something like INTERNAL_IsRelevantToAuto (depends on how auto works)
 

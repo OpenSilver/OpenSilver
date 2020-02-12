@@ -34,7 +34,7 @@ namespace Windows.UI.Xaml.Documents
     /// <summary>
     /// Provides a base class for inline text elements, such as Span and Run.
     /// </summary>
-    public abstract class Inline : TextElement
+    public abstract partial class Inline : TextElement
     {
         // Defining an implicit conversion from string to Inline allows to
         // support the following usage: TextBlock1.Inlines.Add("test");

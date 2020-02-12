@@ -12,7 +12,7 @@ namespace System.Windows.Documents
 namespace Windows.UI.Xaml.Documents
 #endif
 {
-    internal class INTERNAL_TextContainerHelper
+    internal partial class INTERNAL_TextContainerHelper
     {
         public static INTERNAL_ITextContainer FromOwner(DependencyObject parent)
         {

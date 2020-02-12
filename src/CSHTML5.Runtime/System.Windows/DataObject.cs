@@ -32,7 +32,7 @@ namespace System.Windows
     /// Provides a basic implementation of the IDataObject interface,
     /// which defines a format-independent mechanism for transferring data.
     /// </summary>
-    public sealed class DataObject : IDataObject
+    public sealed partial class DataObject : IDataObject
     {
         private Dictionary<string, object> _data = new Dictionary<string, object>();
 

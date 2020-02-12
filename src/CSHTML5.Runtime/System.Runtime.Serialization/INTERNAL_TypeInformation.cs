@@ -28,7 +28,7 @@ using System.Xml.Linq;
 
 namespace System.Runtime.Serialization
 {
-    internal class TypeInformation
+    internal partial class TypeInformation
     {
         public TypeInformation(Type type, string name, string namespaceName, string itemName, string keyName, string valueName, SerializationType isAttributeSuchAsDataContractPresent)
         {

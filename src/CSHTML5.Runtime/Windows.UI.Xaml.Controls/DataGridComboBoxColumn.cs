@@ -114,7 +114,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
 #if BRIDGE
-        private class MyConverter : IValueConverter
+        private partial class MyConverter : IValueConverter
         {
 #if MIGRATION
             public object Convert(object value, Type targetType, object parameter, Globalization.CultureInfo culture)

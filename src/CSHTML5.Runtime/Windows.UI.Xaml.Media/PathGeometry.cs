@@ -44,7 +44,7 @@ namespace Windows.UI.Xaml.Media
     /// lines, and rectangles.
     /// </summary>
     [ContentProperty("Figures")]
-    public sealed class PathGeometry : Geometry
+    public sealed partial class PathGeometry : Geometry
     {
         bool _messageAboutArcsAlreadyShown = false;
 

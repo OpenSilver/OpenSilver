@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents an object that contains audio, video, or both.
     /// </summary>
-    public sealed class MediaElement : FrameworkElement
+    public sealed partial class MediaElement : FrameworkElement
     {
         const string HTML_SHOWCONTROLS_PROPERTY_NAME = "controls";
         const string HTML_AUTOPLAY_PROPERTY_NAME = "autoplay";

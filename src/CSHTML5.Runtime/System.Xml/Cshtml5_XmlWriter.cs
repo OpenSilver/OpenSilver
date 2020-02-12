@@ -28,7 +28,7 @@ using System.Xml.Linq;
 namespace System.Xml
 {
     // allows to instanciate XmlWritter without a complete implementation (setting equivalent to indent = false)
-    internal class Cshtml5_XmlWriter : XmlWriter
+    internal partial class Cshtml5_XmlWriter : XmlWriter
     {
         private string _data;
 

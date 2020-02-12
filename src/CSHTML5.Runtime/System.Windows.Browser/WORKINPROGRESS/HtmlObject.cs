@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 namespace System.Windows.Browser
 {
     #if WORKINPROGRESS
-    public abstract class HtmlObject : ScriptObject
+    public abstract partial class HtmlObject : ScriptObject
     {
         #region Methods
         protected HtmlObject()

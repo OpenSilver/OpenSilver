@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Converts instances of other types to and from System.Windows.GridLength instances.
     /// </summary>
-    public sealed class GridLengthConverter : TypeConverter
+    public sealed partial class GridLengthConverter : TypeConverter
     {
         /// <summary>
         /// Determines whether a class can be converted from a given type to an instance

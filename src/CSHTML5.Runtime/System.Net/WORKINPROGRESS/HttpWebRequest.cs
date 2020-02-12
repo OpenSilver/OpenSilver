@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace System.Net
 {
-    public class HttpWebRequest : WebRequest //, ISerializable
+    public partial class HttpWebRequest : WebRequest //, ISerializable
     {
         #region Data
         private Uri _requestUri;
@@ -96,7 +96,7 @@ namespace System.Net
         #endregion
     }
 
-    internal class HttpRequestAsyncResult : INTERNAL_AsyncResult
+    internal partial class HttpRequestAsyncResult : INTERNAL_AsyncResult
     {
         //internal string XmlReturnedFromTheServer { get; set; }
 

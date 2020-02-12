@@ -12,7 +12,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 	// Summary:
 	//     Provides data for the System.Windows.Controls.ItemContainerGenerator.ItemsChanged
 	//     event.
-	public class ItemsChangedEventArgs : EventArgs
+	public partial class ItemsChangedEventArgs : EventArgs
 	{
 		//
 		// Summary:

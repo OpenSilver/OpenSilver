@@ -48,7 +48,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a control that supports navigation to and from pages.
     /// </summary>
-    public class Frame : ContentControl, INavigate
+    public partial class Frame : ContentControl, INavigate
     {
         bool _isBrowserJournal = true; //we use this so we don't have to determine all the time which journal we want to use.
         bool _isSourceChanging = false;
@@ -943,7 +943,7 @@ namespace Windows.UI.Xaml.Controls
 #endregion
 
         //todo: see if there isn't a more efficient way to do this.
-        internal class FrameCache //Note: this class serves as an intermediate to manage the cache, but we could easily have done the same directly in the Frame class.
+        internal partial class FrameCache //Note: this class serves as an intermediate to manage the cache, but we could easily have done the same directly in the Frame class.
         {
 #region two-way chained list type cache
             //internal int _cacheSize = 10;
@@ -1152,7 +1152,7 @@ namespace Windows.UI.Xaml.Controls
 #endregion
         }
 
-        internal class FrameCacheItem
+        internal partial class FrameCacheItem
         {
             internal FrameCacheItem _previous = null;
             internal FrameCacheItem _next = null;

@@ -34,7 +34,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// This ByteKeyFrame interpolates between the Byte Value of
     /// the previous key frame and its own Value to produce its output value.
     /// </summary>
-    public sealed class SplineDoubleKeyFrame : DoubleKeyFrame
+    public sealed partial class SplineDoubleKeyFrame : DoubleKeyFrame
     {
         public static readonly DependencyProperty KeySplineProperty = DependencyProperty.Register("KeySpline", typeof(KeySpline), typeof(SplineDoubleKeyFrame), new PropertyMetadata(new KeySpline()));
 

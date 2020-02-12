@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Provides data related to the SizeChanged event.
     /// </summary>
-    public sealed class SizeChangedEventArgs : RoutedEventArgs
+    public sealed partial class SizeChangedEventArgs : RoutedEventArgs
     {
         Size _newSize;
 

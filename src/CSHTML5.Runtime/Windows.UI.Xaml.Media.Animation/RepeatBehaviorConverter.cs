@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media.Animation
 {
 #if FOR_DESIGN_TIME
 
-    public sealed class RepeatBehaviorConverter : TypeConverter
+    public sealed partial class RepeatBehaviorConverter : TypeConverter
     {
         /// <summary>
         /// Determines whether an object can be converted from a given type to an instance

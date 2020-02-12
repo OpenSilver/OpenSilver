@@ -46,10 +46,10 @@ namespace Windows.UI.Xaml.Input
     /// elements, such as PointerPressed.
     /// </summary>
 #if MIGRATION
-    public class MouseEventArgs : RoutedEventArgs
+    public partial class MouseEventArgs : RoutedEventArgs
 
 #else
-    public class PointerRoutedEventArgs : RoutedEventArgs
+    public partial class PointerRoutedEventArgs : RoutedEventArgs
 #endif
     {
         internal double _pointerAbsoluteX = 0d; // Note: they are actually "relative" to the XAML Window root.

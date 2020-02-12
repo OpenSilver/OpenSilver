@@ -30,7 +30,7 @@ namespace System.ServiceModel
     /// Communication Foundation (WCF) application.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
-    public sealed class ServiceContract2Attribute : Attribute
+    public sealed partial class ServiceContract2Attribute : Attribute
     {
          /// <summary>
         /// Initializes a new instance of the System.ServiceModel.ServiceContractAttribute

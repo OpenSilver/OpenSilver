@@ -32,7 +32,7 @@ namespace System.ServiceModel
     /// Defines a strongly-typed class that corresponds to a SOAP message.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false)]
-    public sealed class MessageContractAttribute : Attribute
+    public sealed partial class MessageContractAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the System.ServiceModel.MessageContractAttribute

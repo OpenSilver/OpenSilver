@@ -38,7 +38,7 @@ namespace System.Xml.Linq
     /// <summary>
     /// Represents an XML document.
     /// </summary>
-    public class XDocument : XContainer
+    public partial class XDocument : XContainer
     {
         private string _text; //for parsing with XmlReader
 

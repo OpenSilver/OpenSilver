@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml.Documents
     /// Groups other Inline flow content elements.
     /// </summary>
     [ContentProperty("Inlines")]
-    public class Span : Inline
+    public partial class Span : Inline
     {
         private readonly InlineCollection _inlines;
 

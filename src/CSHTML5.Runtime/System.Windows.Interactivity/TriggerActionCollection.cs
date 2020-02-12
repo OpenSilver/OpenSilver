@@ -13,7 +13,7 @@ namespace System.Windows.Interactivity
     /// Represents a collection of actions with a shared AssociatedObject and provides change notifications to its contents when that AssociatedObject changes.
     /// 
     /// </summary>
-    public class TriggerActionCollection : AttachableCollection<TriggerAction>
+    public partial class TriggerActionCollection : AttachableCollection<TriggerAction>
     {
         //Note on this file: see commit 58c52131 of October 30th, 2019 for comments on the modifications from the original source.
         //Based on the code that can be found at https://github.com/jlaanstra/Windows.UI.Interactivity/tree/master/Windows.UI.Interactivity.

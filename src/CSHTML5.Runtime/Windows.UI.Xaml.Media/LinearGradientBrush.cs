@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Paints an area with a linear gradient.
     /// </summary>
-    public sealed class LinearGradientBrush : GradientBrush, ICanConvertToCSSValues
+    public sealed partial class LinearGradientBrush : GradientBrush, ICanConvertToCSSValues
     {
         public LinearGradientBrush() { }
 

@@ -51,7 +51,7 @@ namespace Windows.UI.Xaml.Controls
     /// }
     /// </code>
     /// </example>
-    public class Button : ButtonBase
+    public partial class Button : ButtonBase
     {
         public Button()
         {

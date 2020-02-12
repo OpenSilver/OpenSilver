@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Represents an easing function that creates an animation that accelerates
     /// and/or decelerates using the formula f(t) = t^2
     /// </summary>
-    public sealed class QuadraticEase : EasingFunctionBase
+    public sealed partial class QuadraticEase : EasingFunctionBase
     {
         const string FUNCTION_TYPE_STRING = "Quad";
 

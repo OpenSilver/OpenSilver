@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml
 #endif
 {
 #if WORKINPROGRESS
-    public sealed class TriggerActionCollection : PresentationFrameworkCollection<TriggerAction>
+    public sealed partial class TriggerActionCollection : PresentationFrameworkCollection<TriggerAction>
     {
     }
 #endif

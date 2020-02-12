@@ -50,9 +50,9 @@ namespace Windows.UI.Xaml.Data
     /// Contains information about a single instance of a System.Windows.Data.Binding.
     /// </summary>
 #if WORKINPROGRESS
-    public class BindingExpression : BindingExpressionBase, IPropertyPathWalkerListener
+    public partial class BindingExpression : BindingExpressionBase, IPropertyPathWalkerListener
 #else
-    public class BindingExpression : IPropertyPathWalkerListener
+    public partial class BindingExpression : IPropertyPathWalkerListener
 #endif
     {
 
@@ -446,7 +446,7 @@ namespace Windows.UI.Xaml.Data
             //             };
             //             LayoutRoot.DataContext = x;
             //         }
-            //         public class TestClass
+            //         public partial class TestClass
             //         {
             //             public string TestProperty { get; set; }
             //         }

@@ -41,9 +41,9 @@ using Windows.UI.Xaml;
 namespace System.Windows.Browser
 {
 #if WORKINPROGRESS
-    public sealed class HtmlWindow : HtmlObject
+    public sealed partial class HtmlWindow : HtmlObject
 #else
-    public sealed class HtmlWindow
+    public sealed partial class HtmlWindow
 #endif
     {
         public HtmlWindow()

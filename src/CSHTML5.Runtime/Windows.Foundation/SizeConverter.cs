@@ -35,7 +35,7 @@ namespace Windows.Foundation
     /// <summary>
     /// Converts instances of other types to and from instances of System.Windows.Size.
     /// </summary>
-    public sealed class SizeConverter : TypeConverter
+    public sealed partial class SizeConverter : TypeConverter
     {
         /// <summary>
         /// Determines whether the type converter can create an instance of System.Windows.Size

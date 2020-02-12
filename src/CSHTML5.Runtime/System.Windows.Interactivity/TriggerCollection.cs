@@ -10,7 +10,7 @@ namespace System.Windows.Interactivity
     /// <summary>
     /// Represents a collection of triggers with a shared AssociatedObject and provides change notifications to its contents when that AssociatedObject changes.
     /// </summary>
-    public sealed class TriggerCollection : AttachableCollection<TriggerBase>
+    public sealed partial class TriggerCollection : AttachableCollection<TriggerBase>
     {
         //Note on this file: see commit 58c52131 of October 30th, 2019 for comments on the modifications from the original source.
         //Based on the code that can be found at https://github.com/jlaanstra/Windows.UI.Interactivity/tree/master/Windows.UI.Interactivity.

@@ -44,7 +44,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a cell of a System.Windows.Controls.DataGrid control.
     /// </summary>
-    public class DataGridCell : ButtonBase
+    public partial class DataGridCell : ButtonBase
     {
         //For some reason in the wpf comments, below was "Gets or sets the column that the cell is in." although the set part is internal.
         /// <summary>

@@ -26,7 +26,7 @@ namespace System.Runtime.Serialization
     /// <summary>
     /// The exception that is thrown when the DataContractSerializer encounters an invalid data contract during serialization and deserialization.
     /// </summary>
-    public class InvalidDataContractException : Exception
+    public partial class InvalidDataContractException : Exception
     {
         /// <summary>
         /// Initializes a new instance of the InvalidDataContractException class.

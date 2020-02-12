@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
 #if WORKINPROGRESS
-    public interface IAnimatable
+    public partial interface IAnimatable
     {
 
     }

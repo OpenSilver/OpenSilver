@@ -12,7 +12,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    public sealed class AssemblyPartCollection : PresentationFrameworkCollection<AssemblyPart>
+    public sealed partial class AssemblyPartCollection : PresentationFrameworkCollection<AssemblyPart>
     {
 
     }

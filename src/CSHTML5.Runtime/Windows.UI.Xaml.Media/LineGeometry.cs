@@ -39,7 +39,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents the geometry of a line.
     /// </summary>
-    public sealed class LineGeometry : Geometry
+    public sealed partial class LineGeometry : Geometry
     {
         //// <summary>
         //// Initializes a new instance of the LineGeometry class that has no length.

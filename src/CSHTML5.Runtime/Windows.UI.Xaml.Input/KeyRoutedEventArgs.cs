@@ -35,9 +35,9 @@ namespace Windows.UI.Xaml.Input
     /// attached and Preview events.
     /// </summary>
 #if MIGRATION
-    public sealed class KeyEventArgs : RoutedEventArgs
+    public sealed partial class KeyEventArgs : RoutedEventArgs
 #else
-    public sealed class KeyRoutedEventArgs : RoutedEventArgs
+    public sealed partial class KeyRoutedEventArgs : RoutedEventArgs
 #endif
     {
         bool _handled = false;

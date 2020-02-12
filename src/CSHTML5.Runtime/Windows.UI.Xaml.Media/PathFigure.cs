@@ -42,7 +42,7 @@ namespace Windows.UI.Xaml.Media
     /// geometric segments.
     /// </summary>
     [ContentProperty("Segments")]
-    public sealed class PathFigure : DependencyObject
+    public sealed partial class PathFigure : DependencyObject
     {
         internal Path INTERNAL_parentPath = null;
         internal void SetParentPath(Path path)

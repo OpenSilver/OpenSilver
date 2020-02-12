@@ -58,7 +58,7 @@ namespace System.Xml.Serialization
     /// it serializes or deserializes an object.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface | AttributeTargets.Method, AllowMultiple = true)]
-    public class XmlIncludeAttribute : System.Attribute
+    public partial class XmlIncludeAttribute : System.Attribute
     {
         Type type;
 
@@ -92,7 +92,7 @@ namespace System.Xml.Serialization
     /// by the System.Xml.Serialization.XmlSerializer.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum | AttributeTargets.Interface | AttributeTargets.Struct)]
-    public class XmlTypeAttribute : System.Attribute
+    public partial class XmlTypeAttribute : System.Attribute
     {
         bool includeInSchema = true;
         bool anonymousType;
@@ -172,7 +172,7 @@ namespace System.Xml.Serialization
     /// public field or public read/write property value.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
-    public class XmlIgnoreAttribute : System.Attribute
+    public partial class XmlIgnoreAttribute : System.Attribute
     {
         /// <summary>
         /// Initializes a new instance of the System.Xml.Serialization.XmlIgnoreAttribute
@@ -195,7 +195,7 @@ namespace System.Xml.Serialization
     /// a particular class member as an array of XML elements.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.ReturnValue, AllowMultiple = false)]
-    public class XmlArrayAttribute : System.Attribute
+    public partial class XmlArrayAttribute : System.Attribute
     {
         string elementName;
         string ns;
@@ -289,7 +289,7 @@ namespace System.Xml.Serialization
     /// member.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
-    public class XmlEnumAttribute : System.Attribute
+    public partial class XmlEnumAttribute : System.Attribute
     {
         string name;
 
@@ -336,7 +336,7 @@ namespace System.Xml.Serialization
     /// can place in a serialized array.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.ReturnValue, AllowMultiple = true)]
-    public class XmlArrayItemAttribute : System.Attribute
+    public partial class XmlArrayItemAttribute : System.Attribute
     {
         string elementName;
         Type type;
@@ -476,7 +476,7 @@ namespace System.Xml.Serialization
     /// Controls XML serialization of the attribute target as an XML root element.
     /// </summary>
     [AttributeUsage(AttributeTargets.ReturnValue | AttributeTargets.Class | AttributeTargets.Enum | AttributeTargets.Interface | AttributeTargets.Struct)]
-    public class XmlRootAttribute : System.Attribute
+    public partial class XmlRootAttribute : System.Attribute
     {
         string elementName;
         string ns;

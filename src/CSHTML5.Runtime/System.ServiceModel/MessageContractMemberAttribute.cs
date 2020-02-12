@@ -32,7 +32,7 @@ namespace System.ServiceModel
     /// Declares the base members for System.ServiceModel.MessageBodyMemberAttribute
     /// and System.ServiceModel.MessageHeaderAttribute.
     /// </summary>
-    public abstract class MessageContractMemberAttribute : Attribute
+    public abstract partial class MessageContractMemberAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the System.ServiceModel.MessageContractMemberAttribute

@@ -32,7 +32,7 @@ namespace System.Windows.Input
     /// <summary>
     /// Converts a System.Windows.Input.Cursor object to and from other types.
     /// </summary>
-    public class CursorConverter : TypeConverter
+    public partial class CursorConverter : TypeConverter
     {
         /// <summary>
         /// Determines whether an object of the specified type can be converted to an

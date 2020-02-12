@@ -31,7 +31,7 @@ namespace System.Windows.Interactivity
     /// <summary>
     /// An interface for an object that can be attached to another object.
     /// </summary>
-    public interface IAttachedObject
+    public partial interface IAttachedObject
     {
         /// <summary>
         /// Gets the associated object.

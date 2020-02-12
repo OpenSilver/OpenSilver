@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace System.Windows.Browser
 {
 #if WORKINPROGRESS
-    public sealed class ScriptObjectCollection : ScriptObject, IEnumerable<ScriptObject>, IEnumerable
+    public sealed partial class ScriptObjectCollection : ScriptObject, IEnumerable<ScriptObject>, IEnumerable
     {
         #region Fields
         private int _count;

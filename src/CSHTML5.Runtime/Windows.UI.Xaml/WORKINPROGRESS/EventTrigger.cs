@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml
     ///   A class that controls a set of actions to activate in response to an event
     /// </summary>
     [ContentProperty("Actions")]
-    public sealed class EventTrigger : TriggerBase
+    public sealed partial class EventTrigger : TriggerBase
     {
         private static readonly DependencyProperty ActionsProperty = DependencyProperty.Register("Actions", typeof(TriggerActionCollection), typeof(EventTrigger), new PropertyMetadata(new TriggerActionCollection()));
         private static readonly DependencyProperty RoutedEventProperty = DependencyProperty.Register("RoutedEvent", typeof(RoutedEvent), typeof(EventTrigger), null);

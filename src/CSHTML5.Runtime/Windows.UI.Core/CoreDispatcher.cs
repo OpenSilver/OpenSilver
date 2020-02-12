@@ -45,9 +45,9 @@ namespace Windows.UI.Core
     /// for processing the window messages and dispatching the events to the client.
     /// </summary>
 #if MIGRATION
-    public class Dispatcher
+    public partial class Dispatcher
 #else
-    public class CoreDispatcher
+    public partial class CoreDispatcher
 #endif
     {
 #if MIGRATION

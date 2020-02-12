@@ -12,7 +12,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    public class TemplateBindingExpression
+    public partial class TemplateBindingExpression
     {
         internal TemplateBindingExpression()
         {

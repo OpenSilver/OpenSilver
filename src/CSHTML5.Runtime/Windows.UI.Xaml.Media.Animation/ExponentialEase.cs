@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Represents an easing function that creates an animation that accelerates
     /// and/or decelerates using an exponential formula.
     /// </summary>
-    public sealed class ExponentialEase : EasingFunctionBase
+    public sealed partial class ExponentialEase : EasingFunctionBase
     {
         const string FUNCTION_TYPE_STRING = "ExponentialCustomEasing";
         private static bool velocityInitializationMade = false;

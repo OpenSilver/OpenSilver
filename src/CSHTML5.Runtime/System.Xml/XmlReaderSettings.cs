@@ -29,7 +29,7 @@ namespace System.Xml
 #if !BRIDGE
     [JSIL.Meta.JSStubOnly]
 #endif
-    public sealed class XmlReaderSettings
+    public sealed partial class XmlReaderSettings
     {
         /// <summary>
         /// Initializes a new instance of the System.Xml.XmlReaderSettings class.

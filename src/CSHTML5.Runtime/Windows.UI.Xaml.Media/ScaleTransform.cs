@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Scales an object in the two-dimensional x-y coordinate system.
     /// </summary>
-    public sealed class ScaleTransform : Transform
+    public sealed partial class ScaleTransform : Transform
     {
         double _appliedCssScaleX = 1d;
         double _appliedCssScaleY = 1d;

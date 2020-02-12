@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Provides event data for exceptions that are raised as events by asynchronous operations, such as MediaFailed or ImageFailed.
     /// </summary>
-    public class ExceptionRoutedEventArgs : RoutedEventArgs
+    public partial class ExceptionRoutedEventArgs : RoutedEventArgs
     {
         private string _errorMessage = "";
 

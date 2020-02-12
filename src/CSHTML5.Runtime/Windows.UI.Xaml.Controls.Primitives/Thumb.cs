@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Represents a control that can be dragged by the user.
     /// </summary>
-    public sealed class Thumb : Control
+    public sealed partial class Thumb : Control
     {
         //todo: Perfs: Each time we use GetPosition, only call it once.
         bool _isPointerCaptured;

@@ -43,9 +43,9 @@ namespace System.Runtime.Serialization
 
 #if CSHTML5NETSTANDARD
     // already defined in .NET Standard we need another name for the class
-    public class DataContractSerializer_CSHTML5Ver
+    public partial class DataContractSerializer_CSHTML5Ver
 #else
-    public class DataContractSerializer
+    public partial class DataContractSerializer
 #endif
     {
         Type _type;

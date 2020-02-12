@@ -42,7 +42,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a pop-up menu that enables a control to expose functionality that is specific to the context of the control.
     /// </summary>
-    public class ContextMenu : MenuBase
+    public partial class ContextMenu : MenuBase
     {
         Popup _parentPopup;
         Point? _forceSpecifyAbsoluteCoordinates;

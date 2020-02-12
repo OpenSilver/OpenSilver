@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml.Media
     /// Represents a collection of Point values that can be individually accessed
     /// by index.
     /// </summary>
-    public sealed class PointCollection : List<Point>//: IList<Point>, IEnumerable<Point>
+    public sealed partial class PointCollection : List<Point>//: IList<Point>, IEnumerable<Point>
     {
         ///// <summary>
         ///// Initializes a new instance of the PointCollection class.

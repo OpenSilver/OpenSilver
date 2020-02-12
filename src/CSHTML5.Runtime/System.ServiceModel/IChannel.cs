@@ -27,7 +27,7 @@ namespace System.ServiceModel.Channels
     //     that they implement the state machine interface shared by all communication
     //     objects and that they implement a method to retrieve objects from the channel
     //     stack.
-    public interface IChannel : ICommunicationObject
+    public partial interface IChannel : ICommunicationObject
     {
         // Summary:
         //     Returns a typed object requested, if present, from the appropriate layer

@@ -34,7 +34,7 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     [ContentProperty("Children")]
-    public sealed class TransformGroup : Transform
+    public sealed partial class TransformGroup : Transform
     {
         public TransformGroup()
         {

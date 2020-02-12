@@ -32,7 +32,7 @@ namespace System.Net
     /// class.
     /// </summary>
     [Serializable]
-    public abstract class WebRequest// : MarshalByRefObject, ISerializable
+    public abstract partial class WebRequest// : MarshalByRefObject, ISerializable
     {
         private Uri _address;
 

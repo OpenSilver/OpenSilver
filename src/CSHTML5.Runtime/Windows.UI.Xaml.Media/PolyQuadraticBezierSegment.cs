@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml.Media
     // Summary:
     //     Represents a set of quadratic Bezier segments.
     [ContentProperty("Points")]
-    public sealed class PolyQuadraticBezierSegment : PathSegment
+    public sealed partial class PolyQuadraticBezierSegment : PathSegment
     {
         ///// <summary>
         ///// Initializes a new instance of the PolyQuadraticBezierSegment class.

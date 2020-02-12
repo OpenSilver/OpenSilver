@@ -27,7 +27,7 @@ namespace System.Xml.Serialization
     /// the class member as an XML attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
-    public class XmlAttributeAttribute : System.Attribute
+    public partial class XmlAttributeAttribute : System.Attribute
     {
         string attributeName;
         Type type;

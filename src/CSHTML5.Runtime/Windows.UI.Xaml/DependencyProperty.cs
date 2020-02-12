@@ -42,7 +42,7 @@ namespace Windows.UI.Xaml
 #if FOR_DESIGN_TIME
     [TypeConverter(typeof(DependencyPropertyConverter))]
 #endif
-    public class DependencyProperty
+    public partial class DependencyProperty
     {
         public static readonly object UnsetValue = INTERNAL_NoValue.NoValue;
 

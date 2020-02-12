@@ -45,7 +45,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public class DatePicker : INTERNAL_DateTimePickerBase
+    public partial class DatePicker : INTERNAL_DateTimePickerBase
     {   
         public DatePicker()
         {

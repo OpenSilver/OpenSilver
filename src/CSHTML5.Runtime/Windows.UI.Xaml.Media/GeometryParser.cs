@@ -16,7 +16,7 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    internal class GeometryParser
+    internal partial class GeometryParser
     {
         internal static Geometry ParseGeometry(string pathString/*, IFormatProvider formatProvider*/)
         {
@@ -82,7 +82,7 @@ namespace Windows.UI.Xaml.Media
     /// SVG path spec is closely followed http://www.w3.org/TR/SVG11/paths.html
     /// 3/23/2006, new parser for performance (fyuan)
     /// </summary>
-    internal sealed class AbbreviatedGeometryParser
+    internal sealed partial class AbbreviatedGeometryParser
     {
         private const bool AllowSign = true;
         private const bool AllowComma = true;
@@ -629,8 +629,8 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     ///     PathStreamGeometryContext
     /// </summary>
-    //internal class PathStreamGeometryContext : CapacityStreamGeometryContext
-    internal class PathStreamGeometryContext
+    //internal partial class PathStreamGeometryContext : CapacityStreamGeometryContext
+    internal partial class PathStreamGeometryContext
     {
         #region Public Methods
         static PathStreamGeometryContext()

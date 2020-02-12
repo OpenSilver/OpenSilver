@@ -2,7 +2,7 @@
 
 namespace System.ComponentModel
 {
-    public abstract class GroupDescription : INotifyPropertyChanged
+    public abstract partial class GroupDescription : INotifyPropertyChanged
     {
         protected event PropertyChangedEventHandler PropertyChanged;
 

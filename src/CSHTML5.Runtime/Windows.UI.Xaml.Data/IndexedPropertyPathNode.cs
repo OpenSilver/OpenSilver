@@ -12,7 +12,7 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
-    internal class IndexedPropertyPathNode : PropertyPathNode
+    internal partial class IndexedPropertyPathNode : PropertyPathNode
     {
         //Note: limitations of this class (that I could think of)
         //      - If the source object's type defines this[...] in different ways, it will not work (see comments in the GetMethod method in this class).

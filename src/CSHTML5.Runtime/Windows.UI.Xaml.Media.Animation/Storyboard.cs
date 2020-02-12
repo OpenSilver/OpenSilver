@@ -41,7 +41,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// information for its child animations.
     /// </summary>
     [ContentProperty("Children")]
-    public sealed class Storyboard : Timeline
+    public sealed partial class Storyboard : Timeline
     {
         private Dictionary<Tuple<string, string>, Timeline> INTERNAL_propertiesChanged; //todo: change this into a Hashset.
 
@@ -464,7 +464,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// this class has been added to make passing the parameters through the iterations easier.
     /// </summary>
-    internal class IterationParameters
+    internal partial class IterationParameters
     {
         internal FrameworkElement Target;
         internal Guid Guid;

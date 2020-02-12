@@ -23,7 +23,7 @@ namespace System.ServiceModel
     /// <summary>
     /// 
     /// </summary>
-    public interface IContextChannel
+    public partial interface IContextChannel
     {
     }
 }

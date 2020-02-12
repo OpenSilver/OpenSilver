@@ -33,7 +33,7 @@ using System.Threading.Tasks;
 
 namespace System.IO.IsolatedStorage
 {
-    internal class IsolatedStorageSettingsForCSharp : IDictionary<string, Object>
+    internal partial class IsolatedStorageSettingsForCSharp : IDictionary<string, Object>
     {
         #region Constants/Variables
 

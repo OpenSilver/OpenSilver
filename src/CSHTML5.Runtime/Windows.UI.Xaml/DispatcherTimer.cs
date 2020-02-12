@@ -66,7 +66,7 @@ namespace Windows.UI.Xaml
     ///     _dispatcherTimer.Stop();
     /// </code>
     /// </example>
-    public class DispatcherTimer
+    public partial class DispatcherTimer
     {
 #if CSHTML5NETSTANDARD
         global::System.Threading.Timer _timer;

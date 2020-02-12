@@ -32,7 +32,7 @@ namespace System.ServiceModel.Channels
     /// Contains the binding elements that specify the protocols, transports, and
     /// message encoders used for communication between clients and services.
     /// </summary>
-    public class Binding
+    public partial class Binding
     {
 #if WORKINPROGRESS
         public TimeSpan ReceiveTimeout { get; set; }

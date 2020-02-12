@@ -20,7 +20,7 @@
 namespace System.Windows.Markup
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum, AllowMultiple = false, Inherited = true)]
-    public class MethodToTranslateXamlValueToCSharpAttribute : Attribute
+    public partial class MethodToTranslateXamlValueToCSharpAttribute : Attribute
     {
         public MethodToTranslateXamlValueToCSharpAttribute() { }
 

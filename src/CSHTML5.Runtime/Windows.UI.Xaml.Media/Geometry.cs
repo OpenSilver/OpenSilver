@@ -46,7 +46,7 @@ namespace Windows.UI.Xaml.Media
 #if FOR_DESIGN_TIME
     [TypeConverter(typeof(GeometryConverter))]
 #endif
-    public abstract class Geometry : DependencyObject
+    public abstract partial class Geometry : DependencyObject
     {
         internal Path INTERNAL_parentPath = null;
         internal virtual void SetParentPath(Path path)

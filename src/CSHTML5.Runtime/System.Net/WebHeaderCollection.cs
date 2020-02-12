@@ -30,7 +30,7 @@ namespace System.Net
     /// Contains protocol headers associated with a request or response.
     /// </summary>
     [Serializable]
-    public class WebHeaderCollection //: NameValueCollection, ISerializable //todo: inheritance
+    public partial class WebHeaderCollection //: NameValueCollection, ISerializable //todo: inheritance
     {
         Dictionary<string, string> _headers;
         /// <summary>
@@ -513,7 +513,7 @@ namespace System.Net
         #endregion
     }
 
-    static internal class CSharpHeaderToHtmlHeaderConverter
+    static internal partial class CSharpHeaderToHtmlHeaderConverter
     {
         static Dictionary<string, string> _headerStringEquivalence = new Dictionary<string, string>()
         {

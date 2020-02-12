@@ -33,7 +33,7 @@ namespace System.Net
     /// Provides an HTTP-specific implementation of the System.Net.WebResponse class.
     /// </summary>
     [Serializable]
-    public class HttpWebResponse : WebResponse//, ISerializable
+    public partial class HttpWebResponse : WebResponse//, ISerializable
     {
         private object _xmlHttpRequest;
 

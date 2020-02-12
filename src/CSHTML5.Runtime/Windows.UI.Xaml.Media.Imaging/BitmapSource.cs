@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media.Imaging
     /// <summary>
     /// Provides a source object for properties that use a bitmap.
     /// </summary>
-    public class BitmapSource : ImageSource
+    public partial class BitmapSource : ImageSource
     {
         bool _isStreamAsBase64StringValid = false;
 

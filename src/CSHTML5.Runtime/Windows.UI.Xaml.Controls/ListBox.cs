@@ -55,7 +55,7 @@ namespace Windows.UI.Xaml.Controls
     /// </code>
     /// <code lang="C#">
     /// ListBox1.ItemsSource = Planet.GetListOfPlanets();
-    /// public class Planet
+    /// public partial class Planet
     /// {
     ///    public string Name { get; set; }
     ///    public string ImagePath { get; set; }
@@ -79,7 +79,7 @@ namespace Windows.UI.Xaml.Controls
     ///} 
     /// </code>
     /// </example>
-    public class ListBox : MultiSelector //normally it should be Selector but since MultiSelector already adds SelectedItems, we inherit from MultiSelector.
+    public partial class ListBox : MultiSelector //normally it should be Selector but since MultiSelector already adds SelectedItems, we inherit from MultiSelector.
     {
         //local variable used in SelectionMode.Extended 
         int _indexOfLastClickedItemWithoutShiftKey = 0;

@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Media
     /// Provides utility methods that can used to traverse object relationships (along
     /// child object or parent object axes) in the visual tree.
     /// </summary>
-    public sealed class VisualTreeHelper
+    public sealed partial class VisualTreeHelper
     {
         /// <summary>
         /// Returns an object's parent object in the visual tree.

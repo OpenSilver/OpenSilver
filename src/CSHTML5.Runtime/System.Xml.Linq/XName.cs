@@ -31,7 +31,7 @@ namespace System.Xml.Linq
     /// <summary>
     /// Represents a name of an XML element or attribute.
     /// </summary>
-    public sealed class XName : IEquatable<XName>
+    public sealed partial class XName : IEquatable<XName>
     {
         /// <summary>
         /// Determines whether the specified System.Xml.Linq.XName is equal to this System.Xml.Linq.XName.

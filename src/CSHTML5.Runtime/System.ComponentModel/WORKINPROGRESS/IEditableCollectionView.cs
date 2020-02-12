@@ -2,7 +2,7 @@
 
 namespace System.ComponentModel
 {
-    public interface IEditableCollectionView
+    public partial interface IEditableCollectionView
     {
         bool CanAddNew { get; }
         bool CanCancelEdit { get; }

@@ -5,7 +5,7 @@ using System.Windows.Markup;
 namespace System.Windows
 {
     [SupportsDirectContentViaTypeFromStringConverters]
-    public struct FontStyle
+    public partial struct FontStyle
     {
         private int _style;
 

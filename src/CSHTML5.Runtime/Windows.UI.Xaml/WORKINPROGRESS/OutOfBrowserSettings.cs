@@ -11,7 +11,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    public class OutOfBrowserSettings : DependencyObject
+    public partial class OutOfBrowserSettings : DependencyObject
     {
 
         public static readonly DependencyProperty WindowSettingsProperty = DependencyProperty.Register("WindowSettings", typeof(WindowSettings), typeof(OutOfBrowserSettings), null);

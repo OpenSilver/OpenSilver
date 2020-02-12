@@ -13,7 +13,7 @@ namespace Windows.UI.Xaml
     //
     // Summary:
     //     Provides data for drag-and-drop events in Silverlight.
-    public sealed class DragEventArgs : RoutedEventArgs
+    public sealed partial class DragEventArgs : RoutedEventArgs
     {
         //
         // Summary:

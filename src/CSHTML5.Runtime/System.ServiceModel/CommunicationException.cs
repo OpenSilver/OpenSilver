@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a communication error in either the service or client application.
     /// </summary>
-    public class CommunicationException : SystemException
+    public partial class CommunicationException : SystemException
     {
         /// <summary>
         /// Initializes a new instance of the System.ServiceModel.CommunicationException

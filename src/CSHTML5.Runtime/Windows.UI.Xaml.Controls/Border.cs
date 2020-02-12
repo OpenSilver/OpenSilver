@@ -65,7 +65,7 @@ namespace Windows.UI.Xaml.Controls
     /// </code>
     /// </example>
     [ContentProperty("Child")]
-    public class Border : FrameworkElement
+    public partial class Border : FrameworkElement
     {
         private UIElement _child;
 

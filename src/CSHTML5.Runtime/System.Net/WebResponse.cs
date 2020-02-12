@@ -31,7 +31,7 @@ namespace System.Net
     /// </summary>
     [Serializable]
     //todo: make this class implement IDisposable (I prefer not to do it before knowing what needs to be done while disposing it)
-    public abstract class WebResponse// : MarshalByRefObject//, IDisposable//, ISerializable
+    public abstract partial class WebResponse// : MarshalByRefObject//, IDisposable//, ISerializable
     {
         
         //todo: implement the following then make HttpWebResponse override it

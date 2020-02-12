@@ -16,7 +16,7 @@ namespace System.Windows.Documents
 namespace Windows.UI.Xaml.Documents
 #endif
 {
-    internal sealed class INTERNAL_TextContainerTextBlock : INTERNAL_TextContainer
+    internal sealed partial class INTERNAL_TextContainerTextBlock : INTERNAL_TextContainer
     {
         #region Constructor
         internal INTERNAL_TextContainerTextBlock(TextBlock parent) : base(parent)

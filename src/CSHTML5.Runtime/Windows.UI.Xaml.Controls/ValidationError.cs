@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Controls
     /// or through the System.Windows.Controls.Validation.MarkInvalid(System.Windows.Data.BindingExpressionBase,System.Windows.Controls.ValidationError)
     /// method explicitly.
     /// </summary>
-    public class ValidationError
+    public partial class ValidationError
     {
         /// <summary>
         /// Initializes a new instance of the System.Windows.Controls.ValidationError

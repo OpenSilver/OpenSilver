@@ -27,7 +27,7 @@ namespace System.Xml
 #if !BRIDGE
     [JSIL.Meta.JSStubOnly]
 #endif
-    public abstract class XmlNameTable
+    public abstract partial class XmlNameTable
     {
         /// <summary>
         /// Initializes a new instance of the System.Xml.XmlNameTable class.

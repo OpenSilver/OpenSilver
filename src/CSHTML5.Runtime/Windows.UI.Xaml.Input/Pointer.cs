@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml.Input
     /// <summary>
     /// Represents a pointer device.
     /// </summary>
-    public sealed class Pointer
+    public sealed partial class Pointer
     {
 
         internal static UIElement INTERNAL_captured;

@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml
     /// Defines a transition between VisualStates.
     /// </summary>
     [ContentProperty("Storyboard")]
-    public class VisualTransition : DependencyObject
+    public partial class VisualTransition : DependencyObject
     {
         /// <summary>Gets or sets the <see cref="T:System.Windows.Media.Animation.Storyboard" /> that occurs when the transition occurs.</summary>
         /// <returns>The <see cref="T:System.Windows.Media.Animation.Storyboard" /> that occurs when the transition occurs.</returns>

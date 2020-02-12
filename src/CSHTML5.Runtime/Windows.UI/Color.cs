@@ -43,7 +43,7 @@ namespace Windows.UI
     /// Describes a color in terms of alpha, red, green, and blue channels.
     /// </summary>
     [SupportsDirectContentViaTypeFromStringConverters]
-    public struct Color //todo: this is supposed to inherit from IFormattable
+    public partial struct Color //todo: this is supposed to inherit from IFormattable
     {
         /// <summary>
         /// Gets or sets the sRGB alpha channel value of the color.

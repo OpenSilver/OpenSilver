@@ -28,7 +28,7 @@ namespace System.ServiceModel
     /// <summary>
     /// Configures the security settings of a basicHttpBinding binding.
     /// </summary>
-    public sealed class BasicHttpSecurity
+    public sealed partial class BasicHttpSecurity
     {
         /// <summary>
         /// Initializes a new instance of the System.ServiceModel.BasicHttpSecurity class.

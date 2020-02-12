@@ -36,9 +36,9 @@ namespace Windows.UI.Xaml.Media.Animation
     /// </summary>
 
 #if WORKINPROGRESS
-    public abstract class DoubleKeyFrame : Freezable, IKeyFrame
+    public abstract partial class DoubleKeyFrame : Freezable, IKeyFrame
 #else
-    public abstract class DoubleKeyFrame : DependencyObject, IKeyFrame
+    public abstract partial class DoubleKeyFrame : DependencyObject, IKeyFrame
 #endif
     {
         public static readonly DependencyProperty KeyTimeProperty = DependencyProperty.Register("KeyTime", typeof(KeyTime), typeof(DoubleKeyFrame), new PropertyMetadata(new KeyTime()));

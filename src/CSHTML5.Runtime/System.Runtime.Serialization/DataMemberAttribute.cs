@@ -31,7 +31,7 @@ namespace System.Runtime.Serialization
     /// a data contract and is serializable by the DataContractSerializer.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
-    public sealed class DataMemberAttribute : Attribute
+    public sealed partial class DataMemberAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the DataMemberAttribute

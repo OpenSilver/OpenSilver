@@ -41,7 +41,7 @@ namespace Windows.UI.Xaml
     [TypeConverter(typeof(CornerRadiusConverter))]
 #endif
     [SupportsDirectContentViaTypeFromStringConverters]
-    public struct CornerRadius
+    public partial struct CornerRadius
     {
         double _topLeftRadius;
         double _bottomLeftRadius;

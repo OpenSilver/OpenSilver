@@ -33,9 +33,9 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Provides the base class for all the easing functions.
     /// </summary>
 #if WORKINPROGRESS
-    public class EasingFunctionBase : DependencyObject, IEasingFunction
+    public partial class EasingFunctionBase : DependencyObject, IEasingFunction
 #else
-    public class EasingFunctionBase : DependencyObject
+    public partial class EasingFunctionBase : DependencyObject
 #endif
     {
         /// <summary>

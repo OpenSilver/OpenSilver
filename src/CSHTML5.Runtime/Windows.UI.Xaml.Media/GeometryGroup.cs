@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
 {
 #if WORKINPROGRESS
     [ContentProperty("Children")]
-    public sealed class GeometryGroup : Geometry
+    public sealed partial class GeometryGroup : Geometry
     {
         internal protected override void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize)
         {

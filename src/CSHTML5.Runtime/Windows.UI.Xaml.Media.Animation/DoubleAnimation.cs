@@ -41,7 +41,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Animates the value of a Double property between two target values using linear
     /// interpolation over a specified Duration.
     /// </summary>
-    public class DoubleAnimation : AnimationTimeline
+    public partial class DoubleAnimation : AnimationTimeline
     {
 #if WORKINPROGRESS
         public IEasingFunction EasingFunction

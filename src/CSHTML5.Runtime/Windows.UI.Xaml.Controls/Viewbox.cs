@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Controls
     /// fill the available space.
     /// </summary>
     [ContentProperty("Child")]
-    public class Viewbox : ContentControl
+    public partial class Viewbox : ContentControl
     {
         /// <summary>
         /// Initializes a new instance of the

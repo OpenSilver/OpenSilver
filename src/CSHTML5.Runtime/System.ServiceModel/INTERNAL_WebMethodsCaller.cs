@@ -55,7 +55,7 @@ namespace System.ServiceModel
         }
 
 
-        internal class WebMethodAsyncResult : INTERNAL_AsyncResult
+        internal partial class WebMethodAsyncResult : INTERNAL_AsyncResult
         {
             public string XmlReturnedFromTheServer { get; set; }
 

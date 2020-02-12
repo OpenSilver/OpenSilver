@@ -30,7 +30,7 @@ namespace System.Net
     /// <summary>
     /// Provides data for the System.Net.WebClient.DownloadStringCompleted event.
     /// </summary>
-    public class DownloadStringCompletedEventArgs// : AsyncCompletedEventArgs //todo: AsyncCompletedEventArgs() is obsolete, see what we should do (it might be that it is only obsolete for use by the user, but not for us)
+    public partial class DownloadStringCompletedEventArgs// : AsyncCompletedEventArgs //todo: AsyncCompletedEventArgs() is obsolete, see what we should do (it might be that it is only obsolete for use by the user, but not for us)
     {
         public DownloadStringCompletedEventArgs() { }
         internal DownloadStringCompletedEventArgs(System.Net.DownloadStringCompletedEventArgs e)

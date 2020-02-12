@@ -4,7 +4,7 @@
 
 namespace System.Windows.Browser
 {
-    public sealed class BrowserInformation
+    public sealed partial class BrowserInformation
     {
         //
         // Summary:

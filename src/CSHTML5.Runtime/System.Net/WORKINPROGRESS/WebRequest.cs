@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System.Net
 {
-    public abstract class WebRequest// : MarshalByRefObject, ISerializable
+    public abstract partial class WebRequest// : MarshalByRefObject, ISerializable
     {
         #region Data
         internal INTERNAL_WebRequestHelper_JSOnly _webRequestHelper;

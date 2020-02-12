@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents a two-dimensional skew.
     /// </summary>
-    public sealed class SkewTransform : Transform
+    public sealed partial class SkewTransform : Transform
     {
         double _appliedCssAngleX;
         double _appliedCssAngleY;

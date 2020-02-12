@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Media
 #if FOR_DESIGN_TIME
     [TypeConverter(typeof(ImageSourceConverter))]
 #endif
-    public class ImageSource : DependencyObject
+    public partial class ImageSource : DependencyObject
     {
         static ImageSource()
         {

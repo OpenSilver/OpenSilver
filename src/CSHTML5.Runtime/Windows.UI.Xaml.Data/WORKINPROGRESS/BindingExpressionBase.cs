@@ -12,7 +12,7 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
-    public abstract class BindingExpressionBase
+    public abstract partial class BindingExpressionBase
     {
     }
 }

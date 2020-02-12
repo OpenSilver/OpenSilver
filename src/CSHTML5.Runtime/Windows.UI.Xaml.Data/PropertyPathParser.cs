@@ -38,7 +38,7 @@ namespace CSHTML5.Internal.Windows.UI.Xaml.Data
     }
 
     //Property path syntax: http://msdn.microsoft.com/en-us/library/cc645024(v=vs.95).aspx
-    internal class PropertyPathParser
+    internal partial class PropertyPathParser
     {
         string Path;
 

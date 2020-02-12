@@ -32,7 +32,7 @@ namespace System.ServiceModel
     /// Defines the behavior of outbound request and request/reply channels used
     /// by client applications.
     /// </summary>
-    public interface IClientChannel : IDisposable
+    public partial interface IClientChannel : IDisposable
 #if WORKINPROGRESS && !CSHTML5BLAZOR
         , IChannel
 #endif

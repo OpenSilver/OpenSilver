@@ -47,7 +47,7 @@ namespace Windows.UI.Xaml.Controls
     /// Represents a control that can be used to present a collection of items.
     /// </summary>
     [ContentProperty("Items")]
-    public class ItemsControl : Control
+    public partial class ItemsControl : Control
     {
         protected ItemContainerGenerator _itemContainerGenerator = new ItemContainerGenerator(); // Note: this maps an item (for example a string) to the element that is added to the visual tree (such a datatemplate) or to the native DOM element in case of native combo box for example.
         protected FrameworkElement _placeWhereItemsPanelWillBeRendered = null; // By default, this variable will be equal to "this" (set in the contructor), unless instructed otherwise by a deriving class (such as a templated ListBox or ComboBox):

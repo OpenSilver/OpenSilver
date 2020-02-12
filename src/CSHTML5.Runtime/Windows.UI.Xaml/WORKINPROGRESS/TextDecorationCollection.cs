@@ -33,7 +33,7 @@ using Windows.UI.Xaml.Media.Animation;
 namespace System.Windows
 {
     [SupportsDirectContentViaTypeFromStringConverters]
-    public sealed class TextDecorationCollection
+    public sealed partial class TextDecorationCollection
     {
         static TextDecorationCollection()
         {
@@ -109,7 +109,7 @@ namespace System.Windows
     }
 #if no
     [SupportsDirectContentViaTypeFromStringConverters]
-    public sealed class TextDecorationCollection : Animatable, IList, IList<TextDecoration>
+    public sealed partial class TextDecorationCollection : Animatable, IList, IList<TextDecoration>
     {
 
         public int Add(object value)

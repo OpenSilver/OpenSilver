@@ -53,7 +53,7 @@ namespace Windows.UI.Xaml.Controls
     /// </code>
     /// <code lang="C#">
     /// ComboBox1.ItemsSource = Planet.GetListOfPlanets();
-    /// public class Planet
+    /// public partial class Planet
     ///{
     ///    public string Name { get; set; }
     ///    public string ImagePath { get; set; }
@@ -77,7 +77,7 @@ namespace Windows.UI.Xaml.Controls
     ///}
     /// </code>
     /// </example>
-    public class ComboBox : Selector
+    public partial class ComboBox : Selector
     {
         dynamic _nativeComboBoxDomElement;
         Popup _popup;

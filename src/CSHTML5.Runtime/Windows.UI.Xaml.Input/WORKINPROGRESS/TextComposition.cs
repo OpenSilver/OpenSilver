@@ -15,7 +15,7 @@ namespace Windows.UI.Xaml.Input
 	// Summary:
 	//     Represents a composition related to text input which includes the composition
 	//     text itself.
-	public sealed class TextComposition
+	public sealed partial class TextComposition
 	{
 		//
 		// Summary:

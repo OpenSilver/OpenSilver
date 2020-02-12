@@ -28,7 +28,7 @@ namespace System.Xml.Serialization
     // Summary:
     //     Represents an abstract class used for controlling serialization by the System.Xml.Serialization.XmlSerializer
     //     class.
-    public abstract class XmlSerializationWriter : XmlSerializationGeneratedCode
+    public abstract partial class XmlSerializationWriter : XmlSerializationGeneratedCode
     {
         //note: we assumed that this would not be used improperly so there are no tests on the elements enteredd as parameters.
         //todo: add these tests

@@ -25,7 +25,7 @@ namespace Microsoft.Windows
 namespace System.Windows
 #endif
 {
-    public abstract class ExtendedRoutedEventArgs : EventArgs
+    public abstract partial class ExtendedRoutedEventArgs : EventArgs
     {
         /// <summary>
         /// Gets or sets a value indicating whether the present state of the 

@@ -30,7 +30,7 @@ namespace System.Windows.Input
     /// Provides event data for mouse button input events, for example System.Windows.UIElement.MouseLeftButtonDown
     /// and System.Windows.UIElement.MouseRightButtonUp.
     /// </summary>
-    public class MouseButtonEventArgs : MouseEventArgs
+    public partial class MouseButtonEventArgs : MouseEventArgs
     {
     }
 }

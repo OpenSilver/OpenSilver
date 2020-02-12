@@ -31,7 +31,7 @@ namespace System.Windows
     /// Provides application part and localization information in the application
     /// manifest when deploying a Silverlight-based application.
     /// </summary>
-    public sealed class Deployment : DependencyObject
+    public sealed partial class Deployment : DependencyObject
     {
         private Deployment() { } //Note: There is normally a public parameterless constructor but I'm assuming it works like the Current property so we keep this private for now.
         static Deployment _deployment = null;

@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml.Navigation
     /// <summary>
     /// Provides data for navigation methods and event handlers that cannot cancel
     /// the navigation request.</summary>
-    public sealed class NavigationEventArgs : EventArgs
+    public sealed partial class NavigationEventArgs : EventArgs
     {
         /// <summary>
         /// Initializes a new instance of the NavigationEventArgs class, based on content and URI.

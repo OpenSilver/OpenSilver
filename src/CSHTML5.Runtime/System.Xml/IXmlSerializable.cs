@@ -25,7 +25,7 @@ namespace System.Xml.Serialization
     /// <summary>
     /// Provides custom formatting for XML serialization and deserialization.
     /// </summary>
-    public interface IXmlSerializable
+    public partial interface IXmlSerializable
     {
         //// Summary:
         ////     This method is reserved and should not be used. When implementing the IXmlSerializable

@@ -30,7 +30,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// A collection of selected items.
     /// </summary>
-    public sealed class SelectionCollection : Collection<Selection>
+    public sealed partial class SelectionCollection : Collection<Selection>
     {
 
         /// <summary>

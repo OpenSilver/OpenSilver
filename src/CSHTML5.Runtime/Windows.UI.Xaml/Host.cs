@@ -28,7 +28,7 @@ namespace System.Windows // Note: we didn't use the "Interop" namespace to avoid
 namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoid conflicts with CSHTML5.Interop
 #endif
 {
-    public class Host
+    public partial class Host
     {
         Content _content;
 

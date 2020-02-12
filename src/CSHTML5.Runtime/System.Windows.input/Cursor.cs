@@ -35,7 +35,7 @@ namespace System.Windows.Input
 #if FOR_DESIGN_TIME
     [TypeConverter(typeof(CursorConverter))]
 #endif
-    public sealed class Cursor : IDisposable
+    public sealed partial class Cursor : IDisposable
     {
         bool _isCustom = false;
         internal string _cursorHtmlString;

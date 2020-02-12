@@ -45,7 +45,7 @@ namespace Windows.UI.Xaml.Controls
     /// Represents the base class for UI elements that use a ControlTemplate to define
     /// their appearance.
     /// </summary>
-    public class Control : FrameworkElement
+    public partial class Control : FrameworkElement
     {
         private UIElement _renderedControlTemplate = null;
         private bool _isDisabled = false;

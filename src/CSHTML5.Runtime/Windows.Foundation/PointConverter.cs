@@ -36,7 +36,7 @@ namespace Windows.Foundation
     /// <summary>
     /// Converts instances of other types to and from an instance of Windows.Foundation.Point.
     /// </summary>
-    public sealed class PointConverter : TypeConverter
+    public sealed partial class PointConverter : TypeConverter
     {
         /// <summary>
         /// Determines whether an object can be converted from a given type to an instance

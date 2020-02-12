@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Creates an arbitrary affine matrix transformation that is used to manipulate objects or coordinate systems in a two-dimensional plane.
     /// </summary>
-    public sealed class MatrixTransform : Transform
+    public sealed partial class MatrixTransform : Transform
     {
         /// <summary>
         /// Gets or sets the Matrix that defines this transformation. The default is an

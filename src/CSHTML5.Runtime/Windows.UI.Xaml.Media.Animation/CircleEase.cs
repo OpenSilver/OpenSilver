@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Represents an easing function that creates an animation that accelerates
     /// and/or decelerates using a circular function.
     /// </summary>
-    public sealed class CircleEase : EasingFunctionBase
+    public sealed partial class CircleEase : EasingFunctionBase
     {
         const string FUNCTION_TYPE_STRING = "Circ";
 

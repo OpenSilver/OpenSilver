@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// Primitive control - TextBox with UpPressed and DownPressed events for use in a NumericUpDown
     /// to make up and down keys work to increment and decrement the values.
     /// </summary>
-    public class UpDownTextBox : TextBox
+    public partial class UpDownTextBox : TextBox
     {
         #region UpPressed event
         /// <summary>

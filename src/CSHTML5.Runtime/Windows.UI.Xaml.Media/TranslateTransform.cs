@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Translates (moves) an object in the two-dimensional x-y coordinate system.
     /// </summary>
-    public sealed class TranslateTransform : Transform
+    public sealed partial class TranslateTransform : Transform
     {
         double _appliedCssX;
         double _appliedCssY;

@@ -26,7 +26,7 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-    public sealed class EasingDoubleKeyFrame : DoubleKeyFrame
+    public sealed partial class EasingDoubleKeyFrame : DoubleKeyFrame
     {
         public static readonly DependencyProperty EasingFunctionProperty =  DependencyProperty.Register("EasingFunction",
                                                                                                         typeof(EasingFunctionBase),

@@ -48,9 +48,9 @@ namespace Windows.UI.Xaml.Data
     /// <p>the order of the operations is: Filtering, Sorting, Grouping</p>
     /// </remarks>
 #if WORKINPROGRESS && !CSHTML5NETSTANDARD
-    public class PagedCollectionView : IPagedCollectionView, IEnumerable, INotifyCollectionChanged, INotifyPropertyChanged
+    public partial class PagedCollectionView : IPagedCollectionView, IEnumerable, INotifyCollectionChanged, INotifyPropertyChanged
 #else
-    public class PagedCollectionView : IEnumerable, INotifyCollectionChanged
+    public partial class PagedCollectionView : IEnumerable, INotifyCollectionChanged
 #endif
     {
         // the child views

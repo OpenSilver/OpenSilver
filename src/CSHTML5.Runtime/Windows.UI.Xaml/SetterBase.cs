@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Represents the base class for value setters.
     /// </summary>
-    public class SetterBase : DependencyObject
+    public partial class SetterBase : DependencyObject
     {
         private bool _isSealed;
 

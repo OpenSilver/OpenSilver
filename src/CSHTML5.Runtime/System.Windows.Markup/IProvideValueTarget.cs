@@ -29,7 +29,7 @@ namespace System.Windows.Markup
     /// Represents a service that reports situational object-property relationships
     /// for markup extension evaluation.
     /// </summary>
-    public interface IProvideValueTarget
+    public partial interface IProvideValueTarget
     {
         /// <summary>
         /// Gets the target object being reported.

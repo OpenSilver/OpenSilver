@@ -42,7 +42,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a control that creates a pop-up window that displays information for an element in the UI.
     /// </summary>
-    public class ToolTip : ContentControl
+    public partial class ToolTip : ContentControl
     {
         Popup _parentPopup;
         internal Point? _forceSpecifyAbsoluteCoordinates;

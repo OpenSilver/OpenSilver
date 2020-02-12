@@ -15,7 +15,7 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
     /// Executes a specified ICommand when invoked.
     /// 
     /// </summary>
-    public sealed class InvokeCommandAction : TriggerAction //DependencyObject, IAttachedObject //TriggerAction<FrameworkElement>
+    public sealed partial class InvokeCommandAction : TriggerAction //DependencyObject, IAttachedObject //TriggerAction<FrameworkElement>
     {
         //todo: make this class still inherit the DataContext from its "parent". It is not automatically set because the InvokeCommandAction is not added in the Visual tree.
         //Example of a currently working code:

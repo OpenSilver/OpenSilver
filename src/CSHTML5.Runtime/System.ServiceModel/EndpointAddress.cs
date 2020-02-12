@@ -27,7 +27,7 @@ namespace System.ServiceModel
     /// Provides a unique network address that a client uses to communicate with
     /// a service endpoint.
     /// </summary>
-    public class EndpointAddress
+    public partial class EndpointAddress
     {
         Uri _uri;
         public Uri Uri

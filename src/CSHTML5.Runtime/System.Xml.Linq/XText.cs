@@ -30,7 +30,7 @@ namespace System.Xml.Linq
     /// <summary>
     /// Represents a text node.
     /// </summary>
-    public class XText : XNode
+    public partial class XText : XNode
     {
 
         internal XText(object jsNode)

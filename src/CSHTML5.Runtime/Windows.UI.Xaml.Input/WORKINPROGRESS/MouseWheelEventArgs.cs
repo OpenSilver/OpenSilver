@@ -32,9 +32,9 @@ namespace Windows.UI.Xaml.Input
 {
 #if WORKINPROGRESS
 #if MIGRATION
-    public class MouseWheelEventArgs : MouseEventArgs
+    public partial class MouseWheelEventArgs : MouseEventArgs
 #else
-    public class MouseWheelEventArgs
+    public partial class MouseWheelEventArgs
 #endif
     {
         public int Delta { get; private set; }

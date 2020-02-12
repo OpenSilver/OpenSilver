@@ -25,7 +25,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    public class RoutedEvent
+    public partial class RoutedEvent
     {
         string _eventName;
 

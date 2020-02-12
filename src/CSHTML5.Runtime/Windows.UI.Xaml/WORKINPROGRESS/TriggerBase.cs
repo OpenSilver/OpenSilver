@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml
 #endif
 {
 #if WORKINPROGRESS
-    public abstract class TriggerBase : DependencyObject
+    public abstract partial class TriggerBase : DependencyObject
     {
     }
 #endif

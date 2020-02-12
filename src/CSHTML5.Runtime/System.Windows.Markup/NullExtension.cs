@@ -23,7 +23,7 @@ namespace System.Windows.Markup
     /// In XAML markup, specifies a null value for a property.
     /// </summary>
 
-    public class NullExtension : MarkupExtension
+    public partial class NullExtension : MarkupExtension
     {
         /// <summary>
         /// Initializes a new instance of NullExtension.

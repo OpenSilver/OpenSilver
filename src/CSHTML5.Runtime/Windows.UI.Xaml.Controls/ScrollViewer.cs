@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a scrollable area that can contain other visible elements.
     /// </summary>
-    public sealed class ScrollViewer : ContentControl
+    public sealed partial class ScrollViewer : ContentControl
     {
         double _verticalOffset = 0;
         double _horizontalOffset = 0;

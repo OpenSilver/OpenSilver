@@ -44,7 +44,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public class DataGridRowEventArgs : EventArgs
+    public partial class DataGridRowEventArgs : EventArgs
     {
         public DataGridRowEventArgs(DataGridRow row)
         {

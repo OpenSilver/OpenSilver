@@ -30,7 +30,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Contains the event data for the Application.Startup event.
     /// </summary>
-    public sealed class StartupEventArgs : EventArgs
+    public sealed partial class StartupEventArgs : EventArgs
     {
 #if WORKINPROGRESS
         #region Not supported yet

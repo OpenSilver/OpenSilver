@@ -28,7 +28,7 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
-    internal interface IPropertyPathWalkerListener
+    internal partial interface IPropertyPathWalkerListener
     {
         void IsBrokenChanged();
         void ValueChanged();

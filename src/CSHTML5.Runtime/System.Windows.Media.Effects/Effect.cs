@@ -31,7 +31,7 @@ namespace System.Windows.Media.Effects
     /// <summary>
     /// Provides a custom bitmap effect.
     /// </summary>
-    public abstract class Effect : DependencyObject//: Animatable
+    public abstract partial class Effect : DependencyObject//: Animatable
     {
         //Note: we inherit from DependencyObject but we should only inherit from Animatable
 

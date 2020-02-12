@@ -92,9 +92,9 @@ namespace System.ServiceModel
     /// </code>
     /// </example>
 #if WORKINPROGRESS && !CSHTML5BLAZOR
-    public abstract class CSHTML5_ClientBase<TChannel> : ICommunicationObject where TChannel : class
+    public abstract partial class CSHTML5_ClientBase<TChannel> : ICommunicationObject where TChannel : class
 #else
-    public abstract class CSHTML5_ClientBase<TChannel> /*: ICommunicationObject, IDisposable*/ where TChannel : class
+    public abstract partial class CSHTML5_ClientBase<TChannel> /*: ICommunicationObject, IDisposable*/ where TChannel : class
 #endif
     {
 #if OPENSILVER
@@ -484,7 +484,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         /// <summary>
         /// Provides an API to call web methods defined in a WebService
         /// </summary>
-        public class WebMethodsCaller
+        public partial class WebMethodsCaller
         {
             string _addressOfService;
 

@@ -39,7 +39,7 @@ namespace Windows.UI.Xaml.Input
     /// <summary>
     /// Provides event data for the Tapped event.
     /// </summary>
-    public sealed class TappedRoutedEventArgs // Note: normally it does not inherit from "PointerRoutedEventArgs", but this lets us reuse code.
+    public sealed partial class TappedRoutedEventArgs // Note: normally it does not inherit from "PointerRoutedEventArgs", but this lets us reuse code.
 #if MIGRATION
         : MouseEventArgs
 #else

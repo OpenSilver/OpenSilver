@@ -33,7 +33,7 @@ namespace Windows.Foundation
     /// Describes the width, height, and point origin of a rectangle.
     /// </summary>
     [SupportsDirectContentViaTypeFromStringConverters]
-    public struct Rect// : IFormattable
+    public partial struct Rect// : IFormattable
     {
         //todo: Add the interface IFormattable
 

@@ -21,7 +21,7 @@ namespace System.Xml.Linq
     /// <summary>
     /// Represents an XML namespace. This class cannot be inherited.
     /// </summary>
-    public sealed class XNamespace
+    public sealed partial class XNamespace
     {
         /// <summary>
         /// Combines an System.Xml.Linq.XNamespace object with a local name to create

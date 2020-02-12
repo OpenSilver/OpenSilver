@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Controls
     /// CheckBox, and ScrollViewer directly or indirectly inherit from this class.
     /// </summary>
     [ContentProperty("Content")]
-    public class ContentControl : Control
+    public partial class ContentControl : Control
     {
         #region Constructor
         public ContentControl()

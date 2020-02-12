@@ -84,7 +84,7 @@ namespace Windows.UI.Xaml.Data
     /// </code>
     /// </example>
     [ContentProperty("Path")]
-    public class Binding : BindingBase
+    public partial class Binding : BindingBase
     {
         /// <summary>
         /// Initializes a new instance of the Binding class.

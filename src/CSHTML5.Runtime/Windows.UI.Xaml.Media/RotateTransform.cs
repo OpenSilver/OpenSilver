@@ -34,7 +34,7 @@ namespace Windows.UI.Xaml.Media
     /// Rotates an object clockwise about a specified point in a two-dimensional
     /// x-y coordinate system.
     /// </summary>
-    public sealed class RotateTransform : Transform
+    public sealed partial class RotateTransform : Transform
     {
         double _appliedCssAngle;
         object _domElementToWhichTheCssWasApplied;

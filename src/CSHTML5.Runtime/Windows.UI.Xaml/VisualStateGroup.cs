@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml
     /// that are used to go from one state to another.
     /// </summary>
     [ContentProperty("States")]
-    public sealed class VisualStateGroup : DependencyObject
+    public sealed partial class VisualStateGroup : DependencyObject
     {
         ///// <summary>
         ///// Initializes a new instance of the VisualStateGroup class.

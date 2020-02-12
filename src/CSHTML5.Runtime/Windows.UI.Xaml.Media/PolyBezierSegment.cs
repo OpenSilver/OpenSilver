@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Media
     /// Represents one or more cubic Bezier curves.
     /// </summary>
     [ContentProperty("Points")]
-    public sealed class PolyBezierSegment : PathSegment
+    public sealed partial class PolyBezierSegment : PathSegment
     {
         ///// <summary>
         ///// Initializes a new instance of the PolyBezierSegment class.

@@ -30,7 +30,7 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
-    internal abstract class PropertyPathNode : IPropertyPathNode
+    internal abstract partial class PropertyPathNode : IPropertyPathNode
     {
         public IPropertyPathNode _next;
         bool _isBroken;

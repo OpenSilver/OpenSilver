@@ -42,7 +42,7 @@ namespace Windows.UI.Text
     /// of the strokes.
     /// </summary>
     [SupportsDirectContentViaTypeFromStringConverters]
-    public struct FontWeight
+    public partial struct FontWeight
     {
         /// <summary>
         /// The font weight expressed as a numeric value. See Remarks.

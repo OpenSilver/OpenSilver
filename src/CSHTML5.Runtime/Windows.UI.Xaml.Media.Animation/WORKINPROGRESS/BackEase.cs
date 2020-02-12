@@ -13,7 +13,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// This class implements an easing function that backs up before going to the destination.
     /// </summary>
-    public class BackEase : EasingFunctionBase
+    public partial class BackEase : EasingFunctionBase
     {
         public double Amplitude { get; set; }
     }

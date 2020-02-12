@@ -9,7 +9,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 	// Summary:
 	//     System.Windows.Controls.Primitives.GeneratorPosition is used to describe the
 	//     position of an item that is managed by System.Windows.Controls.ItemContainerGenerator.
-	public struct GeneratorPosition
+	public partial struct GeneratorPosition
 	{
 		//
 		// Summary:

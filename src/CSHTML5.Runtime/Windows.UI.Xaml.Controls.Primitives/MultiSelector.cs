@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Provides an abstract class for controls that allow multiple items to be selected.
     /// </summary>
-    public abstract class MultiSelector : Selector
+    public abstract partial class MultiSelector : Selector
     {
         /// <summary>
         /// Initializes a new instance of the System.Windows.Controls.Primitives.MultiSelector

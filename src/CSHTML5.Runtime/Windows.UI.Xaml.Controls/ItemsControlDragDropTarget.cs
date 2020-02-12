@@ -19,7 +19,7 @@ namespace Windows.UI.Xaml.Controls
     /// the items that can be dragged.</typeparam>
     /// <typeparam name="TItemContainerType">The type of the item container.</typeparam>
     //[SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Use of Rx makes code appear more complex than it is to static analyzer.")]
-    public class ItemsControlDragDropTarget : DragDropTarget<ItemsControl, UIElement> //Was abstract but it doesn't make much sense to me.
+    public partial class ItemsControlDragDropTarget : DragDropTarget<ItemsControl, UIElement> //Was abstract but it doesn't make much sense to me.
     {
 
         /// <summary>

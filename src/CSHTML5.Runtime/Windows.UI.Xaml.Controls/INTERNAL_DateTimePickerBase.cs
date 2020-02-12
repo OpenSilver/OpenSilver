@@ -50,7 +50,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public abstract class INTERNAL_DateTimePickerBase : Control
+    public abstract partial class INTERNAL_DateTimePickerBase : Control
     {
         protected FrameworkElement _root;
         protected TextBox _textBox;

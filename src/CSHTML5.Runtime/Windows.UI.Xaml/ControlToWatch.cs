@@ -33,7 +33,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    internal class ControlToWatch
+    internal partial class ControlToWatch
     {
         internal ControlToWatch(UIElement controlToWatch, Action<Point, Size> OnPositionOrSizeChangedCallback)
         {

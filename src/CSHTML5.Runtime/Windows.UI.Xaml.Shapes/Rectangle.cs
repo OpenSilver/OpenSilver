@@ -51,7 +51,7 @@ namespace Windows.UI.Xaml.Shapes
     /// MyStackPanel.Children.Add(rect);
     /// </code>
     /// </example>
-    public class Rectangle : Shape
+    public partial class Rectangle : Shape
     {
         static Rectangle()
         {

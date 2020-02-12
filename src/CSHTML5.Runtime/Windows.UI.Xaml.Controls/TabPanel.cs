@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Controls
     /// Handles the layout of <see cref="T:System.Windows.Controls.TabItem" />
     /// objects on a <see cref="T:System.Windows.Controls.TabControl" />.
     /// </summary>
-    public class TabPanel : WrapPanel
+    public partial class TabPanel : WrapPanel
     {
         public TabPanel()
         {

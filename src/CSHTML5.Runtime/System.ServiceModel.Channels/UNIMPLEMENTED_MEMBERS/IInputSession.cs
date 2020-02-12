@@ -27,7 +27,7 @@ namespace System.ServiceModel.Channels
     /// Defines the interface for the session implemented on the receiving side of
     /// a one-way communication between messaging endpoints.
     /// </summary>
-    public interface IInputSession : ISession
+    public partial interface IInputSession : ISession
     {
     }
 }

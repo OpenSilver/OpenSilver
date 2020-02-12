@@ -30,7 +30,7 @@ namespace System.Xml.Serialization
 #if !BRIDGE
     [JSIL.Meta.JSStubOnly]
 #endif
-    public abstract class XmlSerializationGeneratedCode
+    public abstract partial class XmlSerializationGeneratedCode
     {
         /// <summary>
         /// Initializes an instance of the System.Xml.Serialization.XmlSerializationGeneratedCode

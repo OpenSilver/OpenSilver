@@ -39,7 +39,7 @@ namespace Windows.UI.Xaml.Shapes
     /// <summary>
     /// Draws a straight line between two points.
     /// </summary>
-    public class Line : Shape
+    public partial class Line : Shape
     {
         //internal dynamic canvasDomElement;
 

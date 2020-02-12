@@ -43,7 +43,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal class GripperHoverWrapper
+    internal partial class GripperHoverWrapper
     {
         private readonly GridSplitter.GridResizeDirection _gridSplitterDirection;
 

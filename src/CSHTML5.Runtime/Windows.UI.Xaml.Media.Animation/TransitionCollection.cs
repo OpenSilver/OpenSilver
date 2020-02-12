@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// Represents a collection of Transition objects.
     /// </summary>
-    public sealed class TransitionCollection : List<Transition> //: IList<Transition>, IEnumerable<Transition>
+    public sealed partial class TransitionCollection : List<Transition> //: IList<Transition>, IEnumerable<Transition>
     {
         ///// <summary>
         ///// Initializes a new instance of the TransitionCollection class.

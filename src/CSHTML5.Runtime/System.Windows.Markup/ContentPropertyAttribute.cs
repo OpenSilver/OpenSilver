@@ -28,7 +28,7 @@ namespace System.Windows.Markup
     /// of the attributed type.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    public class ContentPropertyAttribute : Attribute
+    public partial class ContentPropertyAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the ContentPropertyAttribute class.

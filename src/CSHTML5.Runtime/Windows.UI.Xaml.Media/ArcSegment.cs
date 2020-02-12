@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents an elliptical arc between two points.
     /// </summary>
-    public sealed class ArcSegment : PathSegment
+    public sealed partial class ArcSegment : PathSegment
     {
         private double _strokeThickness; //Note: this is required for GetMinMaxXY because for some reason, the stroke thickness needs to go on both side of the stroke instead of towards the inside like every other shape thingy.
         private Point _ellipseCenterInCircleCoordinates;

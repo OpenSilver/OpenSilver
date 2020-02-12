@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Defines row-specific properties that apply to Grid elements.
     /// </summary>
-    public sealed class RowDefinition : DependencyObject
+    public sealed partial class RowDefinition : DependencyObject
     {
         internal Grid Parent;
 

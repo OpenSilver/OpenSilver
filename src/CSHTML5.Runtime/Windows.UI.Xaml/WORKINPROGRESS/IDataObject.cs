@@ -8,7 +8,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    public interface IDataObject
+    public partial interface IDataObject
     {
 #region Methods
         object GetData(string @format);

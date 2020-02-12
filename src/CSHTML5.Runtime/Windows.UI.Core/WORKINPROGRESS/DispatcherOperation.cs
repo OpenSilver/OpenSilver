@@ -5,7 +5,7 @@ namespace System.Windows.Threading
 namespace Windows.UI.Core
 #endif
 {
-    public sealed class DispatcherOperation
+    public sealed partial class DispatcherOperation
     {
         internal DispatcherOperation()
         {

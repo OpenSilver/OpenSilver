@@ -20,7 +20,7 @@ namespace System.Windows.Interactivity
     /// This is an infrastructure class. Trigger authors should derive from Trigger&lt;T&gt; instead of this class.
     /// </remarks>
     [ContentProperty(Name = "Actions")]
-    public abstract class TriggerBase : DependencyObject, IAttachedObject//InteractivityBase
+    public abstract partial class TriggerBase : DependencyObject, IAttachedObject//InteractivityBase
     {
         //Note on this file: see commit 58c52131 of October 30th, 2019 for comments on the modifications from the original source.
         //Based on the code that can be found at https://github.com/jlaanstra/Windows.UI.Interactivity/tree/master/Windows.UI.Interactivity.

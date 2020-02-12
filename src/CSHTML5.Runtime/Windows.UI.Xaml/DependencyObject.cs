@@ -42,7 +42,7 @@ namespace Windows.UI.Xaml
     /// is the immediate base class of many important UI-related classes, such as
     /// UIElement, Geometry, FrameworkTemplate, Style, and ResourceDictionary.
     /// </summary>
-    public class DependencyObject
+    public partial class DependencyObject
     {
         private Dictionary<DependencyProperty, BindingExpression> _bindingExpressions;
 

@@ -13,7 +13,7 @@ namespace System.Windows.Documents
 namespace Windows.UI.Xaml.Documents
 #endif
 {
-    public class InlineCollection : TextElementCollection<Inline>, IList
+    public partial class InlineCollection : TextElementCollection<Inline>, IList
     {
         #region Constructor
         internal InlineCollection(DependencyObject owner) : base(owner)

@@ -40,9 +40,9 @@ namespace Windows.UI.Xaml.Controls
     /// Note: to embed a piece of HTML code without using an iframe, use the HtmlPresenter control instead.
     /// </summary>
 #if MIGRATION
-    public class WebBrowser : FrameworkElement
+    public partial class WebBrowser : FrameworkElement
 #else
-    public class WebView : FrameworkElement
+    public partial class WebView : FrameworkElement
 #endif
     {
         object _iFrame;

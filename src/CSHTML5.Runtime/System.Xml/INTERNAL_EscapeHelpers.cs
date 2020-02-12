@@ -27,7 +27,7 @@ using System.Threading.Tasks;
 using Bridge;
 #endif
 
-internal class INTERNAL_EscapeHelpers
+internal partial class INTERNAL_EscapeHelpers
 {
     public static string EscapeXml(string str)
     {

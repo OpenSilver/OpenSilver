@@ -56,7 +56,7 @@ namespace Windows.UI.Xaml.Controls
     ///     TextBoxName.Text = "Some text";
     /// </code>
     /// </example>
-    public class TextBox : Control
+    public partial class TextBox : Control
     {
         object _contentEditableDiv;
         Control TextAreaContainer = null;

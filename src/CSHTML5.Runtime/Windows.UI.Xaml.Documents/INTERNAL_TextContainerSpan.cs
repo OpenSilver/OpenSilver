@@ -11,7 +11,7 @@ namespace System.Windows.Documents
 namespace Windows.UI.Xaml.Documents
 #endif
 {
-    internal sealed class INTERNAL_TextContainerSpan : INTERNAL_TextContainer
+    internal sealed partial class INTERNAL_TextContainerSpan : INTERNAL_TextContainer
     {
         #region Constructor
         internal INTERNAL_TextContainerSpan(Span span) : base(span)

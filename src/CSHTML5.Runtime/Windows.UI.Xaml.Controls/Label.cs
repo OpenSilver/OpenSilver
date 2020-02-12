@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents the text label for a control and provides support for access keys.
     /// </summary>
-    public class Label : ContentControl
+    public partial class Label : ContentControl
     {
         ///// <summary>
         ///// Identifies the System.Windows.Controls.Label.Target dependency property.

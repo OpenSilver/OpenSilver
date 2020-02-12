@@ -41,7 +41,7 @@ namespace Windows.UI.Xaml
     /// Creates an element tree of elements.
     /// </summary>
     [ContentProperty("ContentPropertyUsefulOnlyDuringTheCompilation")]
-    public class FrameworkTemplate : DependencyObject
+    public partial class FrameworkTemplate : DependencyObject
     {
         internal Func<Control, TemplateInstance> _methodToInstantiateFrameworkTemplate;
 

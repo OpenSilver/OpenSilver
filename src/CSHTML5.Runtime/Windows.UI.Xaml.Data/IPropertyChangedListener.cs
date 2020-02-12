@@ -28,7 +28,7 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
-    internal interface IPropertyChangedListener {
+    internal partial interface IPropertyChangedListener {
         DependencyProperty Property { get; set; }
         void OnPropertyChanged(DependencyObject sender, IDependencyPropertyChangedEventArgs args);
         void Detach();

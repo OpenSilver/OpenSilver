@@ -15,7 +15,7 @@ namespace Windows.UI.Xaml
 	//
 	// Summary:
 	//     Represents a collection of System.Windows.Window instances.
-	public sealed class WindowCollection : ICollection, IEnumerable
+	public sealed partial class WindowCollection : ICollection, IEnumerable
 	{
 		//
 		// Summary:

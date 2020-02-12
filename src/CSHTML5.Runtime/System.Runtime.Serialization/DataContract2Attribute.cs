@@ -32,7 +32,7 @@ namespace System.Runtime.Serialization
     /// for their type.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum, Inherited = false, AllowMultiple = false)]
-    public sealed class DataContract2Attribute : Attribute
+    public sealed partial class DataContract2Attribute : Attribute
     {
         public DataContract2Attribute() { }
 

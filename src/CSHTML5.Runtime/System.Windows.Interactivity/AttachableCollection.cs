@@ -34,7 +34,7 @@ namespace System.Windows.Interactivity
     /// changes.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class AttachableCollection<T> : List<T>, IAttachedObject where T:DependencyObject, IAttachedObject // : DependencyObjectCollection<T>, IAttachedObject where T : DependencyObject, System.Windows.Interactivity.IAttachedObject
+    public abstract partial class AttachableCollection<T> : List<T>, IAttachedObject where T:DependencyObject, IAttachedObject // : DependencyObjectCollection<T>, IAttachedObject where T : DependencyObject, System.Windows.Interactivity.IAttachedObject
     {
         DependencyObject _associatedObject = null;
         /// <summary>

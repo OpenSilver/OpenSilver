@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Media
     /// Represents a collection of PathSegment objects that can be individually accessed
     /// by index.
     /// </summary>
-    public sealed class PathSegmentCollection : List<PathSegment>// IList<PathSegment>, IEnumerable<PathSegment>
+    public sealed partial class PathSegmentCollection : List<PathSegment>// IList<PathSegment>, IEnumerable<PathSegment>
     {
         /// <summary>
         /// Initializes a new instance of the PathSegmentCollection class.

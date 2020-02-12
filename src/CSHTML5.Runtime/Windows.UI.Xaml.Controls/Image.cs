@@ -60,7 +60,7 @@ namespace Windows.UI.Xaml.Controls
     /// MyStackPanel.Children.Add(image);
     /// </code>
     /// </example>
-    public sealed class Image : FrameworkElement
+    public sealed partial class Image : FrameworkElement
     {
         dynamic _imageDiv = null;
         double imgWidth = 0; //might be useless, might be useful.

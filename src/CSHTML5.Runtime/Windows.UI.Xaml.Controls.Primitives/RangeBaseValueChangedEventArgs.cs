@@ -25,7 +25,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Provides data about a change in range value for the ValueChanged event.
     /// </summary>
-    public sealed class RangeBaseValueChangedEventArgs : RoutedEventArgs
+    public sealed partial class RangeBaseValueChangedEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the RangeBaseValueChangedEventArgs class.

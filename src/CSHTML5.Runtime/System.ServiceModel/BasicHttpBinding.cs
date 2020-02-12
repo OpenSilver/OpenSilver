@@ -33,7 +33,7 @@ namespace System.ServiceModel
     /// ASMX-based Web services and clients and other services that conform to the
     /// WS-I Basic Profile 1.1.
     /// </summary>
-    public class BasicHttpBinding : HttpBindingBase
+    public partial class BasicHttpBinding : HttpBindingBase
     {
         /// <summary>
         /// Initializes a new instance of the System.ServiceModel.BasicHttpBinding class.

@@ -64,7 +64,7 @@ namespace Windows.UI.Xaml.Controls
     [TemplateVisualState(Name = VSMSTATE_StateClosed, GroupName = VSMGROUP_Window)]
     [TemplateVisualState(Name = VSMSTATE_StateOpen, GroupName = VSMGROUP_Window)]
 #endif
-    public class ChildWindow : ContentControl
+    public partial class ChildWindow : ContentControl
     {
         #region Static Fields and Constants
 

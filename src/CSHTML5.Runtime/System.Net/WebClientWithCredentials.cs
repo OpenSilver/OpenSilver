@@ -30,11 +30,11 @@ namespace System.Net
 {
     // it is impossible to override the webclient methods from the c# version, so WebClientWithCredentials became
     // a class that can handle both behaviours, with and without credentials. just set CredentialsMode to Auto.
-    public class WebClientWithCredentials : WebClient
+    public partial class WebClientWithCredentials : WebClient
     {
 
 
-        private class CookiesContainer
+        private partial class CookiesContainer
         {
             // the last ASP.NET session id changes at each response from the server.
             // for security reasons and to respect the XHR request format, this ID is added in the cookies list in each request.

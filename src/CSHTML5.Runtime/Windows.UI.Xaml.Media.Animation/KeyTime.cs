@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// Specifies when a particular key frame should take place during an animation.
     /// </summary>
-    public struct KeyTime
+    public partial struct KeyTime
     {
 
         static KeyTime()

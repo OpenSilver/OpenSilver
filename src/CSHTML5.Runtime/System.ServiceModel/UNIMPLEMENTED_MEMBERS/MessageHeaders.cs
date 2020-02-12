@@ -25,7 +25,7 @@ using System.Collections.Generic;
 
 namespace System.ServiceModel
 {
-    public class MessageHeaders : List<MessageHeader>
+    public partial class MessageHeaders : List<MessageHeader>
     {
         public int FindHeader(string headerName, string unused)
         {

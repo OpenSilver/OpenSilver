@@ -56,7 +56,7 @@ namespace Windows.UI.Xaml.Controls
         PreviousNextNumeric
     }
 
-    public class DataPager : Control
+    public partial class DataPager : Control
     {
         TextBox _textBox;
 

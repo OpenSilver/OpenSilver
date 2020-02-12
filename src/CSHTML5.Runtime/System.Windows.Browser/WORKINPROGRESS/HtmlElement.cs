@@ -23,7 +23,7 @@ using System.Security;
 namespace System.Windows.Browser
 {
     #if WORKINPROGRESS
-    public sealed class HtmlElement : HtmlObject
+    public sealed partial class HtmlElement : HtmlObject
     {
         #region Fields
         private ScriptObjectCollection _children;

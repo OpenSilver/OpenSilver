@@ -32,9 +32,9 @@ namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
 #if WORKINPROGRESS
-    public sealed class DoubleKeyFrameCollection : PresentationFrameworkCollection<DoubleKeyFrame>
+    public sealed partial class DoubleKeyFrameCollection : PresentationFrameworkCollection<DoubleKeyFrame>
 #else
-    public sealed class DoubleKeyFrameCollection : List<DoubleKeyFrame>
+    public sealed partial class DoubleKeyFrameCollection : List<DoubleKeyFrame>
 #endif
     {
     }

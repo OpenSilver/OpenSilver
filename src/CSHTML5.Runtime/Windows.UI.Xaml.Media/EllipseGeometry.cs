@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents the geometry of a circle or ellipse.
     /// </summary>
-    public sealed class EllipseGeometry : Geometry
+    public sealed partial class EllipseGeometry : Geometry
     {
         ///// <summary>
         ///// Initializes a new instance of the EllipseGeometry class.

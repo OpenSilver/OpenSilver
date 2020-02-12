@@ -32,7 +32,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace System
 {
-    public class Settings
+    public partial class Settings
     {
 
         public Settings()

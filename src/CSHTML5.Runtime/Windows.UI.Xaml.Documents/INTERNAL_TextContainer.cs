@@ -11,7 +11,7 @@ namespace System.Windows.Documents
 namespace Windows.UI.Xaml.Documents
 #endif
 {
-    internal abstract class INTERNAL_TextContainer : INTERNAL_ITextContainer
+    internal abstract partial class INTERNAL_TextContainer : INTERNAL_ITextContainer
     {
         #region Data
         private readonly DependencyObject _parent;
@@ -69,7 +69,7 @@ namespace Windows.UI.Xaml.Documents
         #endregion
     }
 
-    internal interface INTERNAL_ITextContainer
+    internal partial interface INTERNAL_ITextContainer
     {
         string Text { get; }
         void BeginChange();

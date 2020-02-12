@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Provides a type converter for System.Windows.PropertyPath objects.
     /// </summary>
-    public sealed class PropertyPathConverter : TypeConverter
+    public sealed partial class PropertyPathConverter : TypeConverter
     {
         /// <summary>
         /// Returns whether this converter can convert an object of one type to the System.Windows.PropertyPath

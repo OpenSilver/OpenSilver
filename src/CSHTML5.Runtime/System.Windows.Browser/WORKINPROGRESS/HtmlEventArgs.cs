@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace System.Windows.Browser
 {
 #if WORKINPROGRESS
-    public class HtmlEventArgs : EventArgs
+    public partial class HtmlEventArgs : EventArgs
     {
         #region Fields
         private int _offsetX;

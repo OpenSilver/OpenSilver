@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
     /// Used to convert a System.Windows.Media.Matrix object to or from another object
     /// type.
     /// </summary>
-    public sealed class MatrixConverter : TypeConverter
+    public sealed partial class MatrixConverter : TypeConverter
     {
         /// <summary>
         /// Determines whether this class can convert an object of a given type to a

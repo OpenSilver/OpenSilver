@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 
 namespace System.IO.IsolatedStorage
 {
-    public class IsolatedStorageFile : IDisposable
+    public partial class IsolatedStorageFile : IDisposable
     {
         string _assemblyName;
         public static IsolatedStorageFile GetUserStoreForAssembly()

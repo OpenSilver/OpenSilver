@@ -25,7 +25,7 @@ namespace System.ServiceModel
 {
     //[AttributeUsage(ServiceModelAttributeTargets.OperationContract, AllowMultiple = true, Inherited = false)]
     [AttributeUsage(AttributeTargets.All, AllowMultiple = true, Inherited = false)]
-    public sealed class FaultContractAttribute : Attribute
+    public sealed partial class FaultContractAttribute : Attribute
     {
         string action;
         string name;

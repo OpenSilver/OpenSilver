@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace System.ComponentModel
 {
     /// <summary>Defines methods and properties that a collection view implements to provide paging capabilities to a collection.</summary>
-    public interface IPagedCollectionView
+    public partial interface IPagedCollectionView
     {
         /// <summary>When implementing this interface, raise this event after the <see cref="P:System.ComponentModel.IPagedCollectionView.PageIndex" /> has changed.</summary>
         event EventHandler<EventArgs> PageChanged;

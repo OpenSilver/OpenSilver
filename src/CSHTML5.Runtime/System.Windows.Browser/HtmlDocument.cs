@@ -27,9 +27,9 @@ using CSHTML5;
 namespace System.Windows.Browser
 {
 #if WORKINPROGRESS
-    public sealed class HtmlDocument : HtmlObject
+    public sealed partial class HtmlDocument : HtmlObject
 #else
-    public sealed class HtmlDocument
+    public sealed partial class HtmlDocument
 #endif
     {
         public HtmlDocument()

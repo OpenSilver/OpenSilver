@@ -41,7 +41,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public class AutoCompleteBox : Selector
+    public partial class AutoCompleteBox : Selector
     {
         Popup _popup;
         ToggleButton _dropDownToggle;

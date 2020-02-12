@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// Defines a segment of time.
     /// </summary>
-    public abstract class Timeline : DependencyObject
+    public abstract partial class Timeline : DependencyObject
     {
 #if MIGRATION
         internal static readonly string[] defaultTypesPaths = {

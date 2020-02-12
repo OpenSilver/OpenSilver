@@ -34,7 +34,7 @@ namespace System.Windows.Markup
     /// Class used to access elements inside the XAML code
     /// </summary>
     [System.Windows.Markup.ContentProperty("ResourceKey")]
-    public class StaticResourceExtension : MarkupExtension
+    public partial class StaticResourceExtension : MarkupExtension
     {
         /// <summary>
         /// The key of the StaticResource.

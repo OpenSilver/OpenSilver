@@ -36,7 +36,7 @@ namespace System.Net
     /// </summary>
     [Serializable]
     //[FriendAccessAllowed]
-    public class HttpWebRequest : WebRequest//, ISerializable
+    public partial class HttpWebRequest : WebRequest//, ISerializable
     {
         INTERNAL_WebRequestHelper _webRequestHelper = new INTERNAL_WebRequestHelper();
 

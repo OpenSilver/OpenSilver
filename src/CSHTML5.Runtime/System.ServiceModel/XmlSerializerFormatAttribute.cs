@@ -24,7 +24,7 @@ using System;
 namespace System.ServiceModel
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
-    public sealed class XmlSerializerFormatAttribute : Attribute
+    public sealed partial class XmlSerializerFormatAttribute : Attribute
     {
         public OperationFormatStyle Style { get; set; }
         public bool SupportFaults { get; set; }

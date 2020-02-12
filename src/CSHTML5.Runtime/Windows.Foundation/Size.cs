@@ -38,7 +38,7 @@ namespace Windows.Foundation
 #if FOR_DESIGN_TIME
     [TypeConverter(typeof(SizeConverter))]
 #endif
-    public struct Size
+    public partial struct Size
     {
         private static Size emptySize;
 

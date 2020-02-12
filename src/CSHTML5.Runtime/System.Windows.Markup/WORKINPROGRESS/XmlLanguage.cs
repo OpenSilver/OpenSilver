@@ -2,7 +2,7 @@
 
 namespace System.Windows.Markup
 {
-    public sealed class XmlLanguage
+    public sealed partial class XmlLanguage
     {
         public string IetfLanguageTag { get; private set; }
 

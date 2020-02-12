@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
 #if WORKINPROGRESS
-    public sealed class BitmapCache : CacheMode
+    public sealed partial class BitmapCache : CacheMode
     {
     }
 #endif

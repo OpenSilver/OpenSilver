@@ -14,7 +14,7 @@ namespace Windows.UI.Xaml.Input
 	//
 	// Summary:
 	//     Provides data for the System.Windows.UIElement.TextInput routed event.
-	public sealed class TextCompositionEventArgs : RoutedEventArgs
+	public sealed partial class TextCompositionEventArgs : RoutedEventArgs
 	{
 		//
 		// Summary:

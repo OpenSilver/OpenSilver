@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml
 {
 #if WORKINPROGRESS
     #region Not implemented yet
-    public class HierarchicalDataTemplate : DataTemplate
+    public partial class HierarchicalDataTemplate : DataTemplate
     {
         /// <summary>
         /// Gets or sets the binding that is used to generate content for the next sublevel in the data hierarchy.

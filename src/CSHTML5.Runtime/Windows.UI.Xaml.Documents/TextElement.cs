@@ -34,7 +34,7 @@ namespace Windows.UI.Xaml.Documents
     /// TextElement supports common API for classes involved in the XAML text object model,
     /// such as properties that control text size, font families and so on.
     /// </summary>
-    public abstract class TextElement : Control
+    public abstract partial class TextElement : Control
     {
 #if WORKINPROGRESS
         public static readonly DependencyProperty CharacterSpacingProperty = DependencyProperty.Register("CharacterSpacing", typeof(int), typeof(TextElement), null);

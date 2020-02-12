@@ -42,7 +42,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public sealed class SelectedDatesCollection : ObservableCollection<DateTime>
+    public sealed partial class SelectedDatesCollection : ObservableCollection<DateTime>
     {
         private Collection<object> _addedItems;
         private Collection<object> _removedItems;

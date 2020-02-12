@@ -53,7 +53,7 @@ namespace Windows.UI.Xaml.Controls
     /// myCanvas.HorizontalAlignment=HorizontalAlignment.Left;
     /// </code>
     /// </example>
-    public class Canvas : Panel
+    public partial class Canvas : Panel
     {
         /// <summary>
         /// Identifies the Canvas.Left XAML attached property.

@@ -30,7 +30,7 @@ namespace System.Xml.Serialization
 #if !BRIDGE
     [JSIL.Meta.JSStubOnly]
 #endif
-    public abstract class XmlSerializationReader : XmlSerializationGeneratedCode
+    public abstract partial class XmlSerializationReader : XmlSerializationGeneratedCode
     {
         /// <summary>
         /// Initializes a new instance of the System.Xml.Serialization.XmlSerializationReader

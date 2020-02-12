@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Documents
     /// <summary>
     /// Provides an inline-level content element that provides facilities for hosting hyperlinks.
     /// </summary>
-    public sealed class Hyperlink : Span
+    public sealed partial class Hyperlink : Span
     {
         Uri _uri;
 

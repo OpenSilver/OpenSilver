@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <exclude/>
-    public class UIElementCollection : ObservableCollection<UIElement>
+    public partial class UIElementCollection : ObservableCollection<UIElement>
     {
         bool _suppressCollectionChanged;
 

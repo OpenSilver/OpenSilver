@@ -45,7 +45,7 @@ namespace Windows.UI.Xaml.Controls
     ///  Represents a button that allows a user to select a single option from a group
     ///  of options.
     /// </summary>
-    public class RadioButton : ToggleButton
+    public partial class RadioButton : ToggleButton
     {
         /// <summary>
         /// Initializes a new instance of the RadioButton class.

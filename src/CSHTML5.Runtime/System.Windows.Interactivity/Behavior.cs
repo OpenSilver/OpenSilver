@@ -36,7 +36,7 @@ namespace System.Windows.Interactivity
     /// Encapsulates state information and zero or more ICommands into an attachable
     /// object.
     /// </summary>
-    public abstract class Behavior : DependencyObject, IAttachedObject
+    public abstract partial class Behavior : DependencyObject, IAttachedObject
     {
         internal DependencyObject _associatedObject = null;
         /// <summary>
@@ -109,7 +109,7 @@ namespace System.Windows.Interactivity
     /// object.
     /// </summary>
     /// <typeparam name="T">The type the System.Windows.Interactivity.Behavior`1 can be attached to.</typeparam>
-    public abstract class Behavior<T> : Behavior where T : DependencyObject
+    public abstract partial class Behavior<T> : Behavior where T : DependencyObject
     {
         /// <summary>
         /// Initializes a new instance of the System.Windows.Interactivity.Behavior`1

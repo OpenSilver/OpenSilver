@@ -36,7 +36,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public class Expander : HeaderedContentControl
+    public partial class Expander : HeaderedContentControl
     {
         bool _isInToggleButtonClickHandler = false;
 

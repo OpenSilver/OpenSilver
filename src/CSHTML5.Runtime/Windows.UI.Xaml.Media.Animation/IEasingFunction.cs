@@ -25,7 +25,7 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-    public interface IEasingFunction
+    public partial interface IEasingFunction
     {
         /// <summary>Transforms normalized time to control the pace of an animation.</summary>
         /// <returns>The transformed progress.</returns>

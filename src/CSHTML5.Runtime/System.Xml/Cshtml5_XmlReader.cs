@@ -32,7 +32,7 @@ namespace System.Xml
 {
 
     // this class s here to help interating with the child nodes, since XAttribute and XText are not XNode
-    internal class INTERNAL_NodeType
+    internal partial class INTERNAL_NodeType
     {
         IEnumerator _nodeEnumerator = null;
         IEnumerator _attributsEnumerator = null;
@@ -108,7 +108,7 @@ namespace System.Xml
     // allows to instanciate XmlReader without a complete implementation
     // the original one works directly on text, here we use an Xml document already parsed.
     // the constructor takes the original text but it is not used for now.
-    internal class Cshtml5_XmlReader : XmlReader
+    internal partial class Cshtml5_XmlReader : XmlReader
     {
         private XDocument _xmlDoc;
 

@@ -44,7 +44,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// Displays content on top of existing content, within the bounds of the application window.
     /// </summary>
     [ContentProperty("Child")]
-    public class Popup : FrameworkElement
+    public partial class Popup : FrameworkElement
     {
         // Note for proper placement of the popup:
         //      - The HorizontalOffset and VerticalOffset define the placement of the Popup relative to the reference point.

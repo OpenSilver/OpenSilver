@@ -34,7 +34,7 @@ namespace System.Xml.Linq
     /// <summary>
     /// Represents an XML element.
     /// </summary>
-    public class XElement : XContainer
+    public partial class XElement : XContainer
     {
 
         internal XElement(object jsNode)

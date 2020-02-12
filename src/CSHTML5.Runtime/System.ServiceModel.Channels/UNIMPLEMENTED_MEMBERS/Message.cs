@@ -29,7 +29,7 @@ namespace System.ServiceModel.Channels
     /// <summary>
     /// Represents the unit of communication between endpoints in a distributed environment.
     /// </summary>
-    public abstract class Message : IDisposable
+    public abstract partial class Message : IDisposable
     {
         public void Dispose()
         {

@@ -53,7 +53,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Encapsulates the app and its available services.
     /// </summary>
-    public class Application
+    public partial class Application
     {
         static Dictionary<string, string> _resourcesCache = null;
         INTERNAL_XamlResourcesHandler _xamlResourcesHandler = new INTERNAL_XamlResourcesHandler();

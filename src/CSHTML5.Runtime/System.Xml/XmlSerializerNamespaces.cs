@@ -29,7 +29,7 @@ namespace System.Xml.Serialization
     /// Contains the XML namespaces and prefixes that the System.Xml.Serialization.XmlSerializer
     /// uses to generate qualified names in an XML-document instance.
     /// </summary>
-    public class XmlSerializerNamespaces
+    public partial class XmlSerializerNamespaces
     {
         // Summary:
         //     Initializes a new instance of the System.Xml.Serialization.XmlSerializerNamespaces

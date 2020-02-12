@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml
 #endif
 {
     /// <exclude/>
-    public sealed class SetterBaseCollection : List<Setter> //ObservableCollection<Setter> // IList<SetterBase>, IEnumerable<SetterBase>
+    public sealed partial class SetterBaseCollection : List<Setter> //ObservableCollection<Setter> // IList<SetterBase>, IEnumerable<SetterBase>
     {
         //todo: once this will be changed into an ObservableCollection, so that it updates its _dictionaryOfSetters with the changes that are made on Style.Setters
 

@@ -24,7 +24,7 @@ namespace System.Xml.Linq
     /// <summary>
     /// Represents a node or an attribute in an XML tree.
     /// </summary>
-    public abstract class XObject
+    public abstract partial class XObject
     {
     }
 }

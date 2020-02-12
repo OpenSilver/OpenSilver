@@ -63,7 +63,7 @@ namespace System.IO.IsolatedStorage
     /// string myString = IsolatedStorageSettings.ApplicationSettings.TryGetValue("someKey", out value);
     /// </code>
     /// </example>
-    public sealed class IsolatedStorageSettings : IEnumerable, IEnumerable<KeyValuePair<string, object>> // : IDictionary<string, object>, ICollection<KeyValuePair<string, object>>, IDictionary, ICollection
+    public sealed partial class IsolatedStorageSettings : IEnumerable, IEnumerable<KeyValuePair<string, object>> // : IDictionary<string, object>, ICollection<KeyValuePair<string, object>>, IDictionary, ICollection
     {
         string _fullApplicationName = null;
 

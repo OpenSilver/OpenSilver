@@ -33,7 +33,7 @@ namespace System.ServiceModel
     /// in a Windows Communication Foundation (WCF) application.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public sealed class OperationContractAttribute : Attribute
+    public sealed partial class OperationContractAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the System.ServiceModel.OperationContractAttribute

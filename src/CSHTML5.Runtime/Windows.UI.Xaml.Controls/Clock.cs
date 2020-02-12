@@ -37,7 +37,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public class Clock : INTERNAL_CalendarOrClockBase
+    public partial class Clock : INTERNAL_CalendarOrClockBase
     {
         public Clock()
         {

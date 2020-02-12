@@ -32,7 +32,7 @@ namespace System.Xml.Linq
     /// <summary>
     /// Represents a node that can contain other nodes.
     /// </summary>
-    public abstract class XContainer : XNode
+    public abstract partial class XContainer : XNode
     {
         //todo: handle the comment nodes type XComment in c#
         //todo: change the way we determine the type of the nodes (cf. https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)

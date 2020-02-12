@@ -39,7 +39,7 @@ namespace Windows.UI.Xaml.Controls
     /// Defines an area where you can arrange child elements either horizontally
     /// or vertically, relative to each other.
     /// </summary>
-    public class DockPanel : Panel
+    public partial class DockPanel : Panel
     {
         Grid _grid;
 

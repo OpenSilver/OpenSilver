@@ -28,7 +28,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Provides data for the context menu event.
     /// </summary>
-    public sealed class ContextMenuEventArgs : RoutedEventArgs
+    public sealed partial class ContextMenuEventArgs : RoutedEventArgs
     {
         double _pointerLeft;
         double _pointerTop;
