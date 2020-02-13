@@ -5,6 +5,8 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{03DFD03A-5639-4523-901A-8310296A4317}</ProjectGuid>
+    <BinFolder>bin\CSHTML5</BinFolder>
+    <ObjFolder>obj\CSHTML5</ObjFolder>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CSHTML5.Runtime</RootNamespace>
@@ -18,31 +20,30 @@
     <NoCSHTML5Reference>true</NoCSHTML5Reference>
     <!--<SkipXamlPreprocessor>true</SkipXamlPreprocessor>-->
     <SkipResourcesExtractorAndCopier>true</SkipResourcesExtractorAndCopier>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <BaseIntermediateOutputPath>$(ObjFolder)</BaseIntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE</DefineConstants>
+    <OutputPath>$(BinFolder)\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;BRIDGE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoStdLib>true</NoStdLib>
-    <DocumentationFile>bin\Debug\CSHTML5.xml</DocumentationFile>
+    <DocumentationFile>$(BinFolder)\Debug\CSHTML5.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug.WorkInProgress\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;WORKINPROGRESS</DefineConstants>
+    <OutputPath>$(BinFolder)\Debug.WorkInProgress\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;WORKINPROGRESS</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Debug.WorkInProgress\CSHTML5.xml</DocumentationFile>
+    <DocumentationFile>$(BinFolder)\Debug.WorkInProgress\CSHTML5.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration|AnyCPU'">
@@ -51,14 +52,14 @@
     <!-- ************************************* -->
     <AssemblyName>CSHTML5.Migration</AssemblyName>
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Migration\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;SILVERLIGHTCOMPATIBLEVERSION;SLMIGRATION;MIGRATION</DefineConstants>
+    <OutputPath>$(BinFolder)\Migration\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Migration\CSHTML5.Migration.xml</DocumentationFile>
+    <DocumentationFile>$(BinFolder)\Migration\CSHTML5.Migration.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU'">
@@ -67,14 +68,14 @@
     <!-- ************************************* -->
     <AssemblyName>CSHTML5.Migration</AssemblyName>
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Migration.WorkInProgress\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;SILVERLIGHTCOMPATIBLEVERSION;SLMIGRATION;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS</DefineConstants>
+    <OutputPath>$(BinFolder)\Migration.WorkInProgress\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Migration.WorkInProgress\CSHTML5.Migration.xml</DocumentationFile>
+    <DocumentationFile>$(BinFolder)\Migration.WorkInProgress\CSHTML5.Migration.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
