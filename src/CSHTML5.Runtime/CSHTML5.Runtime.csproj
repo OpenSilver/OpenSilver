@@ -2,81 +2,52 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform>AnyCPU</Platform>
     <ProjectGuid>{03DFD03A-5639-4523-901A-8310296A4317}</ProjectGuid>
     <BinFolder>bin\CSHTML5</BinFolder>
-    <ObjFolder>obj\CSHTML5</ObjFolder>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CSHTML5.Runtime</RootNamespace>
-    <AssemblyName>CSHTML5</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
     <FileAlignment>512</FileAlignment>
+    <DebugSymbols>true</DebugSymbols>
+    <NoStdLib>true</NoStdLib>
+    <NoWarn>1591</NoWarn>
     <IsCSharpXamlForHtml5>true</IsCSharpXamlForHtml5>
     <CSharpXamlForHtml5OutputType>Library</CSharpXamlForHtml5OutputType>
+    <OutputPath>$(BinFolder)\$(Configuration)\</OutputPath>
     <IsCshtml5>true</IsCshtml5>
     <Cshtml5OutputType>Library</Cshtml5OutputType>
     <NoCSHTML5Reference>true</NoCSHTML5Reference>
     <!--<SkipXamlPreprocessor>true</SkipXamlPreprocessor>-->
     <SkipResourcesExtractorAndCopier>true</SkipResourcesExtractorAndCopier>
-    <BaseIntermediateOutputPath>$(ObjFolder)</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\CSHTML5</BaseIntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>$(BinFolder)\Debug\</OutputPath>
+    <AssemblyName>CSHTML5</AssemblyName>
     <DefineConstants>TRACE;DEBUG;BRIDGE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <NoStdLib>true</NoStdLib>
     <DocumentationFile>$(BinFolder)\Debug\CSHTML5.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>$(BinFolder)\Debug.WorkInProgress\</OutputPath>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' ">
+    <AssemblyName>CSHTML5</AssemblyName>
     <DefineConstants>TRACE;DEBUG;BRIDGE;WORKINPROGRESS</DefineConstants>
-    <NoStdLib>true</NoStdLib>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>$(BinFolder)\Debug.WorkInProgress\CSHTML5.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration|AnyCPU'">
-    <!-- ************************************* -->
-    <!-- We manually override the AssemblyName -->
-    <!-- ************************************* -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">
     <AssemblyName>CSHTML5.Migration</AssemblyName>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>$(BinFolder)\Migration\</OutputPath>
     <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION</DefineConstants>
-    <NoStdLib>true</NoStdLib>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>$(BinFolder)\Migration\CSHTML5.Migration.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU'">
-    <!-- ************************************* -->
-    <!-- We manually override the AssemblyName -->
-    <!-- ************************************* -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">
     <AssemblyName>CSHTML5.Migration</AssemblyName>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>$(BinFolder)\Migration.WorkInProgress\</OutputPath>
     <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS</DefineConstants>
-    <NoStdLib>true</NoStdLib>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>$(BinFolder)\Migration.WorkInProgress\CSHTML5.Migration.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Core\Main\INTERNAL_DefaultValueStore.cs" />
