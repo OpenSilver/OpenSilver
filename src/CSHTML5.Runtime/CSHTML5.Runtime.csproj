@@ -99,7 +99,10 @@
     <Compile Include="System.Windows.Interactivity\TriggerActionCollection.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerBase.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerCollection.cs" />
+    <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction.cs" />
+    <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction`1.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Frame.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\LoadCompletedEventHandler.cs" />
@@ -742,6 +745,10 @@
     <Compile Include="Windows.UI.Xaml.Navigation\NavigationEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\NavigationFailedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\NavigationFailedEventHandler.cs" />
+    <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigatingCancelEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigatingCancelEventHandler.cs" />
+    <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationMode.cs" />
+    <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationStoppedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Shapes\Ellipse.cs" />
     <Compile Include="Windows.UI.Xaml.Shapes\Line.cs" />
     <Compile Include="Windows.UI.Xaml.Shapes\Path.cs" />
