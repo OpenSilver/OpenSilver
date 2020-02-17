@@ -320,7 +320,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (_nativeComboBoxDomElement != null)
                 {
-                    var optionDomElement = _itemContainerGenerator.ContainerFromItem(item);
+                    var optionDomElement = _itemContainerGenerator.INTERNAL_ContainerFromItem(item);
                     if (optionDomElement != null)
                     {
                         INTERNAL_HtmlDomManager.RemoveOptionFromNativeComboBox(optionDomElement, _nativeComboBoxDomElement);
