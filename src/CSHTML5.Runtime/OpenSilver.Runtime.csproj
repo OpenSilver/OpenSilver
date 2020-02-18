@@ -16,25 +16,25 @@
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
 		<AssemblyName>OpenSilver</AssemblyName>
-		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION</DefineConstants>
+		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER</DefineConstants>
 		<CSHTML5ObjPath>obj\CSHTML5\Migration</CSHTML5ObjPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' ">
 		<AssemblyName>OpenSilver</AssemblyName>
-		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS;WCF_STACK</DefineConstants>
+		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER;WORKINPROGRESS;REVAMPPOINTEREVENTS;WCF_STACK</DefineConstants>
 		<CSHTML5ObjPath>obj\CSHTML5\Migration.WorkInProgress</CSHTML5ObjPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
 		<AssemblyName>OpenSilver.UWPCompatible</AssemblyName>
-		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD</DefineConstants>
+		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER</DefineConstants>
 		<CSHTML5ObjPath>obj\CSHTML5\Debug</CSHTML5ObjPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' ">
 		<AssemblyName>OpenSilver.UWPCompatible</AssemblyName>
-		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;WORKINPROGRESS</DefineConstants>
+		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER;WORKINPROGRESS</DefineConstants>
 		<CSHTML5ObjPath>obj\CSHTML5\Debug.WorkInProgress</CSHTML5ObjPath>
 	</PropertyGroup>
 
@@ -44,6 +44,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Blazor.HttpClient" Version="3.1.0-preview1.19508.20" />
 		<PackageReference Include="Microsoft.AspNetCore.Blazor.DevServer" Version="3.1.0-preview1.19508.20" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+		<PackageReference Include="System.ServiceModel.Primitives" Version="4.7.0" />
 		<PackageReference Include="System.Text.Json" Version="4.7.0" />
 	</ItemGroup>
 
@@ -181,47 +182,10 @@
 		<Compile Include="System.Runtime.Serialization\InvalidDataContractException.cs" />
 		<Compile Include="System.Runtime.Serialization\Serializable2Attribute.cs" />
 		<Compile Include="System.Runtime.Serialization\SerializationType.cs" />
-		<Compile Include="System.ServiceModel.Channels\AddressHeader.cs" />
-		<Compile Include="System.ServiceModel.Channels\Binding.cs" />
-		<Compile Include="System.ServiceModel.Channels\UNIMPLEMENTED_MEMBERS\IInputSession.cs" />
-		<Compile Include="System.ServiceModel.Channels\UNIMPLEMENTED_MEMBERS\IOutputSession.cs" />
-		<Compile Include="System.ServiceModel.Channels\UNIMPLEMENTED_MEMBERS\Message.cs" />
-		<Compile Include="System.ServiceModel\BasicHttpBinding.cs" />
-		<Compile Include="System.ServiceModel\BasicHttpSecurity.cs" />
-		<Compile Include="System.ServiceModel\BasicHttpSecurityMode.cs" />
 		<Compile Include="System.ServiceModel\CSHTML5_ClientBase.cs" />
-		<Compile Include="System.ServiceModel\EndpointAddress.cs" />
-		<Compile Include="System.ServiceModel\FaultContractAttribute.cs" />
-		<Compile Include="System.ServiceModel\FaultException.cs" />
-		<Compile Include="System.ServiceModel\HttpBindingBase.cs" />
-		<Compile Include="System.ServiceModel\HttpRequest.cs" />
-		<Compile Include="System.ServiceModel\IClientChannel.cs" />
 		<Compile Include="System.ServiceModel\INTERNAL_AsyncResult.cs" />
 		<Compile Include="System.ServiceModel\INTERNAL_WebMethodsCaller.cs" />
-		<Compile Include="System.ServiceModel\MessageBodyMemberAttribute.cs" />
-		<Compile Include="System.ServiceModel\MessageContractAttribute.cs" />
-		<Compile Include="System.ServiceModel\MessageContractMemberAttribute.cs" />
-		<Compile Include="System.ServiceModel\OperationContractAttribute.cs" />
-		<Compile Include="System.ServiceModel\OperationFormatStyle.cs" />
-		<Compile Include="System.ServiceModel\OperationFormatUse.cs" />
 		<Compile Include="System.ServiceModel\ServiceContract2Attribute.cs" />
-		<Compile Include="System.ServiceModel\ServiceContractAttribute.cs" />
-		<Compile Include="System.ServiceModel\ServiceKnownTypeAttribute.cs" />
-		<Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\ChannelFactory.cs" />
-		<Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\CommunicationState.cs" />
-		<Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\IChannel.cs" />
-		<Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\ICommunicationObject.cs" />
-		<Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\IContextChannel.cs" />
-		<Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\IExtensibleObject.cs" />
-		<Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\IExtension.cs" />
-		<Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\IExtensionCollection.cs" />
-		<Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\ISession.cs" />
-		<Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\MessageHeader.cs" />
-		<Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\MessageHeaders.cs" />
-		<Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\OperationContext.cs" />
-		<Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\OperationContextScope.cs" />
-		<Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\UnknownMessageReceivedEventArgs.cs" />
-		<Compile Include="System.ServiceModel\XmlSerializerFormatAttribute.cs" />
 		<Compile Include="System.Windows.Browser\HtmlDocument.cs" />
 		<Compile Include="System.Windows.Browser\HtmlPage.cs" />
 		<Compile Include="System.Windows.Browser\HtmlWindow.cs" />
