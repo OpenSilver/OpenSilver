@@ -174,6 +174,7 @@ namespace Windows.UI.Xaml.Controls
             var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
             //divStyle.overflow = "auto";
             divStyle.lineHeight = "0px";
+            divStyle.whiteSpace = "normal";
             domElementWhereToPlaceChildren = div;
             return div;
         }
