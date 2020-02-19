@@ -385,7 +385,6 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = contentEditableDiv;
             this.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth = contentEditableDiv;
 
-            contentEditableDivStyle.display = "inline-block"; // Fixes issue where Caret doesn't show up when a styled TextBox is empty and focused 
             contentEditableDivStyle.minWidth = "14px";
             contentEditableDivStyle.minHeight = (Math.Floor(this.FontSize * 1.5 * 1000) / 1000).ToString() + "px"; // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most. //Note: setting "minHeight" is for FireFox only, because other browsers don't seem to need it. The "1.5" factor is here to ensure that the resulting Height is the same as that of the PasswordBox.
 
