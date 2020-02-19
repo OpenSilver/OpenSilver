@@ -1,0 +1,31 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29728.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSilver.Runtime", "CSHTML5.Runtime\OpenSilver.Runtime.csproj", "{945935AC-0649-4054-A3E3-9671441A3343}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		UWP|Any CPU = UWP|Any CPU
+		UWP.WorkInProgress|Any CPU = UWP.WorkInProgress|Any CPU
+		SL.WorkInProgress|Any CPU = SL.WorkInProgress|Any CPU
+		SL|Any CPU = SL|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{945935AC-0649-4054-A3E3-9671441A3343}.UWP|Any CPU.ActiveCfg = UWP|Any CPU
+		{945935AC-0649-4054-A3E3-9671441A3343}.UWP|Any CPU.Build.0 = UWP|Any CPU
+		{945935AC-0649-4054-A3E3-9671441A3343}.UWP.WorkInProgress|Any CPU.ActiveCfg = UWP.WorkInProgress|Any CPU
+		{945935AC-0649-4054-A3E3-9671441A3343}.UWP.WorkInProgress|Any CPU.Build.0 = UWP.WorkInProgress|Any CPU
+		{945935AC-0649-4054-A3E3-9671441A3343}.SL.WorkInProgress|Any CPU.ActiveCfg = SL.WorkInProgress|Any CPU
+		{945935AC-0649-4054-A3E3-9671441A3343}.SL.WorkInProgress|Any CPU.Build.0 = SL.WorkInProgress|Any CPU
+		{945935AC-0649-4054-A3E3-9671441A3343}.SL|Any CPU.ActiveCfg = SL|Any CPU
+		{945935AC-0649-4054-A3E3-9671441A3343}.SL|Any CPU.Build.0 = SL|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A13C12CC-0544-49D7-A852-FCE1C884AA54}
+	EndGlobalSection
+EndGlobal

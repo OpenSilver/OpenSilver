@@ -84,14 +84,14 @@ namespace Windows.UI.Xaml.Controls
         private double _unusedManipulationDelta;
 
         private bool _isDraggingWithMouse;
-#if UWP
+#if false
         private MouseDevice _mouseDevice;
 #endif
         private const double MinMouseDragDelta = 2;
         private double _totalDeltaX;
         private double _totalDeltaY;
 
-#if UWP
+#if false
         #region ValueFormat
         /// <summary>
         /// ValueFormat Dependency Property
@@ -269,7 +269,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public NumericUpDown()
         {
-#if UWP
+#if false
             this.DefaultStyleKey = typeof(NumericUpDown);
 #else
             // Set default style:
@@ -283,7 +283,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (_dragOverlay != null)
             {
-#if UWP
+#if false
                 Window.Current.CoreWindow.PointerReleased += this.CoreWindowOnPointerReleased;
                 Window.Current.CoreWindow.VisibilityChanged += this.OnCoreWindowVisibilityChanged;
 #else
@@ -298,7 +298,7 @@ namespace Windows.UI.Xaml.Controls
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
-#if UWP
+#if false
             Window.Current.CoreWindow.PointerReleased -= this.CoreWindowOnPointerReleased;
             Window.Current.CoreWindow.VisibilityChanged -= this.OnCoreWindowVisibilityChanged;
 #else
@@ -322,7 +322,7 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnApplyTemplate();
 
-#if UWP
+#if false
             if (DesignMode.DesignModeEnabled)
             {
                 return;
@@ -331,7 +331,7 @@ namespace Windows.UI.Xaml.Controls
 
             this.GotFocus += this.OnGotFocus;
             this.LostFocus += this.OnLostFocus;
-#if UWP
+#if false
             this.PointerWheelChanged += this.OnPointerWheelChanged;
 #endif
             _valueTextBox = this.GetTemplateChild(ValueTextBoxName) as UpDownTextBox;
@@ -344,7 +344,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 _valueTextBox.LostFocus += this.OnValueTextBoxLostFocus;
                 _valueTextBox.GotFocus += this.OnValueTextBoxGotFocus;
-#if UWP
+#if false
                 _valueTextBox.Text = this.Value.ToString(CultureInfo.CurrentCulture);
 #else
                 _valueTextBox.Text = this.Value.ToString();
@@ -353,14 +353,14 @@ namespace Windows.UI.Xaml.Controls
                 _valueTextBox.KeyDown += this.OnValueTextBoxKeyDown;
                 _valueTextBox.UpPressed += (s, e) => this.DoIncrement();
                 _valueTextBox.DownPressed += (s, e) => this.DoDecrement();
-#if UWP
+#if false
                 _valueTextBox.PointerExited += this.OnValueTextBoxPointerExited;
 #endif
             }
 
             if (_dragOverlay != null)
             {
-#if UWP
+#if false
                 _dragOverlay.Tapped += this.OnDragOverlayTapped;
                 _dragOverlay.ManipulationMode = ManipulationModes.TranslateX | ManipulationModes.TranslateY;
 #endif
@@ -378,7 +378,7 @@ namespace Windows.UI.Xaml.Controls
             if (_decrementButton != null)
             {
                 _decrementButton.Click += this.OnDecrementButtonClick;
-#if UWP
+#if false
                 var pcc =
                     new PropertyChangeEventSource<bool>
                         (_decrementButton, "IsPressed");
@@ -389,7 +389,7 @@ namespace Windows.UI.Xaml.Controls
             if (_incrementButton != null)
             {
                 _incrementButton.Click += this.OnIncrementButtonClick;
-#if UWP
+#if false
                 var pcc =
                     new PropertyChangeEventSource<bool>
                         (_incrementButton, "IsPressed");
@@ -408,7 +408,7 @@ namespace Windows.UI.Xaml.Controls
             this.SetValidIncrementDirection();
         }
 
-#if UWP
+#if false
         private void OnPointerWheelChanged(object sender, PointerRoutedEventArgs pointerRoutedEventArgs)
         {
             if (!_hasFocus)
@@ -479,7 +479,7 @@ namespace Windows.UI.Xaml.Controls
 
             double val;
 
-#if UWP
+#if false
             if (double.TryParse(_valueTextBox.Text, NumberStyles.Any, CultureInfo.CurrentUICulture, out val) ||
                 Calculator.TryCalculate(_valueTextBox.Text, out val))
 #else
@@ -499,7 +499,7 @@ namespace Windows.UI.Xaml.Controls
         #endregion
 
         #region Button event handlers
-#if UWP
+#if false
         private void OnDecrementButtonIsPressedChanged(object decrementButton, bool isPressed)
         {
             // TODO: The thinking was to handle speed and acceleration of value changes manually on a regular Button when it is pressed.
@@ -512,24 +512,24 @@ namespace Windows.UI.Xaml.Controls
 #endif
         private void OnDecrementButtonClick(object sender, RoutedEventArgs routedEventArgs)
         {
-#if UWP
+#if false
             if (Window.Current.CoreWindow.IsInputEnabled)
             {
 #endif
                 this.DoDecrement();
-#if UWP
+#if false
             }
 #endif
         }
 
         private void OnIncrementButtonClick(object sender, RoutedEventArgs routedEventArgs)
         {
-#if UWP
+#if false
             if (Window.Current.CoreWindow.IsInputEnabled)
             {
 #endif
                 this.DoIncrement();
-#if UWP
+#if false
             }
 #endif
         }
@@ -583,7 +583,7 @@ namespace Windows.UI.Xaml.Controls
 
         private void OnValueTextBoxLostFocus(object sender, RoutedEventArgs routedEventArgs)
         {
-#if UWP
+#if false
             if (_dragOverlay != null)
             {
                 _dragOverlay.IsHitTestVisible = true;
@@ -609,7 +609,7 @@ namespace Windows.UI.Xaml.Controls
         private void OnDragOverlayPointerPressed(object sender, PointerRoutedEventArgs e)
 #endif
         {
-#if UWP
+#if false
 #if MIGRATION
             _dragOverlay.CaptureMouse();
 #else
@@ -619,7 +619,7 @@ namespace Windows.UI.Xaml.Controls
             _totalDeltaX = 0;
             _totalDeltaY = 0;
 
-#if UWP
+#if false
             if (e.Pointer.PointerDeviceType == PointerDeviceType.Mouse)
             {
                 _isDraggingWithMouse = true;
@@ -634,7 +634,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
         }
 
-#if UWP
+#if false
         private void CoreWindowOnPointerReleased(CoreWindow sender, PointerEventArgs args)
 #else
 #if MIGRATION
@@ -651,7 +651,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#if UWP
+#if false
         private void SuspendValueTextBoxTabStop()
         {
             if (_valueTextBox != null)
@@ -667,7 +667,7 @@ namespace Windows.UI.Xaml.Controls
             // It's a bit hacky, but it's the simplest solution.
             await Task.Delay(100);
 
-#if UWP
+#if false
             if (_valueTextBox != null)
             {
                 _valueTextBox.IsTabStop = true;
@@ -699,7 +699,7 @@ namespace Windows.UI.Xaml.Controls
         private void EndDragging(PointerRoutedEventArgs args)
 #endif
         {
-#if UWP
+#if false
             if (_isDraggingWithMouse)
             {
                 _isDraggingWithMouse = false;
@@ -723,7 +723,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#if UWP
+#if false
         private void OnCoreWindowVisibilityChanged(CoreWindow sender, VisibilityChangedEventArgs args)
         {
             // There are cases where pointer isn't getting released - this should hopefully end dragging too.
@@ -736,7 +736,7 @@ namespace Windows.UI.Xaml.Controls
         }
 #endif
 
-#if UWP
+#if false
         private void OnMouseDragged(MouseDevice sender, MouseEventArgs args)
         {
             var dx = args.MouseDelta.X;
@@ -796,7 +796,7 @@ namespace Windows.UI.Xaml.Controls
 
             this.ApplyManipulationDelta(delta);
 
-#if UWP
+#if false
             this.SuspendValueTextBoxTabStop();
 #endif
 
@@ -855,7 +855,7 @@ namespace Windows.UI.Xaml.Controls
             _unusedManipulationDelta = 0;
         }
 
-#if UWP
+#if false
         private void OnDragOverlayTapped(object sender, TappedRoutedEventArgs tappedRoutedEventArgs)
         {
             if (this.IsEnabled &&
@@ -906,7 +906,7 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
-#if UWP
+#if false
             _valueBar.Clip =
                 new RectangleGeometry
                 {
@@ -934,7 +934,7 @@ namespace Windows.UI.Xaml.Controls
             if (_valueTextBox != null)
             {
                 _isChangingTextWithCode = true;
-#if UWP
+#if false
                 _valueTextBox.Text = this.Value.ToString(this.ValueFormat);
 #else
                 _valueTextBox.Text = this.Value.ToString();
