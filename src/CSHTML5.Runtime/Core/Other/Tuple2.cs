@@ -1,6 +1,6 @@
 using System;
 
-namespace OpenSilver.Runtime.Core.Other
+namespace System
 {
 	/// <summary>
     /// Utility class that simplifies cration of tuples by using
