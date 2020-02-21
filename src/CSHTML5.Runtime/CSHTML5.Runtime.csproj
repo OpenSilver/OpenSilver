@@ -72,7 +72,7 @@
     <Compile Include="System.Windows.Interactivity\TriggerBase.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerCollection.cs" />
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction.cs" />
-    <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction`1.cs" />
+    <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Frame.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
