@@ -11,7 +11,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    public partial class WindowSettings : DependencyObject
+    public sealed partial class WindowSettings : DependencyObject
     {
         public static readonly DependencyProperty WindowStyleProperty = DependencyProperty.Register("WindowStyle", typeof(WindowStyle), typeof(WindowSettings), null);
 
