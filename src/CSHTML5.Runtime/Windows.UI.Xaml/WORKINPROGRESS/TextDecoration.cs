@@ -38,8 +38,9 @@ namespace System.Windows
 
         public override bool Equals(object o)
         {
-            if (o is TextDecoration td)
+            if (o is TextDecoration)
             {
+                TextDecoration td = (TextDecoration)o;
                 return this.Decoration == td.Decoration;
             }
             return false;
