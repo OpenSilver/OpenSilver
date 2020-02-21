@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,13 +17,20 @@ namespace Windows.UI.Xaml
 	//     Represents a collection of System.Windows.Window instances.
 	public sealed partial class WindowCollection : ICollection, IEnumerable
 	{
+		private int _count;
+		private bool _isSynchronized;
+		private object _syncRoot;
 		//
 		// Summary:
 		//     Gets the number of windows in the collection.
 		//
 		// Returns:
 		//     The number of windows in the collection.
-		public int Count { get; }
+		public int Count
+		{
+			get;
+		}
+
 		//
 		// Summary:
 		//     Gets a value that indicates whether access to the collection is synchronized
@@ -31,18 +38,31 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     Always returns false.
-		public bool IsSynchronized { get; }
+		public bool IsSynchronized
+		{
+			get;
+		}
+
 		//
 		// Summary:
 		//     Gets an object that can be used to synchronize access to the System.Windows.WindowCollection.
 		//
 		// Returns:
 		//     An object that can be used to synchronize access to the System.Windows.WindowCollection.
-		public object SyncRoot { get; }
+		public object SyncRoot
+		{
+			get;
+		}
+
+		internal WindowCollection()
+		{
+			_count = 0;
+			_isSynchronized = false;
+			_syncRoot = null;
+		}
 
 		public void CopyTo(Array array, int arrayIndex)
 		{
-			
 		}
 
 		//
@@ -54,6 +74,10 @@ namespace Windows.UI.Xaml
 		public IEnumerator GetEnumerator()
 		{
 			return default(IEnumerator);
+		}
+
+		void ICollection.CopyTo(Array @array, int @index)
+		{
 		}
 	}
 #endif

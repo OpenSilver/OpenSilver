@@ -1,4 +1,3 @@
-﻿
 //===============================================================================
 //
 //  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
@@ -14,9 +13,6 @@
 //  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
 //
 //===============================================================================
-
-
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,22 +21,24 @@ using System.Threading.Tasks;
 
 namespace System.Windows.Browser
 {
-    #if WORKINPROGRESS
-    public abstract partial class HtmlObject : ScriptObject
-    {
-        #region Methods
-        protected HtmlObject()
-        {
-        }
-        public bool AttachEvent(string @eventName, EventHandler @handler)
-        {
-            return false;
-        }
-        public bool AttachEvent(string @eventName, EventHandler<HtmlEventArgs> @handler)
-        {
-            return false;
-        }
-        #endregion
-    }
+#if WORKINPROGRESS
+	public abstract partial class HtmlObject : ScriptObject
+	{
+#region Methods
+		protected HtmlObject()
+		{
+		}
+
+		public bool AttachEvent(string @eventName, EventHandler @handler)
+		{
+			return false;
+		}
+
+		public bool AttachEvent(string @eventName, EventHandler<HtmlEventArgs> @handler)
+		{
+			return false;
+		}
+#endregion
+	}
 #endif
 }

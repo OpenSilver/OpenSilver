@@ -81,7 +81,7 @@ namespace Windows.UI.Xaml
 #if MIGRATION
             CSHTML5.Interop.ExecuteJavaScript(@"document.isSLMigration = true");
 #else
-            Interop.ExecuteJavaScript(@"document.isSLMigration = false");
+            CSHTML5.Interop.ExecuteJavaScript(@"document.isSLMigration = false");
 #endif
 
             //Interop.ExecuteJavaScript("document.raiseunhandledException = $0", (Action<object>)RaiseUnhandledException);
