@@ -105,5 +105,9 @@ namespace System.Windows.Browser
         {
             return CSHTML5.Interop.ExecuteJavaScript(string.Format("eval(\"{0}\")", code)); //Note: this probably doesn't work on multiline code 
         }
+
+#if WORKINPROGRESS
+        public string CurrentBookmark { get; set; }
+#endif
     }
 }

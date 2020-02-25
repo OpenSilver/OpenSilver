@@ -63,10 +63,18 @@ namespace Windows.Foundation
         /// <param name="height">The initial height of the instance of Windows.Foundation.Size.</param>
         public Size(double width, double height)
         {
+#if !BRIDGE
+
+            if ((!double.IsNaN(width) && width < 0) || (!double.IsNaN(height) && height < 0))
+            {
+                throw new ArgumentException("Width and Height cannot be negative.");
+            }
+#else
             if(width < 0 || height < 0)
             {
                 throw new ArgumentException("Width and Height cannot be negative.");
             }
+#endif
             this._width = width;
             this._height = height;
         }

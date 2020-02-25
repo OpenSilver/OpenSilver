@@ -85,8 +85,9 @@ namespace System.Windows
 
         public override bool Equals(object o)
         {
-            if (o is TextDecorationCollection tdc)
+            if (o is TextDecorationCollection)
             {
+                TextDecorationCollection tdc = (TextDecorationCollection)o;
                 return TextDecoration.Equals(this.Decoration, tdc.Decoration);
             }
             return false;

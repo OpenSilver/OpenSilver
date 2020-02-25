@@ -113,8 +113,9 @@ namespace Windows.UI.Text
 
         public override bool Equals(object o)
         {
-            if (o is FontWeight fw)
+            if (o is FontWeight)
             {
+                FontWeight fw = (FontWeight)o;
                 return this == fw;
             }
             return false;

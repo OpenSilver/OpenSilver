@@ -21,8 +21,9 @@ namespace System.Windows
 
         public override bool Equals(object o)
         {
-            if (o is FontStyle fs)
+            if (o is FontStyle)
             {
+                FontStyle fs = (FontStyle)o;
                 return this == fs;
             }
             return false;

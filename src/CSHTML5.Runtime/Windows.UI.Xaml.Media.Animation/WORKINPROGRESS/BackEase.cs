@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if WORKINPROGRESS
+
+using System;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -6,10 +8,6 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-
-#if WORKINPROGRESS
-    #region Not Supported yet
-
     /// <summary>
     /// This class implements an easing function that backs up before going to the destination.
     /// </summary>
@@ -17,7 +15,6 @@ namespace Windows.UI.Xaml.Media.Animation
     {
         public double Amplitude { get; set; }
     }
-
-    #endregion
-#endif
 }
+
+#endif

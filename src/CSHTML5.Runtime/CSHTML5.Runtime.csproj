@@ -2,90 +2,71 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform>AnyCPU</Platform>
     <ProjectGuid>{03DFD03A-5639-4523-901A-8310296A4317}</ProjectGuid>
+    <BinFolder>bin\CSHTML5</BinFolder>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CSHTML5.Runtime</RootNamespace>
-    <AssemblyName>CSHTML5</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
     <FileAlignment>512</FileAlignment>
+    <DebugSymbols>true</DebugSymbols>
+    <NoStdLib>true</NoStdLib>
+    <NoWarn>1591</NoWarn>
     <IsCSharpXamlForHtml5>true</IsCSharpXamlForHtml5>
     <CSharpXamlForHtml5OutputType>Library</CSharpXamlForHtml5OutputType>
+    <OutputPath>$(BinFolder)\$(Configuration)\</OutputPath>
     <IsCshtml5>true</IsCshtml5>
     <Cshtml5OutputType>Library</Cshtml5OutputType>
     <NoCSHTML5Reference>true</NoCSHTML5Reference>
     <!--<SkipXamlPreprocessor>true</SkipXamlPreprocessor>-->
     <SkipResourcesExtractorAndCopier>true</SkipResourcesExtractorAndCopier>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <BaseIntermediateOutputPath>obj\CSHTML5</BaseIntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
+    <AssemblyName>CSHTML5</AssemblyName>
+    <DefineConstants>TRACE;DEBUG;BRIDGE</DefineConstants>
     <WarningLevel>4</WarningLevel>
-    <NoStdLib>true</NoStdLib>
-    <DocumentationFile>bin\Debug\CSHTML5.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
+    <DocumentationFile>$(BinFolder)\Debug\CSHTML5.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug.WorkInProgress\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;WORKINPROGRESS</DefineConstants>
-    <NoStdLib>true</NoStdLib>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' ">
+    <AssemblyName>CSHTML5</AssemblyName>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;WORKINPROGRESS</DefineConstants>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Debug.WorkInProgress\CSHTML5.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
+    <DocumentationFile>$(BinFolder)\Debug.WorkInProgress\CSHTML5.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration|AnyCPU'">
-    <!-- ************************************* -->
-    <!-- We manually override the AssemblyName -->
-    <!-- ************************************* -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">
     <AssemblyName>CSHTML5.Migration</AssemblyName>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Migration\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;SILVERLIGHTCOMPATIBLEVERSION;SLMIGRATION;MIGRATION</DefineConstants>
-    <NoStdLib>true</NoStdLib>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION</DefineConstants>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Migration\CSHTML5.Migration.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
+    <DocumentationFile>$(BinFolder)\Migration\CSHTML5.Migration.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU'">
-    <!-- ************************************* -->
-    <!-- We manually override the AssemblyName -->
-    <!-- ************************************* -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">
     <AssemblyName>CSHTML5.Migration</AssemblyName>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Migration.WorkInProgress\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSHTML5_RUNTIME;CSHARP_XAML_FOR_HTML5;CSHTML5;BRIDGE;SILVERLIGHTCOMPATIBLEVERSION;SLMIGRATION;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS</DefineConstants>
-    <NoStdLib>true</NoStdLib>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS</DefineConstants>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Migration.WorkInProgress\CSHTML5.Migration.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
+    <DocumentationFile>$(BinFolder)\Migration.WorkInProgress\CSHTML5.Migration.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Core\Main\INTERNAL_DefaultValueStore.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
+    <Compile Include="System.Collections.ObjectModel\WORKINPROGRESS\ReadOnlyObservableCollection_1.cs" />
     <Compile Include="System.ComponentModel\IPagedCollectionView.cs" />
+    <Compile Include="System.ComponentModel\ListSortDirection.cs" />
     <Compile Include="System.ComponentModel\PageChangingEventArgs.cs" />
     <Compile Include="System.ComponentModel\ReadOnlyAttribute.cs" />
+    <Compile Include="System.ComponentModel\WORKINPROGRESS\CurrentChangingEventArgs.cs" />
+    <Compile Include="System.ComponentModel\WORKINPROGRESS\CurrentChangingEventHandler.cs" />
     <Compile Include="System.ComponentModel\WORKINPROGRESS\GroupDescription.cs" />
+    <Compile Include="System.ComponentModel\WORKINPROGRESS\ICollectionView.cs" />
     <Compile Include="System.ComponentModel\WORKINPROGRESS\IEditableCollectionView.cs" />
+    <Compile Include="System.ComponentModel\WORKINPROGRESS\ISupportInitialize.cs" />
     <Compile Include="System.ComponentModel\WORKINPROGRESS\NewItemPlaceholderPosition.cs" />
+    <Compile Include="System.ComponentModel\WORKINPROGRESS\SortDescription.cs" />
+    <Compile Include="System.ComponentModel\WORKINPROGRESS\SortDescriptionCollection.cs" />
+    <Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageSettings.cs" />
     <Compile Include="System.Net\WORKINPROGRESS\HttpWebRequest.cs" />
     <Compile Include="System.Net\WORKINPROGRESS\WebRequest.cs" />
     <Compile Include="System.Resources\ResourceManager.cs" />
@@ -100,15 +81,20 @@
     <Compile Include="System.Windows.Interactivity\TriggerBase.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerCollection.cs" />
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction.cs" />
-    <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction`1.cs" />
+    <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DescriptionViewer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Frame.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Page.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\CollectionViewSource.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\LoadCompletedEventHandler.cs" />
     <Compile Include="System.Xml.Linq\XObject.cs" />
-    <Compile Include="ToBeReviewed\GroupedEnumerable.cs" />
-    <Compile Include="ToBeReviewed\Grouping.cs" />
+    <Compile Include="ToBeReviewed\GroupedEnumerable_3.cs" />
+    <Compile Include="ToBeReviewed\GroupedEnumerable_4.cs" />
+    <Compile Include="ToBeReviewed\Grouping_2.cs" />
     <Compile Include="ToBeReviewed\OrderedEnumerable.cs" />
     <Compile Include="Core\Main\DelegateUtility.cs" />
     <Compile Include="Core\Main\INameScope.cs" />
@@ -127,7 +113,7 @@
     <Compile Include="Core\Main\SupportsDirectContentViaTypeFromStringConvertersAttribute.cs" />
     <Compile Include="Core\Main\TypeFromStringConverters.cs" />
     <Compile Include="Core\Events\HtmlEventProxy.cs" />
-    <Compile Include="Core\Events\INTERNAL_EventManager.cs" />
+    <Compile Include="Core\Events\INTERNAL_EventManager_2.cs" />
     <Compile Include="Core\Events\INTERNAL_EventsHelper.cs" />
     <Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly.cs" />
     <Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs.cs" />
@@ -152,7 +138,7 @@
     <Compile Include="ToBeReviewed\WORKINPROGRESS\MissingNamespaces.cs" />
     <Compile Include="ToBeReviewed\WORKINPROGRESS\Path.cs" />
     <Compile Include="ToBeReviewed\WORKINPROGRESS\StackFrame.cs" />
-    <Compile Include="Core\Other\HashSet2.cs" />
+    <Compile Include="Core\Other\HashSet2_1.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherHelpers.cs" />
     <Compile Include="Core\Other\INTERNAL_FontsHelper.cs" />
     <Compile Include="Core\Other\INTERNAL_ShapesDrawHelpers.cs" />
@@ -160,10 +146,15 @@
     <Compile Include="Core\Other\INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.cs" />
     <Compile Include="Core\Other\INTERNAL_WorkaroundObservableCollectionBugWithJSIL.cs" />
     <Compile Include="Core\Other\INTERNAL_XamlResourcesHandler.cs" />
-    <Compile Include="Core\Other\ISet2.cs" />
+    <Compile Include="Core\Other\ISet2_1.cs" />
     <Compile Include="Core\Other\Performance.cs" />
     <Compile Include="Core\Other\ServiceProvider.cs" />
     <Compile Include="Core\Other\Tuple2.cs" />
+    <Compile Include="Core\Other\Tuple2_2.cs" />
+    <Compile Include="Core\Other\Tuple2_3.cs" />
+    <Compile Include="Core\Other\Tuple2_4.cs" />
+    <Compile Include="Core\Other\Tuple2_5.cs" />
+    <Compile Include="Core\Other\Tuple2_6.cs" />
     <Compile Include="Core\Other\Windows.ApplicationModel.Activation.LaunchActivatedEventArgs.cs" />
     <Compile Include="Core\Other\WorkaroundFixMe.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -190,6 +181,7 @@
     <Compile Include="PublicAPI\Interop\OnCallBack.cs" />
     <Compile Include="PublicAPI\MinimumRequiredCompilerVersionFriendlyNameAttribute.cs" />
     <Compile Include="PublicAPI\MinimumRequiredCompilerVersionNumberAttribute.cs" />
+    <Compile Include="PublicAPI\Native.Html.Controls\CircleElement.cs" />
     <Compile Include="PublicAPI\Native.Html.Controls\ContainerElement.cs" />
     <Compile Include="PublicAPI\Native.Html.Controls\ElementStyle.cs" />
     <Compile Include="PublicAPI\Native.Html.Controls\HtmlCanvas.cs" />
@@ -285,7 +277,7 @@
     <Compile Include="System.ServiceModel\BasicHttpSecurity.cs" />
     <Compile Include="System.ServiceModel\BasicHttpSecurityMode.cs" />
     <Compile Include="System.ServiceModel\CommunicationState.cs" />
-    <Compile Include="System.ServiceModel\CSHTML5_ClientBase.cs" />
+    <Compile Include="System.ServiceModel\CSHTML5_ClientBase_1.cs" />
     <Compile Include="System.ServiceModel\EndpointAddress.cs" />
     <Compile Include="System.ServiceModel\FaultContractAttribute.cs" />
     <Compile Include="System.ServiceModel\FaultException.cs" />
@@ -352,8 +344,9 @@
     <Compile Include="System.Windows.input\ICommand.cs" />
     <Compile Include="System.Windows.input\Keyboard.cs" />
     <Compile Include="System.Windows.input\MouseButtonEventArgs.cs" />
-    <Compile Include="System.Windows.Interactivity\AttachableCollection.cs" />
+    <Compile Include="System.Windows.Interactivity\AttachableCollection_1.cs" />
     <Compile Include="System.Windows.Interactivity\Behavior.cs" />
+    <Compile Include="System.Windows.Interactivity\Behavior_1.cs" />
     <Compile Include="System.Windows.Interactivity\BehaviorCollection.cs" />
     <Compile Include="System.Windows.Interactivity\IAttachedObject.cs" />
     <Compile Include="System.Windows.Interactivity\Interaction.cs" />
@@ -379,7 +372,7 @@
     <Compile Include="System.Windows\Deployment.cs" />
     <Compile Include="System.Windows\DragDrop.cs" />
     <Compile Include="System.Windows\IDataObject.cs" />
-    <Compile Include="System.Windows\RoutedPropertyChangedEventArgs.cs" />
+    <Compile Include="System.Windows\RoutedPropertyChangedEventArgs_1.cs" />
     <Compile Include="System.Windows\RoutedPropertyChangedEventHandler.cs" />
     <Compile Include="System.Xml.Linq\XAttribute.cs" />
     <Compile Include="System.Xml.Linq\XContainer.cs" />
@@ -413,11 +406,15 @@
     <Compile Include="System.Xml\XmlSerializerVersionAttribute.cs" />
     <Compile Include="System.Xml\XmlWriter.cs" />
     <Compile Include="TypeScriptDefinitionsSupportFiles\EmptyNamespaceDefinition.cs" />
-    <Compile Include="TypeScriptDefinitionsSupportFiles\JSArray.cs" />
+    <Compile Include="TypeScriptDefinitionsSupportFiles\JSArray_1.cs" />
     <Compile Include="TypeScriptDefinitionsSupportFiles\JSObject.cs" />
-    <Compile Include="TypeScriptDefinitionsSupportFiles\Promise.cs" />
+    <Compile Include="TypeScriptDefinitionsSupportFiles\Promise_1.cs" />
     <Compile Include="TypeScriptDefinitionsSupportFiles\ToJavaScriptObjectExtender.cs" />
     <Compile Include="TypeScriptDefinitionsSupportFiles\UnionType.cs" />
+    <Compile Include="TypeScriptDefinitionsSupportFiles\UnionType_2.cs" />
+    <Compile Include="TypeScriptDefinitionsSupportFiles\UnionType_3.cs" />
+    <Compile Include="TypeScriptDefinitionsSupportFiles\UnionType_4.cs" />
+    <Compile Include="TypeScriptDefinitionsSupportFiles\UnionType_5.cs" />
     <Compile Include="Windows.Devices.Input\PointerDeviceType.cs" />
     <Compile Include="Windows.Foundation\Point.cs" />
     <Compile Include="Windows.Foundation\PointConverter.cs" />
@@ -503,7 +500,7 @@
     <Compile Include="Windows.UI.Xaml.Controls\DatePicker.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DragDropEffects.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DragDropKeyStates.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\DragDropTarget.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\DragDropTarget_2.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DragEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DragEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Expander.cs" />
@@ -616,7 +613,7 @@
     <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerHelper.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerSpan.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerTextBlock.cs" />
-    <Compile Include="Windows.UI.Xaml.Documents\TextElementCollection.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\TextElementCollection_1.cs" />
     <Compile Include="Windows.UI.Xaml.Input\KeyEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Input\KeyRoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Input\Pointer.cs" />
@@ -676,7 +673,7 @@
     <Compile Include="Windows.UI.Xaml.Media.Animation\IEasingFunction.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\IKeyFrame.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\KeySpline.cs" />
-    <Compile Include="Windows.UI.Xaml.Media.Animation\INTERNAL_ResolvedKeyFramesEntries.cs" />
+    <Compile Include="Windows.UI.Xaml.Media.Animation\INTERNAL_ResolvedKeyFramesEntries_1.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\SplineColorKeyFrame.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\SplineDoubleKeyFrame.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Imaging\BitmapImage.cs" />
@@ -748,6 +745,7 @@
     <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigatingCancelEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigatingCancelEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationMode.cs" />
+    <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationService.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationStoppedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Shapes\Ellipse.cs" />
     <Compile Include="Windows.UI.Xaml.Shapes\Line.cs" />
@@ -829,6 +827,7 @@
     <Compile Include="Windows.UI.Xaml\WhenToCallPropertyChangedEnum.cs" />
     <Compile Include="Windows.UI.Xaml\Window.cs" />
     <Compile Include="Windows.UI.Xaml\WindowSizeChangedEventHandler.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\Application.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationUnhandledExceptionEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\AssemblyPart.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\AssemblyPartCollection.cs" />
@@ -841,7 +840,7 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\HierarchicalDataTemplate.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\IDataObject.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\OutOfBrowserSettings.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\PresentationFrameworkCollection.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\PresentationFrameworkCollection_1.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TabletDeviceType.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TemplateBindingExpression.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextDecoration.cs" />
