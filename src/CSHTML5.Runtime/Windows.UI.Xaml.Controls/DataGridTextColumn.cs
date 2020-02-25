@@ -42,7 +42,7 @@ namespace Windows.UI.Xaml.Controls
     /// Represents a System.Windows.Controls.DataGrid column that hosts textual content
     /// in its cells.
     /// </summary>
-    public class DataGridTextColumn : DataGridBoundColumn
+    public partial class DataGridTextColumn : DataGridBoundColumn
     {
         internal override FrameworkElement GenerateEditingElement(object childData)
         {

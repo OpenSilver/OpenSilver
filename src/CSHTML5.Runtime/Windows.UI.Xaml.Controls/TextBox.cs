@@ -56,7 +56,7 @@ namespace Windows.UI.Xaml.Controls
     ///     TextBoxName.Text = "Some text";
     /// </code>
     /// </example>
-    public class TextBox : Control
+    public partial class TextBox : Control
     {
         object _contentEditableDiv;
         Control TextAreaContainer = null;
@@ -307,28 +307,6 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             });
         #endregion
 
-#if WORKINPROGRESS
-        #region SelectionBackground
-        public Brush SelectionBackground
-        {
-            get { return (Brush)GetValue(SelectionBackgroundProperty); }
-            set { SetValue(SelectionBackgroundProperty, value); }
-        }
-
-        //public static readonly DependencyProperty SelectionBackgroundProperty =
-        //    DependencyProperty.Register("SelectionBackground", typeof(Brush), typeof(TextBox), new PropertyMetadata(new SolidColorBrush(Colors.Blue))
-        //    {
-        //        //TODO : Change CSSEquivalent
-        //        GetCSSEquivalent = (instance) =>
-        //        {
-        //            return new CSSEquivalent();
-        //        }
-        //    });
-        public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register("SelectionBackground", typeof(Brush), typeof(TextBox), null);
-
-        #endregion
-#endif
-
         public override void INTERNAL_AttachToDomEvents()
         {
             base.INTERNAL_AttachToDomEvents();
@@ -489,7 +467,7 @@ $0.addEventListener('keydown', function(e) {
 
     if((e.keyCode == 13 || e.keyCode == 32 || e.keyCode > 47) && instance['get_MaxLength']() != 0)
     {
-        var textLength = document.getTextLengthIncludingNewLineCompensation(instance);
+        var textLength = instance.GetTextLengthIncludingNewLineCompensation();
 
         if (e.keyCode == 13)
         {
@@ -604,7 +582,7 @@ $0.addEventListener('paste', function(e) {
     {
         var isSingleLine = (instance['get_AcceptsReturn']() !== true); // This is the current value at the time when the event is raised.
         var maxLength = instance['get_MaxLength']();
-        var textBoxTextLength = document.getTextLengthIncludingNewLineCompensation(instance);
+        var textBoxTextLength = instance.GetTextLengthIncludingNewLineCompensation();
 
         // Chrome supports setting ContentEditable to PlainText-Only, so we try this first:
         $0.setAttribute('contenteditable', 'PLAINTEXT-ONLY');
@@ -692,8 +670,8 @@ $0.addEventListener('paste', function(e) {
             content = content.replace(/\n/g, '').replace(/\r/g, '');
             document.execCommand('insertText', false, content);
           }
-        }
-        else
+    }
+    else
         {
           {0}.setAttribute('contenteditable', 'true');
           if (e.clipboardData){
@@ -963,7 +941,6 @@ var range,selection;
 
         private void NEW_SET_SELECTION(int startIndex, int endIndex)
         {
-#if !BRIDGE
             CSHTML5.Interop.ExecuteJavaScriptAsync(@"
 var range = document.createRange();
 var sel = window.getSelection();
@@ -974,18 +951,6 @@ range.setEnd(nodesAndOffsets['endParent'], nodesAndOffsets['endOffset']);
 sel.removeAllRanges();
 sel.addRange(range);
 ", _contentEditableDiv, startIndex, endIndex);
-#else
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-var range = document.createRange();
-var sel = window.getSelection();
-var nodesAndOffsets = {}; //this will hold the nodes and offsets useful to set the range's start and end.
-document.getRangeStartAndEnd({0}, true, 0, {1}, {2}, nodesAndOffsets, false, false)
-range.setStart(nodesAndOffsets['startParent'], nodesAndOffsets['startOffset']);
-range.setEnd(nodesAndOffsets['endParent'], nodesAndOffsets['endOffset']);
-sel.removeAllRanges();
-sel.addRange(range);
-", _contentEditableDiv, startIndex, endIndex);
-#endif
         }
 
         private void NEW_GET_SELECTION(out int selectionStartIndex, out int selectionLength)
@@ -993,8 +958,7 @@ sel.addRange(range);
             //todo: fix the that happens (at least in chrome) that makes the index returned be 0 when the caret is on the last line when it's empty
             //what I think happens: the range gives the index of the <br> in the childNodes of _contentEditableDiv which makes it not find the range.startContainer, which is actually _contentEditableDiv.
             //todo: (probably in the documant.getRangeStartAndEnd and document.getRangeGlobalStartAndEndIndexes methods), fix the bad count of characters in the simulator when copy/pasting a multiline text.
-#if !BRIDGE
-            
+
             var globalIndexes = CSHTML5.Interop.ExecuteJavaScript(@"
 (function(domElement){
 var sel = window.getSelection();
@@ -1012,30 +976,9 @@ else
 return globalIndexes;
 }($0))
 ", _contentEditableDiv);
+
             selectionStartIndex = CastToInt(CSHTML5.Interop.ExecuteJavaScript("($0.isStartFound ? $0.startIndex : 0)", globalIndexes)); //todo: if not "isStartFound", should we raise an exception? (eg. running "STAR" app in the Simulator and clicking the TextBox in the "Products and key performance measures" screen)
             selectionLength = CastToInt(CSHTML5.Interop.ExecuteJavaScript("($0.isEndFound ? $0.endIndex : ($0.isStartFound ? $0.startIndex : 0))", globalIndexes)); //todo: if not "isEndFound", should we raise an exception? (eg. running "STAR" app in the Simulator and clicking the TextBox in the "Products and key performance measures" screen)
-#else
-
-            var globalIndexes = CSHTML5.Interop.ExecuteJavaScript(@"
-(function(domElement){
-var sel = window.getSelection();
-var globalIndexes = {}; //this will hold indexes of start and end and booleans that specify if each has been found.
-if(sel.rangeCount == 0)
-{
-    globalIndexes.startIndex = 0; //apparently, we get 0 and not -1 when nothing is selected.
-    globalIndexes.endIndex = 0; //apparently, we get 0 and not -1 when nothing is selected.
-        }
-else
-{
-    var range = sel.getRangeAt(0);
-    document.getRangeGlobalStartAndEndIndexes(domElement, true, 0, range, globalIndexes);
-}
-return globalIndexes;
-}({0}))
-", _contentEditableDiv);
-            selectionStartIndex = CastToInt(CSHTML5.Interop.ExecuteJavaScript("{0}.startIndex", globalIndexes));
-            selectionLength = CastToInt(CSHTML5.Interop.ExecuteJavaScript("{0}.enIndex", globalIndexes));
-#endif
         }
 
 #if !BRIDGE
@@ -1284,11 +1227,52 @@ element.setAttribute(""data-maxlength"", ""{1}"");
 
 
         #region TextDecorations
-
+#if MIGRATION
         /// <summary>
         /// Gets or sets the text decorations (underline, strikethrough...).
         /// </summary>
-        public TextDecorations? TextDecorations
+        public new TextDecorationCollection TextDecorations
+        {
+            get { return (TextDecorationCollection)GetValue(TextDecorationsProperty); }
+            set { SetValue(TextDecorationsProperty, value); }
+        }
+        /// <summary>
+        /// Identifies the TextDecorations dependency property.
+        /// </summary>
+        public new static readonly DependencyProperty TextDecorationsProperty = DependencyProperty.Register("TextDecorations",
+                                                                                                        typeof(TextDecorationCollection),
+                                                                                                        typeof(TextBox),
+                                                                                                        new PropertyMetadata(null) { MethodToUpdateDom = TextDecorations_MethodToUpdateDom });
+
+        static void TextDecorations_MethodToUpdateDom(DependencyObject d, object newValue)
+        {
+            var textBox = (TextBox)d;
+            TextDecorationCollection newTextDecorations = (TextDecorationCollection)newValue;
+
+            string cssValue;
+            if (newTextDecorations == System.Windows.TextDecorations.OverLine)
+            {
+                cssValue = "overline";
+            }
+            else if (newTextDecorations == System.Windows.TextDecorations.Strikethrough)
+            {
+                cssValue = "line-through";
+            }
+            else if (newTextDecorations == System.Windows.TextDecorations.Underline)
+            {
+                cssValue = "underline";
+            }
+            else
+            {
+                cssValue = string.Empty; // Note: this will reset the value.
+            }
+            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBox.INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
+        }
+#else
+        /// <summary>
+        /// Gets or sets the text decorations (underline, strikethrough...).
+        /// </summary>
+        public new TextDecorations? TextDecorations
         {
             get { return (TextDecorations?)GetValue(TextDecorationsProperty); }
             set { SetValue(TextDecorationsProperty, value); }
@@ -1296,7 +1280,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
         /// <summary>
         /// Identifies the TextDecorations dependency property.
         /// </summary>
-        public static readonly DependencyProperty TextDecorationsProperty =
+        public new static readonly DependencyProperty TextDecorationsProperty =
             DependencyProperty.Register("TextDecorations", typeof(TextDecorations?), typeof(TextBox), new PropertyMetadata(null) { MethodToUpdateDom = TextDecorations_MethodToUpdateDom });
 
         static void TextDecorations_MethodToUpdateDom(DependencyObject d, object newValue)
@@ -1309,42 +1293,28 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             {
                 switch (newTextDecorations.Value)
                 {
-#if MIGRATION
-                    case global::System.Windows.TextDecorations.OverLine:
+                    case Windows.UI.Text.TextDecorations.OverLine:
                         cssValue = "overline";
                         break;
-                    case global::System.Windows.TextDecorations.Strikethrough:
+                    case Windows.UI.Text.TextDecorations.Strikethrough:
                         cssValue = "line-through";
                         break;
-                    case global::System.Windows.TextDecorations.Underline:
+                    case Windows.UI.Text.TextDecorations.Underline:
                         cssValue = "underline";
                         break;
-                    case global::System.Windows.TextDecorations.None:
+                    case Windows.UI.Text.TextDecorations.None:
                     default:
                         cssValue = ""; // Note: this will reset the value.
                         break;
-#else
-                    case global::Windows.UI.Text.TextDecorations.OverLine:
-                        cssValue = "overline";
-                        break;
-                    case global::Windows.UI.Text.TextDecorations.Strikethrough:
-                        cssValue = "line-through";
-                        break;
-                    case global::Windows.UI.Text.TextDecorations.Underline:
-                        cssValue = "underline";
-                        break;
-                    case global::Windows.UI.Text.TextDecorations.None:
-                    default:
-                        cssValue = ""; // Note: this will reset the value.
-                        break;
-#endif
                 }
             }
             else
+            {
                 cssValue = ""; // Note: this will reset the value.
+            }
             INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBox.INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
         }
-
+#endif
         #endregion
 
 
@@ -1447,7 +1417,7 @@ element.setAttribute(""data-isreadonly"",""{1}"");
             }
         }
 
-        #region Not implemented yet
+        #region Not implemented yet (should we move this in WORKINPROGRESS ?)
 
         public event RoutedEventHandler SelectionChanged;
 
@@ -1460,6 +1430,25 @@ element.setAttribute(""data-isreadonly"",""{1}"");
         }
 
         #endregion
+
+#if WORKINPROGRESS
+        #region SelectionBackground
+        public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register("SelectionBackground", typeof(Brush), typeof(TextBox), null);
+
+        public Brush SelectionBackground
+        {
+            get { return (Brush)GetValue(SelectionBackgroundProperty); }
+            set { SetValue(SelectionBackgroundProperty, value); }
+        }
+        #endregion
+
+        public void Select(int start, int length)
+        {
+
+        }
+
+        public string SelectedText { get; set; }
+#endif
 
     }
 }

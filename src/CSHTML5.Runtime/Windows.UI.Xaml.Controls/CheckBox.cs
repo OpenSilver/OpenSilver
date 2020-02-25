@@ -62,7 +62,7 @@ namespace Windows.UI.Xaml.Controls
     /// }
     /// </code>
     /// </example>
-    public class CheckBox : ToggleButton
+    public partial class CheckBox : ToggleButton
     {
         /// <summary>
         /// Initializes a new instance of the CheckBox class.

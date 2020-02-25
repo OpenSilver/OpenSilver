@@ -41,8 +41,20 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Animates the value of a Double property between two target values using linear
     /// interpolation over a specified Duration.
     /// </summary>
-    public class DoubleAnimation : AnimationTimeline
+    public partial class DoubleAnimation : AnimationTimeline
     {
+#if WORKINPROGRESS
+        public IEasingFunction EasingFunction
+        {
+            get { return (EasingFunctionBase)GetValue(EasingFunctionProperty); }
+            set { SetValue(EasingFunctionProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the EasingFunction dependency property.
+        /// </summary>
+        public static readonly DependencyProperty EasingFunctionProperty = DependencyProperty.Register("EasingFunction", typeof(IEasingFunction), typeof(DoubleAnimation), new PropertyMetadata(null));
+#else
         /// <summary>
         /// Gets or sets the easing function applied to this animation.
         /// </summary>
@@ -51,11 +63,13 @@ namespace Windows.UI.Xaml.Media.Animation
             get { return (EasingFunctionBase)GetValue(EasingFunctionProperty); }
             set { SetValue(EasingFunctionProperty, value); }
         }
+
         /// <summary>
         /// Identifies the EasingFunction dependency property.
         /// </summary>
-        public static readonly DependencyProperty EasingFunctionProperty =
-            DependencyProperty.Register("EasingFunction", typeof(EasingFunctionBase), typeof(DoubleAnimation), new PropertyMetadata(null));
+        public static readonly DependencyProperty EasingFunctionProperty = DependencyProperty.Register("EasingFunction", typeof(EasingFunctionBase), typeof(DoubleAnimation), new PropertyMetadata(null));
+
+#endif
 
         /// <summary>
         /// Gets or sets the animation's starting value.
@@ -129,7 +143,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     if (cssEquivalent != null)
                     {
                         cssEquivalentExists = true;
-                        StartAnimation(_propertyContainer, cssEquivalent, From, To, Duration, EasingFunction, specificGroupName,
+                        StartAnimation(_propertyContainer, cssEquivalent, From, To, Duration, (EasingFunctionBase)EasingFunction, specificGroupName,
                         OnAnimationCompleted(parameters, isLastLoop, To.Value, _propertyContainer, _targetProperty, _animationID));
 
                     }
@@ -141,7 +155,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     foreach (CSSEquivalent equivalent in cssEquivalents)
                     {
                         cssEquivalentExists = true;
-                        StartAnimation(_propertyContainer, equivalent, From, To, Duration, EasingFunction, specificGroupName,
+                        StartAnimation(_propertyContainer, equivalent, From, To, Duration, (EasingFunctionBase)EasingFunction, specificGroupName,
                         OnAnimationCompleted(parameters, isLastLoop, To.Value, _propertyContainer, _targetProperty, _animationID));
                     }
                 }
@@ -189,7 +203,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
                         object newObj = CSHTML5.Interop.ExecuteJavaScriptAsync(@"new Object()");
 
-                        if (from == null)
+                        if (AnimationHelpers.IsValueNull(from)) //todo: when using Bridge, I guess we would want to directly use "from == null" since it worked in the first place (I think).
                         {
                             foreach (string csspropertyName in cssEquivalent.Name)
                             {
@@ -260,5 +274,14 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
             }
         }
+
+#if WORKINPROGRESS
+        public static readonly DependencyProperty ByProperty = DependencyProperty.Register("By", typeof(double?), typeof(DoubleAnimation), null);
+        public double? By
+        {
+            get { return (double?)this.GetValue(ByProperty); }
+            set { this.SetValue(ByProperty, value); }
+        }
+#endif
     }
 }

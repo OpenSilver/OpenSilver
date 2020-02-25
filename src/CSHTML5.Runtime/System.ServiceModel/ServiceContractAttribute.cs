@@ -15,9 +15,9 @@
 //
 //===============================================================================
 
+#if !OPENSILVER
 
-
-#if WCF_STACK || BRIDGE
+#if WCF_STACK || BRIDGE || CSHTML5BLAZOR
 
 using System;
 using System.Collections.Generic;
@@ -32,7 +32,7 @@ namespace System.ServiceModel
     /// Communication Foundation (WCF) application.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
-    public sealed class ServiceContractAttribute : Attribute
+    public sealed partial class ServiceContractAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the System.ServiceModel.ServiceContractAttribute
@@ -89,4 +89,5 @@ namespace System.ServiceModel
     }
 }
 
+#endif
 #endif

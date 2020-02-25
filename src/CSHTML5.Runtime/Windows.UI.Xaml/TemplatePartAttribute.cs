@@ -30,7 +30,7 @@ namespace Windows.UI.Xaml
     /// The part is usually required in the style and should have a specific predefined name.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class TemplatePartAttribute : Attribute
+    public sealed partial class TemplatePartAttribute : Attribute
     {
         /// <summary>
         /// Default constructor

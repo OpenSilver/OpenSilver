@@ -42,7 +42,7 @@ namespace System.Xml
 #if !BRIDGE
     [JSIL.Meta.JSStubOnly]
 #endif
-    public abstract class XmlWriter : IDisposable
+    public abstract partial class XmlWriter : IDisposable
     {
         /// <summary>
         /// Initializes a new instance of the System.Xml.XmlWriter class.

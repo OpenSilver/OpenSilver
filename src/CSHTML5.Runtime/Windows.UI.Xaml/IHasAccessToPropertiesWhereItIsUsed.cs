@@ -29,7 +29,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    public interface IHasAccessToPropertiesWhereItIsUsed
+    public partial interface IHasAccessToPropertiesWhereItIsUsed
     {
 
         HashSet2<KeyValuePair<DependencyObject, DependencyProperty>> PropertiesWhereUsed

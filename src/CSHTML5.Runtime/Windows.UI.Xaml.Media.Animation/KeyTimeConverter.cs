@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Converts instances of System.Windows.Media.Animation.KeyTime to and from
     /// other types.
     /// </summary>
-    public class KeyTimeConverter : TypeConverter
+    public partial class KeyTimeConverter : TypeConverter
     {
         /// <summary>
         /// Determines whether an object can be converted from a given type to an instance

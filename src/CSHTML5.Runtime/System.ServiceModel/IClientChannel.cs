@@ -15,9 +15,9 @@
 //
 //===============================================================================
 
+#if !OPENSILVER
 
-
-#if WCF_STACK || BRIDGE
+#if WCF_STACK || BRIDGE || CSHTML5BLAZOR
 
 using System;
 using System.Collections.Generic;
@@ -32,8 +32,8 @@ namespace System.ServiceModel
     /// Defines the behavior of outbound request and request/reply channels used
     /// by client applications.
     /// </summary>
-    public interface IClientChannel : IDisposable
-#if WORKINPROGRESS
+    public partial interface IClientChannel : IDisposable
+#if WORKINPROGRESS && !CSHTML5BLAZOR
         , IChannel
 #endif
 #if UNIMPLEMENTED_MEMBERS
@@ -99,4 +99,5 @@ namespace System.ServiceModel
     }
 }
 
+#endif
 #endif

@@ -23,6 +23,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
+using DotNetForHtml5.Core;
 
 
 #if MIGRATION
@@ -49,7 +50,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public abstract class INTERNAL_DateTimePickerBase : Control
+    public abstract partial class INTERNAL_DateTimePickerBase : Control
     {
         protected FrameworkElement _root;
         protected TextBox _textBox;
@@ -117,9 +118,11 @@ namespace Windows.UI.Xaml.Controls
 
         #region DropDownHandler
 
-        protected void OpenDropDown()
+        protected async void OpenDropDown()
         {
             _popup.IsOpen = true;
+            await Task.Delay(TimeSpan.FromSeconds(0.5));
+            INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(_popup);
         }
 
         protected void CloseDropDown()

@@ -41,7 +41,7 @@ namespace Windows.UI.Xaml
     /// state.
     /// </summary>
     [ContentProperty("Storyboard")]
-    public sealed class VisualState : DependencyObject
+    public sealed partial class VisualState : DependencyObject
     {
 
 

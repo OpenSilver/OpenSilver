@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
 #if false
-    public class ProgressBar : RangeBase
+    public partial class ProgressBar : RangeBase
     {
         //public bool IsIndeterminateProperty;
         Canvas _rootCanvas;

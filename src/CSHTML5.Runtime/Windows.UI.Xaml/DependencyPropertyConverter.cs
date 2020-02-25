@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Converts instances of Windows.UI.Xaml.DependencyProperty to and from other data types.
     /// </summary>
-    public sealed class DependencyPropertyConverter : TypeConverter
+    public sealed partial class DependencyPropertyConverter : TypeConverter
     {
         /// <summary>
         /// Returns a value that indicates whether this converter can convert an object

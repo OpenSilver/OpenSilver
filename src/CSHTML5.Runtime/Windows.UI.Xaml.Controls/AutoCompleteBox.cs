@@ -41,7 +41,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public class AutoCompleteBox : Selector
+    public partial class AutoCompleteBox : Selector
     {
         Popup _popup;
         ToggleButton _dropDownToggle;
@@ -465,6 +465,16 @@ namespace Windows.UI.Xaml.Controls
 
             return comboBoxItem;
         }
+
+        protected override DependencyObject GetContainerFromItem(object item)
+        {
+            ComboBoxItem comboBoxItem = item as ComboBoxItem ?? new ComboBoxItem();
+            comboBoxItem.INTERNAL_CorrespondingItem = item;
+            comboBoxItem.INTERNAL_ParentSelectorControl = this;
+            comboBoxItem.Click += ComboBoxItem_Click;
+            return comboBoxItem;
+        }
+
 
         void ComboBoxItem_Click(object sender, RoutedEventArgs e)
         {

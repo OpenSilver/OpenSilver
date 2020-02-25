@@ -23,7 +23,7 @@
 
 namespace System.ServiceModel
 {
-    public class MessageHeader
+    public partial class MessageHeader
     {
         public string Name;
         public object Value;

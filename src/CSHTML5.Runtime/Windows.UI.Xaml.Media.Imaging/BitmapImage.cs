@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Media.Imaging
     /// <summary>
     /// Provides the practical object source type for the Source and ImageSource properties.
     /// </summary>
-    public class BitmapImage : BitmapSource
+    public partial class BitmapImage : BitmapSource
     {
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace Windows.UI.Xaml.Media.Imaging
             {
 #if !BRIDGE
                 // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
-                string callerAssemblyName = Interop.IsRunningInTheSimulator ? Assembly.GetCallingAssembly().GetName().Name : INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
+                string callerAssemblyName = CSHTML5.Interop.IsRunningInTheSimulator ? Assembly.GetCallingAssembly().GetName().Name : INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #else
                 // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
                 string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
@@ -221,5 +221,9 @@ namespace Windows.UI.Xaml.Media.Imaging
                 UriSourceChanged(this, new EventArgs());
             }
         }
+
+#if WORKINPROGRESS
+        public BitmapCreateOptions CreateOptions { get; set; }
+#endif
     }
 }

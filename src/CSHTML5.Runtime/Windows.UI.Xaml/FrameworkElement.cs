@@ -29,11 +29,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Markup;
 
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Markup;
 using System.Windows.Data;
 #else
 using Windows.Foundation;
@@ -386,10 +386,46 @@ namespace Windows.UI.Xaml
 
         public static DependencyProperty TriggersProperty = DependencyProperty.Register("Triggers", typeof(TriggerCollection), typeof(FrameworkElement), new PropertyMetadata(new TriggerCollection()));
 
-#endregion
+        #endregion
+
+        //
+        // Summary:
+        //     Provides the behavior for the Arrange pass of Silverlight layout. Classes can
+        //     override this method to define their own Arrange pass behavior.
+        //
+        // Parameters:
+        //   finalSize:
+        //     The final area within the parent that this object should use to arrange itself
+        //     and its children.
+        //
+        // Returns:
+        //     The actual size that is used after the element is arranged in layout.
+        protected virtual Size ArrangeOverride(Size finalSize)
+        {
+            return new Size();
+        }
+        //
+        // Summary:
+        //     Provides the behavior for the Measure pass of Silverlight layout. Classes can
+        //     override this method to define their own Measure pass behavior.
+        //
+        // Parameters:
+        //   availableSize:
+        //     The available size that this object can give to child objects. Infinity (System.Double.PositiveInfinity)
+        //     can be specified as a value to indicate that the object will size to whatever
+        //     content is available.
+        //
+        // Returns:
+        //     The size that this object determines it needs during layout, based on its calculations
+        //     of the allocated sizes for child objects; or based on other considerations, such
+        //     as a fixed container size.
+        protected virtual Size MeasureOverride(Size availableSize)
+        {
+            return new Size();
+        }
 #endif
 
-#region Tag
+        #region Tag
 
         /// <summary>
         /// Gets or sets an arbitrary object value that can be used to store custom information
@@ -687,48 +723,7 @@ namespace Windows.UI.Xaml
 #endregion
 
 
-
-
-#region ContextMenu
-
-        /// <summary>
-        /// Gets or sets the context menu element that should appear whenever the context menu is requested through user interface (UI) from within this element.
-        /// </summary>
-        public ContextMenu ContextMenu
-        {
-            get { return (ContextMenu)GetValue(ContextMenuProperty); }
-            set { SetValue(ContextMenuProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the ContextMenu dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ContextMenuProperty =
-            DependencyProperty.Register("ContextMenu", typeof(ContextMenu), typeof(FrameworkElement), new PropertyMetadata(null, ContextMenu_Changed));
-
-        private static void ContextMenu_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var frameworkElement = (FrameworkElement)d;
-            var contextMenu = (ContextMenu)e.NewValue;
-
-            INTERNAL_ContextMenuHelpers.RegisterContextMenu(frameworkElement, contextMenu);
-        }
-
-        /// <summary>
-        /// Occurs when any context menu on the element is opened.
-        /// </summary>
-        public event ContextMenuEventHandler ContextMenuOpening;
-
-        internal void INTERNAL_RaiseContextMenuOpeningEvent(double pointerLeft, double pointerTop)
-        {
-            if (ContextMenuOpening != null)
-                ContextMenuOpening(this, new ContextMenuEventArgs(pointerLeft, pointerTop));
-        }
-
-#endregion
-
 #if WORKINPROGRESS
-#region Not supported yet
 
         public event EventHandler LayoutUpdated;
 
@@ -752,7 +747,13 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        public static readonly DependencyProperty LanguageProperty = DependencyProperty.Register("Language", typeof(XmlLanguage), typeof(FrameworkElement), null);
+
+        public XmlLanguage Language
+        {
+            get { return (XmlLanguage)this.GetValue(LanguageProperty); }
+            set { this.SetValue(LanguageProperty, value); }
+        }
 #endif
     }
 }

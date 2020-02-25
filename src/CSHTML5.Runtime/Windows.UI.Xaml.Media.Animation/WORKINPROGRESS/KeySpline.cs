@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
 #if WORKINPROGRESS
-    public sealed class KeySpline : DependencyObject
+    public sealed partial class KeySpline : DependencyObject
     {
     }
 #endif

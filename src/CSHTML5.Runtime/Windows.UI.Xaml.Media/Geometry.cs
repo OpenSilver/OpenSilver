@@ -46,7 +46,7 @@ namespace Windows.UI.Xaml.Media
 #if FOR_DESIGN_TIME
     [TypeConverter(typeof(GeometryConverter))]
 #endif
-    public abstract class Geometry : DependencyObject
+    public abstract partial class Geometry : DependencyObject
     {
         internal Path INTERNAL_parentPath = null;
         internal virtual void SetParentPath(Path path)
@@ -96,9 +96,11 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Draws the Geometry on the canvas.
         /// </summary>
-        internal abstract void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize);
+        internal protected abstract void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize);
+        internal protected abstract void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY);
 
-        internal abstract void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY);
+        //internal abstract void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize);
+        //internal abstract void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY);
 
         static Geometry()
         {
@@ -119,5 +121,16 @@ namespace Windows.UI.Xaml.Media
         {
             return "evenodd";
         }
+
+#if WORKINPROGRESS
+        public static readonly DependencyProperty TransformProperty = DependencyProperty.Register("Transform", typeof(Transform), typeof(Geometry), null);
+        public Transform Transform
+        {
+            get { return (Transform)this.GetValue(TransformProperty); }
+            set { this.SetValue(TransformProperty, value); }
+        }
+
+        public Rect Bounds { get; private set; }
+#endif
     }
 }

@@ -31,7 +31,7 @@ namespace System.ServiceModel.Channels
     /// objects and that they implement a method to retrieve objects from the channel
     /// stack.
     /// </summary>
-    public interface IChannel : ICommunicationObject
+    public partial interface IChannel : ICommunicationObject
     {
         /// <summary>
         /// Returns a typed object requested, if present, from the appropriate layer

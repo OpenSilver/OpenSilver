@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Defines functionality that enables transformations in a two-dimensional plane.
     /// </summary>
-    public abstract class Transform : GeneralTransform
+    public abstract partial class Transform : GeneralTransform
     {
         // Must be implemented by the concrete class:
         internal abstract void INTERNAL_ApplyTransform();

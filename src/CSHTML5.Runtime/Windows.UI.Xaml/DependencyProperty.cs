@@ -42,7 +42,7 @@ namespace Windows.UI.Xaml
 #if FOR_DESIGN_TIME
     [TypeConverter(typeof(DependencyPropertyConverter))]
 #endif
-    public class DependencyProperty
+    public partial class DependencyProperty
     {
         public static readonly object UnsetValue = INTERNAL_NoValue.NoValue;
 
@@ -63,6 +63,11 @@ namespace Windows.UI.Xaml
         Dictionary<Type, PropertyMetadata> _typesToOverridenMetadatas = null; //this is the same as Optimization_typesToOverrides except that this one contains only the types that called the OverrideMetaData method.
         Dictionary<Type, bool> Optimization_typesWithoutOverride = null; //todo: replace with a hashset when possible.
         Dictionary<Type, PropertyMetadata> Optimization_typesToOverrides = null; //note: see comment on _typesToOverridenMetadatas
+
+        public PropertyMetadata GetMetadata(Type type)
+        {
+            return this.GetTypeMetaData(type);
+        }
 
         internal PropertyMetadata GetTypeMetaData(Type typeOfOwner)
         {
@@ -141,23 +146,31 @@ namespace Windows.UI.Xaml
             return property;
         }
 
-        private static void EnsureDefaultValue(PropertyMetadata typeMetadata, Type propertyType)
+        private static void EnsureDefaultValue(PropertyMetadata typeMetadata, Type propertyType, string name, Type ownerType)
         {
-            if (typeMetadata != null)
+#if BRIDGE || NETSTANDARD // We exclude the following code in the JSIL version, because of issues in JSIL comparing "1.0" and "System.Double" (it says that they are not the same type when running in the browser)
+            if (typeMetadata.IsDefaultValueModified)
             {
-                if (typeMetadata.DefaultValueWasSet())
+                if (!DefaultValueStore.ValidateDefaultValue(typeMetadata.DefaultValue, propertyType))
                 {
-                    object defaultValue;
-                    if (!DefaultValueStore.EnsureDefaultValueIsValid(typeMetadata.DefaultValue, propertyType, out defaultValue))
+                    string message = string.Format("Default value type does not match type of property. To fix this issue, please change the default value of the dependency property named '{0}' in the type '{1}' so that it matches the type of the property.", name, ownerType.ToString());
+                    if (Application.Current.Host.Settings.EnableInvalidPropertyMetadataDefaultValueExceptions)
                     {
+                        throw new ArgumentException(message);
+                    }
+                    else
+                    {
+                        var defaultValue = DefaultValueStore.CreateDefaultValue(propertyType);
                         typeMetadata.DefaultValue = defaultValue;
+                        Console.WriteLine(message + Environment.NewLine + string.Format("The default value has been automatically set to '{0}'.", defaultValue));
                     }
                 }
-                else
-                {
-                    typeMetadata.DefaultValue = DefaultValueStore.CreateDefaultValue(propertyType);
-                }
             }
+            else
+            {
+                typeMetadata.DefaultValue = DefaultValueStore.CreateDefaultValue(propertyType);
+            }
+#endif
         }
 
         /// <summary>
@@ -173,15 +186,21 @@ namespace Windows.UI.Xaml
 #if PERFSTAT
             var t = Performance.now();
 #endif
+            PropertyMetadata defaultMetadata = typeMetadata;
+            if (defaultMetadata == null)
+            {
+                //Create metadata if not set
+                defaultMetadata = new PropertyMetadata();
+            }
             // Make sure typeMetadata default value is valid.
-            EnsureDefaultValue(typeMetadata, propertyType);
+            EnsureDefaultValue(defaultMetadata, propertyType, name, ownerType);
 
             var newDependencyProperty = new DependencyProperty()
             {
                 Name = name,
                 PropertyType = propertyType,
                 OwnerType = ownerType,
-                _typeMetadata = typeMetadata
+                _typeMetadata = defaultMetadata
                 //Store = INTERNAL_PropertyStore.Instance
             };
 
@@ -233,10 +252,40 @@ namespace Windows.UI.Xaml
                 return base.ToString();
         }
 
+        private void PrepareOverrideMetadata(Type newOwnerType, PropertyMetadata typeMetadata)
+        {
+            if (newOwnerType == null)
+            {
+                throw new ArgumentNullException("newOwnerType");
+            }
+            if (typeMetadata == null)
+            {
+                throw new ArgumentNullException("typeMetadata");
+            }
+            //Default value has been specified when creating the typeMetadata.
+            //We need to make sure it's type is correct.
+            if (typeMetadata.IsDefaultValueModified)
+            {
+                if (!DefaultValueStore.ValidateDefaultValue(typeMetadata.DefaultValue, PropertyType))
+                {
+                    throw new ArgumentException(string.Format("Default value type does not match type of property. To fix this issue, please change the default value of the dependency property named '{0}' in the type '{1}' so that it matches the type of the property.", this.Name, this.OwnerType.ToString()));
+                }
+            }
+            //todo: check that newOnwerType inherit from the base metadata owner type.
+        }
+
+
         public void OverrideMetadata(Type newOwnerType, PropertyMetadata typeMetadata)
         {
-            // Make sure typeMetadata default value is not set to INTERNAL_NoValue.NoValue.
-            EnsureDefaultValue(typeMetadata, PropertyType);
+            // Validate parameters.
+            PrepareOverrideMetadata(newOwnerType, typeMetadata);
+
+            // Make sure typeMetadata default value is set.
+            if (!typeMetadata.IsDefaultValueModified)
+            {
+                typeMetadata.DefaultValue = DefaultValueStore.CreateDefaultValue(PropertyType);
+            }
+            //EnsureDefaultValue(typeMetadata, PropertyType);
 
             if (_typesToOverridenMetadatas == null)
             {

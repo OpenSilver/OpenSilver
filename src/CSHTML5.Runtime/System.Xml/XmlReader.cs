@@ -32,7 +32,7 @@ namespace System.Xml
 #if !BRIDGE
     [JSIL.Meta.JSStubOnly]
 #endif
-    public abstract class XmlReader : IDisposable
+    public abstract partial class XmlReader : IDisposable
     {
         /// <summary>
         /// Initializes a new instance of the XmlReader class.
@@ -3209,7 +3209,7 @@ namespace System.Xml
     public enum XmlSpace { }
 
     //todo move to its own file?
-    public interface IXmlSchemaInfo { }
+    public partial interface IXmlSchemaInfo { }
 
     //todo move to its own file?
     public enum ReadState { }

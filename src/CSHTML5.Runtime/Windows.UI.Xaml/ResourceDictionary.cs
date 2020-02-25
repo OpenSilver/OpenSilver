@@ -44,7 +44,7 @@ namespace Windows.UI.Xaml
     /// Alternatively you can access resources by traversing the dictionary at run
     /// time.
     /// </summary>
-    public class ResourceDictionary : DependencyObject,
+    public partial class ResourceDictionary : DependencyObject,
 
         // TODOBRIDGE: Fix that
 #if !BRIDGE

@@ -37,7 +37,12 @@ namespace CSHTML5.Internal
 #else
     [External]
 #endif
+
+#if CSHTML5NETSTANDARD
+    public class INTERNAL_HtmlDomStyleReference : DynamicObject
+#else
     internal class INTERNAL_HtmlDomStyleReference : DynamicObject
+#endif
     {
 #if PERFORMANCE_ANALYSIS
         static Dictionary<string, int> NumberOfTimesEachDynamicMemberIsCalled = new Dictionary<string, int>();

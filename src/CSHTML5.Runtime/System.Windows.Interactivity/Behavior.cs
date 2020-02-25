@@ -36,7 +36,7 @@ namespace System.Windows.Interactivity
     /// Encapsulates state information and zero or more ICommands into an attachable
     /// object.
     /// </summary>
-    public abstract class Behavior : DependencyObject, IAttachedObject
+    public abstract partial class Behavior : DependencyObject, IAttachedObject
     {
         internal DependencyObject _associatedObject = null;
         /// <summary>
@@ -96,35 +96,5 @@ namespace System.Windows.Interactivity
         /// before it has actually occurred.
         /// </summary>
         protected virtual void OnDetaching() { } //does nothing?
-    }
-
-
-    // Remarks:
-    //     Behavior is the base class for providing attachable state and commands to
-    //     an object.  The types the Behavior can be attached to can be controlled by
-    //     the generic parameter.  Override OnAttached() and OnDetaching() methods to
-    //     hook and unhook any necessary handlers from the AssociatedObject.
-    /// <summary>
-    /// Encapsulates state information and zero or more ICommands into an attachable
-    /// object.
-    /// </summary>
-    /// <typeparam name="T">The type the System.Windows.Interactivity.Behavior`1 can be attached to.</typeparam>
-    public abstract class Behavior<T> : Behavior where T : DependencyObject
-    {
-        /// <summary>
-        /// Initializes a new instance of the System.Windows.Interactivity.Behavior`1
-        /// class.
-        /// </summary>
-        protected Behavior()
-        {
-            _associatedType = typeof(T);
-        }
-
-        //private T _associatedObject = null;
-        /// <summary>
-        /// Gets the object to which this System.Windows.Interactivity.Behavior`1 is
-        /// attached.
-        /// </summary>
-        public T AssociatedObject { get { return (T)_associatedObject; } }  //todo: was protected but it has to be public because it comes from an interface si I don't really understand.
     }
 }

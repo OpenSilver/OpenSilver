@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml.Documents
     /// Provides an inline content element that enables UIElement types to be embedded in the content of a (Rich)TextBlock.
     /// </summary>
     [ContentProperty("Child")]
-    public sealed class InlineUIContainer : Inline
+    public sealed partial class InlineUIContainer : Inline
     {
         private UIElement _child;
 

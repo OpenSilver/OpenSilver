@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Navigation
     /// rules of a matching object specified in a collection of mapping objects.
     /// </summary>
     [ContentProperty("UriMappings")]
-    public sealed class UriMapper : UriMapperBase
+    public sealed partial class UriMapper : UriMapperBase
     {
         ///// <summary>
         ///// Initializes a new instance of the System.Windows.Navigation.UriMapper class.

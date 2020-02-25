@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml
 #if WORKINPROGRESS
     #region Not supported yet
     [SupportsDirectContentViaTypeFromStringConverters]
-    public struct FontStretch : IFormattable
+    public partial struct FontStretch : IFormattable
     {
         public string ToString(string format, IFormatProvider formatProvider)
         {

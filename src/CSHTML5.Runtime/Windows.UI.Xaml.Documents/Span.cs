@@ -31,15 +31,16 @@ namespace Windows.UI.Xaml.Documents
     /// Groups other Inline flow content elements.
     /// </summary>
     [ContentProperty("Inlines")]
-    public class Span : Inline
+    public partial class Span : Inline
     {
-        InlineCollection _inlines;
+        private readonly InlineCollection _inlines;
 
         /// <summary>
         /// Initializes a new instance of the Span class.
         /// </summary>
         public Span()
         {
+            this._inlines = new InlineCollection(this);
         }
 
         /// <summary>
@@ -49,9 +50,7 @@ namespace Windows.UI.Xaml.Documents
         {
             get
             {
-                if (_inlines == null)
-                    _inlines = new InlineCollection();
-                return _inlines;
+                return this._inlines;
             }
         }
 
@@ -64,12 +63,9 @@ namespace Windows.UI.Xaml.Documents
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
-            if (_inlines != null)
+            foreach (Inline child in _inlines)
             {
-                foreach (Inline child in _inlines)
-                {
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
-                }
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
             }
         }
     }

@@ -29,7 +29,7 @@ namespace System.Xml
 #if !BRIDGE
     [JSIL.Meta.JSStubOnly]
 #endif
-    public class XmlParserContext
+    public partial class XmlParserContext
     {
         
     }

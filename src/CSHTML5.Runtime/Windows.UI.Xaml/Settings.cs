@@ -32,7 +32,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace System
 {
-    public class Settings
+    public partial class Settings
     {
 
         public Settings()
@@ -41,6 +41,7 @@ namespace System
             DefaultSoapCredentialsMode = CredentialsMode.Disabled;
             EnableBindingErrorsLogging = false;
             EnableBindingErrorsThrowing = false;
+            EnableInvalidPropertyMetadataDefaultValueExceptions = true;
         }
 
         public CredentialsMode DefaultSoapCredentialsMode { get; set; }
@@ -58,7 +59,6 @@ namespace System
             {
                 _enablePerformanceLogging = value;
                 INTERNAL_VisualTreeManager.EnablePerformanceLogging = value;
-
             }
         }
 
@@ -80,10 +80,16 @@ namespace System
             set
             {
                 _enableProgressiveRendering = value;
-                Panel.EnableProgressiveRendering = value;
+                Panel.INTERNAL_ApplicationWideEnableProgressiveRendering = value;
 
             }
         }
 
+        public bool EnableInvalidPropertyMetadataDefaultValueExceptions { get; set; }
+
+#if WORKINPROGRESS
+        public bool EnableAutoZoom { get; set; }
+        public bool Windowless { get; private set; }
+#endif
     }
 }

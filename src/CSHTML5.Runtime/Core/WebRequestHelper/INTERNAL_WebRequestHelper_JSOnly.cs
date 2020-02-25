@@ -23,9 +23,10 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-
-#if BRIDGE
+#if CSHTML5NETSTANDARD || BRIDGE
 using CSHTML5;
+#endif
+#if BRIDGE
 using Bridge;
 #endif
 
@@ -268,7 +269,7 @@ namespace System
 #endif
         private static bool GetIsFileProtocol()
         {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
             return Convert.ToBoolean(Interop.ExecuteJavaScript(@"(document.location.protocol === ""file:"")"));
 #else
             throw new InvalidOperationException();//we should never arrive here
@@ -282,7 +283,7 @@ namespace System
 #endif
         private static void SetRequestHeader(object xmlHttpRequest, string key, string header)
         {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
             Interop.ExecuteJavaScript("$0.setRequestHeader($1, $2)", xmlHttpRequest, key, header);
 #endif
         }
@@ -294,7 +295,7 @@ namespace System
 #endif
         internal static dynamic GetWebRequest()
         {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
             return Interop.ExecuteJavaScript("new XMLHttpRequest()");
 #else
             throw new InvalidOperationException();//we should never arrive here
@@ -309,7 +310,7 @@ namespace System
 
         internal static void SetCallbackMethod(object xmlHttpRequest, Action OnDownloadStatusCompleted)
         {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
             Interop.ExecuteJavaScript("$0.onloadend = $1", xmlHttpRequest, OnDownloadStatusCompleted);
 #endif
         }
@@ -321,7 +322,7 @@ namespace System
 #endif
         private static void CreateRequest(object xmlHttpRequest, string address, string method, bool isAsync)
         {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
             Interop.ExecuteJavaScript("$0.open($1, $2, $3)", xmlHttpRequest, method, address, isAsync);
 #endif
         }
@@ -334,7 +335,7 @@ namespace System
 #endif
         private static void EnableCookies(object xmlHttpRequest, bool value)
         {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
             Interop.ExecuteJavaScript("$0.withCredentials = $1", xmlHttpRequest, value);
 #endif
         }
@@ -347,7 +348,7 @@ namespace System
 #endif
         internal static void SetErrorCallback(object xmlHttpRequest, Action<object> OnError)
         {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
             Interop.ExecuteJavaScript("$0.onerror = $1", xmlHttpRequest, OnError);
 #endif
         }
@@ -360,7 +361,7 @@ namespace System
 #endif
         internal static void ConsoleLog_JSOnly(string message)
         {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
             Interop.ExecuteJavaScript("console.log($0);", message);
 #endif
         }
@@ -372,7 +373,7 @@ namespace System
 #endif
         internal static void SendRequest(object xmlHttpRequest, string address, string method, bool isAsync, string body)
         {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
             Interop.ExecuteJavaScript("$0.send($1)", xmlHttpRequest, body);
 #endif
         }
@@ -395,9 +396,26 @@ namespace System
         {
             int currentReadyState = GetCurrentReadyState((object)_xmlHttpRequest);
             int currentStatus = GetCurrentStatus((object)_xmlHttpRequest);
-            if (currentStatus == 404)
+            if (currentStatus == 400)
             {
-                e.Error = new Exception("Page not found");
+                e.Error = new Exception("400 - Bad Request");
+            }
+            
+            else if (currentStatus == 401)
+            {
+                e.Error = new Exception("401 - Unauthorized ");
+            }
+            else if (currentStatus == 403)
+            {
+                e.Error = new Exception("403 - Forbidden");
+            }
+            else if (currentStatus == 404)
+            {
+                e.Error = new Exception("404 - Page not found");
+            }
+            else if (currentStatus == 500)
+            {
+                e.Error = new Exception("500 - Internal Server Error");
             }
             else if (currentReadyState == 0 && !e.Cancelled)
             {
@@ -426,7 +444,7 @@ namespace System
 #endif
         private static int GetCurrentReadyState(object xmlHttpRequest)
         {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
             return Convert.ToInt32(Interop.ExecuteJavaScript("$0.readyState", xmlHttpRequest));
 #else
             throw new InvalidOperationException(); //We should never arrive here.
@@ -442,7 +460,7 @@ namespace System
 
         private static int GetCurrentStatus(object xmlHttpRequest)
         {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
             return Convert.ToInt32(Interop.ExecuteJavaScript("$0.status", xmlHttpRequest));
 #else
             throw new InvalidOperationException(); //We should never arrive here.
@@ -457,7 +475,7 @@ namespace System
 #endif
         private static int GetCurrentStatusText(object xmlHttpRequest)
         {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
             return Convert.ToInt32(Interop.ExecuteJavaScript("$0.statusText", xmlHttpRequest));
 #else
             throw new InvalidOperationException(); //We should never arrive here.
@@ -473,7 +491,7 @@ namespace System
 
         private static string GetResult(object xmlHttpRequest)
         {
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
             return Convert.ToString(Interop.ExecuteJavaScript("$0.responseText", xmlHttpRequest));
 #else
             throw new InvalidOperationException(); //We should never arrive here.

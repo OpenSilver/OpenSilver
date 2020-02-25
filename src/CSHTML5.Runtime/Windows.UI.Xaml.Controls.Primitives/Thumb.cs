@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Represents a control that can be dragged by the user.
     /// </summary>
-    public sealed class Thumb : Control
+    public sealed partial class Thumb : Control
     {
         //todo: Perfs: Each time we use GetPosition, only call it once.
         bool _isPointerCaptured;
@@ -198,11 +198,20 @@ namespace Windows.UI.Xaml.Controls.Primitives
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
-            if (!Interop.IsRunningInTheSimulator)
+            if (!CSHTML5.Interop.IsRunningInTheSimulator)
             {
                 // Prevent the selection of text while dragging from the thumb
-                Interop.ExecuteJavaScriptAsync("$0.onselectstart = function() { return false; }", this.INTERNAL_OuterDomElement);
+                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.onselectstart = function() { return false; }", this.INTERNAL_OuterDomElement);
             }
         }
+
+#if WORKINPROGRESS
+        public static readonly DependencyProperty IsFocusedProperty = DependencyProperty.Register("IsFocused", typeof(bool), typeof(Thumb), null);
+        public bool IsFocused
+        {
+            get { return (bool)this.GetValue(IsFocusedProperty); }
+            private set { this.SetValue(IsFocusedProperty, value); }
+        }
+#endif
     }
 }

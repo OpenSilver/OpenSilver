@@ -35,9 +35,9 @@ namespace Windows.UI.Xaml.Media.Animation
     /// accessed by index.
     /// </summary>
 #if WORKINPROGRESS
-    public sealed class ObjectKeyFrameCollection : PresentationFrameworkCollection<ObjectKeyFrame>
+    public sealed partial class ObjectKeyFrameCollection : PresentationFrameworkCollection<ObjectKeyFrame>
 #else
-    public sealed class ObjectKeyFrameCollection : List<ObjectKeyFrame> //: IList<ObjectKeyFrame>, IEnumerable<ObjectKeyFrame>
+    public sealed partial class ObjectKeyFrameCollection : List<ObjectKeyFrame> //: IList<ObjectKeyFrame>, IEnumerable<ObjectKeyFrame>
 #endif
     {
         //// Summary:

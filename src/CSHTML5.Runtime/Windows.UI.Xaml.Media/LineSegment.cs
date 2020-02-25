@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml.Media
     /// Represents a line drawn between two points, which can be part of a PathFigure
     /// within Path data.
     /// </summary>
-    public sealed class LineSegment : PathSegment
+    public sealed partial class LineSegment : PathSegment
     {
         ///// <summary>
         ///// Initializes a new instance of the LineSegment class.

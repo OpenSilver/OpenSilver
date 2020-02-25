@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents a two-dimensional skew.
     /// </summary>
-    public sealed class SkewTransform : Transform
+    public sealed partial class SkewTransform : Transform
     {
         double _appliedCssAngleX;
         double _appliedCssAngleY;
@@ -200,5 +200,23 @@ namespace Windows.UI.Xaml.Media
         {
             throw new NotImplementedException("Please contact support@cshtml5.com");
         }
+
+#if WORKINPROGRESS
+        public override GeneralTransform Inverse
+        {
+            get { return null; }
+        }
+
+        public override Rect TransformBounds(Rect rect)
+        {
+            return Rect.Empty;
+        }
+
+        public override bool TryTransform(Point inPoint, out Point outPoint)
+        {
+            outPoint = new Point();
+            return false;
+        }
+#endif
     }
 }

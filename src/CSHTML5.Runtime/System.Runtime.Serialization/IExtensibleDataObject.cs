@@ -30,7 +30,7 @@ namespace System.Runtime.Serialization
     /// during deserialization of a type marked with the System.Runtime.Serialization.DataContractAttribute
     /// attribute.
     /// </summary>
-    public interface IExtensibleDataObject
+    public partial interface IExtensibleDataObject
     {
         /// <summary>
         /// Gets or sets the structure that contains extra data.

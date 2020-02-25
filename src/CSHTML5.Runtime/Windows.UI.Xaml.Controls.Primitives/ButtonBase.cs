@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// Represents the base class for all button controls, such as Button, RepeatButton,
     /// and HyperlinkButton.
     /// </summary>
-    public class ButtonBase : ContentControl
+    public partial class ButtonBase : ContentControl
     {
         public ButtonBase()
         {
@@ -92,6 +92,18 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public static readonly DependencyProperty CommandProperty =
             DependencyProperty.Register("Command", typeof(ICommand), typeof(ButtonBase), new PropertyMetadata(null, Command_Changed));
+
+#if WORKINPROGRESS
+        //
+        // Summary:
+        //     Identifies the System.Windows.Controls.Primitives.ButtonBase.IsMouseOver dependency
+        //     property.
+        //
+        // Returns:
+        //     The identifier for the System.Windows.Controls.Primitives.ButtonBase.IsMouseOver
+        //     dependency property.
+        public static readonly DependencyProperty IsMouseOverProperty;
+#endif
 
         static void Command_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -200,6 +212,23 @@ namespace Windows.UI.Xaml.Controls.Primitives
             this.IsPressed = false;
         }
 
+#if WORKINPROGRESS
+#if MIGRATION
+        //
+        // Summary:
+        //     Called when the value of the System.Windows.Controls.Primitives.ButtonBase.IsPressed
+        //     property changes.
+        //
+        // Parameters:
+        //   e:
+        //     The data for System.Windows.DependencyPropertyChangedEventArgs.
+        protected virtual void OnIsPressedChanged(DependencyPropertyChangedEventArgs e)
+        {
+            
+        }
+#endif
+#endif
+
         void StopPointerCapture()
         {
             _timerToReleaseCaptureAutomaticallyIfNoMouseUpEvent.Stop();
@@ -237,9 +266,28 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 return false;
         }
 
-#endregion
+        #endregion
 
 
+#if WORKINPROGRESS
+        //
+        // Summary:
+        //     Gets a value that determines whether the button has focus.
+        //
+        // Returns:
+        //     true if the control has focus; otherwise, false. The default is false.
+        public bool IsFocused { get; }
+
+        //
+        // Summary:
+        //     Gets a value indicating whether the mouse pointer is located over this button
+        //     control.
+        //
+        // Returns:
+        //     true to indicate the mouse pointer is over the button control, otherwise false.
+        //     The default is false.
+        public bool IsMouseOver { get; }
+#endif
 
         /// <summary>
         /// Gets a value that indicates whether a ButtonBase is currently in a pressed state.

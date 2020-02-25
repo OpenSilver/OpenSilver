@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// Defines a segment of time.
     /// </summary>
-    public abstract class Timeline : DependencyObject
+    public abstract partial class Timeline : DependencyObject
     {
 #if MIGRATION
         internal static readonly string[] defaultTypesPaths = {
@@ -85,6 +85,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 string end = splittedPath[splittedPath.Length - 1];
                 string[] splittedEnd = end.Split('.'); //with the example above: --> ["Canvas", "Left)"]
                 string parentTypeString = end.Substring(0, end.Length - splittedEnd[splittedEnd.Length - 1].Length - 1); // -1 to remove the dot that wasn't counted due to the split.
+                parentTypeString = parentTypeString.StartsWith("global::") ? parentTypeString.Substring(8) : parentTypeString;
                 int i = 0;
                 //todo: find a way to handle user defined types
                 //todo: find a better way to do the following
@@ -101,12 +102,7 @@ namespace Windows.UI.Xaml.Media.Animation
             FieldInfo dependencyPropertyField = dependencyPropertyContainerType.GetField(propertyPath.INTERNAL_DependencyPropertyName + "Property");
 
             // - Get the DependencyProperty (since Bridge, the GetValue parameter must be null because DependencyProperties are always static)
-#if MIGRATION
-            DependencyProperty dp = (global::System.Windows.DependencyProperty)dependencyPropertyField.GetValue(null);
-#else
-            DependencyProperty dp = (global::Windows.UI.Xaml.DependencyProperty)dependencyPropertyField.GetValue(null);
-#endif
-
+            DependencyProperty dp = (DependencyProperty)dependencyPropertyField.GetValue(null);
             return dp;
         }
 
@@ -351,7 +347,7 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             string targetName = Storyboard.GetTargetName(this);
             propertyPath = Storyboard.GetTargetProperty(this);
-            if (!isTargetParentTheTarget)
+            if (!isTargetParentTheTarget && targetName != null) //If the targetName is null, the target has to be the targetParent.
             {
                 if (targetParent is Control)
                 {
@@ -401,11 +397,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 Type dependencyPropertyContainerType = propertyInfo.DeclaringType;
                 FieldInfo dependencyPropertyField = dependencyPropertyContainerType.GetField(propertyPath.INTERNAL_DependencyPropertyName + "Property");
                 // - Get the DependencyProperty
-#if MIGRATION
-                DependencyProperty dp = (global::System.Windows.DependencyProperty)dependencyPropertyField.GetValue(null);
-#else
-                DependencyProperty dp = (global::Windows.UI.Xaml.DependencyProperty)dependencyPropertyField.GetValue(null);
-#endif
+                DependencyProperty dp = (DependencyProperty)dependencyPropertyField.GetValue(null);
                 // - Get the propertyMetadata from the property
                 PropertyMetadata propertyMetadata = dp.GetTypeMetaData(target.GetType());
                 // - Get the cssPropertyName from the PropertyMetadata
@@ -627,8 +619,6 @@ namespace Windows.UI.Xaml.Media.Animation
         }
 #if WORKINPROGRESS
 
-        #region Not supported yet
-
         public static readonly DependencyProperty SpeedRatioProperty = DependencyProperty.Register("SpeedRatio", typeof(double), typeof(Timeline), new PropertyMetadata(1d));
 
         public double SpeedRatio
@@ -637,7 +627,19 @@ namespace Windows.UI.Xaml.Media.Animation
             set { this.SetValue(Timeline.SpeedRatioProperty, value); }
         }
 
-        #endregion
+        public static readonly DependencyProperty AutoReverseProperty = DependencyProperty.Register("AutoReverse", typeof(bool), typeof(Timeline), null);
+        public bool AutoReverse
+        {
+            get { return (bool)this.GetValue(AutoReverseProperty); }
+            set { this.SetValue(AutoReverseProperty, value); }
+        }
+
+        public static readonly DependencyProperty FillBehaviorProperty = DependencyProperty.Register("FillBehavior", typeof(FillBehavior), typeof(Timeline), null);
+        public FillBehavior FillBehavior
+        {
+            get { return (FillBehavior)this.GetValue(FillBehaviorProperty); }
+            set { this.SetValue(FillBehaviorProperty, value); }
+        }
 #endif
     }
 }

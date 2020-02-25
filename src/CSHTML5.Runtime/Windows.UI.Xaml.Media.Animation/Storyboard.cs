@@ -24,7 +24,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Threading;
+#else
 using Windows.UI.Core;
 #endif
 
@@ -39,7 +41,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// information for its child animations.
     /// </summary>
     [ContentProperty("Children")]
-    public sealed class Storyboard : Timeline
+    public sealed partial class Storyboard : Timeline
     {
         private Dictionary<Tuple<string, string>, Timeline> INTERNAL_propertiesChanged; //todo: change this into a Hashset.
 
@@ -362,6 +364,11 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
+        public void Stop()
+        {
+            this.Stop(null);
+        }
+
         //todo: make a Stop method with no arguments that actually stops the Storyboard (at least when the storyboard was started programatically).
         //Note: in WPF, Stop(FrameworkElement parentElement) does NOT stop the Storyboard (at least when it was started through Storyboard.Begin())
 
@@ -430,13 +437,34 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
+#if WORKINPROGRESS
+        public ClockState GetCurrentState()
+        {
+            return ClockState.Active;
+        }
+
+        public void SkipToFill()
+        {
+
+        }
+
+        public void Seek(TimeSpan offset)
+        {
+
+        }
+
+        public void Pause()
+        {
+
+        }
+#endif
 
     }
 
     /// <summary>
     /// this class has been added to make passing the parameters through the iterations easier.
     /// </summary>
-    internal class IterationParameters
+    internal partial class IterationParameters
     {
         internal FrameworkElement Target;
         internal Guid Guid;

@@ -34,7 +34,7 @@ namespace System.ServiceModel
     // Type parameters:
     //   T:
     //     The type of the extension objects.
-    public interface IExtensionCollection<T> : ICollection<IExtension<T>>, IEnumerable<IExtension<T>>, IEnumerable where T : System.ServiceModel.IExtensibleObject<T>
+    public partial interface IExtensionCollection<T> : ICollection<IExtension<T>>, IEnumerable<IExtension<T>>, IEnumerable where T : System.ServiceModel.IExtensibleObject<T>
     {
         // Summary:
         //     Finds the specified extension object in the collection.

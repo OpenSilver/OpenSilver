@@ -28,7 +28,7 @@ using System.Xml.Linq;
 
 namespace System.Runtime.Serialization
 {
-    internal class MemberInformation
+    internal partial class MemberInformation
     {
         public MemberInformation(MemberInfo memberInfo, MemberInfo memberInfoBase,  bool emitDefaultValue, bool isRequired, string name, int order, bool hasXmlElementAttribute, bool hasXmlAttributeAttribute)
         {

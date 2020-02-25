@@ -163,6 +163,18 @@ namespace Windows.UI.Xaml
         public static readonly RoutedEvent PointerPressedEvent = new RoutedEvent("PointerPressedEvent");
 #endif
 
+#if WORKINPROGRESS
+#if MIGRATION
+        //
+        // Summary:
+        //     Identifies the System.Windows.UIElement.MouseRightButtonDown routed event.
+        //
+        // Returns:
+        //     The identifier for the System.Windows.UIElement.MouseRightButtonDown routed event.
+        public static readonly RoutedEvent MouseRightButtonDownEvent;
+#endif
+#endif
+
 #if MIGRATION
         INTERNAL_EventManager<MouseButtonEventHandler, MouseButtonEventArgs> _pointerPressedEventManager;
         INTERNAL_EventManager<MouseButtonEventHandler, MouseButtonEventArgs> PointerPressedEventManager
@@ -639,6 +651,48 @@ namespace Windows.UI.Xaml
         #endregion
 
 
+        #region Wheel event
+
+#if WORKINPROGRESS
+#if MIGRATION
+        //
+        // Summary:
+        //     Identifies the System.Windows.UIElement.MouseWheel routed event.
+        //
+        // Returns:
+        //     The identifier for the System.Windows.UIElement.MouseWheel routed event.
+        public static readonly RoutedEvent MouseWheelEvent = new RoutedEvent("MouseWheelEvent");
+
+        /// <summary>
+        /// Occurs when a keyboard key is pressed while the UIElement has focus.
+        /// </summary>
+        public event MouseWheelEventHandler MouseWheel
+        {
+            add
+            {
+
+            }
+            remove
+            {
+
+            }
+        }
+#endif
+        public static readonly RoutedEvent TextInputEvent;
+        public static readonly RoutedEvent TextInputStartEvent;
+        public static readonly RoutedEvent TextInputUpdateEvent;
+
+        public event TextCompositionEventHandler TextInput;
+        public event TextCompositionEventHandler TextInputStart;
+#if MIGRATION
+        public event MouseButtonEventHandler MouseRightButtonDown;
+#endif
+
+#endif
+
+        #endregion
+
+
         #region Tapped event
 
         public static readonly RoutedEvent TappedEvent = new RoutedEvent("TappedEvent");
@@ -680,7 +734,7 @@ namespace Windows.UI.Xaml
             var eventArgs = new TappedRoutedEventArgs()
             {
                 INTERNAL_OriginalJSEventArg = jsEventArg,
-                Handled = ((Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
+                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
             };
 
             if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
@@ -697,7 +751,7 @@ namespace Windows.UI.Xaml
 
                 if (eventArgs.Handled)
                 {
-                    Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                    CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
                 }
             }
         }
@@ -793,7 +847,7 @@ namespace Windows.UI.Xaml
 #endif
             {
                 INTERNAL_OriginalJSEventArg = jsEventArg,
-                Handled = ((Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
+                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
             };
 
             if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
@@ -823,7 +877,7 @@ namespace Windows.UI.Xaml
 
                 if (eventArgs.Handled)
                 {
-                    Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                    CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
                 }
             }
         }
@@ -915,7 +969,7 @@ namespace Windows.UI.Xaml
         /// </summary>
         void ProcessOnKeyDown(object jsEventArg)
         {
-            int keyCode = Convert.ToInt32(Interop.ExecuteJavaScript("$0.keyCode", jsEventArg));
+            int keyCode = Convert.ToInt32(CSHTML5.Interop.ExecuteJavaScript("$0.keyCode", jsEventArg));
 
 #if MIGRATION
             keyCode = INTERNAL_VirtualKeysHelpers.FixKeyCodeForSilverlight(keyCode);
@@ -932,7 +986,7 @@ namespace Windows.UI.Xaml
 #else
                 Key = (INTERNAL_VirtualKeysHelpers.IsUnknownKey(keyCode) ? VirtualKey.Unknown : (VirtualKey)keyCode),
 #endif
-                Handled = ((Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
+                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
             };
 
             // Add the key modifier to the eventArgs:
@@ -947,7 +1001,7 @@ namespace Windows.UI.Xaml
 
             if (eventArgs.Handled)
             {
-                Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
             }
         }
 
@@ -1030,7 +1084,7 @@ namespace Windows.UI.Xaml
         /// </summary>
         void ProcessOnKeyUp(object jsEventArg)
         {
-            int keyCode = Convert.ToInt32(Interop.ExecuteJavaScript("$0.keyCode", jsEventArg));
+            int keyCode = Convert.ToInt32(CSHTML5.Interop.ExecuteJavaScript("$0.keyCode", jsEventArg));
 
 #if MIGRATION
             keyCode = INTERNAL_VirtualKeysHelpers.FixKeyCodeForSilverlight(keyCode);
@@ -1046,7 +1100,7 @@ namespace Windows.UI.Xaml
 #else
                 Key = (INTERNAL_VirtualKeysHelpers.IsUnknownKey(keyCode) ? VirtualKey.Unknown : (VirtualKey)keyCode),
 #endif
-                Handled = ((Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
+                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
             };
 
             // Add the key modifier to the eventArgs:
@@ -1061,7 +1115,7 @@ namespace Windows.UI.Xaml
 
             if (eventArgs.Handled)
             {
-                Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
             }
         }
 
@@ -1216,6 +1270,7 @@ namespace Windows.UI.Xaml
         }
 
         #endregion
+
 
         #region Handle keyboard events when focused
 
@@ -1472,12 +1527,12 @@ namespace Windows.UI.Xaml
 #endif
             {
                 INTERNAL_OriginalJSEventArg = jsEventArg,
-                Handled = ((Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
+                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
             };
 
             if (!eventArgs.Handled && checkForDivsThatAbsorbEvents)
             {
-                eventArgs.Handled = Convert.ToBoolean(Interop.ExecuteJavaScript("document.checkForDivsThatAbsorbEvents($0)", jsEventArg));
+                eventArgs.Handled = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("document.checkForDivsThatAbsorbEvents($0)", jsEventArg));
             }
 
             if (refreshClickCount)
@@ -1499,7 +1554,7 @@ namespace Windows.UI.Xaml
 
                 if (eventArgs.Handled)
                 {
-                    Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                    CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
                 }
             }
 

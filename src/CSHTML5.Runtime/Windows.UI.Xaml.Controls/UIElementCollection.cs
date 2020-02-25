@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <exclude/>
-    public class UIElementCollection : ObservableCollection<UIElement>
+    public partial class UIElementCollection : ObservableCollection<UIElement>
     {
         bool _suppressCollectionChanged;
 
@@ -56,5 +56,15 @@ namespace Windows.UI.Xaml.Controls
 
             _suppressCollectionChanged = false;
         }
+
+#if WORKINPROGRESS
+        public object SyncRoot
+        {
+            get
+            {
+                return this;
+            }
+        }
+#endif
     }
 }

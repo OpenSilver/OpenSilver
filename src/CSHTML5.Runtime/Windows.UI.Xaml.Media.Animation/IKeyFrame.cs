@@ -10,7 +10,7 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-    public interface IKeyFrame
+    public partial interface IKeyFrame
     {
         /// <summary>
         /// The key time associated with the key frame.

@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
     /// Provides generalized transformation support for objects, such as points and
     /// rectangles.
     /// </summary>
-    public abstract class GeneralTransform : DependencyObject
+    public abstract partial class GeneralTransform : DependencyObject
     {
         internal UIElement INTERNAL_parent;
 
@@ -171,5 +171,13 @@ namespace Windows.UI.Xaml.Media
         // Returns:
         //     True if inPoint was transformed; otherwise, false.
         //protected virtual bool TryTransformCore(Point inPoint, out Point outPoint);
+
+#if WORKINPROGRESS
+        public abstract GeneralTransform Inverse { get; }
+
+        public abstract Rect TransformBounds(Rect rect);
+
+        public abstract bool TryTransform(Point inPoint, out Point outPoint);
+#endif
     }
 }

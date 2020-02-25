@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace System.Windows.Markup
 {
-    public class XamlParseException : SystemException
+    public partial class XamlParseException : SystemException
     {
         /// <summary>
         /// Initializes a new instance of the System.Windows.Markup.XamlParseException

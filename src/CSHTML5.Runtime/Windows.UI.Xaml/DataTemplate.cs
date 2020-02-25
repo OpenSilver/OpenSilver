@@ -35,11 +35,20 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Describes the visual structure of a data object.
     /// </summary>
-    public class DataTemplate : FrameworkTemplate
+    public partial class DataTemplate : FrameworkTemplate
     {
         /// <summary>
         /// Initializes a new instance of the DataTemplate class.
         /// </summary>
         public DataTemplate() : base() { }
+
+        /// <summary>
+        /// Creates the System.Windows.UIElement objects in the System.Windows.DataTemplate.
+        /// </summary>
+        /// <returns>The root System.Windows.UIElement of the System.Windows.DataTemplate.</returns>
+        public DependencyObject LoadContent()
+        {
+            return this.INTERNAL_InstantiateFrameworkTemplate();
+        }
     }
 }

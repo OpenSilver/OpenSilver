@@ -31,7 +31,7 @@ namespace System.ServiceModel
     // Type parameters:
     //   T:
     //     The object that participates in the custom behavior.
-    public interface IExtension<T> where T : System.ServiceModel.IExtensibleObject<T>
+    public partial interface IExtension<T> where T : System.ServiceModel.IExtensibleObject<T>
     {
         // Summary:
         //     Enables an extension object to find out when it has been aggregated. Called

@@ -42,7 +42,7 @@ namespace Windows.UI.Xaml.Controls
     /// Represents a System.Windows.Controls.DataGrid column that hosts System.Windows.Controls.CheckBox
     /// controls in its cells.
     /// </summary>
-    public class DataGridCheckBoxColumn : DataGridBoundColumn
+    public partial class DataGridCheckBoxColumn : DataGridBoundColumn
     {
         internal override FrameworkElement GenerateEditingElement(object childData)
         {

@@ -28,7 +28,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Represents a control that provides a scroll bar that has a sliding Thumb whose position corresponds to a value.
     /// </summary>
-    public sealed class ScrollBar : RangeBase
+    public sealed partial class ScrollBar : RangeBase
     {
         const double MINIMUM_THUMB_SIZE = 16d;
         double _smallDecreaseButtonSize;

@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents the geometry of a circle or ellipse.
     /// </summary>
-    public sealed class EllipseGeometry : Geometry
+    public sealed partial class EllipseGeometry : Geometry
     {
         ///// <summary>
         ///// Initializes a new instance of the EllipseGeometry class.
@@ -114,7 +114,7 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        internal override void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
+        internal protected override void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
         {
             double maxAbs = Center.X + RadiusX;
             double minAbs = Center.X - RadiusX;
@@ -138,7 +138,7 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        internal override void DefineInCanvas(Shapes.Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize)
+        internal protected override void DefineInCanvas(Shapes.Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize)
         {
             string strokeAsString = string.Empty;
             if (path.Stroke == null || path.Stroke is SolidColorBrush) //todo: make sure we want the same behaviour when it is null and when it is a SolidColorBrush (basically, check if null means default value)

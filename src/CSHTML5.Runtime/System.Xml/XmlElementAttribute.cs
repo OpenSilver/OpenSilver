@@ -28,7 +28,7 @@ namespace System.Xml.Serialization
     /// object that contains it.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.ReturnValue, AllowMultiple = true)]
-    public class XmlElementAttribute : System.Attribute
+    public partial class XmlElementAttribute : System.Attribute
     {
         string elementName;
         Type type;

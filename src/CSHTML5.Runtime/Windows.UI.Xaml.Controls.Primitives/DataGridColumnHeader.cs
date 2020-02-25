@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Represents an individual System.Windows.Controls.DataGrid column header.
     /// </summary>
-    public class DataGridColumnHeader : ButtonBase//, IProvideDataGridColumn
+    public partial class DataGridColumnHeader : ButtonBase//, IProvideDataGridColumn
     {
         
 

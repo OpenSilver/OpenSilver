@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents the container for an item in a ListBox control.
     /// </summary>
-    public class ListBoxItem : SelectorItem
+    public partial class ListBoxItem : SelectorItem
     {
     }
 }

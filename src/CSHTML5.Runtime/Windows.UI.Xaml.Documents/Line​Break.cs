@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Documents
     /// <summary>
     /// Represents an inline element that causes a new line to begin in content when rendered in a text container.
     /// </summary>
-    public sealed class LineBreak : Inline
+    public sealed partial class LineBreak : Inline
     {
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {

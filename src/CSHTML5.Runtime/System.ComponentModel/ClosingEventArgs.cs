@@ -28,7 +28,7 @@ namespace System.ComponentModel
     /// <summary>
     /// Provides data for the System.Windows.Window.Closing event.
     /// </summary>
-    public class ClosingEventArgs : CancelEventArgs
+    public partial class ClosingEventArgs : CancelEventArgs
     {
         internal object INTERNAL_JSArgs;
 

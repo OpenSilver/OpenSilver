@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Creates an arbitrary affine matrix transformation that is used to manipulate objects or coordinate systems in a two-dimensional plane.
     /// </summary>
-    public sealed class MatrixTransform : Transform
+    public sealed partial class MatrixTransform : Transform
     {
         /// <summary>
         /// Gets or sets the Matrix that defines this transformation. The default is an
@@ -169,5 +169,23 @@ namespace Windows.UI.Xaml.Media
         {
             throw new NotImplementedException("Please contact support@cshtml5.com");
         }
+
+#if WORKINPROGRESS
+        public override GeneralTransform Inverse
+        {
+            get { return null; }
+        }
+
+        public override Rect TransformBounds(Rect rect)
+        {
+            return Rect.Empty;
+        }
+
+        public override bool TryTransform(Point inPoint, out Point outPoint)
+        {
+            outPoint = new Point();
+            return false;
+        }
+#endif
     }
 }

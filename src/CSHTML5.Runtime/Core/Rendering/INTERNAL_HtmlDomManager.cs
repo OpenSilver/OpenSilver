@@ -34,6 +34,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSHTML5;
 using DotNetForHtml5.Core;
+#if !CSHTML5NETSTANDARD
+using DotNetBrowser;
+#endif
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
@@ -218,7 +221,13 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
                 dynamic domElementRefConcernedByFocus = element.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? element.INTERNAL_OuterDomElement;
+#if CSHTML5BLAZOR
+                // In the OpenSilver we can never be running in javascript but we may not be in the simulator
+                // todo: find a way to use a more generic method (see: IsRunningInTheSimulator)
+                if (!Interop.IsRunningInTheSimulator_WorkAround)
+#else
                 if (IsRunningInJavaScript())
+#endif
                 {
                     CSHTML5.Interop.ExecuteJavaScriptAsync("setTimeout(function() { $0.focus(); }, 1)", domElementRefConcernedByFocus);
                 }
@@ -239,7 +248,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             ExecuteJavaScript(string.Format(@"var domElement = document.getElementById(""{0}"");
                                         setTimeout(function() {{ 
                                             domElement.focus();
-                                        }}, 1);", 
+                                        }}, 1);",
                                         ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier));
         }
 
@@ -337,11 +346,12 @@ if (element)
 #if !CSHTML5NETSTANDARD
             if (IsRunningInJavaScript())
             {
-                uiElement.INTERNAL_OuterDomElement.value = newText;
+                CSHTML5.Interop.ExecuteJavaScript("$0['value'] = newText", uiElement.INTERNAL_InnerDomElement);
             }
             else
             {
-                string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)uiElement.INTERNAL_OuterDomElement).UniqueIdentifier;
+                string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)uiElement.INTERNAL_InnerDomElement).UniqueIdentifier;
+
                 //below: workaround for a bug in Awesomium in which the text was not refreshed inside the <input type="text"/> elements when set programatically. 
                 //element.style.visibility=""collapse"";
                 //setTimeout(function(){ element.style.visibility=""visible""; }, 10);
@@ -349,7 +359,7 @@ if (element)
                 // Note: in the "setTimeout", we must call "document.getElementById" otherwise it does not work.
                 string javaScriptCodeToExecute = string.Format(@"
 var element = document.getElementById(""{0}"");
-if (element)
+if (element) 
 {{
     element.value = ""{1}"";
     element.style.visibility=""collapse"";
@@ -1253,7 +1263,21 @@ parentElement.appendChild(child);
 
         public static bool IsNullOrUndefined(object jsObject)
         {
-            return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
+            if (Interop.IsRunningInTheSimulator)
+            {
+                if (jsObject == null)
+                    return true;
+#if !CSHTML5NETSTANDARD
+                if (!(jsObject is JSValue))
+                    return false;
+                JSValue value = ((JSValue)jsObject);
+                return value.IsNull() || value.IsUndefined();
+#else
+            return false;
+#endif
+            }
+            else
+                return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
         }
 
         static HashSet2<Type> NumericTypes;

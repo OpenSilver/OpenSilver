@@ -23,7 +23,7 @@ using System.ComponentModel;
 namespace System.Net
 {
 #if WORKINPROGRESS
-    public class OpenReadCompletedEventArgs //: AsyncCompletedEventArgs
+    public partial class OpenReadCompletedEventArgs //: AsyncCompletedEventArgs
     {
     }
 #endif

@@ -39,12 +39,24 @@ namespace Windows.UI.Xaml.Media
     /// Represents a collection of PathFigure objects that collectively make up the
     /// geometry of a PathGeometry.
     /// </summary>
-    public sealed class PathFigureCollection : List<PathFigure> // : IList<PathFigure>, IEnumerable<PathFigure>
+    public sealed partial class PathFigureCollection : List<PathFigure> // : IList<PathFigure>, IEnumerable<PathFigure>
     {
-        ///// <summary>
-        ///// Initializes a new instance of the PathFigureCollection class.
-        ///// </summary>
-        //public PathFigureCollection() { }
+        /// <summary>
+        /// Initializes a new instance of the PathFigureCollection class.
+        /// </summary>
+        public PathFigureCollection()
+        {
+
+        }
+
+        /// <summary>
+        /// Initializes a new instance that is empty and has the specified initial capacity.
+        /// </summary>
+        /// <param name="capacity"> int - The number of elements that the new list is initially capable of storing. </param>
+        public PathFigureCollection(int capacity) : base(capacity)
+        {
+
+        }
 
         internal void SetParentPath(Path path)
         {

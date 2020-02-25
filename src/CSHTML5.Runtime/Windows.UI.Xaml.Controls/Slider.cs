@@ -32,7 +32,7 @@ using Windows.UI.Xaml.Shapes;
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public class Slider : RangeBase
+    public partial class Slider : RangeBase
     {
         //todo: Clean up this class (even functionality-wise): It was quickly made by copy-pasting the code from ScrollBar.cs and making minor changes.
         //      Changes to do:  - change _horizontal/_verticalRoot into Grids so we can position stuff in it more easily OR keep them as Canvas but programatically position their children depending on their Horizontal/VerticalAlignment. This is to allow templating because as it is, what the user can do is VERY limited.

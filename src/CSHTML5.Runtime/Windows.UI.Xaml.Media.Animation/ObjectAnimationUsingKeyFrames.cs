@@ -42,7 +42,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// specified Duration.
     /// </summary>
     [ContentProperty("KeyFrames")]
-    public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline
+    public sealed partial class ObjectAnimationUsingKeyFrames : AnimationTimeline
     {
         private ObjectKeyFrameCollection _keyFrames;
 
@@ -296,7 +296,7 @@ namespace Windows.UI.Xaml.Media.Animation
         }
 
         #region Provide a Timer that can be null
-        private class NullableTimer
+        private partial class NullableTimer
         {
             private bool HasTimer
             {

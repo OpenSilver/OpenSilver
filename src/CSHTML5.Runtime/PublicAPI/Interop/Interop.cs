@@ -66,7 +66,6 @@ namespace CSHTML5
 #endif
         public static object ExecuteJavaScript(string javascript, params object[] variables)
         {
-            
             return INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: false, variables: variables);
         }
 
@@ -93,6 +92,21 @@ namespace CSHTML5
         public static object ExecuteJavaScriptAsync(string javascript, params object[] variables)
         {
             return INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: true, variables: variables);
+        }
+
+        /// <summary>
+        /// Unboxes the value passed as a parameter. It is particularly useful for the variables of the ExecuteJavaScript Methods calls aimed at using third party libraries.
+        /// </summary>
+        /// <param name="value">The value to unbox.</param>
+        /// <returns>the unboxed value if the value was boxed, the value itself otherwise.</returns>
+#if !BRIDGE
+        [JSIL.Meta.JSReplacement("$value")]
+#else
+        [Bridge.Template("({value} == undefined ? {value} : ({value}.v != undefined ? {value}.v : {value}))")]
+#endif
+        public static object Unbox(object value)
+        {
+            return value;
         }
 
         /// <summary>
@@ -257,15 +271,62 @@ namespace CSHTML5
                 return frameworkElement.INTERNAL_OuterDomElement;
         }
 
+#if CSHTML5BLAZOR
+        /// <summary>
+        /// Returns True is the app is running in C#, and False otherwise. 
+        /// To know if you're in the simulator use IsRunningInTheSimulator_WorkAround.
+        /// </summary>
+#else
         /// <summary>
         /// Returns True is the app is running in C# inside the Simulator, and False otherwise.
         /// </summary>
+#endif
         public static bool IsRunningInTheSimulator
         {
             get
             {
                 return INTERNAL_InteropImplementation.IsRunningInTheSimulator();
             }
+        }
+
+#if CSHTML5BLAZOR
+        /// <summary>
+        /// Returns True is the app is running inside the Simulator, and False otherwise.
+        /// </summary>
+        public static bool IsRunningInTheSimulator_WorkAround
+        {
+            get
+            {
+                return INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround();
+            }
+        }
+#endif
+
+
+        /// <summary>
+        /// Check if the given jsnode is undefined
+        /// </summary>
+#if BRIDGE
+        [Template("(typeof({jsObject}) === 'undefined')")]
+#else
+        [JSReplacement("(typeof($jsObject) === 'undefined')")]
+#endif
+        public static bool IsUndefined(object jsObject)
+        {
+            return ((CSHTML5.Types.INTERNAL_JSObjectReference)jsObject).IsUndefined();
+        }
+
+        /// <summary>
+        /// Check if the given jsnode is undefined
+        /// </summary>
+#if BRIDGE
+        [Template("({jsObject} === null)")]
+#else
+        [JSReplacement("($jsObject === null)")]
+#endif
+        public static bool IsNull(object jsObject)
+        {
+            return ((CSHTML5.Types.INTERNAL_JSObjectReference)jsObject).IsNull();
         }
 
         public class ResourceFile

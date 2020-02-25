@@ -33,13 +33,13 @@ namespace System.Net
     /// Provides an HTTP-specific implementation of the System.Net.WebResponse class.
     /// </summary>
     [Serializable]
-    public class HttpWebResponse : WebResponse//, ISerializable
+    public partial class HttpWebResponse : WebResponse//, ISerializable
     {
-        dynamic _xmlHttpRequest;
+        private object _xmlHttpRequest;
 
         internal HttpWebResponse(object xmlHttpRequest)
         {
-            _xmlHttpRequest = xmlHttpRequest;
+            this._xmlHttpRequest = xmlHttpRequest;
         }
 
         // Exceptions:
@@ -49,21 +49,15 @@ namespace System.Net
         /// Gets the status of the response.
         /// </summary>
         /// 
-#if !BRIDGE
+#if !BRIDGE && !NETSTANDARD // This is the JSIL version, which doesn't have access to the "CSHTML5.Interop" class because we are in the project "DotNetForHtml5.System.dll".
         [JSIL.Meta.JSReplacement("$xmlHttpRequest.status")]
         public virtual HttpStatusCode StatusCode { get { throw new NotImplementedException(); } } //todo: maybe implement this in another way?
         
 #else
-
-        // In Bridge.Meta the following code: [Bridge.Template("return {xmlHttpRequest}.status")] 
-        // cause to generate: "function () { return this.return xmlHttpRequest.status; }"
-        // to avoid this double return we use Script to generate a sub-function instead of inline code.
-        // BRIDGE TODO: find how Bridge.Script can translate variables because {xmlHttpRequest} is translated as "{xmlHttpRequest}" and not as "this._xmlHttpRequest" like when we use Template.
-        // BRIDGE TODO: verify if [Bridge.Template("{xmlHttpRequest}.status")] will still working in all case (but probably not). 
-        [Bridge.Script("return this._xmlHttpRequest.status")]
         public virtual HttpStatusCode StatusCode()
         {
-            return HttpStatusCode.Forbidden;
+            int statusCode = Convert.ToInt32(CSHTML5.Interop.ExecuteJavaScript("$0.status", _xmlHttpRequest));
+            return (HttpStatusCode)statusCode;
         }
 #endif
 
@@ -77,22 +71,29 @@ namespace System.Net
         /// Gets the stream that is used to read the body of the response from the server.
         /// </summary>
         /// <returns>A System.IO.Stream containing the body of the response.</returns>
-        public Stream GetResponseStream()//todo: this is supposed to be an override
+        public override Stream GetResponseStream()
         {
-            return null; //todo: fix this
-            //return new MemoryStream(GetResponseAsString((object)_xmlHttpRequest));
+            MemoryStream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.Write(this.GetResponseAsString((object)this._xmlHttpRequest));
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
         }
 
-#if !BRIDGE
+#if !BRIDGE && !NETSTANDARD // This is the JSIL version, which doesn't have access to the "CSHTML5.Interop" class because we are in the project "DotNetForHtml5.System.dll".
         [JSIL.Meta.JSReplacement("$xmlHttpRequest.responseText")]
-#else
-        [Bridge.Template("{xmlHttpRequest}.responseText")]
-#endif
         private string GetResponseAsString(object xmlHttpRequest)
         {
-            //do nothing
-            return null;
+            return null; // Simulator
         }
+#else
+        private string GetResponseAsString(object xmlHttpRequest)
+        {
+            return Convert.ToString(CSHTML5.Interop.ExecuteJavaScript(@"$0.responseText", xmlHttpRequest));
+        }
+#endif
+
 
 
 

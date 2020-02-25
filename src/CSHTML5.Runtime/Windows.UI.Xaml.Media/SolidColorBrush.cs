@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Paints an area with a solid color.
     /// </summary>
-    public sealed class SolidColorBrush : Brush, ICanConvertToCSSValue, ICloneOnAnimation
+    public sealed partial class SolidColorBrush : Brush, ICanConvertToCSSValue, ICloneOnAnimation
     {
         bool _isAlreadyAClone = false;
 

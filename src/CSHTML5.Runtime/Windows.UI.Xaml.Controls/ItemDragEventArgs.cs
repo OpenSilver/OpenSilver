@@ -44,7 +44,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Information describing a drag event on a UIElement.
     /// </summary>
-    public sealed class ItemDragEventArgs : EventArgs
+    public sealed partial class ItemDragEventArgs : EventArgs
     {
         /// <summary>
         /// Initializes a new instance of the ItemDragEventArgs class.

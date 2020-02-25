@@ -124,7 +124,8 @@ namespace Windows.UI.Xaml
                         },
                         CallbackMethod = Height_Changed,
                         UIElement = (UIElement)instance,
-                        Name = new List<string> { "height" }
+                        Name = new List<string> { "height" },
+                        ApplyAlsoWhenThereIsAControlTemplate = true
                     };
                 }
             });
@@ -210,7 +211,8 @@ namespace Windows.UI.Xaml
                         },
                         CallbackMethod = Width_Changed,
                         UIElement = (UIElement)instance,
-                        Name = new List<string> { "width" }
+                        Name = new List<string> { "width" },
+                        ApplyAlsoWhenThereIsAControlTemplate = true
                     };
                 }
             });
@@ -1498,12 +1500,12 @@ if ($0.tagName.toLowerCase() != 'span')
 
                 if (!INTERNAL_SizeComparisonHelpers.AreSizesEqual(currentSize, _valueOfLastSizeChanged))
                 {
+                    _valueOfLastSizeChanged = currentSize;
+
                     // Raise the "SizeChanged" event of all the listeners:
                     foreach (var sizeChangedEventHandler in _sizeChangedEventHandlers)
                         sizeChangedEventHandler(this, new SizeChangedEventArgs(currentSize));
                 }
-
-                _valueOfLastSizeChanged = currentSize;
             }
         }
 
@@ -1512,6 +1514,49 @@ if ($0.tagName.toLowerCase() != 'span')
             // We reset the previous size value so that the SizeChanged event can be called (see the comment in "HandleSizeChanged"):
             _valueOfLastSizeChanged = new Size(double.NaN, double.NaN);
             HandleSizeChanged();
+        }
+
+        #endregion
+
+
+        #region ContextMenu
+
+        //Note: ContextMenu needs to be at the end of this file because JSIL sometimes causes errors when contructing the Control type (Control inherits from FrameworkElement and ContextMenu inherits Control so we get the error "Recursive construction of type Control")
+        //      This causes all the properties that are defined after this one to never be added when constructing the FrameworkElement Type.
+        //      cf. project "Chess" or "QSwot".
+
+        /// <summary>
+        /// Gets or sets the context menu element that should appear whenever the context menu is requested through user interface (UI) from within this element.
+        /// </summary>
+        public ContextMenu ContextMenu
+        {
+            get { return (ContextMenu)GetValue(ContextMenuProperty); }
+            set { SetValue(ContextMenuProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the ContextMenu dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContextMenuProperty =
+            DependencyProperty.Register("ContextMenu", typeof(ContextMenu), typeof(FrameworkElement), new PropertyMetadata(null, ContextMenu_Changed));
+
+        private static void ContextMenu_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var frameworkElement = (FrameworkElement)d;
+            var contextMenu = (ContextMenu)e.NewValue;
+
+            INTERNAL_ContextMenuHelpers.RegisterContextMenu(frameworkElement, contextMenu);
+        }
+
+        /// <summary>
+        /// Occurs when any context menu on the element is opened.
+        /// </summary>
+        public event ContextMenuEventHandler ContextMenuOpening;
+
+        internal void INTERNAL_RaiseContextMenuOpeningEvent(double pointerLeft, double pointerTop)
+        {
+            if (ContextMenuOpening != null)
+                ContextMenuOpening(this, new ContextMenuEventArgs(pointerLeft, pointerTop));
         }
 
         #endregion

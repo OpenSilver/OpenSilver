@@ -44,7 +44,7 @@ namespace Windows.UI.Xaml.Data
     //
     //------------------------------------
     [ContentProperty("Property")]
-    public class TemplateBinding : BindingBase
+    public partial class TemplateBinding : BindingBase
     {
         public TemplateBinding() { }
 

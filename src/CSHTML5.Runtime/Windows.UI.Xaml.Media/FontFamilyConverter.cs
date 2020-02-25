@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
     /// Converts instances of the System.String type to and from System.Windows.Media.FontFamily
     /// instances.
     /// </summary>
-    public sealed class FontFamilyConverter : TypeConverter
+    public sealed partial class FontFamilyConverter : TypeConverter
     {
         /// <summary>
         /// Determines whether a class can be converted from a given type to an instance

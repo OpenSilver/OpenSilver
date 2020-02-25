@@ -22,7 +22,7 @@ using System.Runtime.Serialization;
 
 namespace System.Net
 {
-    public class WebException : InvalidOperationException //, ISerializable
+    public partial class WebException : InvalidOperationException //, ISerializable
     {
         private WebExceptionStatus m_Status = WebExceptionStatus.UnknownError;
         private WebResponse m_Response;

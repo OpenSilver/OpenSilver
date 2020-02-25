@@ -53,7 +53,7 @@ namespace Windows.UI.Xaml.Controls
     /// myCanvas.HorizontalAlignment=HorizontalAlignment.Left;
     /// </code>
     /// </example>
-    public class Canvas : Panel
+    public partial class Canvas : Panel
     {
         /// <summary>
         /// Identifies the Canvas.Left XAML attached property.
@@ -63,16 +63,24 @@ namespace Windows.UI.Xaml.Controls
             {
                 GetCSSEquivalent = (instance) =>
                 {
-                    return new CSSEquivalent()
+                    var uielement = instance as UIElement;
+                    if (uielement != null && uielement.INTERNAL_VisualParent is Canvas)
                     {
-                        Value = (inst, value) =>
-                            {
-                                return value.ToString() + "px";
-                            },
-                        Name = new List<string> { "left" },
-                        DomElement = ((UIElement)instance).INTERNAL_AdditionalOutsideDivForMargins,
-                        ApplyAlsoWhenThereIsAControlTemplate = true
-                    };
+                        return new CSSEquivalent()
+                        {
+                            Value = (inst, value) =>
+                                {
+                                    return value.ToString() + "px";
+                                },
+                            Name = new List<string> { "left" },
+                            DomElement = uielement.INTERNAL_AdditionalOutsideDivForMargins,
+                            ApplyAlsoWhenThereIsAControlTemplate = true
+                        };
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
             );
@@ -85,16 +93,24 @@ namespace Windows.UI.Xaml.Controls
             {
                 GetCSSEquivalent = (instance) =>
                 {
-                    return new CSSEquivalent()
+                    var uielement = instance as UIElement;
+                    if (uielement != null && uielement.INTERNAL_VisualParent is Canvas)
                     {
-                        Value = (inst, value) =>
+                        return new CSSEquivalent()
                         {
-                            return value.ToString() + "px";
-                        },
-                        Name = new List<string> { "top" },
-                        DomElement = ((UIElement)instance).INTERNAL_AdditionalOutsideDivForMargins,
-                        ApplyAlsoWhenThereIsAControlTemplate = true
-                    };
+                            Value = (inst, value) =>
+                            {
+                                return value.ToString() + "px";
+                            },
+                            Name = new List<string> { "top" },
+                            DomElement = uielement.INTERNAL_AdditionalOutsideDivForMargins,
+                            ApplyAlsoWhenThereIsAControlTemplate = true
+                        };
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
             );
@@ -130,7 +146,7 @@ namespace Windows.UI.Xaml.Controls
         {
             element.SetValue(LeftProperty, value);
         }
-        
+
         /// <summary>
         /// Gets the value of the Canvas.Left XAML attached property for the target element.
         /// </summary>
@@ -141,7 +157,7 @@ namespace Windows.UI.Xaml.Controls
             return (double)element.GetValue(LeftProperty);
         }
 
-       
+
         /// <summary>
         /// Sets the value of the Canvas.Top XAML attached property for a target element.
         /// </summary>

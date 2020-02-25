@@ -30,7 +30,7 @@ namespace System.ServiceModel
     /// objects in the system, including channels, the channel managers, factories,
     /// listeners, and dispatchers, and service hosts.
     /// </summary>
-    public interface ICommunicationObject
+    public partial interface ICommunicationObject
     {
         // Summary:
         //     Gets the current state of the communication-oriented object.

@@ -49,7 +49,11 @@ namespace Windows.UI.Xaml.Data
     /// <summary>
     /// Contains information about a single instance of a System.Windows.Data.Binding.
     /// </summary>
-    public class BindingExpression : IPropertyPathWalkerListener
+#if WORKINPROGRESS
+    public partial class BindingExpression : BindingExpressionBase, IPropertyPathWalkerListener
+#else
+    public partial class BindingExpression : IPropertyPathWalkerListener
+#endif
     {
 
         //we are not allowed to change the following in BindingExpression because it is used:
@@ -379,7 +383,7 @@ namespace Windows.UI.Xaml.Data
                         //We get the new Error (which is the innermost exception as far as I know):
                         Exception currentException = e;
 
-                        if (Interop.IsRunningInTheSimulator) // Note: "InnerException" is only supported in the Simulator as of July 27, 2017.
+                        if (CSHTML5.Interop.IsRunningInTheSimulator) // Note: "InnerException" is only supported in the Simulator as of July 27, 2017.
                         {
                             while (currentException.InnerException != null)
                                 currentException = currentException.InnerException;
@@ -442,7 +446,7 @@ namespace Windows.UI.Xaml.Data
             //             };
             //             LayoutRoot.DataContext = x;
             //         }
-            //         public class TestClass
+            //         public partial class TestClass
             //         {
             //             public string TestProperty { get; set; }
             //         }
@@ -654,7 +658,7 @@ namespace Windows.UI.Xaml.Data
                         //We get the new Error (which is the innermost exception as far as I know):
                         Exception currentException = e;
 
-                        if (Interop.IsRunningInTheSimulator) // Note: "InnerException" is only supported in the Simulator as of July 27, 2017.
+                        if (CSHTML5.Interop.IsRunningInTheSimulator) // Note: "InnerException" is only supported in the Simulator as of July 27, 2017.
                         {
                             while (currentException.InnerException != null)
                                 currentException = currentException.InnerException;

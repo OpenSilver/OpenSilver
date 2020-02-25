@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents a cubic Bezier curve drawn between two points.
     /// </summary>
-    public sealed class BezierSegment : PathSegment
+    public sealed partial class BezierSegment : PathSegment
     {
         ///// <summary>
         ///// Initializes a new instance of the BezierSegment class.

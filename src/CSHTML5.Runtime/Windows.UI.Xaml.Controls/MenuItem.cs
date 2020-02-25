@@ -28,7 +28,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a selectable item inside a Menu.
     /// </summary>
-    public class MenuItem : Button //HeaderedItemsControl, ICommandSource //todo: support the other features of the MenuItem class, such as the ability to nest menu items inside one another.
+    public partial class MenuItem : Button //HeaderedItemsControl, ICommandSource //todo: support the other features of the MenuItem class, such as the ability to nest menu items inside one another.
     {
         /// <summary>
         /// Initializes a new instance of the MenuItem class.

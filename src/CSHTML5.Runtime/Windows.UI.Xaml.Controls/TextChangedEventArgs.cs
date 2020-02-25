@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Provides data for the TextChanged event.
     /// </summary>
-    public class TextChangedEventArgs : RoutedEventArgs
+    public partial class TextChangedEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the TextChangedEventArgs class.

@@ -37,7 +37,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public class Clock : INTERNAL_CalendarOrClockBase
+    public partial class Clock : INTERNAL_CalendarOrClockBase
     {
         public Clock()
         {
@@ -49,10 +49,10 @@ namespace Windows.UI.Xaml.Controls
             DateTime defaultDate = SelectedValue == null ? DateTime.Now : SelectedValue.Value;
 
             // Get a reference to the HTML DOM representation of the control (must be in the Visual Tree):
-            object div = Interop.GetDiv(this);
+            object div = CSHTML5.Interop.GetDiv(this);
 
             // Render the control: clock only (defaultDate is required)
-            _flatpickrInstance = Interop.ExecuteJavaScript(@"flatpickr($0, {
+            _flatpickrInstance = CSHTML5.Interop.ExecuteJavaScript(@"flatpickr($0, {
                     inline: true,
                     enableTime: true,
                     noCalendar: true,
@@ -62,10 +62,10 @@ namespace Windows.UI.Xaml.Controls
                     })", div, defaultDate.Hour, defaultDate.Minute - (defaultDate.Minute % 5));
 
 
-            if (Interop.IsRunningInTheSimulator)
+            if (CSHTML5.Interop.IsRunningInTheSimulator)
             {
                 // Register the JS events:
-                Interop.ExecuteJavaScript(@"$0.config.onChange.push(function(args) {
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.config.onChange.push(function(args) {
                 var date = args[0];
                 var hours = date.getHours();
                 var minutes = date.getMinutes();
@@ -77,10 +77,10 @@ namespace Windows.UI.Xaml.Controls
                 // In JS there is a bug that prevents us from using the exact same code as the Simulator. The bug has to do with the "this" keyword when used inside the callback from the JS interop: it returns the "onChange" array because the callback was added with "onChange.push".
 
                 // Force capturing the "this" instance now because in JS "this" keyword has a different meaning when retrieved later:
-                var clock = Interop.ExecuteJavaScript(@"$0", this);
+                var clock = CSHTML5.Interop.ExecuteJavaScript(@"$0", this);
 
                 // Register the JS events:
-                Interop.ExecuteJavaScript(@"$0.config.onChange.push(function(args) {
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.config.onChange.push(function(args) {
                 var date = args[0];
                 var hours = date.getHours();
                 var minutes = date.getMinutes();
@@ -89,7 +89,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             // Hide the input area:
-            Interop.ExecuteJavaScript(@"$0.style.display = 'none'", div);
+            CSHTML5.Interop.ExecuteJavaScript(@"$0.style.display = 'none'", div);
         }
 
         static void WorkaroundJSILBug(object clockInstance, object hours, object minutes)

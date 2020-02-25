@@ -19,12 +19,13 @@
 
 using System;
 
+#if !CSHTML5BLAZOR
 namespace System.ComponentModel
 {
     /// <summary>
     /// Provides data for a cancelable event.
     /// </summary>
-    public class CancelEventArgs : EventArgs
+    public partial class CancelEventArgs : EventArgs
     {
         private bool _cancel;
 
@@ -63,3 +64,4 @@ namespace System.ComponentModel
         }
     }
 }
+#endif

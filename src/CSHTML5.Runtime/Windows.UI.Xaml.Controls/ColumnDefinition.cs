@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Defines column-specific properties that apply to Grid objects.
     /// </summary>
-    public sealed class ColumnDefinition : DependencyObject
+    public sealed partial class ColumnDefinition : DependencyObject
     {
         internal Grid Parent;
 

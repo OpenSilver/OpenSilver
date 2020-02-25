@@ -36,14 +36,14 @@ namespace Windows.UI.Xaml.Media
 {
 #if WORKINPROGRESS
     [ContentProperty("Children")]
-    public sealed class GeometryGroup : Geometry
+    public sealed partial class GeometryGroup : Geometry
     {
-        internal override void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize)
+        internal protected override void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize)
         {
             throw new NotImplementedException();
         }
 
-        internal override void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
+        internal protected override void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
         {
             throw new NotImplementedException();
         }

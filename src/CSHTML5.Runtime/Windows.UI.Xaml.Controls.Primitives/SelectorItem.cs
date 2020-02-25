@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Provides a base class for ListBoxItem, ComboBoxItem, or potentially for other item types.
     /// </summary>
-    public class SelectorItem : ButtonBase //todo: it originally inherited from ContentControl so maybe it would be better to inherit from it. NOTE: we inherited from ButtonBase so that we could use the Click event
+    public partial class SelectorItem : ButtonBase //todo: it originally inherited from ContentControl so maybe it would be better to inherit from it. NOTE: we inherited from ButtonBase so that we could use the Click event
     {
         /// <summary>
         /// The business object that the SelectorItem (ListBoxItem, ComboBoxItem, etc.) represents. For example, if the ItemsSource is a collection of business objects, each of them will be stored in this variable.

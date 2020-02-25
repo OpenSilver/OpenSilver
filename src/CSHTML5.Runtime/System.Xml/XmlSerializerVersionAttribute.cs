@@ -27,7 +27,7 @@ namespace System.Xml.Serialization
     /// to an assembly.
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly)]
-    public sealed class XmlSerializerVersionAttribute : Attribute
+    public sealed partial class XmlSerializerVersionAttribute : Attribute
     {
         // Summary:
         //     

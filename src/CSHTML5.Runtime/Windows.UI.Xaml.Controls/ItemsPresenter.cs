@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Displays the content of a ItemsPresenter.
     /// </summary>
-    public class ItemsPresenter : FrameworkElement
+    public partial class ItemsPresenter : FrameworkElement
     {
     }
 }

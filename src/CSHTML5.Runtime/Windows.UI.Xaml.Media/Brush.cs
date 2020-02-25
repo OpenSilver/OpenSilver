@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
 #if FOR_DESIGN_TIME
     [TypeConverter(typeof(BrushConverter))]
 #endif
-    public class Brush : DependencyObject, IHasAccessToPropertiesWhereItIsUsed
+    public partial class Brush : DependencyObject, IHasAccessToPropertiesWhereItIsUsed
     {
         static Brush()
         {
@@ -81,7 +81,14 @@ namespace Windows.UI.Xaml.Media
         internal static List<CSSEquivalent> MergeCSSEquivalentsOfTheParentsProperties(Brush brush, Func<CSSEquivalent, ValueToHtmlConverter> parentPropertyToValueToHtmlConverter) // note: "CSSEquivalent" here stands for the CSSEquicalent of the parent property.
         {
             List<CSSEquivalent> result = new List<CSSEquivalent>();
+            //We copy brush.PropertiesWhereUsed in a local variable because we need to modify it in the foreach:
+            HashSet2<KeyValuePair<DependencyObject, DependencyProperty>> propertiesWhereUsed = new HashSet2<KeyValuePair<DependencyObject, DependencyProperty>>();
             foreach (KeyValuePair<DependencyObject, DependencyProperty> tuple in brush.PropertiesWhereUsed)
+            {
+                propertiesWhereUsed.Add(tuple);
+            }
+
+            foreach (KeyValuePair<DependencyObject, DependencyProperty> tuple in propertiesWhereUsed)
             {
                 UIElement uiElement = tuple.Key as UIElement;
                 DependencyProperty dependencyProperty = tuple.Value;

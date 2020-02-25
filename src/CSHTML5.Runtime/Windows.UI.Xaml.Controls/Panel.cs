@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Controls
     /// and arrange child objects in a UI page.
     /// </summary>
     [ContentProperty("Children")]
-    public abstract class Panel : FrameworkElement
+    public abstract partial class Panel : FrameworkElement
     {
 #if REVAMPPOINTEREVENTS
         internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
@@ -56,8 +56,20 @@ namespace Windows.UI.Xaml.Controls
 
         UIElementCollection _children;
 
-        public bool INTERNAL_EnableProgressiveLoading;
-        internal static bool EnableProgressiveRendering;
+        [Obsolete("Replaced by 'EnableProgressiveRendering'")]
+        public bool INTERNAL_EnableProgressiveLoading
+        {
+            get { return this.EnableProgressiveRendering; }
+            set { this.EnableProgressiveRendering = value; }
+        }
+
+        private bool _enableProgressiveRendering;
+        public bool EnableProgressiveRendering
+        {
+            get { return this._enableProgressiveRendering || INTERNAL_ApplicationWideEnableProgressiveRendering; }
+            set { this._enableProgressiveRendering = value; }
+        }
+        internal static bool INTERNAL_ApplicationWideEnableProgressiveRendering;
 
         void Children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -92,7 +104,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 
             //we put "this" below because the sender is directly the colection and we need to have an access to the control
-            ManageChildrenChanged(this, oldItems, newItems);
+            this.ManageChildrenChanged(oldItems, newItems);
         }
 
         /// <summary>
@@ -159,7 +171,7 @@ namespace Windows.UI.Xaml.Controls
                 _children.CollectionChanged += Children_CollectionChanged;
             }
 
-            ManageChildrenChanged(this, _children, _children);
+            this.ManageChildrenChanged(this._children, this._children);
         }
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
@@ -168,87 +180,44 @@ namespace Windows.UI.Xaml.Controls
                 _children.CollectionChanged -= Children_CollectionChanged;
         }
 
-        static void ManageChildrenChanged(DependencyObject d, UIElementCollection oldChildren, UIElementCollection newChildren)
+        internal virtual void ManageChildrenChanged(UIElementCollection oldChildren, UIElementCollection newChildren)
         {
-#if PERFSTAT
-            var t1 = Performance.now();
-#endif
-
-            Panel parent = (Panel)d;
-            if (parent is DockPanel)
+            if (oldChildren != null)
             {
-                ((DockPanel)parent).ManageChildrenChanged(oldChildren, newChildren);
-            }
-            else
-            {
-                bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-                if (!isCSSGrid && parent is Grid)
+                // Detach old children only if they are not in the "newChildren" collection:
+                foreach (UIElement child in oldChildren) //note: there is no setter for Children so the user cannot change the order of the elements in one step --> we cannot have the same children in another order (which would keep the former order with the way it is handled now) --> no problem here
                 {
-                    ((Grid)parent).ManageChildrenChanged(oldChildren, newChildren);
-                }
-                else
-                {
-                    if (oldChildren != null)
-                    {
-                        //// Put the list in a HashSet for performant lookup:
-                        //HashSet<UIElement> newChidrenHashSet = new HashSet<UIElement>();
-                        //if (newChildren != null)
-                        //{
-                        //    foreach (UIElement child in newChildren)
-                        //        newChidrenHashSet.Add(child);
-                        //}
-                        //// Detach old children only if they are not in the "newChildren" collection:
-                        //foreach (UIElement child in oldChildren)
-                        //{
-                        //    if (newChildren == null || !newChidrenHashSet.Contains(child)) //todo: verify that in the produced JavaScript, "newChidrenHashSet.Contains" has still a O(1) complexity.
-                        //    {
-                        //        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, parent);
-                        //    }
-                        //}
-
-                        //todo: use HashSet version.
-
-                        // Detach old children only if they are not in the "newChildren" collection:
-                        foreach (UIElement child in oldChildren) //note: there is no setter for Children so the user cannot change the order of the elements in one step --> we cannot have the same children in another order (which would keep the former order with the way it is handled now) --> no problem here
-                        {
 #if PERFSTAT
                     var t2 = Performance.now();
 #endif
-                            if (newChildren == null || !newChildren.Contains(child))
-                            {
+                    if (newChildren == null || !newChildren.Contains(child))
+                    {
 #if PERFSTAT
                         Performance.Counter("Panel.ManageChildrenChanged 'Contains'", t2);
 #endif
-                                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, parent);
-                            }
-                            else
-                            {
+                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, this);
+                    }
+                    else
+                    {
 #if PERFSTAT
                         Performance.Counter("Panel.ManageChildrenChanged 'Contains'", t2);
 #endif
-                            }
-                        }
                     }
-                    if (newChildren != null)
-                    {
-                        // Note: we attach all the children (regardless of whether they are in the oldChildren collection or not) to make it work when the item is first added to the Visual Tree (at that moment, all the properties are refreshed by calling their "Changed" method).
+                }
+            }
+            if (newChildren != null)
+            {
+                // Note: we attach all the children (regardless of whether they are in the oldChildren collection or not) to make it work when the item is first added to the Visual Tree (at that moment, all the properties are refreshed by calling their "Changed" method).
 
-                        if (parent.INTERNAL_EnableProgressiveLoading || EnableProgressiveRendering)
-                        {
-                            parent.ProgressivelyAttachChildren(newChildren);
-                        }
-                        else
-                        {
-                            foreach (UIElement child in newChildren)
-                            {
-                                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, parent);
-                            }
-                        }
-                    }
-
-                    if (parent is Grid)
+                if (this.EnableProgressiveRendering)
+                {
+                    this.ProgressivelyAttachChildren(newChildren);
+                }
+                else
+                {
+                    foreach (UIElement child in newChildren)
                     {
-                        ((Grid)parent).LocallyManageChildrenChanged();
+                        INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
                     }
                 }
             }
@@ -259,6 +228,11 @@ namespace Windows.UI.Xaml.Controls
             foreach (UIElement child in newChildren)
             {
                 await Task.Delay(1);
+                if(!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+                {
+                    //this can happen if the Panel is detached during the delay.
+                    break;
+                }
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
                 INTERNAL_OnChildProgressivelyLoaded();
             }
@@ -267,6 +241,63 @@ namespace Windows.UI.Xaml.Controls
         protected virtual void INTERNAL_OnChildProgressivelyLoaded()
         {
         }
+
+
+        /// <summary>
+        /// Retrieves the named element in the instantiated ControlTemplate visual tree.
+        /// </summary>
+        /// <param name="childName">The name of the element to find.</param>
+        /// <returns>
+        /// The named element from the template, if the element is found. Can return
+        /// null if no element with name childName was found in the template.
+        /// </returns>
+        protected internal DependencyObject GetTemplateChild(string childName)
+        {
+            return (DependencyObject)this.TryFindTemplateChildFromName(childName);
+        }
+        #region ---------- INameScope implementation ----------
+        //note: copy from UserControl
+        Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
+
+        /// <summary>
+        /// Finds the UIElement with the specified name. Returns null if not found.
+        /// </summary>
+        /// <param name="name">The name to look for.</param>
+        /// <returns>The object with the specified name if any; otherwise null.</returns>
+        private object TryFindTemplateChildFromName(string name)
+        {
+            //todo: see if this fits to the behaviour it should have.
+            if (_nameScopeDictionary.ContainsKey(name))
+                return _nameScopeDictionary[name];
+            else
+                return null;
+        }
+
+        public void RegisterName(string name, object scopedElement)
+        {
+            if (_nameScopeDictionary.ContainsKey(name) && _nameScopeDictionary[name] != scopedElement)
+                throw new ArgumentException(string.Format("Cannot register duplicate name '{0}' in this scope.", name));
+
+            _nameScopeDictionary[name] = scopedElement;
+        }
+
+        public void UnregisterName(string name)
+        {
+            if (!_nameScopeDictionary.ContainsKey(name))
+                throw new ArgumentException(string.Format("Name '{0}' was not found.", name));
+
+            _nameScopeDictionary.Remove(name);
+        }
+
+        void ClearRegisteredNames()
+        {
+            _nameScopeDictionary.Clear();
+        }
+
+
+        #endregion
+
+
 
         //internal override void INTERNAL_Render()
         //{
@@ -277,5 +308,9 @@ namespace Windows.UI.Xaml.Controls
         //        INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this).backgroundColor = ((SolidColorBrush)Background).Color.INTERNAL_ToHtmlString();
         //    }
         //}
+
+#if WORKINPROGRESS
+        public bool IsItemsHost { get; private set; }
+#endif
     }
 }

@@ -31,7 +31,7 @@ namespace System.ServiceModel
     /// Specifies that a member is serialized as an element inside the SOAP body.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false)]
-    public class MessageBodyMemberAttribute : MessageContractMemberAttribute
+    public partial class MessageBodyMemberAttribute : MessageContractMemberAttribute
     {
         /// <summary>
         /// Initializes a new instance of the System.ServiceModel.MessageBodyMemberAttribute

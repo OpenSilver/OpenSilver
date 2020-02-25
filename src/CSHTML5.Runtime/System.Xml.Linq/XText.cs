@@ -23,12 +23,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if !CSHTML5NETSTANDARD
+// already defined in .NET Standard
 namespace System.Xml.Linq
 {
     /// <summary>
     /// Represents a text node.
     /// </summary>
-    public class XText : XNode
+    public partial class XText : XNode
     {
 
         internal XText(object jsNode)
@@ -69,7 +71,7 @@ namespace System.Xml.Linq
             return new XText(Value);
         }
 
-        #region not implemented
+#region not implemented
 
         ///// <summary>
         ///// Initializes a new instance of the System.Xml.Linq.XText class from another
@@ -93,6 +95,7 @@ namespace System.Xml.Linq
         ///// <param name="writer"></param>
         //public override void WriteTo(XmlWriter writer);
 
-        #endregion
+#endregion
     }
 }
+#endif

@@ -40,7 +40,12 @@ namespace CSHTML5.Internal
 #else
     [JSIgnore]
 #endif
+
+#if CSHTML5NETSTANDARD
+    public class INTERNAL_Html2dContextReference : DynamicObject
+#else
     internal class INTERNAL_Html2dContextReference : DynamicObject
+#endif
     {
         static Dictionary<string, INTERNAL_Html2dContextReference> IdToInstance = new Dictionary<string, INTERNAL_Html2dContextReference>();
 

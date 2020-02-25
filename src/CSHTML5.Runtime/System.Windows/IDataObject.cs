@@ -29,7 +29,7 @@ namespace System.Windows
     /// Provides a format-independent mechanism for transferring data.
     /// </summary>
     /// <QualityBand>Experimental</QualityBand>
-    public interface IDataObject
+    public partial interface IDataObject
     {
         /// <summary>
         /// Retrieves a data object in a specified format; the data format is specified

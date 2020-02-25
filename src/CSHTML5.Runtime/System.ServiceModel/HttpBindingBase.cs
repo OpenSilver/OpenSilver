@@ -29,7 +29,7 @@ namespace System.ServiceModel
     // Summary:
     //     Specifies the base HTTP binding.
     // BRIDGETODO is the class working ?
-    public abstract class HttpBindingBase : Binding //, IBindingRuntimePreferences
+    public abstract partial class HttpBindingBase : Binding //, IBindingRuntimePreferences
     {
         //todo: uncomment the "DefaultValue" attributes because it can be useful for the end-user to know what the Simulator default value is (though it is useless in JavaScript, and it doesn't change the runtime because the DLL is swapped with the MS version of the same DLL during runtime in the simulator).
 

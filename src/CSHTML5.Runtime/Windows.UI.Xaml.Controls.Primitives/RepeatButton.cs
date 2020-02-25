@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Represents a control that raises its Click event repeatedly from the time it is pressed until it is released.
     /// </summary>
-    public class RepeatButton : ButtonBase
+    public partial class RepeatButton : ButtonBase
     {
         private DispatcherTimer _timer;
 

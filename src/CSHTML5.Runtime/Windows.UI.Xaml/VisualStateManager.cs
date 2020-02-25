@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Manages states and the logic for transitioning between states for controls.
     /// </summary>
-    public class VisualStateManager : DependencyObject
+    public partial class VisualStateManager : DependencyObject
     {
         //private HashSet2<Tuple<string, string>> _propertiesSetAtLeastOnce = new HashSet2<Tuple<string,string>>();
 

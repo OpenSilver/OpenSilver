@@ -41,7 +41,7 @@ namespace Windows.UI.Xaml
     // Type parameters:
     //   T:
     //     Type constraint for type safety of the constrained collection implementation.
-    public abstract class PresentationFrameworkCollection<T> : DependencyObject, INotifyPropertyChanged, INotifyCollectionChanged, IList<T>, ICollection<T>, IEnumerable<T>, IList, ICollection, IEnumerable
+    public abstract partial class PresentationFrameworkCollection<T> : DependencyObject, INotifyPropertyChanged, INotifyCollectionChanged, IList<T>, ICollection<T>, IEnumerable<T>, IList, ICollection, IEnumerable
     {
         public PresentationFrameworkCollection()
         {
@@ -178,7 +178,7 @@ namespace Windows.UI.Xaml
         {
             get
             {
-                return (object)this;
+                return this;
             }
         }
 

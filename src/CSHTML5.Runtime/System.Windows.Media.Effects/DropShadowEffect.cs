@@ -37,7 +37,7 @@ namespace System.Windows.Media.Effects
     /// <summary>
     /// A bitmap effect that paints a drop shadow around the target texture.
     /// </summary>
-    public sealed class DropShadowEffect : Effect
+    public sealed partial class DropShadowEffect : Effect
     {
         //Note: If we want to allow inwards shadows, we can use "inset" in the string that is set.
         //      From what I could gather, the shadows in WPF are naturally going both ways (inwards and outwards), and the trick the people use to have an inwards shadow is

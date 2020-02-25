@@ -86,6 +86,32 @@ namespace CSHTML5.Types
             return result;
         }
 
+        public bool IsUndefined()
+        {
+#if CSHTML5NETSTANDARD
+           return Value == null;
+#else
+            if (Value ==  null || !(Value is JSValue))
+                return false;
+            return ((JSValue)Value).IsUndefined();
+#endif
+        }
+
+        public bool IsNull()
+        {
+
+#if CSHTML5NETSTANDARD
+           return Value == null;
+#else
+            if (Value == null)
+                return true;
+            if (!(Value is JSValue))
+                return false;
+            return ((JSValue)Value).IsNull();
+#endif
+        }
+
+
         //  Note: in the methods below, we use "Convert.*" rather than  casting, in order to prevent issues related to unboxing values. cf. http://stackoverflow.com/questions/4113056/whats-wrong-with-casting-0-0-to-double
 
         public static explicit operator string(INTERNAL_JSObjectReference input)
@@ -159,13 +185,14 @@ namespace CSHTML5.Types
             return Convert.ToUInt64(input.GetActualValue());
         }
 
+
         public override string ToString()
         {
             object actualValue = this.GetActualValue();
             return (actualValue != null ? actualValue.ToString() : null);
         }
 
-        #region IConvertible implementation
+#region IConvertible implementation
 
         //  Note: in the methods below, we use "Convert.*" rather than  casting, in order to prevent issues related to unboxing values. cf. http://stackoverflow.com/questions/4113056/whats-wrong-with-casting-0-0-to-double
 
@@ -254,6 +281,6 @@ namespace CSHTML5.Types
         {
             throw new NotImplementedException();
         }
-        #endregion
+#endregion
     }
 }

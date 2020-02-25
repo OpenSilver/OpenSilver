@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml
     [TypeConverter(typeof(GridLengthConverter))]
 #endif
     [SupportsDirectContentViaTypeFromStringConverters]
-    public struct GridLength
+    public partial struct GridLength
     {
         /// <summary>
         /// Returns a new instance of Gridlength with the same properties values.

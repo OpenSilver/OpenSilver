@@ -25,7 +25,7 @@ using System.ServiceModel.Channels;
 
 namespace System.ServiceModel
 {
-    public interface IContextChannel : IChannel, ICommunicationObject, IExtensibleObject<IContextChannel>
+    public partial interface IContextChannel : IChannel, ICommunicationObject, IExtensibleObject<IContextChannel>
     {
         bool AllowOutputBatching { get; set; }
         IInputSession InputSession { get; }

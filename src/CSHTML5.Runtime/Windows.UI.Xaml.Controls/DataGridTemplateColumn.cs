@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Controls
     /// Represents a System.Windows.Controls.DataGrid column that hosts template-specified
     /// content in its cells.
     /// </summary>
-    public class DataGridTemplateColumn : DataGridBoundColumn
+    public partial class DataGridTemplateColumn : DataGridBoundColumn
     {
         /// <summary>
         /// Gets or sets the template to use to display the contents of a cell that is

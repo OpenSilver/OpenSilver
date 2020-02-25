@@ -35,7 +35,7 @@ namespace Windows.UI.Text
     /// <summary>
     /// Converts instances of System.Windows.FontWeight to and from other data types.
     /// </summary>
-    public sealed class FontWeightConverter : TypeConverter
+    public sealed partial class FontWeightConverter : TypeConverter
     {
         /// <summary>
         /// Returns a value that indicates whether this converter can convert an object

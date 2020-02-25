@@ -26,7 +26,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public class PanelDragDropTarget : DragDropTarget<Panel, UIElement>
+    public partial class PanelDragDropTarget : DragDropTarget<Panel, UIElement>
     {
         /// <summary>
         /// Initializes a new instance of the PanelDragDropTarget class.
@@ -132,6 +132,11 @@ namespace Windows.UI.Xaml.Controls
                 {
                     Orientation = Orientation.Horizontal
                 };
+        }
+
+        internal override int INTERNAL_GetNumberOfElementsBetweenItemsRootAndDragDropTarget()
+        {
+            return 2;
         }
     }
 }

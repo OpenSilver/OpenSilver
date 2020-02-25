@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml.Navigation
     /// Defines the pattern for converting a requested uniform resource identifier
     /// (URI) into a new URI.
     /// </summary>
-    public sealed class UriMapping : DependencyObject
+    public sealed partial class UriMapping : DependencyObject
     {
         ///// <summary>
         ///// Initializes a new instance of the System.Windows.Navigation.UriMapping class.

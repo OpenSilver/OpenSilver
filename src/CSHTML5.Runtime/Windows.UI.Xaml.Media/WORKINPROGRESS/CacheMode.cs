@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml.Media
 {
 #if WORKINPROGRESS
     [SupportsDirectContentViaTypeFromStringConverters]
-    public abstract class CacheMode : DependencyObject
+    public abstract partial class CacheMode : DependencyObject
     {
         static CacheMode()
         {

@@ -49,7 +49,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// Represents a control that allows a user to select an item from a collection
     /// of items.
     /// </summary>
-    public class Selector : ItemsControl
+    public partial class Selector : ItemsControl
     {
         bool _selectionChangeIsOnIndex = false;
         bool _selectionChangeIsOnItem = false;

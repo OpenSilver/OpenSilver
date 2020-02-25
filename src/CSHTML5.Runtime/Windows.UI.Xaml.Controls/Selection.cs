@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// A class that holds a selected item.
     /// </summary>
-    public sealed class Selection
+    public sealed partial class Selection
     {
         /// <summary>
         /// Initializes an instance of the Selection class.

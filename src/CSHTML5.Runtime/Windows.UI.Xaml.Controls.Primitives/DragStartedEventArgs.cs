@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Provides data for the DragStarted event that occurs when a user drags a Thumb control with the mouse.
     /// </summary>
-    public class DragStartedEventArgs : RoutedEventArgs
+    public partial class DragStartedEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the DragStartedEventArgs class.

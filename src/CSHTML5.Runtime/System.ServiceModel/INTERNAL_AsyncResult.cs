@@ -23,7 +23,7 @@ namespace System.ServiceModel
     using System;
     using System.Security.Permissions;
 
-    internal class INTERNAL_AsyncResult : IAsyncResult, IDisposable
+    internal partial class INTERNAL_AsyncResult : IAsyncResult, IDisposable
     {
         //cf. https://rashimuddin.wordpress.com/2014/02/08/iasyncresult-asynchronous-service-in-wcf/
 

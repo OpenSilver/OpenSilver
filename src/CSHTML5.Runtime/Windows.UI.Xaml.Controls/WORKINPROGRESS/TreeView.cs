@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
 #if WORKINPROGRESS
-    public class TreeView : ItemsControl
+    public partial class TreeView : ItemsControl
     {
         public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register("SelectedItem", typeof(object), typeof(TreeView), null);
 

@@ -15,10 +15,6 @@
 //
 //===============================================================================
 
-
-
-#if !CSHTML5NETSTANDARD
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,7 +55,7 @@ namespace System.ServiceModel
         }
 
 
-        internal class WebMethodAsyncResult : INTERNAL_AsyncResult
+        internal partial class WebMethodAsyncResult : INTERNAL_AsyncResult
         {
             public string XmlReturnedFromTheServer { get; set; }
 
@@ -149,5 +145,3 @@ namespace System.ServiceModel
         }
     }
 }
-
-#endif

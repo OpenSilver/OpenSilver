@@ -24,12 +24,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if !CSHTML5NETSTANDARD
+// already defined in .NET Standard
 namespace System.Xml.Linq
 {
     /// <summary>
     /// Represents an XML attribute.
     /// </summary>
-    public class XAttribute : XObject
+    public partial class XAttribute : XObject
     {
         private bool isJsValueUpToDate = false;
 
@@ -179,7 +181,7 @@ namespace System.Xml.Linq
             }
         }
 
-        #region explicit operators
+#region explicit operators
 
         //Note: DateTimeOffset's and decimal's explicit operators are not implemented because:
         //          - users cannot make new DateTimeOffset()
@@ -710,7 +712,7 @@ namespace System.Xml.Linq
             }
         }
 
-        #endregion
+#endregion
 
         //// Exceptions:
         ////   System.InvalidOperationException:
@@ -741,7 +743,7 @@ namespace System.Xml.Linq
         ///// </returns>
         //public override string ToString();
 
-        #region non implemented
+#region non implemented
 
         ///// <summary>
         ///// Gets an empty collection of attributes.
@@ -753,6 +755,7 @@ namespace System.Xml.Linq
         ///// </summary>
         //public bool IsNamespaceDeclaration { get; }
 
-        #endregion
+#endregion
     }
 }
+#endif

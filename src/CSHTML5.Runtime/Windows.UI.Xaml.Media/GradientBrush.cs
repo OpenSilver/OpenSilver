@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
     /// gradient stops.
     /// </summary>
     [ContentProperty("GradientStops")]
-    public class GradientBrush : Brush
+    public partial class GradientBrush : Brush
     {
         //// Returns:
         ////     Specifies how the colors in a gradient are interpolated. The default is SRgbLinearInterpolation.

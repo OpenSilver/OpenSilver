@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Converts instances of other types to and from instances of System.Windows.Media.Geometry.
     /// </summary>
-    public sealed class GeometryConverter : TypeConverter
+    public sealed partial class GeometryConverter : TypeConverter
     {
         ///// <summary>
         ///// Initializes a new instance of the System.Windows.Media.Geometry class.

@@ -33,56 +33,33 @@ namespace Windows.UI.Xaml
 {
 #if WORKINPROGRESS
     #region Not supported yet
-
     /// <summary>
     /// Defines a transition between VisualStates.
     /// </summary>
     [ContentProperty("Storyboard")]
-    public class VisualTransition : DependencyObject
+    public partial class VisualTransition : DependencyObject
     {
         /// <summary>Gets or sets the <see cref="T:System.Windows.Media.Animation.Storyboard" /> that occurs when the transition occurs.</summary>
         /// <returns>The <see cref="T:System.Windows.Media.Animation.Storyboard" /> that occurs when the transition occurs.</returns>
-        public Storyboard Storyboard
-        {
-            get { return (Storyboard)this.GetValue(VisualTransition.StoryboardProperty); }
-            set { this.SetValue(VisualTransition.StoryboardProperty, (DependencyObject)value); }
-        }
-
-        public static readonly DependencyProperty StoryboardProperty = DependencyProperty.Register("Storyboard", typeof(Storyboard), typeof(VisualTransition), null);
+        public Storyboard Storyboard { get; set; }
 
         /// <summary>Gets or sets the amount of time it takes to move from one state to another.</summary>
         /// <returns>The amount of time it takes to move from one state to another.</returns>
-        public Duration GeneratedDuration
-        {
-            get { return (Duration)this.GetValue(VisualTransition.GeneratedDurationProperty); }
-            set { this.SetValue(VisualTransition.GeneratedDurationProperty, (object)value); }
-        }
+        public Duration GeneratedDuration { get; set; }
 
-        public static readonly DependencyProperty GeneratedDurationProperty = DependencyProperty.Register("GeneratedDuration", typeof(Duration), typeof(VisualTransition), null);
+        /// <summary>
+        /// Easing Function for the transition
+        /// </summary>
+        public IEasingFunction GeneratedEasingFunction { get; set; }
 
         /// <summary>Gets or sets the name of the <see cref="T:System.Windows.VisualState" /> to transition to.</summary>
         /// <returns>The name of the <see cref="T:System.Windows.VisualState" /> to transition to.</returns>
-        public string To
-        {
-            get { return (string)this.GetValue(VisualTransition.ToProperty); }
-            set { this.SetValue(VisualTransition.ToProperty, (object)value);  }
-        }
-
-        public static readonly DependencyProperty ToProperty = DependencyProperty.Register("To", typeof(string), typeof(VisualTransition), null);
+        public string To { get; set; }
 
         /// <summary>Gets or sets the name of the <see cref="T:System.Windows.VisualState" /> to transition from.</summary>
         /// <returns>The name of the <see cref="T:System.Windows.VisualState" /> to transition from.</returns>
-        public string From
-        {
-            get { return (string)GetValue(FromProperty); }
-            set { SetValue(FromProperty, value); }
-        }
-
-        public static readonly DependencyProperty FromProperty = DependencyProperty.Register("From", typeof(string), typeof(VisualTransition), new PropertyMetadata(0));
-
-        
+        public string From { get; set; }
     }
-
     #endregion
 #endif
 }

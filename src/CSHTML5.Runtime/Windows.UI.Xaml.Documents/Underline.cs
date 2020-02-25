@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml.Documents
     /// <summary>
     /// Provides an inline-level content element that causes content to render with a bold font weight.
     /// </summary>
-    public sealed class Underline : Span
+    public sealed partial class Underline : Span
     {
         /// <summary>
         /// Initializes a new instance of the Underline class.

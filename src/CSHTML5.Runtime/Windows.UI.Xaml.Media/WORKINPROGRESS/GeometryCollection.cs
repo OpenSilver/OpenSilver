@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
 #if WORKINPROGRESS
-    public sealed class GeometryCollection : Animatable, IList, IList<Geometry>
+    public sealed partial class GeometryCollection : Animatable, IList, IList<Geometry>
     {
         public int IndexOf(Geometry item)
         {

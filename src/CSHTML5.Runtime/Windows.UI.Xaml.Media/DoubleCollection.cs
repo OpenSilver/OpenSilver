@@ -39,7 +39,7 @@ namespace Windows.UI.Xaml.Media
 #if FOR_DESIGN_TIME
     [TypeConverter(typeof(DoubleCollectionConverter))]
 #endif
-    public sealed class DoubleCollection : List<double> //: IList<double>, IEnumerable<double>
+    public sealed partial class DoubleCollection : List<double> //: IList<double>, IEnumerable<double>
     {
         static DoubleCollection()
         {

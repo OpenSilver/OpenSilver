@@ -30,7 +30,7 @@ namespace System.ServiceModel
     /// Contains the message received by a channel and cannot be associated with
     /// any callback operation or pending request.
     /// </summary>
-    public sealed class UnknownMessageReceivedEventArgs : EventArgs
+    public sealed partial class UnknownMessageReceivedEventArgs : EventArgs
     {
         /// <summary>
         /// Gets the unknown message that caused the event.

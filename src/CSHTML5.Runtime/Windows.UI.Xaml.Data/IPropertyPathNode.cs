@@ -28,7 +28,7 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
-    internal interface IPropertyPathNode
+    internal partial interface IPropertyPathNode
     {
         IPropertyPathNode Next {get; set;}
         object Value { get; }

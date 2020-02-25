@@ -30,7 +30,7 @@ namespace Windows.UI.Xaml
     /// ControlTemplate for use with the VisualStateManager.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class TemplateVisualStateAttribute : Attribute
+    public sealed partial class TemplateVisualStateAttribute : Attribute
     {
         /// <summary>
         /// Name of the VisualState.

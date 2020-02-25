@@ -16,8 +16,9 @@
 //===============================================================================
 
 
+#if !OPENSILVER
 
-#if WCF_STACK || BRIDGE
+#if WCF_STACK || BRIDGE || CSHTML5BLAZOR
 
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,7 @@ namespace System.ServiceModel.Channels
     /// Contains the binding elements that specify the protocols, transports, and
     /// message encoders used for communication between clients and services.
     /// </summary>
-    public class Binding
+    public partial class Binding
     {
 #if WORKINPROGRESS
         public TimeSpan ReceiveTimeout { get; set; }
@@ -40,4 +41,5 @@ namespace System.ServiceModel.Channels
     }
 }
 
+#endif
 #endif

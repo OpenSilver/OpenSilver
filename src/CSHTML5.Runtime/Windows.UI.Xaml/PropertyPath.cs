@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml
 #if FOR_DESIGN_TIME
     [TypeConverter(typeof(PropertyPathConverter))]
 #endif
-    public sealed class PropertyPath : DependencyObject
+    public sealed partial class PropertyPath : DependencyObject
     {
         internal DependencyProperty INTERNAL_DependencyProperty; //this is only defined when the user uses the PropertyPath(DependencyProperty dependencyProperty) constructor.
         internal bool INTERNAL_IsDirectlyDependencyPropertyPath = false;
@@ -197,6 +197,13 @@ namespace Windows.UI.Xaml
         {
             return new PropertyPath(path);
         }
+
+#if WORKINPROGRESS
+        public PropertyPath(string path, params object[] pathParameters)
+        {
+
+        }
+#endif
 
     }
 }

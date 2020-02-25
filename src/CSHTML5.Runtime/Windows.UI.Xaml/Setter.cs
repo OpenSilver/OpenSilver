@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Applies a value to a property in a Style.
     /// </summary>
-    public sealed class Setter : SetterBase
+    public sealed partial class Setter : SetterBase
     {
         internal Style INTERNAL_ParentStyle;
 

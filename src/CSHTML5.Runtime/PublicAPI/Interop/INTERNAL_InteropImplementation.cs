@@ -23,9 +23,10 @@ using Bridge;
 using JSIL.Meta;
 #endif
 
-#if !BUILDINGDOCUMENTATION && !CSHTML5NETSTANDARD
+#if !BUILDINGDOCUMENTATION
 using DotNetBrowser;
 #endif
+
 
 using CSHTML5.Types;
 using CSHTML5.Internal;
@@ -33,6 +34,10 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+#if CSHTML5BLAZOR
+// we need to use JsonValueKind for OpenSilver browser Interops
+using System.Text.Json;
+#endif
 #if MIGRATION
 using System.Windows;
 #else
@@ -80,12 +85,19 @@ namespace CSHTML5
             // Make sure the JS to C# interop is set up:
             if (!IsJavaScriptCSharpInteropSetUp)
             {
-#if !CSHTML5NETSTANDARD
+#if CSHTML5BLAZOR
+                if (Interop.IsRunningInTheSimulator_WorkAround)
+                {
+#endif
                 // Adding a property to the JavaScript "window" object:
                 JSObject jsWindow = (JSObject)INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("window");
                 jsWindow.SetProperty("onCallBack", new OnCallBack(CallbacksDictionary));
-#else
-                OnCallBack.SetCallbacksDictionary(CallbacksDictionary);
+#if CSHTML5BLAZOR
+                }
+                else
+                {
+                    OnCallBack.SetCallbacksDictionary(CallbacksDictionary);
+                }
 #endif
                 IsJavaScriptCSharpInteropSetUp = true;
             }
@@ -239,7 +251,7 @@ result;
 
             return objectReference;
 #else
-                    return null;
+            return null;
 #endif
         }
 
@@ -266,9 +278,40 @@ result;
 #endif
         internal static object CastFromJsValue(object obj)
         {
-#if CSHTML5NETSTANDARD
-            return obj;
-#else
+#if CSHTML5BLAZOR
+            if (!Interop.IsRunningInTheSimulator_WorkAround)
+            {
+                JsonElement jsonElement = (JsonElement)obj;
+                object res;
+                switch (jsonElement.ValueKind)
+                {
+                    case JsonValueKind.Object:
+                    case JsonValueKind.Array:
+                        res = obj;
+                        break;
+                    case JsonValueKind.String:
+                        res = jsonElement.GetString();
+                        break;
+                    case JsonValueKind.Number:
+                        res = jsonElement.GetSingle();
+                        break;
+                    case JsonValueKind.True:
+                    case JsonValueKind.False:
+                        res = jsonElement.GetBoolean();
+                        break;
+                    case JsonValueKind.Undefined:
+                    case JsonValueKind.Null:
+                        res = null;
+                        break;
+                    default:
+                        res = null;
+                        break;
+                }
+                return res;
+            }
+            else
+            {
+#endif
 #if !BUILDINGDOCUMENTATION
             var res = (JSValue)obj;
             int resInt;
@@ -312,7 +355,8 @@ result;
 #else
             return obj;
 #endif
-
+#if CSHTML5BLAZOR
+        }
 #endif
         }
 
@@ -371,7 +415,7 @@ head.appendChild(script);", html5Path, callbackOnSuccess, callbackOnFailure);
                 },
                 () =>
                 {
-                    if(onError != null)
+                    if (onError != null)
                         onError();
                 });
             }
@@ -437,5 +481,15 @@ img.src = $0;", html5Path, callback);
         {
             return true;
         }
+
+#if CSHTML5BLAZOR
+        // In the OpenSilver Version
+        // This is does not reprensent if we are in the simulator but if we're
+        // For This purpose use DotNetForHtml5.Core.IsRunningInTheSimulator_WorkAround
+        internal static bool IsRunningInTheSimulator_WorkAround()
+        {
+            return DotNetForHtml5.Core.INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround;
+        }
+#endif
     }
 }

@@ -47,7 +47,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a System.Windows.Controls.DataGrid row.
     /// </summary>
-    public class DataGridRow : DependencyObject
+    public partial class DataGridRow : DependencyObject
     {
         internal UIElement _headerUIElement;
         internal ObjectRepresentationInRow _representationInRow = new ObjectRepresentationInRow();
@@ -245,7 +245,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
 
-        internal class ObjectRepresentationInRow
+        internal partial class ObjectRepresentationInRow
         {
             internal List<DataGridCell> ElementsInRow = new List<DataGridCell>();
             internal RowDefinition RowDefinition;

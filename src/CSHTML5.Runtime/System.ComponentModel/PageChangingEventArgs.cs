@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace System.ComponentModel
 {
     /// <summary>Provides data for the <see cref="E:System.ComponentModel.IPagedCollectionView.PageChanging" /> event.</summary>
-    public sealed class PageChangingEventArgs : CancelEventArgs
+    public sealed partial class PageChangingEventArgs : CancelEventArgs
     {
         /// <summary>Initializes a new instance of the <see cref="T:System.ComponentModel.PageChangingEventArgs" /> class.</summary>
         /// <param name="newPageIndex">The index of the requested page.</param>

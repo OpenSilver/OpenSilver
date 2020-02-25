@@ -29,7 +29,7 @@ namespace System.Collections.Specialized
     /// Provides data for the System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged
     /// event.
     /// </summary>
-    public class NotifyCollectionChangedEventArgs : EventArgs
+    public partial class NotifyCollectionChangedEventArgs : EventArgs
     {
 
         /// <summary>

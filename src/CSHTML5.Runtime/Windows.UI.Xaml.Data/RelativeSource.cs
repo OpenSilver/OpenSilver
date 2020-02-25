@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Data
     /// Implements a markup extension that describes the location of the binding source relative to the position of the binding target.
     /// </summary>
     [ContentProperty("Mode")]
-    public class RelativeSource : MarkupExtension
+    public partial class RelativeSource : MarkupExtension
     {
         /// <summary>
         /// Initializes a new instance of the RelativeSource class by using default relative source mode.

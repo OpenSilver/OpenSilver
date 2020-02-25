@@ -21,12 +21,16 @@ using CSHTML5;
 using System;
 
 #if MIGRATION
+#if WORKINPROGRESS
+namespace System.Windows.Interop
+#else
 namespace System.Windows // Note: we didn't use the "Interop" namespace to avoid conflicts with CSHTML5.Interop
+#endif
 #else
 namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoid conflicts with CSHTML5.Interop
 #endif
 {
-    public class Content
+    public partial class Content
     {
         /// <summary>
         /// Gets the browser-determined height of the content area.
@@ -57,7 +61,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         {
             get
             {
-                return Convert.ToBoolean(Interop.ExecuteJavaScript(@"
+                return Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript(@"
 (function(){
     if (window.IE_VERSION)
     {
@@ -75,9 +79,9 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
             {
                 if (value)
                 {
-                    if (!Interop.IsRunningInTheSimulator)
+                    if (!CSHTML5.Interop.IsRunningInTheSimulator)
                     {
-                        Interop.ExecuteJavaScript(@"
+                        CSHTML5.Interop.ExecuteJavaScript(@"
 var element = document.body;
 var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
 if (requestMethod) { // Native full screen.
@@ -100,7 +104,7 @@ if (requestMethod) { // Native full screen.
                 }
                 else
                 {
-                    Interop.ExecuteJavaScript(@"
+                    CSHTML5.Interop.ExecuteJavaScript(@"
 var requestMethod = document.exitFullScreen || document.webkitExitFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || document.msExitFullScreen || document.msCancelFullScreen;
 if (requestMethod) { // Native exit full screen.
     requestMethod.call(document);
@@ -119,8 +123,6 @@ if (requestMethod) { // Native exit full screen.
         }
 
 #if WORKINPROGRESS
-        #region Not supported yet
-
         // Summary:
         //     Gets or sets a value that indicates the behavior of full-screen mode.
         //
@@ -148,14 +150,14 @@ if (requestMethod) { // Native exit full screen.
          /// Occurs when the System.Windows.Interop.Content.ActualHeight or the System.Windows.Interop.Content.ActualWidth 
          /// of the Silverlight plug-in change.
          /// </summary>
-             
         public event EventHandler Resized;
 
         /// <summary>
         //  Occurs when the zoom setting in the host browser window changes or is initialized.
         /// </summary>
         public event EventHandler Zoomed;
-        #endregion
+
+        public event EventHandler FullScreenChanged;
 #endif
     }
 }

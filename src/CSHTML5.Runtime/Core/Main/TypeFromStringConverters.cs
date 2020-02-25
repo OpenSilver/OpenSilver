@@ -56,8 +56,10 @@ namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is cal
             RegisterConverter(typeof(Uri), ConvertUriFromString);
             RegisterConverter(typeof(object), ConvertObjectFromString);
             RegisterConverter(typeof(byte), ConvertByteFromString);
+#if !MIGRATION
             RegisterConverter(typeof(TextDecorations), ConvertTextDecorationsFromString);
             RegisterConverter(typeof(Nullable<TextDecorations>), ConvertNullableTextDecorationsFromString);
+#endif
             RegisterConverter(typeof(TimeSpan), ConvertTimeSpanFromString);
             RegisterConverter(typeof(Nullable<TimeSpan>), ConvertTimeSpanFromString);
         }
@@ -113,7 +115,7 @@ namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is cal
             }
             else
             {
-#if WORKINPROGRESS
+#if WORKINPROGRESS && !CSHTML5NETSTANDARD
                 if (Interop.IsRunningInTheSimulator) // this is usefull if we need to call a static constructor of a type that is defined outside of core assembly, so that it registers the type's converter.
                 {
                     INTERNAL_Simulator.SimulatorProxy.RunClassConstructor(type);
@@ -196,7 +198,7 @@ namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is cal
             }
         }
 
-        #region Converters for base types
+#region Converters for base types
 
         static object ConvertBoolFromString(string str)
         {
@@ -295,6 +297,7 @@ namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is cal
             return (object)str;
         }
 
+#if !MIGRATION
         static object ConvertTextDecorationsFromString(string textDecorations)
         {
             TextDecorations? returnValue;
@@ -327,6 +330,7 @@ namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is cal
             textDecorations = null;
             return false;
         }
+#endif
 
         static object ConvertTimeSpanFromString(string str)
         {
@@ -345,6 +349,6 @@ namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is cal
             }
         }
 
-        #endregion
+#endregion
     }
 }

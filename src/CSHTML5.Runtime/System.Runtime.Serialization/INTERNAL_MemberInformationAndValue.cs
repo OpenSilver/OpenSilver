@@ -28,7 +28,7 @@ using System.Xml.Linq;
 
 namespace System.Runtime.Serialization
 {
-    internal class MemberInformationAndValue
+    internal partial class MemberInformationAndValue
     {
         public MemberInformationAndValue(MemberInformation memberInformation, object memberValue)
         {

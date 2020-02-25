@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Data
     /// The class that creates a tree results based on the operations requested by a PagedCollectionView.
     /// This is the class that can filter, sort and group (not paged, because pages are handled PagedCollectionView).
     /// </summary>
-    internal class CollectionViewGroupInternal //: INotifyPropertyChanged
+    internal partial class CollectionViewGroupInternal //: INotifyPropertyChanged
     {
         // Parent has lower priority on sort and other operations
         CollectionViewGroupInternal _parentView;

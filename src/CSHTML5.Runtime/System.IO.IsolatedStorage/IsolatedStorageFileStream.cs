@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 
 namespace System.IO.IsolatedStorage
 {
-    public class IsolatedStorageFileStream : FileStream, IDisposable
+    public partial class IsolatedStorageFileStream : FileStream, IDisposable
     {
         internal string _filePath;
         MemoryStream _fs;
@@ -97,8 +97,7 @@ namespace System.IO.IsolatedStorage
 
             //update the localStorage:
             string filePath_lowered = _filePath.ToLower();
-            Interop.ExecuteJavaScript("localStorage.setItem($0, $1)", filePath_lowered + "ǀǀCaseSensitivePath", _filePath); //Note: this is not a pipe (the thing we get with ctrl+alt+6), it is U+01C0
-            Interop.ExecuteJavaScript("localStorage.setItem($0, $1)", filePath_lowered, System.Convert.ToBase64String(bytes));
+            Interop.ExecuteJavaScript("localStorage.setItem($0, $1); localStorage.setItem($0, $2)", filePath_lowered + "ǀǀCaseSensitivePath", _filePath, System.Convert.ToBase64String(bytes)); //Note: this is not a pipe (the thing we get with ctrl+alt+6), it is U+01C0
         }
 
         /// <summary>

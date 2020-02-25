@@ -25,7 +25,7 @@ namespace System.Xml.Serialization
     /// <summary>
     /// Defines the reader, writer, and methods for pre-generated, typed serializers.
     /// </summary>
-    public abstract class XmlSerializerImplementation
+    public abstract partial class XmlSerializerImplementation
     {
         /// <summary>
         /// Initializes a new instance of the System.Xml.Serialization.XmlSerializerImplementation

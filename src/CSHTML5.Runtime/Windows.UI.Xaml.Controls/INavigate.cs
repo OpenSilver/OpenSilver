@@ -9,7 +9,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Defines a method for internal navigation in an application.
     /// </summary>
-    public interface INavigate
+    public partial interface INavigate
     {
         /// <summary>
         /// Displays the content located at the specified URI.

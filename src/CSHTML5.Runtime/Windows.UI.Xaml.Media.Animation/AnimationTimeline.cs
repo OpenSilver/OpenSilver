@@ -12,7 +12,7 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-    public abstract class AnimationTimeline : Timeline
+    public abstract partial class AnimationTimeline : Timeline
     {
         internal string _targetName;
         internal PropertyPath _targetProperty;

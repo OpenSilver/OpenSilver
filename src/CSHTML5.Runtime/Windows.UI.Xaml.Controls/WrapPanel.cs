@@ -61,7 +61,7 @@ namespace Windows.UI.Xaml.Controls
     /// //Do not forget to add the WrapPanel itself to the visual tree.
     /// </code>
     /// </example>
-    public class WrapPanel : Panel
+    public partial class WrapPanel : Panel
     {
         
         /// <summary>
@@ -174,6 +174,7 @@ namespace Windows.UI.Xaml.Controls
             var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
             //divStyle.overflow = "auto";
             divStyle.lineHeight = "0px";
+            divStyle.whiteSpace = "normal";
             domElementWhereToPlaceChildren = div;
             return div;
         }

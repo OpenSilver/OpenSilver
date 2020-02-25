@@ -32,7 +32,7 @@ namespace Windows.UI.Input
     /// Provides basic properties for the input pointer associated with a single
     /// mouse, pen/stylus, or touch contact.
     /// </summary>
-    public sealed class PointerPoint
+    public sealed partial class PointerPoint
     {
         //uint _frameId;
         ///// <summary>

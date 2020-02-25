@@ -21,6 +21,8 @@ using CSHTML5;
 using CSHTML5.Internal;
 using System.Windows;
 using DotNetForHtml5.Core;
+using System.Collections.Generic;
+using System.Linq;
 #if MIGRATION
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
@@ -28,6 +30,7 @@ using System.Windows.Media;
 using Microsoft.Windows;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
+using MS = Microsoft.Windows;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
@@ -37,6 +40,7 @@ using System.Windows.Controls;
 using System;
 using Windows.UI.Xaml.Shapes;
 using Windows.UI.Xaml.Controls;
+using MS = System.Windows;
 #endif
 
 #if MIGRATION
@@ -55,7 +59,7 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     /// <typeparam name="TItemsControlType">The type of the items control.</typeparam>
     /// <typeparam name="TItemContainerType">The type of the item container.</typeparam>
-    public abstract class DragDropTarget<TItemsControlType, TItemContainerType> : ContentControl
+    public abstract partial class DragDropTarget<TItemsControlType, TItemContainerType> : ContentControl
         where TItemsControlType : UIElement
         where TItemContainerType : UIElement
     {
@@ -275,8 +279,8 @@ namespace Windows.UI.Xaml.Controls
             Selection selection = new Selection(_sourceItemContainer);
             SelectionCollection selectionCollection = SelectionCollection.ToSelectionCollection(selection);
             DataObject dataObject = new DataObject();
-            dataObject.SetData((typeof(ItemDragEventArgs).ToString()), new ItemDragEventArgs(selectionCollection));
-            DragEventArgs dragOverEventArgs = new DragEventArgs(dataObject);
+            dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
+            MS.DragEventArgs dragOverEventArgs = new MS.DragEventArgs(dataObject);
 
             // Get the DragDropTarget element that is under the pointer, if any:
             TItemContainerType targetItemContainer;
@@ -292,7 +296,7 @@ namespace Windows.UI.Xaml.Controls
                 // Raise the DragLeave event of the element that was under the pointer before:
                 if (_previousdragDropTargetUnderPointer != null && _previousdragDropTargetUnderPointer.DragLeave != null)
                 {
-                    _previousdragDropTargetUnderPointer.DragLeave(_previousdragDropTargetUnderPointer, new DragEventArgs(dataObject));
+                    _previousdragDropTargetUnderPointer.DragLeave(_previousdragDropTargetUnderPointer, new MS.DragEventArgs(dataObject));
 
                     // Reset the value of "_isDragCancelled" when leaving a control. This variable lets the user prevent a Drop on an element when the user sets e.Handled=true in the "DragOver" event of that element.
                     _isDragCancelled = false;
@@ -302,7 +306,7 @@ namespace Windows.UI.Xaml.Controls
 
                 // Raise the DragEnter event of the new element that is under the pointer:
                 if (dragDropTargetUnderPointer != null && dragDropTargetUnderPointer.DragEnter != null)
-                    dragDropTargetUnderPointer.DragEnter(dragDropTargetUnderPointer, new DragEventArgs(dataObject));
+                    dragDropTargetUnderPointer.DragEnter(dragDropTargetUnderPointer, new MS.DragEventArgs(dataObject));
             }
 
             if (dragDropTargetUnderPointer != null)
@@ -372,11 +376,15 @@ namespace Windows.UI.Xaml.Controls
                 this.ReleasePointerCapture(_capturedPointer);
 #endif
                 // Handle the drop:
-                OnDropped();
+                OnDropped(e);
             }
         }
 
-        void OnDropped()
+#if MIGRATION
+        void OnDropped(MouseButtonEventArgs e)
+#else
+        void OnDropped(PointerRoutedEventArgs e)
+#endif
         {
 
             _popup.IsOpen = false;
@@ -419,10 +427,10 @@ namespace Windows.UI.Xaml.Controls
                         {
                             // Prepare the event args:
                             DataObject dataObject = new DataObject();
-                            dataObject.SetData(typeof(ItemDragEventArgs).ToString(), new ItemDragEventArgs(selectionCollection));
+                            dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
 
 #if !(BRIDGE && MIGRATION)
-                            dragDropTargetUnderPointer.ItemDroppedOnSource(dragDropTargetUnderPointer, new DragEventArgs(dataObject));
+                            dragDropTargetUnderPointer.ItemDroppedOnSource(dragDropTargetUnderPointer, new MS.DragEventArgs(dataObject, e));
 #endif
                         }
                     }
@@ -441,11 +449,11 @@ namespace Windows.UI.Xaml.Controls
                         {
                             // Prepare the event args:
                             DataObject dataObject = new DataObject();
-                            dataObject.SetData(typeof(ItemDragEventArgs).ToString(), new ItemDragEventArgs(selectionCollection));
+                            dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
 
                             // Raise the Drop event:
 #if !(BRIDGE && MIGRATION)
-                            dragDropTargetUnderPointer.Drop(dragDropTargetUnderPointer, new DragEventArgs(dataObject));
+                            dragDropTargetUnderPointer.Drop(dragDropTargetUnderPointer, new MS.DragEventArgs(dataObject, e));
 #endif
                         }
 
@@ -510,7 +518,7 @@ namespace Windows.UI.Xaml.Controls
         /// Raises the DragOver event.
         /// </summary>
         /// <param name="dragOverEventArgs">Information about the event.</param>
-        protected virtual void OnDragOver(DragEventArgs dragOverEventArgs)
+        protected virtual void OnDragOver(MS.DragEventArgs dragOverEventArgs)
         {
             if (this.DragOver != null)
             {
@@ -524,10 +532,10 @@ namespace Windows.UI.Xaml.Controls
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            if (!Interop.IsRunningInTheSimulator)
+            if (!CSHTML5.Interop.IsRunningInTheSimulator)
             {
                 // Prevent the selection of text while dragging from the DragDropTarget
-                Interop.ExecuteJavaScriptAsync("$0.onselectstart = function() { return false; }", this.INTERNAL_OuterDomElement);
+                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.onselectstart = function() { return false; }", this.INTERNAL_OuterDomElement);
             }
         }
 
@@ -625,7 +633,6 @@ namespace Windows.UI.Xaml.Controls
 
 
 #region Private helper methods
-
         /// <summary>
         /// This method returns null if no DragDropTarget is under the pointer, else it returns the DragDropTarget under it (the first Parent found)
         /// </summary>
@@ -636,30 +643,53 @@ namespace Windows.UI.Xaml.Controls
         static DragDropTarget<TItemsControlType, TItemContainerType> GetDragDropTargetUnderPointer(double x, double y, out TItemContainerType itemContainerUnderPointer)
         {
             UIElement element = VisualTreeHelper.FindElementInHostCoordinates(new Point(x, y));
-            UIElement childElement = null;
-            UIElement childOfChildElement = null;
+            List<object> ElementsBetweenClickedElementAndDragDropTarget = new List<object>(); //This list will contain all the elements we go through when going from the clicked element to the DragDropTarget (both included)
+            DragDropTarget<TItemsControlType, TItemContainerType> dragDropTargetUnder = null;
+            // 1) Walk up the visual tree from the clicked element until we find the DragDropTarget:
             while (element != null)
             {
+                ElementsBetweenClickedElementAndDragDropTarget.Add(element);
                 if (element is DragDropTarget<TItemsControlType, TItemContainerType>)
                 {
                     //------------------
                     // FOUND
                     //------------------
-                    DragDropTarget<TItemsControlType, TItemContainerType> dragDropTargetUnder = (DragDropTarget<TItemsControlType, TItemContainerType>)element;
-                    itemContainerUnderPointer = childOfChildElement as TItemContainerType;
-                    return dragDropTargetUnder;
+                    dragDropTargetUnder = (DragDropTarget<TItemsControlType, TItemContainerType>)element;
+                    break;
                 }
 
                 //Move up to the parent
-                childOfChildElement = childElement;
-                childElement = element;
                 element = (UIElement)element.INTERNAL_VisualParent;
             }
 
-            // Not found:
-            itemContainerUnderPointer = null;
-            return null;
+            if (dragDropTargetUnder != null)
+            {
+                //We found the DragDropTarget:
+                // 2) Find the item to move from the list of the children of the DragDropTarget
+                int indexOfLastElementInList = ElementsBetweenClickedElementAndDragDropTarget.Count - 1;
+                int amoutOfElementsBetweenItemsRootAndDragDropTarget = dragDropTargetUnder.INTERNAL_GetNumberOfElementsBetweenItemsRootAndDragDropTarget();
+                if(indexOfLastElementInList < amoutOfElementsBetweenItemsRootAndDragDropTarget) //Note: this can happen while dragging: the element under the pointer can be closer to the DragDropTarget than the root of the item we are dragging.
+                {
+                    itemContainerUnderPointer = null;
+                    return dragDropTargetUnder;
+                }
+                object elementToMove = ElementsBetweenClickedElementAndDragDropTarget.ElementAt(indexOfLastElementInList - amoutOfElementsBetweenItemsRootAndDragDropTarget);
+                itemContainerUnderPointer = (TItemContainerType)elementToMove;
+                return dragDropTargetUnder;
+            }
+            else
+            {
+                // Not found:
+                itemContainerUnderPointer = null;
+                return null;
+            }
         }
+
+        /// <summary>
+        /// Returns the amount of times we have to get the parent of the Root of an Item to reach the DragDropTarget.
+        /// </summary>
+        /// <returns>The amount of times we have to get the parent of the Root of an Item to have the DragDropTarget.</returns>
+        internal abstract int INTERNAL_GetNumberOfElementsBetweenItemsRootAndDragDropTarget();
 
         static StackPanel GeneratePopupContent(UIElement sourceItemContainer, out UIElement iconStop, out UIElement iconArrow)
         {

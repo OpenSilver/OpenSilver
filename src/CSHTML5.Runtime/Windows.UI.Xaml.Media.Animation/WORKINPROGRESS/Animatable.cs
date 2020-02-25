@@ -31,34 +31,9 @@ namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
 #if WORKINPROGRESS
-    #region Not Supported yet
-    public abstract class Animatable : Freezable, IAnimatable
+    public abstract partial class Animatable : Freezable, IAnimatable
     {
-        //public void ApplyAnimationClock(DependencyProperty dp, AnimationClock clock)
-        //{
-            
-        //}
 
-        //public void ApplyAnimationClock(DependencyProperty dp, AnimationClock clock, HandoffBehavior handoffBehavior)
-        //{
-            
-        //}
-
-        //public void BeginAnimation(DependencyProperty dp, AnimationTimeline animation)
-        //{
-            
-        //}
-
-        //public void BeginAnimation(DependencyProperty dp, AnimationTimeline animation, HandoffBehavior handoffBehavior)
-        //{
-            
-        //}
-
-        //public object GetAnimationBaseValue(DependencyProperty dp)
-        //{
-        //    return null;
-        //}
     }
-    #endregion
 #endif
 }

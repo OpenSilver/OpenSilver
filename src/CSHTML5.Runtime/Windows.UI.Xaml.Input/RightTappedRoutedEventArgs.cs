@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Input
     /// <summary>
     /// Provides event data for the RightTapped event.
     /// </summary>
-    public sealed class RightTappedRoutedEventArgs  // Note: normally it does not inherit from "PointerRoutedEventArgs", but this lets us reuse code.
+    public sealed partial class RightTappedRoutedEventArgs  // Note: normally it does not inherit from "PointerRoutedEventArgs", but this lets us reuse code.
 #if MIGRATION
         : MouseEventArgs
 #else

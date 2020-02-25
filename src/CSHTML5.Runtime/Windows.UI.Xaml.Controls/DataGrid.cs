@@ -65,7 +65,7 @@ namespace Windows.UI.Xaml.Controls
     /// </code>
     /// <code lang="C#">
     /// DataGrid1.ItemsSource = Planet.GetListOfPlanets();
-    /// public class Planet
+    /// public partial class Planet
     /// {
     ///    public string Name { get; set; }
     ///    public string ImagePath { get; set; }
@@ -88,7 +88,7 @@ namespace Windows.UI.Xaml.Controls
     ///} 
     /// </code>
     /// </example>
-    public class DataGrid : MultiSelector
+    public partial class DataGrid : MultiSelector
     {
         Dictionary<object, DataGridRow> _objectsToDisplay = new Dictionary<object, DataGridRow>();
         Grid _grid;

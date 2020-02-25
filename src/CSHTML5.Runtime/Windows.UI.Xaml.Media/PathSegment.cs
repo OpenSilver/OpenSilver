@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents a segment of a PathFigure object.
     /// </summary>
-    public class PathSegment : DependencyObject
+    public partial class PathSegment : DependencyObject
     {
         internal Path INTERNAL_parentPath = null;
         internal void SetParentPath(Path path)

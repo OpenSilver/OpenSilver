@@ -11,7 +11,7 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-    internal class INTERNAL_ResolvedKeyFramesEntries<T> : IEnumerable<int> where T : IKeyFrame
+    internal partial class INTERNAL_ResolvedKeyFramesEntries<T> : IEnumerable<int> where T : IKeyFrame
     {
         private List<int> _resolvedKeyFramesIndexes;
 

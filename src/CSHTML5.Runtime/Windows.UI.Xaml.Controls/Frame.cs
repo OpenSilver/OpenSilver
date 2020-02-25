@@ -25,6 +25,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSHTML5.Internal;
+#if !CSHTML5NETSTANDARD
+using DotNetBrowser;
+#endif
 
 #if MIGRATION
 using System.Windows.Navigation;
@@ -45,7 +48,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a control that supports navigation to and from pages.
     /// </summary>
-    public class Frame : ContentControl, INavigate
+    public partial class Frame : ContentControl, INavigate
     {
         bool _isBrowserJournal = true; //we use this so we don't have to determine all the time which journal we want to use.
         bool _isSourceChanging = false;
@@ -298,7 +301,7 @@ namespace Windows.UI.Xaml.Controls
 
 
 
-        #region own ournal specific methods
+#region own ournal specific methods
 
         internal bool Navigate_OwnJournalVersion(Uri source)
         {
@@ -337,9 +340,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion
+#endregion
 
-        #region browser journal specific methods
+#region browser journal specific methods
 
 
         //--------------------------------------------------
@@ -523,7 +526,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion
+#endregion
 
         private object GetPageFromUri(Uri source)
         {
@@ -609,7 +612,21 @@ namespace Windows.UI.Xaml.Controls
 
         static bool IsNullOrUndefined(object jsObject)
         {
-            return Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
+            if (CSHTML5.Interop.IsRunningInTheSimulator)
+            {
+                if (jsObject == null)
+                    return true;
+#if CSHTML5NETSTANDARD
+                return false;
+#else
+                if (!(jsObject is JSValue))
+                    return false;
+                JSValue value = ((JSValue)jsObject);
+                return value.IsNull() || value.IsUndefined();
+#endif
+            }
+            else
+                return Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
         }
 
         static void GetXamlFileAssociatedClassInstancierName(Uri uri, out string assemblyName, out string instancierName)
@@ -829,7 +846,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
 
-        #region not implemented yet:
+#region not implemented yet:
 
         //// Returns:
         ////     The number of pages that can be cached for the frame. The default value is
@@ -923,12 +940,12 @@ namespace Windows.UI.Xaml.Controls
         ///// </summary>
         //public void StopLoading();
 
-        #endregion
+#endregion
 
         //todo: see if there isn't a more efficient way to do this.
-        internal class FrameCache //Note: this class serves as an intermediate to manage the cache, but we could easily have done the same directly in the Frame class.
+        internal partial class FrameCache //Note: this class serves as an intermediate to manage the cache, but we could easily have done the same directly in the Frame class.
         {
-            #region two-way chained list type cache
+#region two-way chained list type cache
             //internal int _cacheSize = 10;
             int _currentAmount = 0;
 
@@ -990,7 +1007,7 @@ namespace Windows.UI.Xaml.Controls
                 _currentItem = nextFrameCacheItem;
             }
 
-            #region Add when I thought CacheSize defined the maximum amount of elements in the chained list.
+#region Add when I thought CacheSize defined the maximum amount of elements in the chained list.
             //note: I kept it because the algorithm might be useful when we will have figured out what CacheSize means.
 
             ///// <summary>
@@ -1034,7 +1051,7 @@ namespace Windows.UI.Xaml.Controls
             //    }
             //    _currentItem = nextFrameCacheItem;
             //}
-            #endregion
+#endregion
 
             internal FrameCacheItem GoBack()
             {
@@ -1067,10 +1084,10 @@ namespace Windows.UI.Xaml.Controls
                 firstItem.RemoveNext();
                 firstItem = null;
             }
-            #endregion
+#endregion
 
 
-            #region list type cache
+#region list type cache
             //List<object> _cache = new List<object>();
             //int currentIndex = 0;
 
@@ -1132,10 +1149,10 @@ namespace Windows.UI.Xaml.Controls
             //        throw new InvalidOperationException("There are no entries in the forward navigation history.");
             //    }
             //}
-            #endregion
+#endregion
         }
 
-        internal class FrameCacheItem
+        internal partial class FrameCacheItem
         {
             internal FrameCacheItem _previous = null;
             internal FrameCacheItem _next = null;
@@ -1163,7 +1180,7 @@ namespace Windows.UI.Xaml.Controls
                     next.RemoveNext(); //we remove all the next elements recursively.
                 }
             }
-            #region RemoveNext when I thought CacheSize defined the maximum amount of elements in the chained list.
+#region RemoveNext when I thought CacheSize defined the maximum amount of elements in the chained list.
             //internal int RemoveNext()
             //{
             //    if (_next != null)
@@ -1177,7 +1194,7 @@ namespace Windows.UI.Xaml.Controls
             //    }
             //    return 0;
             //}
-            #endregion
+#endregion
         }
     }
 }

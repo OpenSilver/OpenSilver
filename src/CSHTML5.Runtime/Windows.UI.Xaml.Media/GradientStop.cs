@@ -34,7 +34,7 @@ namespace Windows.UI.Xaml.Media
     /// Describes the location and color of a transition point in a gradient.
     /// </summary>
     [ContentProperty("Color")]
-    public sealed class GradientStop : DependencyObject, ICloneOnAnimation
+    public sealed partial class GradientStop : DependencyObject, ICloneOnAnimation
     {
         internal Brush INTERNAL_ParentBrush;
 

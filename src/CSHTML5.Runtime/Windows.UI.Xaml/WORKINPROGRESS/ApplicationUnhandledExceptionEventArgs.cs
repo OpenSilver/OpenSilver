@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml
 #endif 
 { 
 #if WORKINPROGRESS
-    public class ApplicationUnhandledExceptionEventArgs : EventArgs 
+    public partial class ApplicationUnhandledExceptionEventArgs : EventArgs 
     { 
         public Exception ExceptionObject { get; set; } 
         

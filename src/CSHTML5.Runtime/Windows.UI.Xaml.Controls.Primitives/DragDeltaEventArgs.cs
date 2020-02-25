@@ -27,7 +27,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// Provides data for the DragDelta event that occurs one or more times when
     /// a user drags a Thumb control with the mouse.
     /// </summary>
-    public class DragDeltaEventArgs : RoutedEventArgs
+    public partial class DragDeltaEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the DragDeltaEventArgs class.

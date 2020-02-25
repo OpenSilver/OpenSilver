@@ -26,13 +26,15 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
+#if !CSHTML5NETSTANDARD
+// already defined in .NET Standard
 namespace System.Xml.Linq
 {
     /// <summary>
     /// Represents the abstract concept of a node (element, comment, document type,
     /// processing instruction, or text node) in the XML tree.
     /// </summary>
-    public abstract class XNode : XObject
+    public abstract partial class XNode : XObject
     {
         internal object INTERNAL_jsnode;
 
@@ -132,7 +134,7 @@ namespace System.Xml.Linq
             }
         }
 
-        #region From XObject
+#region From XObject
         /// <summary>
         /// Gets the System.Xml.Linq.XDocument for this System.Xml.Linq.XObject.
         /// </summary>
@@ -150,9 +152,9 @@ namespace System.Xml.Linq
         }
 
         internal virtual void CascadeDocumentToChildren() { }
-        #endregion
+#endregion
 
-        #region not implemented
+#region not implemented
         ///// <summary>
         ///// Gets a comparer that can compare the relative position of two nodes.
         ///// </summary>
@@ -411,7 +413,7 @@ namespace System.Xml.Linq
         ///// <param name="writer">An System.Xml.XmlWriter into which this method will write.</param>
         //public abstract void WriteTo(XmlWriter writer);
 
-        #endregion
+#endregion
 
         internal virtual XNode Clone()
         {
@@ -424,3 +426,4 @@ namespace System.Xml.Linq
         }
     }
 }
+#endif

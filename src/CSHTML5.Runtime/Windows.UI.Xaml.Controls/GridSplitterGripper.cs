@@ -45,7 +45,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal class GridSplitterGripper : ContentControl
+    internal partial class GridSplitterGripper : ContentControl
     {
         // Symbol GripperBarVertical in Segoe MDL2 Assets
 #if CSHTML5_NOT_SUPPORTED

@@ -63,7 +63,7 @@ namespace System.Net
     /// <code lang="C#">
     /// // Workaround for the fact that "ArrayOf" types cannot directly be deserialized by the XmlSerializer in this Beta version:
     /// [DataContract]
-    /// public class ToDoItemsWrapper
+    /// public partial class ToDoItemsWrapper
     /// {
     ///     public List&lt;ToDoItem&gt; ToDoItems { get; set; }
     /// }
@@ -80,7 +80,7 @@ namespace System.Net
     /// string response = await webClient.UploadStringTaskAsync("http://cshtml5-rest-sample.azurewebsites.net/api/Todo/", "POST", data);
     /// </code>
     /// </example>
-    public class WebClient // : Component
+    public partial class WebClient // : Component
     {
         //todo: handle the DownloadStringCompletedEventArgs properly when in javascript (otherwise, this whole thing is pretty much useless : people want to know when an error has occured while downloading the resource or when the downloading has been cancelled)
 

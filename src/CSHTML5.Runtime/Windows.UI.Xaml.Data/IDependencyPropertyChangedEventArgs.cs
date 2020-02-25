@@ -28,7 +28,7 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
-    internal interface IDependencyPropertyChangedEventArgs
+    internal partial interface IDependencyPropertyChangedEventArgs
     {
         DependencyProperty Property {get; }
         object OldValue { get; }

@@ -41,7 +41,7 @@ namespace Windows.UI.Xaml.Shapes
     /// are declared through the Data property, and can be specified either with
     /// a path-specific mini-language, or with an object model.
     /// </summary>
-    public class Path : Shape
+    public partial class Path : Shape
     {
         //internal dynamic canvasDomElement;
 
@@ -98,7 +98,10 @@ namespace Windows.UI.Xaml.Shapes
             Path path = (Path)d;
             if (e.NewValue != e.OldValue && path._isLoaded)
             {
-                oldgeometry.SetParentPath(null);
+                if (oldgeometry != null)
+                {
+                    oldgeometry.SetParentPath(null);
+                }
                 newgeometry.SetParentPath(path);
                 path.ScheduleRedraw();
             }

@@ -55,7 +55,7 @@ namespace Windows.UI.Xaml.Controls
     /// </code>
     /// <code lang="C#">
     /// ListBox1.ItemsSource = Planet.GetListOfPlanets();
-    /// public class Planet
+    /// public partial class Planet
     /// {
     ///    public string Name { get; set; }
     ///    public string ImagePath { get; set; }
@@ -79,7 +79,7 @@ namespace Windows.UI.Xaml.Controls
     ///} 
     /// </code>
     /// </example>
-    public class ListBox : MultiSelector //normally it should be Selector but since MultiSelector already adds SelectedItems, we inherit from MultiSelector.
+    public partial class ListBox : MultiSelector //normally it should be Selector but since MultiSelector already adds SelectedItems, we inherit from MultiSelector.
     {
         //local variable used in SelectionMode.Extended 
         int _indexOfLastClickedItemWithoutShiftKey = 0;
@@ -99,6 +99,15 @@ namespace Windows.UI.Xaml.Controls
 
             listBoxItem.Click += listBoxItem_Click;
 
+            return listBoxItem;
+        }
+
+        protected override DependencyObject GetContainerFromItem(object item)
+        {
+            ListBoxItem listBoxItem = item as ListBoxItem ?? new ListBoxItem();
+            listBoxItem.INTERNAL_CorrespondingItem = item;
+            listBoxItem.INTERNAL_ParentSelectorControl = this;
+            listBoxItem.Click += listBoxItem_Click;
             return listBoxItem;
         }
 
@@ -357,5 +366,12 @@ namespace Windows.UI.Xaml.Controls
             get { return UnselectedItemForeground; }
             set { UnselectedItemForeground = value; }
         }
+
+#if WORKINPROGRESS
+        public void ScrollIntoView(object item)
+        {
+
+        }
+#endif
     }
 }

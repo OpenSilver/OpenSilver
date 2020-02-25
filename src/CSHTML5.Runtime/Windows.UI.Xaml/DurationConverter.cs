@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Converts instances of System.Windows.Duration to and from other type representations.
     /// </summary>
-    public class DurationConverter : TypeConverter
+    public partial class DurationConverter : TypeConverter
     {
         /// <summary>
         /// Determines if conversion from a given type to an instance of System.Windows.Duration

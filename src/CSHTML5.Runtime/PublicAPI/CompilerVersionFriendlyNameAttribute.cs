@@ -19,7 +19,7 @@
 
 using System;
 
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
 namespace CSHTML5.Internal.Attributes
 {
 #endif
@@ -46,6 +46,6 @@ public sealed class CompilerVersionFriendlyNameAttribute : Attribute
     public string VersionFriendlyName { get; private set; }
 }
 
-#if BRIDGE
+#if BRIDGE || CSHTML5BLAZOR
 }
 #endif

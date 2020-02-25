@@ -34,7 +34,7 @@ namespace Windows.UI.Xaml.Media
     /// Rotates an object clockwise about a specified point in a two-dimensional
     /// x-y coordinate system.
     /// </summary>
-    public sealed class RotateTransform : Transform
+    public sealed partial class RotateTransform : Transform
     {
         double _appliedCssAngle;
         object _domElementToWhichTheCssWasApplied;
@@ -154,8 +154,6 @@ namespace Windows.UI.Xaml.Media
             throw new NotImplementedException("Please contact support@cshtml5.com");
         }
 #if WORKINPROGRESS
-#region Not supported yet
-
         /// <summary>
         ///     CenterX - double.  Default value is 0.0.
         /// </summary>
@@ -190,8 +188,21 @@ namespace Windows.UI.Xaml.Media
 
         public static readonly DependencyProperty CenterYProperty = DependencyProperty.Register("CenterY", typeof(double), typeof(RotateTransform), new PropertyMetadata(null));
 
+        public override GeneralTransform Inverse
+        {
+            get { return null; }
+        }
 
-#endregion
+        public override Rect TransformBounds(Rect rect)
+        {
+            return Rect.Empty;
+        }
+
+        public override bool TryTransform(Point inPoint, out Point outPoint)
+        {
+            outPoint = new Point();
+            return false;
+        }
 #endif
     }
 }

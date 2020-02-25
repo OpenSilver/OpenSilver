@@ -45,7 +45,7 @@ namespace Windows.UI.Xaml.Controls
     /// Represents a System.Windows.Controls.DataGrid column that hosts System.Uri
     /// elements in its cells.
     /// </summary>
-    public class DataGridHyperlinkColumn : DataGridBoundColumn
+    public partial class DataGridHyperlinkColumn : DataGridBoundColumn
     {
         /// <summary>
         /// Gets or sets the binding to the text of the hyperlink.

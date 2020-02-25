@@ -20,6 +20,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,7 +46,7 @@ namespace Windows.UI.Xaml.Data
         Descending
     }
 
-    internal class INTERNAL_Operations
+    internal partial class INTERNAL_Operations
     {
         public INTERNAL_Operations(PagedCollectionView collectionViewer)
         {
@@ -115,7 +116,7 @@ namespace Windows.UI.Xaml.Data
         }
     }
 
-    internal class FilterDescription
+    internal partial class FilterDescription
     {
         // Note: the user has two options for filtering: either by passing a predicate,
         // or by registering an event and setting e.Accepted to true or false in the
@@ -133,9 +134,22 @@ namespace Windows.UI.Xaml.Data
     /// <summary>
     /// Description of grouping based on a property value.
     /// </summary>
-    public class PropertyGroupDescription
+#if WORKINPROGRESS
+    public partial class PropertyGroupDescription : GroupDescription
+#else
+    public partial class PropertyGroupDescription
+#endif
     {
+#if WORKINPROGRESS
+        public string PropertyName { get; set; }
+#else
         public string PropertyName { get; private set; }
+#endif
+
+        public PropertyGroupDescription()
+        {
+
+        }
 
         public PropertyGroupDescription(string propertyName)
         {
@@ -146,7 +160,7 @@ namespace Windows.UI.Xaml.Data
     /// <summary>
     /// Defines a property and direction to sort a list by.
     /// </summary>
-    public class PropertySortDescription
+    public partial class PropertySortDescription
     {
         public string PropertyName { get; private set; }
         public ListSortDirection Direction { get; internal set; }

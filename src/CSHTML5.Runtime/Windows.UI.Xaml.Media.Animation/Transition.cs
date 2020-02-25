@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// using the Transitions property, or applied to the children of a Panel using
     /// the ChildrenTransitions property.
     /// </summary>
-    public class Transition : DependencyObject
+    public partial class Transition : DependencyObject
     {
     }
 }

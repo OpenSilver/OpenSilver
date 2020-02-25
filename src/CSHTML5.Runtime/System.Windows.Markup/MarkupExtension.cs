@@ -30,7 +30,7 @@ namespace System.Windows.Markup
     /// be supported by .NET Framework XAML Services and other XAML readers and XAML
     /// writers.
     /// </summary> 
-    public abstract class MarkupExtension
+    public abstract partial class MarkupExtension
     {
         //// <summary>
         //// Initializes a new instance of a class derived from System.Windows.Markup.MarkupExtension.

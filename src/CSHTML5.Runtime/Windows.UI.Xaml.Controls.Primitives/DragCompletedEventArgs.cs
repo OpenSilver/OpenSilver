@@ -27,7 +27,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// Provides data for the DragCompleted event that occurs when a user completes
     /// a drag operation with the mouse of a Thumb control.
     /// </summary>
-    public class DragCompletedEventArgs : RoutedEventArgs
+    public partial class DragCompletedEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the DragCompletedEventArgs class.

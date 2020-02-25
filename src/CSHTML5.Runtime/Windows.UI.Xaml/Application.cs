@@ -53,7 +53,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Encapsulates the app and its available services.
     /// </summary>
-    public class Application
+    public partial class Application
     {
         static Dictionary<string, string> _resourcesCache = null;
         INTERNAL_XamlResourcesHandler _xamlResourcesHandler = new INTERNAL_XamlResourcesHandler();
@@ -70,12 +70,16 @@ namespace Windows.UI.Xaml
 
         public Application()
         {
+#if CSHTML5BLAZOR
+            // we change the resource manager for every resource registered
+            ClientSideResourceRegister.Startup();
+#endif
             // Keep a reference to the startup assembly:
             StartupAssemblyInfo.StartupAssembly = this.GetType().Assembly;
 
             // Remember whether we are in "SL Migration" mode or not:
 #if MIGRATION
-            Interop.ExecuteJavaScript(@"document.isSLMigration = true");
+            CSHTML5.Interop.ExecuteJavaScript(@"document.isSLMigration = true");
 #else
             Interop.ExecuteJavaScript(@"document.isSLMigration = false");
 #endif
@@ -84,14 +88,14 @@ namespace Windows.UI.Xaml
 
 
             // Inject the "DataContractSerializer" into the "XmlSerializer" (read note in the "XmlSerializer" implementation to understand why):
-            if (!Interop.IsRunningInTheSimulator) //Note: in case of the Simulator, we reference the .NET Framework version of "System.xml.dll", so we cannot inject stuff because the required members of XmlSerializer would be missing.
+            if (!CSHTML5.Interop.IsRunningInTheSimulator) //Note: in case of the Simulator, we reference the .NET Framework version of "System.xml.dll", so we cannot inject stuff because the required members of XmlSerializer would be missing.
             {
                 InjectDataContractSerializerIntoXmlSerializer();
             }
 
 #if !CSHTML5NETSTANDARD
             // Fix the freezing of the Simulator when calling 'alert' using the "Interop.ExecuteJavaScript()" method by redirecting the JavaScript "alert" to the Simulator message box:
-            if (Interop.IsRunningInTheSimulator)
+            if (CSHTML5.Interop.IsRunningInTheSimulator)
             {
                 RedirectAlertToMessageBox_SimulatorOnly();
             }
@@ -143,7 +147,7 @@ namespace Windows.UI.Xaml
             }));
         }
 
-        #region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
+#region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
 
 #if !CSHTML5NETSTANDARD
         DispatcherTimer _timerForWorkaroundFireFoxIssue = new DispatcherTimer();
@@ -181,7 +185,7 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Injects the "DataContractSerializer" into the "XmlSerializer" (read note in the "XmlSerializer" implementation to understand why).
@@ -204,7 +208,7 @@ namespace Windows.UI.Xaml
         static void RedirectAlertToMessageBox_SimulatorOnly()
         {
             // Fix the freezing of the Simulator when calling 'alert' using the "Interop.ExecuteJavaScript()" method by redirecting the JavaScript "alert" to the Simulator message box:
-            Interop.ExecuteJavaScript(@"window.alert =  function(msg){ $0(msg); }", (Action<object>)((msg) => { MessageBox.Show(msg.ToString()); }));
+            CSHTML5.Interop.ExecuteJavaScript(@"window.alert =  function(msg){ $0(msg); }", (Action<object>)((msg) => { MessageBox.Show(msg.ToString()); }));
         }
 #endif
 
@@ -252,13 +256,38 @@ namespace Windows.UI.Xaml
         {
             get
             {
+#if WORKINPROGRESS
+                return Window.Current.Content;
+#else
                 return (Window.Current.Content as UIElement);
+#endif
             }
             set
             {
+#if WORKINPROGRESS
+                Window.Current.Content = value as FrameworkElement;
+#else
                 Window.Current.Content = value;
+#endif
             }
         }
+
+#if WORKINPROGRESS
+        //
+        // Summary:
+        //     Gets a collection of the System.Windows.Window instances that have been created.
+        //
+        // Returns:
+        //     A collection of the windows used by the application.
+        //
+        // Exceptions:
+        //   T:System.NotSupportedException:
+        //     The application is not running outside the browser.
+        //
+        //   T:System.UnauthorizedAccessException:
+        //     The current thread is not the user interface (UI) thread.
+        public WindowCollection Windows { get; }
+#endif
 
         /// <summary>
         /// Occurs just before an application shuts down and cannot be canceled.
@@ -331,31 +360,31 @@ namespace Windows.UI.Xaml
             uris.Add(uriAsString + ".g.js");
             if (uriResource.OriginalString.ToLower() == "ms-appx://app.config")
             {
-                Interop.LoadJavaScriptFilesAsync(
+                CSHTML5.Interop.LoadJavaScriptFilesAsync(
                     uris,
                     (Action)(() =>
                     {
-                        tcs.SetResult(Convert.ToString(Interop.ExecuteJavaScript("window.AppConfig")));
+                        tcs.SetResult(Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("window.AppConfig")));
                     })
                     );
             }
             else if (uriResource.OriginalString.ToLower() == "ms-appx://servicereferences.clientconfig")
             {
-                Interop.LoadJavaScriptFilesAsync(
+                CSHTML5.Interop.LoadJavaScriptFilesAsync(
                     uris,
                     (Action)(() =>
                     {
-                        tcs.SetResult(Convert.ToString(Interop.ExecuteJavaScript("window.ServiceReferencesClientConfig")));
+                        tcs.SetResult(Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("window.ServiceReferencesClientConfig")));
                     })
                     );
             }
             else
             {
-                Interop.LoadJavaScriptFilesAsync(
+                CSHTML5.Interop.LoadJavaScriptFilesAsync(
                     uris,
                     (Action)(() =>
                     {
-                        string result = Convert.ToString(Interop.ExecuteJavaScript("window.FileContent"));
+                        string result = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("window.FileContent"));
                         _resourcesCache.Add(uriResource.OriginalString.ToLower(), result);
                         tcs.SetResult(result);
                     })
@@ -444,7 +473,7 @@ namespace Windows.UI.Xaml
         }
 
 
-        #region Exit event
+#region Exit event
 
         INTERNAL_EventManager<EventHandler, EventArgs> _ExitEventManager;
         INTERNAL_EventManager<EventHandler, EventArgs> ExitEventManager
@@ -496,10 +525,10 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
 #if WORKINPROGRESS
-        #region UnhandledException event (Not supported yet)
+#region UnhandledException event (Not supported yet)
 
         /// <summary>
         /// Occurs when an exception that is raised is not handled.
@@ -515,7 +544,7 @@ namespace Windows.UI.Xaml
         //#endif
         //        }
 
-        #endregion
+#endregion
 #endif
 
         static Host _host;
@@ -547,6 +576,15 @@ namespace Windows.UI.Xaml
                 entryPoint
                 );
         }
+#endif
+
+#if WORKINPROGRESS
+        public bool IsRunningOutOfBrowser
+        {
+            get { return false; }
+        }
+
+        public bool HasElevatedPermissions { get; set; }
 #endif
     }
 }

@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml
 #endif
 {
 #if WORKINPROGRESS
-    public abstract class TriggerAction : DependencyObject
+    public abstract partial class TriggerAction : DependencyObject
     {
     }
 #endif

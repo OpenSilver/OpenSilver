@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents an object that contains audio, video, or both.
     /// </summary>
-    public sealed class MediaElement : FrameworkElement
+    public sealed partial class MediaElement : FrameworkElement
     {
         const string HTML_SHOWCONTROLS_PROPERTY_NAME = "controls";
         const string HTML_AUTOPLAY_PROPERTY_NAME = "autoplay";
@@ -224,7 +224,7 @@ namespace Windows.UI.Xaml.Controls
             {
 #if ! BRIDGE
                 // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
-                string callerAssemblyName = Interop.IsRunningInTheSimulator ? Assembly.GetCallingAssembly().GetName().Name : INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
+                string callerAssemblyName = CSHTML5.Interop.IsRunningInTheSimulator ? Assembly.GetCallingAssembly().GetName().Name : INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #else
                 
                 // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
@@ -289,11 +289,17 @@ namespace Windows.UI.Xaml.Controls
                         {
                             object element = null;
                             object outerDiv = control.INTERNAL_OuterDomElement;
-                            INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle(tagString, outerDiv, control, out element);
+                            var elementStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle(tagString, outerDiv, control, out element);
 
                             control._mediaElement_ForAudioOnly_ForSimulatorOnly = null;
 
                             control._mediaElement = element;
+
+                            if (tagString == "video")
+                            {
+                                elementStyle.width = "100%";
+                                elementStyle.height = "100%";
+                            }
 
                             control.Refresh(); //we refresh all the values of the element in the visual tree
                         }
@@ -913,5 +919,10 @@ namespace Windows.UI.Xaml.Controls
         //public void RemoveAllEffects();
 
         #endregion
+
+#if WORKINPROGRESS
+        public event RoutedEventHandler MediaOpened;
+        public event EventHandler<ExceptionRoutedEventArgs> MediaFailed;
+#endif
     }
 }

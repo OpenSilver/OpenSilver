@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// Represents a collection of Timeline objects.
     /// </summary>
-    public sealed class TimelineCollection : List<Timeline>// : IList<Timeline>, IEnumerable<Timeline>
+    public sealed partial class TimelineCollection : List<Timeline>// : IList<Timeline>, IEnumerable<Timeline>
     {
         //todo: if we change the implementation of this class, see this class in WinRT.
     }

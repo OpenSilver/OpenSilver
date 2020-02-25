@@ -24,7 +24,7 @@ using System.ServiceModel.Channels;
 
 namespace System.ServiceModel
 {
-    public class ChannelFactory<T> : IDisposable
+    public partial class ChannelFactory<T> : IDisposable
     {
         public Binding Binding { get; set; }
         public EndpointAddress EndpointAddress { get; set; }

@@ -16,7 +16,7 @@ namespace System.ComponentModel
     ///       is read-only or read/write.</para>
     /// </devdoc>
     [AttributeUsage(AttributeTargets.All)]
-    public sealed class ReadOnlyAttribute : Attribute
+    public sealed partial class ReadOnlyAttribute : Attribute
     {
         private bool isReadOnly = false;
 

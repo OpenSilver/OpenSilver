@@ -24,6 +24,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 #if MIGRATION
+using System.Windows.Threading;
 using System.Windows.Data;
 #else
 using Windows.UI.Core;
@@ -41,23 +42,8 @@ namespace Windows.UI.Xaml
     /// is the immediate base class of many important UI-related classes, such as
     /// UIElement, Geometry, FrameworkTemplate, Style, and ResourceDictionary.
     /// </summary>
-    public class DependencyObject
+    public partial class DependencyObject
     {
-#if REVAMPPOINTEREVENTS
-        internal bool INTERNAL_ArePointerEventsEnabled
-        {
-            get
-            {
-                return INTERNAL_ManagePointerEventsAvailability();
-            }
-        }
-
-        internal virtual bool INTERNAL_ManagePointerEventsAvailability()
-        {
-            return false;
-        }
-#endif
-
         private Dictionary<DependencyProperty, BindingExpression> _bindingExpressions;
 
         /// <summary>
@@ -429,5 +415,25 @@ namespace Windows.UI.Xaml
         }
 
         #endregion
+
+#if WORKINPROGRESS
+        //
+        // Summary:
+        //     Clears the local value of a dependency property.
+        //
+        // Parameters:
+        //   dp:
+        //     The System.Windows.DependencyProperty identifier of the property to clear the
+        //     value for.
+        public void ClearValue(DependencyProperty dp)
+        {
+
+        }
+
+        public bool CheckAccess()
+        {
+            return false;
+        }
+#endif
     }
 }

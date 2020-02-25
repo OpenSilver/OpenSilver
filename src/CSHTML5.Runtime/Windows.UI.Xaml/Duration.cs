@@ -39,7 +39,7 @@ namespace Windows.UI.Xaml
     /// Represents the duration of time that a Windows.UI.Xaml.Media.Animation.Timeline
     /// is active.
     /// </summary>
-    public struct Duration
+    public partial struct Duration
     {
         private DurationType _durationType;
         // Exceptions:

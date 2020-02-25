@@ -30,7 +30,7 @@ namespace System.Runtime.Serialization
     /// Stores data from a versioned data contract that has been extended by adding
     /// new members.
     /// </summary>
-    public class ExtensionDataObject
+    public partial class ExtensionDataObject
     {
         //IList<ExtensionDataMember> members;
 

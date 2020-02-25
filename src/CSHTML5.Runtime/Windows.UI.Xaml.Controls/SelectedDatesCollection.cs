@@ -42,7 +42,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public sealed class SelectedDatesCollection : ObservableCollection<DateTime>
+    public sealed partial class SelectedDatesCollection : ObservableCollection<DateTime>
     {
         private Collection<object> _addedItems;
         private Collection<object> _removedItems;
@@ -60,7 +60,11 @@ namespace Windows.UI.Xaml.Controls
             this._removedItems = new Collection<object>();
         }
 
+#if WORKINPROGRESS
+        private void RaiseSelectionChanged(IList removedItems, IList addedItems)
+#else
         private void RaiseSelectionChanged(IList<object> removedItems, IList<object> addedItems)
+#endif
         {
             this._owner.OnSelectedDatesCollectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
         }

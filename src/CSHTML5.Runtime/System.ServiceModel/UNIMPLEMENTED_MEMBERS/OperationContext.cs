@@ -23,7 +23,7 @@
 
 namespace System.ServiceModel
 {
-    public class OperationContext
+    public partial class OperationContext
     {
         IContextChannel _channel;
 

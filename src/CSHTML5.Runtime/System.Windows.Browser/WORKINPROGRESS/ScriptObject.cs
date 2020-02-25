@@ -28,12 +28,11 @@ using System.Linq.Expressions;
 namespace System.Windows.Browser
 {
 #if WORKINPROGRESS
-    public class ScriptObject : IDynamicMetaObjectProvider
+    public partial class ScriptObject : IDynamicMetaObjectProvider
     {
-    #region Not supported yet
         DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression parameter)
         {
-            return default(DynamicMetaObject);
+            return null;
         }
 
         //
@@ -67,7 +66,27 @@ namespace System.Windows.Browser
         {
             return null;
         }
-    #endregion
+        public object GetProperty(int @index)
+        {
+            return null;
+        }
+        public void SetProperty(int @index, object @value)
+        {
+
+        }
+        public virtual object GetProperty(string @name)
+        {
+            return null;
+        }
+        public virtual void SetProperty(string @name, object @value)
+        {
+
+        }
+
+        public virtual object InvokeSelf(params object[] args)
+        {
+            return null;
+        }
     }
 #endif
 }

@@ -41,9 +41,9 @@ using Windows.UI.Xaml;
 namespace System.Windows.Browser
 {
 #if WORKINPROGRESS
-    public sealed class HtmlWindow : HtmlObject
+    public sealed partial class HtmlWindow : HtmlObject
 #else
-    public sealed class HtmlWindow
+    public sealed partial class HtmlWindow
 #endif
     {
         public HtmlWindow()
@@ -64,7 +64,7 @@ namespace System.Windows.Browser
                 {
 #if !CSHTML5NETSTANDARD
                     // The Simulator cannot open a URL in another window/tab:
-                    if (target == "_blank" && Interop.IsRunningInTheSimulator)
+                    if (target == "_blank" && CSHTML5.Interop.IsRunningInTheSimulator)
                     {
                         INTERNAL_Simulator.SimulatorProxy.NavigateToUrlInNewBrowserWindow(navigateToUri.ToString());
                     }
@@ -99,11 +99,11 @@ namespace System.Windows.Browser
 #if !BRIDGE
         [JSReplacement("eval($code)")]
 #else
-        [Template("eval({code})")]
+        [Bridge.Script("eval(code)")]
 #endif
         public object Eval(string code)
         {
-            return Interop.ExecuteJavaScript(string.Format("eval(\"{0}\")", code)); //Note: this probably doesn't work on multiline code 
+            return CSHTML5.Interop.ExecuteJavaScript(string.Format("eval(\"{0}\")", code)); //Note: this probably doesn't work on multiline code 
         }
     }
 }

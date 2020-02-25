@@ -18,6 +18,9 @@
 
 
 using System;
+#if WORKINPROGRESS && MIGRATION
+using System.Windows.Interop;
+#endif
 
 #if MIGRATION
 namespace System.Windows // Note: we didn't use the "Interop" namespace to avoid conflicts with CSHTML5.Interop
@@ -25,7 +28,7 @@ namespace System.Windows // Note: we didn't use the "Interop" namespace to avoid
 namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoid conflicts with CSHTML5.Interop
 #endif
 {
-    public class Host
+    public partial class Host
     {
         Content _content;
 
@@ -58,7 +61,6 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         }
 
 #if WORKINPROGRESS
-        #region Not supported yet
         
         //// Summary:
         ////     Gets the background color value that was applied to the Silverlight plug-in
@@ -126,8 +128,6 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         //// Returns:
         ////     true if the version can be supported by the installation; otherwise, false.
         //public bool IsVersionSupported(string versionStr);
-     
-        #endregion
 #endif
     }
 }

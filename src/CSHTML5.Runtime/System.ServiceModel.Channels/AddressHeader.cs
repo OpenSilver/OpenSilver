@@ -17,7 +17,7 @@
 
 
 
-#if WCF_STACK || BRIDGE
+#if WCF_STACK || BRIDGE || CSHTML5BLAZOR
 
 using System;
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ namespace System.ServiceModel.Channels
     /// Represents a header that encapsulates an address information item used to
     /// identify or interact with an endpoint.
     /// </summary>
-    public abstract class AddressHeader
+    public abstract partial class AddressHeader
     {
     }
 }

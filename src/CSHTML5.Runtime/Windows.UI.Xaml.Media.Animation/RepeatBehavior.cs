@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Describes how a Windows.UI.Xaml.Media.Animation.Timeline repeats its simple
     /// duration.
     /// </summary>
-    public struct RepeatBehavior// : IFormattable
+    public partial struct RepeatBehavior// : IFormattable
     {
 
         //for details on how the animations are supposed to behave depending on RepeatBehavior, see: https://msdn.microsoft.com/en-us/library/system.windows.media.animation.timeline.repeatbehavior(v=vs.100).aspx

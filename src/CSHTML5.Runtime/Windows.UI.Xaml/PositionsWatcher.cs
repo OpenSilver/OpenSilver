@@ -36,7 +36,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    internal class PositionsWatcher
+    internal partial class PositionsWatcher
     {
         private List<ControlToWatch> _controlsToWatch = new List<ControlToWatch>();
         private DispatcherTimer _timer = new DispatcherTimer();

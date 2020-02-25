@@ -359,7 +359,11 @@ namespace CSHTML5.Native.Html.Controls
             //------------------
 
             object div1;
+#if CSHTML5BLAZOR
+            object div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("canvas", parentRef, this, out div1);
+#else
             dynamic div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("canvas", parentRef, this, out div1);
+#endif
             domElementWhereToPlaceChildren = div1;
 
             // Use the div2 as the js canvas object

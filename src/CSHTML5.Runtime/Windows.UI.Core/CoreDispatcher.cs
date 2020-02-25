@@ -31,7 +31,11 @@ using Windows.Foundation;
 #endif
 
 #if MIGRATION
+#if WORKINPROGRESS
+namespace System.Windows.Threading
+#else
 namespace System.Windows
+#endif
 #else
 namespace Windows.UI.Core
 #endif
@@ -41,9 +45,9 @@ namespace Windows.UI.Core
     /// for processing the window messages and dispatching the events to the client.
     /// </summary>
 #if MIGRATION
-    public class Dispatcher
+    public partial class Dispatcher
 #else
-    public class CoreDispatcher
+    public partial class CoreDispatcher
 #endif
     {
 #if MIGRATION
@@ -93,12 +97,21 @@ namespace Windows.UI.Core
         /// The delegate to a method, which is
         /// pushed onto the System.Windows.Threading.Dispatcher event queue.
         /// </param>
+#if WORKINPROGRESS
+        public DispatcherOperation BeginInvoke(Action method)
+#else
         public void BeginInvoke(Action method)
+#endif
         {
             if (method == null)
                 throw new ArgumentNullException("method");
-
+#if WORKINPROGRESS
+            DispatcherOperation dispatcherOperation = new DispatcherOperation();
             BeginInvokeInternal(method);
+            return dispatcherOperation;
+#else
+            BeginInvokeInternal(method);
+#endif
         }
 
 #if !BRIDGE
@@ -110,15 +123,24 @@ namespace Windows.UI.Core
         {
 #if CSHTML5NETSTANDARD
             //Console.WriteLine("ON BEGININVOKE CALLED");
-
-            CSHTML5.Interop.ExecuteJavaScriptAsync("setTimeout($0, 1)",
-                (Action)(() =>
-                {
-                    //Console.WriteLine("ON BEGININVOKE EXECUTION");
-
-                    method();
-                }));
-#else
+            if (!INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround)
+            {
+                CSHTML5.Interop.ExecuteJavaScriptAsync("setTimeout($0, 1)",
+                    (Action)(() =>
+                    {
+                        try
+                        {
+                            method();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.Error.WriteLine("DEBUG: CoreDispatcher: BeginIvokeInternal: Method excution failed: " + e);
+                        }
+                    }));
+            }
+            else
+            {
+#endif
             //Simulator only. We call the JavaScript "setTimeout" to queue the action on the thread, and then we call Dispatcher.BeginInvoke(...) to ensure that it runs in the UI thread.
             //CSHTML5.Interop.ExecuteJavaScriptAsync("setTimeout($0, 1)",
             //    (Action)(() =>
@@ -128,8 +150,9 @@ namespace Windows.UI.Core
                     method();
                 }));
             //}));
+#if CSHTML5NETSTANDARD
+            }
 #endif
-
             // Note: the implementation below was commented because it led to issues when drawing the Shape controls: sometimes some Shape controls did not render in the Simulator because the method passed "Dispatcher.Begin()" was called too early.
             /*
             global::System.Threading.Timer timer = new global::System.Threading.Timer(
@@ -145,5 +168,17 @@ namespace Windows.UI.Core
                 global::System.Threading.Timeout.Infinite);
              */
         }
+
+#if WORKINPROGRESS
+        public DispatcherOperation BeginInvoke(Delegate d, params object[] args)
+        {
+            return null;
+        }
+
+        public bool CheckAccess()
+        {
+            return false;
+        }
+#endif
     }
 }

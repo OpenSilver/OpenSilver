@@ -41,7 +41,7 @@ namespace System.Windows
     /// <summary>
     /// Provides data for drag-and-drop events in Silverlight.
     /// </summary>
-    public sealed class DragEventArgs : ExtendedRoutedEventArgs
+    public sealed partial class DragEventArgs : ExtendedRoutedEventArgs
     {
 #if MIGRATION
         internal MouseEventArgs MouseEventArgs { get; set; }
@@ -55,6 +55,23 @@ namespace System.Windows
         internal DragEventArgs(IDataObject data)
         {
             this.Data = data;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the DragEventArgs class.
+        /// </summary>
+#if MIGRATION
+        internal DragEventArgs(IDataObject data, MouseEventArgs e) //todo: check whether this should be "MouseButtonEventArgs"
+#else
+        internal DragEventArgs(IDataObject data, PointerRoutedEventArgs e)
+#endif
+        {
+            this.Data = data;
+#if MIGRATION
+            this.MouseEventArgs = e;
+#else
+            this.PointerRoutedEventArgs = e;
+#endif
         }
 
         /// <summary>

@@ -41,7 +41,7 @@ namespace Windows.UI.Xaml
     /// Creates an element tree of elements.
     /// </summary>
     [ContentProperty("ContentPropertyUsefulOnlyDuringTheCompilation")]
-    public class FrameworkTemplate : DependencyObject
+    public partial class FrameworkTemplate : DependencyObject
     {
         internal Func<Control, TemplateInstance> _methodToInstantiateFrameworkTemplate;
 
@@ -67,6 +67,11 @@ namespace Windows.UI.Xaml
         /// <returns>The instantiated control template.</returns>
         internal FrameworkElement INTERNAL_InstantiateAndAttachControlTemplate(Control templateOwner)
         {
+#if CSHTML5BLAZOR && DEBUG
+            Console.WriteLine("OPEN SILVER DEBUG: FrameworkTemplate: INTERNAL_InstantiateAndAttachControlTemplate:" +
+                " template owner = " + templateOwner +
+                " template owner hash = " + (templateOwner != null ? templateOwner.GetHashCode().ToString() : ""));
+#endif
             if (_methodToInstantiateFrameworkTemplate != null)
             {
                 if (templateOwner != null)
@@ -82,6 +87,12 @@ namespace Windows.UI.Xaml
                     {
                         templateOwner.RaiseOnApplyTemplate();
                     }
+#if CSHTML5BLAZOR && DEBUG
+                    else
+                    {
+                        Console.WriteLine("OPEN SILVER DEBUG: FrameworkTemplate: INTERNAL_InstantiateAndAttachControlTemplate: template owner is null");
+                    }
+#endif
                     return templateInstance.TemplateContent;
                 }
                 else

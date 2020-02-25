@@ -39,7 +39,7 @@ namespace Windows.UI.Xaml.Media
     /// Point specifying the end point of a line segment.
     /// </summary>
     [ContentProperty("Points")]
-    public sealed class PolyLineSegment : PathSegment
+    public sealed partial class PolyLineSegment : PathSegment
     {
         ///// <summary>
         ///// Initializes a new instance of the PolyLineSegment class.

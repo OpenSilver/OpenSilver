@@ -36,14 +36,9 @@ namespace Windows.UI.Xaml.Documents
     /// Represents a discrete section of formatted or unformatted text.
     /// </summary>
     [ContentProperty("Text")]
-    public sealed class Run : Inline
+    public sealed partial class Run : Inline
     {
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            dynamic span = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("span", parentRef, this);
-            domElementWhereToPlaceChildren = span;
-            return span;
-        }
+        private const string defaultText = "\u00A0"; // We add a space at the end of the text so that two <Run> tags do not appear to touch each other (eg. <Run>This is a</Run><Run>test.</Run>).
 
         /// <summary>
         /// Get or Set the Text property
@@ -58,17 +53,37 @@ namespace Windows.UI.Xaml.Documents
         /// Identifies the Text dependency property.
         /// </summary>
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof(string), typeof(Run), new PropertyMetadata(string.Empty) { MethodToUpdateDom = Text_MethodToUpdateDom });
+            DependencyProperty.Register("Text", typeof(string), typeof(Run), new PropertyMetadata(string.Empty, OnTextPropertyChanged, CoerceTextProperty) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
 
-        static void Text_MethodToUpdateDom(DependencyObject d, object newValue)
+        private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var run = (Run)d;
-            
-            string newText = newValue as string;
-            if (newText == null || newText == string.Empty)
-                newText = "\u00A0"; // We put a non-breaking space here because otherwise with string.Empty the Height of the TextBlock in HTML becomes 0.
-            newText = newText + "\u00A0"; // We add a space at the end of the text so that two <Run> tags do not appear to touch each other (eg. <Run>This is a</Run><Run>test.</Run>).
-            INTERNAL_HtmlDomManager.SetContentString(run, newText);
+            Run run = (Run)d;
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(run))
+            {
+                INTERNAL_HtmlDomManager.SetContentString(run, (string)e.NewValue);
+            }
+        }
+
+        private static object CoerceTextProperty(DependencyObject d, object baseValue)
+        {
+            if (string.IsNullOrEmpty((string)baseValue))
+            {
+                return defaultText;
+            }
+            return baseValue;
+        }
+
+        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        {
+            dynamic span = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("span", parentRef, this);
+            domElementWhereToPlaceChildren = span;
+            return span;
+        }
+
+        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        {
+            base.INTERNAL_OnAttachedToVisualTree();
+            INTERNAL_HtmlDomManager.SetContentString(this, (string)CoerceTextProperty(this, this.Text));
         }
     }
 }

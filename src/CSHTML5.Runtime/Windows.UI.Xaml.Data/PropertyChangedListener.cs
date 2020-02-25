@@ -30,7 +30,7 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
-    internal class PropertyChangedListener : IPropertyChangedListener
+    internal partial class PropertyChangedListener : IPropertyChangedListener
     {
         
         public DependencyProperty Property {get; set;}

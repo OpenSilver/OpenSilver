@@ -298,14 +298,10 @@ namespace CSHTML5.Internal
             // DETERMINE IF WE SHOULD RAISE THE "PROPERTYCHANGED" EVENT AND CASCADE THE PROPERTY TO THE CHILDREN:
             //-----------------------
 
-            bool raisePropertyChanged =
-                impactsActualValue
-                && (!inherits || storage.Property.OwnerType.IsAssignableFrom(storage.Owner.GetType()) || storage.Property == FrameworkElement.DataContextProperty); // If the property is inherited, we should only raise the PropertyChanged event on the types that the property is compatible with (unless it's the DataContext property, in which case we always raise the PropertyChanged event).
+            bool raisePropertyChanged = impactsActualValue && (!inherits || ShouldRaisePropertyChanged(storage)); // If the property is inherited, we should only raise the PropertyChanged event on the types that the property is compatible with (unless it's the DataContext property, in which case we always raise the PropertyChanged event).
             //todo: are attached properties properly handled?
 
-            bool cascadetoChildren =
-                impactsActualValue
-                && inherits;
+            bool cascadetoChildren = impactsActualValue && inherits;
 
             //we make sure that we don't raise PropertyChanged for IsEnabled if its inherited value is false, because a "false" inherited value has priority over any local value.
             if (storage._isIsEnabledOrIsHitTestVisibleProperty)
@@ -447,7 +443,7 @@ namespace CSHTML5.Internal
                 // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
                 //-----------------------
                 //we only do the following inside the "if" because otherwise, the children's inherithed property would not change anyway
-                if (oldValue != newValue)
+                if (!Object.Equals(oldValue, newValue)) //Note: We can't use ' != ' because if we have two integers x and y who are equal but are boxed as objects, x == y will always be false while Object.Equals(x, y) will be true. 
                 {
                     if (ShouldRaisePropertyChanged(storage))
                     {
@@ -466,7 +462,7 @@ namespace CSHTML5.Internal
                     storage.ActualValueIsDirty = true; //The actual value is Dirty because it didn't take into consideration the values that usually have priority over the inherited value (i.e: local) and since the newValue is "true", it now needs to take them into consideration.
                     newValue = GetValue(GetStorageIfExists(storage.Owner, storage.Property), typeMetadata); //we need newValue to be the value that will be active afterwards.
                 }
-                if (oldValue != newValue)
+                if (!Object.Equals(oldValue, newValue)) //Note: We can't use ' != ' because if we have two integers x and y who are equal but are boxed as objects, x == y will always be false while Object.Equals(x, y) will be true. 
                 {
                     storage.ActualValue = newValue; // Make sure Storage.ActualValue is up to date.
                     if (ShouldRaisePropertyChanged(storage))
@@ -580,8 +576,10 @@ namespace CSHTML5.Internal
 
             if (typeMetadata != null && typeMetadata.PropertyChangedCallback != null)
             {
-                if (newValue != oldValue)
+                if (!Object.Equals(newValue, oldValue)) //Note: We can't use ' != ' because if we have two integers x and y who are equal but are boxed as objects, x == y will always be false while Object.Equals(x, y) will be true. 
+                {
                     typeMetadata.PropertyChangedCallback(sender, new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
+                }
             }
 
             //---------------------

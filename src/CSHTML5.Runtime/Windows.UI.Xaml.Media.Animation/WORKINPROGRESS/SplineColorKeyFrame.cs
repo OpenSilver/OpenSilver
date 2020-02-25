@@ -34,7 +34,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// This ColorKeyFrame interpolates between the Color Value of
     /// the previous key frame and its own Value to produce its output value.
     /// </summary>
-    public sealed class SplineColorKeyFrame : ColorKeyFrame
+    public sealed partial class SplineColorKeyFrame : ColorKeyFrame
     {
     }
 #endif

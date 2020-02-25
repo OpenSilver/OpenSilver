@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 
 namespace System.ComponentModel
 {
-    public class AsyncCompletedEventArgs : EventArgs
+    public partial class AsyncCompletedEventArgs : EventArgs
     {
         public AsyncCompletedEventArgs(Exception error, bool cancelled, object userState)
         {

@@ -31,7 +31,7 @@ namespace System.Windows
     /// Provides application part and localization information in the application
     /// manifest when deploying a Silverlight-based application.
     /// </summary>
-    public sealed class Deployment : DependencyObject
+    public sealed partial class Deployment : DependencyObject
     {
         private Deployment() { } //Note: There is normally a public parameterless constructor but I'm assuming it works like the Current property so we keep this private for now.
         static Deployment _deployment = null;
@@ -50,6 +50,12 @@ namespace System.Windows
                 return _deployment;
             }
         }
+
+#if WORKINPROGRESS
+        public OutOfBrowserSettings OutOfBrowserSettings { get; private set; }
+
+        public AssemblyPartCollection Parts { get; private set; }
+#endif
 
         #region not implemented
 
@@ -126,7 +132,7 @@ namespace System.Windows
         ////     The System.Windows.Deployment.Current property has already been initialized.
         //public Deployment();
 
-        
+
         ////
         //// Summary:
         ////     Gets a string name that identifies which part in the System.Windows.Deployment

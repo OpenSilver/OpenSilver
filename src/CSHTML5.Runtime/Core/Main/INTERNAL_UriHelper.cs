@@ -332,7 +332,9 @@ namespace CSHTML5.Internal
             }
             else
             {
-#if !BRIDGE
+#if CSHTML5NETSTANDARD
+                listOfAssemblies = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetName().Name).ToArray();
+#elif !BRIDGE
                 listOfAssemblies = JSIL.Verbatim.Expression("Object.keys(JSIL.AssemblyShortNames)");
 #else
                 listOfAssemblies = AppDomain.CurrentDomain.GetAssemblies().Select(a => GetAssemblyName(a.FullName)).ToArray();//Script.Write<string[]>("Object.keys(JSIL.AssemblyShortNames);");
@@ -354,6 +356,8 @@ namespace CSHTML5.Internal
             else
                 return fullName.Substring(0, tmpIndex);
         }
+
+#if !CSHTML5NETSTANDARD
 
 #if !BRIDGE
         [JSReplacement("$relativePath")]
@@ -382,6 +386,8 @@ namespace CSHTML5.Internal
             finalAbsolutePath = @"file:///" + finalAbsolutePath.Replace('\\', '/');
             return finalAbsolutePath;
         }
+#endif
+
 
 #if WORKINPROGRESS
         public static Uri EnsureAbsoluteUri(string uriString)

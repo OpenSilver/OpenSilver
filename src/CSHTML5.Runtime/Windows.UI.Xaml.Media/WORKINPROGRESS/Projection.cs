@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml.Media
 {
 #if WORKINPROGRESS
     #region Not supported yet
-    public abstract class Projection : DependencyObject
+    public abstract partial class Projection : DependencyObject
     {
     }
     #endregion

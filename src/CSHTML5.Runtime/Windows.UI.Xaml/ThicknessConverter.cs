@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Converts instances of other types to and from instances of System.Windows.Thickness.
     /// </summary>
-    public sealed class ThicknessConverter : TypeConverter
+    public sealed partial class ThicknessConverter : TypeConverter
     {
         /// <summary>
         /// Determines whether the type converter can create an instance of System.Windows.Thickness

@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Converts a System.Windows.Media.ImageSource to and from other data types.
     /// </summary>
-    public sealed class ImageSourceConverter : TypeConverter
+    public sealed partial class ImageSourceConverter : TypeConverter
     {
         /// <summary>
         /// Determines whether the converter can convert an object of the given type

@@ -44,7 +44,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a cell of a System.Windows.Controls.DataGrid control.
     /// </summary>
-    public class DataGridCell : ButtonBase
+    public partial class DataGridCell : ButtonBase
     {
         //For some reason in the wpf comments, below was "Gets or sets the column that the cell is in." although the set part is internal.
         /// <summary>
@@ -60,7 +60,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.DataGridCell.Column dependency property.
         /// </summary>
         public static readonly DependencyProperty ColumnProperty =
-            DependencyProperty.Register("Column", typeof(DataGridColumn), typeof(DataGridCell), new PropertyMetadata(false));
+            DependencyProperty.Register("Column", typeof(DataGridColumn), typeof(DataGridCell), new PropertyMetadata(null));
 
         /// <summary>
         /// Gets or sets a value that indicates whether the cell is in edit mode.

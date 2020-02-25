@@ -28,7 +28,7 @@ namespace System.Xml
 #if !BRIDGE
     [JSIL.Meta.JSStubOnly]
 #endif
-    public class XmlQualifiedName
+    public partial class XmlQualifiedName
     {
         /// <summary>
         /// Provides an empty System.Xml.XmlQualifiedName.

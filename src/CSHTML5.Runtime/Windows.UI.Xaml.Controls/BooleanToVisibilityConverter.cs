@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Convert between boolean and visibility
     /// </summary>
-    public class BooleanToVisibilityConverter : IValueConverter
+    public partial class BooleanToVisibilityConverter : IValueConverter
     {
         /// <summary>
         /// Convert bool or Nullable&lt;bool&gt; to Visibility

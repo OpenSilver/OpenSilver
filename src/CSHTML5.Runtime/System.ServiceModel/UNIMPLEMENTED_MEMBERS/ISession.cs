@@ -29,7 +29,7 @@ namespace System.ServiceModel.Channels
     /// Defines the interface to establish a shared context among parties that exchange
     /// messages by providing an ID for the communication session.
     /// </summary>
-    public interface ISession
+    public partial interface ISession
     {
         /// <summary>
         /// Gets the ID that uniquely identifies the session.

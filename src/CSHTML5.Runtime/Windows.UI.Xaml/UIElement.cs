@@ -596,6 +596,21 @@ namespace Windows.UI.Xaml
 
         }
 
+#if REVAMPPOINTEREVENTS
+        internal bool INTERNAL_ArePointerEventsEnabled
+        {
+            get
+            {
+                return INTERNAL_ManagePointerEventsAvailability();
+            }
+        }
+
+        internal virtual bool INTERNAL_ManagePointerEventsAvailability()
+        {
+            return false;
+        }
+#endif
+
         #endregion
 
 #if REVAMPPOINTEREVENTS
@@ -606,7 +621,7 @@ namespace Windows.UI.Xaml
                 dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
                 if (element.INTERNAL_ArePointerEventsEnabled)
                 {
-                    style.pointerEvents = "auto";
+                    style.pointerEvents = "auto"; //Note: MDN lies: pointer-events: "auto" is not the same as pointer-event not set.
                 }
                 else
                 {
@@ -1053,11 +1068,14 @@ namespace Windows.UI.Xaml
             // We make sure an element that is detached cannot have the cursor captured, which causes bugs.
             // For example in a DataGrid, if we had a column with two focusable elements in its edition mode, clicking one then the other one would leave the edition mode and detach the elements
             // but the second element that was clicked would still have captured the pointer events, preventing the user to click on anything until the capture is released (if it does ever happen).
+            if (Pointer.INTERNAL_captured == this)
+            {
 #if MIGRATION
-            ReleaseMouseCapture();
+                ReleaseMouseCapture();
 #else
-            ReleasePointerCapture();
+                ReleasePointerCapture();
 #endif
+            }
         }
 
 
@@ -1096,8 +1114,15 @@ namespace Windows.UI.Xaml
             else
             {
                 // ------- SIMULATOR -------
-                offsetLeft = Convert.ToDouble(Interop.ExecuteJavaScript("$0.getBoundingClientRect().left - $1.getBoundingClientRect().left", outerDivOfThisControl, outerDivOfReferenceVisual));
-                offsetTop = Convert.ToDouble(Interop.ExecuteJavaScript("$0.getBoundingClientRect().top - $1.getBoundingClientRect().top", outerDivOfThisControl, outerDivOfReferenceVisual));
+
+                // Hack to improve the Simulator performance by making only one interop call rather than two:
+                string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("($0.getBoundingClientRect().left - $1.getBoundingClientRect().left) + '|' + ($0.getBoundingClientRect().top - $1.getBoundingClientRect().top)",
+                                                                        outerDivOfThisControl, outerDivOfReferenceVisual));
+                int sepIndex = concatenated.IndexOf('|');
+                string offsetLeftAsString = concatenated.Substring(0, sepIndex);
+                string offsetTopAsString = concatenated.Substring(sepIndex + 1);
+                offsetLeft = Convert.ToDouble(offsetLeftAsString);
+                offsetTop = Convert.ToDouble(offsetTopAsString);
             }
             //#endif
 
@@ -1107,5 +1132,35 @@ namespace Windows.UI.Xaml
         //internal virtual void INTERNAL_Render()
         //{
         //}
+
+#if WORKINPROGRESS
+        public Size DesiredSize { get; private set; }
+        public Size RenderSize { get; private set; }
+
+        public void Arrange(Rect finalRect)
+        {
+
+        }
+
+        public void Measure(Size availableSize)
+        {
+
+        }
+
+        public void InvalidateArrange()
+        {
+
+        }
+
+        public void InvalidateMeasure()
+        {
+
+        }
+
+        public void UpdateLayout()
+        {
+
+        }
+#endif
     }
 }

@@ -12,7 +12,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    public class DependencyObjectCollection<T> : DependencyObject, IList<T>, ICollection<T>, IEnumerable<T>, IList, ICollection, IEnumerable, INotifyCollectionChanged
+    public partial class DependencyObjectCollection<T> : DependencyObject, IList<T>, ICollection<T>, IEnumerable<T>, IList, ICollection, IEnumerable, INotifyCollectionChanged
     {
         private List<T> _collection;
 

@@ -30,7 +30,7 @@ namespace System.ServiceModel
     // Type parameters:
     //   T:
     //     The type of the extension class.
-    public interface IExtensibleObject<T> where T : System.ServiceModel.IExtensibleObject<T>
+    public partial interface IExtensibleObject<T> where T : System.ServiceModel.IExtensibleObject<T>
     {
         // Summary:
         //     Gets a collection of extension objects for this extensible object.

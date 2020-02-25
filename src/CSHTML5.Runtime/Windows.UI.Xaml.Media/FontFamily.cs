@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Media
     /// Represents a family of related fonts.
     /// </summary>
     [SupportsDirectContentViaTypeFromStringConverters]
-    public class FontFamily
+    public partial class FontFamily
     {
         static FontFamily()
         {

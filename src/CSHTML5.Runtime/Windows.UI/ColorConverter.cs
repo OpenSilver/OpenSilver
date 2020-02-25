@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Converts instances of other types to and from an instance of System.Windows.Media.Color.
     /// </summary>
-    public sealed class ColorConverter : TypeConverter
+    public sealed partial class ColorConverter : TypeConverter
     {
         /// <summary>
         /// Determines whether an object can be converted from a given type to an instance

@@ -47,7 +47,7 @@ namespace Windows.UI.Xaml.Controls
     /// stackPanel.Orientation = Orientation.Horizontal;
     /// </code>
     /// </example>
-    public class StackPanel : Panel
+    public partial class StackPanel : Panel
     {
         Orientation? _renderedOrientation = null;
 

@@ -31,7 +31,7 @@ namespace Windows.UI.Core
     /// <summary>
     /// Contains the argument returned by a window size change event.
     /// </summary>
-    public sealed class WindowSizeChangedEventArgs
+    public sealed partial class WindowSizeChangedEventArgs
     {
         /// <summary>
         /// Gets or sets whether the window size event was handled.

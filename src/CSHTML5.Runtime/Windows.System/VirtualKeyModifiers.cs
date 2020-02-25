@@ -63,9 +63,14 @@ namespace Windows.System
         /// </summary>
         Shift = 4,
 
-        ///// <summary>
-        ///// The Windows virtual key.
-        ///// </summary>
-        //Windows = 8,
+        /// <summary>
+        /// The Windows virtual key.
+        /// </summary>
+        Windows = 8,
+
+        /// <summary>
+        /// The Apple key (also known as the Open Apple key) is pressed.
+        /// </summary>
+        Apple = 8
     }
 }

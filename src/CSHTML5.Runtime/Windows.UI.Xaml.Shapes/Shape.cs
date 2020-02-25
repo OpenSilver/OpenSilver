@@ -48,7 +48,7 @@ namespace Windows.UI.Xaml.Shapes
     /// <summary>
     /// Provides a base class for shape elements, such as Ellipse, Polygon, and Rectangle.
     /// </summary>
-    public abstract class Shape : FrameworkElement
+    public abstract partial class Shape : FrameworkElement
     {
         internal protected object _canvasDomElement;
         internal protected Point _marginOffsets;//this is for the case where we have negative positions in the shapes.
@@ -1017,7 +1017,7 @@ context.restore();
         //
         // Returns:
         //     The identifier for the StrokeDashCap dependency property.
-        public static readonly DependencyProperty StrokeDashCapProperty = DependencyProperty.Register("StrokeDashCap", typeof(PenLineCap), typeof(Shape), null);
+        public static readonly DependencyProperty StrokeDashCapProperty = DependencyProperty.Register("StrokeDashCap", typeof(PenLineCap), typeof(Shape), new PropertyMetadata(PenLineCap.Flat));
         
         
         #endregion

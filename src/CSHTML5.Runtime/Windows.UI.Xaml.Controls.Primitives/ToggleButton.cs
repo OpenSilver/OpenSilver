@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Base class for controls that can switch states, such as CheckBox and RadioButton.
     /// </summary>
-    public class ToggleButton : ButtonBase
+    public partial class ToggleButton : ButtonBase
     {
         public ToggleButton()
         {
@@ -167,11 +167,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 this.MouseEnter += Control_MouseEnter;
                 this.MouseLeave -= Control_MouseLeave;
                 this.MouseLeave += Control_MouseLeave;
+                this.LostMouseCapture -= Control_LostMouseCapture;
+                this.LostMouseCapture += Control_LostMouseCapture;
 #else
                 this.PointerEntered -= Control_PointerEntered;
                 this.PointerEntered += Control_PointerEntered;
                 this.PointerExited -= Control_PointerExited;
                 this.PointerExited += Control_PointerExited;
+                this.PointerCaptureLost -= Control_PointerCaptureLost;
+                this.PointerCaptureLost += Control_PointerCaptureLost;
 #endif
             }
 
@@ -196,6 +200,18 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         bool _isPointerOver = false;
         bool _isPressed = false;
+
+#if MIGRATION
+        void Control_LostMouseCapture(object sender, MouseEventArgs e)
+
+#else
+        void Control_PointerCaptureLost(object sender, Input.PointerRoutedEventArgs e)
+#endif
+        {
+            _isPressed = false;
+            UpdateVisualStates();
+        }
+
 #if MIGRATION
         void Control_MouseEnter(object sender, Input.MouseEventArgs e)
 #else
@@ -236,44 +252,109 @@ namespace Windows.UI.Xaml.Controls.Primitives
             UpdateVisualStates();
         }
 
-        void UpdateVisualStates()
+        private void UpdateVisualStates()
         {
-            if (_isChecked == false)
+            if(this.INTERNAL_IsLegacyVisualStates) //Silverlight/WPF visual states
             {
-                if (_isDisabled)
-                    VisualStateManager.GoToState(this, "Disabled", true);
-                else if (_isPressed)
-                    VisualStateManager.GoToState(this, "Pressed", true);
-                else if (_isPointerOver)
+                // "call to base"
+                if (this._isDisabled)
+                {
+                    VisualStateManager.GoToState(this, VisualStates.StateDisabled, true);
+                }
+                else if (this._isPressed)
+                {
+                    VisualStateManager.GoToState(this, VisualStates.StatePressed, true);
+                }
+                else if (this._isPointerOver)
+                {
 #if MIGRATION
-                    VisualStateManager.GoToState(this, "MouseOver", true);
+                    VisualStateManager.GoToState(this, VisualStates.StateMouseOver, true);
 #else
                     VisualStateManager.GoToState(this, "PointerOver", true);
 #endif
+                }
                 else
-                    VisualStateManager.GoToState(this, "Normal", true);
-            }
-            else if (_isChecked == true)
-            {
-                if (_isDisabled)
-                    VisualStateManager.GoToState(this, "CheckedDisabled", true);
-                else if (_isPressed)
-                    VisualStateManager.GoToState(this, "CheckedPressed", true);
-                else if (_isPointerOver)
-                    VisualStateManager.GoToState(this, "CheckedPointerOver", true);
-                else
+                {
+                    VisualStateManager.GoToState(this, VisualStates.StateNormal, true);
+                }
+
+                //ToggleButton states
+                if (this._isChecked == true)
+                {
                     VisualStateManager.GoToState(this, "Checked", true);
-            }
-            else if (_isChecked == null)
-            {
-                if (_isDisabled)
-                    VisualStateManager.GoToState(this, "IndeterminateDisabled", true);
-                else if (_isPressed)
-                    VisualStateManager.GoToState(this, "IndeterminatePressed", true);
-                else if (_isPointerOver)
-                    VisualStateManager.GoToState(this, "IndeterminatePointerOver", true);
+                }
+                else if (this._isChecked == false)
+                {
+                    VisualStateManager.GoToState(this, "Unchecked", true);
+                }
                 else
+                {
                     VisualStateManager.GoToState(this, "Indeterminate", true);
+                }
+            }
+            else // UWP visual states
+            {
+                if (this._isChecked == false)
+                {
+                    if (this._isDisabled)
+                    {
+                        VisualStateManager.GoToState(this, VisualStates.StateDisabled, true);
+                    }
+                    else if (this._isPressed)
+                    {
+                        VisualStateManager.GoToState(this, VisualStates.StatePressed, true);
+                    }
+                    else if (this._isPointerOver)
+                    {
+#if MIGRATION
+                        VisualStateManager.GoToState(this, VisualStates.StateMouseOver, true);
+#else
+                        VisualStateManager.GoToState(this, "PointerOver", true);
+#endif
+                    }
+                    else
+                    {
+                        VisualStateManager.GoToState(this, VisualStates.StateNormal, true);
+                    }
+                }
+                else if (this._isChecked == true)
+                {
+                    if (this._isDisabled)
+                    {
+                        VisualStateManager.GoToState(this, "CheckedDisabled", true);
+                    }
+                    else if (this._isPressed)
+                    {
+                        VisualStateManager.GoToState(this, "CheckedPressed", true);
+                    }
+                    else if (this._isPointerOver)
+                    {
+                        VisualStateManager.GoToState(this, "CheckedPointerOver", true);
+                    }
+                    else
+                    {
+                        VisualStateManager.GoToState(this, "Checked", true);
+                    }
+                }
+                else if (this._isChecked == null)
+                {
+                    if (this._isDisabled)
+                    {
+                        VisualStateManager.GoToState(this, "IndeterminateDisabled", true);
+                    }
+                    else if (this._isPressed)
+                    {
+                        VisualStateManager.GoToState(this, "IndeterminatePressed", true);
+                    }
+                    else if (this._isPointerOver)
+                    {
+                        VisualStateManager.GoToState(this, "IndeterminatePointerOver", true);
+                    }
+                    else
+                    {
+                        VisualStateManager.GoToState(this, "Indeterminate", true);
+                    }
+                }
             }
         }
 
@@ -398,12 +479,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         }
 
-        ///// <summary>
-        ///// Called when the ToggleButton receives toggle stimulus.
-        ///// </summary>
-        //protected virtual void OnToggle() //todo: see what it is supposed to do and implement it
-        //{
-        //}
+#if WORKINPROGRESS
+        /// <summary>
+        /// Called when the ToggleButton receives toggle stimulus.
+        /// </summary>
+        protected virtual void OnToggle() //todo: see what it is supposed to do and implement it
+        {
+
+        }
+#endif
 
         //-----------------------
         // ISENABLED (OVERRIDE)

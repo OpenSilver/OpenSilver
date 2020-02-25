@@ -24,7 +24,7 @@ using System.IO;
 namespace System.Net
 {
 #if WORKINPROGRESS
-    public class OpenWriteCompletedEventArgs //: AsyncCompletedEventArgs
+    public partial class OpenWriteCompletedEventArgs //: AsyncCompletedEventArgs
     {
         #region Not supported yet
         // Summary:

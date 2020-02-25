@@ -28,7 +28,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Represents a control that defines choices for users to select.
     /// </summary>
-    public abstract class MenuBase : ItemsControl
+    public abstract partial class MenuBase : ItemsControl
     {
         /// <summary>
         /// Initializes a new instance of the System.Windows.Controls.Primitives.MenuBase class.

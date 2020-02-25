@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Controls
     /// Converts instances of various types to and from instances of the System.Windows.Controls.DataGridLength
     /// class.
     /// </summary>
-    public sealed class DataGridLengthConverter : TypeConverter
+    public sealed partial class DataGridLengthConverter : TypeConverter
     {
         
         /// <summary>

@@ -33,7 +33,7 @@ namespace Windows.Foundation
     /// Describes the width, height, and point origin of a rectangle.
     /// </summary>
     [SupportsDirectContentViaTypeFromStringConverters]
-    public struct Rect// : IFormattable
+    public partial struct Rect// : IFormattable
     {
         //todo: Add the interface IFormattable
 
@@ -384,6 +384,13 @@ namespace Windows.Foundation
         {
             return X.GetHashCode() ^ Y.GetHashCode() ^ Width.GetHashCode() ^ Height.GetHashCode();
         }
+
+#if WORKINPROGRESS
+        public void Intersect(Rect rect)
+        {
+
+        }
+#endif
 
         public static Rect Parse(string rectAsString)
         {

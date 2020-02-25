@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml.Navigation
 {
     /// <summary>
     /// Provides data for the NavigationFailed event of the NavigationService class and the NavigationFailed event of the Frame class.</summary>
-    public sealed class NavigationFailedEventArgs : EventArgs
+    public sealed partial class NavigationFailedEventArgs : EventArgs
     {
         /// <summary>
         /// Initializes a new instance of the NavigationFailedEventArgs.

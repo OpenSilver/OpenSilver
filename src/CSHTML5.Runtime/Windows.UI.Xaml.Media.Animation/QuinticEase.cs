@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Represents an easing function that creates an animation that accelerates
     /// and/or decelerates using the formula f(t) = t5.
     /// </summary>
-    public sealed class QuinticEase : EasingFunctionBase
+    public sealed partial class QuinticEase : EasingFunctionBase
     {
         const string FUNCTION_TYPE_STRING = "Quint";
 

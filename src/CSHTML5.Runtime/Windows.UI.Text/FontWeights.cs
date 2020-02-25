@@ -32,7 +32,7 @@ namespace Windows.UI.Text
     /// <summary>
     /// Provides a set of predefined font weights as static property values.
     /// </summary>
-    public sealed class FontWeights
+    public sealed partial class FontWeights
     {
         internal enum INTERNAL_FontweightsEnum : ushort
         {

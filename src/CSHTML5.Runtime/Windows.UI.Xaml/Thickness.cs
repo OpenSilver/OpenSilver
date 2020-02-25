@@ -46,7 +46,7 @@ namespace Windows.UI.Xaml
     [MethodToTranslateXamlValueToCSharp("TranslateXamlValueToCSharp")]
 #endif
     [SupportsDirectContentViaTypeFromStringConverters]
-    public struct Thickness
+    public partial struct Thickness
     {
         double _left, _top, _right, _bottom;
 

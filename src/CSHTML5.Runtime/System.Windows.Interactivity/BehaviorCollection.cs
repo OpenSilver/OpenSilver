@@ -29,7 +29,7 @@ namespace System.Windows.Interactivity
     /// Represents a collection of behaviors with a shared AssociatedObject and provides
     /// change notifications to its contents when that AssociatedObject changes.
     /// </summary>
-    public sealed class BehaviorCollection : AttachableCollection<Behavior>
+    public sealed partial class BehaviorCollection : AttachableCollection<Behavior>
     {
         /// <summary>
         /// Called immediately after the collection is attached to an AssociatedObject.

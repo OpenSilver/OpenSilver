@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Converts instances of other types to and from a System.Windows.CornerRadius.
     /// </summary>
-    public sealed class CornerRadiusConverter : TypeConverter
+    public sealed partial class CornerRadiusConverter : TypeConverter
     {
         /// <summary>
         /// Indicates whether an object can be converted from a given type to a System.Windows.CornerRadius.

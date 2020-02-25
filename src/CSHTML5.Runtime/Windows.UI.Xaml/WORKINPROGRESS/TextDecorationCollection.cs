@@ -31,13 +31,86 @@ using Windows.UI.Xaml.Media.Animation;
 
 #if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
-#if WORKINPROGRESS
     [SupportsDirectContentViaTypeFromStringConverters]
-    public sealed class TextDecorationCollection : Animatable, IList, IList<TextDecoration>
+    public sealed partial class TextDecorationCollection
+    {
+        static TextDecorationCollection()
+        {
+            TypeFromStringConverters.RegisterConverter(typeof(TextDecorationCollection), INTERNAL_ConvertFromString);
+        }
+
+        internal TextDecorationCollection(TextDecoration textDecoration)
+        {
+            if (textDecoration == null)
+            {
+                textDecoration = new TextDecoration(0);
+            }
+            this.Decoration = textDecoration;
+        }
+
+        internal TextDecoration Decoration { get; private set; }
+
+        internal static object INTERNAL_ConvertFromString(string textDecorationAsString)
+        {
+            switch ((textDecorationAsString ?? string.Empty).ToLower())
+            {
+                case "underline":
+                    return TextDecorations.Underline;
+                case "strikethrough":
+                    return TextDecorations.Strikethrough;
+                case "overline":
+                    return TextDecorations.OverLine;
+                default:
+                    return TextDecorations.None;
+            }
+        }
+
+        public override string ToString()
+        {
+            switch (this.Decoration.Decoration)
+            {
+                //case 1:
+                    //return "Baseline";
+                case 2:
+                    return "Overline";
+                case 3:
+                    return "Strikethrough";
+                case 4:
+                    return "Underline";
+                default:
+                    return "None";
+            }
+        }
+
+        public override bool Equals(object o)
+        {
+            if (o is TextDecorationCollection)
+            {
+                TextDecorationCollection tdc = (TextDecorationCollection)o;
+                return TextDecoration.Equals(this.Decoration, tdc.Decoration);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Decoration.GetHashCode();
+        }
+
+        public static bool operator ==(TextDecorationCollection left, TextDecorationCollection right)
+        {
+            return TextDecoration.Equals(left.Decoration, right.Decoration);
+        }
+
+        public static bool operator !=(TextDecorationCollection left, TextDecorationCollection right)
+        {
+            return !TextDecoration.Equals(left.Decoration, right.Decoration);
+        }
+    }
+#if no
+    [SupportsDirectContentViaTypeFromStringConverters]
+    public sealed partial class TextDecorationCollection : Animatable, IList, IList<TextDecoration>
     {
 
         public int Add(object value)
@@ -181,3 +254,4 @@ namespace Windows.UI.Xaml
     }
 #endif
 }
+#endif

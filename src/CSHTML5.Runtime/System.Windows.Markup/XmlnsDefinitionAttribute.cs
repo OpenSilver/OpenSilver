@@ -31,7 +31,7 @@ namespace System.Windows.Markup
     /// writer or XAML schema context.
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    public class XmlnsDefinitionAttribute : Attribute
+    public partial class XmlnsDefinitionAttribute : Attribute
     {
         
         // Exceptions:

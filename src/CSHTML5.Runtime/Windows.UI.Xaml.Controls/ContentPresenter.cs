@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Controls
     /// Displays the content of a ContentControl.
     /// </summary>
     [ContentProperty("Content")]
-    public class ContentPresenter : ContentControl
+    public partial class ContentPresenter : ContentControl
     {
         //--------------------------------------------------
         // In our simple implementation, a ContentPresenter

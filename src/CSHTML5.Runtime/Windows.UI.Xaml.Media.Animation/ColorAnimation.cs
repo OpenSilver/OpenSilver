@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Animates the value of a Color property between two target values using linear
     /// interpolation over a specified Duration.
     /// </summary>
-    public sealed class ColorAnimation : AnimationTimeline
+    public sealed partial class ColorAnimation : AnimationTimeline
     {
         /// <summary>
         /// Gets or sets the easing function applied to this animation.
@@ -263,7 +263,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
                         object newObj = CSHTML5.Interop.ExecuteJavaScriptAsync(@"new Object()");
 
-                        if (from == null)
+                        if (AnimationHelpers.IsValueNull(from)) //todo: when using Bridge, I guess we would want to directly use "from == null" since it worked in the first place (I think).
                         {
                             if (!(cssValue is Dictionary<string, object>))
                             {
@@ -396,5 +396,14 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
             }
         }
+
+#if WORKINPROGRESS
+        public static readonly DependencyProperty ByProperty = DependencyProperty.Register("By", typeof(Color?), typeof(ColorAnimation), null);
+        public Color? By
+        {
+            get { return (Color?)this.GetValue(ByProperty); }
+            set { this.SetValue(ByProperty, value); }
+        }
+#endif
     }
 }

@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Media
     /// Represents a 3x3 affine transformation matrix used for transformations in
     /// two-dimensional space.
     /// </summary>
-    public struct Matrix
+    public partial struct Matrix
     {
         bool _isInitialized; // This is due to the fact that we cannot set default values in structs, and we cannot implement a default constructor in structs, so we need to initialize with the Matrix so that it becomes the Identity matrix by default.
         double _m11;
@@ -383,6 +383,13 @@ namespace Windows.UI.Xaml.Media
         //{
         //    throw new NotImplementedException();
         //}
+
+#if WORKINPROGRESS
+        public Point Transform(Point point)
+        {
+            return new Point();
+        }
+#endif
     }
 
 }

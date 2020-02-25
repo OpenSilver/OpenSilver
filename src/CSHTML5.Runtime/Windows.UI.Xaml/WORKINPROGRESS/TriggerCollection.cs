@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml
 #endif
 {
 #if WORKINPROGRESS
-    public sealed class TriggerCollection : PresentationFrameworkCollection<TriggerBase>
+    public sealed partial class TriggerCollection : PresentationFrameworkCollection<TriggerBase>
     {
     }
 #endif

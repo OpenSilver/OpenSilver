@@ -30,6 +30,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using System.ComponentModel;
+using System.Globalization;
+
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
@@ -44,8 +48,6 @@ using Windows.UI.Xaml.Markup;
 using Windows.UI.Core;
 using Windows.Foundation;
 #endif
-using System.Diagnostics;
-using System.ComponentModel;
 
 
 #if MIGRATION
@@ -59,9 +61,9 @@ namespace Windows.UI.Xaml
     /// </summary>
     [global::System.Windows.Markup.ContentProperty("Content")]
 #if RECURSIVE_CONSTRUCTION_FIXED
-    public class Window : ContentControl
+    public partial class Window : ContentControl
 #else
-    public class Window : FrameworkElement, INameScope
+    public partial class Window : FrameworkElement, INameScope
 #endif
     {
         /// <summary>
@@ -89,12 +91,12 @@ namespace Windows.UI.Xaml
             this.INTERNAL_RootDomElement = rootDomElement;
 
             // Reset the content of the root DIV:
-            Interop.ExecuteJavaScriptAsync(@"$0.innerHTML = ''", rootDomElement);
+            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.innerHTML = ''", rootDomElement);
 
             // In case of XAML view hosted inside an HTML app, we usually set the "position" of the window root to "relative" rather than "absolute" (via external JavaScript code) in order to display it inside a specific DIV. However, in this case, the layers that contain the Popups are placed under the window DIV instead of over it. To work around this issue, we set the root element display to "grid". See the sample app "IntegratingACshtml5AppInAnSPA".
             if (Grid_InternalHelpers.isCSSGridSupported()) //todo: what about the old browsers where "CSS Grid" is not supported?
             {
-                Interop.ExecuteJavaScriptAsync("$0.style.display = 'grid'", rootDomElement);
+                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.style.display = 'grid'", rootDomElement);
             }
 
             // Create the DIV that will correspond to the root of the window visual tree:
@@ -129,7 +131,7 @@ namespace Windows.UI.Xaml
             this.INTERNAL_RaiseLoadedEvent();
         }
 
-#region Bounds and SizeChanged event
+        #region Bounds and SizeChanged event
 
         INTERNAL_EventManager<WindowSizeChangedEventHandler, WindowSizeChangedEventArgs> _windowSizeChangedEventManager;
         /// <summary>
@@ -152,8 +154,24 @@ namespace Windows.UI.Xaml
 
         void ProcessOnWindowSizeChanged(object jsEventArg)
         {
-            double width = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.offsetWidth", this.INTERNAL_OuterDomElement)); //(double)INTERNAL_HtmlDomManager.GetRawHtmlBody().clientWidth;
-            double height = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.offsetHeight", this.INTERNAL_OuterDomElement)); //(double)INTERNAL_HtmlDomManager.GetRawHtmlBody().clientHeight;
+            double width;
+            double height;
+            if (CSHTML5.Interop.IsRunningInTheSimulator)
+            {
+                // Hack to improve the Simulator performance by making only one interop call rather than two:
+                string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.offsetWidth + '|' + $0.offsetHeight", this.INTERNAL_OuterDomElement));
+                int sepIndex = concatenated.IndexOf('|');
+                string widthAsString = concatenated.Substring(0, sepIndex);
+                string heightAsString = concatenated.Substring(sepIndex + 1);
+                width = double.Parse(widthAsString, CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                height = double.Parse(heightAsString, CultureInfo.InvariantCulture); //todo: read note above
+            }
+            else
+            {
+                width = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.offsetWidth", this.INTERNAL_OuterDomElement)); //(double)INTERNAL_HtmlDomManager.GetRawHtmlBody().clientWidth;
+                height = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.offsetHeight", this.INTERNAL_OuterDomElement)); //(double)INTERNAL_HtmlDomManager.GetRawHtmlBody().clientHeight;
+            }
+
             var eventArgs = new WindowSizeChangedEventArgs()
             {
                 Size = new Size(width, height)
@@ -186,7 +204,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        #endregion
 
 #if RECURSIVE_CONSTRUCTION_FIXED
         protected override void OnContentChanged(object oldContent, object newContent)
@@ -203,7 +221,7 @@ namespace Windows.UI.Xaml
                 // then gets passed to the children recursively:
                 this.INTERNAL_ParentWindow = this;
 
-                if(Application.Current.Resources.INTERNAL_HasImplicitStyles)
+                if (Application.Current.Resources.INTERNAL_HasImplicitStyles)
                 {
                     this.INTERNAL_InheritedImplicitStyles = new List<ResourceDictionary>();
                     this.INTERNAL_InheritedImplicitStyles.Add(Application.Current.Resources);
@@ -234,6 +252,27 @@ namespace Windows.UI.Xaml
 
 #if RECURSIVE_CONSTRUCTION_FIXED
 #else
+#if WORKINPROGRESS
+        /// <summary>
+        /// Gets or sets the content of the Window.
+        /// </summary>
+        public FrameworkElement Content
+        {
+            get { return (FrameworkElement)GetValue(ContentProperty); }
+            set { SetValue(ContentProperty, value); }
+        }
+        /// <summary>
+        /// Identifies the Content dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContentProperty =
+            DependencyProperty.Register("Content", typeof(FrameworkElement), typeof(Window), new PropertyMetadata(null, Content_Changed));
+
+        static internal void Content_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var window = (Window)d;
+            window.OnContentChanged(e.OldValue, e.NewValue);
+        }
+#else
         /// <summary>
         /// Gets or sets the content of the Window.
         /// </summary>
@@ -254,10 +293,11 @@ namespace Windows.UI.Xaml
             window.OnContentChanged(e.OldValue, e.NewValue);
         }
 #endif
+#endif
 
 #if RECURSIVE_CONSTRUCTION_FIXED
 #else
-#region ---------- INameScope implementation ----------
+        #region ---------- INameScope implementation ----------
 
         Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
 
@@ -290,7 +330,7 @@ namespace Windows.UI.Xaml
             _nameScopeDictionary.Remove(name);
         }
 
-#endregion
+        #endregion
 #endif
 
 #if !BRIDGE
@@ -318,7 +358,7 @@ namespace Windows.UI.Xaml
         }
 
 
-#region Closing event
+        #region Closing event
 
         INTERNAL_EventManager<EventHandler<ClosingEventArgs>, ClosingEventArgs> _closingEventManager;
         INTERNAL_EventManager<EventHandler<ClosingEventArgs>, ClosingEventArgs> ClosingEventManager
@@ -379,7 +419,35 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        #endregion
 
+#if WORKINPROGRESS
+        public bool IsActive { get; private set; }
+        public bool IsVisible { get; private set; }
+
+        public WindowStyle WindowStyle { get; set; }
+
+        public static Window GetWindow(DependencyObject dependencyObject)
+        {
+            return null;
+        }
+
+        public WindowState WindowState { get; set; }
+
+        public void Close()
+        {
+
+        }
+
+        public void DragMove()
+        {
+
+        }
+
+        public void DragResize(WindowResizeEdge resizeEdge)
+        {
+
+        }
+#endif
     }
 }

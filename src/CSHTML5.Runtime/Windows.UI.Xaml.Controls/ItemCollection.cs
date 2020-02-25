@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Controls
     /// Holds the list of items that represent the content of an ItemsControl.
     /// </summary>
     /// <exclude/>
-    public sealed class ItemCollection : ObservableCollection<object>
+    public sealed partial class ItemCollection : ObservableCollection<object>
     {
         bool _suppressCollectionChanged;
 

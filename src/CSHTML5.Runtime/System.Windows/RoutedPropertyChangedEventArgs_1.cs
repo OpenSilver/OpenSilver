@@ -26,7 +26,7 @@ namespace System.Windows
     /// that changed.
     /// </summary>
     /// <typeparam name="T">The type of the dependency property that has changed.</typeparam>
-    public class RoutedPropertyChangedEventArgs<T> : RoutedEventArgs
+    public partial class RoutedPropertyChangedEventArgs<T> : RoutedEventArgs
     { 
         /// <summary>
         /// Initializes a new instance of the System.Windows.RoutedPropertyChangedEventArgs`1

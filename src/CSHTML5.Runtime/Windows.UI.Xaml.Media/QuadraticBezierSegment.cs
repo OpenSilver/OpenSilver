@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Creates a quadratic Bezier curve between two points in a PathFigure.
     /// </summary>
-    public sealed class QuadraticBezierSegment : PathSegment
+    public sealed partial class QuadraticBezierSegment : PathSegment
     {
         ///// <summary>
         ///// Initializes a new instance of the QuadraticBezierSegment class.

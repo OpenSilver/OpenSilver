@@ -41,7 +41,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Animates the value of a Double property along a set of key frames.
     /// </summary>
     [ContentProperty("KeyFrames")]
-    public sealed class DoubleAnimationUsingKeyFrames : AnimationTimeline
+    public sealed partial class DoubleAnimationUsingKeyFrames : AnimationTimeline
     {
         private DoubleKeyFrameCollection _keyFrames;
 
@@ -350,7 +350,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
                         object newObj = CSHTML5.Interop.ExecuteJavaScriptAsync(@"new Object()");
 
-                        if (from == null)
+                        if (AnimationHelpers.IsValueNull(from)) //todo: when using Bridge, I guess we would want to directly use "from == null" since it worked in the first place (I think).
                         {
                             foreach (string csspropertyName in cssEquivalent.Name)
                             {

@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Controls
     /// Specifies the panel that the ItemsPresenter creates for the layout of the
     /// items of an ItemsControl.
     /// </summary>
-    public class ItemsPanelTemplate : FrameworkTemplate
+    public partial class ItemsPanelTemplate : FrameworkTemplate
     {
         /// <summary>
         /// Initializes a new instance of the ItemsPanelTemplate class.

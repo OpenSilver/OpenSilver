@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Defines a generated instance of a FrameworkTemplate.
     /// </summary>
-    public class TemplateInstance
+    public partial class TemplateInstance
     {
         /// <summary>
         /// The element that contains the FrameworkTemplate.
