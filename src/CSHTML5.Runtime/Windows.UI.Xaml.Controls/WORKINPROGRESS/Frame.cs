@@ -3,6 +3,7 @@
 #if MIGRATION
 using System.Windows.Navigation;
 #else
+using System;
 using Windows.UI.Xaml.Navigation;
 #endif
 

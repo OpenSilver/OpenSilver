@@ -1,5 +1,6 @@
 ﻿#if WORKINPROGRESS
 
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -13,8 +14,8 @@ namespace Windows.UI.Xaml.Navigation
     // Summary:
     //     Provides data for the System.Windows.Controls.Page.OnNavigatingFrom(System.Windows.Navigation.NavigatingCancelEventArgs)
     //     method and the System.Windows.Navigation.NavigationService.Navigating event.
-    [TypeForwardedFrom("System.Windows.Controls.Navigation, Version=2.0.5.0, Culture=Neutral, PublicKeyToken=31bf3856ad364e35")]
-    public sealed class NavigatingCancelEventArgs : CancelEventArgs
+    //[TypeForwardedFrom("System.Windows.Controls.Navigation, Version=2.0.5.0, Culture=Neutral, PublicKeyToken=31bf3856ad364e35")]
+    public sealed partial class NavigatingCancelEventArgs : CancelEventArgs
     {
         //
         // Summary:
