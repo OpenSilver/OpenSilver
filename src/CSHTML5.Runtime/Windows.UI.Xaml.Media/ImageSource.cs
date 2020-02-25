@@ -51,10 +51,17 @@ namespace Windows.UI.Xaml.Media
         }
 
 
-        internal static object INTERNAL_ConvertFromString(string str)
+        internal static object INTERNAL_ConvertFromString(string str1)
         {
             UriKind uriKind;
-            if (str.Contains(@":/"))
+            string str = str1;
+            string pa = "pack://application:,,,/";
+            if (str.StartsWith(pa))
+            {
+                str = str1.Substring(pa.Length);
+                uriKind = UriKind.Relative;
+            }
+            else if (str.Contains(@":/"))
                 uriKind = UriKind.Absolute;
             else
                 uriKind = UriKind.Relative;
