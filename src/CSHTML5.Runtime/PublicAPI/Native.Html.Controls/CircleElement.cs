@@ -68,7 +68,7 @@ namespace CSHTML5.Native.Html.Controls
         public double Radius {  get { return Diameter / 2; } set { Diameter = 2.0 * value; } }
 
         /// <summary>
-        /// Default rectangle constructor
+        /// Default circle constructor
         /// </summary>
         public CircleElement()
             : base()
@@ -89,7 +89,7 @@ namespace CSHTML5.Native.Html.Controls
         }
 
         /// <summary>
-        /// Draws the rectangle
+        /// Draws the circle
         /// </summary>
         /// <param name="currentDrawingStyle">Draw style used for last element (can allow optimizations, null if unknown)</param>
         /// <param name="jsContext2d">Canvas 2d javascript context</param>
