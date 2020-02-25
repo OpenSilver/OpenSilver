@@ -168,6 +168,7 @@
     <Compile Include="PublicAPI\Interop\OnCallBack.cs" />
     <Compile Include="PublicAPI\MinimumRequiredCompilerVersionFriendlyNameAttribute.cs" />
     <Compile Include="PublicAPI\MinimumRequiredCompilerVersionNumberAttribute.cs" />
+    <Compile Include="PublicAPI\Native.Html.Controls\CircleElement.cs" />
     <Compile Include="PublicAPI\Native.Html.Controls\ContainerElement.cs" />
     <Compile Include="PublicAPI\Native.Html.Controls\ElementStyle.cs" />
     <Compile Include="PublicAPI\Native.Html.Controls\HtmlCanvas.cs" />
