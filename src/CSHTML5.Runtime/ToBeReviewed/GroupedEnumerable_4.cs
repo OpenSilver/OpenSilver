@@ -26,56 +26,6 @@ using System.Threading.Tasks;
 
 namespace System.Linq
 {
-    public class GroupedEnumerable<TSource, TKey, TElement> : IEnumerable<IGrouping<TKey, TElement>>
-    {
-        Dictionary<TKey, Grouping<TKey, TElement>> groups = new Dictionary<TKey, Grouping<TKey, TElement>>();
-
-        public GroupedEnumerable(IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
-        {
-#if !BRIDGE
-            if (source == null) throw new ArgumentNullException("source");
-            if (keySelector == null) throw new ArgumentNullException("keySelector");
-            if (elementSelector == null) throw new ArgumentNullException("elementSelector");
-
-
-            FillGroups(source, keySelector, elementSelector, comparer);
-#endif
-        }
-
-        private void FillGroups(IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
-        {
-#if !BRIDGE
-            foreach (TSource sourceElement in source)
-            {
-                TElement element = elementSelector(sourceElement);
-                TKey key = keySelector(sourceElement);
-                if (!groups.ContainsKey(key))
-                {
-                    groups.Add(key, new Grouping<TKey, TElement>(key));
-                }
-                var v = groups[key];
-                v.Add(element);
-            }
-#endif
-        }
-
-        public IEnumerator<IGrouping<TKey, TElement>> GetEnumerator()
-        {
-            foreach (TKey key in groups.Keys)
-            {
-                yield return groups[key];
-            }
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-    }
-
-
-
     public class GroupedEnumerable<TSource, TKey, TElement, TResult> : IEnumerable<TResult>
     {
         Collection<TResult> result = new Collection<TResult>();

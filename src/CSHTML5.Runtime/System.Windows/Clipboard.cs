@@ -35,7 +35,6 @@ namespace System.Windows
         public static void SetText(string text)
         {
             // Credits: https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
-
 #if !CSHTML5NETSTANDARD
             if (CSHTML5.Interop.IsRunningInTheSimulator)
             {
@@ -44,7 +43,7 @@ namespace System.Windows
             else
             {
 #endif
-                CSHTML5.Interop.ExecuteJavaScript(@"
+            CSHTML5.Interop.ExecuteJavaScript(@"
                   // IE specific
                   if (window.clipboardData && window.clipboardData.setData) {
                     return clipboardData.setData(""Text"", $0);
