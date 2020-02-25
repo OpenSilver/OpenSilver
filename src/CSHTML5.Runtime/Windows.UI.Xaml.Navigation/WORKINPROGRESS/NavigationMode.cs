@@ -11,7 +11,7 @@ namespace Windows.UI.Xaml.Navigation
     //
     // Summary:
     //     Specifies the type of navigation that is occurring.
-    //[TypeForwardedFrom("System.Windows.Controls.Navigation, Version=2.0.5.0, Culture=Neutral, PublicKeyToken=31bf3856ad364e35")]
+    [TypeForwardedFrom("System.Windows.Controls.Navigation, Version=2.0.5.0, Culture=Neutral, PublicKeyToken=31bf3856ad364e35")]
     public enum NavigationMode : byte
     {
         //

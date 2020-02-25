@@ -272,6 +272,23 @@ namespace Windows.UI.Xaml
             }
         }
 
+#if WORKINPROGRESS
+        //
+        // Summary:
+        //     Gets a collection of the System.Windows.Window instances that have been created.
+        //
+        // Returns:
+        //     A collection of the windows used by the application.
+        //
+        // Exceptions:
+        //   T:System.NotSupportedException:
+        //     The application is not running outside the browser.
+        //
+        //   T:System.UnauthorizedAccessException:
+        //     The current thread is not the user interface (UI) thread.
+        public WindowCollection Windows { get; }
+#endif
+
         /// <summary>
         /// Occurs just before an application shuts down and cannot be canceled.
         /// </summary>
@@ -510,6 +527,26 @@ namespace Windows.UI.Xaml
 
 #endregion
 
+#if WORKINPROGRESS
+#region UnhandledException event (Not supported yet)
+
+        /// <summary>
+        /// Occurs when an exception that is raised is not handled.
+        /// </summary>
+        public event EventHandler<ApplicationUnhandledExceptionEventArgs> UnhandledException;
+
+        //        void RaiseUnhandledException(object jsElement)
+        //        {
+        //#if !MIGRATION
+        //            UnhandledException(null, new ApplicationUnhandledExceptionEventArgs())
+        //#else
+        //            UnhandledException(null, new ApplicationUnhandledExceptionEventArgs(null, true));
+        //#endif
+        //        }
+
+#endregion
+#endif
+
         static Host _host;
 
         /// <summary>
@@ -539,6 +576,15 @@ namespace Windows.UI.Xaml
                 entryPoint
                 );
         }
+#endif
+
+#if WORKINPROGRESS
+        public bool IsRunningOutOfBrowser
+        {
+            get { return false; }
+        }
+
+        public bool HasElevatedPermissions { get; set; }
 #endif
     }
 }

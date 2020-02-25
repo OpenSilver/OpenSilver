@@ -31,6 +31,21 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
+    /// <summary>
+    /// Specifies the direction of a sort.
+    /// </summary>
+    public enum ListSortDirection
+    {
+        /// <summary>
+        /// Sort in ascending order.
+        /// </summary>
+        Ascending,
+        /// <summary>
+        /// Sort in descending order.
+        /// </summary>
+        Descending
+    }
+
     internal partial class INTERNAL_Operations
     {
         public INTERNAL_Operations(PagedCollectionView collectionViewer)

@@ -164,17 +164,11 @@
 		<Compile Include="System.ComponentModel\DesignerProperties.cs" />
 		<Compile Include="System.ComponentModel\IPagedCollectionView.cs" />
 		<Compile Include="System.ComponentModel\PageChangingEventArgs.cs" />
-		<Compile Include="System.ComponentModel\WORKINPROGRESS\CurrentChangingEventArgs.cs" />
-		<Compile Include="System.ComponentModel\WORKINPROGRESS\CurrentChangingEventHandler.cs" />
-		<Compile Include="System.ComponentModel\WORKINPROGRESS\ICollectionView.cs" />
 		<Compile Include="System.ComponentModel\WORKINPROGRESS\IEditableCollectionView.cs" />
 		<Compile Include="System.ComponentModel\WORKINPROGRESS\NewItemPlaceholderPosition.cs" />
 		<Compile Include="System.ComponentModel\WORKINPROGRESS\GroupDescription.cs" />
-		<Compile Include="System.ComponentModel\WORKINPROGRESS\SortDescription.cs" />
-		<Compile Include="System.ComponentModel\WORKINPROGRESS\SortDescriptionCollection.cs" />
 		<Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettings.cs" />
 		<Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettingsForCSharp.cs" />
-		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageSettings.cs" />
 		<Compile Include="System.Net\CredentialsMode.cs" />
 		<Compile Include="System.Net\WebClientWithCredentials.cs" />
 		<Compile Include="System.Runtime.Serialization\CollectionDataContract2Attribute.cs" />
@@ -428,9 +422,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\TextChangedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TextChangedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TimePicker.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\Toolkit\CollectionHelpers.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\Toolkit\EnumerableExtensions.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\Toolkit\ItemsControlExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ToolTip.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ToolTipService.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\UIElementCollection.cs" />
@@ -442,10 +433,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\Viewbox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\VisualStates.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WebView.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DescriptionViewer.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Frame.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Page.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TreeView.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\VirtualizationMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WrapPanel.cs" />
@@ -476,7 +463,6 @@
 		<Compile Include="Windows.UI.Xaml.Data\TemplateBinding.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\UpdateSourceTrigger.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
-		<Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\CollectionViewSource.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\Bold.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\Hyperlink.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\Inline.cs" />
@@ -547,7 +533,6 @@
 		<Compile Include="Windows.UI.Xaml.Media.Animation\Transition.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\TransitionCollection.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\Animatable.cs" />
-		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\BackEase.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\ColorAnimationUsingKeyFrames.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\ColorKeyFrame.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\ColorKeyFrameCollection.cs" />
@@ -624,11 +609,6 @@
 		<Compile Include="Windows.UI.Xaml.Navigation\NavigationFailedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Navigation\NavigationFailedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\LoadCompletedEventHandler.cs" />
-		<Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigatingCancelEventArgs.cs" />
-		<Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigatingCancelEventHandler.cs" />
-		<Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationMode.cs" />
-		<Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationService.cs" />
-		<Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationStoppedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Shapes\Ellipse.cs" />
 		<Compile Include="Windows.UI.Xaml.Shapes\Line.cs" />
 		<Compile Include="Windows.UI.Xaml.Shapes\Path.cs" />
@@ -709,7 +689,6 @@
 		<Compile Include="Windows.UI.Xaml\Window.cs" />
 		<Compile Include="Windows.UI.Xaml\WindowSizeChangedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml\FontStyle.cs" />
-		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\Application.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationUnhandledExceptionEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\EventTrigger.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FlowDirection.cs" />

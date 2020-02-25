@@ -68,6 +68,21 @@ namespace Windows.UI.Xaml.Controls
             return div;
         }
 
+#if WORKINPROGRESS
+        #region Not supported yet
 
+        private string _title;
+
+        /// <summary>
+        /// Gets or sets the name for the page.
+        /// </summary>
+        public string Title
+        {
+            get { return _title; }
+            set { _title = value; }
+        }
+
+        #endregion
+#endif
     }
 }
