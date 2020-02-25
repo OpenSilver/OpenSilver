@@ -233,7 +233,16 @@ namespace System.Runtime.Serialization
 
                         elementName = "ArrayOf" + itemsTypeName;
                     }
-                    XElement xElement = new XElement(XNamespace.Get("http://schemas.microsoft.com/2003/10/Serialization/Arrays").GetName(elementName), result);
+
+                    XElement xElement;
+                    if (itemsType.IsPrimitive)
+                    {
+                        xElement = new XElement(XNamespace.Get("http://schemas.microsoft.com/2003/10/Serialization/Arrays").GetName(elementName), result);
+                    }
+                    else
+                    {
+                        xElement = new XElement(XNamespace.Get(DataContractSerializer_Helpers.GetDefaultNamespace(itemsType.Namespace, useXmlSerializerFormat)).GetName(elementName), result);
+                    }
                     xElement.Add(new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLNS_NAMESPACE).GetName("xmlns:i"), DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE));
                     return new List<XObject>() { xElement };
                 }
