@@ -118,6 +118,48 @@ namespace CSHTML5.Internal
 
                 return uri;
             }
+            else if (originalStringLowercase.StartsWith(@"pack://application:,,,/"))
+            {
+                // https://docs.microsoft.com/en-us/dotnet/framework/wpf/app-development/pack-uris-in-wpf
+                // Note that the pack URI syntax for referenced assembly resource files can be used only with the application:/// authority. 
+                // For example, the following is not supported in WPF.
+                // pack://siteoforigin:,,,/SomeAssembly;component/ResourceFile.xaml
+
+                string html5Path = uri.Substring(23);
+
+                // If the path does not contain an assembly name, we need to add it:
+                string assemblyNameIncludingSlashes;
+                string pathAfterAssemblyName;
+                if (!DoesPathContainAssemblyName("/" + html5Path, out assemblyNameIncludingSlashes, out pathAfterAssemblyName))
+                {
+                    // We are supposed to know the startup assembly (it is set by the constructor of the "Application" class):
+                    string startupAssemblyShortName = StartupAssemblyInfo.StartupAssemblyShortName;
+                    if (!string.IsNullOrEmpty(startupAssemblyShortName))
+                    {
+                        html5Path = startupAssemblyShortName + "/" + html5Path.ToLower();
+                    }
+                }
+                else
+                {
+                    // Make sure the portion of the path AFTER the assembly name is lowercase:
+                    html5Path = assemblyNameIncludingSlashes + pathAfterAssemblyName.ToLower();
+                }
+
+                // Get the relative path where the resources are located (such as "Resources/"), and ensure that it ends with "/":
+                string outputResourcesPath = StartupAssemblyInfo.OutputResourcesPath.Replace('\\', '/'); // Note: this is populated at the startup of the application (cf. "codeToPutInTheInitializeComponentOfTheApplicationClass" in the "Compiler" project)
+                if (!outputResourcesPath.EndsWith("/") && outputResourcesPath != "")
+                    outputResourcesPath = outputResourcesPath + '/';
+
+                // Add the above relative path to the beginning of the path:
+                html5Path = outputResourcesPath + html5Path;
+
+#if !CSHTML5NETSTANDARD
+                // Support running in the simulator (note: the following method is not translated to JavaScript, so it only runs in the Simulator):
+                html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
+#endif
+
+                return html5Path;
+            }
             else if (uri.Contains(@";component/"))
             {
                 //----------------
