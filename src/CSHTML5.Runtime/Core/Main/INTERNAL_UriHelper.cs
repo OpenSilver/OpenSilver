@@ -103,9 +103,12 @@ namespace CSHTML5.Internal
                 // Add the above relative path to the beginning of the path:
                 html5Path = outputResourcesPath + html5Path;
 
-#if !CSHTML5NETSTANDARD
+#if CSHTML5BLAZOR
+                if (Interop.IsRunningInTheSimulator_WorkAround)
+                {
                 // Support running in the simulator (note: the following method is not translated to JavaScript, so it only runs in the Simulator):
-                html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
+                    html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
+                }
 #endif
 
                 return html5Path;
@@ -399,7 +402,7 @@ namespace CSHTML5.Internal
                 return fullName.Substring(0, tmpIndex);
         }
 
-#if !CSHTML5NETSTANDARD
+//#if !CSHTML5NETSTANDARD
 
 #if !BRIDGE
         [JSReplacement("$relativePath")]
@@ -428,7 +431,7 @@ namespace CSHTML5.Internal
             finalAbsolutePath = @"file:///" + finalAbsolutePath.Replace('\\', '/');
             return finalAbsolutePath;
         }
-#endif
+//#endif
 
 
 #if WORKINPROGRESS
