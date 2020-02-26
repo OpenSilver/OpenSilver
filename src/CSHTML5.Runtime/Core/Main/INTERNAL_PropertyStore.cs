@@ -50,14 +50,15 @@ namespace CSHTML5.Internal
         }
         public static INTERNAL_PropertyStorage GetStorageOrCreateNewIfNotExists(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
         {
-            // Check if the storage exists:
-            INTERNAL_PropertyStorage storage;
-            if (dependencyObject.INTERNAL_PropertyStorageDictionary == null
-                || !dependencyObject.INTERNAL_PropertyStorageDictionary.TryGetValue(dependencyProperty, out storage))
+            if (dependencyObject.INTERNAL_PropertyStorageDictionary == null)
             {
                 // Create the dictionary of it does not already exist:
-                if (dependencyObject.INTERNAL_PropertyStorageDictionary == null)
-                    dependencyObject.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
+                dependencyObject.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
+            }
+            // Check if the storage exists:
+            INTERNAL_PropertyStorage storage;
+            if (!dependencyObject.INTERNAL_PropertyStorageDictionary.TryGetValue(dependencyProperty, out storage))
+            {
 
                 // Get the type metadata (if any):
                 PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(dependencyObject.GetType());

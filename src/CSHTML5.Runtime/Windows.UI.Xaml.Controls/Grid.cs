@@ -905,7 +905,7 @@ namespace Windows.UI.Xaml.Controls
         //}
 
 
-        #region ****************** Attached Properties ******************
+#region ****************** Attached Properties ******************
 
         /// <summary>
         /// Sets the value of the Grid.Row XAML attached property on the specified FrameworkElement.
@@ -1097,7 +1097,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion
+#endregion
 
         internal double GetColumnActualWidth(ColumnDefinition columnDefinition)
         {
@@ -1230,15 +1230,5 @@ namespace Windows.UI.Xaml.Controls
         //            return double.NaN;
         //    }
         //}
-
-#if WORKINPROGRESS
-        public static readonly DependencyProperty ShowGridLinesProperty = DependencyProperty.Register("ShowGridLines", typeof(bool), typeof(Grid), new PropertyMetadata(false));
-
-        public bool ShowGridLines
-        {
-            get { return (bool)this.GetValue(ShowGridLinesProperty); }
-            set { this.SetValue(ShowGridLinesProperty, value); }
-        }
-#endif
     }
 }

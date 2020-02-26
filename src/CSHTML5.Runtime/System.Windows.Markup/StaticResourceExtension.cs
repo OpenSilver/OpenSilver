@@ -55,24 +55,11 @@ namespace System.Windows.Markup
             ResourceKey = resourceKey;
         }
 
-        //public override object ProvideValue(IServiceProvider serviceProvider)
-        //{
-        //    serviceProvider.GetService();
-        //    var staticResourceExtension = new StaticResourceExtension(ResourceKey);
-
-        //    var resource = staticResourceExtension.ProvideValue(serviceProvider) as INTERNAL_CorrespondingItem;
-
-        //    return resource == null ? "Invalid INTERNAL_CorrespondingItem" : String.Format("My {0} {1}", resource.Value, resource.Title);
-        //}
-
-
-
         /// <summary>
         /// returns an object that is provided as the value of the target property for this StaticResource.
         /// </summary>
         /// <param name="serviceProvider">A service provider helper that can provide services for the StaticResource.</param>
         /// <returns>An object that is provided as the value of the target property for this StaticResource.</returns>
-
 #if BRIDGE
         public override object ProvideValue(ServiceProvider serviceProvider)
 #else
@@ -100,18 +87,17 @@ namespace System.Windows.Markup
                 else
                 {
                     ResourceDictionary resourceDictionary = null;
-                    if (parentElement is ResourceDictionary)
+                    if ((resourceDictionary = parentElement as ResourceDictionary) == null)
                     {
-                        resourceDictionary = (ResourceDictionary)parentElement;
-                    }
-                    else if (parentElement is FrameworkElement)
-                    {
-                        resourceDictionary = ((FrameworkElement)parentElement).Resources;
+                        if (parentElement is FrameworkElement parentAsFrameworkElement)
+                        {
+                            resourceDictionary = parentAsFrameworkElement.Resources;
+                        }
                     }
                     if (resourceDictionary != null && resourceDictionary.ContainsKey(ResourceKey))
                     {
                         object returnElement = resourceDictionary[ResourceKey];
-                        if (returnElement != elementItself)
+                        if (!object.Equals(returnElement, elementItself))
                         {
                             return this.EnsurePropertyType(returnElement, targetType);
                         }

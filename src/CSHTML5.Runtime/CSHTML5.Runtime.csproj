@@ -45,12 +45,12 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">
     <AssemblyName>CSHTML5.Migration</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS;</DefineConstants>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>$(BinFolder)\Migration.WorkInProgress\CSHTML5.Migration.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Core\Main\INTERNAL_DefaultValueStore.cs" />
+    <Compile Include="Core\Main\INTERNAL_DefaultValueProvider.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
     <Compile Include="System.Collections.ObjectModel\WORKINPROGRESS\ReadOnlyObservableCollection_1.cs" />
     <Compile Include="System.ComponentModel\IPagedCollectionView.cs" />
@@ -85,6 +85,7 @@
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DescriptionViewer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Frame.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Page.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
@@ -850,6 +851,7 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerActionCollection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerBase.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerCollection.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\UIElement.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\VisualTransition.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\WindowCollection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\WindowResizeEdge.cs" />
