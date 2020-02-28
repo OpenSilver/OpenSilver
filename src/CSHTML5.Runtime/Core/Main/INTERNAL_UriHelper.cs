@@ -104,11 +104,14 @@ namespace CSHTML5.Internal
                 html5Path = outputResourcesPath + html5Path;
 
 #if CSHTML5BLAZOR
-                if (Interop.IsRunningInTheSimulator_WorkAround)
+                if (Interop.IsRunningInTheSimulator_WorkAround) // Checks that we are in the Simulator as opposed to running in WebAssembly.
                 {
-                // Support running in the simulator (note: the following method is not translated to JavaScript, so it only runs in the Simulator):
+                    // Support running in the simulator:
                     html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
                 }
+#else
+                // Support running in the simulator (note: the following method is not translated to JavaScript, so it only runs in the Simulator):
+                html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
 #endif
 
                 return html5Path;
