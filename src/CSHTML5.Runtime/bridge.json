@@ -19,7 +19,7 @@
   // Enable browser debugging of C# files.
   // Default is false.
   "sourceMap": {
-    "enabled": true
+    "enabled": false
   },
 
   // Set to true to disable Reflection metadata generation.

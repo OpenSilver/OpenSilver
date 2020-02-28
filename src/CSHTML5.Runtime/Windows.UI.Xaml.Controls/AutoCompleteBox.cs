@@ -592,11 +592,11 @@ namespace Windows.UI.Xaml.Controls
                 var item = this.Items[index];
 
                 // If the item is a FrameworkElement, we detach it from its current parent (if any) so that we can later put it into the ContentPresenter:
-                if (item is FrameworkElement)
+                if (item is FrameworkElement fe)
                 {
                     // Detach it from the current parent:
-                    if (((FrameworkElement)item).INTERNAL_VisualParent is UIElement)
-                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(((FrameworkElement)item), (UIElement)((FrameworkElement)item).INTERNAL_VisualParent);
+                    if (fe.INTERNAL_VisualParent is UIElement uiE)
+                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(fe, uiE);
                 }
                 else if (item != null)
                 {
@@ -604,7 +604,7 @@ namespace Windows.UI.Xaml.Controls
                     item = GenerateFrameworkElementToRenderTheItem(item);
                 }
 
-                newSelectedContent = (FrameworkElement)item; // Note: this can be null.
+                newSelectedContent = item as FrameworkElement; // Note: this can be null.
 
                 if (_textBox != null)
                     if (newSelectedContent is TextBlock)

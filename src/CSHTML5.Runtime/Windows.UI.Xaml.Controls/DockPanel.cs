@@ -228,7 +228,11 @@ namespace Windows.UI.Xaml.Controls
                     }
                 }
                 //the changes on the grid's structure are over so we can put it back.
+#if REWORKLOADED
+                this.AddVisualChild(this._grid);
+#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_grid, this);
+#endif
             }
         }
 

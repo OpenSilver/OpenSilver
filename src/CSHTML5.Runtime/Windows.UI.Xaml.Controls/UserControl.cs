@@ -76,14 +76,18 @@ namespace Windows.UI.Xaml.Controls
             UIElement oldChild = (UIElement)e.OldValue;
             UIElement newChild = (UIElement)e.NewValue;
             INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, parent);
+#if REWORKLOADED
+            parent.AddVisualChild(newChild);
+#else
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, parent);
+#endif
         }
 
         //protected virtual void InitializeComponent()
         //{
         //}
 
-        #region ---------- INameScope implementation ----------
+#region ---------- INameScope implementation ----------
 
         Dictionary<string, object> _nameScopeDictionary = new Dictionary<string,object>();
 
@@ -116,6 +120,6 @@ namespace Windows.UI.Xaml.Controls
             _nameScopeDictionary.Remove(name);
         }
 
-        #endregion
+#endregion
     }
 }

@@ -60,7 +60,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// The name of the ExpanderButton template part.
         /// </summary>
-        private string[] TextAreaContainerNames = { "ContentElement", "PART_ContentHost" };
+        private readonly string[] TextAreaContainerNames = { "ContentElement", "PART_ContentHost" };
         //                                                  Sl & UWP                WPF
 
         //static TextBox()
@@ -94,6 +94,11 @@ namespace Windows.UI.Xaml.Controls
         public TextBox()
         {
             UseSystemFocusVisuals = true;
+        }
+
+        internal sealed override bool INTERNAL_GetFocusInBrowser
+        {
+            get { return true; }
         }
 
         #region AcceptsReturn
@@ -168,17 +173,36 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
         /// Identifies the Text dependency property.
         /// </summary>
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof(string), typeof(TextBox), new PropertyMetadata(string.Empty, Text_Changed) { CoerceValueCallback = CoerceText });
+            DependencyProperty.Register("Text", typeof(string), typeof(TextBox), new PropertyMetadata(string.Empty, Text_Changed) { CoerceValueCallback = CoerceText, MethodToUpdateDom = UpdateDomText, CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
         static void Text_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var textBox = (TextBox)d;
             if (!textBox._isUserChangingText)
             {
-                textBox._isCodeProgrammaticallyChangingText = true; // So that when the c# caller sets the text programmatically, it does not get set multiple times.
-                string newText = e.NewValue as string ?? string.Empty;
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(textBox) && textBox._contentEditableDiv != null)
-                    INTERNAL_HtmlDomManager.SetContentString(textBox, newText);
-                textBox._isCodeProgrammaticallyChangingText = false;
+                //textBox._isCodeProgrammaticallyChangingText = true; // So that when the c# caller sets the text programmatically, it does not get set multiple times.
+                //string newText = e.NewValue as string ?? string.Empty;
+                //if (INTERNAL_VisualTreeManager.IsElementInVisualTree(textBox) && textBox._contentEditableDiv != null)
+                //{
+                //INTERNAL_HtmlDomManager.SetContentString(textBox, newText);
+                textBox.OnTextChanged(new TextChangedEventArgs() { OriginalSource = textBox });
+                //}
+                //textBox._isCodeProgrammaticallyChangingText = false;
+            }
+        }
+
+        private static void UpdateDomText(DependencyObject d, object newValue)
+        {
+            var textBox = (TextBox)d;
+            if (!textBox._isUserChangingText)
+            {
+                string displayedText = INTERNAL_HtmlDomManager.GetTextBoxText(textBox.INTERNAL_InnerDomElement);
+                string text = textBox.Text ?? string.Empty;
+                if (displayedText != text)
+                {
+                    textBox._isCodeProgrammaticallyChangingText = true;
+                    INTERNAL_HtmlDomManager.SetContentString(textBox, text);
+                    textBox._isCodeProgrammaticallyChangingText = false;
+                }
             }
         }
 
@@ -366,7 +390,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             _contentEditableDiv = contentEditableDiv;
             contentEditableDivStyle.width = "100%";
             contentEditableDivStyle.height = "100%";
-            contentEditableDivStyle.whiteSpace = "normal"; // Because by default we have decided to make the TextBox wrap, because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
+            contentEditableDivStyle.whiteSpace = "pre-wrap"; // Because by default we have decided to make the TextBox wrap, because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
             contentEditableDivStyle.overflowX = "hidden"; // Note: this is because the default HorizontalScrollBarVisibility in "Hidden"
             contentEditableDivStyle.overflowY = "hidden"; // Note: this is because the default VerticalScrollBarVisibility in "Hidden"
             if (isTemplated) //When templated, we remove the outlining that apears when the element has the focus:

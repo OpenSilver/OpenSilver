@@ -61,7 +61,11 @@ namespace Windows.UI.Xaml.Documents
         {
             foreach (Inline child in _inlines)
             {
+#if REWORKLOADED
+                this.AddVisualChild(child);
+#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
+#endif
             }
         }
     }

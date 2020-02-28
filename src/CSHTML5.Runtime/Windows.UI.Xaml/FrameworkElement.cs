@@ -346,11 +346,19 @@ namespace Windows.UI.Xaml
         /// Identifies the Name dependency property.
         /// </summary>
         public static readonly DependencyProperty NameProperty =
-            DependencyProperty.Register("Name", typeof(string), typeof(FrameworkElement), new PropertyMetadata(string.Empty));
+            DependencyProperty.Register("Name", typeof(string), typeof(FrameworkElement), new PropertyMetadata(string.Empty)
+            {
+                MethodToUpdateDom = OnNameChanged_MethodToUpdateDom,
+            });
 
+        private static void OnNameChanged_MethodToUpdateDom(DependencyObject d, object value)
+        {
+            var @this = (FrameworkElement)d;
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(@this.INTERNAL_OuterDomElement, "dataId", (value ?? string.Empty).ToString());
+        }
 #endregion
 
-#region DataContext
+        #region DataContext
 
         /// <summary>
         /// Gets or sets the data context for a FrameworkElement when it participates
@@ -749,6 +757,14 @@ namespace Windows.UI.Xaml
         {
             get { return (XmlLanguage)this.GetValue(LanguageProperty); }
             set { this.SetValue(LanguageProperty, value); }
+        }
+#endif
+
+#if REWORKLOADED
+        internal override void INTERNAL_OnVisualParentChanged()
+        {
+            this.INTERNAL_SizeChangedWhenAttachedToVisualTree(); // Raise SizeChanged event
+            this.INTERNAL_RaiseLoadedEvent(); // Raise Loaded event
         }
 #endif
     }

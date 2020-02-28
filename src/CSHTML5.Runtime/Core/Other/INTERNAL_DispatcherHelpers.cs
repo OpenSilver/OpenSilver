@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 #if MIGRATION
 #if WORKINPROGRESS
 using System.Windows.Threading;
+using System.Windows;
 #else
 using System.Windows;
 #endif

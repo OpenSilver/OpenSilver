@@ -213,7 +213,11 @@ namespace Windows.UI.Xaml.Controls
                 {
                     foreach (UIElement child in newChildren)
                     {
+#if REWORKLOADED
+                        this.AddVisualChild(child);
+#else
                         INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
+#endif
                     }
                 }
             }
@@ -229,7 +233,11 @@ namespace Windows.UI.Xaml.Controls
                     //this can happen if the Panel is detached during the delay.
                     break;
                 }
+#if REWORKLOADED
+                this.AddVisualChild(child);
+#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
+#endif
                 INTERNAL_OnChildProgressivelyLoaded();
             }
         }
@@ -251,7 +259,7 @@ namespace Windows.UI.Xaml.Controls
         {
             return (DependencyObject)this.TryFindTemplateChildFromName(childName);
         }
-        #region ---------- INameScope implementation ----------
+#region ---------- INameScope implementation ----------
         //note: copy from UserControl
         Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
 
@@ -291,7 +299,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
 
-        #endregion
+#endregion
 
 
 

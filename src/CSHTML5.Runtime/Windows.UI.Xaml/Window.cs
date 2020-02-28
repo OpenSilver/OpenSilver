@@ -228,7 +228,11 @@ namespace Windows.UI.Xaml
                 base.OnContentChanged(oldContent, newContent);
 #else
                 INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldContent as UIElement, this);
+#if REWORKLOADED
+                this.AddVisualChild(newContent as UIElement);
+#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newContent as UIElement, this);
+#endif
 #endif
                 // We can now revert the "ParentWindow" to null (cf. comment above):
                 this.INTERNAL_ParentWindow = null;

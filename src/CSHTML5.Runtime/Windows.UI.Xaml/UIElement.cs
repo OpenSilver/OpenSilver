@@ -1066,5 +1066,21 @@ namespace Windows.UI.Xaml
         //internal virtual void INTERNAL_Render()
         //{
         //}
+#if REWORKLOADED
+        internal virtual void INTERNAL_OnVisualParentChanged()
+        {
+
         }
+
+        internal void AddVisualChild(UIElement child)
+        {
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
+
+            if (object.ReferenceEquals(INTERNAL_VisualTreeOperation.Current.Root, this))
+            {
+                INTERNAL_VisualTreeOperation.Current.Complete();
+            }
+        }
+#endif
+    }
 }

@@ -141,7 +141,7 @@ namespace CSHTML5.Internal
             {
                 ((FrameworkElement)element).INTERNAL_RaiseUnloadedEvent();
             }
-
+        
             // Traverse all elements recursively:
             if (element.INTERNAL_VisualChildrenInformation != null)
             {
@@ -198,13 +198,14 @@ namespace CSHTML5.Internal
                     EndTransactionToOptimizeSimulatorPerformance();
 #endif
                 }
-                else if (child.INTERNAL_VisualParent != parent)
+                else if (!object.ReferenceEquals(child.INTERNAL_VisualParent, parent))
                 {
                     throw new InvalidOperationException("The element already has a parent. An element cannot appear in multiple locations in the Visual Tree. Remove the element from the Visual Tree before adding it elsewhere.");
                 }
                 else
                 {
                     // Nothing to do: the element is already attached to the specified parent.
+                    return; //prevent from useless call to INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE().
                 }
 
                 INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
@@ -420,6 +421,12 @@ namespace CSHTML5.Internal
             object wrapperForChild
             )
         {
+#if REWORKLOADED
+            if (INTERNAL_VisualTreeOperation.Current.Root == null)
+            {
+                INTERNAL_VisualTreeOperation.Current.Root = parent;
+            }
+#endif
             //#if CSHTML5BLAZOR && DEBUG
             //            string childIndentity = child + (child != null ? " (" + child.GetHashCode() + ")" : "");
             //            string parentIndentity = parent + (parent != null ? " (" + parent.GetHashCode() + ")" : "");
@@ -672,15 +679,16 @@ namespace CSHTML5.Internal
             Performance.Counter("VisualTreeManager: Handle binding", t9);
 #endif
 
-            //--------------------------------------------------------
-            // HANDLE TABINDEX:
-            //--------------------------------------------------------
+//--------------------------------------------------------
+// HANDLE TABINDEX:
+//--------------------------------------------------------
 
-            // For GotFocus and LostFocus to work, the DIV specified by "INTERNAL_OptionalSpecifyDomElementConcernedByFocus"
-            // (or the OuterDomElement otherwise) needs to have the "tabIndex" attribute set. Therefore we need to always set
-            // it (unless IsTabStop is False) to its current value (default is Int32.MaxValue). At the time when this code was
-            // written, there was no way to automatically call the "OnChanged" on a dependency property if no value was set.
+// For GotFocus and LostFocus to work, the DIV specified by "INTERNAL_OptionalSpecifyDomElementConcernedByFocus"
+// (or the OuterDomElement otherwise) needs to have the "tabIndex" attribute set. Therefore we need to always set
+// it (unless IsTabStop is False) to its current value (default is Int32.MaxValue). At the time when this code was
+// written, there was no way to automatically call the "OnChanged" on a dependency property if no value was set.
 
+#if !REWORKLOADED
             // IMPORTANT: This needs to be done AFTER the "OnApplyTemplate" (for example, the TextBox sets the "INTERNAL_OptionalSpecifyDomElementConcernedByFocus" in the "OnApplyTemplate").
             if (isChildAControl)
             {
@@ -689,12 +697,12 @@ namespace CSHTML5.Internal
                     Control.TabIndexProperty_MethodToUpdateDom(child, ((Control)child).TabIndex);
                 }
             }
-
+#endif
 
             //--------------------------------------------------------
             // RAISE THE "SIZECHANGED" EVENT:
             //--------------------------------------------------------
-
+#if !REWORKLOADED
 #if PERFSTAT
             var t10 = Performance.now();
 #endif
@@ -713,7 +721,6 @@ namespace CSHTML5.Internal
             //--------------------------------------------------------
             // RAISE THE "LOADED" EVENT:
             //--------------------------------------------------------
-
 #if PERFSTAT
             var t11 = Performance.now();
 #endif
@@ -728,6 +735,10 @@ namespace CSHTML5.Internal
 
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Raise Loaded event", t11);
+#endif
+
+#else
+            INTERNAL_VisualTreeOperation.Current.Enqueue(child);
 #endif
         }
 
@@ -935,4 +946,44 @@ namespace CSHTML5.Internal
             return null;
         }
     }
+
+#if REWORKLOADED
+    internal sealed class INTERNAL_VisualTreeOperation
+    {
+        private readonly Queue<UIElement> visualElements;
+
+        static INTERNAL_VisualTreeOperation()
+        {
+            Current = new INTERNAL_VisualTreeOperation();
+        }
+
+        private INTERNAL_VisualTreeOperation()
+        {
+            this.visualElements = new Queue<UIElement>();
+        }
+
+        public static INTERNAL_VisualTreeOperation Current { get; private set; }
+
+        public UIElement Root { get; set; }
+
+        public void Enqueue(UIElement uiE)
+        {
+            this.visualElements.Enqueue(uiE);
+        }
+
+        public void Complete()
+        {
+            while (this.visualElements.Count > 0)
+            {
+                UIElement uiE = this.visualElements.Dequeue();
+                if (uiE._isLoaded)
+                {
+                    uiE.INTERNAL_OnVisualParentChanged();
+                    uiE.StartManagingPointerPositionForPointerExitedEventIfNeeded();
+                }
+            }
+            this.Root = null;
+        }
+    }
+#endif
 }

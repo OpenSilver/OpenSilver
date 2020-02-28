@@ -296,7 +296,11 @@ namespace Windows.UI.Xaml.Controls
                     //todo-perf: when adding the columns and rows of the Grid, we currently remove and add back all the children many times.
                     foreach (UIElement child in Children)
                     {
+#if REWORKLOADED
+                        this.AddVisualChild(child);
+#else
                         INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
+#endif
                     }
                 }
             }
@@ -788,7 +792,11 @@ namespace Windows.UI.Xaml.Controls
                         {
                             // Note: we do this for all items (regardless of whether they are in the oldChildren collection or not) to make it work when the item is first added to the Visual Tree (at that moment, all the properties are refreshed by calling their "Changed" method).
                             UpdateStructureWhenAddingChild(child);
+#if REWORKLOADED
+                            this.AddVisualChild(child);
+#else
                             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
+#endif
                         }
                     }
                     this.LocallyManageChildrenChanged();

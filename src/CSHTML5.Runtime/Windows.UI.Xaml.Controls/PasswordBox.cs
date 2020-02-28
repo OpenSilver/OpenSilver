@@ -52,7 +52,10 @@ namespace Windows.UI.Xaml.Controls
 
         private string[] TextAreaContainerNames = { "ContentElement", "PART_ContentHost" };
 
-
+        internal sealed override bool INTERNAL_GetFocusInBrowser
+        {
+            get { return true; }
+        }
 
         public PasswordBox()
         {

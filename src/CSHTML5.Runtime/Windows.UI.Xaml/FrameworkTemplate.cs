@@ -76,7 +76,11 @@ namespace Windows.UI.Xaml
                     TemplateInstance templateInstance = _methodToInstantiateFrameworkTemplate(templateOwner);
 
                     // Attach it:
+#if REWORKLOADED
+                    templateOwner.AddVisualChild(templateInstance.TemplateContent);
+#else
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(templateInstance.TemplateContent, templateOwner);
+#endif
 
                     // Raise the "OnApplyTemplate" property:
                     if (templateOwner != null)

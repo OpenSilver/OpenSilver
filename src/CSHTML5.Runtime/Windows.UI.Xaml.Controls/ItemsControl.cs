@@ -262,7 +262,11 @@ namespace Windows.UI.Xaml.Controls
                             }
 
                             // Attach the panel:
+#if REWORKLOADED
+                            this._placeWhereItemsPanelWillBeRendered.AddVisualChild(this._renderedItemsPanel);
+#else
                             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_renderedItemsPanel, _placeWhereItemsPanelWillBeRendered);
+#endif
 
                             // Update the children:
                             if (_actualItemsSource != null)
@@ -606,7 +610,11 @@ namespace Windows.UI.Xaml.Controls
                             _itemContainerGenerator.INTERNAL_RegisterContainer(newContent, item);
 
                             // We directly attach the content to the visual tree:
+#if REWORKLOADED
+                            this._renderedItemsPanel.AddVisualChild(newContent);
+#else
                             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newContent, _renderedItemsPanel);
+#endif
                         }
                         else
                         {
@@ -633,7 +641,11 @@ namespace Windows.UI.Xaml.Controls
                             }
 
                             // We attach the container to the visual tree:
+#if REWORKLOADED
+                            this._renderedItemsPanel.AddVisualChild(containerIfAny);
+#else
                             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(containerIfAny, _renderedItemsPanel);
+#endif
 
                             if (containerIfAny == newContent)
                             {

@@ -88,7 +88,11 @@ namespace Windows.UI.Xaml.Controls
                 if (this._isLoaded)
                 {
                     INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
+#if REWORKLOADED
+                    this.AddVisualChild(value);
+#else
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
+#endif
                 }
                 _child = value;
             }
@@ -96,7 +100,11 @@ namespace Windows.UI.Xaml.Controls
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
+#if REWORKLOADED
+            this.AddVisualChild(this._child);
+#else
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
+#endif
         }
 
 

@@ -40,6 +40,12 @@ namespace Windows.UI.Xaml.Controls
         // and "ContentTemplate" properties (those bindings
         // are added at compile-time).
         //--------------------------------------------------
+        internal override void UpdateTabIndex(bool isTabStop, int tabIndex)
+        {
+            // we don't do anything since ContentPresenter is not supposed to be a Control in the first place
+            // and it is not supposed to be counted in tabbing
+            return;
+        }
     }
 }
 
