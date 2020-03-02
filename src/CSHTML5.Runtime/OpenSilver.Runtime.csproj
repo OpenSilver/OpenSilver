@@ -171,6 +171,11 @@
 		<Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettingsForCSharp.cs" />
 		<Compile Include="System.Net\CredentialsMode.cs" />
 		<Compile Include="System.Net\WebClientWithCredentials.cs" />
+		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\ComInterfaces.cs" />
+		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\CustomAttributeBuilder.cs" />
+		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\DynamicMethod.cs" />
+		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\ParameterBuilder.cs" />
+		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\ParameterToken.cs" />
 		<Compile Include="System.Runtime.Serialization\CollectionDataContract2Attribute.cs" />
 		<Compile Include="System.Runtime.Serialization\DataContract2Attribute.cs" />
 		<Compile Include="System.Runtime.Serialization\DataContractSerializer.cs" />
