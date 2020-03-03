@@ -276,6 +276,7 @@
 		<Compile Include="Windows.Foundation\Rect.cs" />
 		<Compile Include="Windows.Foundation\Size.cs" />
 		<Compile Include="Windows.Foundation\SizeConverter.cs" />
+		<Compile Include="Windows.Foundation\WORKINPROGRESS\Point.cs" />
 		<Compile Include="Windows.System\VirtualKey.cs" />
 		<Compile Include="Windows.System\VirtualKeyModifiers.cs" />
 		<Compile Include="Windows.UI.Core\CoreDispatcher.cs" />
@@ -438,6 +439,10 @@
 		<Compile Include="Windows.UI.Xaml.Controls\Viewbox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\VisualStates.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WebView.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleSubImage.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SubImageEventHandler.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SubImageRoutedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TreeView.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\VirtualizationMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WrapPanel.cs" />
@@ -606,9 +611,13 @@
 		<Compile Include="Windows.UI.Xaml.Media\VisualTreeHelper.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\BitmapCache.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\CacheMode.cs" />
+		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\CompositeTransform.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\GeometryCollection.cs" />
+		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\MultiScaleTileSource.cs" />
+		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\Polygon.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\Projection.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\RectangleGeometry.cs" />
+		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\SkewTransform.cs" />
 		<Compile Include="Windows.UI.Xaml.Navigation\NavigatedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Navigation\NavigationEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Navigation\NavigationFailedEventArgs.cs" />
@@ -708,6 +717,7 @@
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerActionCollection.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerBase.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerCollection.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\UIElement.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\VisualTransition.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\WindowCollection.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\WindowStyle.cs" />

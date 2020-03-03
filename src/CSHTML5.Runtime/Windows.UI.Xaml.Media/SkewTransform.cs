@@ -181,6 +181,7 @@ namespace Windows.UI.Xaml.Media
 
 
         // NOTE: CenterX and CenterY are currently not supported because in CSS there is only the "transformOrigin" property, which is used for the "UIElement.RenderTransformOrigin" property.
+        // However, they are still present as stubs in the WorkInProgress version or SkewTransform
 
 
         internal override void INTERNAL_ApplyTransform()
