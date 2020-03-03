@@ -484,6 +484,9 @@ $0.addEventListener('keydown', function(e) {
                 //BRIDGETODO : here the code below works weird
                 // instance = this
                 // makes instance working properly, where it shouldn't
+                //Note: I think the reason why instance = this works is because it is set with the correct context of "this",
+                //      so instance = this TextBox. If it was inside the function defined as callback of addEventListener,
+                //      "this" would be in the context of the event triggered, so it would be the contentEditable div.
                 Script.Write(@"
 var instance = $1;
 $0.addEventListener('keydown', function(e) {
@@ -651,6 +654,7 @@ $0.addEventListener('paste', function(e) {
   
 }, false);", contentEditableDiv);
 #else
+                var acceptsReturn = this.AcceptsReturn;
                 Script.Write(@"
 {0}.addEventListener('paste', function(e) {
     var isReadOnly= {1};
@@ -703,7 +707,7 @@ $0.addEventListener('paste', function(e) {
       }
             }
   
-}, false);", contentEditableDiv, this.IsReadOnly, this.AcceptsReturn);
+}, false);", contentEditableDiv, isReadOnly, acceptsReturn);
                 //BRIDGETODO : check the code up
 #endif
             }
