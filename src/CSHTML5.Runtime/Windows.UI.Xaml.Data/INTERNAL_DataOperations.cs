@@ -21,6 +21,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -155,6 +156,13 @@ namespace Windows.UI.Xaml.Data
         {
             PropertyName = propertyName;
         }
+
+#if WORKINPROGRESS
+        public override object GroupNameFromItem(object item, int level, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+#endif
     }
 
     /// <summary>
