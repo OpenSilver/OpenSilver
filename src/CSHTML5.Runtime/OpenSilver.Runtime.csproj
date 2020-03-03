@@ -245,6 +245,7 @@
 		<Compile Include="System.Windows\IDataObject.cs" />
 		<Compile Include="System.Windows\RoutedPropertyChangedEventArgs_1.cs" />
 		<Compile Include="System.Windows\RoutedPropertyChangedEventHandler.cs" />
+		<Compile Include="System.Windows\WORKINPROGRESS\FontStretches.cs" />
 		<Compile Include="System.Xml.Linq\XAttribute.cs" />
 		<Compile Include="System.Xml.Linq\XContainer.cs" />
 		<Compile Include="System.Xml.Linq\XDocument.cs" />
@@ -551,6 +552,7 @@
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\ColorKeyFrameCollection.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\IAnimatable.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\KeySpline.cs" />
+		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\RepeatBehavior.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\SplineColorKeyFrame.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\SplineDoubleKeyFrame.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\FillBehavior.cs" />
@@ -736,6 +738,7 @@
 		<Compile Include="Windows.UI\Color.cs" />
 		<Compile Include="Windows.UI\ColorConverter.cs" />
 		<Compile Include="Windows.UI\Colors.cs" />
+		<Compile Include="Windows.UI\WORKINPROGRESS\Color.cs" />
 		<Compile Include="__COMPATIBILITY__\JSIL.Meta.dll ASSEMBLY\JSIL.Meta\JSIgnoreAttribute.cs" />
 		<Compile Include="__COMPATIBILITY__\JSIL.Meta.dll ASSEMBLY\JSIL.Meta\JSReplacementAttribute.cs" />
 		<Compile Include="__COMPATIBILITY__\JSIL.Meta.dll ASSEMBLY\JSIL\Verbatim.cs" />
