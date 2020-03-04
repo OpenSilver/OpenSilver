@@ -29,26 +29,19 @@ namespace Windows.UI.Xaml.Documents
     [ContentProperty("Inlines")]
     public partial class Span : Inline
     {
-        private readonly InlineCollection _inlines;
 
         /// <summary>
         /// Initializes a new instance of the Span class.
         /// </summary>
         public Span()
         {
-            this._inlines = new InlineCollection(this);
+            this.Inlines = new InlineCollection(this);
         }
 
         /// <summary>
         ///Gets an InlineCollection containing the top-level inline elements that include the contents of Span.
         /// </summary>
-        public InlineCollection Inlines
-        {
-            get
-            {
-                return this._inlines;
-            }
-        }
+        public InlineCollection Inlines { get; }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
@@ -59,7 +52,7 @@ namespace Windows.UI.Xaml.Documents
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
-            foreach (Inline child in _inlines)
+            foreach (Inline child in this.Inlines)
             {
 #if REWORKLOADED
                 this.AddVisualChild(child);

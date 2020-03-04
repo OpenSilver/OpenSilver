@@ -15,6 +15,7 @@
 
 #if MIGRATION
 using System.Windows.Controls;
+using CSHTML5.Internal;
 #else
 using Windows.UI.Text;
 using Windows.UI.Xaml.Controls;
@@ -54,7 +55,8 @@ namespace Windows.UI.Xaml.Documents
         public new static readonly DependencyProperty TextDecorationsProperty = DependencyProperty.Register("TextDecorations", 
                                                                                                             typeof(TextDecorationCollection), 
                                                                                                             typeof(Inline), 
-                                                                                                            new PropertyMetadata(System.Windows.TextDecorations.None) {
+                                                                                                            new PropertyMetadata(System.Windows.TextDecorations.None) 
+                                                                                                            {
                                                                                                                 GetCSSEquivalent = Control.INTERNAL_GetCSSEquivalentForTextDecorations 
                                                                                                             });
 #else
@@ -76,5 +78,17 @@ namespace Windows.UI.Xaml.Documents
             }
             );
 #endif
+        
+        protected override void OnAfterApplyHorizontalAlignmentAndWidth()
+        {
+            dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement);
+            style.display = "inline";
+        }
+
+        protected override void OnAfterApplyVerticalAlignmentAndWidth()
+        {
+            dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement);
+            style.display = "inline";
+        }
     }
 }
