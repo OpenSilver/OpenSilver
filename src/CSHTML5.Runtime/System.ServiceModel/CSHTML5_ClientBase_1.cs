@@ -1149,7 +1149,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         }
 #endif
 
-#if WORKINPROGRESS && !CSHTML5BLAZOR || WORKINPROGRESS
+#if WORKINPROGRESS && (!CSHTML5BLAZOR || WORKINPROGRESS)
 #region Not Supported Stuff
 
         //    /// <summary>
