@@ -45,13 +45,17 @@ namespace System
         /// <param name="element"></param>
         /// <param name="property"></param>
         /// <param name="parents"></param>
-        public ServiceProvider(object element, DependencyProperty property, List<Object> parents = null)
+        public ServiceProvider(object element, DependencyProperty property, List<object> parents)
         {
             TargetObject = element;
             TargetProperty = property;
             Parents = parents;
         }
 
+        public ServiceProvider(object element, DependencyProperty property) : this(element, property, new List<object>())
+        {
+
+        }
         
         /// <summary>
         /// Gets the service object of the specified type.
