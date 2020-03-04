@@ -47,7 +47,11 @@ namespace Windows.UI.Xaml.Controls
     {
         protected ItemContainerGenerator _itemContainerGenerator = new ItemContainerGenerator(); // Note: this maps an item (for example a string) to the element that is added to the visual tree (such a datatemplate) or to the native DOM element in case of native combo box for example.
         protected FrameworkElement _placeWhereItemsPanelWillBeRendered = null; // By default, this variable will be equal to "this" (set in the contructor), unless instructed otherwise by a deriving class (such as a templated ListBox or ComboBox):
+#if WORKINPROGRESS
+        protected Panel _renderedItemsPanel = null;
+#else
         protected FrameworkElement _renderedItemsPanel = null;
+#endif
         protected IEnumerable _itemsSourceAsSetByUser; // This corresponds to the value that the user has set to ItemsSource. The only case where this value differs from this.ItemsSource is when the validation of the value entered by the user has failed (for example if the user sets to a value while the Items collection is not empty).
         protected IEnumerable _actualItemsSource; // This corresponds to the elements that are actually displayed. It is either equal to "_itemsSourceAsSetByUser" (if the user has specified an ItemsSource), or it is equal to an internally-created ItemsCollection.
         List<object> _snapshotOfTheActualItemsSourceCollectionBeforeCollectionChangedEvent; // This variable stores a "snapshot" of the "Items" collection before the "CollectionChanged" event. The idea here is that when the user adds/removes/clears the collection, we arrive into the "CollectionChanged" event, but we have no mean to know what the collection was like before it was changed. This variables allows us to get the answer to this question.
@@ -62,7 +66,7 @@ namespace Windows.UI.Xaml.Controls
             _disableDefaultRendering = true;
         }
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Gets the collection used to generate the content of the control. WARNING: When ItemsSource is set, it will only return a snapshot. The returned values will not be updated at the same time as the ItemsSource.
@@ -169,7 +173,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion
+#endregion
 
 
         /// <summary>
@@ -226,9 +230,7 @@ namespace Windows.UI.Xaml.Controls
 
         static void OnItemsPanel_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ItemsControl element = (ItemsControl)d;
-            ItemsPanelTemplate newTemplate = (ItemsPanelTemplate)e.NewValue;
-            element.UpdateItemsPanel(newTemplate);
+            ((ItemsControl)d).UpdateItemsPanel((ItemsPanelTemplate)e.NewValue);
         }
 
         protected virtual void UpdateItemsPanel(ItemsPanelTemplate newTemplate)
@@ -247,6 +249,22 @@ namespace Windows.UI.Xaml.Controls
                         if (newTemplate != null)
                         {
                             // Create an instance of the Panel:
+#if WORKINPROGRESS
+                            FrameworkElement template = newTemplate.INTERNAL_InstantiateFrameworkTemplate();
+                            if (template is Panel panel)
+                            {
+                                this._renderedItemsPanel = panel;
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException("ItemsControl.ItemsPanelTemplate must derive from Panel.");
+                            }
+                            // Make sure that the panel contains no children:
+                            if (this._renderedItemsPanel.Children != null && this._renderedItemsPanel.Children.Count > 0)
+                            {
+                                throw new InvalidOperationException("Cannot explicitly modify Children collection of Panel used as ItemsPanel for ItemsControl. ItemsControl generates child elements for Panel.");
+                            }
+#else
                             _renderedItemsPanel = newTemplate.INTERNAL_InstantiateFrameworkTemplate();
 
                             // Make sure the panel derives from the type "Panel":
@@ -260,6 +278,7 @@ namespace Windows.UI.Xaml.Controls
                             {
                                 throw new InvalidOperationException("Cannot explicitly modify Children collection of Panel used as ItemsPanel for ItemsControl. ItemsControl generates child elements for Panel.");
                             }
+#endif
 
                             // Attach the panel:
 #if REWORKLOADED
@@ -304,7 +323,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 //throw an exception if Items is not empty and the old ItemsSource is null (which means the items in Items have been put there directly by the user without passing through ItemsSource):
                 bool areWeMovingFromDefaultCollectionToCustomOne = (oldValue == null);
-                bool previousCollectionWasNotEmpty = this._actualItemsSource is ItemCollection && ((ItemCollection)this._actualItemsSource).Count > 0;
+                bool previousCollectionWasNotEmpty = (this._actualItemsSource is ItemCollection itemCollection) && itemCollection.Count > 0;
                 if (areWeMovingFromDefaultCollectionToCustomOne && previousCollectionWasNotEmpty)
                 {
                     throw new InvalidOperationException("Items collection must be empty before using ItemsSource.");
@@ -314,9 +333,9 @@ namespace Windows.UI.Xaml.Controls
                 _itemsSourceAsSetByUser = newValue;
 
                 // Unregister the "CollectionChanged" of the previous collection:
-                if (this._actualItemsSource is INotifyCollectionChanged)
+                if (this._actualItemsSource is INotifyCollectionChanged oldItemsSourceAsCollectionChanged)
                 {
-                    ((INotifyCollectionChanged)this._actualItemsSource).CollectionChanged -= this.ItemCollection_CollectionChanged;
+                    oldItemsSourceAsCollectionChanged.CollectionChanged -= this.ItemCollection_CollectionChanged;
                 }
 
                 // Distinguish between the case where the user is setting its own ItemsSource and the case where he is setting null to use the default collection provided by the control:
@@ -335,9 +354,9 @@ namespace Windows.UI.Xaml.Controls
                 RememberTheContentOfTheActualItemsSourceForFutureUse();
 
                 // Register the "CollectionChanged" event:
-                if (this._actualItemsSource is INotifyCollectionChanged)
+                if (this._actualItemsSource is INotifyCollectionChanged itemsSourceAsCollectionChanged)
                 {
-                    ((INotifyCollectionChanged)this._actualItemsSource).CollectionChanged += this.ItemCollection_CollectionChanged;
+                    itemsSourceAsCollectionChanged.CollectionChanged += this.ItemCollection_CollectionChanged;
                 }
 
                 OnItemsSourceChanged_BeforeVisualUpdate(oldValue, newValue);
@@ -350,7 +369,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     //we set the new Items (which will refresh the display)
                     OnItemsChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-                    UpdateChildrenInVisualTree((IEnumerable)oldValue, (IEnumerable)newValue);
+                    UpdateChildrenInVisualTree(oldValue, newValue);
                 }
             }
         }
@@ -394,15 +413,7 @@ namespace Windows.UI.Xaml.Controls
         {
             //todo: test scenario: Add ItemsSource, change it for something that is not IEnumerable, change it for something that is IEnumerable
             //todo: also see DataGrid.OnCollectionChanged (it covers one more case)
-            if (e.NewValue is IEnumerable || e.NewValue == null)
-            {
-                ItemsControl itemsControl = (ItemsControl)d;
-                IEnumerable oldValue = e.OldValue as IEnumerable;
-                itemsControl.OnItemsSourceChanged(oldValue, (IEnumerable)e.NewValue);
-            }
-            else
-                throw new InvalidOperationException("ItemsControl.ItemsSource must be of type IEnumerable.");
-
+            ((ItemsControl)d).OnItemsSourceChanged((IEnumerable)e.OldValue, (IEnumerable)e.NewValue);
         }
 
 
@@ -554,11 +565,10 @@ namespace Windows.UI.Xaml.Controls
                 var containerIfAny = _itemContainerGenerator.ContainerFromItem(item);
                 if (containerIfAny == null)
                 {
-                    if (item is UIElement)
+                    if (item is UIElement itemAsUIElement)
                     {
                         // It means that no DataTemplate was applied, so we just remove the element.
 
-                        UIElement itemAsUIElement = (UIElement)item;
                         if (itemAsUIElement.INTERNAL_VisualParent != null)
                         {
                             INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(itemAsUIElement, (UIElement)itemAsUIElement.INTERNAL_VisualParent);
@@ -566,12 +576,11 @@ namespace Windows.UI.Xaml.Controls
                         }
                     }
                 }
-                else if (containerIfAny is FrameworkElement)
+                else if (containerIfAny is FrameworkElement containerAsFE)
                 {
-                    FrameworkElement containerAsFrameworkElement = (FrameworkElement)containerIfAny;
-                    if ((UIElement)((FrameworkElement)containerIfAny).INTERNAL_VisualParent != null)
+                    if ((UIElement)containerAsFE.INTERNAL_VisualParent != null)
                     {
-                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull((FrameworkElement)containerIfAny, (UIElement)((FrameworkElement)containerIfAny).INTERNAL_VisualParent);
+                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(containerAsFE, (UIElement)containerAsFE.INTERNAL_VisualParent);
                     }
                     if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_renderedItemsPanel))
                     {
@@ -610,10 +619,10 @@ namespace Windows.UI.Xaml.Controls
                             _itemContainerGenerator.INTERNAL_RegisterContainer(newContent, item);
 
                             // We directly attach the content to the visual tree:
-#if REWORKLOADED
-                            this._renderedItemsPanel.AddVisualChild(newContent);
+#if WORKINPROGRESS
+                            this._renderedItemsPanel.Children.Add(newContent);
 #else
-                            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newContent, _renderedItemsPanel);
+                            ((Panel)this._renderedItemsPanel).Children.Add(newContent);
 #endif
                         }
                         else
@@ -641,10 +650,10 @@ namespace Windows.UI.Xaml.Controls
                             }
 
                             // We attach the container to the visual tree:
-#if REWORKLOADED
-                            this._renderedItemsPanel.AddVisualChild(containerIfAny);
+#if WORKINPROGRESS
+                            this._renderedItemsPanel.Children.Add(containerIfAny);
 #else
-                            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(containerIfAny, _renderedItemsPanel);
+                            ((Panel)this._renderedItemsPanel).Children.Add(containerIfAny);
 #endif
 
                             if (containerIfAny == newContent)
@@ -672,16 +681,11 @@ namespace Windows.UI.Xaml.Controls
 
         protected FrameworkElement GenerateFrameworkElementToRenderTheItem(object item)
         {
-            FrameworkElement result;
-
-            if (item is FrameworkElement)
-            {
-                //---------------
-                // The item is already a FrameworkElement, so we return itself:
-                //---------------
-                result = (FrameworkElement)item;
-            }
-            else
+            //---------------
+            // if the item is a FrameworkElement, return itself:
+            //---------------
+            FrameworkElement result = item as FrameworkElement;
+            if (result == null)
             {
                 object displayElement = PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(item, this.DisplayMemberPath);
                 if (this.ItemTemplate != null)
@@ -709,7 +713,7 @@ namespace Windows.UI.Xaml.Controls
                     container.DataContext = item;
                     result = container;
                 }
-            }
+            }            
 #if WORKINPROGRESS
             this.PrepareContainerForItemOverride(result, item);
 #endif
@@ -789,9 +793,8 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register("DisplayMemberPath", typeof(string), typeof(ItemsControl), new PropertyMetadata(string.Empty, DisplayMemberPath_Changed));
         private static void DisplayMemberPath_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var itemsControl = d as ItemsControl;
-            if (itemsControl != null)
-                ((ItemsControl)d).UpdateChildrenInVisualTree(itemsControl.Items, itemsControl.Items, true);
+            ItemsControl itemsControl = (ItemsControl)d;
+            itemsControl.UpdateChildrenInVisualTree(itemsControl.Items, itemsControl.Items, true);
         }
 
 
@@ -811,9 +814,8 @@ namespace Windows.UI.Xaml.Controls
 
         private static void ItemContainerStyle_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var itemsControl = d as ItemsControl;
-            if (itemsControl != null)
-                ((ItemsControl)d).UpdateChildrenInVisualTree(itemsControl.Items, itemsControl.Items, true);
+            ItemsControl itemsControl = (ItemsControl)d;
+            itemsControl.UpdateChildrenInVisualTree(itemsControl.Items, itemsControl.Items, true);
         }
 
 
@@ -1029,6 +1031,7 @@ namespace Windows.UI.Xaml.Controls
         {
             //throw new NotImplementedException();
             //todo: implement this
+            //for now the implementation of this method is fully handled by derived classes.
         }
 
         public static ItemsControl GetItemsOwner(DependencyObject element)
