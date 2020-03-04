@@ -321,6 +321,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\Thumb.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\ToggleButton.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\UpDownTextBox.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\AutoCompleteBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\AutoCompleteFilterPredicate.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\BooleanToVisibilityConverter.cs" />
@@ -623,6 +624,7 @@
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\Projection.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\RectangleGeometry.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\SkewTransform.cs" />
+		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\VisualTreeHelper.cs" />
 		<Compile Include="Windows.UI.Xaml.Navigation\NavigatedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Navigation\NavigationEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Navigation\NavigationFailedEventArgs.cs" />
