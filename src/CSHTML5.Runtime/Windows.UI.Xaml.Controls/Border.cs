@@ -100,6 +100,11 @@ namespace Windows.UI.Xaml.Controls
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
+            if (this.BorderBrush == null)
+            {
+                INTERNAL_PropertyStore.ApplyCssChanges(null, null, Border.BorderBrushProperty.GetMetadata(typeof(Border)), this);
+            }
+
 #if REWORKLOADED
             this.AddVisualChild(this._child);
 #else
@@ -161,6 +166,17 @@ namespace Windows.UI.Xaml.Controls
                 {
                     return new CSSEquivalent()
                     {
+                        Value = (inst, value) =>
+                        {
+                            if (value == null)
+                            {
+                                return "transparent";
+                            }
+                            else
+                            {
+                                return value;
+                            }
+                        },
                         Name = new List<string> { "borderColor" },
                     };
                 }
