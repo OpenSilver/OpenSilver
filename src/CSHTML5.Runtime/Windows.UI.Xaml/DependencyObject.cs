@@ -339,7 +339,7 @@ namespace Windows.UI.Xaml
             {
                 if (newBindingExpression.IsAttached)
                 {
-                    throw new InvalidOperationException("Cannot attach an instance of Windows.UI.Xaml.Data.BindingExpression multiple times");
+                    throw new InvalidOperationException(string.Format("Cannot attach an instance of '{0}' multiple times", typeof(BindingExpression)));
                 }
                 else
                 {
