@@ -1,6 +1,10 @@
 #if WORKINPROGRESS
 
+#if MIGRATION
 using System.Windows.Automation.Peers;
+#else
+using Windows.UI.Xaml.Automation.Peers;
+#endif
 
 #if MIGRATION
 namespace System.Windows

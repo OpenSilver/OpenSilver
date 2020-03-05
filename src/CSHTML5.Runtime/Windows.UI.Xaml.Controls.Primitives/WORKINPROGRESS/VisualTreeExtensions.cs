@@ -1,12 +1,9 @@
 #if WORKINPROGRESS
+#if MIGRATION
 
 using System.Collections.Generic;
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
 	public static partial class VisualTreeExtensions
 	{
@@ -62,4 +59,5 @@ namespace Windows.UI.Xaml.Controls.Primitives
 	}
 }
 
+#endif
 #endif

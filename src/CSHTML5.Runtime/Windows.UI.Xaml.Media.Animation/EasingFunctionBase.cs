@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Provides the base class for all the easing functions.
     /// </summary>
 #if WORKINPROGRESS
-    public partial class EasingFunctionBase : DependencyObject, IEasingFunction
+    public abstract partial class EasingFunctionBase : DependencyObject, IEasingFunction
 #else
     public partial class EasingFunctionBase : DependencyObject
 #endif
@@ -84,16 +84,5 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </summary>
         /// <returns></returns>
         internal virtual Dictionary<string, object> GetAdditionalOptionsForVelocityCall() { return null; }
-
-#if WORKINPROGRESS
-        #region Not supported yet
-
-        public double Ease(double normalizedTime)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-#endif
     }
 }

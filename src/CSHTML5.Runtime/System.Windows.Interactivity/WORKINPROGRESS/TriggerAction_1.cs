@@ -1,5 +1,8 @@
 ﻿#if WORKINPROGRESS
-#if MIGRATION
+
+#if !MIGRATION
+using Windows.UI.Xaml;
+#endif
 
 namespace System.Windows.Interactivity
 {
@@ -16,5 +19,4 @@ namespace System.Windows.Interactivity
     }
 }
 
-#endif
 #endif

@@ -1,5 +1,9 @@
 #if WORKINPROGRESS
 
+#if !MIGRATION
+using System;
+#endif
+
 #if MIGRATION
 namespace System.Windows.Media.Animation
 #else
@@ -12,7 +16,7 @@ namespace Windows.UI.Xaml.Media.Animation
 		/// Initializes a new instance of the System.Windows.Media.Animation.RepeatBehavior structure with the specified repeat duration.
 		/// </summary>
 		/// <param name="duration">The total length of time that the System.Windows.Media.Animation.Timeline should play (its active duration).</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">duration evaluates to a negative number.</exception>
+		/// <exception cref="ArgumentOutOfRangeException">duration evaluates to a negative number.</exception>
 		public RepeatBehavior(TimeSpan duration)
 		{
 			_type = RepeatBehaviorType.Count;
@@ -26,7 +30,7 @@ namespace Windows.UI.Xaml.Media.Animation
 		/// Gets the total length of time a System.Windows.Media.Animation.Timeline should play.
 		/// </summary>
 		/// <returns>The total length of time a timeline should play.</returns>
-		/// <exception cref="System.InvalidOperationException">
+		/// <exception cref="InvalidOperationException">
 		/// This System.Windows.Media.Animation.RepeatBehavior describes an iteration count,
 		/// not a repeat duration.
 		/// </exception>

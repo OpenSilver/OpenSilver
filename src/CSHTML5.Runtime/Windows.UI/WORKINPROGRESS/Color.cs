@@ -1,5 +1,9 @@
 #if WORKINPROGRESS
 
+#if !MIGRATION
+using System;
+#endif
+
 #if MIGRATION
 namespace System.Windows.Media
 #else

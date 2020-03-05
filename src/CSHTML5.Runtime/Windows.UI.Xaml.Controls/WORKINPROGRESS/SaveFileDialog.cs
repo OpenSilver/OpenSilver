@@ -1,4 +1,5 @@
 #if WORKINPROGRESS
+
 using System.IO;
 using System.Security;
 
@@ -21,6 +22,20 @@ namespace Windows.UI.Xaml.Controls
 			get;
 			private set;
 		}
+		
+		//
+		// Summary:
+		//     Gets or sets the file name used if a file name is not specified by the user.
+		//
+		// Returns:
+		//     The file name used if a file name is not specified by the user.System.String.
+		//
+		// Exceptions:
+		//   T:System.ArgumentException:
+		//     Occurs if the specified file name is null or contains invalid characters such
+		//     as quotes ("), less than (<), greater than (>), pipe (|), backspace (\b), null
+		//     (\0), tab (\t), colon (:), asterisk(*), question mark (?), and slashes (\\, /).
+		public string DefaultFileName { get; set; }
 
 		//
 		// Summary:
@@ -64,4 +79,5 @@ namespace Windows.UI.Xaml.Controls
 		}
 	}
 }
+
 #endif

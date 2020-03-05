@@ -1,5 +1,8 @@
 #if WORKINPROGRESS
-using System.Windows.Markup;
+
+#if !MIGRATION
+using System;
+#endif
 
 #if MIGRATION
 namespace System.Windows

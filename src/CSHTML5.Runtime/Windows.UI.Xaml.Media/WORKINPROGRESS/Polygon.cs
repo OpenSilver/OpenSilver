@@ -1,5 +1,10 @@
 #if WORKINPROGRESS
+
+#if MIGRATION
 using System.Windows.Shapes;
+#else
+using Windows.UI.Xaml.Shapes;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Media
