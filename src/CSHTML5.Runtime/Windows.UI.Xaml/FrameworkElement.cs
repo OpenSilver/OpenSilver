@@ -475,6 +475,7 @@ namespace Windows.UI.Xaml
             {
                 CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never
             });
+
         private static void Style_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var frameworkElement = (FrameworkElement)d;
@@ -521,12 +522,12 @@ namespace Windows.UI.Xaml
                 {
                     if (oldSetter.Property != null) // Note: it can be null for example in the XAML text editor during design time, because the "DependencyPropertyConverter" class returns "null".
                     {
-                        if (!newStyleDictionary.ContainsKey(oldSetter.Property))
+                        if (!newStyleDictionary.ContainsKey(oldSetter.Property)) // only handle this property here if it is not going set by the new style
                         {
                             INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorageIfExists(d, oldSetter.Property);
                             if (storage != null)
                             {
-                                INTERNAL_PropertyStore.ResetLocalStyleValue(storage);
+                                INTERNAL_PropertyStore.ResetLocalStyleValue(storage, true);
                             }
                         }
                     }

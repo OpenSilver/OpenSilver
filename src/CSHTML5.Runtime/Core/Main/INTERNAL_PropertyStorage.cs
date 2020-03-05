@@ -107,32 +107,6 @@ namespace CSHTML5.Internal
         public object ImplicitStyleValue { get; set; }
         public object InheritedValue { get; set; }
 
-        //private object _defaultValue;
-        //internal object DefaultValue
-        //{
-        //    get
-        //    {
-        //        EnsureDefaultValue();
-        //        return _defaultValue;
-        //    }
-        //}
-
-        //private void EnsureDefaultValue()
-        //{
-        //    if (_defaultValue == INTERNAL_NoValue.NoValue)
-        //    {
-        //        PropertyMetadata typeMetadata = Property.GetTypeMetaData(Property.OwnerType);
-        //        if (typeMetadata != null)
-        //        {
-        //            _defaultValue = typeMetadata.DefaultValue;
-        //        }
-        //        else
-        //        {
-        //            _defaultValue = Property.CreateDefaultValue();
-        //        }
-        //    }
-        //}
-
         public List<IPropertyChangedListener> PropertyListeners { get; set; }
 
         internal class INTERNAL_LocalValue
@@ -180,17 +154,14 @@ namespace CSHTML5.Internal
 
             internal object GetActiveLocalValue()
             {
-                if (ActiveValue == KindOfValue.Local)
+                switch (this.ActiveValue)
                 {
-                    return Local;
-                }
-                else if (ActiveValue == KindOfValue.Animated)
-                {
-                    return Animated;
-                }
-                else
-                {
-                    return INTERNAL_NoValue.NoValue;
+                    case KindOfValue.Local:
+                        return this.Local;
+                    case KindOfValue.Animated:
+                        return this.Animated;
+                    default:
+                        return INTERNAL_NoValue.NoValue;
                 }
             }
         }

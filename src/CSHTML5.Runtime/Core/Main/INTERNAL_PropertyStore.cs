@@ -523,8 +523,35 @@ namespace CSHTML5.Internal
 
         internal static void ResetLocalStyleValue(INTERNAL_PropertyStorage storage)
         {
-            storage.LocalStyleValue = INTERNAL_NoValue.NoValue; //this only occurs when we detach an item so there is no need to care about the propertyChanged event.
-            storage.ActualValueIsDirty = true;
+            ResetLocalStyleValue(storage, false);
+        }
+
+        internal static void ResetLocalStyleValue(INTERNAL_PropertyStorage storage, bool dontRefresh)
+        {
+            if (dontRefresh)
+            {
+                storage.LocalStyleValue = INTERNAL_NoValue.NoValue;
+                storage.ActualValueIsDirty = true;
+            }
+            else
+            {
+                // we need to refresh the actual value if we switch from an old style to a new one. for instance:
+                // old style :
+                // <Style>
+                //   <Style.Setters>
+                //     <Setter Property="Property1" Value="Value1">
+                //   <Style.Setters>
+                // <Style>
+                // new style :
+                // <Style>
+                //   <Style.Setters>
+                //     <Setter Property="Property2" Value="Value2">
+                //   <Style.Setters>
+                // <Style>
+                // if we switch from old style to new style we need to force the refresh or the Property1 property would still have
+                // its value set to Value1.
+                SetLocalStyleValue(storage, INTERNAL_NoValue.NoValue);
+            }
         }
 
 
