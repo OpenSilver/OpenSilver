@@ -198,7 +198,7 @@ namespace System
             }
             else
             {
-                // in asynchronous mode, the error callback will directly arrive in errorOnSetting, and it will resend this request
+                // in asynchronous mode, the error callback will directly arrive in OnError, and it will resend this request
                 _isFirstTryAtSendingUnsafeRequest = true;
                 SendRequest((object)_xmlHttpRequest, address, method, isAsync, body);
                 return GetResult((object)_xmlHttpRequest);
@@ -382,7 +382,7 @@ namespace System
         {
             var e = new INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs();
             SetEventArgs(e);
-            if (e.Error == null || !_isFirstTryAtSendingUnsafeRequest)
+            if (!_isFirstTryAtSendingUnsafeRequest || !IsCrashInPreflight) // if NOT(first unsafe try AND preflight error). The only case we do not want to enter this if is when the request will be resent without credentials.
             {
                 if (DownloadStringCompleted != null)
                 {
