@@ -448,29 +448,36 @@ namespace Windows.UI.Xaml.Data
 
 #region Public methods to navigate
 
-        public void MoveToFirstPage()
+        public bool MoveToFirstPage()
         {
-            PageIndex = 0;
+            return MoveToPage(0);
         }
 
-        public void MoveToLastPage()
+        public bool MoveToLastPage()
         {
-            PageIndex = _pages.Count - 1;
+            return MoveToPage(_pages.Count - 1);
         }
 
-        public void MoveToNextPage()
+        public bool MoveToNextPage()
         {
-            PageIndex++;
+            return MoveToPage(PageIndex + 1);
         }
 
-        public void MoveToPage(int index)
+        public bool MoveToPreviousPage()
         {
+            return MoveToPage(PageIndex - 1);
+        }
+
+        public bool MoveToPage(int index)
+        {
+            if (PageIndex >= _pages.Count)
+                return false;
+            if (PageIndex < 0)
+                return false;
+                    
             PageIndex = index;
-        }
-
-        public void MoveToPreviousPage()
-        {
-            PageIndex--;
+                    
+            return true;
         }
 
 #endregion
@@ -485,38 +492,6 @@ namespace Windows.UI.Xaml.Data
             }
             return true; // if no filter, we consider the filter as passed
         }
-
-#if WORKINPROGRESS && !CSHTML5NETSTANDARD
-        bool IPagedCollectionView.MoveToFirstPage()
-        {
-            MoveToFirstPage();
-            return true;
-        }
-
-        bool IPagedCollectionView.MoveToLastPage()
-        {
-            MoveToLastPage();
-            return true;
-        }
-
-        bool IPagedCollectionView.MoveToNextPage()
-        {
-            MoveToNextPage();
-            return true;
-        }
-
-        bool IPagedCollectionView.MoveToPreviousPage()
-        {
-            MoveToPreviousPage();
-            return true;
-        }
-
-        bool IPagedCollectionView.MoveToPage(int pageIndex)
-        {
-            MoveToPage(pageIndex);
-            return true;
-        }
-#endif
 
         // Gets the top-level groups, constructed according to the descriptions specified in the GroupDescriptions property.
         public Collection<IEnumerable> Groups
