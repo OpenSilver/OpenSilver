@@ -399,55 +399,35 @@ namespace Windows.UI.Xaml.Shapes
 
         internal static void GetShapeInfos(Shape shape, out double xOffsetToApplyBeforeMultiplication, out double yOffsetToApplyBeforeMultiplication, out double xOffsetToApplyAfterMultiplication, out double yOffsetToApplyAfterMultiplication, out double sizeX, out double sizeY, out double horizontalMultiplicator, out double verticalMultiplicator, out Size shapeActualSize)
         {
-            double minX = 1;
-            double maxX = 1;
-            double minY = 1;
-            double maxY = 1;
-            if (shape.Width > 0)
-            {
-                minX = 0;
-                maxX = shape.Width;
-            }
-            if (shape.Height > 0)
-            {
-                minY = 0;
-                maxY = shape.Height;
-            }
+            double width = shape.Width;
+            double height = shape.Height;
+            double strokeThickness = shape.StrokeThickness;
+            Stretch strech = shape.Stretch;
 
-            INTERNAL_ShapesDrawHelpers.PrepareStretch(shape, shape._canvasDomElement, minX, maxX, minY, maxY, shape.Stretch, out shapeActualSize);
+            double minX = 0;
+            double maxX = double.IsNaN(width) ? 0 : width;
+            double minY = 0;
+            double maxY = double.IsNaN(height) ? 0 : height;
 
-            double strokeThickness = shape.StrokeThickness; //Note: if Stroke is null, the StrokeThickness should not have an influence on the multiplicators.
+            INTERNAL_ShapesDrawHelpers.PrepareStretch(shape, shape._canvasDomElement, minX, maxX, minY, maxY, strech, out shapeActualSize);
+
             if (shape.Stroke == null)
             {
                 strokeThickness = 0;
             }
 
-            INTERNAL_ShapesDrawHelpers.GetMultiplicatorsAndOffsetForStretch(shape, strokeThickness, minX, maxX, minY, maxY, shape.Stretch, shapeActualSize, out horizontalMultiplicator, out verticalMultiplicator, out xOffsetToApplyBeforeMultiplication, out yOffsetToApplyBeforeMultiplication, out xOffsetToApplyAfterMultiplication, out yOffsetToApplyAfterMultiplication, out shape._marginOffsets);
+            INTERNAL_ShapesDrawHelpers.GetMultiplicatorsAndOffsetForStretch(shape, strokeThickness, minX, maxX, minY, maxY, strech, shapeActualSize, out horizontalMultiplicator, out verticalMultiplicator, out xOffsetToApplyBeforeMultiplication, out yOffsetToApplyBeforeMultiplication, out xOffsetToApplyAfterMultiplication, out yOffsetToApplyAfterMultiplication, out shape._marginOffsets);
 
-            if (shape.Stretch == Stretch.None)
+            if (strech == Stretch.None)
             {
-                Margin_MethodToUpdateDom(shape, new Thickness(shape.Margin.Left + shape._marginOffsets.X,
-                                                            shape.Margin.Top + shape._marginOffsets.Y,
-                                                            shape.Margin.Right, shape.Margin.Bottom));
+                Thickness margin = shape.Margin;
+                Margin_MethodToUpdateDom(shape, new Thickness(margin.Left + shape._marginOffsets.X,
+                                                              margin.Top + shape._marginOffsets.Y,
+                                                              margin.Right, 
+                                                              margin.Bottom));
             }
-
-
-            //dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(shape._canvasDomElement);
-
-            
-            sizeX = maxX - minX;
-            if (sizeX == 0)
-            {
-                sizeX = 1;
-            }
-            sizeX *= horizontalMultiplicator;
-
-            sizeY = maxY - minY;
-            if (sizeY == 0)
-            {
-                sizeY = 1;
-            }
-            sizeY *= verticalMultiplicator;
+            sizeX = Math.Max(1, maxX - minX) * horizontalMultiplicator;
+            sizeY = Math.Max(1, maxY - minY) * verticalMultiplicator;
         }
 
         /// <summary>
@@ -477,9 +457,8 @@ namespace Windows.UI.Xaml.Shapes
 $0.save()", context);
 
             //FillStyle:
-            object fillValue = null;
             double opacity = shape.Fill == null ? 1 : shape.Fill.Opacity;
-            fillValue = GetHtmlBrush(shape, shape.Fill, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
+            object fillValue = GetHtmlBrush(shape, shape.Fill, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
 
             if (fillValue != null)
             {
