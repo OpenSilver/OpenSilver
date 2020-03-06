@@ -47,11 +47,7 @@ namespace Windows.UI.Xaml.Data
     /// <remarks>
     /// <p>the order of the operations is: Filtering, Sorting, Grouping</p>
     /// </remarks>
-#if WORKINPROGRESS
-    public partial class PagedCollectionView : IEnumerable, INotifyCollectionChanged, IPagedCollectionView, IEditableCollectionView, INotifyPropertyChanged //TODO: Needs to also implement ICollectionView
-#else
-    public partial class PagedCollectionView : IEnumerable, INotifyCollectionChanged
-#endif
+    public partial class INTERNAL_PagedCollectionView : IEnumerable, INotifyCollectionChanged
     {
         // the child views
         List<CollectionViewGroupInternal> _views = new List<CollectionViewGroupInternal>();
@@ -75,7 +71,7 @@ namespace Windows.UI.Xaml.Data
         bool _avoidCollectionChangedEvent;
 
         // set the original data. Source can't be change later if it's not an observable collection
-        public PagedCollectionView(IEnumerable source)
+        public INTERNAL_PagedCollectionView(IEnumerable source)
         {
             _originalDataSource = source != null ? source : new Collection<object>();
 
@@ -104,7 +100,7 @@ namespace Windows.UI.Xaml.Data
         {
             _originalDataSourceWithoutCopy = newSource;
 
-            if (!(newSource is PagedCollectionView))
+            if (!(newSource is INTERNAL_PagedCollectionView))
             {
                 _avoidCollectionChangedEvent = true;
 
