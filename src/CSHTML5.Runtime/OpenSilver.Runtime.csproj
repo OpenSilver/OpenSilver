@@ -183,6 +183,9 @@
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\DynamicMethod.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\ParameterBuilder.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\ParameterToken.cs" />
+		<Compile Include="System.Runtime.InteropServices.Automation\WORKINPROGRESS\AutomationEvent.cs" />
+		<Compile Include="System.Runtime.InteropServices.Automation\WORKINPROGRESS\AutomationEventArgs.cs" />
+		<Compile Include="System.Runtime.InteropServices.Automation\WORKINPROGRESS\AutomationFactory.cs" />
 		<Compile Include="System.Runtime.Serialization\CollectionDataContract2Attribute.cs" />
 		<Compile Include="System.Runtime.Serialization\DataContract2Attribute.cs" />
 		<Compile Include="System.Runtime.Serialization\DataContractSerializer.cs" />
@@ -207,6 +210,7 @@
 		<Compile Include="System.Windows.Browser\HtmlPage.cs" />
 		<Compile Include="System.Windows.Browser\HtmlWindow.cs" />
 		<Compile Include="System.Windows.Browser\HttpUtility.cs" />
+		<Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlDocument.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlElement.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlEventArgs.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlObject.cs" />
@@ -245,6 +249,9 @@
 		<Compile Include="System.Windows.Media.Effects\DropShadowEffect.cs" />
 		<Compile Include="System.Windows.Media.Effects\Effect.cs" />
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\BlurEffect.cs" />
+		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\LocalMessageReceiver.cs" />
+		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\MessageReceivedEventArgs.cs" />
+		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\ReceiverNameScope.cs" />
 		<Compile Include="System.Windows.Navigation\JournalOwnership.cs" />
 		<Compile Include="System.Windows.Navigation\UriMapper.cs" />
 		<Compile Include="System.Windows.Navigation\UriMapperBase.cs" />
@@ -258,6 +265,7 @@
 		<Compile Include="System.Windows\RoutedPropertyChangedEventArgs_1.cs" />
 		<Compile Include="System.Windows\RoutedPropertyChangedEventHandler.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontStretches.cs" />
+		<Compile Include="System.Windows\WORKINPROGRESS\NotificationWindow.cs" />
 		<Compile Include="System.Xml.Linq\XAttribute.cs" />
 		<Compile Include="System.Xml.Linq\XContainer.cs" />
 		<Compile Include="System.Xml.Linq\XDocument.cs" />
@@ -456,11 +464,14 @@
 		<Compile Include="Windows.UI.Xaml.Controls\Viewbox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\VisualStates.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WebView.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleSubImage.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SubImageEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SubImageRoutedEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TextBlock.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TreeView.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\VirtualizationMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WrapPanel.cs" />
@@ -491,6 +502,7 @@
 		<Compile Include="Windows.UI.Xaml.Data\TemplateBinding.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\UpdateSourceTrigger.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
+		<Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\PagedCollectionView.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\Bold.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\Hyperlink.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\Inline.cs" />
@@ -507,6 +519,12 @@
 		<Compile Include="Windows.UI.Xaml.Documents\TextElement.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\TextElementCollection_1.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\Underline.cs" />
+		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\BlockCollection.cs" />
+		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\LogicalDirection.cs" />
+		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Paragraph.cs" />
+		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextElementCollection_1.cs" />
+		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextPointer.cs" />
+		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextSelection.cs" />
 		<Compile Include="Windows.UI.Xaml.Input\KeyEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Input\KeyRoutedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Input\Pointer.cs" />
@@ -739,6 +757,7 @@
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontStretch.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\Freezable.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\HierarchicalDataTemplate.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\LineStackingStrategy.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\PresentationFrameworkCollection_1.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextDecoration.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextDecorationCollection.cs" />

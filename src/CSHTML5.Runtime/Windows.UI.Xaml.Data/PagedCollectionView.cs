@@ -47,8 +47,8 @@ namespace Windows.UI.Xaml.Data
     /// <remarks>
     /// <p>the order of the operations is: Filtering, Sorting, Grouping</p>
     /// </remarks>
-#if WORKINPROGRESS && !CSHTML5NETSTANDARD
-    public partial class PagedCollectionView : IPagedCollectionView, IEnumerable, INotifyCollectionChanged, INotifyPropertyChanged
+#if WORKINPROGRESS
+    public partial class PagedCollectionView : IEnumerable, INotifyCollectionChanged, IPagedCollectionView, IEditableCollectionView, INotifyPropertyChanged //TODO: Needs to also implement ICollectionView
 #else
     public partial class PagedCollectionView : IEnumerable, INotifyCollectionChanged
 #endif
@@ -474,9 +474,9 @@ namespace Windows.UI.Xaml.Data
                 return false;
             if (PageIndex < 0)
                 return false;
-                    
+            
             PageIndex = index;
-                    
+            
             return true;
         }
 

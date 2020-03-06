@@ -77,14 +77,5 @@ namespace System.Windows.Browser
                 return returnValue;
             }
         }
-
-#if WORKINPROGRESS
-        public HtmlElement Body { get; private set; }
-
-        public HtmlElement CreateElement(string tagName)
-        {
-            return null;
-        }
-#endif
     }
 }
