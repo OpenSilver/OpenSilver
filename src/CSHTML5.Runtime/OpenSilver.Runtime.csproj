@@ -64,7 +64,7 @@
 		<Compile Include="Core\Events\INTERNAL_EventsHelper.cs" />
 		<Compile Include="Core\Main\DelegateUtility.cs" />
 		<Compile Include="Core\Main\INameScope.cs" />
-		<Compile Include="Core\Main\INTERNAL_DefaultValueStore.cs" />
+		<Compile Include="Core\Main\INTERNAL_DefaultValueProvider.cs" />
 		<Compile Include="Core\Main\INTERNAL_ListsHelper.cs" />
 		<Compile Include="Core\Main\INTERNAL_NoValue.cs" />
 		<Compile Include="Core\Main\INTERNAL_PropertyStorage.cs" />
