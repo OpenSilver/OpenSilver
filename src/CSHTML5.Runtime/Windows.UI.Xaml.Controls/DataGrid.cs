@@ -46,7 +46,7 @@ using Windows.UI.Xaml.Media;
 #if MIGRATION
 namespace System.Windows.Controls
 #else
-namespace Windows.UI.Xaml.Controls
+namespace Microsoft.Toolkit.Uwp.UI.Controls
 #endif
 {
     /// <summary>
