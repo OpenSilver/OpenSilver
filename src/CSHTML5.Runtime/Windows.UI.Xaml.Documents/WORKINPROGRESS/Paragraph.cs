@@ -5,7 +5,7 @@ using System.Windows.Markup;
 #if MIGRATION
 namespace System.Windows.Documents
 #else
-namespace Windows.UI.Xaml.Controls
+namespace Windows.UI.Xaml.Documents
 #endif
 {
 	//
