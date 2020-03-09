@@ -1,6 +1,12 @@
-using System.Windows.Documents;
-
 #if WORKINPROGRESS
+
+#if MIGRATION
+using System.Windows.Documents;
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml.Documents;
+#endif
+
 #if MIGRATION
 namespace System.Windows.Controls
 #else

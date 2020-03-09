@@ -1,5 +1,9 @@
 #if WORKINPROGRESS
 
+#if !MIGRATION
+using Windows.Foundation;
+#endif
+
 #if MIGRATION
 namespace System.Windows.Documents
 #else
