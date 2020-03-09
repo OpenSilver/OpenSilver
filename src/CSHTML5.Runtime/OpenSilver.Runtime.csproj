@@ -418,7 +418,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\ItemsControl.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ItemsPanelTemplate.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ItemsPresenter.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\Label.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ListBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ListBoxItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\MediaElement.cs" />
@@ -464,8 +463,10 @@
 		<Compile Include="Windows.UI.Xaml.Controls\Viewbox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\VisualStates.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WebView.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Label.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleSubImage.cs" />

@@ -260,11 +260,100 @@ namespace Windows.UI.Xaml.Controls
         /// control is used to filter items specified by the AutoCompleteBox.ItemsSource
         /// property for display in the drop-down.
         /// </summary>
+#if WORKINPROGRESS
+	    public enum AutoCompleteFilterMode
+	    {
+		    //
+		    // Summary:
+		    //     Specifies that no filter is used. All items are returned.
+		    None = 0,
+		    //
+		    // Summary:
+		    //     Specifies a culture-sensitive, case-insensitive filter where the returned items
+		    //     start with the specified text. The filter uses the System.String.StartsWith(System.String,System.StringComparison)
+		    //     method, specifying System.StringComparer.CurrentCultureIgnoreCase as the string
+		    //     comparison criteria.
+		    StartsWith = 1,
+		    //
+		    // Summary:
+		    //     Specifies a culture-sensitive, case-sensitive filter where the returned items
+		    //     start with the specified text. The filter uses the System.String.StartsWith(System.String,System.StringComparison)
+		    //     method, specifying System.StringComparer.CurrentCulture as the string comparison
+		    //     criteria.
+		    StartsWithCaseSensitive = 2,
+		    //
+		    // Summary:
+		    //     Specifies an ordinal, case-insensitive filter where the returned items start
+		    //     with the specified text. The filter uses the System.String.StartsWith(System.String,System.StringComparison)
+		    //     method, specifying System.StringComparer.OrdinalIgnoreCase as the string comparison
+		    //     criteria.
+		    StartsWithOrdinal = 3,
+		    //
+		    // Summary:
+		    //     Specifies an ordinal, case-sensitive filter where the returned items start with
+		    //     the specified text. The filter uses the System.String.StartsWith(System.String,System.StringComparison)
+		    //     method, specifying System.StringComparer.Ordinal as the string comparison criteria.
+		    StartsWithOrdinalCaseSensitive = 4,
+		    //
+		    // Summary:
+		    //     Specifies a culture-sensitive, case-insensitive filter where the returned items
+		    //     contain the specified text.
+		    Contains = 5,
+		    //
+		    // Summary:
+		    //     Specifies a culture-sensitive, case-sensitive filter where the returned items
+		    //     contain the specified text.
+		    ContainsCaseSensitive = 6,
+		    //
+		    // Summary:
+		    //     Specifies an ordinal, case-insensitive filter where the returned items contain
+		    //     the specified text.
+		    ContainsOrdinal = 7,
+		    //
+		    // Summary:
+		    //     Specifies an ordinal, case-sensitive filter where the returned items contain
+		    //     the specified text.
+		    ContainsOrdinalCaseSensitive = 8,
+		    //
+		    // Summary:
+		    //     Specifies a culture-sensitive, case-insensitive filter where the returned items
+		    //     equal the specified text. The filter uses the System.String.Equals(System.String,System.StringComparison)
+		    //     method, specifying System.StringComparer.CurrentCultureIgnoreCase as the search
+		    //     comparison criteria.
+		    Equals = 9,
+		    //
+		    // Summary:
+		    //     Specifies a culture-sensitive, case-sensitive filter where the returned items
+		    //     equal the specified text. The filter uses the System.String.Equals(System.String,System.StringComparison)
+		    //     method, specifying System.StringComparer.CurrentCulture as the string comparison
+		    //     criteria.
+		    EqualsCaseSensitive = 10,
+		    //
+		    // Summary:
+		    //     Specifies an ordinal, case-insensitive filter where the returned items equal
+		    //     the specified text. The filter uses the System.String.Equals(System.String,System.StringComparison)
+		    //     method, specifying System.StringComparer.OrdinalIgnoreCase as the string comparison
+		    //     criteria.
+		    EqualsOrdinal = 11,
+		    //
+		    // Summary:
+		    //     Specifies an ordinal, case-sensitive filter where the returned items equal the
+		    //     specified text. The filter uses the System.String.Equals(System.String,System.StringComparison)
+		    //     method, specifying System.StringComparer.Ordinal as the string comparison criteria.
+		    EqualsOrdinalCaseSensitive = 12,
+		    //
+		    // Summary:
+		    //     Specifies that a custom filter is used. This mode is used when the System.Windows.Controls.AutoCompleteBox.TextFilter
+		    //     or System.Windows.Controls.AutoCompleteBox.ItemFilter properties are set.
+		    Custom = 13
+	    }
+#else
         public enum AutoCompleteFilterMode
         {
             StartsWith,
             Custom
         }
+#endif
 
         /// <summary>
         /// Gets or sets the minimum delay, in milliseconds, after text is typed in the text box before the AutoCompleteBox control populates the list of possible matches in the drop-down.
