@@ -40,6 +40,3 @@ CSHTML5 version 2.x is powered by [Bridge.NET](https://bridge.net/)
 ### Where is the rest of the source code?
 The full source code of the CSHTML5 runtime has now been published to GitHub. You should be able to view and modify the source code of all the .NET types, the C# types, and the XAML types. Many low-level types are located in the Bridge.NET repository, which is located [here](https://github.com/cshtml5/Bridge). Any remaining parts will be published to GitHub as soon as possible.
 
-### How is the source code licensed?
-The CSHTML5 source code is dual-licensed (GPLv3 + Commercial). Please read the file [LICENSE.txt](LICENSE.txt) for important information. Licenses that permit proprietary use can be obtained from: http://cshtml5.com
-
