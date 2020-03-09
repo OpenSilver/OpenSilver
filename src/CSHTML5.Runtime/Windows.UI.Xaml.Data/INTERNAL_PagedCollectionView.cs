@@ -23,11 +23,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -47,7 +43,11 @@ namespace Windows.UI.Xaml.Data
     /// <remarks>
     /// <p>the order of the operations is: Filtering, Sorting, Grouping</p>
     /// </remarks>
+#if MIGRATION
     public partial class INTERNAL_PagedCollectionView : IEnumerable, INotifyCollectionChanged
+#else
+    internal partial class INTERNAL_PagedCollectionView : IEnumerable, INotifyCollectionChanged
+#endif
     {
         // the child views
         List<CollectionViewGroupInternal> _views = new List<CollectionViewGroupInternal>();

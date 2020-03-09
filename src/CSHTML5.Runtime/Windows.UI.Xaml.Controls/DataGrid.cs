@@ -115,7 +115,7 @@ namespace Windows.UI.Xaml.Controls
             _pagerUI.DisplayMode = DataPager_DisplayMode.FirstLastPreviousNext;
         }
 
-        public DataPager DataPager { get { return _pagerUI; } }
+        // public DataPager DataPager { get { return _pagerUI; } }
 
         protected virtual void OnLoadingRow(DataGridRowEventArgs e)
         {

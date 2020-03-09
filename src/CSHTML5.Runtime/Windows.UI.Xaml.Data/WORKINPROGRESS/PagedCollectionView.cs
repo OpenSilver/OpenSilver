@@ -1,3 +1,4 @@
+#if MIGRATION
 #if WORKINPROGRESS
 
 using System.Collections;
@@ -6,11 +7,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
 	//
 	// Summary:
@@ -706,11 +703,7 @@ namespace Windows.UI.Xaml.Data
 
 using System.Collections;
 
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
 	//
 	// Summary:
@@ -724,4 +717,5 @@ namespace Windows.UI.Xaml.Data
 	}
 }
 
+#endif
 #endif

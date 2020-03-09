@@ -56,7 +56,11 @@ namespace Windows.UI.Xaml.Controls
         PreviousNextNumeric
     }
 
+#if MIGRATION
     public partial class DataPager : Control
+#else
+    internal partial class DataPager : Control
+#endif
     {
         TextBox _textBox;
 
