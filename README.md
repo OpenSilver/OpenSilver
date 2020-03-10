@@ -4,6 +4,10 @@ This repository contains the source of both CSHTML5 and OpenSilver. More informa
 
 Open the solution named "OpenSilver.sln" to compile the OpenSilver runtime.
 
+We are working to provide more detailed instructions on how to build the OpenSilver runtime and how to contribute. We are also updating the headers to reflect the MIT license.
+
+Please check back soon for updates.
+
 
 
 # For CSHTML5:
