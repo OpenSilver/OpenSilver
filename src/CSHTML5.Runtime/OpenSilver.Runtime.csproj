@@ -1,7 +1,6 @@
 <Project>
 	<PropertyGroup>
 		<BaseIntermediateOutputPath>obj\OpenSilver</BaseIntermediateOutputPath>
-    <NoCSHTML5Reference>true</NoCSHTML5Reference>
   </PropertyGroup>
 	<!-- We do this that way because otherwise the <BaseIntermediateOutputPath> directive will not work. This is a bug with .NET Standard 2.0 -->
 	<Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
@@ -15,30 +14,27 @@
 		<NoWarn>1591</NoWarn>
 		<DebugType>full</DebugType>
 		<DebugSymbols>true</DebugSymbols>
+		<NoCSHTML5Reference>true</NoCSHTML5Reference>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
 		<AssemblyName>OpenSilver</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER</DefineConstants>
-		<CSHTML5ObjPath>obj\OpenSilver\SL\netstandard2.0</CSHTML5ObjPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' ">
 		<AssemblyName>OpenSilver</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER;WORKINPROGRESS;REVAMPPOINTEREVENTS;WCF_STACK</DefineConstants>
-		<CSHTML5ObjPath>obj\CSHTML5\Migration.WorkInProgress</CSHTML5ObjPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
 		<AssemblyName>OpenSilver.UWPCompatible</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER</DefineConstants>
-		<CSHTML5ObjPath>obj\CSHTML5\Debug</CSHTML5ObjPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' ">
 		<AssemblyName>OpenSilver.UWPCompatible</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER;WORKINPROGRESS</DefineConstants>
-		<CSHTML5ObjPath>obj\CSHTML5\Debug.WorkInProgress</CSHTML5ObjPath>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -845,8 +841,8 @@
 		</Content>
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="obj\OpenSilver\SL\netstandard2.0\DefaultStyles\" />
-	  <Folder Include="obj\OpenSilver\SL\netstandard2.0\Themes\" />
+	  <Folder Include="obj\OpenSilver\$(Configuration)\netstandard2.0\DefaultStyles\" />
+	  <Folder Include="obj\OpenSilver\$(Configuration)\netstandard2.0\Themes\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Include="OpenSilver.Runtime.licenseheader" />
