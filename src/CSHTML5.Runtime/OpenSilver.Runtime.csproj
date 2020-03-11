@@ -28,12 +28,12 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
-		<AssemblyName>OpenSilver.UWPCompatible</AssemblyName>
+		<AssemblyName>OpenSilver.UwpCompatible</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' ">
-		<AssemblyName>OpenSilver.UWPCompatible</AssemblyName>
+		<AssemblyName>OpenSilver.UwpCompatible</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER;WORKINPROGRESS</DefineConstants>
 	</PropertyGroup>
 
