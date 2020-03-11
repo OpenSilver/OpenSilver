@@ -1,4 +1,6 @@
-﻿
+﻿extensions: designer.cs generated.cs
+extensions: .cs
+
 
 /*===================================================================================
 * 
@@ -13,27 +15,3 @@
 \*====================================================================================*/
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
-#if MIGRATION
-namespace System.Windows.Input
-#else
-namespace Windows.UI.Xaml.Input
-#endif
-{
-#if WORKINPROGRESS
-#if MIGRATION
-    public partial class MouseWheelEventArgs : MouseEventArgs
-#else
-    public partial class MouseWheelEventArgs
-#endif
-    {
-        public int Delta { get; private set; }
-    }
-#endif
-}

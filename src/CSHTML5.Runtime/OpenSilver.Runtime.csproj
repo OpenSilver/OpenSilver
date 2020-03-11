@@ -866,6 +866,9 @@
 			<SubType>Designer</SubType>
 		</Content>
 	</ItemGroup>
+	<ItemGroup>
+	  <None Include="OpenSilver.Runtime.licenseheader" />
+	</ItemGroup>
 	
 	<!-- See ths comment on the first <Import> -->
 	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
