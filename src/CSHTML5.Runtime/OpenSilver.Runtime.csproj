@@ -28,12 +28,12 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
-		<AssemblyName>OpenSilver.UWPCompatible</AssemblyName>
+		<AssemblyName>OpenSilver.UwpCompatible</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' ">
-		<AssemblyName>OpenSilver.UWPCompatible</AssemblyName>
+		<AssemblyName>OpenSilver.UwpCompatible</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER;WORKINPROGRESS</DefineConstants>
 	</PropertyGroup>
 
@@ -840,10 +840,10 @@
 			<SubType>Designer</SubType>
 		</Content>
 	</ItemGroup>
-	<ItemGroup>
+	<!--<ItemGroup>
 	  <Folder Include="obj\OpenSilver\$(Configuration)\netstandard2.0\DefaultStyles\" />
 	  <Folder Include="obj\OpenSilver\$(Configuration)\netstandard2.0\Themes\" />
-	</ItemGroup>
+	</ItemGroup>-->
 	<ItemGroup>
 	  <None Include="OpenSilver.Runtime.licenseheader" />
 	</ItemGroup>
