@@ -29,13 +29,13 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
-		<AssemblyName>OpenSilver.UWPCompatible</AssemblyName>
+		<AssemblyName>OpenSilver.UwpCompatible</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER</DefineConstants>
 		<CSHTML5ObjPath>obj\CSHTML5\Debug</CSHTML5ObjPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' ">
-		<AssemblyName>OpenSilver.UWPCompatible</AssemblyName>
+		<AssemblyName>OpenSilver.UwpCompatible</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER;WORKINPROGRESS</DefineConstants>
 		<CSHTML5ObjPath>obj\CSHTML5\Debug.WorkInProgress</CSHTML5ObjPath>
 	</PropertyGroup>
