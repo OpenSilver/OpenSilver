@@ -299,9 +299,5 @@ namespace Windows.UI.Xaml.Data
         public bool ValidatesOnLoad { get; set; }
 
 #endregion
-
-#if WORKINPROGRESS
-        
-#endif
     }
 }

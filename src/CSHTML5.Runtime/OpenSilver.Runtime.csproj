@@ -477,6 +477,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TextBlock.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TreeView.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\VirtualizationMode.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WrapPanel.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WrapPanel.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\Binding.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\BindingBase.cs" />
@@ -756,6 +757,7 @@
 		<Compile Include="Windows.UI.Xaml\WindowSizeChangedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml\FontStyle.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationUnhandledExceptionEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DataTemplate.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\EventTrigger.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FlowDirection.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontStretch.cs" />
