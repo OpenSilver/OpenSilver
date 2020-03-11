@@ -1,7 +1,8 @@
 <Project>
 	<PropertyGroup>
 		<BaseIntermediateOutputPath>obj\OpenSilver</BaseIntermediateOutputPath>
-	</PropertyGroup>
+    <NoCSHTML5Reference>true</NoCSHTML5Reference>
+  </PropertyGroup>
 	<!-- We do this that way because otherwise the <BaseIntermediateOutputPath> directive will not work. This is a bug with .NET Standard 2.0 -->
 	<Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
@@ -19,7 +20,7 @@
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
 		<AssemblyName>OpenSilver</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER</DefineConstants>
-		<CSHTML5ObjPath>obj\CSHTML5\Migration</CSHTML5ObjPath>
+		<CSHTML5ObjPath>obj\OpenSilver\SL\netstandard2.0</CSHTML5ObjPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' ">
@@ -756,29 +757,6 @@
 		<None Remove="**" />
 	</ItemGroup>
 	<ItemGroup>
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultAutoCompleteBoxStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultAutoCompleteBoxStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultButtonStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultButtonStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultChildWindowStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultChildWindowStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultComboBoxStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultComboBoxStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultDataPagerStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultDataPagerStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultDatePickerStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultDatePickerStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultExpanderStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultExpanderStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultGridSplitterStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultGridSplitterStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultHyperlinkButtonStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultHyperlinkButtonStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultMenuItemStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultMenuItemStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultNumericUpDownStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultNumericUpDownStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultScrollBarStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultScrollBarStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultSliderStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultSliderStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultTabControlStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultTabControlStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultTabItemStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultTabItemStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultThumbStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultThumbStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultTimePickerStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultTimePickerStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultToggleButtonStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultToggleButtonStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultToolTipStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultToolTipStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultViewboxStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultViewboxStyle.xaml.g.cs" />
-		<Compile Include="$(CSHTML5ObjPath)\Themes\generic.xaml.g.cs" Link="Themes\generic.xaml.g.cs" />
-	</ItemGroup>
-	<ItemGroup>
 		<Content Include="Themes\generic.xaml">
 			<SubType>Designer</SubType>
 			<Generator>MSBuild:Compile</Generator>
@@ -867,9 +845,20 @@
 		</Content>
 	</ItemGroup>
 	<ItemGroup>
+	  <Folder Include="obj\OpenSilver\SL\netstandard2.0\DefaultStyles\" />
+	  <Folder Include="obj\OpenSilver\SL\netstandard2.0\Themes\" />
+	</ItemGroup>
+	<ItemGroup>
 	  <None Include="OpenSilver.Runtime.licenseheader" />
 	</ItemGroup>
 	
 	<!-- See ths comment on the first <Import> -->
 	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <Import Project="..\packages\OpenSilver.1.0.0-alpha-002\build\OpenSilver.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' " />
+  <Import Project="..\packages\OpenSilver.WorkInProgress.1.0.0-alpha-002\build\OpenSilver.WorkInProgress.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' " />
+  <Import Project="..\packages\OpenSilver.UWPCompatible.1.0.0-alpha-002\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
+  <Import Project="..\packages\OpenSilver.UWPCompatible.1.0.0-alpha-002\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' " />
+
+
 </Project>
