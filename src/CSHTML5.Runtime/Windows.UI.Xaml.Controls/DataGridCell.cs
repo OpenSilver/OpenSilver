@@ -56,7 +56,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.DataGridCell.Column dependency property.
         /// </summary>
         public static readonly DependencyProperty ColumnProperty =
-            DependencyProperty.Register("Column", typeof(DataGridColumn), typeof(DataGridCell), new PropertyMetadata(null));
+            DependencyProperty.Register("Column", typeof(DataGridColumn), typeof(DataGridCell), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Gets or sets a value that indicates whether the cell is in edit mode.
@@ -70,7 +71,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.DataGridCell.IsEditing dependency property.
         /// </summary>
         public static readonly DependencyProperty IsEditingProperty =
-            DependencyProperty.Register("IsEditing", typeof(bool), typeof(DataGridCell), new PropertyMetadata(false, IsEditing_Changed));
+            DependencyProperty.Register("IsEditing", typeof(bool), typeof(DataGridCell), new PropertyMetadata(false, IsEditing_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void IsEditing_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -103,7 +105,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.DataGridCell.IsSelected dependency property.
         /// </summary>
         public static readonly DependencyProperty IsSelectedProperty =
-            DependencyProperty.Register("IsSelected", typeof(bool), typeof(DataGridCell), new PropertyMetadata(false, IsSelected_Changed));
+            DependencyProperty.Register("IsSelected", typeof(bool), typeof(DataGridCell), new PropertyMetadata(false, IsSelected_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         private static void IsSelected_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             //todo: call event accordingly to the new Value + set the Background/Foreground

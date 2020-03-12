@@ -135,7 +135,8 @@ namespace Windows.UI.Xaml.Media.Imaging
         /// Identifies the UriSource dependency property.
         /// </summary>
         public static readonly DependencyProperty UriSourceProperty =
-            DependencyProperty.Register("UriSource", typeof(Uri), typeof(BitmapImage), new PropertyMetadata(null, UriSource_Changed));
+            DependencyProperty.Register("UriSource", typeof(Uri), typeof(BitmapImage), new PropertyMetadata(null, UriSource_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         static void UriSource_Changed(DependencyObject i, DependencyPropertyChangedEventArgs e)
         {
             var bitmapImage = (BitmapImage)i;

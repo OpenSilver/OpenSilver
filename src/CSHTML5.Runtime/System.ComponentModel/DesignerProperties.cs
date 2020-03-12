@@ -62,7 +62,7 @@ namespace System.ComponentModel
         /// property.
         /// </summary>
         public static readonly DependencyProperty IsInDesignModeProperty =
-            DependencyProperty.RegisterAttached("IsInDesignMode", typeof(bool), typeof(DesignerProperties), new PropertyMetadata(false));
+            DependencyProperty.RegisterAttached("IsInDesignMode", typeof(bool), typeof(DesignerProperties), new PropertyMetadata(false) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
 

@@ -57,7 +57,8 @@ namespace Windows.UI.Xaml.Documents
                                                                                                             typeof(Inline), 
                                                                                                             new PropertyMetadata(System.Windows.TextDecorations.None) 
                                                                                                             {
-                                                                                                                GetCSSEquivalent = Control.INTERNAL_GetCSSEquivalentForTextDecorations 
+                                                                                                                GetCSSEquivalent = Control.INTERNAL_GetCSSEquivalentForTextDecorations,
+                                                                                                                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                                                                                                             });
 #else
                 /// <summary>
@@ -74,7 +75,8 @@ namespace Windows.UI.Xaml.Documents
         public new static readonly DependencyProperty TextDecorationsProperty =
             DependencyProperty.Register("TextDecorations", typeof(TextDecorations?), typeof(Inline), new PropertyMetadata(null)
             {
-                GetCSSEquivalent = Control.INTERNAL_GetCSSEquivalentForTextDecorations
+                GetCSSEquivalent = Control.INTERNAL_GetCSSEquivalentForTextDecorations,
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 #endif

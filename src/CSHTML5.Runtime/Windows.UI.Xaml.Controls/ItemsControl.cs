@@ -115,10 +115,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty ItemsPanelProperty =
             DependencyProperty.Register("ItemsPanel", typeof(ItemsPanelTemplate), typeof(ItemsControl),
-                new PropertyMetadata(GetDefaultItemsPanel(), OnItemsPanel_Changed)
-                {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never
-                });
+                new PropertyMetadata(GetDefaultItemsPanel(), OnItemsPanel_Changed));
 
         static ItemsPanelTemplate GetDefaultItemsPanel()
         {
@@ -144,7 +141,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the ItemsSource dependency property.
         /// </summary>
         public static readonly DependencyProperty ItemsSourceProperty =
-            DependencyProperty.Register("ItemsSource", typeof(IEnumerable), typeof(ItemsControl), new PropertyMetadata(null, ItemsSource_Changed));
+            DependencyProperty.Register("ItemsSource", typeof(IEnumerable), typeof(ItemsControl), new PropertyMetadata(null, ItemsSource_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         /// <summary>
@@ -159,7 +157,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the ItemTemplate dependency property.
         /// </summary>
         public static readonly DependencyProperty ItemTemplateProperty =
-            DependencyProperty.Register("ItemTemplate", typeof(DataTemplate), typeof(ItemsControl), new PropertyMetadata(null, OnItemTemplate_Changed));
+            DependencyProperty.Register("ItemTemplate", typeof(DataTemplate), typeof(ItemsControl), new PropertyMetadata(null, OnItemTemplate_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         /// <summary>
@@ -790,7 +789,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the DisplayMemberPath dependency property.
         /// </summary>
         public static readonly DependencyProperty DisplayMemberPathProperty =
-            DependencyProperty.Register("DisplayMemberPath", typeof(string), typeof(ItemsControl), new PropertyMetadata(string.Empty, DisplayMemberPath_Changed));
+            DependencyProperty.Register("DisplayMemberPath", typeof(string), typeof(ItemsControl), new PropertyMetadata(string.Empty, DisplayMemberPath_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         private static void DisplayMemberPath_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ItemsControl itemsControl = (ItemsControl)d;
@@ -810,7 +810,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the ItemContainerStyle dependency property.
         /// </summary>
         public static readonly DependencyProperty ItemContainerStyleProperty =
-            DependencyProperty.Register("ItemContainerStyle", typeof(Style), typeof(ItemsControl), new PropertyMetadata(null, ItemContainerStyle_Changed));
+            DependencyProperty.Register("ItemContainerStyle", typeof(Style), typeof(ItemsControl), new PropertyMetadata(null, ItemContainerStyle_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void ItemContainerStyle_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

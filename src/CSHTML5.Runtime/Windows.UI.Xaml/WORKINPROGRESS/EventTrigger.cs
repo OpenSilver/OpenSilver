@@ -29,8 +29,12 @@ namespace Windows.UI.Xaml
     [ContentProperty("Actions")]
     public sealed partial class EventTrigger : TriggerBase
     {
-        private static readonly DependencyProperty ActionsProperty = DependencyProperty.Register("Actions", typeof(TriggerActionCollection), typeof(EventTrigger), new PropertyMetadata(new TriggerActionCollection()));
-        private static readonly DependencyProperty RoutedEventProperty = DependencyProperty.Register("RoutedEvent", typeof(RoutedEvent), typeof(EventTrigger), null);
+        private static readonly DependencyProperty ActionsProperty = 
+            DependencyProperty.Register("Actions", typeof(TriggerActionCollection), typeof(EventTrigger), new PropertyMetadata(new TriggerActionCollection())
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+
+        private static readonly DependencyProperty RoutedEventProperty = 
+            DependencyProperty.Register("RoutedEvent", typeof(RoutedEvent), typeof(EventTrigger), null);
 
         /// <summary>Gets the collection of <see cref="T:System.Windows.Media.Animation.BeginStoryboard" /> objects that this <see cref="T:System.Windows.EventTrigger" /> maintains.</summary>
         /// <returns>The existing <see cref="T:System.Windows.TriggerActionCollection" />.</returns>

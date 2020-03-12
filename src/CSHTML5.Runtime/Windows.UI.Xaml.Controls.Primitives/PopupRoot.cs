@@ -57,7 +57,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the PopupRoot.Content dependency property.
         /// </summary>
         public static readonly DependencyProperty ContentProperty =
-            DependencyProperty.Register("Content", typeof(UIElement), typeof(PopupRoot), new PropertyMetadata(null, Content_Changed));
+            DependencyProperty.Register("Content", typeof(UIElement), typeof(PopupRoot), new PropertyMetadata(null, Content_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         static void Content_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)

@@ -224,7 +224,8 @@ namespace Windows.UI.Xaml
             set { SetValue(CursorProperty, value); }
         }
         public static readonly DependencyProperty CursorProperty =
-            DependencyProperty.Register("Cursor", typeof(Cursor), typeof(FrameworkElement), new PropertyMetadata() { MethodToUpdateDom = Cursor_MethodToUpdateDom });
+            DependencyProperty.Register("Cursor", typeof(Cursor), typeof(FrameworkElement), new PropertyMetadata() { MethodToUpdateDom = Cursor_MethodToUpdateDom,
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void Cursor_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -258,7 +259,8 @@ namespace Windows.UI.Xaml
         /// Identifies the IsEnabled dependency property.
         /// </summary>
         public static readonly DependencyProperty IsEnabledProperty =
-            DependencyProperty.Register("IsEnabled", typeof(bool), typeof(FrameworkElement), new PropertyMetadata(true, IsEnabled_Changed) { MethodToUpdateDom = IsEnabled_MethodToUpdateDom, Inherits = true });
+            DependencyProperty.Register("IsEnabled", typeof(bool), typeof(FrameworkElement), new PropertyMetadata(true, IsEnabled_Changed) { MethodToUpdateDom = IsEnabled_MethodToUpdateDom, Inherits = true,
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
 
@@ -349,6 +351,7 @@ namespace Windows.UI.Xaml
             DependencyProperty.Register("Name", typeof(string), typeof(FrameworkElement), new PropertyMetadata(string.Empty)
             {
                 MethodToUpdateDom = OnNameChanged_MethodToUpdateDom,
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             });
 
         private static void OnNameChanged_MethodToUpdateDom(DependencyObject d, object value)
@@ -373,7 +376,9 @@ namespace Windows.UI.Xaml
         /// Identifies the DataContext dependency property.
         /// </summary>
         public static readonly DependencyProperty DataContextProperty =
-            DependencyProperty.Register("DataContext", typeof(object), typeof(FrameworkElement), new PropertyMetadata() { Inherits = true });
+            DependencyProperty.Register("DataContext", typeof(object), typeof(FrameworkElement), new PropertyMetadata() { Inherits = true,
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+            });
 
 #endregion
 
@@ -388,7 +393,8 @@ namespace Windows.UI.Xaml
             }
         }
 
-        public static DependencyProperty TriggersProperty = DependencyProperty.Register("Triggers", typeof(TriggerCollection), typeof(FrameworkElement), new PropertyMetadata(new TriggerCollection()));
+        public static DependencyProperty TriggersProperty = DependencyProperty.Register("Triggers", typeof(TriggerCollection), typeof(FrameworkElement), new PropertyMetadata(new TriggerCollection())
+        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         #endregion
 
@@ -444,7 +450,8 @@ namespace Windows.UI.Xaml
         /// Identifies the Tag dependency property.
         /// </summary>
         public static readonly DependencyProperty TagProperty =
-            DependencyProperty.Register("Tag", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null, null));
+            DependencyProperty.Register("Tag", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 #endregion
 
@@ -471,10 +478,7 @@ namespace Windows.UI.Xaml
         /// Identifies the Style dependency property.
         /// </summary>
         public static readonly DependencyProperty StyleProperty =
-            DependencyProperty.Register("Style", typeof(Style), typeof(FrameworkElement), new PropertyMetadata(null, Style_Changed)
-            {
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never
-            });
+            DependencyProperty.Register("Style", typeof(Style), typeof(FrameworkElement), new PropertyMetadata(null, Style_Changed));
 
         private static void Style_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -615,7 +619,7 @@ namespace Windows.UI.Xaml
         /// property.
         /// </summary>
         public static readonly DependencyProperty DefaultStyleKeyProperty =
-            DependencyProperty.Register("DefaultStyleKey", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null, DefaultStyleKey_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("DefaultStyleKey", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null, DefaultStyleKey_Changed));
 
         private static void DefaultStyleKey_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -736,7 +740,8 @@ namespace Windows.UI.Xaml
         public event DependencyPropertyChangedEventHandler DataContextChanged;
 
 
-        public static readonly DependencyProperty FlowDirectionProperty = DependencyProperty.Register("FlowDirection", typeof(FlowDirection), typeof(FrameworkElement), new PropertyMetadata(FlowDirection.LeftToRight));
+        public static readonly DependencyProperty FlowDirectionProperty = DependencyProperty.Register("FlowDirection", typeof(FlowDirection), typeof(FrameworkElement), new PropertyMetadata(FlowDirection.LeftToRight)
+        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>Gets or sets the direction that text and other user interface elements flow within any parent element that controls their layout.</summary>
         /// <returns>The direction that text and other UI elements flow within their parent element, as a value of the enumeration. The default value is <see cref="F:System.Windows.FlowDirection.LeftToRight" />.</returns>

@@ -65,7 +65,8 @@ namespace Windows.UI.Xaml.Navigation
         /// Identifies the System.Windows.Navigation.UriMapping.MappedUri dependency property
         /// </summary>
         public static readonly DependencyProperty MappedUriProperty =
-            DependencyProperty.Register("MappedUri", typeof(Uri), typeof(UriMapping), new PropertyMetadata(null));
+            DependencyProperty.Register("MappedUri", typeof(Uri), typeof(UriMapping), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
 
@@ -105,7 +106,8 @@ namespace Windows.UI.Xaml.Navigation
         /// Identifies the System.Windows.Navigation.UriMapping.Uri dependency property
         /// </summary>
         public static readonly DependencyProperty UriProperty =
-            DependencyProperty.Register("Uri", typeof(Uri), typeof(UriMapping), new PropertyMetadata(null, Uri_Changed));
+            DependencyProperty.Register("Uri", typeof(Uri), typeof(UriMapping), new PropertyMetadata(null, Uri_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void Uri_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

@@ -93,13 +93,10 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Text dependency property.
         /// </summary>
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", 
-                                                                                             typeof(string), 
-                                                                                             typeof(TextBlock), 
-                                                                                             new PropertyMetadata(string.Empty, OnTextPropertyChanged) 
-                                                                                             { 
-                                                                                                 CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never 
-                                                                                             });
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text",
+                                                                                             typeof(string),
+                                                                                             typeof(TextBlock),
+                                                                                             new PropertyMetadata(string.Empty, OnTextPropertyChanged));
 
         private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -142,7 +139,8 @@ namespace Windows.UI.Xaml.Controls
                                                                                                       typeof(TextBlock), 
                                                                                                       new PropertyMetadata(TextAlignment.Left) 
                                                                                                       { 
-                                                                                                          MethodToUpdateDom = TextAlignment_MethodToUpdateDom 
+                                                                                                          MethodToUpdateDom = TextAlignment_MethodToUpdateDom,
+                                                                                                          CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                                                                                                       });
 
         static void TextAlignment_MethodToUpdateDom(DependencyObject d, object newValue)
@@ -200,7 +198,8 @@ namespace Windows.UI.Xaml.Controls
                             },
                         Name = new List<string> { "whiteSpace" },
                     };
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 
@@ -230,13 +229,10 @@ namespace Windows.UI.Xaml.Controls
 #if WORKINPROGRESS
 
         // There is an implementation for TextTrimming in the shelvesheets
-        public static readonly DependencyProperty TextTrimmingProperty = DependencyProperty.Register("TextTrimming", 
-                                                                                                     typeof(TextTrimming), 
-                                                                                                     typeof(TextBlock), 
-                                                                                                     new PropertyMetadata(TextTrimming.None)
-                                                                                                     {
-                                                                                                         CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never
-                                                                                                     });
+        public static readonly DependencyProperty TextTrimmingProperty = DependencyProperty.Register("TextTrimming",
+                                                                                                     typeof(TextTrimming),
+                                                                                                     typeof(TextBlock),
+                                                                                                     new PropertyMetadata(TextTrimming.None));
 
         /// <summary>
         /// Gets or sets how the TextBlock trims text.
@@ -249,13 +245,10 @@ namespace Windows.UI.Xaml.Controls
 
         public double BaselineOffset { get; private set; }
 
-        public static readonly DependencyProperty CharacterSpacingProperty = DependencyProperty.Register("CharacterSpacing", 
-                                                                                                         typeof(int), 
-                                                                                                         typeof(TextBlock), 
-                                                                                                         new PropertyMetadata(0)
-                                                                                                         {
-                                                                                                             CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never
-                                                                                                         });
+        public static readonly DependencyProperty CharacterSpacingProperty = DependencyProperty.Register("CharacterSpacing",
+                                                                                                         typeof(int),
+                                                                                                         typeof(TextBlock),
+                                                                                                         new PropertyMetadata(0));
         public int CharacterSpacing
         {
             get { return (int)this.GetValue(CharacterSpacingProperty); }

@@ -122,7 +122,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the SelectionMode dependency property.
         /// </summary>
         public static readonly DependencyProperty SelectionModeProperty =
-            DependencyProperty.Register("SelectionMode", typeof(SelectionMode), typeof(ListBox), new PropertyMetadata(SelectionMode.Single));
+            DependencyProperty.Register("SelectionMode", typeof(SelectionMode), typeof(ListBox), new PropertyMetadata(SelectionMode.Single)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         //we didn't implement a SelectionMode_Changed method since I don't think it would be of any use.
 
 

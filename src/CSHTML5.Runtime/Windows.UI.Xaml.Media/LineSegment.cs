@@ -52,7 +52,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the Point dependency property.
         /// </summary>
         public static readonly DependencyProperty PointProperty =
-            DependencyProperty.Register("Point", typeof(Point), typeof(LineSegment), new PropertyMetadata(new Point(), Point_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("Point", typeof(Point), typeof(LineSegment), new PropertyMetadata(new Point(), Point_Changed));
 
         private static void Point_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

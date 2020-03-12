@@ -68,7 +68,7 @@ namespace Windows.UI.Xaml.Shapes
         /// Identifies the X1 dependency property.
         /// </summary>
         public static readonly DependencyProperty X1Property =
-            DependencyProperty.Register("X1", typeof(double), typeof(Line), new PropertyMetadata(0d, X1_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("X1", typeof(double), typeof(Line), new PropertyMetadata(0d, X1_Changed));
         private static void X1_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Line line = (Line)d;
@@ -90,7 +90,7 @@ namespace Windows.UI.Xaml.Shapes
         /// Identifies the X2 dependency property.
         /// </summary>
         public static readonly DependencyProperty X2Property =
-            DependencyProperty.Register("X2", typeof(double), typeof(Line), new PropertyMetadata(0d, X2_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("X2", typeof(double), typeof(Line), new PropertyMetadata(0d, X2_Changed));
         private static void X2_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Line line = (Line)d;
@@ -112,7 +112,7 @@ namespace Windows.UI.Xaml.Shapes
         /// Identifies the Y1 dependency property.
         /// </summary>
         public static readonly DependencyProperty Y1Property =
-            DependencyProperty.Register("Y1", typeof(double), typeof(Line), new PropertyMetadata(0d, Y1_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("Y1", typeof(double), typeof(Line), new PropertyMetadata(0d, Y1_Changed));
         private static void Y1_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Line line = (Line)d;
@@ -134,7 +134,7 @@ namespace Windows.UI.Xaml.Shapes
         /// Identifies the Y2 dependency property.
         /// </summary>
         public static readonly DependencyProperty Y2Property =
-            DependencyProperty.Register("Y2", typeof(double), typeof(Line), new PropertyMetadata(0d, Y2_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("Y2", typeof(double), typeof(Line), new PropertyMetadata(0d, Y2_Changed));
         private static void Y2_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Line line = (Line)d;

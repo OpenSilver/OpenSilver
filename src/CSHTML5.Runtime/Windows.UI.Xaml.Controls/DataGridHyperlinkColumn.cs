@@ -55,7 +55,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.DataGridBoundColumn.Binding dependency property.
         /// </summary>
         public static readonly DependencyProperty ContentBindingProperty =
-            DependencyProperty.Register("ContentBinding", typeof(BindingBase), typeof(DataGridBoundColumn), new PropertyMetadata(null, ContentBinding_Changed));
+            DependencyProperty.Register("ContentBinding", typeof(BindingBase), typeof(DataGridBoundColumn), new PropertyMetadata(null, ContentBinding_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         static void ContentBinding_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)

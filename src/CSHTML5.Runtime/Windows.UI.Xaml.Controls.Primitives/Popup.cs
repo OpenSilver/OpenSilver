@@ -123,7 +123,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Gets the identifier for the Child dependency property.
         /// </summary>
         public static readonly DependencyProperty ChildProperty =
-            DependencyProperty.Register("Child", typeof(UIElement), typeof(Popup), new PropertyMetadata(null, Child_Changed));
+            DependencyProperty.Register("Child", typeof(UIElement), typeof(Popup), new PropertyMetadata(null, Child_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         private static void Child_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -162,7 +163,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Gets the identifier for the IsOpen dependency property.
         /// </summary>
         public static readonly DependencyProperty IsOpenProperty =
-            DependencyProperty.Register("IsOpen", typeof(bool), typeof(Popup), new PropertyMetadata(false, IsOpen_Changed));
+            DependencyProperty.Register("IsOpen", typeof(bool), typeof(Popup), new PropertyMetadata(false, IsOpen_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         private static void IsOpen_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -291,7 +293,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Gets the identifier for the HorizontalOffset dependency property.
         /// </summary>
         public static readonly DependencyProperty HorizontalOffsetProperty =
-            DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(Popup), new PropertyMetadata(0d, HorizontalOffset_Changed));
+            DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(Popup), new PropertyMetadata(0d, HorizontalOffset_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void HorizontalOffset_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -317,7 +320,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Gets the identifier for the VerticalOffset dependency property.
         /// </summary>
         public static readonly DependencyProperty VerticalOffsetProperty =
-            DependencyProperty.Register("VerticalOffset", typeof(double), typeof(Popup), new PropertyMetadata(0d, VerticalOffset_Changed));
+            DependencyProperty.Register("VerticalOffset", typeof(double), typeof(Popup), new PropertyMetadata(0d, VerticalOffset_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void VerticalOffset_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -350,7 +354,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the HorizontalContentAlignment dependency property.
         /// </summary>
         public static readonly DependencyProperty HorizontalContentAlignmentProperty =
-            DependencyProperty.Register("HorizontalContentAlignment", typeof(HorizontalAlignment), typeof(Popup), new PropertyMetadata(HorizontalAlignment.Left, HorizontalContentAlignment_Changed));
+            DependencyProperty.Register("HorizontalContentAlignment", typeof(HorizontalAlignment), typeof(Popup), new PropertyMetadata(HorizontalAlignment.Left, HorizontalContentAlignment_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void HorizontalContentAlignment_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -377,7 +382,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the VerticalContentAlignment dependency property.
         /// </summary>
         public static readonly DependencyProperty VerticalContentAlignmentProperty =
-            DependencyProperty.Register("VerticalContentAlignment", typeof(VerticalAlignment), typeof(Popup), new PropertyMetadata(VerticalAlignment.Top, VerticalContentAlignment_Changed));
+            DependencyProperty.Register("VerticalContentAlignment", typeof(VerticalAlignment), typeof(Popup), new PropertyMetadata(VerticalAlignment.Top, VerticalContentAlignment_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void VerticalContentAlignment_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

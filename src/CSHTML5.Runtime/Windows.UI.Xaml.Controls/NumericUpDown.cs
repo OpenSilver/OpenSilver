@@ -147,7 +147,8 @@ namespace Windows.UI.Xaml.Controls
                 "ValueBarVisibility",
                 typeof(NumericUpDownValueBarVisibility),
                 typeof(NumericUpDown),
-                new PropertyMetadata(NumericUpDownValueBarVisibility.Visible, OnValueBarVisibilityChanged));
+                new PropertyMetadata(NumericUpDownValueBarVisibility.Visible, OnValueBarVisibilityChanged)
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Gets or sets the ValueBarVisibility property. This dependency property 
@@ -196,7 +197,8 @@ namespace Windows.UI.Xaml.Controls
                 "IsReadOnly",
                 typeof(bool),
                 typeof(NumericUpDown),
-                new PropertyMetadata(false, OnIsReadOnlyChanged));
+                new PropertyMetadata(false, OnIsReadOnlyChanged)
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Gets or sets the IsReadOnly property. This dependency property 
@@ -245,7 +247,8 @@ namespace Windows.UI.Xaml.Controls
                 "DragSpeed",
                 typeof(double),
                 typeof(NumericUpDown),
-                new PropertyMetadata(double.NaN));
+                new PropertyMetadata(double.NaN)
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Gets or sets the DragSpeed property. This dependency property 
@@ -565,7 +568,8 @@ namespace Windows.UI.Xaml.Controls
         /// The identifier for the Increment dependency property.
         /// </summary>
         public static readonly DependencyProperty IncrementProperty =
-            DependencyProperty.Register("Increment", typeof(double), typeof(NumericUpDown), new PropertyMetadata(1.0));
+            DependencyProperty.Register("Increment", typeof(double), typeof(NumericUpDown), new PropertyMetadata(1.0)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private void OnValueTextBoxGotFocus(object sender, RoutedEventArgs routedEventArgs)
         {

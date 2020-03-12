@@ -131,7 +131,8 @@ namespace Windows.UI.Xaml.Controls
                 "Header",
                 typeof(object),
                 typeof(TabItem),
-                new PropertyMetadata(null, OnHeaderChanged));
+                new PropertyMetadata(null, OnHeaderChanged)
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Header property changed handler.
@@ -210,7 +211,8 @@ namespace Windows.UI.Xaml.Controls
                 "HasHeader",
                 typeof(bool),
                 typeof(TabItem),
-                new PropertyMetadata(false));
+                new PropertyMetadata(false)
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 #endregion HasHeader
 
 #region HeaderTemplate
@@ -243,7 +245,8 @@ namespace Windows.UI.Xaml.Controls
                 "HeaderTemplate",
                 typeof(DataTemplate),
                 typeof(TabItem),
-                new PropertyMetadata(null, OnHeaderTemplateChanged));
+                new PropertyMetadata(null, OnHeaderTemplateChanged)
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// HeaderTemplate property changed handler.
@@ -308,7 +311,8 @@ namespace Windows.UI.Xaml.Controls
                 "IsSelected",
                 typeof(bool),
                 typeof(TabItem),
-                new PropertyMetadata(false, OnIsSelectedChanged));
+                new PropertyMetadata(false, OnIsSelectedChanged)
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// IsSelected changed handler.
@@ -446,7 +450,8 @@ namespace Windows.UI.Xaml.Controls
                 "IsFocused",
                 typeof(bool),
                 typeof(TabItem),
-                new PropertyMetadata(false, OnIsFocusedPropertyChanged));
+                new PropertyMetadata(false, OnIsFocusedPropertyChanged)
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// IsFocusedProperty property changed handler.
@@ -716,7 +721,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the SelectedBackground dependency property
         /// </summary>
         public static readonly DependencyProperty SelectedBackgroundProperty =
-            DependencyProperty.Register("SelectedBackground", typeof(Brush), typeof(TabItem), new PropertyMetadata(new SolidColorBrush(Colors.White)));
+            DependencyProperty.Register("SelectedBackground", typeof(Brush), typeof(TabItem), new PropertyMetadata(new SolidColorBrush(Colors.White))
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Gets or sets the foreground color of the selected INTERNAL_CorrespondingItem.
@@ -730,7 +736,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the SelectedForeground dependency property
         /// </summary>
         public static readonly DependencyProperty SelectedForegroundProperty =
-            DependencyProperty.Register("SelectedForeground", typeof(Brush), typeof(TabItem), new PropertyMetadata(new SolidColorBrush(Colors.Black)));
+            DependencyProperty.Register("SelectedForeground", typeof(Brush), typeof(TabItem), new PropertyMetadata(new SolidColorBrush(Colors.Black))
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Gets or sets the accent color of the selected INTERNAL_CorrespondingItem.
@@ -744,7 +751,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the SelectedAccent dependency property
         /// </summary>
         public static readonly DependencyProperty SelectedAccentProperty =
-            DependencyProperty.Register("SelectedAccent", typeof(Brush), typeof(TabItem), new PropertyMetadata(new SolidColorBrush(Colors.Blue)));
+            DependencyProperty.Register("SelectedAccent", typeof(Brush), typeof(TabItem), new PropertyMetadata(new SolidColorBrush(Colors.Blue))
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 #endregion
     }

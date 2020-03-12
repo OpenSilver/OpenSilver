@@ -81,7 +81,8 @@ namespace Windows.UI.Xaml.Media
                     {
                         throw new ArgumentException();
                     }
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 
@@ -97,7 +98,8 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the Offset dependency property.
         /// </summary>
         public static readonly DependencyProperty OffsetProperty =
-            DependencyProperty.Register("Offset", typeof(double), typeof(GradientStop), new PropertyMetadata(0d));
+            DependencyProperty.Register("Offset", typeof(double), typeof(GradientStop), new PropertyMetadata(0d)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         public object Clone()
         {

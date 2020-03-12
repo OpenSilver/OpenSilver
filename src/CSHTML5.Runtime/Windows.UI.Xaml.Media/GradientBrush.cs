@@ -90,7 +90,8 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the GradientStops dependency property.
         /// </summary>
         public static readonly DependencyProperty GradientStopsProperty =
-            DependencyProperty.Register("GradientStops", typeof(GradientStopCollection), typeof(GradientBrush), new PropertyMetadata(null));
+            DependencyProperty.Register("GradientStops", typeof(GradientStopCollection), typeof(GradientBrush), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
 
@@ -108,7 +109,8 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the MappingMode dependency property.
         /// </summary>
         public static readonly DependencyProperty MappingModeProperty =
-            DependencyProperty.Register("MappingMode", typeof(BrushMappingMode), typeof(GradientBrush), new PropertyMetadata(BrushMappingMode.RelativeToBoundingBox));
+            DependencyProperty.Register("MappingMode", typeof(BrushMappingMode), typeof(GradientBrush), new PropertyMetadata(BrushMappingMode.RelativeToBoundingBox)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
 
@@ -127,7 +129,8 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the SpreadMethod dependency property.
         /// </summary>
         public static readonly DependencyProperty SpreadMethodProperty =
-            DependencyProperty.Register("SpreadMethod", typeof(GradientSpreadMethod), typeof(GradientBrush), new PropertyMetadata(GradientSpreadMethod.Pad));
+            DependencyProperty.Register("SpreadMethod", typeof(GradientSpreadMethod), typeof(GradientBrush), new PropertyMetadata(GradientSpreadMethod.Pad)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
     }

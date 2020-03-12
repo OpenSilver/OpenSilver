@@ -77,7 +77,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the IsChecked dependency property
         /// </summary>
         public static readonly DependencyProperty IsCheckedProperty =
-            DependencyProperty.Register("IsChecked", typeof(bool?), typeof(ToggleButton), new PropertyMetadata(false, IsChecked_Changed));
+            DependencyProperty.Register("IsChecked", typeof(bool?), typeof(ToggleButton), new PropertyMetadata(false, IsChecked_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         internal static void IsChecked_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ToggleButton toggleButton = (ToggleButton)d;
@@ -123,7 +124,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the ToggleButton.IsThreeState dependency property.
         /// </summary>
         public static readonly DependencyProperty IsThreeStateProperty =
-            DependencyProperty.Register("IsThreeState", typeof(bool), typeof(ToggleButton), new PropertyMetadata(false)); //I don't think we need a callback here.
+            DependencyProperty.Register("IsThreeState", typeof(bool), typeof(ToggleButton), new PropertyMetadata(false)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 #if MIGRATION
         internal override void OnKeyDownWhenFocused(object sender, KeyEventArgs e)

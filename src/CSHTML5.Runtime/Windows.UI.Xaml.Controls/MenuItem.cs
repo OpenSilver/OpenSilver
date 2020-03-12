@@ -49,7 +49,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.MenuItem.Icon dependency property.
         /// </summary>
         public static readonly DependencyProperty IconProperty =
-            DependencyProperty.Register("Icon", typeof(object), typeof(MenuItem), new PropertyMetadata(null));
+            DependencyProperty.Register("Icon", typeof(object), typeof(MenuItem), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
 
@@ -67,7 +68,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.HeaderedItemsControl.Header dependency property.
         /// </summary>
         public static readonly DependencyProperty HeaderProperty =
-            DependencyProperty.Register("Header", typeof(object), typeof(MenuItem), new PropertyMetadata(null, Header_Changed));
+            DependencyProperty.Register("Header", typeof(object), typeof(MenuItem), new PropertyMetadata(null, Header_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void Header_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

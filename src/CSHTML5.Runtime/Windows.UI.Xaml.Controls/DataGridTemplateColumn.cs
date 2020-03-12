@@ -52,7 +52,8 @@ namespace Windows.UI.Xaml.Controls
         /// dependency property.
         /// </summary>
         public static readonly DependencyProperty CellTemplateProperty =
-            DependencyProperty.Register("CellTemplate", typeof(DataTemplate), typeof(DataGridTemplateColumn), new PropertyMetadata(null, CellTemplateProperty_Changed));
+            DependencyProperty.Register("CellTemplate", typeof(DataTemplate), typeof(DataGridTemplateColumn), new PropertyMetadata(null, CellTemplateProperty_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void CellTemplateProperty_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -72,7 +73,8 @@ namespace Windows.UI.Xaml.Controls
         /// dependency property.
         /// </summary>
         public static readonly DependencyProperty CellEditingTemplateProperty =
-            DependencyProperty.Register("CellEditingTemplate", typeof(DataTemplate), typeof(DataGridTemplateColumn), new PropertyMetadata(null, CellEditingTemplateProperty_Changed));
+            DependencyProperty.Register("CellEditingTemplate", typeof(DataTemplate), typeof(DataGridTemplateColumn), new PropertyMetadata(null, CellEditingTemplateProperty_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void CellEditingTemplateProperty_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

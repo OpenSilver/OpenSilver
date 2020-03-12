@@ -91,7 +91,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the SelectedIndex dependency property.
         /// </summary>
         public static readonly DependencyProperty SelectedIndexProperty =
-            DependencyProperty.Register("SelectedindexProperty", typeof(int), typeof(Selector), new PropertyMetadata(-1, SelectedIndex_Changed));
+            DependencyProperty.Register("SelectedindexProperty", typeof(int), typeof(Selector), new PropertyMetadata(-1, SelectedIndex_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         private static void SelectedIndex_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Selector selector = (Selector)d;
@@ -188,7 +189,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the SelectedItem dependency property.
         /// </summary>
         public static readonly DependencyProperty SelectedItemProperty =
-            DependencyProperty.Register("SelectedItem", typeof(object), typeof(Selector), new PropertyMetadata(null, SelectedItem_changed));
+            DependencyProperty.Register("SelectedItem", typeof(object), typeof(Selector), new PropertyMetadata(null, SelectedItem_changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         private static void SelectedItem_changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (!AreObjectsEqual(e.OldValue, e.NewValue))
@@ -247,7 +249,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the SelectedValue dependency property.
         /// </summary>
         public static readonly DependencyProperty SelectedValueProperty =
-            DependencyProperty.Register("SelectedValue", typeof(object), typeof(Selector), new PropertyMetadata(null, SelectedValue_Changed));
+            DependencyProperty.Register("SelectedValue", typeof(object), typeof(Selector), new PropertyMetadata(null, SelectedValue_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         private static void SelectedValue_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (!AreObjectsEqual(e.OldValue, e.NewValue)) 
@@ -349,7 +352,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the SelectedValuePath dependency property.
         /// </summary>
         public static readonly DependencyProperty SelectedValuePathProperty =
-            DependencyProperty.Register("SelectedValuePath", typeof(string), typeof(Selector), new PropertyMetadata(string.Empty));
+            DependencyProperty.Register("SelectedValuePath", typeof(string), typeof(Selector), new PropertyMetadata(string.Empty)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         internal virtual void RefreshSelectedItem()
@@ -396,7 +400,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the SelectedItemBackground dependency property
         /// </summary>
         public static readonly DependencyProperty SelectedItemBackgroundProperty =
-            DependencyProperty.Register("SelectedItemBackground", typeof(Brush), typeof(Selector), new PropertyMetadata(new SolidColorBrush(Colors.Blue)));
+            DependencyProperty.Register("SelectedItemBackground", typeof(Brush), typeof(Selector), new PropertyMetadata(new SolidColorBrush(Colors.Blue))
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Gets or sets the foreground color of the selected Items.
@@ -410,7 +415,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the SelectedItemForeground dependency property
         /// </summary>
         public static readonly DependencyProperty SelectedItemForegroundProperty =
-            DependencyProperty.Register("SelectedItemForeground", typeof(Brush), typeof(Selector), new PropertyMetadata(new SolidColorBrush(Colors.White)));
+            DependencyProperty.Register("SelectedItemForeground", typeof(Brush), typeof(Selector), new PropertyMetadata(new SolidColorBrush(Colors.White))
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         [Obsolete("Use RowBackground instead.")]
@@ -435,7 +441,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the RowBackground dependency property
         /// </summary>
         public static readonly DependencyProperty RowBackgroundProperty =
-            DependencyProperty.Register("RowBackground", typeof(Brush), typeof(Selector), new PropertyMetadata(new SolidColorBrush(Colors.White)));
+            DependencyProperty.Register("RowBackground", typeof(Brush), typeof(Selector), new PropertyMetadata(new SolidColorBrush(Colors.White))
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         /// <summary>
@@ -450,7 +457,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the UnselectedItemForeground dependency property
         /// </summary>
         public static readonly DependencyProperty UnselectedItemForegroundProperty =
-            DependencyProperty.Register("UnselectedItemForeground", typeof(Brush), typeof(Selector), new PropertyMetadata(null));
+            DependencyProperty.Register("UnselectedItemForeground", typeof(Brush), typeof(Selector), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         #endregion
 

@@ -145,7 +145,8 @@ namespace Windows.UI.Xaml
             set { SetValue(ClipToBoundsProperty, value); }
         }
         public static readonly DependencyProperty ClipToBoundsProperty =
-            DependencyProperty.Register("ClipToBounds", typeof(bool), typeof(UIElement), new PropertyMetadata(false) { MethodToUpdateDom = ClipToBounds_MethodToUpdateDom });
+            DependencyProperty.Register("ClipToBounds", typeof(bool), typeof(UIElement), new PropertyMetadata(false) { MethodToUpdateDom = ClipToBounds_MethodToUpdateDom,
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void ClipToBounds_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -217,7 +218,8 @@ namespace Windows.UI.Xaml
 
         // Using a DependencyProperty as the backing store for Effect.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty EffectProperty =
-            DependencyProperty.Register("Effect", typeof(Effect), typeof(UIElement), new PropertyMetadata(null, Effect_Changed));
+            DependencyProperty.Register("Effect", typeof(Effect), typeof(UIElement), new PropertyMetadata(null, Effect_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void Effect_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -251,7 +253,8 @@ namespace Windows.UI.Xaml
         /// Identifies the RenderTransform dependency property.
         /// </summary>
         public static readonly DependencyProperty RenderTransformProperty =
-            DependencyProperty.Register("RenderTransform", typeof(Transform), typeof(UIElement), new PropertyMetadata(null, RenderTransform_Changed));
+            DependencyProperty.Register("RenderTransform", typeof(Transform), typeof(UIElement), new PropertyMetadata(null, RenderTransform_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void RenderTransform_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -311,7 +314,8 @@ namespace Windows.UI.Xaml
 
         // Using a DependencyProperty as the backing store for RenderTransformOrigin.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty RenderTransformOriginProperty =
-            DependencyProperty.Register("RenderTransformOrigin", typeof(Point), typeof(UIElement), new PropertyMetadata(new Point(0d, 0d), RenderTransformOrigin_Changed));
+            DependencyProperty.Register("RenderTransformOrigin", typeof(Point), typeof(UIElement), new PropertyMetadata(new Point(0d, 0d), RenderTransformOrigin_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void RenderTransformOrigin_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -379,7 +383,8 @@ namespace Windows.UI.Xaml
         /// Identifies the UseLayoutRounding dependency property.
         /// </summary>
         public static readonly DependencyProperty UseLayoutRoundingProperty =
-            DependencyProperty.Register("UseLayoutRounding", typeof(bool), typeof(UIElement), new PropertyMetadata(false));
+            DependencyProperty.Register("UseLayoutRounding", typeof(bool), typeof(UIElement), new PropertyMetadata(false)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         //------
         // NOTE: The "UseLayoutRounding" is currently not supported, but we provide it anyway because it's a pain for end-users to remove the option in all their XAML elements and the benefit of not including it is not significant.
         //------
@@ -402,7 +407,9 @@ namespace Windows.UI.Xaml
         /// Identifies the Visibility dependency property.
         /// </summary>
         public static readonly DependencyProperty VisibilityProperty =
-            DependencyProperty.Register("Visibility", typeof(Visibility), typeof(UIElement), new PropertyMetadata(Visibility.Visible, Visibility_Changed));
+            DependencyProperty.Register("Visibility", typeof(Visibility), typeof(UIElement), new PropertyMetadata(Visibility.Visible, Visibility_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+
         string _previousValueOfDisplayCssProperty = "block";
         static void Visibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -494,7 +501,8 @@ namespace Windows.UI.Xaml
                         Name = new List<string> { "opacity" },
                         ApplyAlsoWhenThereIsAControlTemplate = true,
                     };
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never
             }
             );
 
@@ -515,7 +523,8 @@ namespace Windows.UI.Xaml
         /// Identifies the IsHitTestVisible property.
         /// </summary>
         public static readonly DependencyProperty IsHitTestVisibleProperty =
-            DependencyProperty.Register("IsHitTestVisible", typeof(bool), typeof(UIElement), new PropertyMetadata(true) { MethodToUpdateDom = IsHitTestVisible_MethodToUpdateDom, Inherits = true });
+            DependencyProperty.Register("IsHitTestVisible", typeof(bool), typeof(UIElement), new PropertyMetadata(true) { MethodToUpdateDom = IsHitTestVisible_MethodToUpdateDom, Inherits = true,
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
 
         private static void IsHitTestVisible_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -616,7 +625,8 @@ namespace Windows.UI.Xaml
         /// Identifies the AllowDrop dependency property.
         /// </summary>
         public static readonly DependencyProperty AllowDropProperty =
-            DependencyProperty.Register("AllowDrop", typeof(bool), typeof(UIElement), new PropertyMetadata(false));
+            DependencyProperty.Register("AllowDrop", typeof(bool), typeof(UIElement), new PropertyMetadata(false)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         #endregion
 

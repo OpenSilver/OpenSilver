@@ -570,7 +570,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the Orientation dependency property.
         /// </summary>
         public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(ScrollBar), new PropertyMetadata(Orientation.Vertical, Orientation_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(ScrollBar), new PropertyMetadata(Orientation.Vertical, Orientation_Changed));
 
         private static void Orientation_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -592,7 +592,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the ViewportSize dependency property.
         /// </summary>
         public static readonly DependencyProperty ViewportSizeProperty =
-            DependencyProperty.Register("ViewportSize", typeof(double), typeof(ScrollBar), new PropertyMetadata(0d, ViewportSize_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("ViewportSize", typeof(double), typeof(ScrollBar), new PropertyMetadata(0d, ViewportSize_Changed));
 
         private static void ViewportSize_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

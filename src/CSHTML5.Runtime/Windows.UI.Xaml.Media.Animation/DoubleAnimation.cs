@@ -49,7 +49,8 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <summary>
         /// Identifies the EasingFunction dependency property.
         /// </summary>
-        public static readonly DependencyProperty EasingFunctionProperty = DependencyProperty.Register("EasingFunction", typeof(IEasingFunction), typeof(DoubleAnimation), new PropertyMetadata(null));
+        public static readonly DependencyProperty EasingFunctionProperty = DependencyProperty.Register("EasingFunction", typeof(IEasingFunction), typeof(DoubleAnimation), new PropertyMetadata(null)
+        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 #else
         /// <summary>
         /// Gets or sets the easing function applied to this animation.
@@ -63,7 +64,8 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <summary>
         /// Identifies the EasingFunction dependency property.
         /// </summary>
-        public static readonly DependencyProperty EasingFunctionProperty = DependencyProperty.Register("EasingFunction", typeof(EasingFunctionBase), typeof(DoubleAnimation), new PropertyMetadata(null));
+        public static readonly DependencyProperty EasingFunctionProperty = DependencyProperty.Register("EasingFunction", typeof(EasingFunctionBase), typeof(DoubleAnimation), new PropertyMetadata(null)
+        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 #endif
 
@@ -79,7 +81,8 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Identifies the From dependency property.
         /// </summary>
         public static readonly DependencyProperty FromProperty =
-            DependencyProperty.Register("From", typeof(double?), typeof(DoubleAnimation), new PropertyMetadata(null));
+            DependencyProperty.Register("From", typeof(double?), typeof(DoubleAnimation), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
 
@@ -99,7 +102,8 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Identifies the To dependency property.
         /// </summary>
         public static readonly DependencyProperty ToProperty =
-            DependencyProperty.Register("To", typeof(double?), typeof(DoubleAnimation), new PropertyMetadata(null));
+            DependencyProperty.Register("To", typeof(double?), typeof(DoubleAnimation), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         internal override void GetTargetInformation(IterationParameters parameters)
         {

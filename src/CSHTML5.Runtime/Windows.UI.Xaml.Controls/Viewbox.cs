@@ -117,7 +117,8 @@ namespace Windows.UI.Xaml.Controls
                 "Stretch",
                 typeof(Stretch),
                 typeof(Viewbox),
-                new PropertyMetadata(Stretch.Uniform));
+                new PropertyMetadata(Stretch.Uniform)
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Gets or sets the StretchDirection, which determines how scaling
@@ -145,7 +146,7 @@ namespace Windows.UI.Xaml.Controls
                 "StretchDirection",
                 typeof(StretchDirection),
                 typeof(Viewbox),
-                new PropertyMetadata(StretchDirection.Both, OnStretchDirectionPropertyChanged) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+                new PropertyMetadata(StretchDirection.Both, OnStretchDirectionPropertyChanged));
 
         /// <summary>
         /// StretchDirectionProperty property changed handler.

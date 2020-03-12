@@ -78,7 +78,8 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Identifies the Storyboard.TargetName XAML attached property.
         /// </summary>
         public static readonly DependencyProperty TargetNameProperty =
-            DependencyProperty.RegisterAttached("TargetName", typeof(string), typeof(Storyboard), new PropertyMetadata(null));
+            DependencyProperty.RegisterAttached("TargetName", typeof(string), typeof(Storyboard), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Gets the value of the Storyboard.TargetProperty XAML attached property from
@@ -121,7 +122,8 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Identifies the Storyboard.TargetProperty XAML attached property.
         /// </summary>
         public static readonly DependencyProperty TargetPropertyProperty =
-            DependencyProperty.RegisterAttached("TargetProperty", typeof(PropertyPath), typeof(Storyboard), new PropertyMetadata(null));
+            DependencyProperty.RegisterAttached("TargetProperty", typeof(PropertyPath), typeof(Storyboard), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
 
@@ -302,7 +304,8 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Identifies the Storyboard.TargetName XAML attached property.
         /// </summary>
         public static readonly DependencyProperty TargetProperty =
-            DependencyProperty.RegisterAttached("Target", typeof(DependencyObject), typeof(Storyboard), new PropertyMetadata(null));
+            DependencyProperty.RegisterAttached("Target", typeof(DependencyObject), typeof(Storyboard), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         //public FrameworkElement Target

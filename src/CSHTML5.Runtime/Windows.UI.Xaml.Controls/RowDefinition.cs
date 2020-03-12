@@ -63,7 +63,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the MaxHeight dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxHeightProperty =
-            DependencyProperty.Register("MaxHeight", typeof(double), typeof(RowDefinition), new PropertyMetadata(double.PositiveInfinity, MaxHeight_Changed));
+            DependencyProperty.Register("MaxHeight", typeof(double), typeof(RowDefinition), new PropertyMetadata(double.PositiveInfinity, MaxHeight_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         static void MaxHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             //todo: set the new value in a proper manner
@@ -88,7 +89,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the MinHeight dependency property.
         /// </summary>
         public static readonly DependencyProperty MinHeightProperty =
-            DependencyProperty.Register("MinHeight", typeof(double), typeof(RowDefinition), new PropertyMetadata(double.PositiveInfinity, MinHeight_Changed));
+            DependencyProperty.Register("MinHeight", typeof(double), typeof(RowDefinition), new PropertyMetadata(double.PositiveInfinity, MinHeight_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         static void MinHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             //todo: set the new value in a proper manner
@@ -113,7 +115,9 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Height dependency property.
         /// </summary>
         public static readonly DependencyProperty HeightProperty =
-            DependencyProperty.Register("Height", typeof(GridLength), typeof(RowDefinition), new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), Height_Changed));
+            DependencyProperty.Register("Height", typeof(GridLength), typeof(RowDefinition), new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), Height_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+
         static void Height_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var rowDefinition = (RowDefinition)d;

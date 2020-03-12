@@ -65,7 +65,8 @@ namespace Windows.UI.Xaml
         }
 
         public static readonly DependencyProperty BasedOnProperty =
-            DependencyProperty.Register("BasedOn", typeof(Style), typeof(Style), new PropertyMetadata(null, BasedOn_Changed));
+            DependencyProperty.Register("BasedOn", typeof(Style), typeof(Style), new PropertyMetadata(null, BasedOn_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void BasedOn_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

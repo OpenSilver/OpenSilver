@@ -42,7 +42,8 @@ namespace Windows.UI.Xaml.Shapes
 
         static Ellipse()
         {
-            Shape.StretchProperty.OverrideMetadata(typeof(Ellipse), new PropertyMetadata(Stretch.Fill, Shape.Stretch_Changed));
+            Shape.StretchProperty.OverrideMetadata(typeof(Ellipse), new PropertyMetadata(Stretch.Fill, Shape.Stretch_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)

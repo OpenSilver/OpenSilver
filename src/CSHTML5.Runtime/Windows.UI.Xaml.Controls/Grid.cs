@@ -934,7 +934,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Grid.Row XAML attached property.
         /// </summary>
         public static readonly DependencyProperty RowProperty =
-            DependencyProperty.RegisterAttached("Row", typeof(int), typeof(UIElement), new PropertyMetadata(0, Row_Changed));
+            DependencyProperty.RegisterAttached("Row", typeof(int), typeof(UIElement), new PropertyMetadata(0, Row_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void Row_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -975,7 +976,8 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty RowSpanProperty =
-            DependencyProperty.RegisterAttached("RowSpan", typeof(int), typeof(UIElement), new PropertyMetadata(1, RowSpan_Changed));
+            DependencyProperty.RegisterAttached("RowSpan", typeof(int), typeof(UIElement), new PropertyMetadata(1, RowSpan_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void RowSpan_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1029,7 +1031,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Grid.Column XAML attached property
         /// </summary>
         public static readonly DependencyProperty ColumnProperty =
-            DependencyProperty.RegisterAttached("Column", typeof(int), typeof(UIElement), new PropertyMetadata(0, Column_Changed));
+            DependencyProperty.RegisterAttached("Column", typeof(int), typeof(UIElement), new PropertyMetadata(0, Column_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void Column_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1070,7 +1073,8 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty ColumnSpanProperty =
-            DependencyProperty.RegisterAttached("ColumnSpan", typeof(int), typeof(UIElement), new PropertyMetadata(1, ColumnSpan_Changed));
+            DependencyProperty.RegisterAttached("ColumnSpan", typeof(int), typeof(UIElement), new PropertyMetadata(1, ColumnSpan_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void ColumnSpan_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

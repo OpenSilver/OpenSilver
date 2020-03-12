@@ -283,7 +283,8 @@ var radios = document.getElementsByName( $0 );
         /// Identifies the GroupName dependency property.
         /// </summary>
         public static readonly DependencyProperty GroupNameProperty =
-            DependencyProperty.Register("GroupName", typeof(string), typeof(RadioButton), new PropertyMetadata(null, GroupName_Changed));
+            DependencyProperty.Register("GroupName", typeof(string), typeof(RadioButton), new PropertyMetadata(null, GroupName_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void GroupName_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

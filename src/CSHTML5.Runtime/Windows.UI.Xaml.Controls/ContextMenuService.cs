@@ -29,10 +29,11 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty ContextMenuProperty =
                 DependencyProperty.Register(
-                       "ContextMenu",              // Name
-                        typeof(ContextMenu),        // Type
-                        typeof(ContextMenuService), // Owner
-                        new PropertyMetadata(null));
+                       "ContextMenu",
+                        typeof(ContextMenu),
+                        typeof(ContextMenuService),
+                        new PropertyMetadata(null)
+                        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         ///     Gets the value of the ContextMenu property on the specified object.

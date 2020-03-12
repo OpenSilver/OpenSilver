@@ -125,7 +125,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the IsDropDownOpen dependency property.
         /// </summary>
         public static readonly DependencyProperty IsDropDownOpenProperty =
-            DependencyProperty.Register("IsDropDownOpen", typeof(bool), typeof(AutoCompleteBox), new PropertyMetadata(false, IsDropDownOpen_Changed));
+            DependencyProperty.Register("IsDropDownOpen", typeof(bool), typeof(AutoCompleteBox), new PropertyMetadata(false, IsDropDownOpen_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void IsDropDownOpen_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -225,7 +226,8 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty IsArrowVisibleProperty =
-            DependencyProperty.Register("IsArrowVisible", typeof(bool), typeof(AutoCompleteBox), new PropertyMetadata(false, IsArrowVisible_Changed));
+            DependencyProperty.Register("IsArrowVisible", typeof(bool), typeof(AutoCompleteBox), new PropertyMetadata(false, IsArrowVisible_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void IsArrowVisible_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -361,7 +363,8 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty MinimumPopulateDelayProperty =
-            DependencyProperty.Register("MinimumPopulateDelay", typeof(int), typeof(AutoCompleteBox), new PropertyMetadata(0, MinimumPopulateDelay_Changed));
+            DependencyProperty.Register("MinimumPopulateDelay", typeof(int), typeof(AutoCompleteBox), new PropertyMetadata(0, MinimumPopulateDelay_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void MinimumPopulateDelay_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -379,7 +382,8 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty MinimumPrefixLengthProperty =
-            DependencyProperty.Register("MinimumPrefixLength", typeof(int), typeof(AutoCompleteBox), new PropertyMetadata(1));
+            DependencyProperty.Register("MinimumPrefixLength", typeof(int), typeof(AutoCompleteBox), new PropertyMetadata(1)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Gets the text that is used to filter items in the ItemsSource item collection.
@@ -402,7 +406,8 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof(string), typeof(AutoCompleteBox), new PropertyMetadata("", Text_Changed));
+            DependencyProperty.Register("Text", typeof(string), typeof(AutoCompleteBox), new PropertyMetadata(string.Empty, Text_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void Text_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -682,7 +687,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the MaxDropDownHeight dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxDropDownHeightProperty =
-            DependencyProperty.Register("MaxDropDownHeight", typeof(double), typeof(AutoCompleteBox), new PropertyMetadata(200d));
+            DependencyProperty.Register("MaxDropDownHeight", typeof(double), typeof(AutoCompleteBox), new PropertyMetadata(200d)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 #region event
 

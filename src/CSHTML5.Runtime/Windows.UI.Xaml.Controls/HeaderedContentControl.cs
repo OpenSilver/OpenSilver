@@ -70,7 +70,8 @@ namespace Windows.UI.Xaml.Controls
                         "Header",
                         typeof(object),
                         typeof(HeaderedContentControl),
-                        new PropertyMetadata(null, OnHeaderPropertyChanged));
+                        new PropertyMetadata(null, OnHeaderPropertyChanged)
+                        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// HeaderProperty property changed handler.
@@ -114,7 +115,8 @@ namespace Windows.UI.Xaml.Controls
                         "HeaderTemplate",
                         typeof(DataTemplate),
                         typeof(HeaderedContentControl),
-                        new PropertyMetadata(null, OnHeaderTemplatePropertyChanged));
+                        new PropertyMetadata(null, OnHeaderTemplatePropertyChanged)
+                        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// HeaderTemplateProperty property changed handler.

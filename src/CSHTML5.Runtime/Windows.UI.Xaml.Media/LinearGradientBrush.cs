@@ -68,7 +68,8 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the EndPoint dependency property.
         /// </summary>
         public static readonly DependencyProperty EndPointProperty =
-            DependencyProperty.Register("EndPoint", typeof(Point), typeof(LinearGradientBrush), new PropertyMetadata(new Point(1, 1), EndPoint_Changed));
+            DependencyProperty.Register("EndPoint", typeof(Point), typeof(LinearGradientBrush), new PropertyMetadata(new Point(1, 1), EndPoint_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void EndPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -88,7 +89,8 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the StartPoint dependency property.
         /// </summary>
         public static readonly DependencyProperty StartPointProperty =
-            DependencyProperty.Register("StartPoint", typeof(Point), typeof(LinearGradientBrush), new PropertyMetadata(new Point(), StartPoint_Changed));
+            DependencyProperty.Register("StartPoint", typeof(Point), typeof(LinearGradientBrush), new PropertyMetadata(new Point(), StartPoint_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void StartPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

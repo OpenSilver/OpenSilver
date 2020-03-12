@@ -66,7 +66,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the AutoPlay dependency property.
         /// </summary>
         public static readonly DependencyProperty AutoPlayProperty =
-            DependencyProperty.Register("AutoPlay", typeof(bool), typeof(MediaElement), new PropertyMetadata(true, AutoPlay_Changed));
+            DependencyProperty.Register("AutoPlay", typeof(bool), typeof(MediaElement), new PropertyMetadata(true, AutoPlay_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void AutoPlay_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -117,7 +118,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the IsAudioOnly dependency property.
         /// </summary>
         public static readonly DependencyProperty IsAudioOnlyProperty =
-            DependencyProperty.Register("IsAudioOnly", typeof(bool), typeof(MediaElement), new PropertyMetadata(false));
+            DependencyProperty.Register("IsAudioOnly", typeof(bool), typeof(MediaElement), new PropertyMetadata(false)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
 
@@ -135,7 +137,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the IsLooping dependency property.
         /// </summary>
         public static readonly DependencyProperty IsLoopingProperty =
-            DependencyProperty.Register("IsLooping", typeof(bool), typeof(MediaElement), new PropertyMetadata(false, IsLooping_Changed));
+            DependencyProperty.Register("IsLooping", typeof(bool), typeof(MediaElement), new PropertyMetadata(false, IsLooping_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         private static void IsLooping_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = (MediaElement)d;
@@ -161,7 +164,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the IsMuted dependency property.
         /// </summary>
         public static readonly DependencyProperty IsMutedProperty =
-            DependencyProperty.Register("IsMuted", typeof(bool), typeof(MediaElement), new PropertyMetadata(false, IsMuted_Changed));
+            DependencyProperty.Register("IsMuted", typeof(bool), typeof(MediaElement), new PropertyMetadata(false, IsMuted_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void IsMuted_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -234,7 +238,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Source dependency property.
         /// </summary>
         public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register("Source", typeof(Uri), typeof(MediaElement), new PropertyMetadata(null, Source_Changed));
+            DependencyProperty.Register("Source", typeof(Uri), typeof(MediaElement), new PropertyMetadata(null, Source_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void Source_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -343,7 +348,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Volume dependency property.
         /// </summary>
         public static readonly DependencyProperty VolumeProperty =
-            DependencyProperty.Register("Volume", typeof(double), typeof(MediaElement), new PropertyMetadata(0.5d, Volume_Changed));
+            DependencyProperty.Register("Volume", typeof(double), typeof(MediaElement), new PropertyMetadata(0.5d, Volume_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void Volume_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -505,7 +511,8 @@ namespace Windows.UI.Xaml.Controls
 
         // Using a DependencyProperty as the backing store for ShowControls.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ShowControlsProperty =
-            DependencyProperty.Register("ShowControls", typeof(bool), typeof(MediaElement), new PropertyMetadata(false, ShowControls_Changed));
+            DependencyProperty.Register("ShowControls", typeof(bool), typeof(MediaElement), new PropertyMetadata(false, ShowControls_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void ShowControls_Changed(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {

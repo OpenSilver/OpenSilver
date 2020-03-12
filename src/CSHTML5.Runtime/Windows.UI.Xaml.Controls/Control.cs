@@ -103,95 +103,13 @@ namespace Windows.UI.Xaml.Controls
                 )
             {
                 GetCSSEquivalent = (instance) =>
+                {
+                    return new CSSEquivalent()
                     {
-                        return new CSSEquivalent()
-                        {
-                            Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
-                        };
-                    }
-                    //GetCSSEquivalents = (instance) =>
-                    //    {
-                    //        Control control = (Control)instance;
-                    //        List<CSSEquivalent> result = new List<CSSEquivalent>();
-                    //        if (control.Background != null)
-                    //        {
-                    //            Brush background = (Brush)control.Background;
-                    //            List<KeyValuePair<DependencyObject, DependencyProperty>> tuples = new List<KeyValuePair<DependencyObject, DependencyProperty>>();
-                    //            //we make a copy of the list of tuples so that we can modify it while going though it.
-                    //            foreach (KeyValuePair<DependencyObject, DependencyProperty> tuple in background.PropertiesWhereUsed)
-                    //            {
-                    //                tuples.Add(tuple);
-                    //            }
-                    //            foreach (KeyValuePair<DependencyObject, DependencyProperty> tuple in tuples)
-                    //            {
-                    //                UIElement uiElement = tuple.Key as UIElement;
-                    //                DependencyProperty dependencyProperty = tuple.Value;
-                    //                if (uiElement != null)
-                    //                {
-                    //                    if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
-                    //                    {
-                    //                        PropertyMetadata propertyMetadata = dependencyProperty.GetTypeMetaData(uiElement.GetType());
-                    //                        //if (propertyMetadata.GetCSSEquivalent != null) //todo: temporary test so remove it?
-                    //                        //{
-                    //                            //var parentPropertyCSSEquivalent = propertyMetadata.GetCSSEquivalent(uiElement);
-                    //                            List<string> names = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" };
-
-                    //                            result.Add(new CSSEquivalent()
-                    //                            {
-                    //                                Name = names,
-
-                    //                                Value = (inst, value) =>
-                    //                                {
-                    //                                    Dictionary<string, object> valuesDict = new Dictionary<string, object>();
-                    //                                    foreach (string name in names)
-                    //                                    {
-                    //                                        if (!name.EndsWith("Alpha"))
-                    //                                        {
-                    //                                            valuesDict.Add(name, ((Color)value).INTERNAL_ToHtmlStringForVelocity());
-                    //                                        }
-                    //                                        else
-                    //                                        {
-                    //                                            valuesDict.Add(name, ((double)((Color)value).A) / 255);
-                    //                                        }
-                    //                                    }
-                    //                                    return valuesDict;
-                    //                                },
-                    //                                //DomElement = parentPropertyCSSEquivalent.DomElement,
-                    //                                UIElement = uiElement
-                    //                            });
-                    //                        //}
-                    //                        //else
-                    //                        //{
-                    //                        //    //we want to create a CSSEquivalent that will just make the UIElement call the property callback if any:
-                    //                        //    if (propertyMetadata.PropertyChangedCallback != null)
-                    //                        //    {
-                    //                        //        result.Add(new CSSEquivalent()
-                    //                        //        {
-                    //                        //            UIElement = uiElement,
-                    //                        //            CallbackMethod = propertyMetadata.PropertyChangedCallback,
-                    //                        //            DependencyProperty = dependencyProperty
-                    //                        //        });
-                    //                        //    }
-                    //                        //}
-                    //                    }
-                    //                }
-                    //                else
-                    //                {
-                    //                    //Commented because it could be a Setter in a Style
-                    //                    //throw new NotSupportedException("A solidColorBrush cannot currently be set inside a class that desn't inherit from UIElement.");
-                    //                }
-                    //            }
-                    //        }
-                    //        else
-                    //        {
-                    //            result.Add(new CSSEquivalent()
-                    //                {
-                    //                    Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
-                    //                });
-                    //        }
-                    //        return result;
-
-                    //    }
+                        Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
+                    };
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 
@@ -240,7 +158,8 @@ namespace Windows.UI.Xaml.Controls
                     {
                         Name = new List<string> { "borderColor" },
                     };
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 
@@ -259,7 +178,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the BorderThickness dependency property.
         /// </summary>
         public static readonly DependencyProperty BorderThicknessProperty =
-            DependencyProperty.Register("BorderThickness", typeof(Thickness), typeof(Control), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = BorderThickness_MethodToUpdateDom });
+            DependencyProperty.Register("BorderThickness", typeof(Thickness), typeof(Control), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = BorderThickness_MethodToUpdateDom,
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void BorderThickness_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -309,7 +229,8 @@ namespace Windows.UI.Xaml.Controls
                         Name = new List<string> { "fontWeight" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
                     };
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 
@@ -350,7 +271,8 @@ namespace Windows.UI.Xaml.Controls
                         Name = new List<string> { "fontStyle" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
                     };
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 
@@ -381,7 +303,8 @@ namespace Windows.UI.Xaml.Controls
                         Name = new List<string> { "color", "colorAlpha" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
                     };
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 
@@ -402,7 +325,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the FontFamily dependency property.
         /// </summary>
         public static readonly DependencyProperty FontFamilyProperty =
-            DependencyProperty.Register("FontFamily", typeof(FontFamily), typeof(Control), new PropertyMetadata(null) //todo: put a default value?
+            DependencyProperty.Register("FontFamily", typeof(FontFamily), typeof(Control), new PropertyMetadata(null)
             {
                 GetCSSEquivalent = (instance) =>
                 {
@@ -436,7 +359,8 @@ namespace Windows.UI.Xaml.Controls
                         Name = new List<string> { "fontFamily" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
                     };
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 
@@ -476,7 +400,8 @@ namespace Windows.UI.Xaml.Controls
                         Name = new List<string> { "fontSize" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
                     };
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 
@@ -502,7 +427,8 @@ namespace Windows.UI.Xaml.Controls
                                                                                                         typeof(Control),
                                                                                                         new PropertyMetadata(System.Windows.TextDecorations.None)
                                                                                                         {
-                                                                                                            GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations
+                                                                                                            GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations,
+                                                                                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                                                                                                         });
         internal static CSSEquivalent INTERNAL_GetCSSEquivalentForTextDecorations(DependencyObject instance)
         {
@@ -547,7 +473,8 @@ namespace Windows.UI.Xaml.Controls
         public static readonly DependencyProperty TextDecorationsProperty =
             DependencyProperty.Register("TextDecorations", typeof(TextDecorations?), typeof(Control), new PropertyMetadata(null)
             {
-                GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations
+                GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations,
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 
@@ -615,7 +542,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Padding dependency property.
         /// </summary>
         public static readonly DependencyProperty PaddingProperty =
-            DependencyProperty.Register("Padding", typeof(Thickness), typeof(Control), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = Padding_MethodToUpdateDom });
+            DependencyProperty.Register("Padding", typeof(Thickness), typeof(Control), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = Padding_MethodToUpdateDom,
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         private static void Padding_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             var control = (Control)d;
@@ -662,7 +590,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the HorizontalContentAlignment dependency property.
         /// </summary>
         public static readonly DependencyProperty HorizontalContentAlignmentProperty =
-            DependencyProperty.Register("HorizontalContentAlignment", typeof(HorizontalAlignment), typeof(Control), new PropertyMetadata(HorizontalAlignment.Center));
+            DependencyProperty.Register("HorizontalContentAlignment", typeof(HorizontalAlignment), typeof(Control), new PropertyMetadata(HorizontalAlignment.Center)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         //-----------------------
@@ -682,7 +611,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the VerticalContentAlignment dependency property.
         /// </summary>
         public static readonly DependencyProperty VerticalContentAlignmentProperty =
-            DependencyProperty.Register("VerticalContentAlignment", typeof(VerticalAlignment), typeof(Control), new PropertyMetadata(VerticalAlignment.Center));
+            DependencyProperty.Register("VerticalContentAlignment", typeof(VerticalAlignment), typeof(Control), new PropertyMetadata(VerticalAlignment.Center)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         //-----------------------
@@ -785,7 +715,6 @@ namespace Windows.UI.Xaml.Controls
             {
                 //MethodToUpdateDom = TabIndexProperty_MethodToUpdateDom,
                 MethodToUpdateDom = TabStopProperty_MethodToUpdateDom,
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never //there is no point in calling this since it does the exact same thing as the one for TabIndex, which is always called.
             });
 
         //-----------------------
@@ -806,7 +735,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Template dependency property.
         /// </summary>
         public static readonly DependencyProperty TemplateProperty =
-            DependencyProperty.Register("Template", typeof(ControlTemplate), typeof(Control), new PropertyMetadata(null, Template_Changed));
+            DependencyProperty.Register("Template", typeof(ControlTemplate), typeof(Control), new PropertyMetadata(null, Template_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void Template_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1195,7 +1125,9 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
 
         }
 
-        public static readonly DependencyProperty TabNavigationProperty = DependencyProperty.Register("TabNavigation", typeof(KeyboardNavigationMode), typeof(Control), new PropertyMetadata(KeyboardNavigationMode.Local));
+        public static readonly DependencyProperty TabNavigationProperty = 
+            DependencyProperty.Register("TabNavigation", typeof(KeyboardNavigationMode), typeof(Control), new PropertyMetadata(KeyboardNavigationMode.Local)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         public KeyboardNavigationMode TabNavigation
         {
@@ -1203,7 +1135,9 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
             set { this.SetValue(Control.TabNavigationProperty, value); }
         }
 
-        public static readonly DependencyProperty FontStretchProperty = DependencyProperty.Register("FontStretch", typeof(FontStretch), typeof(Control), new PropertyMetadata(default(FontStretch)));
+        public static readonly DependencyProperty FontStretchProperty = 
+            DependencyProperty.Register("FontStretch", typeof(FontStretch), typeof(Control), new PropertyMetadata(new FontStretch())
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         ///     The stretch of the desired font.

@@ -143,7 +143,8 @@ namespace Windows.UI.Xaml.Controls
             "IsDropDownOpen",
             typeof(bool),
             typeof(INTERNAL_DateTimePickerBase),
-            new PropertyMetadata(false, OnIsDropDownOpenChanged));
+            new PropertyMetadata(false, OnIsDropDownOpenChanged)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// IsDropDownOpenProperty property changed handler.
@@ -217,7 +218,8 @@ namespace Windows.UI.Xaml.Controls
             "Text",
             typeof(string),
             typeof(INTERNAL_DateTimePickerBase),
-            new PropertyMetadata(string.Empty, OnTextChanged));
+            new PropertyMetadata(string.Empty, OnTextChanged)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// TextProperty property changed handler.

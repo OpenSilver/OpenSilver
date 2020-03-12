@@ -116,7 +116,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the NavigateUri dependency property.
         /// </summary>
         public static readonly DependencyProperty NavigateUriProperty =
-            DependencyProperty.Register("NavigateUri", typeof(Uri), typeof(HyperlinkButton), new PropertyMetadata(null));
+            DependencyProperty.Register("NavigateUri", typeof(Uri), typeof(HyperlinkButton), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
 
@@ -133,7 +134,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the TargetName dependency property.
         /// </summary>
         public static readonly DependencyProperty TargetNameProperty =
-            DependencyProperty.Register("TargetName", typeof(string), typeof(HyperlinkButton), new PropertyMetadata(""));
+            DependencyProperty.Register("TargetName", typeof(string), typeof(HyperlinkButton), new PropertyMetadata("")
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
     }

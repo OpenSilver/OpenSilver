@@ -51,10 +51,7 @@ namespace Windows.UI.Xaml.Documents
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", 
                                                                                              typeof(string), 
                                                                                              typeof(Run), 
-                                                                                             new PropertyMetadata(string.Empty, OnTextPropertyChanged, CoerceTextProperty) 
-                                                                                             { 
-                                                                                                 CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never 
-                                                                                             });
+                                                                                             new PropertyMetadata(string.Empty, OnTextPropertyChanged, CoerceTextProperty));
 
         private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

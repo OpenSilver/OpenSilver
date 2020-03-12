@@ -130,7 +130,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the Figures dependency property.
         /// </summary>
         public static readonly DependencyProperty FiguresProperty =
-            DependencyProperty.Register("Figures", typeof(PathFigureCollection), typeof(PathGeometry), new PropertyMetadata(null, Figures_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("Figures", typeof(PathFigureCollection), typeof(PathGeometry), new PropertyMetadata(null, Figures_Changed));
 
         private static void Figures_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -170,7 +170,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the FillRule dependency property.
         /// </summary>
         public static readonly DependencyProperty FillRuleProperty =
-            DependencyProperty.Register("FillRule", typeof(FillRule), typeof(PathGeometry), new PropertyMetadata(FillRule.EvenOdd, FillRule_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("FillRule", typeof(FillRule), typeof(PathGeometry), new PropertyMetadata(FillRule.EvenOdd, FillRule_Changed));
 
         private static void FillRule_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

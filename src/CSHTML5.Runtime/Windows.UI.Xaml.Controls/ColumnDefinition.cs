@@ -64,7 +64,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the MaxWidth dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxWidthProperty =
-            DependencyProperty.Register("MaxWidth", typeof(double), typeof(ColumnDefinition), new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed));
+            DependencyProperty.Register("MaxWidth", typeof(double), typeof(ColumnDefinition), new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         static void MaxWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -91,7 +92,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the MinWidth dependency property.
         /// </summary>
         public static readonly DependencyProperty MinWidthProperty =
-            DependencyProperty.Register("MinWidth", typeof(double), typeof(ColumnDefinition), new PropertyMetadata(double.PositiveInfinity, MinWidth_Changed));
+            DependencyProperty.Register("MinWidth", typeof(double), typeof(ColumnDefinition), new PropertyMetadata(double.PositiveInfinity, MinWidth_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         static void MinWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -118,7 +120,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Width dependency property.
         /// </summary>
         public static readonly DependencyProperty WidthProperty =
-            DependencyProperty.Register("Width", typeof(GridLength), typeof(ColumnDefinition), new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), Width_Changed));
+            DependencyProperty.Register("Width", typeof(GridLength), typeof(ColumnDefinition), new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), Width_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void Width_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -200,7 +203,7 @@ namespace Windows.UI.Xaml.Controls
 
         // Using a DependencyProperty as the backing store for Visibility.  This enables animation, styling, binding, etc...
         internal static readonly DependencyProperty VisibilityProperty =
-            DependencyProperty.Register("Visibility", typeof(Visibility), typeof(ColumnDefinition), new PropertyMetadata(Visibility.Visible, Visibility_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("Visibility", typeof(Visibility), typeof(ColumnDefinition), new PropertyMetadata(Visibility.Visible, Visibility_Changed));
 
         private static void Visibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

@@ -109,7 +109,8 @@ namespace Windows.UI.Xaml.Controls
             set { SetValue(HeaderTemplateProperty, value); }
         }
         public static readonly DependencyProperty HeaderTemplateProperty =
-            DependencyProperty.Register("HeaderTemplate", typeof(DataTemplate), typeof(DataGridRow), new PropertyMetadata(null, HeaderTemplate_Changed));
+            DependencyProperty.Register("HeaderTemplate", typeof(DataTemplate), typeof(DataGridRow), new PropertyMetadata(null, HeaderTemplate_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void HeaderTemplate_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -186,7 +187,8 @@ namespace Windows.UI.Xaml.Controls
 
         // Using a DependencyProperty as the backing store for IsSelected.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsSelectedProperty =
-            DependencyProperty.Register("IsSelected", typeof(bool), typeof(DataGridRow), new PropertyMetadata(false, IsSelected_Changed));
+            DependencyProperty.Register("IsSelected", typeof(bool), typeof(DataGridRow), new PropertyMetadata(false, IsSelected_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void IsSelected_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -293,7 +295,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the DataContext dependency property.
         /// </summary>
         public static readonly DependencyProperty DataContextProperty =
-            DependencyProperty.Register("DataContext", typeof(object), typeof(DataGridRow), new PropertyMetadata() { Inherits = true });
+            DependencyProperty.Register("DataContext", typeof(object), typeof(DataGridRow), new PropertyMetadata() { Inherits = true,
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         #endregion
     }

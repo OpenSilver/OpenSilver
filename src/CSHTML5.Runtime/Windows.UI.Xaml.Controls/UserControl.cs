@@ -68,7 +68,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Content dependency property
         /// </summary>
         public static readonly DependencyProperty ContentProperty =
-            DependencyProperty.Register("Content", typeof(UIElement), typeof(UserControl), new PropertyMetadata(null, Content_Changed));
+            DependencyProperty.Register("Content", typeof(UIElement), typeof(UserControl), new PropertyMetadata(null, Content_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void Content_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

@@ -73,7 +73,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the IsSelected dependency property.
         /// </summary>
         public static readonly DependencyProperty IsSelectedProperty =
-    DependencyProperty.Register("IsSelected", typeof(bool), typeof(SelectorItem), new PropertyMetadata(false, IsSelected_Changed));
+            DependencyProperty.Register("IsSelected", typeof(bool), typeof(SelectorItem), new PropertyMetadata(false, IsSelected_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void IsSelected_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

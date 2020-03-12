@@ -72,7 +72,8 @@ namespace Windows.UI.Xaml.Controls
             "SelectedValue",
             typeof(DateTime?),
             typeof(INTERNAL_CalendarOrClockBase),
-            new PropertyMetadata(OnSelectedValueChanged));
+            new PropertyMetadata(OnSelectedValueChanged)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// SelectedValueProperty property changed handler.

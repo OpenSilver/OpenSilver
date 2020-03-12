@@ -27,7 +27,8 @@ namespace Windows.UI.Xaml.Media.Animation
         public static readonly DependencyProperty EasingFunctionProperty =  DependencyProperty.Register("EasingFunction",
                                                                                                         typeof(EasingFunctionBase),
                                                                                                         typeof(EasingDoubleKeyFrame),
-                                                                                                        new PropertyMetadata(null));
+                                                                                                        new PropertyMetadata(null)
+                                                                                                        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         
 

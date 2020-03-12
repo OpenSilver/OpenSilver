@@ -124,7 +124,7 @@ namespace Windows.UI.Xaml
         }
         /// <exclude/>
         public static readonly DependencyProperty ContentPropertyUsefulOnlyDuringTheCompilationProperty =
-            DependencyProperty.Register("ContentPropertyUsefulOnlyDuringTheCompilation", typeof(UIElement), typeof(FrameworkTemplate), new PropertyMetadata(null, null));
+            DependencyProperty.Register("ContentPropertyUsefulOnlyDuringTheCompilation", typeof(UIElement), typeof(FrameworkTemplate), new PropertyMetadata(null));
 
         bool _isSealed = false;
         /// <summary>
