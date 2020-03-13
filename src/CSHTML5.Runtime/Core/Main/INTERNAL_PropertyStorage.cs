@@ -109,6 +109,70 @@ namespace CSHTML5.Internal
 
         public List<IPropertyChangedListener> PropertyListeners { get; set; }
 
+        private bool DoesSpecificValueImpactActualValue(KindOfValue kind)
+        {
+            //Note: in KindOfValue, the value attributed to the enum values corresponds to their priority rank so the lower, the more priority.
+            return ((kind <= KindOfValue.VisualState || this.VisualStateValue == INTERNAL_NoValue.NoValue) //means "kind has a higher priority tha VisualState or there is no VisualState value
+                && (kind <= KindOfValue.Local || this.Local == INTERNAL_NoValue.NoValue || this.ActiveLocalValue.ActiveValue != KindOfValue.Local)
+                && (kind <= KindOfValue.Animated || this.AnimationValue == INTERNAL_NoValue.NoValue || this.ActiveLocalValue.ActiveValue != KindOfValue.Animated)
+                && (kind <= KindOfValue.LocalStyle || this.LocalStyleValue == INTERNAL_NoValue.NoValue)
+                && (kind <= KindOfValue.ImplicitStyle || this.ImplicitStyleValue == INTERNAL_NoValue.NoValue)
+                && (kind <= KindOfValue.Inherited || this.InheritedValue == INTERNAL_NoValue.NoValue));
+        }
+
+        private void SetValue(object value, KindOfValue kind)
+        {
+            switch (kind)
+            {
+                case KindOfValue.Coerced:
+                    this.CoercedValue = value;
+                    break;
+                case KindOfValue.VisualState:
+                    this.VisualStateValue = value;
+                    break;
+                case KindOfValue.Local:
+                    this.Local = value;
+                    break;
+                case KindOfValue.Animated:
+                    this.AnimationValue = value;
+                    break;
+                case KindOfValue.LocalStyle:
+                    this.LocalStyleValue = value;
+                    break;
+                case KindOfValue.ImplicitStyle:
+                    this.ImplicitStyleValue = value;
+                    break;
+                case KindOfValue.Inherited:
+                    //inherited is a special case
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Changes the value of the storage for a given kind.
+        /// </summary>
+        /// <param name="value">new value</param>
+        /// <param name="kind">kind of value to set</param>
+        /// <param name="oldValue">value of previous actual value if it changed (null otherwise)</param>
+        /// <returns>returns true if the actual value is impacted, false otherwise</returns>
+        public bool SetValue(object value, KindOfValue kind, out object oldValue)
+        {
+            bool impactsActualValue = this.DoesSpecificValueImpactActualValue(kind);
+            oldValue = impactsActualValue ? this.ActualValue : null;
+            this.SetValue(value, kind);
+            return impactsActualValue;
+        }
+
+        public bool SetInheritedValue(object value, out object oldValue)
+        {
+            bool impactsActualValue = this.DoesSpecificValueImpactActualValue(KindOfValue.Inherited);
+            oldValue = impactsActualValue ? this.ActualValue : null;
+            this.InheritedValue = value;
+            return impactsActualValue;
+        }
+
         internal class INTERNAL_LocalValue
         {
             internal INTERNAL_LocalValue()

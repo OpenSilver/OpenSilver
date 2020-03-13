@@ -40,7 +40,22 @@ namespace Windows.UI.Xaml
     /// </summary>
     public partial class DependencyObject
     {
-        private Dictionary<DependencyProperty, BindingExpression> _bindingExpressions;
+        private readonly Dictionary<DependencyProperty, BindingExpression> _bindingExpressions;
+        internal Dictionary<DependencyProperty, INTERNAL_PropertyStorage> INTERNAL_PropertyStorageDictionary { get; } // Contains all the properties that are either not in INTERNAL_AllInheritedProperties or in INTERNAL_UsefulInheritedProperties
+        internal Dictionary<DependencyProperty, INTERNAL_PropertyStorage> INTERNAL_AllInheritedProperties { get; } // Here so that when we attach a child, the child gets all the properties that are in there (this allows the inherited properties to go all the way down even for properties that are not contained in the children)
+        //internal List<DependencyProperty> INTERNAL_UsefulInheritedProperties; // this serves to know when we need to call "PropertyChanged" on this instance of DependencyObject when a property changes (These are filled when we call Register())
+
+        internal List<DependencyProperty> INTERNAL_PropertiesForWhichToCallPropertyChangedWhenLoadedIntoVisualTree; // When a UI element is added to the Visual Tree, we call "PropertyChanged" on all its set properties so that the control can refresh itself. However, when a property is not set, we don't call PropertyChanged. Unless the property is listed here.
+
+
+        #region Constructor
+        public DependencyObject()
+        {
+            this._bindingExpressions = new Dictionary<DependencyProperty, BindingExpression>();
+            this.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
+            this.INTERNAL_AllInheritedProperties = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
+        }
+        #endregion
 
         /// <summary>
         /// Returns the System.Windows.Data.BindingExpression that represents the binding
@@ -53,26 +68,12 @@ namespace Windows.UI.Xaml
         /// </returns>
         public BindingExpression GetBindingExpression(DependencyProperty dp)
         {
-            if (_bindingExpressions == null)
-            {
-                _bindingExpressions = new Dictionary<DependencyProperty, BindingExpression>();
-                return null;
-            }
-
             if (_bindingExpressions.ContainsKey(dp))
             {
                 return _bindingExpressions[dp];
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
-        internal Dictionary<DependencyProperty, INTERNAL_PropertyStorage> INTERNAL_PropertyStorageDictionary; // Contains all the properties that are either not in INTERNAL_AllInheritedProperties or in INTERNAL_UsefulInheritedProperties
-        internal Dictionary<DependencyProperty, INTERNAL_PropertyStorage> INTERNAL_AllInheritedProperties; // Here so that when we attach a child, the child gets all the properties that are in there (this allows the inherited properties to go all the way down even for properties that are not contained in the children)
-        //internal List<DependencyProperty> INTERNAL_UsefulInheritedProperties; // this serves to know when we need to call "PropertyChanged" on this instance of DependencyObject when a property changes (These are filled when we call Register())
-
-        internal List<DependencyProperty> INTERNAL_PropertiesForWhichToCallPropertyChangedWhenLoadedIntoVisualTree; // When a UI element is added to the Visual Tree, we call "PropertyChanged" on all its set properties so that the control can refresh itself. However, when a property is not set, we don't call PropertyChanged. Unless the property is listed here.
 
         /// <summary>
         /// Returns the current effective value of a dependency property from a DependencyObject.
@@ -84,16 +85,18 @@ namespace Windows.UI.Xaml
         /// <returns>Returns the current effective value.</returns>
         public object GetValue(DependencyProperty dependencyProperty)
         {
-//#if PERFSTAT
-//          var t = Performance.now();
-//#endif
-            var storage = INTERNAL_PropertyStore.GetStorageIfExists(this, dependencyProperty);
-            PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(this.GetType());
-            var tmp = INTERNAL_PropertyStore.GetValue(storage, typeMetadata);
-//#if PERFSTAT
-//          Performance.Counter("DependencyObject.GetValue [" + dependencyProperty.Name + "]", t);
-//#endif
-            return tmp;
+            //#if PERFSTAT
+            //          var t = Performance.now();
+            //#endif
+            INTERNAL_PropertyStorage storage;
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, false/*don't create*/, out storage))
+            {
+                return storage.ActualValue;
+            }
+            return dependencyProperty.GetTypeMetaData(this.GetType()).DefaultValue;
+            //#if PERFSTAT
+            //          Performance.Counter("DependencyObject.GetValue [" + dependencyProperty.Name + "]", t);
+            //#endif
         }
 
         /// <summary>
@@ -106,7 +109,8 @@ namespace Windows.UI.Xaml
 #if PERFSTAT
             var t = Performance.now();
 #endif
-            var storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, dependencyProperty);
+            INTERNAL_PropertyStorage storage;
+            INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, true/*create*/, out storage);
 #if PERFSTAT
             Performance.Counter("DependencyObject.SetLocalValue", t);
 #endif
@@ -115,7 +119,8 @@ namespace Windows.UI.Xaml
 
         public void CoerceCurrentValue(DependencyProperty dependencyProperty, PropertyMetadata propertyMetadata)
         {
-            var storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, dependencyProperty);
+            INTERNAL_PropertyStorage storage;
+            INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, true/*create*/, out storage);
             INTERNAL_PropertyStore.CoerceCurrentValue(storage);
         }
 
@@ -132,12 +137,12 @@ namespace Windows.UI.Xaml
         /// </returns>
         public object ReadLocalValue(DependencyProperty dependencyProperty)
         {
-            var storage = INTERNAL_PropertyStore.GetStorageIfExists(this, dependencyProperty);
-
-            if (storage != null)
+            INTERNAL_PropertyStorage storage;
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, false/*don't create*/, out storage))
+            {
                 return storage.Local;
-            else
-                return INTERNAL_NoValue.NoValue;
+            }
+            return INTERNAL_NoValue.NoValue;
         }
 
         public object GetVisualStateValue(DependencyProperty dependencyProperty) //todo: see if this is actually useful (to get specifically the VisualStateValue) and if so, change the GetValue into a GetVisualStateValue at the "return" line.
@@ -145,9 +150,12 @@ namespace Windows.UI.Xaml
             if (dependencyProperty == null)
                 throw new ArgumentNullException("No property specified");
 
-            var storage = INTERNAL_PropertyStore.GetStorageIfExists(this, dependencyProperty);
-            PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(this.GetType());
-            return INTERNAL_PropertyStore.GetValue(storage, typeMetadata);
+            INTERNAL_PropertyStorage storage;
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, false/*don't create*/, out storage))
+            {
+                return storage.VisualStateValue;
+            }
+            return dependencyProperty.GetTypeMetaData(this.GetType()).DefaultValue;
         }
 
         public void SetVisualStateValue(DependencyProperty dependencyProperty, object value)
@@ -155,7 +163,8 @@ namespace Windows.UI.Xaml
             if (dependencyProperty == null)
                 throw new ArgumentNullException("No property specified");
 
-            var storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, dependencyProperty);
+            INTERNAL_PropertyStorage storage;
+            INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, true/*create*/, out storage);
             INTERNAL_PropertyStore.SetSpecificValue(storage, KindOfValue.VisualState, value);
         }
 
@@ -164,7 +173,8 @@ namespace Windows.UI.Xaml
             if (dependencyProperty == null)
                 throw new ArgumentNullException("No property specified");
 
-            var storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, dependencyProperty);
+            INTERNAL_PropertyStorage storage;
+            INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, true/*create*/, out storage);
             INTERNAL_PropertyStore.SetSpecificValue(storage, KindOfValue.Animated, value);
         }
 
@@ -173,9 +183,12 @@ namespace Windows.UI.Xaml
             if (dependencyProperty == null)
                 throw new ArgumentNullException("No property specified");
 
-            var storage = INTERNAL_PropertyStore.GetStorageIfExists(this, dependencyProperty);
-            PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(this.GetType());
-            return INTERNAL_PropertyStore.GetValue(storage, typeMetadata);
+            INTERNAL_PropertyStorage storage;
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, false/*don't create*/, out storage))
+            {
+                return storage.AnimationValue;
+            }
+            return dependencyProperty.GetTypeMetaData(this.GetType()).DefaultValue;
         }
 
         /// <summary>
@@ -197,12 +210,9 @@ namespace Windows.UI.Xaml
             }
 
             // Get the previous BindingExpression in case the previous value of a property was a Binding, and detach the Binding:
-            BindingExpression oldBindingExpression = null;
-            if (_bindingExpressions != null
-                && _bindingExpressions.ContainsKey(dependencyProperty))
+            BindingExpression oldBindingExpression;
+            if (_bindingExpressions.TryGetValue(dependencyProperty, out oldBindingExpression))
             {
-                oldBindingExpression = _bindingExpressions[dependencyProperty];
-
                 if (!oldBindingExpression.IsUpdating && oldBindingExpression.ParentBinding.Mode != BindingMode.TwoWay) // If mode is TwoWay, setting the property should not remove the binding. To reproduce: create a TextBox with a TwoWay binding on the property Text, and set textBox.Text = ... => the binding is preserved.
                 {
                     _bindingExpressions.Remove(dependencyProperty);
@@ -237,7 +247,8 @@ namespace Windows.UI.Xaml
             //-----------------------
             // CALL "SET INHERITED VALUE" ON THE STORAGE:
             //-----------------------
-            var storage = INTERNAL_PropertyStore.GetInheritedPropertyStorageOrCreateNewIfNotFound(this, dependencyProperty);
+            INTERNAL_PropertyStorage storage;
+            INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(this, dependencyProperty, true/*create*/, out storage);
             INTERNAL_PropertyStore.SetInheritedValue(storage, value, recursively);
         }
 
@@ -256,17 +267,18 @@ namespace Windows.UI.Xaml
 
         internal void ResetInheritedProperties()
         {
-            if (INTERNAL_AllInheritedProperties != null)
+            foreach (DependencyProperty property in INTERNAL_AllInheritedProperties.Keys)
             {
-                foreach (DependencyProperty property in INTERNAL_AllInheritedProperties.Keys)
+                INTERNAL_PropertyStorage storage;
+                if (INTERNAL_PropertyStorageDictionary.Remove(property, out storage))
                 {
-                    if (INTERNAL_PropertyStorageDictionary.ContainsKey(property))
-                    {
-                        INTERNAL_PropertyStore.ResetInheritedValue(INTERNAL_PropertyStorageDictionary[property]);
-                    }
+                    INTERNAL_PropertyStore.ResetInheritedValue(storage);
                 }
-                INTERNAL_AllInheritedProperties.Clear();
+                //if (INTERNAL_PropertyStorageDictionary.TryGetValue(property, out storage))
+                //{
+                //}
             }
+            INTERNAL_AllInheritedProperties.Clear();
         }
 
         /// <summary>
@@ -293,9 +305,9 @@ namespace Windows.UI.Xaml
 
         internal Binding INTERNAL_GetBinding(DependencyProperty dependencyProperty)
         {
-            if (_bindingExpressions != null && _bindingExpressions.ContainsKey(dependencyProperty))
+            BindingExpression value;
+            if (_bindingExpressions.TryGetValue(dependencyProperty, out value))
             {
-                var value = _bindingExpressions[dependencyProperty];
                 return value.ParentBinding.Clone();
             }
             return null; //todo: see if an exception would be better
@@ -328,11 +340,8 @@ namespace Windows.UI.Xaml
         internal void ApplyBindingExpression(DependencyProperty dependencyProperty, BindingExpression newBindingExpression)
         {
             // Get the previous BindingExpression in case we are replacing an existing Binding:
-            BindingExpression oldBindingExpression = null;
-            if (_bindingExpressions != null && _bindingExpressions.ContainsKey(dependencyProperty))
-            {
-                oldBindingExpression = _bindingExpressions[dependencyProperty];
-            }
+            BindingExpression oldBindingExpression;
+            _bindingExpressions.TryGetValue(dependencyProperty, out oldBindingExpression);
 
             // Detach the previous BindingExpression, in case there was any, and remember the new BindingExpression:
             if (newBindingExpression != oldBindingExpression)
@@ -347,10 +356,6 @@ namespace Windows.UI.Xaml
                     {
                         _bindingExpressions.Remove(dependencyProperty);
                         oldBindingExpression.OnDetached(this);
-                    }
-                    if (_bindingExpressions == null)
-                    {
-                        _bindingExpressions = new Dictionary<DependencyProperty, BindingExpression>();
                     }
                     _bindingExpressions.Add(dependencyProperty, newBindingExpression);
                     newBindingExpression.OnAttached(this);
@@ -384,18 +389,15 @@ namespace Windows.UI.Xaml
 
         internal void INTERNAL_UpdateBindingsSource()
         {
-            if (_bindingExpressions != null)
-            {
-                foreach (BindingExpression bindingExpression in
+            foreach (BindingExpression bindingExpression in
 #if BRIDGE
                     INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(_bindingExpressions)
 #else
                     _bindingExpressions.Values
 #endif
                     )
-                {
-                    bindingExpression.OnSourceAvailable();
-                }
+            {
+                bindingExpression.OnSourceAvailable();
             }
         }
 

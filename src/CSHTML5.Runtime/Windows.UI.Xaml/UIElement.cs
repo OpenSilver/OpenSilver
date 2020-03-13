@@ -523,8 +523,7 @@ namespace Windows.UI.Xaml
         /// Identifies the IsHitTestVisible property.
         /// </summary>
         public static readonly DependencyProperty IsHitTestVisibleProperty =
-            DependencyProperty.Register("IsHitTestVisible", typeof(bool), typeof(UIElement), new PropertyMetadata(true) { MethodToUpdateDom = IsHitTestVisible_MethodToUpdateDom, Inherits = true,
-            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("IsHitTestVisible", typeof(bool), typeof(UIElement), new PropertyMetadata(true) { MethodToUpdateDom = IsHitTestVisible_MethodToUpdateDom, Inherits = true });
 
         private static void IsHitTestVisible_MethodToUpdateDom(DependencyObject d, object newValue)
         {

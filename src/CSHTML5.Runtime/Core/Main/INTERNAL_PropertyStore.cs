@@ -32,31 +32,27 @@ namespace CSHTML5.Internal
 {
     internal static class INTERNAL_PropertyStore
     {
-        public static INTERNAL_PropertyStorage GetStorageIfExists(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
+        /// <summary>
+        /// Attempt to get a Property Storage
+        /// </summary>
+        /// <param name="dependencyObject"></param>
+        /// <param name="dependencyProperty"></param>
+        /// <param name="createIfNotFoud">when set to true, it forces the creation of the storage if it does not exists yet.</param>
+        /// <param name="storage"></param>
+        /// <returns></returns>
+        public static bool TryGetStorage(DependencyObject dependencyObject,
+                                         DependencyProperty dependencyProperty,
+                                         bool createIfNotFoud,
+                                         out INTERNAL_PropertyStorage storage)
         {
-            if (dependencyObject.INTERNAL_PropertyStorageDictionary != null)
+            if (dependencyObject.INTERNAL_PropertyStorageDictionary.TryGetValue(dependencyProperty, out storage))
             {
-                INTERNAL_PropertyStorage storage;
-                if (dependencyObject.INTERNAL_PropertyStorageDictionary.TryGetValue(dependencyProperty, out storage))
-                {
-                    return storage;
-                }
+                return true;
             }
-            return null;
-        }
-        public static INTERNAL_PropertyStorage GetStorageOrCreateNewIfNotExists(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
-        {
-            if (dependencyObject.INTERNAL_PropertyStorageDictionary == null)
-            {
-                // Create the dictionary of it does not already exist:
-                dependencyObject.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
-            }
-            // Check if the storage exists:
-            INTERNAL_PropertyStorage storage;
-            if (!dependencyObject.INTERNAL_PropertyStorageDictionary.TryGetValue(dependencyProperty, out storage))
-            {
 
-                // Get the type metadata (if any):
+            if (createIfNotFoud)
+            {
+                // Get the type metadata
                 PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(dependencyObject.GetType());
 
                 //----------------------
@@ -69,50 +65,48 @@ namespace CSHTML5.Internal
                 //-----------------------
                 // CHECK IF THE PROPERTY IS INHERITABLE:
                 //-----------------------
-                if (typeMetadata != null && typeMetadata.Inherits)
+                if (typeMetadata.Inherits)
                 {
                     //-----------------------
                     // ADD THE STORAGE TO "INTERNAL_AllInheritedProperties" IF IT IS NOT ALREADY THERE:
                     //-----------------------
-                    if (dependencyObject.INTERNAL_AllInheritedProperties == null)
-                        dependencyObject.INTERNAL_AllInheritedProperties = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
-
-                    if (!dependencyObject.INTERNAL_AllInheritedProperties.ContainsKey(dependencyProperty))
-                        dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);
+                    dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);
                 }
             }
 
-            return storage;
+            return createIfNotFoud;
         }
 
-        internal static INTERNAL_PropertyStorage GetInheritedPropertyStorageOrCreateNewIfNotFound(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
+        /// <summary>
+        /// Attemp to get a Property Storage for an inherited property 
+        /// (faster than generic accessor 'TryGetStorage')
+        /// </summary>
+        /// <param name="dependencyObject"></param>
+        /// <param name="dependencyProperty"></param>
+        /// <param name="createIfNotFoud">when set to true, it forces the creation of the storage if it does not exists yet.</param>
+        /// <param name="storage"></param>
+        /// <returns></returns>
+        internal static bool TryGetInheritedPropertyStorage(DependencyObject dependencyObject,
+                                                            DependencyProperty dependencyProperty,
+                                                            bool createIfNotFoud,
+                                                            out INTERNAL_PropertyStorage storage)
         {
-            // Create the dictionary of it does not already exist:
-            if (dependencyObject.INTERNAL_AllInheritedProperties == null)
-                dependencyObject.INTERNAL_AllInheritedProperties = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
-
-            // Create the Storage if it does not already exist, and if "createAndSaveNewStorageIfNotExists" is True:
-            INTERNAL_PropertyStorage storage;
-            if (!dependencyObject.INTERNAL_AllInheritedProperties.TryGetValue(dependencyProperty, out storage))
+            // Create the Storage if it does not already exist
+            if (dependencyObject.INTERNAL_AllInheritedProperties.TryGetValue(dependencyProperty, out storage))
             {
-                // Create the dictionary of it does not already exist:
-                if (dependencyObject.INTERNAL_PropertyStorageDictionary == null)
-                    dependencyObject.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
+                return true;
+            }
 
-                // Get the storage or create a new one:
-                if (dependencyObject.INTERNAL_PropertyStorageDictionary.ContainsKey(dependencyProperty))
-                {
-                    storage = dependencyObject.INTERNAL_PropertyStorageDictionary[dependencyProperty];
-                }
-                else
-                {
-                    // Get the type metadata (if any):
-                    PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(dependencyObject.GetType());
+            if (createIfNotFoud)
+            {
+                // Get the type metadata (if any):
+                PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(dependencyObject.GetType());
 
-                    // Create the storage:
-                    storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty, typeMetadata);
-                }
-                dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);
+                global::System.Diagnostics.Debug.Assert(typeMetadata != null && typeMetadata.Inherits,
+                                                        string.Format("{0} is not an inherited property.", dependencyProperty.Name));
+
+                // Create the storage:
+                storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty, typeMetadata);
 
                 //-----------------------
                 // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
@@ -121,20 +115,67 @@ namespace CSHTML5.Internal
                 if (dependencyProperty.OwnerType.IsAssignableFrom(dependencyObject.GetType()))
                 {
                     //-----------------------
-                    // ADD THE STORAGE TO "INTERNAL_PropertyStorageDictionary" IF IT IS NOT ALREADY THERE:
+                    // ADD THE STORAGE TO "INTERNAL_PropertyStorageDictionary"
                     //-----------------------
-                    if (dependencyObject.INTERNAL_PropertyStorageDictionary == null)
-                        dependencyObject.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
-
-                    if (!dependencyObject.INTERNAL_PropertyStorageDictionary.ContainsKey(dependencyProperty))
-                        dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
+                    dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
                 }
+                dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);
+            }
+
+            return createIfNotFoud;
+        }
+
+        [Obsolete("use TryGetStorage")]
+        public static INTERNAL_PropertyStorage GetStorageIfExists(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
+        {
+            INTERNAL_PropertyStorage storage;
+            TryGetStorage(dependencyObject, dependencyProperty, false /*don't create*/, out storage);
+            return storage;
+        }
+
+        [Obsolete("use TryGetStorage")]
+        public static INTERNAL_PropertyStorage GetStorageOrCreateNewIfNotExists(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
+        {
+            INTERNAL_PropertyStorage storage;
+            TryGetStorage(dependencyObject, dependencyProperty, true /*create*/, out storage);
+            return storage;
+        }
+
+        [Obsolete("use TryGetInheritedPropertyStorage")]
+        internal static INTERNAL_PropertyStorage GetInheritedPropertyStorageOrCreateNewIfNotFound(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
+        {
+            // Create the Storage if it does not already exist
+            INTERNAL_PropertyStorage storage;
+            if (!dependencyObject.INTERNAL_AllInheritedProperties.TryGetValue(dependencyProperty, out storage))
+            {
+                // Get the storage or create a new one:
+                if (!dependencyObject.INTERNAL_PropertyStorageDictionary.TryGetValue(dependencyProperty, out storage))
+                {
+                    // Get the type metadata (if any):
+                    PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(dependencyObject.GetType());
+
+                    // Create the storage:
+                    storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty, typeMetadata);
+
+                    //-----------------------
+                    // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
+                    //-----------------------
+                    //below: we check if the property is useful to the current DependencyObject, in which case we set it as its inheritedValue in "PropertyStorageDictionary"
+                    if (dependencyProperty.OwnerType.IsAssignableFrom(dependencyObject.GetType()))
+                    {
+                        //-----------------------
+                        // ADD THE STORAGE TO "INTERNAL_PropertyStorageDictionary"
+                        //-----------------------
+                        dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
+                    }
+                }
+                dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);                
             }
 
             return storage;
 
 
-            #region OldStuff
+#region OldStuff
             /*
             // This method ensures that the two dictionaries ("INTERNAL_PropertyStorageDictionary" and "INTERNAL_AllInheritedProperties") always share the same instances of Storages (for properties that are in common):
             // This is how it works:
@@ -206,39 +247,16 @@ namespace CSHTML5.Internal
                 }
             }
             */
-            #endregion
+#endregion
         }
 
         public static object GetValue(INTERNAL_PropertyStorage storage, PropertyMetadata typeMetadata)
         {
-#if PERFSTAT
-            var t = Performance.now();
-#endif
-            object returnValue;
-
             if (storage == null)
             {
-                //===================
-                // NO STORAGE EXISTS:
-                //===================
-
-                // Return the default value:
-                returnValue = typeMetadata != null ? typeMetadata.DefaultValue : null;
+                throw new ArgumentNullException("storage");
             }
-            else
-            {
-                //====================
-                // THE STORAGE EXISTS:
-                //====================
-
-                return storage.ActualValue;
-            }
-
-#if PERFSTAT
-            Performance.Counter("INTERNAL_PropertyStore.GetValue", t);
-#endif
-
-            return returnValue;
+            return storage.ActualValue;
         }
 
         public static object ComputeActualValue(INTERNAL_PropertyStorage storage, PropertyMetadata typeMetadata, bool ignoreCoercedValue)
@@ -253,21 +271,23 @@ namespace CSHTML5.Internal
                 }
             }
 
-            if (!ignoreCoercedValue && (actualValue = storage.CoercedValue) != INTERNAL_NoValue.NoValue) { }
-            else if ((actualValue = storage.VisualStateValue) != INTERNAL_NoValue.NoValue) { }
-            else if (storage.ActiveLocalValue.ActiveValue == KindOfValue.Local && (actualValue = storage.Local) != INTERNAL_NoValue.NoValue) { }
-            else if (storage.ActiveLocalValue.ActiveValue == KindOfValue.Animated && (actualValue = storage.AnimationValue) != INTERNAL_NoValue.NoValue) { }
-            else if ((actualValue = storage.LocalStyleValue) != INTERNAL_NoValue.NoValue) { }
-            else if ((actualValue = storage.ImplicitStyleValue) != INTERNAL_NoValue.NoValue) { }
-            else if ((actualValue = storage.InheritedValue) != INTERNAL_NoValue.NoValue) { }
+            if ((!ignoreCoercedValue && (actualValue = storage.CoercedValue) != INTERNAL_NoValue.NoValue)
+            || ((actualValue = storage.VisualStateValue) != INTERNAL_NoValue.NoValue)
+            || (storage.ActiveLocalValue.ActiveValue == KindOfValue.Local && (actualValue = storage.Local) != INTERNAL_NoValue.NoValue)
+            || (storage.ActiveLocalValue.ActiveValue == KindOfValue.Animated && (actualValue = storage.AnimationValue) != INTERNAL_NoValue.NoValue)
+            || ((actualValue = storage.LocalStyleValue) != INTERNAL_NoValue.NoValue)
+            || ((actualValue = storage.ImplicitStyleValue) != INTERNAL_NoValue.NoValue)
+            || ((actualValue = storage.InheritedValue) != INTERNAL_NoValue.NoValue))
+            {
+                return actualValue;
+            }
             else
             {
                 // Return the default value:
-                actualValue = typeMetadata != null ? typeMetadata.DefaultValue : null;
+                return (typeMetadata != null) ? typeMetadata.DefaultValue : null;
             }
-
-            return actualValue;
         }
+
         static bool DoesSpecificValueImpactActualValue(INTERNAL_PropertyStorage storage, KindOfValue kind)
         {
             object value;
@@ -286,97 +306,27 @@ namespace CSHTML5.Internal
 
         internal static void SetSpecificValue(INTERNAL_PropertyStorage storage, KindOfValue kindOfValueToSet, object newValue)
         {
-            var typeMetadata = storage.TypeMetadata;
-            bool inherits = typeMetadata != null && typeMetadata.Inherits;
-            bool impactsActualValue = DoesSpecificValueImpactActualValue(storage, kindOfValueToSet);
-            bool coerces = typeMetadata != null && typeMetadata.CoerceValueCallback != null;
-
-            //-----------------------
-            // DETERMINE IF WE SHOULD RAISE THE "PROPERTYCHANGED" EVENT AND CASCADE THE PROPERTY TO THE CHILDREN:
-            //-----------------------
-
-            bool raisePropertyChanged = impactsActualValue && (!inherits || ShouldRaisePropertyChanged(storage)); // If the property is inherited, we should only raise the PropertyChanged event on the types that the property is compatible with (unless it's the DataContext property, in which case we always raise the PropertyChanged event).
-            //todo: are attached properties properly handled?
-
-            bool cascadetoChildren = impactsActualValue && inherits;
-
-            //we make sure that we don't raise PropertyChanged for IsEnabled if its inherited value is false, because a "false" inherited value has priority over any local value.
-            if (storage._isIsEnabledOrIsHitTestVisibleProperty)
-            {
-                object value;
-                if ((value = storage.InheritedValue) != INTERNAL_NoValue.NoValue && value != null && (((bool)value) == false))
-                {
-                    raisePropertyChanged = false; //we don't want to call RaisePropertyChanged... because the inherited value overrides the local value if it is false.
-                    cascadetoChildren = false;
-                }
-            }
-
-            //-----------------------
-            // GET THE OLD VALUE IF NECESSARY:
-            //-----------------------
-
-            object oldValue;
-            if (raisePropertyChanged)
-            {
-                oldValue = GetValue(storage, typeMetadata);
-            }
-            else
-            {
-                oldValue = null;
-            }
-
+            PropertyMetadata typeMetadata = storage.TypeMetadata;
             //-----------------------
             // SET THE VALUE IN THE STORAGE:
             //-----------------------
-
-            switch (kindOfValueToSet)
-            {
-                case KindOfValue.Coerced:
-                    storage.CoercedValue = newValue;
-                    break;
-                case KindOfValue.VisualState:
-                    //oldValue = (storage.VisualStateValue == INTERNAL_NoValue.NoValue ? (typeMetadata != null ? typeMetadata.DefaultValue : null) : storage.VisualStateValue);
-                    storage.VisualStateValue = newValue;
-                    break;
-                case KindOfValue.Local:
-                    //oldValue = (storage.Local == INTERNAL_NoValue.NoValue ? (typeMetadata != null ? typeMetadata.DefaultValue : null) : storage.Local);
-                    storage.Local = newValue;
-                    break;
-                case KindOfValue.Animated:
-                    //oldValue = (storage.AnimationValue == INTERNAL_NoValue.NoValue ? (typeMetadata != null ? typeMetadata.DefaultValue : null) : storage.AnimationValue);
-                    storage.AnimationValue = newValue;
-                    break;
-                case KindOfValue.LocalStyle:
-                    //oldValue = (storage.LocalStyleValue == INTERNAL_NoValue.NoValue ? (typeMetadata != null ? typeMetadata.DefaultValue : null) : storage.LocalStyleValue);
-                    storage.LocalStyleValue = newValue;
-                    break;
-                case KindOfValue.ImplicitStyle:
-                    //oldValue = (storage.ImplicitStyleValue == INTERNAL_NoValue.NoValue ? (typeMetadata != null ? typeMetadata.DefaultValue : null) : storage.ImplicitStyleValue);
-                    storage.ImplicitStyleValue = newValue;
-                    break;
-                case KindOfValue.Inherited:
-                    //inherited is a special case
-                    break;
-                default:
-                    break;
-            }
-
-            // Update the "ActualValue" and the "CoercedValue":
-            if (impactsActualValue)
+            object oldValue;
+            if (storage.SetValue(newValue, kindOfValueToSet, out oldValue)) // is greather priority
             {
                 // If we are removing the value by setting it to "NoValue", we need to recompute the ActualValue:
-                if (newValue == INTERNAL_NoValue.NoValue) //we need to update the ActualValue because the new value is going to be the one with the highest priority.
+                if (newValue == INTERNAL_NoValue.NoValue)
                 {
+                    // Update the ActualValue to the one with the highest priority that is not set to "INTERNAL_NoValue.NoValue"
                     newValue = ComputeActualValue(storage, typeMetadata, true);
                 }
 
                 //if the new Value changes the actual value and is coerced, we compute the coerced value and set it.
-                if (coerces && kindOfValueToSet != KindOfValue.Coerced)
+                if (typeMetadata.CoerceValueCallback != null && kindOfValueToSet != KindOfValue.Coerced)
                 {
-                    // Compute the coerced value:
+                    // Compute the coerced value
                     newValue = typeMetadata.CoerceValueCallback(storage.Owner, newValue);
 
-                    // Remember the coerced value:
+                    // Remember the coerced value
                     storage.CoercedValue = newValue;
                     storage.ActualValue = newValue;
                 }
@@ -384,45 +334,54 @@ namespace CSHTML5.Internal
                 {
                     storage.ActualValue = newValue;
                 }
-            }
 
-            //-----------------------
-            // RAISE THE "PROPERTYCHANGED" EVENT:
-            //-----------------------
+                //-----------------------
+                // HANDLE SOME SPECIAL Cases where we don't want to propagate the changes
+                //-----------------------
+                if (storage._isIsEnabledOrIsHitTestVisibleProperty)
+                {
+                    object value;
+                    if ((value = storage.InheritedValue) != INTERNAL_NoValue.NoValue && value != null && (((bool)value) == false))
+                    {
+                        return;
+                    }
+                }
 
-            if (raisePropertyChanged && ShouldRaisePropertyChanged(storage))
-            {
-                OnPropertyChanged(storage, oldValue, newValue);
-            }
+                if (!ArePropertiesEqual(oldValue, newValue, storage.Property.PropertyType))
+                {
+                    //-----------------------
+                    // RAISE THE "PROPERTYCHANGED" EVENT:
+                    //-----------------------
+                    if (!typeMetadata.Inherits || ShouldRaisePropertyChanged(storage))
+                    {
+                        OnPropertyChanged(storage, oldValue, newValue);
+                    }
 
-            //-----------------------
-            // PROPAGATE TO CHILDREN (INHERITED PROPERTIES ONLY):
-            //-----------------------
-
-            if (cascadetoChildren)
-            {
-                CascadeInheritedPropertyToChildren(storage, newValue);
-
-                HandleSpecialPropertiesThatShouldInheritDataContext(storage, newValue);
+                    //-----------------------
+                    // PROPAGATE TO CHILDREN (INHERITED PROPERTIES ONLY):
+                    //-----------------------
+                    if (typeMetadata.Inherits)
+                    {
+                        CascadeInheritedPropertyToChildren(storage, newValue);
+                        HandleSpecialPropertiesThatShouldInheritDataContext(storage, newValue);
+                    }
+                }
             }
         }
 
-        internal static void SetInheritedValue(INTERNAL_PropertyStorage storage, object newValue, bool recursively) //the "firePropertyChangedEvent" parameter allows us to only throw the onPropertyChangedEvent when the dependencyObject actually uses the property that is changed.
+        internal static void SetInheritedValue(INTERNAL_PropertyStorage storage, object newValue, bool recursively)
         {
-            var typeMetadata = storage.TypeMetadata;
-            bool impactsActualValue = DoesSpecificValueImpactActualValue(storage, KindOfValue.Inherited);
-            bool coerces = typeMetadata != null && typeMetadata.CoerceValueCallback != null;
-            object oldValue = GetValue(storage, typeMetadata);
-
-            storage.InheritedValue = newValue;
-
+            PropertyMetadata typeMetadata = storage.TypeMetadata;
             //-----------------------
-            // CHECK THAT A LOCAL OR STYLE VALUE DOES NOT EXIST (otherwise the local/style values superset the inherited value, and we don't want to raise PropertyChanged, nor continue the recursion)
+            // CHECK THAT A LOCAL OR STYLE VALUE DOES NOT EXIST 
+            // (otherwise the local/style values superset the inherited value, 
+            // and we don't want to raise PropertyChanged, nor continue the recursion)
             //-----------------------
-            if (impactsActualValue)
+            object oldValue;
+            if (storage.SetInheritedValue(newValue, out oldValue)) // Actual value is impacted
             {
                 newValue = ComputeActualValue(storage, typeMetadata, true);
-                if (coerces)
+                if (typeMetadata != null && typeMetadata.CoerceValueCallback != null)
                 {
                     // Compute the coerced value:
                     newValue = typeMetadata.CoerceValueCallback(storage.Owner, newValue);
@@ -440,26 +399,35 @@ namespace CSHTML5.Internal
                 // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
                 //-----------------------
                 //we only do the following inside the "if" because otherwise, the children's inherithed property would not change anyway
-                if (!Object.Equals(oldValue, newValue)) //Note: We can't use ' != ' because if we have two integers x and y who are equal but are boxed as objects, x == y will always be false while Object.Equals(x, y) will be true. 
+                if (!ArePropertiesEqual(oldValue, newValue, storage.Property.PropertyType))
                 {
                     if (ShouldRaisePropertyChanged(storage))
                     {
                         OnPropertyChanged(storage, oldValue, newValue);
                     }
                     if (recursively)
+                    {
                         CascadeInheritedPropertyToChildren(storage, newValue);
-
+                    }
                     HandleSpecialPropertiesThatShouldInheritDataContext(storage, newValue);
                 }
             }
             else if (storage._isIsEnabledOrIsHitTestVisibleProperty) //todo: if we decide to make coercion possible on IsHitTestVisible or IsEnabled, change the "newValue" below into "coercedNewValue" (probably)
             {
-                if (((bool)newValue == true))
+                if ((bool)newValue)
                 {
                     storage.ActualValueIsDirty = true; //The actual value is Dirty because it didn't take into consideration the values that usually have priority over the inherited value (i.e: local) and since the newValue is "true", it now needs to take them into consideration.
-                    newValue = GetValue(GetStorageIfExists(storage.Owner, storage.Property), typeMetadata); //we need newValue to be the value that will be active afterwards.
+                    INTERNAL_PropertyStorage otherStorage;
+                    if (TryGetStorage(storage.Owner, storage.Property, false/*don't create*/, out otherStorage))
+                    {
+                        newValue = otherStorage.ActualValue;
+                    }
+                    else
+                    {
+                        newValue = typeMetadata.DefaultValue;
+                    }
                 }
-                if (!Object.Equals(oldValue, newValue)) //Note: We can't use ' != ' because if we have two integers x and y who are equal but are boxed as objects, x == y will always be false while Object.Equals(x, y) will be true. 
+                if (!object.Equals(oldValue, newValue)) // note: No need to call 'ArePropertiesEqual' since we know we are dealing with Booleans.
                 {
                     storage.ActualValue = newValue; // Make sure Storage.ActualValue is up to date.
                     if (ShouldRaisePropertyChanged(storage))
@@ -473,13 +441,26 @@ namespace CSHTML5.Internal
                 }
             }
         }
+        
+        internal static bool ArePropertiesEqual(object obj1, object obj2, Type type)
+        {
+            // Note: In Silverlight, a DependencyProperty callback is only called if one of the following condition is met :
+            // - The Property type is a value type or a string and the old and new value are not equal (by value)
+            // - The Property type is a reference and the old value and new value are not the same object
+            // - The Property is the DataContext DependencyProperty (in this case the event 'DataContextChanged' is always raised) (Not handled in this method)
+            if (type.IsValueType || type == typeof(string))
+            {
+                return object.Equals(obj1, obj2);
+            }
+            return object.ReferenceEquals(obj1, obj2);
+        }
 
         internal static void HandleSpecialPropertiesThatShouldInheritDataContext(INTERNAL_PropertyStorage storage, object newValue)
         {
             // Support inheriting the DataContext in other properties such as "RenderTransform", which does not happen automatically because Transforms are not FrameworkElements so they are not in the visual tree (they are not in the "VisualChildren" internal collection). This ensures that, for example, <RotateTransform Angle="{Binding=Angle}"/> work properly:
-            if ((storage.Owner is UIElement)
-                && (storage.Owner as UIElement).RenderTransform != null
-                && storage.Property == FrameworkElement.DataContextProperty)
+            if (storage.Property == FrameworkElement.DataContextProperty
+                && (storage.Owner is UIElement)
+                && (storage.Owner as UIElement).RenderTransform != null)
             {
                 (storage.Owner as UIElement).RenderTransform.SetInheritedValue(FrameworkElement.DataContextProperty, newValue, recursively: false);
             }
@@ -488,8 +469,11 @@ namespace CSHTML5.Internal
         internal static bool ShouldRaisePropertyChanged(INTERNAL_PropertyStorage storage)
         {
             // Note: we only want to call "OnPropertyChanged" when the property is used by the current DependencyObject or if it is the DataContext property.
-            //todo: handle attached properties
-            return storage.Property.OwnerType.IsAssignableFrom(storage.Owner.GetType()) || storage.Property == FrameworkElement.DataContextProperty;
+            if (!storage.Property.IsAttached)
+            {
+                return storage.Property.OwnerType.IsAssignableFrom(storage.Owner.GetType()) || storage.Property == FrameworkElement.DataContextProperty;
+            }
+            return true;
         }
 
         internal static void SetLocalStyleValue(INTERNAL_PropertyStorage storage, object newValue)
@@ -600,10 +584,7 @@ namespace CSHTML5.Internal
 
             if (typeMetadata != null && typeMetadata.PropertyChangedCallback != null)
             {
-                if (!Object.Equals(newValue, oldValue)) //Note: We can't use ' != ' because if we have two integers x and y who are equal but are boxed as objects, x == y will always be false while Object.Equals(x, y) will be true. 
-                {
-                    typeMetadata.PropertyChangedCallback(sender, new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
-                }
+                typeMetadata.PropertyChangedCallback(sender, new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
             }
 
             //---------------------
@@ -750,7 +731,8 @@ namespace CSHTML5.Internal
 
         internal static IPropertyChangedListener ListenToChanged(DependencyObject target, DependencyProperty property, Action<object, IDependencyPropertyChangedEventArgs> updateSourceCallback)
         {
-            var storage = GetStorageOrCreateNewIfNotExists(target, property);
+            INTERNAL_PropertyStorage storage;
+            TryGetStorage(target, property, true/*create*/, out storage);
             List<IPropertyChangedListener> listeners = storage.PropertyListeners;
             if (listeners == null)
             {
