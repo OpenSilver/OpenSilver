@@ -1,5 +1,7 @@
 #if WORKINPROGRESS
 
+#if MIGRATION
+
 namespace System.Windows.Controls
 {
 	public partial class GridSplitter
@@ -23,4 +25,5 @@ namespace System.Windows.Controls
 	}
 }
 
+#endif
 #endif
