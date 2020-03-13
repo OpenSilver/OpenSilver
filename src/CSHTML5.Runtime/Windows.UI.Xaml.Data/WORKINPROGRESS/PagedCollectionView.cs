@@ -1,5 +1,5 @@
 #if MIGRATION
-#if WORKINPROGRESS
+#if WORKINPROGRESS && OPENSILVER
 
 using System.Collections;
 using System.Collections.ObjectModel;

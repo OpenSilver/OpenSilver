@@ -13,6 +13,17 @@ namespace Windows.UI.Xaml.Media.Animation
     {
         //
         // Summary:
+        //     Gets or sets the amplitude of retraction associated with a System.Windows.Media.Animation.BackEase
+        //     animation.
+        //
+        // Returns:
+        //     The amplitude of retraction associated with a System.Windows.Media.Animation.BackEase
+        //     animation. This value must be greater than or equal to 0. The default is 1.
+        public double Amplitude { get; set; }
+        
+#if OPENSILVER
+        //
+        // Summary:
         //     Identifies the System.Windows.Media.Animation.BackEase.Amplitude dependency property.
         //
         // Returns:
@@ -30,16 +41,6 @@ namespace Windows.UI.Xaml.Media.Animation
 
         //
         // Summary:
-        //     Gets or sets the amplitude of retraction associated with a System.Windows.Media.Animation.BackEase
-        //     animation.
-        //
-        // Returns:
-        //     The amplitude of retraction associated with a System.Windows.Media.Animation.BackEase
-        //     animation. This value must be greater than or equal to 0. The default is 1.
-        public double Amplitude { get; set; }
-
-        //
-        // Summary:
         //     Provides the logic portion of the easing function that you can override to produce
         //     the System.Windows.Media.Animation.EasingMode.EaseIn mode of the custom easing
         //     function.
@@ -54,6 +55,7 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             return default(double);
         }
+#endif
     }
 }
 

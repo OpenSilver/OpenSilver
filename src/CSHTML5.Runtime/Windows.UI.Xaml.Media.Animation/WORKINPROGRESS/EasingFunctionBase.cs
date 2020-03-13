@@ -12,7 +12,7 @@ namespace Windows.UI.Xaml.Media.Animation
 	//     custom easing functions by inheriting from this class.
 	public abstract partial class EasingFunctionBase : DependencyObject, IEasingFunction
 	{
-
+#if OPENSILVER
 		//
 		// Summary:
 		//     Initializes a new instance of the System.Windows.Media.Animation.EasingFunctionBase
@@ -20,21 +20,6 @@ namespace Windows.UI.Xaml.Media.Animation
 		protected EasingFunctionBase()
 		{
 			
-		}
-
-		//
-		// Summary:
-		//     Transforms normalized time to control the pace of an animation.
-		//
-		// Parameters:
-		//   normalizedTime:
-		//     Normalized time (progress) of the animation.
-		//
-		// Returns:
-		//     A double that represents the transformed progress.
-		public double Ease(double normalizedTime)
-		{
-			return default(double);
 		}
 		
 		//
@@ -50,6 +35,22 @@ namespace Windows.UI.Xaml.Media.Animation
 		// Returns:
 		//     A double that represents the transformed progress.
 		protected abstract double EaseInCore(double normalizedTime);
+#endif
+		
+		//
+		// Summary:
+		//     Transforms normalized time to control the pace of an animation.
+		//
+		// Parameters:
+		//   normalizedTime:
+		//     Normalized time (progress) of the animation.
+		//
+		// Returns:
+		//     A double that represents the transformed progress.
+		public double Ease(double normalizedTime)
+		{
+			return default(double);
+		}
 	}
 }
 
