@@ -312,6 +312,8 @@
 		<Compile Include="Windows.UI.Text\FontWeights.cs" />
 		<Compile Include="Windows.UI.Text\TextDecorations.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Provider\WORKINPROGRESS\IDockProvider.cs" />
+		<Compile Include="Windows.UI.Xaml.Automation.Text\WORKINPROGRESS\TextPatternRangeEndpoint.cs" />
+		<Compile Include="Windows.UI.Xaml.Automation.Text\WORKINPROGRESS\TextUnit.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\DockPosition.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\MultipleViewPatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TableItemPatternIdentifiers.cs" />
@@ -470,7 +472,9 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Frame.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\GridSplitter.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\Label.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Label.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
@@ -683,6 +687,10 @@
 		<Compile Include="Windows.UI.Xaml.Navigation\NavigationFailedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Navigation\NavigationFailedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\LoadCompletedEventHandler.cs" />
+		<Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigatingCancelEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigatingCancelEventHandler.cs" />
+		<Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationMode.cs" />
+		<Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationStoppedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Shapes\Ellipse.cs" />
 		<Compile Include="Windows.UI.Xaml.Shapes\Line.cs" />
 		<Compile Include="Windows.UI.Xaml.Shapes\Path.cs" />
@@ -987,6 +995,9 @@
 		<Content Remove="**" />
 		<EmbeddedResource Remove="**" />
 		<None Remove="**" />
+		<Compile Remove="System.Windows.Automation.Text\**" />
+		<EmbeddedResource Remove="System.Windows.Automation.Text\**" />
+		<None Remove="System.Windows.Automation.Text\**" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Include="$(CSHTML5ObjPath)\DefaultStyles\INTERNAL_DefaultAutoCompleteBoxStyle.xaml.g.cs" Link="Windows.UI.Xaml.Controls\INTERNAL_DefaultAutoCompleteBoxStyle.xaml.g.cs" />

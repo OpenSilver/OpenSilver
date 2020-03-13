@@ -75,8 +75,12 @@
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Frame.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\PagedCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
+    <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\EasingFunctionBase.cs" />
+    <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\RepeatBehavior.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\LoadCompletedEventHandler.cs" />
     <Compile Include="System.Xml.Linq\XObject.cs" />
     <Compile Include="ToBeReviewed\GroupedEnumerable_3.cs" />
@@ -574,7 +578,6 @@
     <Compile Include="Windows.UI.Xaml.Data\IPropertyPathNodeListener.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IPropertyPathWalkerListener.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IValueConverter.cs" />
-    <Compile Include="Windows.UI.Xaml.Data\PagedCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\PropertyChangedListener.cs" />
     <Compile Include="Windows.UI.Xaml.Data\PropertyPathNode.cs" />
     <Compile Include="Windows.UI.Xaml.Data\PropertyPathParser.cs" />
@@ -843,6 +846,7 @@
     <Compile Include="Windows.UI\Color.cs" />
     <Compile Include="Windows.UI\ColorConverter.cs" />
     <Compile Include="Windows.UI\Colors.cs" />
+    <Compile Include="Windows.UI\WORKINPROGRESS\Color.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bridge.json" />

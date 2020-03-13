@@ -13,9 +13,6 @@ namespace System.Collections.Generic
     //   T:
     //     The type of object contained as items in the thread-safe, read-only collection.
     [ComVisible(false)]
-#if !OPENSILVER
-    [DefaultMember("Item")]
-#endif
     public partial class SynchronizedReadOnlyCollection<T> : IList<T>, ICollection<T>, IEnumerable<T>, IList, ICollection, IEnumerable
     {
         //

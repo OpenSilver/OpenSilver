@@ -1,5 +1,10 @@
 #if WORKINPROGRESS
+
+#if MIGRATION
 using System.Windows.Automation.Text;
+#else
+using Windows.UI.Xaml.Automation.Text;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Automation.Provider
