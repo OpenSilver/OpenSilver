@@ -742,14 +742,6 @@ namespace Windows.UI.Xaml.Controls
         {
             Control control = (Control)d;
             ControlTemplate controlTemplate = (ControlTemplate)e.NewValue;
-            if (controlTemplate == null)
-            {
-                control.INTERNAL_IsTemplated = false;
-            }
-            else
-            {
-                control.INTERNAL_IsTemplated = true;
-            }
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(control))
             {
 

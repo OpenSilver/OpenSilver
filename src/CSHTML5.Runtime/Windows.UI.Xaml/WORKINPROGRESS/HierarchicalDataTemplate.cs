@@ -14,6 +14,7 @@
 
 
 using System;
+using System.Windows.Controls;
 #if MIGRATION
 using System.Windows.Data;
 #else
@@ -30,6 +31,20 @@ namespace Windows.UI.Xaml
     #region Not implemented yet
     public partial class HierarchicalDataTemplate : DataTemplate
     {
+        public HierarchicalDataTemplate()
+        {
+            // Workaround to avoid NullReferenceException since the compiler does not handle HierarchicalDataTemplate yet.
+            this._methodToInstantiateFrameworkTemplate = (control) =>
+            {
+                ContentPresenter presenter = new ContentPresenter();
+                presenter.SetBinding(ContentControl.ContentProperty, new Binding());
+                return new TemplateInstance()
+                {
+                    TemplateContent = presenter,
+                };
+            };
+        }
+
         /// <summary>
         /// Gets or sets the binding that is used to generate content for the next sublevel in the data hierarchy.
         /// </summary>

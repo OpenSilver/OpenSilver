@@ -86,7 +86,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             bool? isChecked = (bool?)e.NewValue;
 
             // Update DOM appearance (if not using a ControlTemplate):
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(toggleButton) && !(toggleButton.INTERNAL_IsTemplated))
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(toggleButton) && !(toggleButton.HasTemplate))
             {
                 toggleButton.UpdateDomBasedOnCheckedState(isChecked);
             }
