@@ -1,27 +1,4 @@
-﻿
-//===============================================================================
-//
-//  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
-//
-//  => This code is licensed under the GNU General Public License (GPL v3). A copy of the license is available at:
-//        https://www.gnu.org/licenses/gpl.txt
-//
-//  => As stated in the license text linked above, "The GNU General Public License does not permit incorporating your program into proprietary programs". It also does not permit incorporating this code into non-GPL-licensed code (such as MIT-licensed code) in such a way that results in a non-GPL-licensed work (please refer to the license text for the precise terms).
-//
-//  => Licenses that permit proprietary use are available at:
-//        http://www.cshtml5.com
-//
-//  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
-//
-//===============================================================================
-
-#if WORKINPROGRESS
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿#if WORKINPROGRESS
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -35,12 +12,9 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    /// <summary>
-    /// Represents the text label for a control and provides support for access keys.
-    /// </summary>
-    public partial class Label : ContentControl
-    {
-        //
+	public partial class Label
+	{
+		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.Label.IsRequired dependency property.
 		//
@@ -62,21 +36,7 @@ namespace Windows.UI.Xaml.Controls
 		//     The identifier for the System.Windows.Controls.Label.PropertyPath dependency
 		//     property.
 		public static readonly DependencyProperty PropertyPathProperty;
-		//
-		// Summary:
-		//     Identifies the System.Windows.Controls.Label.Target dependency property.
-		//
-		// Returns:
-		//     The identifier for the System.Windows.Controls.Label.Target dependency property.
-		public static readonly DependencyProperty TargetProperty;
 
-		//
-		// Summary:
-		//     Initializes a new instance of the System.Windows.Controls.Label class.
-		public Label()
-		{
-			
-		}
 
 		//
 		// Summary:
@@ -124,14 +84,14 @@ namespace Windows.UI.Xaml.Controls
 	    protected override void OnApplyTemplate()
 #endif
 		{
-			
+
 		}
 		//
 		// Summary:
 		//     Reloads the metadata from the System.Windows.Controls.Label.Target element.
 		public virtual void Refresh()
 		{
-			
+
 		}
 		//
 		// Summary:
@@ -146,7 +106,7 @@ namespace Windows.UI.Xaml.Controls
 		//     The new value of the System.Windows.Controls.ContentControl.Content property.
 		protected override void OnContentChanged(object oldContent, object newContent)
 		{
-			
+
 		}
 		//
 		// Summary:
@@ -160,7 +120,7 @@ namespace Windows.UI.Xaml.Controls
 		{
 			return default(AutomationPeer);
 		}
-    }
+	}
 }
 
 #endif

@@ -471,6 +471,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\GridSplitter.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\Label.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Label.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
