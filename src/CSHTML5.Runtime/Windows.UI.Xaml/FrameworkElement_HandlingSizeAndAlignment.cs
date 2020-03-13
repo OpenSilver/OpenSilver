@@ -1528,7 +1528,7 @@ if ($0.tagName.toLowerCase() != 'span')
         /// <summary>
         /// Gets or sets the context menu element that should appear whenever the context menu is requested through user interface (UI) from within this element.
         /// </summary>
-        public ContextMenu ContextMenu
+        internal ContextMenu ContextMenu
         {
             get { return (ContextMenu)GetValue(ContextMenuProperty); }
             set { SetValue(ContextMenuProperty, value); }
@@ -1537,7 +1537,7 @@ if ($0.tagName.toLowerCase() != 'span')
         /// <summary>
         /// Identifies the ContextMenu dependency property.
         /// </summary>
-        public static readonly DependencyProperty ContextMenuProperty =
+        internal static readonly DependencyProperty ContextMenuProperty =
             DependencyProperty.Register("ContextMenu", typeof(ContextMenu), typeof(FrameworkElement), new PropertyMetadata(null, ContextMenu_Changed));
 
         private static void ContextMenu_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -1551,7 +1551,7 @@ if ($0.tagName.toLowerCase() != 'span')
         /// <summary>
         /// Occurs when any context menu on the element is opened.
         /// </summary>
-        public event ContextMenuEventHandler ContextMenuOpening;
+        internal event ContextMenuEventHandler ContextMenuOpening;
 
         internal void INTERNAL_RaiseContextMenuOpeningEvent(double pointerLeft, double pointerTop)
         {

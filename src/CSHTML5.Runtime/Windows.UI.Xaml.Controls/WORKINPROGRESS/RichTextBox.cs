@@ -15,6 +15,15 @@ namespace Windows.UI.Xaml.Controls
 {
 	public partial class RichTextBox : Control
 	{
+		//
+		// Summary:
+		//     Identifies the System.Windows.Controls.RichTextBox.IsReadOnly dependency property.
+		//
+		// Returns:
+		//     The identifier for the System.Windows.Controls.RichTextBox.IsReadOnly dependency
+		//     property.
+		public static readonly DependencyProperty IsReadOnlyProperty;
+		
 		public string Xaml
 		{
 			get;

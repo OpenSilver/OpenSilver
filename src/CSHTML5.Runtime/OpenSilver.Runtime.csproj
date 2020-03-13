@@ -311,6 +311,8 @@
 		<Compile Include="Windows.UI.Text\FontWeightConverter.cs" />
 		<Compile Include="Windows.UI.Text\FontWeights.cs" />
 		<Compile Include="Windows.UI.Text\TextDecorations.cs" />
+		<Compile Include="Windows.UI.Xaml.Automation.Provider\WORKINPROGRESS\IDockProvider.cs" />
+		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\DockPosition.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\MultipleViewPatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TableItemPatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TablePatternIdentifiers.cs" />
@@ -468,6 +470,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\GridSplitter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Label.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
@@ -670,6 +673,10 @@
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\Projection.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\RectangleGeometry.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\SkewTransform.cs" />
+		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TextFormattingMode.cs" />
+		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TextHintingMode.cs" />
+		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TextOptions.cs" />
+		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TextRenderingMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\VisualTreeHelper.cs" />
 		<Compile Include="Windows.UI.Xaml.Navigation\NavigatedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Navigation\NavigationEventArgs.cs" />
@@ -758,6 +765,7 @@
 		<Compile Include="Windows.UI.Xaml\FontStyle.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationUnhandledExceptionEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DataTemplate.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\EventTrigger.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FlowDirection.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontStretch.cs" />

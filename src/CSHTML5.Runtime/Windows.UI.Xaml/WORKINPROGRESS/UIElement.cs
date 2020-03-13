@@ -26,6 +26,12 @@ namespace Windows.UI.Xaml
 		{
 			return default(AutomationPeer);
 		}
+		
+		public event DragEventHandler DragEnter;
+		
+		public event DragEventHandler DragLeave;
+		
+		public event DragEventHandler Drop;
 	}
 }
 #endif

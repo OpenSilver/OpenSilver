@@ -1,7 +1,7 @@
 #if WORKINPROGRESS
 #if MIGRATION
 
-using System.Security.Cryptography.Xml;
+using System.Windows.Media;
 
 namespace System.Windows.Controls
 {

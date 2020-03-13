@@ -88,6 +88,17 @@ namespace Windows.UI.Xaml.Data
 			}
 		}
 		
+		//
+		// Summary:
+		//     Provides filtering logic.
+		//
+		// Exceptions:
+		//   T:System.InvalidOperationException:
+		//     When adding a handler to this event, the System.Windows.Data.CollectionViewSource.View
+		//     property value has a System.ComponentModel.ICollectionView.CanFilter property
+		//     value of false.
+		public event FilterEventHandler Filter;
+		
 		/// <summary>
 		/// Gets the view object that is currently associated with this instance of System.Windows.Data.CollectionViewSource.
 		/// </summary>

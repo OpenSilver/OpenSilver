@@ -611,23 +611,23 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Raises the DragEnter event.
         /// </summary>
-        public event DragEventHandler DragEnter;
+        public event MS.DragEventHandler DragEnter;
         /// <summary>
         /// Raises the DragLeave event.
         /// </summary>
-        public event DragEventHandler DragLeave;
+        public event MS.DragEventHandler DragLeave;
         /// <summary>
         /// Raises the DragOver event.
         /// </summary>
-        public event DragEventHandler DragOver;
+        public event MS.DragEventHandler DragOver;
         /// <summary>
         /// Raises the Drop event
         /// </summary>
-        public event DragEventHandler Drop;
+        public event MS.DragEventHandler Drop;
         /// <summary>
         /// Raises the ItemDroppedOnSource event
         /// </summary>
-        public event DragEventHandler ItemDroppedOnSource;
+        public event MS.DragEventHandler ItemDroppedOnSource;
 
 #endregion
 
