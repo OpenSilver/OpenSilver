@@ -15,7 +15,7 @@
 //
 //===============================================================================
 
-
+#if WORKINPROGRESS
 
 using CSHTML5.Internal;
 using System.Windows.Markup;
@@ -26,8 +26,7 @@ namespace System.Windows.Documents
 namespace Windows.UI.Xaml.Documents
 #endif
 {
-
-#if NOT_YET_IMPLEMENTED // This class is not finished because there is an issue displaying the element "inline" instead of on a new line.
+    // This class is not finished because there is an issue displaying the element "inline" instead of on a new line.
     /// <summary>
     /// Provides an inline content element that enables UIElement types to be embedded in the content of a (Rich)TextBlock.
     /// </summary>
@@ -61,5 +60,6 @@ namespace Windows.UI.Xaml.Documents
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
         }
     }
-#endif
 }
+
+#endif
