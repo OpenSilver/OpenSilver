@@ -37,6 +37,7 @@ namespace Windows.UI.Xaml.Controls
 		//     property.
 		public static readonly DependencyProperty PropertyPathProperty;
 
+		public static readonly DependencyProperty TargetProperty;
 
 		//
 		// Summary:
