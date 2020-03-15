@@ -25,6 +25,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Markup;
 #if MIGRATION
 using System.Windows.Media.Imaging;
 #else
@@ -42,6 +43,9 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
 #if FOR_DESIGN_TIME
     [TypeConverter(typeof(ImageSourceConverter))]
+#endif
+#if WORKINPROGRESS
+    [ContentProperty("UriSource")]
 #endif
     public partial class ImageSource : DependencyObject
     {
@@ -61,6 +65,12 @@ namespace Windows.UI.Xaml.Media
             BitmapImage returnValue = new BitmapImage(new Uri(str, uriKind));
             return returnValue;
         }
+
+#if WORKINPROGRESS
+        //todo: the following property is used in conjuction with the [ContentProperty("UriSource")] attribute to allow to compile the following syntax: <ImageSource x:Key="AppointmentItem_Exception">/Telerik.Windows.Controls.ScheduleView;component/Themes/Images/AppointmentRecurrence.png</ImageSource>
+        //However, it is currently not functional because a BitmapImage needs to be created instead of an ImageSource.
+        public Uri UriSource { get; set; }
+#endif
 
     }
 }
