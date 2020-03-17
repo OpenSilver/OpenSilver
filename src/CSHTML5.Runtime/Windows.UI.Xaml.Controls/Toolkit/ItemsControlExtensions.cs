@@ -30,7 +30,7 @@ namespace Windows.UI.Xaml.Controls
     /// Provides useful extensions to ItemsControl instances.
     /// </summary>
     /// <QualityBand>Experimental</QualityBand>
-    public static class ItemsControlExtensions
+    public static partial class ItemsControlExtensions
     {
         ///// <summary>
         ///// Gets the Panel that contains the containers of an ItemsControl.
