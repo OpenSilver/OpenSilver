@@ -208,6 +208,17 @@ namespace Windows.UI.Xaml
 
         }
 
+        /// <summary>
+        /// Attaches a binding to a FrameworkElement, using the provided binding object.
+        /// </summary>
+        /// <param name="dependencyProperty">The dependency property identifier of the property that is data bound.</param>
+        /// <param name="binding">The binding to use for the property.</param>
+        /// <returns>The BindingExpression created.</returns>
+        public BindingExpression SetBinding(DependencyProperty dependencyProperty, Binding binding)
+        {
+            return BindingOperations.SetBinding(this, dependencyProperty, binding);
+        }
+
         #region Cursor
 
         // Returns:

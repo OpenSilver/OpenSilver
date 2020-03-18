@@ -313,30 +313,6 @@ namespace Windows.UI.Xaml
             return null; //todo: see if an exception would be better
         }
 
-        /// <summary>
-        /// Attaches a binding to a FrameworkElement, using the provided binding object.
-        /// </summary>
-        /// <param name="dependencyProperty">The dependency property identifier of the property that is data bound.</param>
-        /// <param name="binding">The binding to use for the property.</param>
-        /// <returns>The BindingExpression created.</returns>
-        public BindingExpression SetBinding(DependencyProperty dependencyProperty, Binding binding)
-        {
-            // Verify the arguments:
-            if (dependencyProperty == null)
-                throw new ArgumentNullException("No property specified");
-            if (binding == null)
-                throw new ArgumentNullException("No binding specified");
-
-            // Create the BindingExpression from the Binding:
-            BindingExpression newBindingExpression = new BindingExpression(binding, this, dependencyProperty);
-
-            // Apply the BindingExpression:
-            ApplyBindingExpression(dependencyProperty, newBindingExpression);
-
-            // Return the newly created BindingExpression:
-            return newBindingExpression;
-        }
-
         internal void ApplyBindingExpression(DependencyProperty dependencyProperty, BindingExpression newBindingExpression)
         {
             // Get the previous BindingExpression in case we are replacing an existing Binding:
