@@ -84,26 +84,27 @@ namespace CSHTML5.Types
 
         public bool IsUndefined()
         {
+            var actualValue = GetActualValue();
 #if CSHTML5NETSTANDARD
-           return Value == null;
+           return actualValue == null;
 #else
-            if (Value ==  null || !(Value is JSValue))
+            if (actualValue ==  null || !(actualValue is JSValue))
                 return false;
-            return ((JSValue)Value).IsUndefined();
+            return ((JSValue)actualValue).IsUndefined();
 #endif
         }
 
         public bool IsNull()
         {
-
+            var actualValue = GetActualValue();
 #if CSHTML5NETSTANDARD
-           return Value == null;
+            return actualValue == null;
 #else
-            if (Value == null)
+            if (actualValue == null)
                 return true;
-            if (!(Value is JSValue))
+            if (!(actualValue is JSValue))
                 return false;
-            return ((JSValue)Value).IsNull();
+            return ((JSValue)actualValue).IsNull();
 #endif
         }
 
