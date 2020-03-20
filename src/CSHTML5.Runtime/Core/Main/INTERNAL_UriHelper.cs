@@ -56,7 +56,7 @@ namespace CSHTML5.Internal
             {
                 return null;
             }
-
+            uri = uri.Trim();
             var originalStringLowercase = uri.ToLower();
 
             if (originalStringLowercase.StartsWith(@"ms-appx:/"))

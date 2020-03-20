@@ -44,6 +44,7 @@ namespace CSHTML5.Internal
         /// <returns>The name to use to set the font-family property, a.k.a: the relative path to the font.</returns>
         internal static string LoadFont(string fontPath, UIElement elementThatARelativeUriIsRelativeTo = null)
         {
+            fontPath = fontPath.Trim(); //Todo-perf: this is probably negligible in most cases but ensuring that the _source of the FontFamily the fontPath comes from is trimmed will allow us to only call Trim() once per FontFamily instead of every time we add a Control to the Visual tree.
             if(!fontPath.Contains('.')) //Note: if the path does not contain the character '.', then it means that there is no specified file. It is therefore a default font or thet path to a folder containing fonts, which we cannot handle so we simply return the font as is.
             {
                 return fontPath;
