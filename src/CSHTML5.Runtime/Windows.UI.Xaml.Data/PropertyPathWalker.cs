@@ -46,7 +46,7 @@ namespace Windows.UI.Xaml.Data
             StandardPropertyPathNode lastNode;
             IsDataContextBound = isDatacontextBound;
 
-            if (path == null || path == ".")
+            if (string.IsNullOrEmpty(path) || path == ".")
             {
                 //bindsDirectlyToSource set to true means that the binding is directly made to the source (--> there is no path)
                 lastNode = new StandardPropertyPathNode(); //what to put in there ?

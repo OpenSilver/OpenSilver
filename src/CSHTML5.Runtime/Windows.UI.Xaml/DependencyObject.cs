@@ -40,6 +40,78 @@ namespace Windows.UI.Xaml
     /// </summary>
     public partial class DependencyObject
     {
+        private DependencyObject _inheritanceContext;
+        private FrameworkElement _inheritanceContextRoot;
+        private bool _inheritanceContextRootDirty;
+        private readonly HashSet<DependencyObject> _contextListeners = new HashSet<DependencyObject>();
+        internal event EventHandler InheritedContextChanged;
+
+        internal void SetInheritanceContext(DependencyObject context)
+        {
+            DependencyObject oldContext = this._inheritanceContext;
+            this._inheritanceContext = context;
+            this._inheritanceContextRootDirty = true;
+
+            // stop listening to old context changes
+            if (oldContext != null)
+            {
+                oldContext.StopListeningToInheritanceContextChanges(this);
+            }
+
+            // start listening to context changes
+            if (context != null)
+            {
+                context.ListenToInheritanceContextChanges(this);
+            }
+
+            // Notify listeners that inheritance context changed
+            this.OnInheritedContextChanged();
+        }
+
+        private void OnInheritedContextChanged()
+        {
+            if (this.InheritedContextChanged != null)
+            {
+                this.InheritedContextChanged(this, EventArgs.Empty);
+            }
+            foreach (DependencyObject listener in this._contextListeners)
+            {
+                listener._inheritanceContextRootDirty = true;
+                listener.OnInheritedContextChanged();
+            }
+        }
+
+        private void ListenToInheritanceContextChanges(DependencyObject listener)
+        {
+            this._contextListeners.Add(listener);
+        }
+
+        private void StopListeningToInheritanceContextChanges(DependencyObject listener)
+        {
+            bool isListening = this._contextListeners.Contains(listener);
+            System.Diagnostics.Debug.Assert(isListening, string.Format("{0} is not listening to context changes", listener));
+            if (isListening)
+            {
+                this._contextListeners.Remove(listener);
+            }
+        }
+
+        internal virtual FrameworkElement GetInheritedContext()
+        {
+            if (this._inheritanceContextRootDirty)
+            {
+                for (DependencyObject contextDO = this; contextDO != null; contextDO = contextDO._inheritanceContext)
+                {
+                    if ((this._inheritanceContextRoot = contextDO as FrameworkElement) != null)
+                    {
+                        break;
+                    }
+                }
+                this._inheritanceContextRootDirty = false;
+            }
+            return this._inheritanceContextRoot;
+        }
+
         private readonly Dictionary<DependencyProperty, BindingExpression> _bindingExpressions;
         internal Dictionary<DependencyProperty, INTERNAL_PropertyStorage> INTERNAL_PropertyStorageDictionary { get; } // Contains all the properties that are either not in INTERNAL_AllInheritedProperties or in INTERNAL_UsefulInheritedProperties
         internal Dictionary<DependencyProperty, INTERNAL_PropertyStorage> INTERNAL_AllInheritedProperties { get; } // Here so that when we attach a child, the child gets all the properties that are in there (this allows the inherited properties to go all the way down even for properties that are not contained in the children)

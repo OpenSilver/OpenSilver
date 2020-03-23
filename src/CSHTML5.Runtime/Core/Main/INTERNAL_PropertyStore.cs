@@ -288,22 +288,6 @@ namespace CSHTML5.Internal
             }
         }
 
-        static bool DoesSpecificValueImpactActualValue(INTERNAL_PropertyStorage storage, KindOfValue kind)
-        {
-            object value;
-            //Note: in KindOfValue, the value attributed to the enum values corresponds to their priority rank so the lower, the more priority.
-            if ((kind <= KindOfValue.VisualState || ((value = storage.VisualStateValue) == INTERNAL_NoValue.NoValue)) //means "kind has a higher priority tha VisualState or there is no VisualState value
-                && (kind <= KindOfValue.Local || ((value = storage.Local) == INTERNAL_NoValue.NoValue) || storage.ActiveLocalValue.ActiveValue != KindOfValue.Local)
-                && (kind <= KindOfValue.Animated || ((value = storage.AnimationValue) == INTERNAL_NoValue.NoValue) || storage.ActiveLocalValue.ActiveValue != KindOfValue.Animated)
-                && (kind <= KindOfValue.LocalStyle || ((value = storage.LocalStyleValue) == INTERNAL_NoValue.NoValue))
-                && (kind <= KindOfValue.ImplicitStyle || ((value = storage.ImplicitStyleValue) == INTERNAL_NoValue.NoValue))
-                && (kind <= KindOfValue.Inherited || ((value = storage.InheritedValue) == INTERNAL_NoValue.NoValue)))
-            {
-                return true;
-            }
-            return false;
-        }
-
         internal static void SetSpecificValue(INTERNAL_PropertyStorage storage, KindOfValue kindOfValueToSet, object newValue)
         {
             PropertyMetadata typeMetadata = storage.TypeMetadata;
@@ -336,6 +320,22 @@ namespace CSHTML5.Internal
                 }
 
                 //-----------------------
+                // Reset old value inheritance context
+                //-----------------------
+                if (oldValue is DependencyObject oldValueDO && !(oldValueDO is FrameworkElement))
+                {
+                    oldValueDO.SetInheritanceContext(null);
+                }
+
+                //-----------------------
+                // Set new value inheritance context
+                //-----------------------
+                if (newValue is DependencyObject newValueDO && !(newValueDO is FrameworkElement))
+                {
+                    newValueDO.SetInheritanceContext(storage.Owner);
+                }
+
+                //-----------------------
                 // HANDLE SOME SPECIAL Cases where we don't want to propagate the changes
                 //-----------------------
                 if (storage._isIsEnabledOrIsHitTestVisibleProperty)
@@ -363,7 +363,6 @@ namespace CSHTML5.Internal
                     if (typeMetadata.Inherits)
                     {
                         CascadeInheritedPropertyToChildren(storage, newValue);
-                        HandleSpecialPropertiesThatShouldInheritDataContext(storage, newValue);
                     }
                 }
             }
@@ -409,7 +408,6 @@ namespace CSHTML5.Internal
                     {
                         CascadeInheritedPropertyToChildren(storage, newValue);
                     }
-                    HandleSpecialPropertiesThatShouldInheritDataContext(storage, newValue);
                 }
             }
             else if (storage._isIsEnabledOrIsHitTestVisibleProperty) //todo: if we decide to make coercion possible on IsHitTestVisible or IsEnabled, change the "newValue" below into "coercedNewValue" (probably)
@@ -453,17 +451,6 @@ namespace CSHTML5.Internal
                 return object.Equals(obj1, obj2);
             }
             return object.ReferenceEquals(obj1, obj2);
-        }
-
-        internal static void HandleSpecialPropertiesThatShouldInheritDataContext(INTERNAL_PropertyStorage storage, object newValue)
-        {
-            // Support inheriting the DataContext in other properties such as "RenderTransform", which does not happen automatically because Transforms are not FrameworkElements so they are not in the visual tree (they are not in the "VisualChildren" internal collection). This ensures that, for example, <RotateTransform Angle="{Binding=Angle}"/> work properly:
-            if (storage.Property == FrameworkElement.DataContextProperty
-                && (storage.Owner is UIElement)
-                && (storage.Owner as UIElement).RenderTransform != null)
-            {
-                (storage.Owner as UIElement).RenderTransform.SetInheritedValue(FrameworkElement.DataContextProperty, newValue, recursively: false);
-            }
         }
 
         internal static bool ShouldRaisePropertyChanged(INTERNAL_PropertyStorage storage)
