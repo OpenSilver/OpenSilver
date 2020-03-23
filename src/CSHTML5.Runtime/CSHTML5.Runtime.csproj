@@ -590,7 +590,7 @@
     <Compile Include="Windows.UI.Xaml.Documents\Bold.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Hyperlink.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Inline.cs" />
-    <Compile Include="Windows.UI.Xaml.Documents\InlineUIContainer.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Italic.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Line​Break.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Run.cs" />
