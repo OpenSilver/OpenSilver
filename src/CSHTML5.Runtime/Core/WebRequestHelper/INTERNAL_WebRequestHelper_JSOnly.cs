@@ -1,20 +1,16 @@
 ﻿
-//===============================================================================
-//
-//  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
-//
-//  => This code is licensed under the GNU General Public License (GPL v3). A copy of the license is available at:
-//        https://www.gnu.org/licenses/gpl.txt
-//
-//  => As stated in the license text linked above, "The GNU General Public License does not permit incorporating your program into proprietary programs". It also does not permit incorporating this code into non-GPL-licensed code (such as MIT-licensed code) in such a way that results in a non-GPL-licensed work (please refer to the license text for the precise terms).
-//
-//  => Licenses that permit proprietary use are available at:
-//        http://www.cshtml5.com
-//
-//  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
-//
-//===============================================================================
 
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
 
 
 using System;
@@ -198,7 +194,7 @@ namespace System
             }
             else
             {
-                // in asynchronous mode, the error callback will directly arrive in errorOnSetting, and it will resend this request
+                // in asynchronous mode, the error callback will directly arrive in OnError, and it will resend this request
                 _isFirstTryAtSendingUnsafeRequest = true;
                 SendRequest((object)_xmlHttpRequest, address, method, isAsync, body);
                 return GetResult((object)_xmlHttpRequest);
@@ -382,7 +378,7 @@ namespace System
         {
             var e = new INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs();
             SetEventArgs(e);
-            if (e.Error == null || !_isFirstTryAtSendingUnsafeRequest)
+            if (!_isFirstTryAtSendingUnsafeRequest || !IsCrashInPreflight) // if NOT(first unsafe try AND preflight error). The only case we do not want to enter this if is when the request will be resent without credentials.
             {
                 if (DownloadStringCompleted != null)
                 {

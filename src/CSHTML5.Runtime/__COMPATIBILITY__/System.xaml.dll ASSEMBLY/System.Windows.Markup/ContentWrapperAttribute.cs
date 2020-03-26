@@ -1,15 +1,16 @@
 
-//-----------------------------------------------------------------------------
-//  CONFIDENTIALITY NOTICE:
-//  This code is the sole property of Userware and is strictly confidential.
-//  Unless you have a written agreement in effect with Userware that states
-//  otherwise, you are not authorized to view, copy, modify, or compile this
-//  source code, and you should destroy all the copies that you possess.
-//  Any redistribution in source code form is strictly prohibited.
-//  Redistribution in binary form is allowed provided that you have obtained
-//  prior written consent from Userware. You can contact Userware at:
-//  contact@userware-solutions.com - Copyright (c) 2016 Userware
-//-----------------------------------------------------------------------------
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
 
 
 using System;

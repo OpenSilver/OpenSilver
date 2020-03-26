@@ -1,20 +1,16 @@
 ﻿
-//===============================================================================
-//
-//  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
-//
-//  => This code is licensed under the GNU General Public License (GPL v3). A copy of the license is available at:
-//        https://www.gnu.org/licenses/gpl.txt
-//
-//  => As stated in the license text linked above, "The GNU General Public License does not permit incorporating your program into proprietary programs". It also does not permit incorporating this code into non-GPL-licensed code (such as MIT-licensed code) in such a way that results in a non-GPL-licensed work (please refer to the license text for the precise terms).
-//
-//  => Licenses that permit proprietary use are available at:
-//        http://www.cshtml5.com
-//
-//  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
-//
-//===============================================================================
 
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
 
 
 using CSHTML5;
@@ -272,23 +268,6 @@ namespace Windows.UI.Xaml
             }
         }
 
-#if WORKINPROGRESS
-        //
-        // Summary:
-        //     Gets a collection of the System.Windows.Window instances that have been created.
-        //
-        // Returns:
-        //     A collection of the windows used by the application.
-        //
-        // Exceptions:
-        //   T:System.NotSupportedException:
-        //     The application is not running outside the browser.
-        //
-        //   T:System.UnauthorizedAccessException:
-        //     The current thread is not the user interface (UI) thread.
-        public WindowCollection Windows { get; }
-#endif
-
         /// <summary>
         /// Occurs just before an application shuts down and cannot be canceled.
         /// </summary>
@@ -527,26 +506,6 @@ namespace Windows.UI.Xaml
 
 #endregion
 
-#if WORKINPROGRESS
-#region UnhandledException event (Not supported yet)
-
-        /// <summary>
-        /// Occurs when an exception that is raised is not handled.
-        /// </summary>
-        public event EventHandler<ApplicationUnhandledExceptionEventArgs> UnhandledException;
-
-        //        void RaiseUnhandledException(object jsElement)
-        //        {
-        //#if !MIGRATION
-        //            UnhandledException(null, new ApplicationUnhandledExceptionEventArgs())
-        //#else
-        //            UnhandledException(null, new ApplicationUnhandledExceptionEventArgs(null, true));
-        //#endif
-        //        }
-
-#endregion
-#endif
-
         static Host _host;
 
         /// <summary>
@@ -576,15 +535,6 @@ namespace Windows.UI.Xaml
                 entryPoint
                 );
         }
-#endif
-
-#if WORKINPROGRESS
-        public bool IsRunningOutOfBrowser
-        {
-            get { return false; }
-        }
-
-        public bool HasElevatedPermissions { get; set; }
 #endif
     }
 }

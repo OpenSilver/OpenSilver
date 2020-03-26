@@ -1,20 +1,16 @@
 ﻿
-//===============================================================================
-//
-//  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
-//
-//  => This code is licensed under the GNU General Public License (GPL v3). A copy of the license is available at:
-//        https://www.gnu.org/licenses/gpl.txt
-//
-//  => As stated in the license text linked above, "The GNU General Public License does not permit incorporating your program into proprietary programs". It also does not permit incorporating this code into non-GPL-licensed code (such as MIT-licensed code) in such a way that results in a non-GPL-licensed work (please refer to the license text for the precise terms).
-//
-//  => Licenses that permit proprietary use are available at:
-//        http://www.cshtml5.com
-//
-//  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
-//
-//===============================================================================
 
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
 
 
 using System;
@@ -233,7 +229,16 @@ namespace System.Runtime.Serialization
 
                         elementName = "ArrayOf" + itemsTypeName;
                     }
-                    XElement xElement = new XElement(XNamespace.Get("http://schemas.microsoft.com/2003/10/Serialization/Arrays").GetName(elementName), result);
+
+                    XElement xElement;
+                    if (itemsType.IsPrimitive)
+                    {
+                        xElement = new XElement(XNamespace.Get("http://schemas.microsoft.com/2003/10/Serialization/Arrays").GetName(elementName), result);
+                    }
+                    else
+                    {
+                        xElement = new XElement(XNamespace.Get(DataContractSerializer_Helpers.GetDefaultNamespace(itemsType.Namespace, useXmlSerializerFormat)).GetName(elementName), result);
+                    }
                     xElement.Add(new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLNS_NAMESPACE).GetName("xmlns:i"), DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE));
                     return new List<XObject>() { xElement };
                 }

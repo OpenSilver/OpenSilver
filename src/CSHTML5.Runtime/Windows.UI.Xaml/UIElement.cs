@@ -1,20 +1,16 @@
 ﻿
-//===============================================================================
-//
-//  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
-//
-//  => This code is licensed under the GNU General Public License (GPL v3). A copy of the license is available at:
-//        https://www.gnu.org/licenses/gpl.txt
-//
-//  => As stated in the license text linked above, "The GNU General Public License does not permit incorporating your program into proprietary programs". It also does not permit incorporating this code into non-GPL-licensed code (such as MIT-licensed code) in such a way that results in a non-GPL-licensed work (please refer to the license text for the precise terms).
-//
-//  => Licenses that permit proprietary use are available at:
-//        http://www.cshtml5.com
-//
-//  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
-//
-//===============================================================================
 
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
 
 
 #if !BRIDGE
@@ -503,68 +499,6 @@ namespace Windows.UI.Xaml
             );
 
         #endregion
-
-#if WORKINPROGRESS
-        #region OpacityMask, CacheMode, Clip Not supported yet
-
-        /// <summary>Gets or sets the brush used to alter the opacity of regions of this object.</summary>
-        /// <returns>A brush that describes the opacity applied to this object. The default is null.</returns>
-        public Brush OpacityMask
-        {
-            get { return (Brush)GetValue(OpacityMaskProperty); }
-            set { SetValue(OpacityMaskProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the OpacityMask dependency property.
-        /// </summary>
-        // TODO : Give a value to Metadata arg
-        public static readonly DependencyProperty OpacityMaskProperty =
-            DependencyProperty.Register("OpacityMask", typeof(Brush), typeof(UIElement), null);
-
-
-        /// <summary>Gets or sets a value that indicates that rendered content should be cached when possible.</summary>
-        /// <returns>A value that indicates that rendered content should be cached when possible. If you specify a value of <see cref="T:System.Windows.Media.CacheMode" />, rendering operations from <see cref="P:System.Windows.UIElement.RenderTransform" /> and <see cref="P:System.Windows.UIElement.Opacity" /> execute on the graphics processing unit (GPU), if available. The default is null, which does not enable a cached composition mode. </returns>
-        public CacheMode CacheMode
-        {
-            get
-            {
-                return (CacheMode)this.GetValue(UIElement.CacheModeProperty);
-            }
-            set
-            {
-                this.SetValue(UIElement.CacheModeProperty, (DependencyObject)value);
-            }
-        }
-
-        /// <summary>Identifies the <see cref="P:System.Windows.UIElement.CacheMode" /> dependency property.</summary>
-        /// <returns>The identifier for the <see cref="P:System.Windows.UIElement.CacheMode" /> dependency property.</returns>
-        public static readonly DependencyProperty CacheModeProperty = DependencyProperty.Register("CacheMode", typeof(CacheMode), typeof(UIElement), null);
-
-        public Projection Projection
-        {
-            get { return (Projection)this.GetValue(UIElement.ProjectionProperty); }
-            set { this.SetValue(UIElement.ProjectionProperty, value); }
-        }
-
-        public static readonly DependencyProperty ProjectionProperty = DependencyProperty.Register("Projection", typeof(Projection), typeof(UIElement), null);
-
-
-
-        public Geometry Clip
-        {
-            get { return (Geometry)GetValue(ClipProperty); }
-            set { SetValue(ClipProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for Clip.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ClipProperty =
-            DependencyProperty.Register("Clip", typeof(Geometry), typeof(UIElement), new PropertyMetadata((Geometry)null));
-
-
-
-        #endregion
-#endif
 
         #region IsHitTestVisible
 
@@ -1132,35 +1066,5 @@ namespace Windows.UI.Xaml
         //internal virtual void INTERNAL_Render()
         //{
         //}
-
-#if WORKINPROGRESS
-        public Size DesiredSize { get; private set; }
-        public Size RenderSize { get; private set; }
-
-        public void Arrange(Rect finalRect)
-        {
-
         }
-
-        public void Measure(Size availableSize)
-        {
-
-        }
-
-        public void InvalidateArrange()
-        {
-
-        }
-
-        public void InvalidateMeasure()
-        {
-
-        }
-
-        public void UpdateLayout()
-        {
-
-        }
-#endif
-    }
 }

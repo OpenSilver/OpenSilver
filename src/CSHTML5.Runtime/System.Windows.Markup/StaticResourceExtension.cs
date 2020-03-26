@@ -1,20 +1,16 @@
 ﻿
-//===============================================================================
-//
-//  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
-//
-//  => This code is licensed under the GNU General Public License (GPL v3). A copy of the license is available at:
-//        https://www.gnu.org/licenses/gpl.txt
-//
-//  => As stated in the license text linked above, "The GNU General Public License does not permit incorporating your program into proprietary programs". It also does not permit incorporating this code into non-GPL-licensed code (such as MIT-licensed code) in such a way that results in a non-GPL-licensed work (please refer to the license text for the precise terms).
-//
-//  => Licenses that permit proprietary use are available at:
-//        http://www.cshtml5.com
-//
-//  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
-//
-//===============================================================================
 
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
 
 
 using CSHTML5.Internal;
@@ -55,24 +51,11 @@ namespace System.Windows.Markup
             ResourceKey = resourceKey;
         }
 
-        //public override object ProvideValue(IServiceProvider serviceProvider)
-        //{
-        //    serviceProvider.GetService();
-        //    var staticResourceExtension = new StaticResourceExtension(ResourceKey);
-
-        //    var resource = staticResourceExtension.ProvideValue(serviceProvider) as INTERNAL_CorrespondingItem;
-
-        //    return resource == null ? "Invalid INTERNAL_CorrespondingItem" : String.Format("My {0} {1}", resource.Value, resource.Title);
-        //}
-
-
-
         /// <summary>
         /// returns an object that is provided as the value of the target property for this StaticResource.
         /// </summary>
         /// <param name="serviceProvider">A service provider helper that can provide services for the StaticResource.</param>
         /// <returns>An object that is provided as the value of the target property for this StaticResource.</returns>
-
 #if BRIDGE
         public override object ProvideValue(ServiceProvider serviceProvider)
 #else
@@ -100,18 +83,17 @@ namespace System.Windows.Markup
                 else
                 {
                     ResourceDictionary resourceDictionary = null;
-                    if (parentElement is ResourceDictionary)
+                    if ((resourceDictionary = parentElement as ResourceDictionary) == null)
                     {
-                        resourceDictionary = (ResourceDictionary)parentElement;
-                    }
-                    else if (parentElement is FrameworkElement)
-                    {
-                        resourceDictionary = ((FrameworkElement)parentElement).Resources;
+                        if (parentElement is FrameworkElement parentAsFrameworkElement)
+                        {
+                            resourceDictionary = parentAsFrameworkElement.Resources;
+                        }
                     }
                     if (resourceDictionary != null && resourceDictionary.ContainsKey(ResourceKey))
                     {
                         object returnElement = resourceDictionary[ResourceKey];
-                        if (returnElement != elementItself)
+                        if (!object.Equals(returnElement, elementItself))
                         {
                             return this.EnsurePropertyType(returnElement, targetType);
                         }

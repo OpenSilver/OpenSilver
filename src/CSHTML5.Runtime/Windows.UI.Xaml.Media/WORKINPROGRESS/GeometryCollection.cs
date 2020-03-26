@@ -1,186 +1,165 @@
-//===============================================================================
-//
-//  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
-//
-//  => This code is licensed under the GNU General Public License (GPL v3). A copy of the license is available at:
-//        https://www.gnu.org/licenses/gpl.txt
-//
-//  => As stated in the license text linked above, "The GNU General Public License does not permit incorporating your program into proprietary programs". It also does not permit incorporating this code into non-GPL-licensed code (such as MIT-licensed code) in such a way that results in a non-GPL-licensed work (please refer to the license text for the precise terms).
-//
-//  => Licenses that permit proprietary use are available at:
-//        http://www.cshtml5.com
-//
-//  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
-//
-//===============================================================================
+﻿
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+#if WORKINPROGRESS
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 #if MIGRATION
 using System.Windows.Media.Animation;
-using System.Windows;
-
 #else
 using Windows.UI.Xaml.Media.Animation;
 #endif
+
 #if MIGRATION
 namespace System.Windows.Media
 #else
 namespace Windows.UI.Xaml.Media
 #endif
 {
-#if WORKINPROGRESS
-	public sealed partial class GeometryCollection : Animatable, IList, IList<Geometry>
-	{
-		public int Count
-		{
-			get
-			{
-				throw new NotImplementedException();
-			}
-		}
+    public sealed partial class GeometryCollection : Animatable, IList, IList<Geometry>
+    {
+        public int IndexOf(Geometry item)
+        {
+            return default(int)
+        }
 
-		public bool IsReadOnly
-		{
-			get
-			{
-				throw new NotImplementedException();
-			}
-		}
+        public void Insert(int index, Geometry item)
+        {
+            
+        }
 
-		public bool IsFixedSize
-		{
-			get
-			{
-				throw new NotImplementedException();
-			}
-		}
+        public void RemoveAt(int index)
+        {
+            
+        }
 
-		public bool IsSynchronized
-		{
-			get
-			{
-				throw new NotImplementedException();
-			}
-		}
+        public Geometry this[int index]
+        {
+            get
+            {
+                return default(Geometry)
+            }
+            set
+            {
+                
+            }
+        }
 
-		public object SyncRoot
-		{
-			get
-			{
-				throw new NotImplementedException();
-			}
-		}
+        public void Add(Geometry item)
+        {
+            
+        }
 
-		public GeometryCollection()
-		{
-		}
+        public void Clear()
+        {
+            
+        }
 
-		public int IndexOf(Geometry item)
-		{
-			throw new NotImplementedException();
-		}
+        public bool Contains(Geometry item)
+        {
+            
+        }
 
-		public void Insert(int index, Geometry item)
-		{
-			throw new NotImplementedException();
-		}
+        public void CopyTo(Geometry[] array, int arrayIndex)
+        {
+            
+        }
 
-		public void RemoveAt(int index)
-		{
-			throw new NotImplementedException();
-		}
+        public int Count
+        {
+            get;
+        }
 
-		public void Add(Geometry item)
-		{
-			throw new NotImplementedException();
-		}
+        public bool IsReadOnly
+        {
+            get;
+        }
 
-		public void Clear()
-		{
-			throw new NotImplementedException();
-		}
+        public bool Remove(Geometry item)
+        {
+            return default(bool)
+        }
 
-		public bool Contains(Geometry item)
-		{
-			throw new NotImplementedException();
-		}
+        public IEnumerator<Geometry> GetEnumerator()
+        {
+            return default(bool)
+        }
 
-		public void CopyTo(Geometry[] array, int arrayIndex)
-		{
-			throw new NotImplementedException();
-		}
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return default(bool)
+        }
 
-		public bool Remove(Geometry item)
-		{
-			throw new NotImplementedException();
-		}
+        public int Add(object value)
+        {
+            return default(bool)
+        }
 
-		public IEnumerator<Geometry> GetEnumerator()
-		{
-			throw new NotImplementedException();
-		}
+        public bool Contains(object value)
+        {
+            return default(bool)
+        }
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			throw new NotImplementedException();
-		}
+        public int IndexOf(object value)
+        {
+            return default(bool)
+        }
 
-		public int Add(object value)
-		{
-			throw new NotImplementedException();
-		}
+        public void Insert(int index, object value)
+        {
+            
+        }
 
-		public bool Contains(object value)
-		{
-			throw new NotImplementedException();
-		}
+        public bool IsFixedSize
+        {
+            get;
+        }
 
-		public int IndexOf(object value)
-		{
-			throw new NotImplementedException();
-		}
+        public void Remove(object value)
+        {
+            
+        }
 
-		public void Insert(int index, object value)
-		{
-			throw new NotImplementedException();
-		}
+        object IList.this[int index]
+        {
+            get
+            {
+                return default(bool)
+            }
+            set
+            {
+                
+            }
+        }
 
-		public void Remove(object value)
-		{
-			throw new NotImplementedException();
-		}
+        public void CopyTo(Array array, int index)
+        {
+            
+        }
 
-		public void CopyTo(Array array, int index)
-		{
-			throw new NotImplementedException();
-		}
+        public bool IsSynchronized
+        {
+            get;
+        }
 
-		public Geometry this[int index]
-		{
-			get
-			{
-				throw new NotImplementedException();
-			}
-
-			set
-			{
-				throw new NotImplementedException();
-			}
-		}
-
-		object IList.this[int index]
-		{
-			get
-			{
-				throw new NotImplementedException();
-			}
-
-			set
-			{
-				throw new NotImplementedException();
-			}
-		}
-	}
-#endif
+        public object SyncRoot
+        {
+            get;
+        }
+    }
 }
+
+#endif

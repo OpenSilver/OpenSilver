@@ -1,20 +1,16 @@
 ﻿
-//===============================================================================
-//
-//  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
-//
-//  => This code is licensed under the GNU General Public License (GPL v3). A copy of the license is available at:
-//        https://www.gnu.org/licenses/gpl.txt
-//
-//  => As stated in the license text linked above, "The GNU General Public License does not permit incorporating your program into proprietary programs". It also does not permit incorporating this code into non-GPL-licensed code (such as MIT-licensed code) in such a way that results in a non-GPL-licensed work (please refer to the license text for the precise terms).
-//
-//  => Licenses that permit proprietary use are available at:
-//        http://www.cshtml5.com
-//
-//  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
-//
-//===============================================================================
 
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
 
 
 using CSHTML5.Internal;
@@ -44,11 +40,11 @@ namespace Windows.UI.Xaml
 #endif
     public partial class DependencyProperty
     {
+        private static readonly Type nullableType;
+        private static readonly INTERNAL_DefaultValueProvider defaultValueProvider;
+
         public static readonly object UnsetValue = INTERNAL_NoValue.NoValue;
 
-        internal static INTERNAL_DefaultValueStore DefaultValueStore = INTERNAL_DefaultValueStore.Instance;
-
-        //internal INTERNAL_PropertyStore Store { get; set; }
         internal string Name { get; set; }
         internal Type PropertyType { get; set; }
         internal Type OwnerType { get; set; }
@@ -63,6 +59,12 @@ namespace Windows.UI.Xaml
         Dictionary<Type, PropertyMetadata> _typesToOverridenMetadatas = null; //this is the same as Optimization_typesToOverrides except that this one contains only the types that called the OverrideMetaData method.
         Dictionary<Type, bool> Optimization_typesWithoutOverride = null; //todo: replace with a hashset when possible.
         Dictionary<Type, PropertyMetadata> Optimization_typesToOverrides = null; //note: see comment on _typesToOverridenMetadatas
+
+        static DependencyProperty()
+        {
+            nullableType = typeof(Nullable<>);
+            defaultValueProvider = new INTERNAL_DefaultValueProvider();
+        }
 
         public PropertyMetadata GetMetadata(Type type)
         {
@@ -151,7 +153,7 @@ namespace Windows.UI.Xaml
 #if BRIDGE || NETSTANDARD // We exclude the following code in the JSIL version, because of issues in JSIL comparing "1.0" and "System.Double" (it says that they are not the same type when running in the browser)
             if (typeMetadata.IsDefaultValueModified)
             {
-                if (!DefaultValueStore.ValidateDefaultValue(typeMetadata.DefaultValue, propertyType))
+                if (!IsValueTypeValid(typeMetadata.DefaultValue, propertyType))
                 {
                     string message = string.Format("Default value type does not match type of property. To fix this issue, please change the default value of the dependency property named '{0}' in the type '{1}' so that it matches the type of the property.", name, ownerType.ToString());
                     if (Application.Current.Host.Settings.EnableInvalidPropertyMetadataDefaultValueExceptions)
@@ -160,7 +162,7 @@ namespace Windows.UI.Xaml
                     }
                     else
                     {
-                        var defaultValue = DefaultValueStore.CreateDefaultValue(propertyType);
+                        var defaultValue = defaultValueProvider.ProvideValue(propertyType);
                         typeMetadata.DefaultValue = defaultValue;
                         Console.WriteLine(message + Environment.NewLine + string.Format("The default value has been automatically set to '{0}'.", defaultValue));
                     }
@@ -168,9 +170,41 @@ namespace Windows.UI.Xaml
             }
             else
             {
-                typeMetadata.DefaultValue = DefaultValueStore.CreateDefaultValue(propertyType);
+                typeMetadata.DefaultValue = defaultValueProvider.ProvideValue(propertyType);
             }
 #endif
+        }
+
+        private static bool IsValueTypeValid(object value, Type type)
+        {
+            if (object.ReferenceEquals(value, INTERNAL_NoValue.NoValue))
+            {
+                return false;
+            }
+            else
+            {
+                if (value == null)
+                {
+                    // Null values are invalid for value-types
+                    if (type.IsValueType && !(type.IsGenericType && type.GetGenericTypeDefinition() == nullableType))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    // Non-null default value, ensure its the correct type
+#if !BRIDGE && !NETSTANDARD // This is the JSIL version
+                    if (!value.GetType().IsAssignableFrom(type))
+#else
+                    if (!type.IsInstanceOfType(value))
+#endif
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
 
         /// <summary>
@@ -266,7 +300,7 @@ namespace Windows.UI.Xaml
             //We need to make sure it's type is correct.
             if (typeMetadata.IsDefaultValueModified)
             {
-                if (!DefaultValueStore.ValidateDefaultValue(typeMetadata.DefaultValue, PropertyType))
+                if (!IsValueTypeValid(typeMetadata.DefaultValue, PropertyType))
                 {
                     throw new ArgumentException(string.Format("Default value type does not match type of property. To fix this issue, please change the default value of the dependency property named '{0}' in the type '{1}' so that it matches the type of the property.", this.Name, this.OwnerType.ToString()));
                 }
@@ -283,7 +317,7 @@ namespace Windows.UI.Xaml
             // Make sure typeMetadata default value is set.
             if (!typeMetadata.IsDefaultValueModified)
             {
-                typeMetadata.DefaultValue = DefaultValueStore.CreateDefaultValue(PropertyType);
+                typeMetadata.DefaultValue = defaultValueProvider.ProvideValue(PropertyType);
             }
             //EnsureDefaultValue(typeMetadata, PropertyType);
 

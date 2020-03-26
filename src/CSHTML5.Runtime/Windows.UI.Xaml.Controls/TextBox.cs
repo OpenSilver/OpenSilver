@@ -1,20 +1,16 @@
 ﻿
-//===============================================================================
-//
-//  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
-//
-//  => This code is licensed under the GNU General Public License (GPL v3). A copy of the license is available at:
-//        https://www.gnu.org/licenses/gpl.txt
-//
-//  => As stated in the license text linked above, "The GNU General Public License does not permit incorporating your program into proprietary programs". It also does not permit incorporating this code into non-GPL-licensed code (such as MIT-licensed code) in such a way that results in a non-GPL-licensed work (please refer to the license text for the precise terms).
-//
-//  => Licenses that permit proprietary use are available at:
-//        http://www.cshtml5.com
-//
-//  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
-//
-//===============================================================================
 
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
 
 
 #if !BRIDGE
@@ -484,6 +480,9 @@ $0.addEventListener('keydown', function(e) {
                 //BRIDGETODO : here the code below works weird
                 // instance = this
                 // makes instance working properly, where it shouldn't
+                //Note: I think the reason why instance = this works is because it is set with the correct context of "this",
+                //      so instance = this TextBox. If it was inside the function defined as callback of addEventListener,
+                //      "this" would be in the context of the event triggered, so it would be the contentEditable div.
                 Script.Write(@"
 var instance = $1;
 $0.addEventListener('keydown', function(e) {
@@ -651,6 +650,7 @@ $0.addEventListener('paste', function(e) {
   
 }, false);", contentEditableDiv);
 #else
+                var acceptsReturn = this.AcceptsReturn;
                 Script.Write(@"
 {0}.addEventListener('paste', function(e) {
     var isReadOnly= {1};
@@ -703,7 +703,7 @@ $0.addEventListener('paste', function(e) {
       }
             }
   
-}, false);", contentEditableDiv, this.IsReadOnly, this.AcceptsReturn);
+}, false);", contentEditableDiv, isReadOnly, acceptsReturn);
                 //BRIDGETODO : check the code up
 #endif
             }
