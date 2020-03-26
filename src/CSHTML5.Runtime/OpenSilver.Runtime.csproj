@@ -54,7 +54,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Remove="**" />
-		<Compile Include="Core\Main\INTERNAL_DefaultValueStore.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ChangePropertyAction.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ComparisonConditionType.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ControlStoryboardAction.cs" />
@@ -716,7 +715,6 @@
 		<Compile Include="Windows.UI.Xaml.Data\IPropertyPathNodeListener.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\IPropertyPathWalkerListener.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\IValueConverter.cs" />
-		<Compile Include="Windows.UI.Xaml.Data\PagedCollectionView.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\PropertyChangedListener.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\PropertyPathNode.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\PropertyPathParser.cs" />
@@ -732,7 +730,6 @@
 		<Compile Include="Windows.UI.Xaml.Documents\Hyperlink.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\Inline.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\InlineCollection.cs" />
-		<Compile Include="Windows.UI.Xaml.Documents\InlineUIContainer.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainer.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerHelper.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerSpan.cs" />
