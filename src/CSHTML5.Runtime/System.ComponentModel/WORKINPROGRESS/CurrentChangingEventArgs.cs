@@ -68,7 +68,7 @@ namespace System.ComponentModel
             set
             {
                 if (!IsCancelable)
-                    throw new InvalidOperationException("The IsCancelable property value is false.")
+                    throw new InvalidOperationException("The IsCancelable property value is false.");
                 _cancel = value;
             }
         }

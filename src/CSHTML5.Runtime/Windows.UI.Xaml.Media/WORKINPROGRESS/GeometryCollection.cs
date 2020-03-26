@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media
     {
         public int IndexOf(Geometry item)
         {
-            return default(int)
+            return default(int);
         }
 
         public void Insert(int index, Geometry item)
@@ -48,10 +48,7 @@ namespace Windows.UI.Xaml.Media
 
         public Geometry this[int index]
         {
-            get
-            {
-                return default(Geometry)
-            }
+            get { return default(Geometry); }
             set
             {
                 
@@ -70,7 +67,7 @@ namespace Windows.UI.Xaml.Media
 
         public bool Contains(Geometry item)
         {
-            
+            return default(bool);
         }
 
         public void CopyTo(Geometry[] array, int arrayIndex)
@@ -90,32 +87,32 @@ namespace Windows.UI.Xaml.Media
 
         public bool Remove(Geometry item)
         {
-            return default(bool)
+            return default(bool);
         }
 
         public IEnumerator<Geometry> GetEnumerator()
         {
-            return default(bool)
+            return default(IEnumerator<Geometry>);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return default(bool)
+            return default(IEnumerator);
         }
 
         public int Add(object value)
         {
-            return default(bool)
+            return default(int);
         }
 
         public bool Contains(object value)
         {
-            return default(bool)
+            return default(bool);
         }
 
         public int IndexOf(object value)
         {
-            return default(bool)
+            return default(int);
         }
 
         public void Insert(int index, object value)
@@ -135,10 +132,7 @@ namespace Windows.UI.Xaml.Media
 
         object IList.this[int index]
         {
-            get
-            {
-                return default(bool)
-            }
+            get { return default(object); }
             set
             {
                 

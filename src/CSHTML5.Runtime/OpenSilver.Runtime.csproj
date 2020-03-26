@@ -247,8 +247,6 @@
 		<Compile Include="Windows.UI.Xaml.Automation.Provider\WORKINPROGRESS\ITransformProvider.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Provider\WORKINPROGRESS\IValueProvider.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Provider\WORKINPROGRESS\IWindowProvider.cs" />
-		<Compile Include="System.Windows.Automation.Text\WORKINPROGRESS\TextPatternRangeEndpoint.cs" />
-		<Compile Include="System.Windows.Automation.Text\WORKINPROGRESS\TextUnit.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptableMemberAttribute.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptableTypeAttribute.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\FocusingInvalidControlEventArgs.cs" />

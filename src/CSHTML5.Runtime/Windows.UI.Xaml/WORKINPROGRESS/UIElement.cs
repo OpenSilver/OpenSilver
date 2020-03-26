@@ -5,8 +5,10 @@ using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
+using System.Windows.Automation.Peers;
 #else
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.Foundation;
 #endif
 

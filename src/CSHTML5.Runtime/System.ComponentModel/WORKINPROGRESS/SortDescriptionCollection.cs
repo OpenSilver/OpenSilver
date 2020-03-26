@@ -15,6 +15,8 @@
 
 #if WORKINPROGRESS
 
+using System.Collections;
+
 namespace System.ComponentModel
 {
     using System.Collections.ObjectModel;
@@ -54,7 +56,7 @@ namespace System.ComponentModel
         /// <summary>
         /// Immutable, read-only SortDescriptionCollection
         /// </summary>
-        private class EmptySortDescriptionCollection : SortDescriptionCollection//, IList
+        private class EmptySortDescriptionCollection : SortDescriptionCollection, IList
         {
             /// <summary>
             /// called by base class Collection&lt;T&gt; when the list is being cleared;
