@@ -1,14 +1,9 @@
 #if WORKINPROGRESS
+#if MIGRATION
 
 using System.Windows.Interactivity;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Media.Animation;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media.Animation;
-#endif
 
 namespace Microsoft.Expression.Interactivity.Core
 {
@@ -79,4 +74,5 @@ namespace Microsoft.Expression.Interactivity.Core
 	}
 }
 
+#endif
 #endif

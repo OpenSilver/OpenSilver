@@ -14,19 +14,11 @@
 
 
 #if WORKINPROGRESS
-
 #if MIGRATION
+
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Media;
-#endif
 
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     //
     // Summary:
@@ -117,4 +109,5 @@ namespace Windows.UI.Xaml.Controls
     }
 }
 
+#endif
 #endif

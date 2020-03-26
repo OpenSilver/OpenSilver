@@ -1,12 +1,8 @@
-using System;
-
-#if MIGRATION
-using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
-
 #if WORKINPROGRESS
+#if MIGRATION
+
+using System;
+using System.Windows;
 
 namespace Microsoft.Expression.Interactivity.Core
 {
@@ -45,4 +41,5 @@ namespace Microsoft.Expression.Interactivity.Core
 	}
 }
 
+#endif
 #endif
