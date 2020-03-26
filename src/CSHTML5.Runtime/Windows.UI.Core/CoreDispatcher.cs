@@ -145,10 +145,7 @@ namespace Windows.UI.Core
             //CSHTML5.Interop.ExecuteJavaScriptAsync("setTimeout($0, 1)",
             //    (Action)(() =>
             //    {
-            INTERNAL_Simulator.WebControl.Dispatcher.BeginInvoke((Action)(() =>
-                {
-                    method();
-                }));
+            INTERNAL_Simulator.WebControlDispatcherBeginInvoke(method);
             //}));
 #if CSHTML5NETSTANDARD
             }
