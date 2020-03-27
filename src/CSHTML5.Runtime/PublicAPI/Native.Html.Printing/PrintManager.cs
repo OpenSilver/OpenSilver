@@ -49,7 +49,11 @@ namespace CSHTML5.Native.Html.Printing
         /// </summary>
         public static void Print()
         {
+#if CSHTML5BLAZOR
+            if (!Interop.IsRunningInTheSimulator_WorkAround)
+#else
             if (!Interop.IsRunningInTheSimulator)
+#endif
             {
                 Interop.ExecuteJavaScript("window.print()");
             }
@@ -69,7 +73,11 @@ namespace CSHTML5.Native.Html.Printing
             {
                 if (element._isLoaded)
                 {
+#if CSHTML5BLAZOR
+                    if (!Interop.IsRunningInTheSimulator_WorkAround)
+#else
                     if (!Interop.IsRunningInTheSimulator)
+#endif
                     {
                         // Remove the class "section-to-print" from the previous print area:
                         if (CurrentPrintArea != null && CurrentPrintArea._isLoaded)
@@ -99,7 +107,11 @@ namespace CSHTML5.Native.Html.Printing
         /// </summary>
         public static void ResetPrintArea()
         {
+#if CSHTML5BLAZOR
+            if (!Interop.IsRunningInTheSimulator_WorkAround)
+#else
             if (!Interop.IsRunningInTheSimulator)
+#endif
             {
                 // Set the print area to be the whole window (this is the default value, also called from the "setter" of "Window.Current.Content"):
                 var root = Window.Current.Content;
@@ -131,7 +143,11 @@ namespace CSHTML5.Native.Html.Printing
         /// <param name="element">The element to print.</param>
         public static void Print(FrameworkElement element)
         {
+#if CSHTML5BLAZOR
+            if (!Interop.IsRunningInTheSimulator_WorkAround)
+#else
             if (!Interop.IsRunningInTheSimulator)
+#endif
             {
                 // Remember the previous print area, if any:
                 var previousPrintArea = CurrentPrintArea;
