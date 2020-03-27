@@ -385,15 +385,33 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Identifies the DataContext dependency property.
         /// </summary>
-        public static readonly DependencyProperty DataContextProperty =
-            DependencyProperty.Register("DataContext", typeof(object), typeof(FrameworkElement), new PropertyMetadata() { Inherits = true,
-                //CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            });
+        public static readonly DependencyProperty DataContextProperty = DependencyProperty.Register("DataContext", 
+                                                                                                    typeof(object), 
+                                                                                                    typeof(FrameworkElement), 
+                                                                                                    new PropertyMetadata(null, OnDataContextPropertyChanged)
+                                                                                                    {
+                                                                                                        Inherits = true
+                                                                                                    });
 
-#endregion
+        private static void OnDataContextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((FrameworkElement)d).RaiseDataContextChangedEvent(e);
+        }
+
+        private void RaiseDataContextChangedEvent(DependencyPropertyChangedEventArgs e)
+        {
+            if (this.DataContextChanged != null)
+            {
+                this.DataContextChanged(this, e);
+            }
+        }
+
+        /// <summary>Occurs when the data context for this element changes. </summary>
+        public event DependencyPropertyChangedEventHandler DataContextChanged;
+        #endregion
 
 #if WORKINPROGRESS
-#region Triggers (not implemented)
+        #region Triggers (not implemented)
 
         public TriggerCollection Triggers
         {
@@ -747,10 +765,6 @@ namespace Windows.UI.Xaml
 #if WORKINPROGRESS
 
         public event EventHandler LayoutUpdated;
-
-        /// <summary>Occurs when the data context for this element changes. </summary>
-        public event DependencyPropertyChangedEventHandler DataContextChanged;
-
 
         public static readonly DependencyProperty FlowDirectionProperty = DependencyProperty.Register("FlowDirection", typeof(FlowDirection), typeof(FrameworkElement), new PropertyMetadata(FlowDirection.LeftToRight)
         { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
