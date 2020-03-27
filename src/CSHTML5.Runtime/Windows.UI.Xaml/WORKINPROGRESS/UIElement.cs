@@ -5,8 +5,10 @@ using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
+using System.Windows.Automation.Peers;
 #else
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.Foundation;
 #endif
 
@@ -18,6 +20,12 @@ namespace Windows.UI.Xaml
 {
     public abstract partial class UIElement
     {
+        public event DragEventHandler DragEnter;
+		
+		public event DragEventHandler DragLeave;
+		
+		public event DragEventHandler Drop;
+
         /// <summary>Gets or sets the brush used to alter the opacity of regions of this object.</summary>
         /// <returns>A brush that describes the opacity applied to this object. The default is null.</returns>
         public Brush OpacityMask
@@ -88,6 +96,19 @@ namespace Windows.UI.Xaml
         {
 
         }
+
+		//
+		// Summary:
+		//     When implemented in a derived class, returns class-specific System.Windows.Automation.Peers.AutomationPeer
+		//     implementations for the Silverlight automation infrastructure.
+		//
+		// Returns:
+		//     The class-specific System.Windows.Automation.Peers.AutomationPeer subclass to
+		//     return.
+		protected virtual AutomationPeer OnCreateAutomationPeer()
+		{
+			return default(AutomationPeer);
+		}
     }
 }
 

@@ -17,6 +17,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace Windows.UI.Xaml.Data
 {
     internal partial class INTERNAL_Operations
     {
-        public INTERNAL_Operations(PagedCollectionView collectionViewer)
+        public INTERNAL_Operations(INTERNAL_PagedCollectionView collectionViewer)
         {
             _hasFilteringBeenDone = false;
             _sortOperationIndex = -1;
@@ -53,10 +54,10 @@ namespace Windows.UI.Xaml.Data
             return operation.Direction; // normal
         }
 
-        PagedCollectionView _collectionViewer;
+        INTERNAL_PagedCollectionView _collectionViewer;
 
         // get the origin / first parent of all the viewGroups
-        public PagedCollectionView Requester { get { return _collectionViewer; } }
+        public INTERNAL_PagedCollectionView Requester { get { return _collectionViewer; } }
 
         // check if the filtering has already been applied
         public bool HasFilteringBeenDone()
@@ -136,6 +137,13 @@ namespace Windows.UI.Xaml.Data
         {
             PropertyName = propertyName;
         }
+
+#if WORKINPROGRESS
+        public override object GroupNameFromItem(object item, int level, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+#endif
     }
 
     /// <summary>

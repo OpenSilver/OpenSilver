@@ -1535,7 +1535,7 @@ if ($0.tagName.toLowerCase() != 'span')
         /// </summary>
         public static readonly DependencyProperty ContextMenuProperty =
             DependencyProperty.Register("ContextMenu", typeof(ContextMenu), typeof(FrameworkElement), new PropertyMetadata(null, ContextMenu_Changed));
-
+        
         private static void ContextMenu_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var frameworkElement = (FrameworkElement)d;

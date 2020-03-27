@@ -21,9 +21,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -43,10 +40,10 @@ namespace Windows.UI.Xaml.Data
     /// <remarks>
     /// <p>the order of the operations is: Filtering, Sorting, Grouping</p>
     /// </remarks>
-#if WORKINPROGRESS && !CSHTML5NETSTANDARD
-    public partial class PagedCollectionView : IPagedCollectionView, IEnumerable, INotifyCollectionChanged, INotifyPropertyChanged
+#if MIGRATION
+    public partial class INTERNAL_PagedCollectionView : IEnumerable, INotifyCollectionChanged
 #else
-    public partial class PagedCollectionView : IEnumerable, INotifyCollectionChanged
+    internal partial class INTERNAL_PagedCollectionView : IEnumerable, INotifyCollectionChanged
 #endif
     {
         // the child views
@@ -71,7 +68,7 @@ namespace Windows.UI.Xaml.Data
         bool _avoidCollectionChangedEvent;
 
         // set the original data. Source can't be change later if it's not an observable collection
-        public PagedCollectionView(IEnumerable source)
+        public INTERNAL_PagedCollectionView(IEnumerable source)
         {
             _originalDataSource = source != null ? source : new Collection<object>();
 
@@ -100,7 +97,7 @@ namespace Windows.UI.Xaml.Data
         {
             _originalDataSourceWithoutCopy = newSource;
 
-            if (!(newSource is PagedCollectionView))
+            if (!(newSource is INTERNAL_PagedCollectionView))
             {
                 _avoidCollectionChangedEvent = true;
 
@@ -444,29 +441,36 @@ namespace Windows.UI.Xaml.Data
 
 #region Public methods to navigate
 
-        public void MoveToFirstPage()
+        public bool MoveToFirstPage()
         {
-            PageIndex = 0;
+            return MoveToPage(0);
         }
 
-        public void MoveToLastPage()
+        public bool MoveToLastPage()
         {
-            PageIndex = _pages.Count - 1;
+            return MoveToPage(_pages.Count - 1);
         }
 
-        public void MoveToNextPage()
+        public bool MoveToNextPage()
         {
-            PageIndex++;
+            return MoveToPage(PageIndex + 1);
         }
 
-        public void MoveToPage(int index)
+        public bool MoveToPreviousPage()
         {
+            return MoveToPage(PageIndex - 1);
+        }
+
+        public bool MoveToPage(int index)
+        {
+            if (PageIndex >= _pages.Count)
+                return false;
+            if (PageIndex < 0)
+                return false;
+            
             PageIndex = index;
-        }
-
-        public void MoveToPreviousPage()
-        {
-            PageIndex--;
+            
+            return true;
         }
 
 #endregion
@@ -481,38 +485,6 @@ namespace Windows.UI.Xaml.Data
             }
             return true; // if no filter, we consider the filter as passed
         }
-
-#if WORKINPROGRESS && !CSHTML5NETSTANDARD
-        bool IPagedCollectionView.MoveToFirstPage()
-        {
-            MoveToFirstPage();
-            return true;
-        }
-
-        bool IPagedCollectionView.MoveToLastPage()
-        {
-            MoveToLastPage();
-            return true;
-        }
-
-        bool IPagedCollectionView.MoveToNextPage()
-        {
-            MoveToNextPage();
-            return true;
-        }
-
-        bool IPagedCollectionView.MoveToPreviousPage()
-        {
-            MoveToPreviousPage();
-            return true;
-        }
-
-        bool IPagedCollectionView.MoveToPage(int pageIndex)
-        {
-            MoveToPage(pageIndex);
-            return true;
-        }
-#endif
 
         // Gets the top-level groups, constructed according to the descriptions specified in the GroupDescriptions property.
         public Collection<IEnumerable> Groups

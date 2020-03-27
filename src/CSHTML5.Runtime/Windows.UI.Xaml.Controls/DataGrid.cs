@@ -93,7 +93,7 @@ namespace Windows.UI.Xaml.Controls
         DataGridCell _currentCell = null;
 
         // members for paging
-        PagedCollectionView _pagedView;
+        INTERNAL_PagedCollectionView _pagedView;
         DataPager _pagerUI = new DataPager();
         IEnumerable _oldOldValue; // When the user sets the value of ItemsSource, the DataGrid changes the ItemsSource again in order to replace it with a PagedCollectionView (which allows for sorting, filtering, grouping, etc.). 
 
@@ -104,14 +104,14 @@ namespace Windows.UI.Xaml.Controls
         {
             Columns = new ObservableCollection<DataGridColumn>();
 
-            _pagedView = new PagedCollectionView(null);
+            _pagedView = new INTERNAL_PagedCollectionView(null);
             _pagedView.PageSize = 20;
             _pagerUI.Source = _pagedView;
             _pagerUI.PageSize = 20;
             _pagerUI.DisplayMode = DataPager_DisplayMode.FirstLastPreviousNext;
         }
 
-        public DataPager DataPager { get { return _pagerUI; } }
+        // public DataPager DataPager { get { return _pagerUI; } }
 
         protected virtual void OnLoadingRow(DataGridRowEventArgs e)
         {
@@ -1271,9 +1271,9 @@ namespace Windows.UI.Xaml.Controls
                 {
                     Type type1 = _itemsSourceAsSetByUser.GetType();
 
-                    if (_itemsSourceAsSetByUser is PagedCollectionView)
+                    if (_itemsSourceAsSetByUser is INTERNAL_PagedCollectionView)
                     {
-                        type1 = ((PagedCollectionView)_itemsSourceAsSetByUser)._originalDataSourceWithoutCopy.GetType();
+                        type1 = ((INTERNAL_PagedCollectionView)_itemsSourceAsSetByUser)._originalDataSourceWithoutCopy.GetType();
                     }
 
                     //BRIDGETODO : verify the code below matches

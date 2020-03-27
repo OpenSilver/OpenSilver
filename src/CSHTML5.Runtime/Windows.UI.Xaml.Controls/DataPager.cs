@@ -52,7 +52,11 @@ namespace Windows.UI.Xaml.Controls
         PreviousNextNumeric
     }
 
+#if MIGRATION
     public partial class DataPager : Control
+#else
+    internal partial class DataPager : Control
+#endif
     {
         TextBox _textBox;
 
@@ -130,9 +134,9 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// The max number of numeric buttons that can be displayed
         /// </summary>
-        public PagedCollectionView Source
+        public INTERNAL_PagedCollectionView Source
         {
-            get { return (PagedCollectionView)GetValue(SourceProperty); }
+            get { return (INTERNAL_PagedCollectionView)GetValue(SourceProperty); }
             set { SetValue(SourceProperty, value); }
         }
 
@@ -142,7 +146,7 @@ namespace Windows.UI.Xaml.Controls
         public static readonly DependencyProperty SourceProperty =
             DependencyProperty.Register(
             "Source",
-            typeof(PagedCollectionView),
+            typeof(INTERNAL_PagedCollectionView),
             typeof(DataPager),
             new PropertyMetadata(OnSourceChanged));
 
@@ -154,8 +158,8 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (e.OldValue != null)
                 {
-                    ((PagedCollectionView)e.OldValue).CollectionChanged -= datapager.Source_CollectionChanged;
-                    ((PagedCollectionView)e.OldValue).PageChanged -= datapager.Source_PageChanged;
+                    ((INTERNAL_PagedCollectionView)e.OldValue).CollectionChanged -= datapager.Source_CollectionChanged;
+                    ((INTERNAL_PagedCollectionView)e.OldValue).PageChanged -= datapager.Source_PageChanged;
                 }
 
                 datapager.Source.PageSize = datapager.PageSize;

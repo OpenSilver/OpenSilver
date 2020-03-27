@@ -15,6 +15,8 @@
 
 #if WORKINPROGRESS
 
+using System.Collections;
+
 namespace System.ComponentModel
 {
     using System.Collections.ObjectModel;
@@ -24,20 +26,6 @@ namespace System.ComponentModel
     //     Represents a collection of System.ComponentModel.SortDescription instances.
     public class SortDescriptionCollection : Collection<SortDescription>, INotifyCollectionChanged
     {
-        //
-        // Summary:
-        //     Gets an empty and non-modifiable System.ComponentModel.SortDescriptionCollection.
-        public static readonly SortDescriptionCollection Empty;
-
-        //
-        // Summary:
-        //     Initializes a new instance of the System.ComponentModel.SortDescriptionCollection
-        //     class.
-        public SortDescriptionCollection()
-        {
-
-        }
-
         //
         // Summary:
         //     Occurs when a System.ComponentModel.SortDescription is added or removed.
@@ -55,6 +43,68 @@ namespace System.ComponentModel
                 throw new NotImplementedException();
             }
         }
+
+        //
+        // Summary:
+        //     Initializes a new instance of the System.ComponentModel.SortDescriptionCollection
+        //     class.
+        public SortDescriptionCollection()
+        {
+
+        }
+
+        /// <summary>
+        /// Immutable, read-only SortDescriptionCollection
+        /// </summary>
+        private class EmptySortDescriptionCollection : SortDescriptionCollection, IList
+        {
+            /// <summary>
+            /// called by base class Collection&lt;T&gt; when the list is being cleared;
+            /// raises a CollectionChanged event to any listeners
+            /// </summary>
+            protected override void ClearItems()
+            {
+                throw new NotSupportedException();
+            }
+ 
+            /// <summary>
+            /// called by base class Collection&lt;T&gt; when an item is removed from list;
+            /// raises a CollectionChanged event to any listeners
+            /// </summary>
+            protected override void RemoveItem(int index)
+            {
+                throw new NotSupportedException();
+            }
+ 
+            /// <summary>
+            /// called by base class Collection&lt;T&gt; when an item is added to list;
+            /// raises a CollectionChanged event to any listeners
+            /// </summary>
+            protected override void InsertItem(int index, SortDescription item)
+            {
+                throw new NotSupportedException();
+            }
+ 
+            /// <summary>
+            /// called by base class Collection&lt;T&gt; when an item is set in list;
+            /// raises a CollectionChanged event to any listeners
+            /// </summary>
+            protected override void SetItem(int index, SortDescription item)
+            {
+                throw new NotSupportedException();
+            }
+ 
+            // explicit implementation to override the IsReadOnly and IsFixedSize properties
+ 
+            bool IList.IsFixedSize => true;
+
+            bool IList.IsReadOnly => true;
+        }
+        
+        /// <summary>
+        /// returns an empty and non-modifiable SortDescriptionCollection
+        /// </summary>
+        public static readonly SortDescriptionCollection Empty = new EmptySortDescriptionCollection();
 
         //
         // Summary:

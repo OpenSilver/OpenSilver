@@ -57,8 +57,10 @@ namespace Windows.UI.Xaml.Media.Animation
             _type = RepeatBehaviorType.Count;
             _count = count;
             _hasCount = true;
-            //_hasDuration = false;
-            //_duration = new TimeSpan();
+#if WORKINPROGRESS
+            HasDuration = false;
+            Duration = new TimeSpan();
+#endif
         }
 
         static RepeatBehavior()

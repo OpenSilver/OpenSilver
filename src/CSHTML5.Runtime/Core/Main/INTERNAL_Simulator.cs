@@ -57,18 +57,13 @@ namespace DotNetForHtml5.Core
             }
         }
 
-        static dynamic webControl;
-        public static dynamic WebControl
+        // BeginInvoke of the WebControl's Dispatcher
+        public static Action<Action> WebControlDispatcherBeginInvoke
         {
-            set // Intended to be called by the "Emulator" project to inject the WebControl.
-            {
-                webControl = value;
-            }
-            internal get
-            {
-                return webControl;
-            }
+            set;
+            internal get;
         }
+        // internal static dynamic WebControlDispatcherBeginInvoke => webControl;
 
 #if CSHTML5NETSTANDARD
         public static IJavaScriptExecutionHandler JavaScriptExecutionHandler 

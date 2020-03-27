@@ -13,7 +13,7 @@
 \*====================================================================================*/
 
 
-#if WORKINPROGRESS
+#if WORKINPROGRESS || true
 
 namespace System.ComponentModel
 {
@@ -22,15 +22,16 @@ namespace System.ComponentModel
     //     Provides data for the System.ComponentModel.ICollectionView.CurrentChanging event.
     public class CurrentChangingEventArgs : EventArgs
     {
-        //
+        private bool _cancel;
         // Summary:
         //     Initializes a new instance of the System.ComponentModel.CurrentChangingEventArgs
         //     class and sets the System.ComponentModel.CurrentChangingEventArgs.IsCancelable
         //     property to true.
         public CurrentChangingEventArgs()
         {
-
+            IsCancelable = true;
         }
+        
         //
         // Summary:
         //     Initializes a new instance of the System.ComponentModel.CurrentChangingEventArgs
@@ -43,7 +44,7 @@ namespace System.ComponentModel
         //     change; false to enable cancellation.
         public CurrentChangingEventArgs(bool isCancelable)
         {
-
+            IsCancelable = isCancelable;
         }
 
         //
@@ -58,7 +59,19 @@ namespace System.ComponentModel
         //   T:System.InvalidOperationException:
         //     The System.ComponentModel.CurrentChangingEventArgs.IsCancelable property value
         //     is false.
-        public bool Cancel { get; set; }
+        public bool Cancel
+        {
+            get
+            {
+                return _cancel;
+            }
+            set
+            {
+                if (!IsCancelable)
+                    throw new InvalidOperationException("The IsCancelable property value is false.");
+                _cancel = value;
+            }
+        }
         //
         // Summary:
         //     Gets a value that indicates whether the System.ComponentModel.ICollectionView.CurrentItem
@@ -66,7 +79,7 @@ namespace System.ComponentModel
         //
         // Returns:
         //     true if the event can be canceled; false if the event cannot be canceled.
-        public bool IsCancelable { get; }
+        public bool IsCancelable { get; private set; }
     }
 }
 

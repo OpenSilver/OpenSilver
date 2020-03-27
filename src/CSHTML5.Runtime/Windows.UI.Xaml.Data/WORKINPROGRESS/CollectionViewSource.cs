@@ -156,12 +156,12 @@ namespace Windows.UI.Xaml.Data
 
         void ISupportInitialize.BeginInit()
         {
-            throw new NotImplementedException();
+            
         }
 
         void ISupportInitialize.EndInit()
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

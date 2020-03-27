@@ -12,6 +12,7 @@
 *  
 \*====================================================================================*/
 
+#if WORKINPROGRESS
 
 using System;
 using System.Collections;
@@ -28,137 +29,131 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-#if WORKINPROGRESS
     public sealed partial class GeometryCollection : Animatable, IList, IList<Geometry>
     {
         public int IndexOf(Geometry item)
         {
-            throw new NotImplementedException();
+            return default(int);
         }
 
         public void Insert(int index, Geometry item)
         {
-            throw new NotImplementedException();
+            
         }
 
         public void RemoveAt(int index)
         {
-            throw new NotImplementedException();
+            
         }
 
         public Geometry this[int index]
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { return default(Geometry); }
             set
             {
-                throw new NotImplementedException();
+                
             }
         }
 
         public void Add(Geometry item)
         {
-            throw new NotImplementedException();
+            
         }
 
         public void Clear()
         {
-            throw new NotImplementedException();
+            
         }
 
         public bool Contains(Geometry item)
         {
-            throw new NotImplementedException();
+            return default(bool);
         }
 
         public void CopyTo(Geometry[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            
         }
 
         public int Count
         {
-            get { throw new NotImplementedException(); }
+            get;
         }
 
         public bool IsReadOnly
         {
-            get { throw new NotImplementedException(); }
+            get;
         }
 
         public bool Remove(Geometry item)
         {
-            throw new NotImplementedException();
+            return default(bool);
         }
 
         public IEnumerator<Geometry> GetEnumerator()
         {
-            throw new NotImplementedException();
+            return default(IEnumerator<Geometry>);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return default(IEnumerator);
         }
 
         public int Add(object value)
         {
-            throw new NotImplementedException();
+            return default(int);
         }
 
         public bool Contains(object value)
         {
-            throw new NotImplementedException();
+            return default(bool);
         }
 
         public int IndexOf(object value)
         {
-            throw new NotImplementedException();
+            return default(int);
         }
 
         public void Insert(int index, object value)
         {
-            throw new NotImplementedException();
+            
         }
 
         public bool IsFixedSize
         {
-            get { throw new NotImplementedException(); }
+            get;
         }
 
         public void Remove(object value)
         {
-            throw new NotImplementedException();
+            
         }
 
         object IList.this[int index]
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { return default(object); }
             set
             {
-                throw new NotImplementedException();
+                
             }
         }
 
         public void CopyTo(Array array, int index)
         {
-            throw new NotImplementedException();
+            
         }
 
         public bool IsSynchronized
         {
-            get { throw new NotImplementedException(); }
+            get;
         }
 
         public object SyncRoot
         {
-            get { throw new NotImplementedException(); }
+            get;
         }
     }
-#endif
 }
+
+#endif

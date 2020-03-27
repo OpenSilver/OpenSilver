@@ -1,21 +1,4 @@
-﻿
-
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
-
-
-#if WORKINPROGRESS
-
-using System;
+﻿#if WORKINPROGRESS
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -28,7 +11,51 @@ namespace Windows.UI.Xaml.Media.Animation
     /// </summary>
     public partial class BackEase : EasingFunctionBase
     {
+        //
+        // Summary:
+        //     Gets or sets the amplitude of retraction associated with a System.Windows.Media.Animation.BackEase
+        //     animation.
+        //
+        // Returns:
+        //     The amplitude of retraction associated with a System.Windows.Media.Animation.BackEase
+        //     animation. This value must be greater than or equal to 0. The default is 1.
         public double Amplitude { get; set; }
+        
+#if OPENSILVER
+        //
+        // Summary:
+        //     Identifies the System.Windows.Media.Animation.BackEase.Amplitude dependency property.
+        //
+        // Returns:
+        //     The identifier for the System.Windows.Media.Animation.BackEase.Amplitude dependency
+        //     property.
+        public static readonly DependencyProperty AmplitudeProperty;
+
+        //
+        // Summary:
+        //     Initializes a new instance of the System.Windows.Media.Animation.BackEase class.
+        public BackEase()
+        {
+            
+        }
+
+        //
+        // Summary:
+        //     Provides the logic portion of the easing function that you can override to produce
+        //     the System.Windows.Media.Animation.EasingMode.EaseIn mode of the custom easing
+        //     function.
+        //
+        // Parameters:
+        //   normalizedTime:
+        //     Normalized time (progress) of the animation.
+        //
+        // Returns:
+        //     A double that represents the transformed progress.
+        protected override double EaseInCore(double normalizedTime)
+        {
+            return default(double);
+        }
+#endif
     }
 }
 

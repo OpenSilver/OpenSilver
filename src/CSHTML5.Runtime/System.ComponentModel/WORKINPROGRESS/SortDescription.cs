@@ -43,9 +43,9 @@ namespace System.ComponentModel
         //     a valid value.
         public SortDescription(string propertyName, ListSortDirection direction)
         {
-            this.IsSealed = true;
-            this.PropertyName = propertyName;
-            this.Direction = direction;
+            PropertyName = propertyName;
+			Direction = direction;
+			IsSealed = false;
         }
 
         //

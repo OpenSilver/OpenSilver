@@ -1,6 +1,4 @@
-﻿
-
-/*===================================================================================
+﻿/*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
 *      
@@ -21,10 +19,9 @@ using System.Threading.Tasks;
 
 namespace System.Windows.Browser
 {
-    #if WORKINPROGRESS
+#if WORKINPROGRESS
     public abstract partial class HtmlObject : ScriptObject
     {
-        #region Methods
         protected HtmlObject()
         {
         }
@@ -36,7 +33,6 @@ namespace System.Windows.Browser
         {
             return false;
         }
-        #endregion
     }
 #endif
 }

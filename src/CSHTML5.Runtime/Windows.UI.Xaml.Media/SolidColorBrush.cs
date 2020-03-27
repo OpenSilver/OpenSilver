@@ -16,6 +16,7 @@
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
+using System.Windows.Markup;
 #if !MIGRATION
 using Windows.UI.Xaml.Controls;
 #endif
@@ -29,6 +30,9 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Paints an area with a solid color.
     /// </summary>
+#if WORKINPROGRESS // "ContentProperty" is marked as WORKINPROGRESS because it has not been tested yet.
+    [ContentProperty("Color")]
+#endif
     public sealed partial class SolidColorBrush : Brush, ICanConvertToCSSValue, ICloneOnAnimation
     {
         bool _isAlreadyAClone = false;

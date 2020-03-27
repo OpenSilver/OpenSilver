@@ -14,19 +14,11 @@
 
 
 #if WORKINPROGRESS
-
 #if MIGRATION
+
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Media;
-#endif
 
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     //
     // Summary:
@@ -80,41 +72,42 @@ namespace Windows.UI.Xaml.Controls
         {
 
         }
-        ////
-        //// Summary:
-        ////     Provides the behavior for the "Arrange" pass of layout.
-        ////
-        //// Parameters:
-        ////   finalSize:
-        ////     The final area within the parent that this element should use to arrange itself
-        ////     and its children.
-        ////
-        //// Returns:
-        ////     The actual size used.
-        ////
-        //// Remarks:
-        ////     Using the WPF paramater name finalSize instead of Silverlight's finalSize for
-        ////     clarity
-        //protected override Size ArrangeOverride(Size finalSize)
-        //{
-
-        //}
-        ////
-        //// Summary:
-        ////     Provides the behavior for the "Measure" pass of layout.
-        ////
-        //// Parameters:
-        ////   availableSize:
-        ////     The available size that this element can give to child elements.
-        ////
-        //// Returns:
-        ////     The size that this element determines it needs during layout, based on its calculations
-        ////     of child element sizes.
-        //protected override Size MeasureOverride(Size availableSize)
-        //{
-
-        //}
+        //
+        // Summary:
+        //     Provides the behavior for the "Arrange" pass of layout.
+        //
+        // Parameters:
+        //   finalSize:
+        //     The final area within the parent that this element should use to arrange itself
+        //     and its children.
+        //
+        // Returns:
+        //     The actual size used.
+        //
+        // Remarks:
+        //     Using the WPF paramater name finalSize instead of Silverlight's finalSize for
+        //     clarity
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+				return default(Size);
+        }
+        //
+        // Summary:
+        //     Provides the behavior for the "Measure" pass of layout.
+        //
+        // Parameters:
+        //   availableSize:
+        //     The available size that this element can give to child elements.
+        //
+        // Returns:
+        //     The size that this element determines it needs during layout, based on its calculations
+        //     of child element sizes.
+        protected override Size MeasureOverride(Size availableSize)
+        {
+			return default(Size);
+        }
     }
 }
 
+#endif
 #endif

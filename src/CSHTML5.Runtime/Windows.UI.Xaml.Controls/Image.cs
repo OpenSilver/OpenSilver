@@ -315,6 +315,36 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
 
         #region Image failed event
 
+#if WORKINPROGRESS
+        INTERNAL_EventManager<EventHandler<ExceptionRoutedEventArgs>, ExceptionRoutedEventArgs> _imageFailedEventManager = null;
+
+        /// <summary>
+        /// Occurs when there is an error associated with image retrieval or format.
+        /// </summary>
+        public event EventHandler<ExceptionRoutedEventArgs> ImageFailed
+        {
+            add
+            {
+                if (_imageFailedEventManager == null)
+                {
+                    _imageFailedEventManager = new INTERNAL_EventManager<EventHandler<ExceptionRoutedEventArgs>, ExceptionRoutedEventArgs>(() => _imageDiv, "error", ProcessOnImageFailed);
+                    _imageFailedEventManager.Add(value);
+                }
+                else
+                {
+                    _imageFailedEventManager.Add(value);
+                }
+            }
+            remove
+            {
+                if (_imageFailedEventManager != null)
+                {
+                    _imageFailedEventManager.Remove(value);
+                }
+
+            }
+        }
+#else
         INTERNAL_EventManager<ExceptionRoutedEventHandler, ExceptionRoutedEventArgs> _imageFailedEventManager = null;
 
         /// <summary>
@@ -343,6 +373,7 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
 
             }
         }
+#endif
 
 
         /// <summary>
@@ -357,6 +388,18 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
             OnImageFailed(eventArgs);
         }
 
+#if WORKINPROGRESS
+        /// <summary>
+        /// Raises the ImageFailed event
+        /// </summary>
+        void OnImageFailed(ExceptionRoutedEventArgs eventArgs)
+        {
+            foreach (EventHandler<ExceptionRoutedEventArgs> handler in _imageFailedEventManager.Handlers.ToList<EventHandler<ExceptionRoutedEventArgs>>())
+            {
+                handler(this, eventArgs);
+            }
+        }
+#else
         /// <summary>
         /// Raises the ImageFailed event
         /// </summary>
@@ -367,13 +410,42 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
                 handler(this, eventArgs);
             }
         }
-
+#endif
 
         #endregion
 
 
         #region Image opened event
 
+#if WORKINPROGRESS
+        INTERNAL_EventManager<EventHandler<RoutedEventArgs>, RoutedEventArgs> _imageOpenedEventManager = null;
+
+        /// <summary>
+        /// Occurs when the image source is downloaded and decoded with no failure.
+        /// </summary>
+        public event EventHandler<RoutedEventArgs> ImageOpened
+        {
+            add
+            {
+                if (_imageOpenedEventManager == null)
+                {
+                    _imageOpenedEventManager = new INTERNAL_EventManager<EventHandler<RoutedEventArgs>, RoutedEventArgs>(() => _imageDiv, "load", ProcessOnImageOpened);
+                    _imageOpenedEventManager.Add(value);
+                }
+                else
+                {
+                    _imageOpenedEventManager.Add(value);
+                }
+            }
+            remove
+            {
+                if (_imageOpenedEventManager != null)
+                {
+                    _imageOpenedEventManager.Remove(value);
+                }
+            }
+        }
+#else
         INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs> _imageOpenedEventManager = null;
 
         /// <summary>
@@ -401,6 +473,7 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
                 }
             }
         }
+#endif
 
 
         /// <summary>
@@ -415,6 +488,18 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
             OnImageOpened(eventArgs);
         }
 
+#if WORKINPROGRESS
+        /// <summary>
+        /// Raises the ImageOpened event
+        /// </summary>
+        void OnImageOpened(RoutedEventArgs eventArgs)
+        {
+            foreach (EventHandler<RoutedEventArgs> handler in _imageOpenedEventManager.Handlers.ToList<EventHandler<RoutedEventArgs>>())
+            {
+                handler(this, eventArgs);
+            }
+        }
+#else
         /// <summary>
         /// Raises the ImageOpened event
         /// </summary>
@@ -425,6 +510,7 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
                 handler(this, eventArgs);
             }
         }
+#endif
 
 
         #endregion

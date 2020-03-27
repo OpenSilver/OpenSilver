@@ -1,6 +1,4 @@
-﻿
-
-/*===================================================================================
+﻿/*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
 *      
@@ -60,6 +58,13 @@ namespace Windows.UI.Xaml
 			
 		}
 
+		internal WindowCollection()
+		{
+			Count = 0;
+			IsSynchronized = false;
+			SyncRoot = null;
+		}
+
 		//
 		// Summary:
 		//     Returns an enumerator that iterates through the collection.
@@ -69,6 +74,10 @@ namespace Windows.UI.Xaml
 		public IEnumerator GetEnumerator()
 		{
 			return default(IEnumerator);
+		}
+
+		void ICollection.CopyTo(Array @array, int @index)
+		{
 		}
 	}
 #endif
