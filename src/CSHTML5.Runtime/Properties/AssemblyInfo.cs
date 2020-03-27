@@ -47,10 +47,10 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+#endif
 
 [assembly: InternalsVisibleTo("CSharpXamlForHtml5.Simulator")]
 
-#endif
 
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml", "System.Windows.Markup")] // This is used for example in the {x:Static ...} markup extension.
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/expression/2010/interactions", "Microsoft.Expression.Interactivity.Core")]
