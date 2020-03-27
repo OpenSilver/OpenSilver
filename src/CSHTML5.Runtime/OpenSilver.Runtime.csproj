@@ -38,6 +38,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="DotNetBrowser" Version="1.14.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Blazor" Version="3.1.0-preview1.19508.20" />
 		<PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="3.1.0-preview1.19508.20" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.AspNetCore.Blazor.HttpClient" Version="3.1.0-preview1.19508.20" />
@@ -45,12 +46,6 @@
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="System.ServiceModel.Primitives" Version="4.7.0" />
 		<PackageReference Include="System.Text.Json" Version="4.7.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Reference Include="DotNetBrowser">
-			<HintPath>..\ExtLibs\Stubs\DotNetBrowser.dll</HintPath>
-		</Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Remove="**" />
