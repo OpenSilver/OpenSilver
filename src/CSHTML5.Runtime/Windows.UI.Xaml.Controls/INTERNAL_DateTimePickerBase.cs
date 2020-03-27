@@ -76,6 +76,9 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnApplyTemplate();
 
+            if (_popup != null)
+                _popup.ClosedDueToOutsideClick -= Popup_ClosedDueToOutsideClick;
+
             _root = this.GetTemplateChild(ElementRoot) as FrameworkElement;
             _textBox = GetTemplateChild(ElementTextBox) as TextBox;
             _dropDownButton = GetTemplateChild(ElementButton) as Button;
@@ -89,7 +92,6 @@ namespace Windows.UI.Xaml.Controls
                 _popup.StayOpen = false;
                 _popup.Child = _calendarOrClock;
                 _popup.IsOpen = false;
-                _popup.ClosedDueToOutsideClick -= Popup_ClosedDueToOutsideClick;
                 _popup.ClosedDueToOutsideClick += Popup_ClosedDueToOutsideClick;
             }
 
@@ -104,7 +106,31 @@ namespace Windows.UI.Xaml.Controls
 
         void Popup_ClosedDueToOutsideClick(object sender, EventArgs e)
         {
-            this.IsDropDownOpen = false;
+            if (this._dropDownButton != null)
+            {
+#if MIGRATION
+                // See comment below
+                if (this._dropDownButton.IsMouseCaptured)
+                {
+                    this._dropDownButton.ReleaseMouseCapture();
+                }
+
+#else
+                // In case the pointer is captured by the toggle button, we need to release it because the Click event would be triggered right after the popup was closed, 
+                // resulting in the popup to reopen right away.
+                // To reproduce the issue that happens if we remove the "if" block of code below: create a DatePicker/TimePicker, click the ToggleButton to
+                // open the drop-down popup, then click it again to close the drop-down. Expected result: the drop-down is closed. Actual result: the popup closes and re-opens.
+                // The issue was due to the fact that, when we clicked on the ToggleButton to close the drop-down, the toggle button became Unchecked due to the
+                // "Popup.ClosedDueToOutsideClick" event (resulting in the popup being successfully closed), but then it reopened because the "PointerReleased" event of the
+                // ToggleButton was raised, which re-checked the unchecked ToggleButton. By releasing the capture, we prevent the "PointerReleased" event of the ToggleButton
+                // to be raised.
+                if (this._dropDownButton.IsPointerCaptured)
+                {
+                    this._dropDownButton.ReleasePointerCapture();
+                }
+#endif
+                this.IsDropDownOpen = false; // Note: this has other effects as well: see the "IsDropDownOpen_Changed" method
+            }
         }
 
         protected void DropDownButton_Click(object sender, RoutedEventArgs e)
@@ -228,16 +254,16 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">The DependencyPropertyChangedEventArgs.</param>
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            INTERNAL_DateTimePickerBase dp = d as INTERNAL_DateTimePickerBase;
+            INTERNAL_DateTimePickerBase dp = (INTERNAL_DateTimePickerBase)d;
 
             string newText = (string)e.NewValue;
 
             if (dp._textBox != null)
             {
-                if (newText == dp._defaultText)
-                    dp._textBox.Foreground = new SolidColorBrush(Colors.Gray);
-                else
-                    dp._textBox.Foreground = new SolidColorBrush(Colors.Black);
+                //if (newText == dp._defaultText)
+                //    dp._textBox.Foreground = new SolidColorBrush(Colors.Gray);
+                //else
+                //    dp._textBox.Foreground = new SolidColorBrush(Colors.Black);
 
                 dp._textBox.Text = newText;
             }
