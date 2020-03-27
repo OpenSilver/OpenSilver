@@ -158,7 +158,7 @@ namespace CSHTML5
                     javascript = javascript.Replace("$" + i.ToString(), string.Format(
                     @"(function() {{
                         var argsArray = Array.prototype.slice.call(arguments);
-                        var idWhereCallbackArgsAreStored = ""callback_args_"" + Math.floor(Math.random() * 1000000);
+                        var idWhereCallbackArgsAreStored = ""callback_args_"" + document.callbackCounterForSimulator++;
                         document.jsSimulatorObjectReferences[idWhereCallbackArgsAreStored] = argsArray;
                         setTimeout(
                             function() 
@@ -204,7 +204,7 @@ namespace CSHTML5
 
             // Change the JS code to call ShowErrorMessage in case of error:
             string errorCallBack = string.Format(
-            @"var idWhereErrorCallbackArgsAreStored = ""callback_args_"" + Math.floor(Math.random() * 1000000);
+            @"var idWhereErrorCallbackArgsAreStored = ""callback_args_"" + document.callbackCounterForSimulator++;
                 document.jsSimulatorObjectReferences[idWhereErrorCallbackArgsAreStored] = {0};
                 var argsArr = [];
                 argsArr[0] = error.message;
