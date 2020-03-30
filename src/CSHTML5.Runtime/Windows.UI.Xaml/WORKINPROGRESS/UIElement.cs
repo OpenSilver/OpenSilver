@@ -5,11 +5,17 @@ using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
-using System.Windows.Automation.Peers;
 #else
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Automation.Peers;
 using Windows.Foundation;
+#endif
+
+#if OPENSILVER
+#if MIGRATION
+using System.Windows.Automation.Peers;
+#else
+using Windows.UI.Xaml.Automation.Peers;
+#endif
 #endif
 
 #if MIGRATION
@@ -97,6 +103,7 @@ namespace Windows.UI.Xaml
 
         }
 
+#if OPENSILVER
 		//
 		// Summary:
 		//     When implemented in a derived class, returns class-specific System.Windows.Automation.Peers.AutomationPeer
@@ -109,6 +116,7 @@ namespace Windows.UI.Xaml
 		{
 			return default(AutomationPeer);
 		}
+#endif
     }
 }
 
