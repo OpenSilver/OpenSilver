@@ -88,8 +88,11 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Page.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\CollectionViewSource.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\PagedCollectionView.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\LoadCompletedEventHandler.cs" />
     <Compile Include="System.Xml.Linq\XObject.cs" />
@@ -589,7 +592,6 @@
     <Compile Include="Windows.UI.Xaml.Data\IPropertyPathNodeListener.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IPropertyPathWalkerListener.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IValueConverter.cs" />
-    <Compile Include="Windows.UI.Xaml.Data\PagedCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\PropertyChangedListener.cs" />
     <Compile Include="Windows.UI.Xaml.Data\PropertyPathNode.cs" />
     <Compile Include="Windows.UI.Xaml.Data\PropertyPathParser.cs" />
@@ -602,7 +604,6 @@
     <Compile Include="Windows.UI.Xaml.Documents\Bold.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Hyperlink.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Inline.cs" />
-    <Compile Include="Windows.UI.Xaml.Documents\InlineUIContainer.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Italic.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Line​Break.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Run.cs" />

@@ -663,7 +663,7 @@ namespace CSHTML5.Internal
             if (Interop.IsRunningInTheSimulator)
             {
                 // Go back to the UI thread because DotNetBrowser calls the callback from the socket background thread:
-                INTERNAL_Simulator.WebControl.Dispatcher.BeginInvoke(action);
+                INTERNAL_Simulator.WebControlDispatcherBeginInvoke(action);
             }
             else
             {

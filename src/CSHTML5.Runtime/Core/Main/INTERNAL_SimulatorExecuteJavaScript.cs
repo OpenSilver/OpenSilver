@@ -104,7 +104,7 @@ namespace CSHTML5.Internal
                 {
                     _isDispatcherPending = true;
 
-                    INTERNAL_Simulator.WebControl.Dispatcher.BeginInvoke((Action)(() =>
+                    INTERNAL_Simulator.WebControlDispatcherBeginInvoke((Action)(() =>
                         {
                             if (_isDispatcherPending) // We check again, because in the meantime the dispatcher can be cancelled in case of a forced execution of the pending JS code, for example when making a JavaScript execution that "returns a value".
                             {
