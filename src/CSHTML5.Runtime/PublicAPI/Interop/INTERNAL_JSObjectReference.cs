@@ -64,20 +64,37 @@ namespace CSHTML5.Types
         public object GetActualValue()
         {
 #if !BUILDINGDOCUMENTATION // We don't have the references to the "DotNetBrowser" web browser control when building the documentation.
-            switch (Value)
+            object result;
+            
+            if (IsArray)
             {
-                case JSArray castedValue:
-                    return castedValue[ArrayIndex];
-                case object[] castedValue:
-                    return castedValue[ArrayIndex];
-                case JSNumber castedValue:
-                    return castedValue.GetNumber(); // This prevents the "InvalidCastException" with message "Unable to cast object of type 'DotNetBrowser.JSNumber' to type 'System.IConvertible'" that happened in the method "ToDouble" below.
-                case JSBoolean castedValue:
-                    return castedValue.GetBool();
-                case JSString castedValue:
-                    return castedValue.GetString();
+                switch (Value)
+                {
+                    case JSArray castedValue:
+                        result = castedValue[ArrayIndex];
+                        break;
+                    case object[] castedValue:
+                        result = castedValue[ArrayIndex];
+                        break;
+                    default:
+                        throw new InvalidOperationException("Value is marked as array but is neither an object[] nor a JSArray");
+                }
+            }
+            else
+            {
+                result = Value;
+            }
+            
+            switch (result)
+            {
+                case JSNumber castedResult:
+                    return castedResult.GetNumber(); // This prevents the "InvalidCastException" with message "Unable to cast object of type 'DotNetBrowser.JSNumber' to type 'System.IConvertible'" that happened in the method "ToDouble" below.
+                case JSBoolean castedResult:
+                    return castedResult.GetBool();
+                case JSString castedResult:
+                    return castedResult.GetString();
                 default:
-                    return Value;
+                    return result;
             }
 #endif
         }
