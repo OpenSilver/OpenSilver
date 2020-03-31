@@ -1089,10 +1089,10 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
             }
         }
 
-        internal override void INTERNAL_OnVisualParentChanged()
+        internal override void INTERNAL_FinalizeAttachToParent()
         {
             this.UpdateTabIndex(this.IsTabStop, this.TabIndex);
-            base.INTERNAL_OnVisualParentChanged();
+            base.INTERNAL_FinalizeAttachToParent();
         }
 
 #if WORKINPROGRESS

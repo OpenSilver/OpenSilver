@@ -1076,7 +1076,7 @@ namespace Windows.UI.Xaml
         //{
         //}
 #if REWORKLOADED
-        internal virtual void INTERNAL_OnVisualParentChanged()
+        internal virtual void INTERNAL_FinalizeAttachToParent()
         {
 
         }

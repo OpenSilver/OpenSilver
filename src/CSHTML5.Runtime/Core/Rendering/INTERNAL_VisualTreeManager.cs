@@ -973,7 +973,7 @@ namespace CSHTML5.Internal
                 UIElement uiE = this.visualElements.Dequeue();
                 if (uiE._isLoaded)
                 {
-                    uiE.INTERNAL_OnVisualParentChanged();
+                    uiE.INTERNAL_FinalizeAttachToParent();
                     uiE.StartManagingPointerPositionForPointerExitedEventIfNeeded();
                 }
             }

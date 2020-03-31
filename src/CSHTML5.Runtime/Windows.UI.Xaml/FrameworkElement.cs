@@ -235,8 +235,11 @@ namespace Windows.UI.Xaml
             set { SetValue(CursorProperty, value); }
         }
         public static readonly DependencyProperty CursorProperty =
-            DependencyProperty.Register("Cursor", typeof(Cursor), typeof(FrameworkElement), new PropertyMetadata() { MethodToUpdateDom = Cursor_MethodToUpdateDom,
-            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Cursor", typeof(Cursor), typeof(FrameworkElement), new PropertyMetadata()
+            {
+                MethodToUpdateDom = Cursor_MethodToUpdateDom,
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+            });
 
         private static void Cursor_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -316,9 +319,9 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        #endregion
 
-#region Names handling
+        #region Names handling
 
         /// <summary>
         /// Retrieves an object that has the specified identifier name.
@@ -369,7 +372,7 @@ namespace Windows.UI.Xaml
             var @this = (FrameworkElement)d;
             INTERNAL_HtmlDomManager.SetDomElementAttribute(@this.INTERNAL_OuterDomElement, "dataId", (value ?? string.Empty).ToString());
         }
-#endregion
+        #endregion
 
         #region DataContext
 
@@ -481,9 +484,9 @@ namespace Windows.UI.Xaml
             DependencyProperty.Register("Tag", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null)
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
-#endregion
+        #endregion
 
-#region Handling Styles
+        #region Handling Styles
 
         protected void INTERNAL_SetDefaultStyle(Style defaultStyle)
         {
@@ -629,7 +632,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-#region DefaultStyleKey
+        #region DefaultStyleKey
 
         // Returns:
         //     The key that references the default style for the control. To work correctly
@@ -662,7 +665,7 @@ namespace Windows.UI.Xaml
                 // if we don't find it in the element assembly then we try to find it in the assembly where newValue is defined (since newValue is supposed to be a Type)
                 if (newStyle == null)
                 {
-                    if(newValue is Type)
+                    if (newValue is Type)
                     {
                         newStyle = Application.Current.XamlResourcesHandler.TryFindResourceInGenericXaml(((Type)newValue).Assembly, newValue) as Style;
                     }
@@ -677,11 +680,11 @@ namespace Windows.UI.Xaml
         }
 
 
-#endregion
+        #endregion
 
-#endregion
+        #endregion
 
-#region Loaded/Unloaded events
+        #region Loaded/Unloaded events
 
         /// <summary>
         /// Occurs when a FrameworkElement has been constructed and added to the object tree.
@@ -705,9 +708,9 @@ namespace Windows.UI.Xaml
                 Unloaded(this, new RoutedEventArgs());
         }
 
-#endregion
+        #endregion
 
-#region BindingValidationError event
+        #region BindingValidationError event
 
         internal bool INTERNAL_AreThereAnyBindingValidationErrorHandlers = false;
 
@@ -759,7 +762,7 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-#endregion
+        #endregion
 
 
 #if WORKINPROGRESS
@@ -793,10 +796,24 @@ namespace Windows.UI.Xaml
 #endif
 
 #if REWORKLOADED
-        internal override void INTERNAL_OnVisualParentChanged()
+        internal override void INTERNAL_FinalizeAttachToParent()
         {
             this.INTERNAL_SizeChangedWhenAttachedToVisualTree(); // Raise SizeChanged event
             this.INTERNAL_RaiseLoadedEvent(); // Raise Loaded event
+
+            // Start listening to size changes
+            if (this._sizeChangedEventHandlers != null && this._sizeChangedEventHandlers.Count > 0)
+            {
+                if (this._resizeSensor == null)
+                {
+                    this._resizeSensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action)this.HandleSizeChanged);
+                }
+            }
+        }
+
+        protected internal override void INTERNAL_OnDetachedFromVisualTree()
+        {
+            base.INTERNAL_OnDetachedFromVisualTree();
         }
 #endif
     }

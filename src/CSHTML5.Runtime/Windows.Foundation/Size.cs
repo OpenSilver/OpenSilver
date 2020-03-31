@@ -87,7 +87,7 @@ namespace Windows.Foundation
         /// </returns>
         public static bool operator !=(Size size1, Size size2)
         {
-            return (size1.Height != size2.Height || size1.Width != size2.Width);
+            return size1.Height != size2.Height || size1.Width != size2.Width;
         }
 
         /// <summary>
@@ -101,8 +101,7 @@ namespace Windows.Foundation
         /// </returns>
         public static bool operator ==(Size size1, Size size2)
         {
-            return (size1.Height == size2.Height && size1.Width == size2.Width);
-
+            return size1.Height == size2.Height && size1.Width == size2.Width;
         }
 
         /// <summary>
@@ -182,7 +181,7 @@ namespace Windows.Foundation
             }
             else
             {
-                return size1.Width.Equals(size2.Width) && size1.Height.Equals(size2.Height);
+                return size1.Width == size2.Width && size1.Height == size2.Height;
             }
         }
 
@@ -194,13 +193,11 @@ namespace Windows.Foundation
         /// <returns>true if the sizes are equal; otherwise, false.</returns>
         public override bool Equals(object o)
         {
-            if ((null == o) || !(o is Size))
+            if (o is Size value)
             {
-                return false;
+               return Size.Equals(this, value);
             }
-
-            Size value = (Size)o;
-            return Size.Equals(this, value);
+            return false;
         }
 
 
