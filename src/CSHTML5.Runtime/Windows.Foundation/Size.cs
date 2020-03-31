@@ -18,6 +18,7 @@ using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -246,28 +247,15 @@ namespace Windows.Foundation
 
         internal static object INTERNAL_ConvertFromString(string sizeAsString)
         {
-            char splitter = ',';
-            string trimmedSizeAsString = sizeAsString.Trim(); //we trim the string so that we don't get random spaces at the beginning and at the end act as separators (for example: Margin=" 5")
-            if (!trimmedSizeAsString.Contains(','))
-            {
-                splitter = ' ';
-            }
-            string[] splittedString = trimmedSizeAsString.Split(splitter);
-            if (splittedString.Length == 1)
-            {
-                throw new FormatException("Failed to create a Size from the string \"" + sizeAsString + "\". Premature string termination encountered while parsing \"" + sizeAsString + "\".");
-            }
-            else if (splittedString.Length == 2)
-            {
-                double width = 0d;
-                double height = 0d;
+            string[] splittedString = sizeAsString.Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries);
 
-                bool isParseOK = double.TryParse(splittedString[0], out width);
-                isParseOK = isParseOK && double.TryParse(splittedString[1], out height);
-
-                if (isParseOK)
+            if (splittedString.Length == 2)
+            {
+                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out double width) && 
+                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out double height))
                     return new Size(width, height);
             }
+            
             throw new FormatException(sizeAsString + " is not an eligible value for a Size");
         }
 

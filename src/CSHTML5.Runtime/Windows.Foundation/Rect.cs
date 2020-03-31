@@ -17,6 +17,7 @@ using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -390,28 +391,18 @@ namespace Windows.Foundation
 
         public static Rect Parse(string rectAsString)
         {
-            Rect rect = new Rect();
-            string[] rectAsStringSplittedOverBlanks = rectAsString.Split(' ');
-            List<string> rectAsStringSplittedOverBlanksWithoutWhiteSpaces = new List<string>();
-            foreach (string s in rectAsStringSplittedOverBlanks)
+            string[] splittedString = rectAsString.Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries);
+
+            if (splittedString.Length == 4)
             {
-                if (!string.IsNullOrWhiteSpace(s))
-                {
-                    rectAsStringSplittedOverBlanksWithoutWhiteSpaces.Add(s);
-                }
+                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out double x) && 
+                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out double y) && 
+                    double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out double width) && 
+                    double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out double height))
+                    return new Rect(x, y, width, height);
             }
-            if (rectAsStringSplittedOverBlanksWithoutWhiteSpaces.Count == 4)
-            {
-                rect._x = double.Parse(rectAsStringSplittedOverBlanksWithoutWhiteSpaces[0]);
-                rect._y = double.Parse(rectAsStringSplittedOverBlanksWithoutWhiteSpaces[1]);
-                rect._width = double.Parse(rectAsStringSplittedOverBlanksWithoutWhiteSpaces[2]);
-                rect._height = double.Parse(rectAsStringSplittedOverBlanksWithoutWhiteSpaces[3]);
-            }
-            else
-            {
-                throw new FormatException(rectAsString + "is not an eligible value for Rect"); 
-            }
-            return rect;
+            
+            throw new FormatException(rectAsString + "is not an eligible value for Rect"); 
         }
       
         //// <summary>

@@ -17,6 +17,7 @@ using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -194,31 +195,23 @@ namespace Windows.Foundation
             TypeFromStringConverters.RegisterConverter(typeof(Point), INTERNAL_ConvertFromString);
         }
 
-        internal static object INTERNAL_ConvertFromString(string pointAsString)
+        public static Point Parse(string pointAsString)
         {
-            char separator;
-            if (pointAsString.Contains(","))
-            {
-                separator = ',';
-            }
-            else
-            {
-                separator = ' ';
-            }
-            string[] splittedString = pointAsString.Trim().Split(separator);
+            string[] splittedString = pointAsString.Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries);
+
             if (splittedString.Length == 2)
             {
-                double x = 0d;
-                double y = 0d;
-
-                bool isParseOK = double.TryParse(splittedString[0], out x);
-                isParseOK = isParseOK && double.TryParse(splittedString[1], out y);
-
-                if (isParseOK)
+                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out double x) && 
+                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out double y))
                     return new Point(x, y);
             }
             
             throw new FormatException(pointAsString + " is not an eligible value for a Point");
+        }
+
+        internal static object INTERNAL_ConvertFromString(string pointAsString)
+        {
+            return Parse(pointAsString);
         }
 
         public string ToString(string format, IFormatProvider formatProvider)

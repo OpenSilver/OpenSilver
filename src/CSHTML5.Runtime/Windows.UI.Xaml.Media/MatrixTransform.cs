@@ -16,6 +16,8 @@
 using System;
 using CSHTML5.Internal;
 using System.Collections.Generic;
+using System.Globalization;
+
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -96,13 +98,13 @@ namespace Windows.UI.Xaml.Media
                 var matrix = this.Matrix;
 
                 string value = "matrix("
-                    + matrix.M11.ToString() + ","
-                    + matrix.M12.ToString() + ","
-                    + matrix.M21.ToString() + ","
-                    + matrix.M22.ToString() + ","
-                    + matrix.OffsetX.ToString() + ","
-                    + matrix.OffsetY.ToString()
-                    + ")"; //todo: make sure that the conversion from double to string is culture-invariant so that it uses dots instead of commas for the decimal separator.
+                    + matrix.M11.ToString(CultureInfo.InvariantCulture) + ","
+                    + matrix.M12.ToString(CultureInfo.InvariantCulture) + ","
+                    + matrix.M21.ToString(CultureInfo.InvariantCulture) + ","
+                    + matrix.M22.ToString(CultureInfo.InvariantCulture) + ","
+                    + matrix.OffsetX.ToString(CultureInfo.InvariantCulture) + ","
+                    + matrix.OffsetY.ToString(CultureInfo.InvariantCulture)
+                    + ")";
 
                 try
                 {

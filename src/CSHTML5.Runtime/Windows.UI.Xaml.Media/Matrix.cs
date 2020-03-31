@@ -17,6 +17,7 @@ using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -323,26 +324,23 @@ namespace Windows.UI.Xaml.Media
             TypeFromStringConverters.RegisterConverter(typeof(Matrix), INTERNAL_ConvertFromString);
         }
 
-        internal static object INTERNAL_ConvertFromString(string matrixAsString)
+        public static Matrix Parse(string matrixAsString)
         {
-            string[] splittedString = matrixAsString.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (matrixAsString == "Identity")
+                return Identity;
+            
+            string[] splittedString = matrixAsString.Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries);
 
-            double m11 = 1d;
-            double m12 = 0d;
-            double m21 = 0d;
-            double m22 = 1d;
-            double offsetX = 0d;
-            double offsetY = 0d;
-
-            bool isParseOK = double.TryParse(splittedString[0], out m11); //todo: ensure that parsing is with Invariant Culture.
-            isParseOK = isParseOK && double.TryParse(splittedString[1], out m12);
-            isParseOK = isParseOK && double.TryParse(splittedString[2], out m21);
-            isParseOK = isParseOK && double.TryParse(splittedString[3], out m22);
-            isParseOK = isParseOK && double.TryParse(splittedString[4], out offsetX);
-            isParseOK = isParseOK && double.TryParse(splittedString[5], out offsetY);
-
-            if (isParseOK)
-                return new Matrix(m11, m12, m21, m22, offsetX, offsetY);
+            if (splittedString.Length == 6)
+            {
+                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out double m11) && 
+                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out double m12) && 
+                    double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out double m21) && 
+                    double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out double m22) && 
+                    double.TryParse(splittedString[4], NumberStyles.Any, CultureInfo.InvariantCulture, out double offsetX) && 
+                    double.TryParse(splittedString[5], NumberStyles.Any, CultureInfo.InvariantCulture, out double offsetY))
+                    return new Matrix(m11, m12, m21, m22, offsetX, offsetY);
+            }
 
             throw new FormatException(matrixAsString + " is not an eligible value for a Matrix");
         }
@@ -379,6 +377,11 @@ namespace Windows.UI.Xaml.Media
         //{
         //    throw new NotImplementedException();
         //}
+
+        internal static object INTERNAL_ConvertFromString(string matrixAsString)
+        {
+            return matrixAsString == "Identity" ? Identity : Parse(matrixAsString);
+        }
 
 #if WORKINPROGRESS
         public Point Transform(Point point)
