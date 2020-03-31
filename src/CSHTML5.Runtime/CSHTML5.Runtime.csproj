@@ -91,6 +91,7 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Page.cs" />
     <Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Toolkit\ItemsControlExtensions.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\Binding.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\CollectionViewSource.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\PagedCollectionView.cs" />
