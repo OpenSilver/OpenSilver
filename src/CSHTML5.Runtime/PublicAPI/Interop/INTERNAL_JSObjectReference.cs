@@ -19,7 +19,7 @@ using Bridge;
 using JSIL.Meta;
 #endif
 
-#if !BUILDINGDOCUMENTATION && !CSHTML5NETSTANDARD// We don't have the references to the "DotNetBrowser" web browser control when building the documentation.
+#if !BUILDINGDOCUMENTATION// We don't have the references to the "DotNetBrowser" web browser control when building the documentation.
 using DotNetBrowser;
 #endif
 
@@ -38,7 +38,23 @@ namespace CSHTML5.Types
         public object Value { get; set; }
         public string ReferenceId { get; set; }
         public bool IsArray { get; set; }
-        public int ArrayIndex { get; set; } // Note: this property applies only if "IsArray" is true.
+
+        private int _arrayIndex;
+        public int ArrayIndex
+        {
+            get
+            {
+                if (!IsArray)
+                    throw new InvalidOperationException("Cannot get index of non-array item");
+                return _arrayIndex;
+            }
+            set
+            {
+                if (!IsArray)
+                    throw new InvalidOperationException("Cannot set index of non-array item");
+                _arrayIndex = value;
+            }
+        } // Note: this property applies only if "IsArray" is true.
 
 #if BRIDGE
         [External] //we exclude this method
@@ -47,39 +63,23 @@ namespace CSHTML5.Types
 #endif
         public object GetActualValue()
         {
-            object result = null;
-
 #if !BUILDINGDOCUMENTATION // We don't have the references to the "DotNetBrowser" web browser control when building the documentation.
-            if (this.IsArray)
+            switch (Value)
             {
-#if CSHTML5NETSTANDARD
-                result = ((object[])this.Value)[this.ArrayIndex];
-#else
-                result = ((JSArray)this.Value)[this.ArrayIndex];
-#endif
-            }
-            else
-            {
-                result = this.Value;
-            }
-
-#if !CSHTML5NETSTANDARD
-            if (result is JSNumber)
-            {
-                result = ((JSNumber)result).GetNumber(); // This prevents the "InvalidCastException" with message "Unable to cast object of type 'DotNetBrowser.JSNumber' to type 'System.IConvertible'" that happened in the method "ToDouble" below.
-            }
-            else if (result is JSBoolean)
-            {
-                result = ((JSBoolean)result).GetBool();
-            }
-            else if (result is JSString)
-            {
-                result = ((JSString)result).GetString();
+                case JSArray castedValue:
+                    return castedValue[ArrayIndex];
+                case object[] castedValue:
+                    return castedValue[ArrayIndex];
+                case JSNumber castedValue:
+                    return castedValue.GetNumber(); // This prevents the "InvalidCastException" with message "Unable to cast object of type 'DotNetBrowser.JSNumber' to type 'System.IConvertible'" that happened in the method "ToDouble" below.
+                case JSBoolean castedValue:
+                    return castedValue.GetBool();
+                case JSString castedValue:
+                    return castedValue.GetString();
+                default:
+                    return Value;
             }
 #endif
-#endif
-
-            return result;
         }
 
         public bool IsUndefined()
