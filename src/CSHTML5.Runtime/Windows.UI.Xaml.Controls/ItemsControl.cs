@@ -402,7 +402,15 @@ namespace Windows.UI.Xaml.Controls
             // Attempt to find the <ItemsPresenter /> in the ControlTemplate and, if it was found, use it as the place where all the items should be added:
             ItemsPresenter itemsPresenter = INTERNAL_VisualTreeManager.GetChildOfType<ItemsPresenter>(this);
             if (itemsPresenter != null)
+            {
+                if (this._renderedItemsPanel != null &&
+                    this._placeWhereItemsPanelWillBeRendered.INTERNAL_VisualChildrenInformation != null &&
+                    this._placeWhereItemsPanelWillBeRendered.INTERNAL_VisualChildrenInformation.ContainsKey(this._renderedItemsPanel))
+                {
+                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(this._renderedItemsPanel, this._placeWhereItemsPanelWillBeRendered);
+                }
                 _placeWhereItemsPanelWillBeRendered = itemsPresenter;
+            }
 
             // Update the ItemsPanel:
             UpdateItemsPanel(ItemsPanel);
