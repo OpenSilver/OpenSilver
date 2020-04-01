@@ -1,4 +1,4 @@
-
+﻿
 
 /*===================================================================================
 * 
@@ -614,12 +614,7 @@ namespace Windows.Foundation
 
         static Rect()
         {
-            TypeFromStringConverters.RegisterConverter(typeof(Rect), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string rectAsString)
-        {
-            return Parse(rectAsString);
+            TypeFromStringConverters.RegisterConverter(typeof(Rect), s => Parse(s));
         }
     }
 }

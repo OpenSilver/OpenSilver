@@ -37,19 +37,12 @@ namespace Windows.Foundation
 #endif
     public partial struct Size
     {
-        private static Size emptySize;
-
         double _width;
         double _height;
 
         static Size()
         {
-            emptySize = new Size
-            {
-                _width = double.NegativeInfinity,
-                _height = double.NegativeInfinity
-            };
-            TypeFromStringConverters.RegisterConverter(typeof(Size), INTERNAL_ConvertFromString);
+            TypeFromStringConverters.RegisterConverter(typeof(Size), s => Parse(s));
         }
 
         /// <summary>
@@ -112,7 +105,10 @@ namespace Windows.Foundation
         {
             get
             {
-                return emptySize;
+                Size size = new Size();
+                size._width = Double.NegativeInfinity;
+                size._height = Double.NegativeInfinity;
+                return size;
             }
         }
 
@@ -245,7 +241,7 @@ namespace Windows.Foundation
             return Width + "," + Height;
         }
 
-        internal static object INTERNAL_ConvertFromString(string sizeAsString)
+        public static Size Parse(string sizeAsString)
         {
             string[] splittedString = sizeAsString.Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries);
 

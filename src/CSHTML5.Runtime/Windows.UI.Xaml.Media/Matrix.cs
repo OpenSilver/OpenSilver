@@ -321,7 +321,7 @@ namespace Windows.UI.Xaml.Media
 
         static Matrix()
         {
-            TypeFromStringConverters.RegisterConverter(typeof(Matrix), INTERNAL_ConvertFromString);
+            TypeFromStringConverters.RegisterConverter(typeof(Matrix), s => Parse(s));
         }
 
         public static Matrix Parse(string matrixAsString)
@@ -387,11 +387,6 @@ namespace Windows.UI.Xaml.Media
         //{
         //    throw new NotImplementedException();
         //}
-
-        internal static object INTERNAL_ConvertFromString(string matrixAsString)
-        {
-            return matrixAsString == "Identity" ? Identity : Parse(matrixAsString);
-        }
 
 #if WORKINPROGRESS
         public Point Transform(Point point)

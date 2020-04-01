@@ -192,7 +192,7 @@ namespace Windows.Foundation
 
         static Point()
         {
-            TypeFromStringConverters.RegisterConverter(typeof(Point), INTERNAL_ConvertFromString);
+            TypeFromStringConverters.RegisterConverter(typeof(Point), s => Parse(s));
         }
 
         public static Point Parse(string pointAsString)
@@ -213,11 +213,6 @@ namespace Windows.Foundation
             }
             
             throw new FormatException(pointAsString + " is not an eligible value for a Point");
-        }
-
-        internal static object INTERNAL_ConvertFromString(string pointAsString)
-        {
-            return Parse(pointAsString);
         }
 
         public string ToString(string format, IFormatProvider formatProvider)
