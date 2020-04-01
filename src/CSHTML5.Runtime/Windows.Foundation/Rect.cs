@@ -395,10 +395,18 @@ namespace Windows.Foundation
 
             if (splittedString.Length == 4)
             {
-                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out double x) && 
-                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out double y) && 
-                    double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out double width) && 
-                    double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out double height))
+                double x, y, width, height;
+#if OPENSILVER
+                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out x) && 
+                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out y) && 
+                    double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out width) && 
+                    double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out height))
+#else
+                if (double.TryParse(splittedString[0], out x) &&
+                    double.TryParse(splittedString[1], out y) &&
+                    double.TryParse(splittedString[2], out width) &&
+                    double.TryParse(splittedString[3], out height))
+#endif
                     return new Rect(x, y, width, height);
             }
             

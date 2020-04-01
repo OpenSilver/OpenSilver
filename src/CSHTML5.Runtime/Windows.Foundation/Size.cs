@@ -251,8 +251,14 @@ namespace Windows.Foundation
 
             if (splittedString.Length == 2)
             {
-                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out double width) && 
-                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out double height))
+                double width, height;
+#if OPENSILVER
+                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out width) && 
+                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out height))
+#else
+                if (double.TryParse(splittedString[0], out width) &&
+                    double.TryParse(splittedString[1], out height))
+#endif
                     return new Size(width, height);
             }
             

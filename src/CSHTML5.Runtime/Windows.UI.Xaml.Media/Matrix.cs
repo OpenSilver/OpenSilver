@@ -333,12 +333,22 @@ namespace Windows.UI.Xaml.Media
 
             if (splittedString.Length == 6)
             {
-                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out double m11) && 
-                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out double m12) && 
-                    double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out double m21) && 
-                    double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out double m22) && 
-                    double.TryParse(splittedString[4], NumberStyles.Any, CultureInfo.InvariantCulture, out double offsetX) && 
-                    double.TryParse(splittedString[5], NumberStyles.Any, CultureInfo.InvariantCulture, out double offsetY))
+                double m11, m12, m21, m22, offsetX, offsetY;
+#if OPENSILVER
+                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out m11) && 
+                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out m12) && 
+                    double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out m21) && 
+                    double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out m22) && 
+                    double.TryParse(splittedString[4], NumberStyles.Any, CultureInfo.InvariantCulture, out offsetX) && 
+                    double.TryParse(splittedString[5], NumberStyles.Any, CultureInfo.InvariantCulture, out offsetY))
+#else
+                if (double.TryParse(splittedString[0], out m11) &&
+                    double.TryParse(splittedString[1], out m12) &&
+                    double.TryParse(splittedString[2], out m21) &&
+                    double.TryParse(splittedString[3], out m22) &&
+                    double.TryParse(splittedString[4], out offsetX) &&
+                    double.TryParse(splittedString[5], out offsetY))
+#endif
                     return new Matrix(m11, m12, m21, m22, offsetX, offsetY);
             }
 

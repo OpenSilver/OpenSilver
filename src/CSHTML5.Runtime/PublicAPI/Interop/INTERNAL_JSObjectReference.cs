@@ -68,33 +68,39 @@ namespace CSHTML5.Types
             
             if (IsArray)
             {
-                switch (Value)
+                if (Value is JSArray jsarray)
                 {
-                    case JSArray castedValue:
-                        result = castedValue[ArrayIndex];
-                        break;
-                    case object[] castedValue:
-                        result = castedValue[ArrayIndex];
-                        break;
-                    default:
-                        throw new InvalidOperationException("Value is marked as array but is neither an object[] nor a JSArray");
+                    result = jsarray[ArrayIndex];
+                }
+                else if (Value is object[] array)
+                {
+                    result = array[ArrayIndex];
+                }
+                else
+                {
+                    throw new InvalidOperationException("Value is marked as array but is neither an object[] nor a JSArray");
                 }
             }
             else
             {
                 result = Value;
             }
-            
-            switch (result)
+
+            if (result is JSNumber jsNumber)
             {
-                case JSNumber castedResult:
-                    return castedResult.GetNumber(); // This prevents the "InvalidCastException" with message "Unable to cast object of type 'DotNetBrowser.JSNumber' to type 'System.IConvertible'" that happened in the method "ToDouble" below.
-                case JSBoolean castedResult:
-                    return castedResult.GetBool();
-                case JSString castedResult:
-                    return castedResult.GetString();
-                default:
-                    return result;
+                return jsNumber.GetNumber();
+            }
+            else if (result is JSBoolean jsBoolean)
+            {
+                return jsBoolean.GetBool();
+            }
+            else if (result is JSString jsString)
+            {
+                return jsString.GetString();
+            }
+            else
+            {
+                return result;
             }
 #endif
         }

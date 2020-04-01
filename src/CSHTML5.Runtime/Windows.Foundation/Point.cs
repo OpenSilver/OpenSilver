@@ -201,8 +201,14 @@ namespace Windows.Foundation
 
             if (splittedString.Length == 2)
             {
-                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out double x) && 
-                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out double y))
+                double x, y;
+#if OPENSILVER
+                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out x) && 
+                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out y))
+#else
+                if (double.TryParse(splittedString[0], out x) &&
+                    double.TryParse(splittedString[1], out y))
+#endif
                     return new Point(x, y);
             }
             
