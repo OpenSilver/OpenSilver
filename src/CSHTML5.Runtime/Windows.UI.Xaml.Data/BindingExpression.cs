@@ -331,8 +331,6 @@ namespace Windows.UI.Xaml.Data
                 return;
             }
 
-            System.Diagnostics.Debug.Assert(target == this.Target, "Invalid target");
-
             IsAttached = true;
 
             this.FindSource();

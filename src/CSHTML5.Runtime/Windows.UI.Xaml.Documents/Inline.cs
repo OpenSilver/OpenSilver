@@ -12,10 +12,9 @@
 *  
 \*====================================================================================*/
 
-
+using CSHTML5.Internal;
 #if MIGRATION
 using System.Windows.Controls;
-using CSHTML5.Internal;
 #else
 using Windows.UI.Text;
 using Windows.UI.Xaml.Controls;

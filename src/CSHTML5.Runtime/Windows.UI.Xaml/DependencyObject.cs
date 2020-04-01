@@ -89,7 +89,6 @@ namespace Windows.UI.Xaml
         private void StopListeningToInheritanceContextChanges(DependencyObject listener)
         {
             bool isListening = this._contextListeners.Contains(listener);
-            System.Diagnostics.Debug.Assert(isListening, string.Format("{0} is not listening to context changes", listener));
             if (isListening)
             {
                 this._contextListeners.Remove(listener);

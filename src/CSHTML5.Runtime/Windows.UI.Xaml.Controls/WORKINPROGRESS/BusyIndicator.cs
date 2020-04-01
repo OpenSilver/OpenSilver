@@ -1,12 +1,21 @@
 ﻿using System;
+#if MIGRATION
 using System.Windows;
 using System.Windows.Threading;
+#else
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     public class BusyIndicator : ContentControl
     {
-        #region Data
+#region Data
         /// <summary>
         /// Timer used to delay the initial display and avoid flickering.
         /// </summary>
@@ -18,9 +27,9 @@ namespace System.Windows.Controls
         public static readonly DependencyProperty DisplayAfterProperty = DependencyProperty.Register("DisplayAfter", typeof(TimeSpan), typeof(BusyIndicator), new PropertyMetadata(TimeSpan.FromSeconds(0.1)));
         public static readonly DependencyProperty OverlayStyleProperty = DependencyProperty.Register("OverlayStyle", typeof(Style), typeof(BusyIndicator), new PropertyMetadata(null));
         public static readonly DependencyProperty ProgressBarStyleProperty = DependencyProperty.Register("ProgressBarStyle", typeof(Style), typeof(BusyIndicator), new PropertyMetadata(null));
-        #endregion
+#endregion
 
-        #region Constructor
+#region Constructor
         public BusyIndicator()
         {
             //todo: add this
@@ -28,11 +37,19 @@ namespace System.Windows.Controls
             this._displayAfterTimer = new DispatcherTimer();
             this.Loaded += delegate
             {
+#if MIGRATION
                 this._displayAfterTimer.Tick += new EventHandler(this.DisplayAfterTimerElapsed);
+#else
+                this._displayAfterTimer.Tick += new EventHandler<object>(this.DisplayAfterTimerElapsed);
+#endif
             };
             this.Unloaded += delegate
             {
-                this._displayAfterTimer.Tick -= new EventHandler(this.DisplayAfterTimerElapsed);
+#if MIGRATION
+                this._displayAfterTimer.Tick += new EventHandler(this.DisplayAfterTimerElapsed);
+#else
+                this._displayAfterTimer.Tick += new EventHandler<object>(this.DisplayAfterTimerElapsed);
+#endif
                 this._displayAfterTimer.Stop();
             };
         }
@@ -85,7 +102,11 @@ namespace System.Windows.Controls
         /// <summary>
         /// Overrides the OnApplyTemplate method.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
         {
             base.OnApplyTemplate();
             this.ChangeVisualState(false);
@@ -129,17 +150,21 @@ namespace System.Windows.Controls
             }
             this.ChangeVisualState(true);
         }
-        #endregion
+#endregion
 
-        #region Internal API
+#region Internal API
 
-        #region Internal Methods
+#region Internal Methods
         /// <summary>
         /// Handler for the DisplayAfterTimer.
         /// </summary>
         /// <param name="sender">Event sender.</param>
         /// <param name="e">Event arguments.</param>
+#if MIGRATION
         private void DisplayAfterTimerElapsed(object sender, EventArgs e)
+#else
+        private void DisplayAfterTimerElapsed(object sender, object e)
+#endif
         {
             this._displayAfterTimer.Stop();
             this.IsContentVisible = true;
@@ -150,8 +175,8 @@ namespace System.Windows.Controls
         {
             ((BusyIndicator)d).OnIsBusyChanged(e);
         }
-        #endregion
+#endregion
 
-        #endregion
+#endregion
     }
 }
