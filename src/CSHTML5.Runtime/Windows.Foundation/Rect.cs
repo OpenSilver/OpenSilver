@@ -1,4 +1,4 @@
-﻿
+
 
 /*===================================================================================
 * 
@@ -121,6 +121,22 @@ namespace Windows.Foundation
             Height = height;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the System.Windows.Rect structure that is of the
+        /// specified size and is located at (0,0).
+        /// </summary>
+        /// <param name="size">The size of the new Windows.Foundation.Rect.</param>
+        public Rect(Size size)
+        {
+            //setting the elements of the struct to their default value (we don't set it to the given value because it could be an anothorized value)
+            _x = 0;
+            _y = 0;
+            _width = 0;
+            _height = 0;
+            
+            Width = size.Width;
+            Height = size.Height;
+        }
 
         /// <summary>
         /// Compares two Windows.Foundation.Rect structures for inequality.
@@ -168,6 +184,28 @@ namespace Windows.Foundation
         }
 
         /// <summary>
+        /// Gets the position of the bottom-left corner of the rectangle
+        /// </summary>
+        public Point BottomLeft
+        {
+            get
+            {
+                return new Point(Left, Bottom);
+            }
+        }
+
+        /// <summary>
+        /// Gets the position of the bottom-right corner of the rectangle.
+        /// </summary>
+        public Point BottomRight
+        {
+            get
+            {
+                return new Point(Right, Bottom);
+            }
+        }
+
+        /// <summary>
         /// Gets a special value that represents a rectangle with
         /// no position or area.
         /// </summary>
@@ -195,14 +233,12 @@ namespace Windows.Foundation
             }
             set
             {
-                if (!IsEmpty && value < 0)
-                {
+                if (value < 0)
                     throw new ArgumentException("Height cannot be lower than 0");
-                }
-                else
-                {
-                    _height = value;
-                }
+                if (IsEmpty)
+                    throw new InvalidOperationException("Cannot modify empty Rect.");
+
+                _height = value;
             }
         }
         
@@ -235,7 +271,22 @@ namespace Windows.Foundation
             }
         }
 
-        
+        /// <summary>
+        /// Gets or sets the position of the top-left corner of the rectangle.
+        /// </summary>
+        public Point Location
+        {
+            get => new Point(X, Y);
+            set
+            {
+                if (IsEmpty)
+                    throw new InvalidOperationException("Cannot modify empty Rect.");
+                
+                X = value.X;
+                Y = value.Y;
+            }
+        }
+
         /// <summary>
         /// Gets the x-axis value of the right side of the rectangle.
         /// </summary>
@@ -250,8 +301,23 @@ namespace Windows.Foundation
                 return X + Width;
             }
         }
-
         
+        /// <summary>
+        /// Gets or sets the width and height of the rectangle.
+        /// </summary>
+        public Size Size
+        {
+            get => new Size(Width, Height);
+            set
+            {
+                if (IsEmpty)
+                    throw new InvalidOperationException("Cannot modify empty Rect.");
+                
+                Width = value.Width;
+                Height = value.Height;
+            }
+        }
+
         /// <summary>
         /// Gets the y-axis position of the top of the rectangle.
         /// </summary>
@@ -267,7 +333,28 @@ namespace Windows.Foundation
             }
         }
 
-        
+        /// <summary>
+        /// Gets the position of the top-left corner of the rectangle
+        /// </summary>
+        public Point TopLeft
+        {
+            get
+            {
+                return new Point(Left, Top);
+            }
+        }
+
+        /// <summary>
+        /// Gets the position of the top-right corner of the rectangle.
+        /// </summary>
+        public Point TopRight
+        {
+            get
+            {
+                return new Point(Right, Top);
+            }
+        }
+
         /// <summary>
         /// Gets or sets the width of the rectangle.
         /// </summary>
@@ -302,6 +389,9 @@ namespace Windows.Foundation
             }
             set
             {
+                if (IsEmpty)
+                    throw new InvalidOperationException("Cannot modify empty Rect.");
+                
                 _x = value;
             }
         }
@@ -318,6 +408,9 @@ namespace Windows.Foundation
             }
             set
             {
+                if (IsEmpty)
+                    throw new InvalidOperationException("Cannot modify empty Rect.");
+                
                 _y = value;
             }
         }
@@ -385,7 +478,36 @@ namespace Windows.Foundation
 #if WORKINPROGRESS
         public void Intersect(Rect rect)
         {
+            //todo: finish this
 
+            //Rect intersection = Rect.Empty;
+            //if (rect.X <= X && rect.Width + rect.X >= X)
+            //{
+            //    intersection.X = X;
+            //}
+            //if (rect.Y <= Y && rect.Height + rect.Y >= Y)
+            //{
+            //    intersection.Y = Y;
+            //}
+
+            //if (X <= rect.X && Width + X >= rect.X)
+            //{
+            //    intersection.X = rect.X;
+            //}
+            //if (Y <= rect.Y && Height + Y >= rect.Y)
+            //{
+            //    intersection.Y = rect.Y;
+            //}
+        }
+
+        /// <summary>
+        /// Returns a string representation of the rectangle by using
+        /// the specified format provider.
+        /// </summary>
+        /// <param name="provider">Culture-specific formatting information.</param>
+        public string ToString(IFormatProvider provider)
+        {
+            return default(string);
         }
 #endif
 
@@ -412,37 +534,6 @@ namespace Windows.Foundation
             
             throw new FormatException(rectAsString + "is not an eligible value for Rect"); 
         }
-      
-        //// <summary>
-        //// Finds the intersection of the rectangle represented by
-        //// the current Windows.Foundation.Rect and the rectangle represented by the
-        //// specified Windows.Foundation.Rect, and stores the result as the current Windows.Foundation.Rect.
-        //// </summary>
-        //// <param name="rect">The rectangle to intersect with the current rectangle.</param>
-        //// <exclude/>
-        //public void Intersect(Rect rect)
-        //{
-        //    //todo: finish this
-
-        //    //Rect intersection = Rect.Empty;
-        //    //if (rect.X <= X && rect.Width + rect.X >= X)
-        //    //{
-        //    //    intersection.X = X;
-        //    //}
-        //    //if (rect.Y <= Y && rect.Height + rect.Y >= Y)
-        //    //{
-        //    //    intersection.Y = Y;
-        //    //}
-
-        //    //if (X <= rect.X && Width + X >= rect.X)
-        //    //{
-        //    //    intersection.X = rect.X;
-        //    //}
-        //    //if (Y <= rect.Y && Height + Y >= rect.Y)
-        //    //{
-        //    //    intersection.Y = rect.Y;
-        //    //}
-        //}
 
         /// <summary>
         /// Returns a string representation of the Windows.Foundation.Rect
@@ -456,20 +547,6 @@ namespace Windows.Foundation
         {
             return X + "," + Y + "," + Width + "," + Height;
         }
-
-        // Summary:
-        //     Returns a string representation of the rectangle by using
-        //     the specified format provider.
-        //
-        // Parameters:
-        //   provider:
-        //     Culture-specific formatting information.
-        //
-        // Returns:
-        //     A string representation of the current rectangle that is determined by the
-        //     specified format provider.
-        //public string ToString(IFormatProvider provider);
-        //todo
 
         //
         // Summary:
