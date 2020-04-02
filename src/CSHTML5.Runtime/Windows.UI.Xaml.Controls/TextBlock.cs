@@ -58,18 +58,6 @@ namespace Windows.UI.Xaml.Controls
             this.Inlines = new InlineCollection(this);
         }
 
-        protected override void OnAfterApplyHorizontalAlignmentAndWidth()
-        {
-            dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement);
-            style.display = "block";
-        }
-
-        protected override void OnAfterApplyVerticalAlignmentAndWidth()
-        {
-            dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement);
-            style.display = "block";
-        }
-
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             dynamic div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
