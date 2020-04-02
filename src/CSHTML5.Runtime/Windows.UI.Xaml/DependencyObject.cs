@@ -341,13 +341,10 @@ namespace Windows.UI.Xaml
             foreach (DependencyProperty property in INTERNAL_AllInheritedProperties.Keys)
             {
                 INTERNAL_PropertyStorage storage;
-                if (INTERNAL_PropertyStorageDictionary.Remove(property, out storage))
+                if (INTERNAL_PropertyStorageDictionary.TryGetValue(property, out storage))
                 {
                     INTERNAL_PropertyStore.ResetInheritedValue(storage);
                 }
-                //if (INTERNAL_PropertyStorageDictionary.TryGetValue(property, out storage))
-                //{
-                //}
             }
             INTERNAL_AllInheritedProperties.Clear();
         }
