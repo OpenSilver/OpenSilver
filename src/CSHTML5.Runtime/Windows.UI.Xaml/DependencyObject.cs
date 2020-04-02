@@ -344,6 +344,7 @@ namespace Windows.UI.Xaml
                 if (INTERNAL_PropertyStorageDictionary.TryGetValue(property, out storage))
                 {
                     INTERNAL_PropertyStore.ResetInheritedValue(storage);
+                    INTERNAL_PropertyStorageDictionary.Remove(property);
                 }
             }
             INTERNAL_AllInheritedProperties.Clear();
