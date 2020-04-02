@@ -44,6 +44,11 @@ namespace Windows.UI.Xaml.Controls
         object _iFrame;
         string _htmlString;
 
+        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        {
+            return true;
+        }
+
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             object outerDiv;
