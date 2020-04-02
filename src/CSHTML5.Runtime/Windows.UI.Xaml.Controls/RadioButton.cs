@@ -245,7 +245,7 @@ var radios = document.getElementsByName( $0 );
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
-            if (INTERNAL_IsTemplated)
+            if (this.HasTemplate)
             {
                 //there is a template so we need to make specific changes to make it work with the other RadioButtons
                 this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = this.INTERNAL_OuterDomElement;
