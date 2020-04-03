@@ -209,19 +209,8 @@ namespace Windows.Foundation
         /// Gets a special value that represents a rectangle with
         /// no position or area.
         /// </summary>
-        public static Rect Empty
-        {
-            get
-            {
-                Rect rect = new Rect();
-                rect.Width = double.NegativeInfinity;
-                rect.Height = double.NegativeInfinity;
-                rect.X = double.PositiveInfinity;
-                rect.Y = double.PositiveInfinity;
-                return rect;
-            }
-        }
-        
+        public static Rect Empty { get; }
+
         /// <summary>
         /// Gets or sets the height of the rectangle.
         /// </summary>
@@ -614,6 +603,13 @@ namespace Windows.Foundation
 
         static Rect()
         {
+            Empty = new Rect
+            {
+                _width = double.NegativeInfinity,
+                _height = double.NegativeInfinity,
+                _x = double.PositiveInfinity,
+                _y = double.PositiveInfinity
+            };
             TypeFromStringConverters.RegisterConverter(typeof(Rect), s => Parse(s));
         }
     }
