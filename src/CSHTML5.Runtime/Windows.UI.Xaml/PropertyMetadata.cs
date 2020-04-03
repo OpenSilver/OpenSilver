@@ -51,8 +51,12 @@ namespace Windows.UI.Xaml
                 {
                     throw new ArgumentException("Default Value may not be Unset");
                 }
-                _defaultValue = value;
-                IsDefaultValueModified = true;
+
+                if (_defaultValue != value)
+                {
+                    _defaultValue = value;
+                    IsDefaultValueModified = true; 
+                }
             }
         }
 
