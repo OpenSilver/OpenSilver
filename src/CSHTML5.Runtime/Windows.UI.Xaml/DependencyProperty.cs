@@ -155,7 +155,7 @@ namespace Windows.UI.Xaml
             {
                 if (!IsValueTypeValid(typeMetadata.DefaultValue, propertyType))
                 {
-                    string message = string.Format("Default value type does not match type of property. To fix this issue, please change the default value of the dependency property named '{0}' in the type '{1}' so that it matches the type of the property.", name, ownerType.ToString());
+                    string message = $"Default value type ({(typeMetadata.DefaultValue == null ? "null" : typeMetadata.DefaultValue.GetType().FullName)}) does not match property type ({propertyType.FullName}). To fix this issue, please change the default value of the dependency property named '{name}' in the type '{ownerType}' so that it matches the type of the property.";
                     if (Application.Current.Host.Settings.EnableInvalidPropertyMetadataDefaultValueExceptions)
                     {
                         throw new ArgumentException(message);
