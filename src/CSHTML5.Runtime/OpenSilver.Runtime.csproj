@@ -15,6 +15,9 @@
 		<DebugType>full</DebugType>
 		<DebugSymbols>true</DebugSymbols>
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
+		<EnableDefaultItems>false</EnableDefaultItems> <!-- This emluates the behavior of NET Framework, which excludes every files by default -->
+		<BlazorVersion>3.1.0-preview1.19508.20</BlazorVersion>
+		<OpenSilverVersion>1.0.0-alpha-003</OpenSilverVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
@@ -39,16 +42,15 @@
 
 	<ItemGroup>
 		<PackageReference Include="DotNetBrowser" Version="1.14.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Blazor" Version="3.1.0-preview1.19508.20" />
-		<PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="3.1.0-preview1.19508.20" PrivateAssets="all" />
-		<PackageReference Include="Microsoft.AspNetCore.Blazor.HttpClient" Version="3.1.0-preview1.19508.20" />
-		<PackageReference Include="Microsoft.AspNetCore.Blazor.DevServer" Version="3.1.0-preview1.19508.20" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.AspNetCore.Blazor" Version="$(BlazorVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="$(BlazorVersion)" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.AspNetCore.Blazor.HttpClient" Version="$(BlazorVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Blazor.DevServer" Version="$(BlazorVersion)" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="System.ServiceModel.Primitives" Version="4.7.0" />
 		<PackageReference Include="System.Text.Json" Version="4.7.0" />
 	</ItemGroup>
 	<ItemGroup>
-		<Compile Remove="**" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ChangePropertyAction.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ComparisonConditionType.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ControlStoryboardAction.cs" />
@@ -992,9 +994,6 @@
 		<Compile Include="__COMPATIBILITY__\System.xaml.dll ASSEMBLY\System.Windows.Markup\MarkupExtension.cs" />
 		<Compile Include="__COMPATIBILITY__\System.xaml.dll ASSEMBLY\System.Windows.Markup\XmlnsDefinitionAttribute.cs" />
 		<Compile Include="__SPECIFIC__\IJavaScriptExecutionHandler.cs" />
-		<Content Remove="**" />
-		<EmbeddedResource Remove="**" />
-		<None Remove="**" />
 	</ItemGroup>
 	<ItemGroup>
 		<Content Include="Themes\generic.xaml">
@@ -1091,9 +1090,9 @@
 	<!-- See ths comment on the first <Import> -->
 	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
-	<Import Project="..\packages\OpenSilver.1.0.0-alpha-002\build\OpenSilver.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' " />
-	<Import Project="..\packages\OpenSilver.WorkInProgress.1.0.0-alpha-002\build\OpenSilver.WorkInProgress.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' " />
-	<Import Project="..\packages\OpenSilver.UWPCompatible.1.0.0-alpha-002\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
-	<Import Project="..\packages\OpenSilver.UWPCompatible.1.0.0-alpha-002\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' " />
+	<Import Project="..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' " />
+	<Import Project="..\packages\OpenSilver.WorkInProgress.$(OpenSilverVersion)\build\OpenSilver.WorkInProgress.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' " />
+	<Import Project="..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
+	<Import Project="..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' " />
 	
 </Project>
