@@ -12,7 +12,7 @@
 *  
 \*====================================================================================*/
 
-
+using CSHTML5.Internal;
 #if MIGRATION
 using System.Windows.Controls;
 #else
@@ -54,8 +54,10 @@ namespace Windows.UI.Xaml.Documents
         public new static readonly DependencyProperty TextDecorationsProperty = DependencyProperty.Register("TextDecorations", 
                                                                                                             typeof(TextDecorationCollection), 
                                                                                                             typeof(Inline), 
-                                                                                                            new PropertyMetadata(System.Windows.TextDecorations.None) {
-                                                                                                                GetCSSEquivalent = Control.INTERNAL_GetCSSEquivalentForTextDecorations 
+                                                                                                            new PropertyMetadata(System.Windows.TextDecorations.None) 
+                                                                                                            {
+                                                                                                                GetCSSEquivalent = Control.INTERNAL_GetCSSEquivalentForTextDecorations,
+                                                                                                                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                                                                                                             });
 #else
                 /// <summary>
@@ -72,9 +74,22 @@ namespace Windows.UI.Xaml.Documents
         public new static readonly DependencyProperty TextDecorationsProperty =
             DependencyProperty.Register("TextDecorations", typeof(TextDecorations?), typeof(Inline), new PropertyMetadata(null)
             {
-                GetCSSEquivalent = Control.INTERNAL_GetCSSEquivalentForTextDecorations
+                GetCSSEquivalent = Control.INTERNAL_GetCSSEquivalentForTextDecorations,
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 #endif
+        
+        protected override void OnAfterApplyHorizontalAlignmentAndWidth()
+        {
+            dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement);
+            style.display = "inline";
+        }
+
+        protected override void OnAfterApplyVerticalAlignmentAndWidth()
+        {
+            dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement);
+            style.display = "inline";
+        }
     }
 }

@@ -173,7 +173,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the IsDragging dependency property.
         /// </summary>
         public static readonly DependencyProperty IsDraggingProperty =
-            DependencyProperty.Register("IsDragging", typeof(bool), typeof(Thumb), new PropertyMetadata(false));
+            DependencyProperty.Register("IsDragging", typeof(bool), typeof(Thumb), new PropertyMetadata(false)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         /// <summary>

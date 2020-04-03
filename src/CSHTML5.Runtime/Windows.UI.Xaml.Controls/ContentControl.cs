@@ -53,13 +53,10 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Content dependency property.
         /// </summary>
-        public static readonly DependencyProperty ContentProperty = DependencyProperty.Register("Content", 
-                                                                                                typeof(object), 
-                                                                                                typeof(ContentControl), 
-                                                                                                new PropertyMetadata(null, OnContentPropertyChanged) 
-                                                                                                { 
-                                                                                                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never 
-                                                                                                });
+        public static readonly DependencyProperty ContentProperty = DependencyProperty.Register("Content",
+                                                                                                typeof(object),
+                                                                                                typeof(ContentControl),
+                                                                                                new PropertyMetadata(null, OnContentPropertyChanged));
 
         /// <summary>
         /// Gets or sets the data template that is used to display the content of the
@@ -73,13 +70,10 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the ContentTemplate dependency property.
         /// </summary>
-        public static readonly DependencyProperty ContentTemplateProperty = DependencyProperty.Register("ContentTemplate", 
-                                                                                                        typeof(DataTemplate), 
-                                                                                                        typeof(ContentControl), 
-                                                                                                        new PropertyMetadata(null, OnContentTemplatePropertyChanged) 
-                                                                                                        { 
-                                                                                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never 
-                                                                                                        });
+        public static readonly DependencyProperty ContentTemplateProperty = DependencyProperty.Register("ContentTemplate",
+                                                                                                        typeof(DataTemplate),
+                                                                                                        typeof(ContentControl),
+                                                                                                        new PropertyMetadata(null, OnContentTemplatePropertyChanged));
         #endregion
 
         #region Public Methods
@@ -109,6 +103,7 @@ namespace Windows.UI.Xaml.Controls
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
+            base.INTERNAL_OnAttachedToVisualTree();
             if (this.HasTemplate)
             {
                 return;
@@ -147,7 +142,11 @@ namespace Windows.UI.Xaml.Controls
             UIElement newChildAsUIElement = newChild as UIElement;
             if(newChildAsUIElement != null)
             {
+#if REWORKLOADED
+                this.AddVisualChild(newChildAsUIElement);
+#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChildAsUIElement, this);
+#endif
                 this.Child = newChildAsUIElement;
             }
             else
@@ -191,6 +190,6 @@ namespace Windows.UI.Xaml.Controls
             }
             contentControl.ApplyContentTemplate((DataTemplate)e.NewValue);
         }
-        #endregion
+#endregion
     }
 }

@@ -65,7 +65,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the IsClosed dependency property.
         /// </summary>
         public static readonly DependencyProperty IsClosedProperty =
-            DependencyProperty.Register("IsClosed", typeof(bool), typeof(PathFigure), new PropertyMetadata(false, IsClosed_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("IsClosed", typeof(bool), typeof(PathFigure), new PropertyMetadata(false, IsClosed_Changed));
 
         private static void IsClosed_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -89,7 +89,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the IsFilled dependency property.
         /// </summary>
         public static readonly DependencyProperty IsFilledProperty =
-            DependencyProperty.Register("IsFilled", typeof(bool), typeof(PathFigure), new PropertyMetadata(false, IsFilled_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("IsFilled", typeof(bool), typeof(PathFigure), new PropertyMetadata(false, IsFilled_Changed));
 
         private static void IsFilled_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -123,7 +123,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the Segments dependency property.
         /// </summary>
         public static readonly DependencyProperty SegmentsProperty =
-            DependencyProperty.Register("Segments", typeof(PathSegmentCollection), typeof(PathFigure), new PropertyMetadata(null, Segments_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("Segments", typeof(PathSegmentCollection), typeof(PathFigure), new PropertyMetadata(null, Segments_Changed));
 
         private static void Segments_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -157,7 +157,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the StartPoint dependency property.
         /// </summary>
         public static readonly DependencyProperty StartPointProperty =
-            DependencyProperty.Register("StartPoint", typeof(Point), typeof(PathFigure), new PropertyMetadata(new Point(), StartPoint_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("StartPoint", typeof(Point), typeof(PathFigure), new PropertyMetadata(new Point(), StartPoint_Changed));
 
         private static void StartPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

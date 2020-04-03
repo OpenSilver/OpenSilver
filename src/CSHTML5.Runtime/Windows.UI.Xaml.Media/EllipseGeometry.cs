@@ -51,7 +51,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the Center dependency property.
         /// </summary>
         public static readonly DependencyProperty CenterProperty =
-            DependencyProperty.Register("Center", typeof(Point), typeof(EllipseGeometry), new PropertyMetadata(new Point(), Point_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("Center", typeof(Point), typeof(EllipseGeometry), new PropertyMetadata(new Point(), Point_Changed));
 
         private static void Point_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -74,7 +74,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the RadiusX dependency property.
         /// </summary>
         public static readonly DependencyProperty RadiusXProperty =
-            DependencyProperty.Register("RadiusX", typeof(double), typeof(EllipseGeometry), new PropertyMetadata(0d, RadiusX_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("RadiusX", typeof(double), typeof(EllipseGeometry), new PropertyMetadata(0d, RadiusX_Changed));
 
         private static void RadiusX_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -99,7 +99,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the RadiusY dependency property.
         /// </summary>
         public static readonly DependencyProperty RadiusYProperty =
-            DependencyProperty.Register("RadiusY", typeof(double), typeof(EllipseGeometry), new PropertyMetadata(0d, RadiusY_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("RadiusY", typeof(double), typeof(EllipseGeometry), new PropertyMetadata(0d, RadiusY_Changed));
 
         private static void RadiusY_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

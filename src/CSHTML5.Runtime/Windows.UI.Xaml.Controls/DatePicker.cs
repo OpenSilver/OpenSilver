@@ -105,7 +105,8 @@ namespace Windows.UI.Xaml.Controls
             "SelectedDate",
             typeof(DateTime?),
             typeof(DatePicker),
-            new PropertyMetadata(OnSelectedDateChanged));
+            new PropertyMetadata(OnSelectedDateChanged)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// SelectedDateProperty property changed handler.

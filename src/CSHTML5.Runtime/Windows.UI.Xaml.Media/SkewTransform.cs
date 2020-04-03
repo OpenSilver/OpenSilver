@@ -70,7 +70,8 @@ namespace Windows.UI.Xaml.Media
                         };
                     }
                     return null;
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             });
 
 
@@ -108,7 +109,8 @@ namespace Windows.UI.Xaml.Media
                         };
                     }
                     return null;
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             });
 
         private void ApplyCSSChanges(SkewTransform skewTransform, double angleX, double angleY)

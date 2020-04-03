@@ -138,7 +138,8 @@ namespace Windows.UI.Xaml.Controls
                 "SelectedItem",
                 typeof(object),
                 typeof(TabControl),
-                new PropertyMetadata(null, OnSelectedItemChanged));
+                new PropertyMetadata(null, OnSelectedItemChanged)
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// SelectedItem property changed handler.
@@ -192,7 +193,8 @@ namespace Windows.UI.Xaml.Controls
                 "SelectedIndex",
                 typeof(int),
                 typeof(TabControl),
-                new PropertyMetadata(-1, OnSelectedIndexChanged));
+                new PropertyMetadata(-1, OnSelectedIndexChanged)
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// SelectedIndex property changed handler.
@@ -310,7 +312,8 @@ namespace Windows.UI.Xaml.Controls
                 "SelectedContent",
                 typeof(object),
                 typeof(TabControl),
-                new PropertyMetadata(null, OnSelectedContentChanged));
+                new PropertyMetadata(null, OnSelectedContentChanged)
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// SelectedContent property changed handler.

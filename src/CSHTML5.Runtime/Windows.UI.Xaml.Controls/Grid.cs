@@ -296,7 +296,11 @@ namespace Windows.UI.Xaml.Controls
                     //todo-perf: when adding the columns and rows of the Grid, we currently remove and add back all the children many times.
                     foreach (UIElement child in Children)
                     {
+#if REWORKLOADED
+                        this.AddVisualChild(child);
+#else
                         INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
+#endif
                     }
                 }
             }
@@ -788,7 +792,11 @@ namespace Windows.UI.Xaml.Controls
                         {
                             // Note: we do this for all items (regardless of whether they are in the oldChildren collection or not) to make it work when the item is first added to the Visual Tree (at that moment, all the properties are refreshed by calling their "Changed" method).
                             UpdateStructureWhenAddingChild(child);
+#if REWORKLOADED
+                            this.AddVisualChild(child);
+#else
                             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
+#endif
                         }
                     }
                     this.LocallyManageChildrenChanged();
@@ -926,7 +934,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Grid.Row XAML attached property.
         /// </summary>
         public static readonly DependencyProperty RowProperty =
-            DependencyProperty.RegisterAttached("Row", typeof(int), typeof(UIElement), new PropertyMetadata(0, Row_Changed));
+            DependencyProperty.RegisterAttached("Row", typeof(int), typeof(UIElement), new PropertyMetadata(0, Row_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void Row_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -967,7 +976,8 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty RowSpanProperty =
-            DependencyProperty.RegisterAttached("RowSpan", typeof(int), typeof(UIElement), new PropertyMetadata(1, RowSpan_Changed));
+            DependencyProperty.RegisterAttached("RowSpan", typeof(int), typeof(UIElement), new PropertyMetadata(1, RowSpan_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void RowSpan_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1021,7 +1031,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Grid.Column XAML attached property
         /// </summary>
         public static readonly DependencyProperty ColumnProperty =
-            DependencyProperty.RegisterAttached("Column", typeof(int), typeof(UIElement), new PropertyMetadata(0, Column_Changed));
+            DependencyProperty.RegisterAttached("Column", typeof(int), typeof(UIElement), new PropertyMetadata(0, Column_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void Column_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1062,7 +1073,8 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty ColumnSpanProperty =
-            DependencyProperty.RegisterAttached("ColumnSpan", typeof(int), typeof(UIElement), new PropertyMetadata(1, ColumnSpan_Changed));
+            DependencyProperty.RegisterAttached("ColumnSpan", typeof(int), typeof(UIElement), new PropertyMetadata(1, ColumnSpan_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void ColumnSpan_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

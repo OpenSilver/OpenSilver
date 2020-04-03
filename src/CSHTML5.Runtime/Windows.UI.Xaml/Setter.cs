@@ -74,7 +74,8 @@ namespace Windows.UI.Xaml
 
         // Using a DependencyProperty as the backing store for Value.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register("Value", typeof(object), typeof(Setter), new PropertyMetadata(null, Value_Changed));
+            DependencyProperty.Register("Value", typeof(object), typeof(Setter), new PropertyMetadata(null, Value_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void Value_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

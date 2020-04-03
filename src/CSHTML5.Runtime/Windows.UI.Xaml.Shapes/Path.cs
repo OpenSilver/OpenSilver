@@ -85,7 +85,7 @@ namespace Windows.UI.Xaml.Shapes
         /// Identifies the Data dependency property.
         /// </summary>
         public static readonly DependencyProperty DataProperty =
-            DependencyProperty.Register("Data", typeof(Geometry), typeof(Path), new PropertyMetadata(null, Data_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("Data", typeof(Geometry), typeof(Path), new PropertyMetadata(null, Data_Changed));
 
         private static void Data_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

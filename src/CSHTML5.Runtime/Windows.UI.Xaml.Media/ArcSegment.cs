@@ -60,7 +60,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the IsLargeArc dependency property.
         /// </summary>
         public static readonly DependencyProperty IsLargeArcProperty =
-            DependencyProperty.Register("IsLargeArc", typeof(bool), typeof(ArcSegment), new PropertyMetadata(false, IsLargeArc_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("IsLargeArc", typeof(bool), typeof(ArcSegment), new PropertyMetadata(false, IsLargeArc_Changed));
 
         private static void IsLargeArc_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -90,7 +90,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the Point dependency property.
         /// </summary>
         public static readonly DependencyProperty PointProperty =
-            DependencyProperty.Register("Point", typeof(Point), typeof(ArcSegment), new PropertyMetadata(new Point(), Point_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("Point", typeof(Point), typeof(ArcSegment), new PropertyMetadata(new Point(), Point_Changed));
 
         private static void Point_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -119,7 +119,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the RotationAngle dependency property.
         /// </summary>
         public static readonly DependencyProperty RotationAngleProperty =
-            DependencyProperty.Register("RotationAngle", typeof(double), typeof(ArcSegment), new PropertyMetadata(0d, RotationAngle_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("RotationAngle", typeof(double), typeof(ArcSegment), new PropertyMetadata(0d, RotationAngle_Changed));
 
         private static void RotationAngle_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -151,7 +151,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the Size dependency property.
         /// </summary>
         public static readonly DependencyProperty SizeProperty =
-            DependencyProperty.Register("Size", typeof(Size), typeof(ArcSegment), new PropertyMetadata(new Size(), Size_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("Size", typeof(Size), typeof(ArcSegment), new PropertyMetadata(new Size(), Size_Changed));
 
         private static void Size_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -180,7 +180,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the SweepDirection dependency property.
         /// </summary>
         public static readonly DependencyProperty SweepDirectionProperty =
-            DependencyProperty.Register("SweepDirection", typeof(SweepDirection), typeof(ArcSegment), new PropertyMetadata(SweepDirection.Counterclockwise, SweepDirection_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("SweepDirection", typeof(SweepDirection), typeof(ArcSegment), new PropertyMetadata(SweepDirection.Counterclockwise, SweepDirection_Changed));
 
         private static void SweepDirection_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

@@ -60,7 +60,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// The name of the ExpanderButton template part.
         /// </summary>
-        private string[] TextAreaContainerNames = { "ContentElement", "PART_ContentHost" };
+        private readonly string[] TextAreaContainerNames = { "ContentElement", "PART_ContentHost" };
         //                                                  Sl & UWP                WPF
 
         //static TextBox()
@@ -96,6 +96,11 @@ namespace Windows.UI.Xaml.Controls
             UseSystemFocusVisuals = true;
         }
 
+        internal sealed override bool INTERNAL_GetFocusInBrowser
+        {
+            get { return true; }
+        }
+
         #region AcceptsReturn
 
         /// <summary>
@@ -111,7 +116,9 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the AcceptsReturn dependency property.
         /// </summary>
         public static readonly DependencyProperty AcceptsReturnProperty =
-            DependencyProperty.Register("AcceptsReturn", typeof(bool), typeof(TextBox), new PropertyMetadata(false, AcceptsReturn_Changed));
+            DependencyProperty.Register("AcceptsReturn", typeof(bool), typeof(TextBox), new PropertyMetadata(false, AcceptsReturn_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+
         private static void AcceptsReturn_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var textBox = (TextBox)d;
@@ -150,7 +157,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
         /// Identifies the PlaceholderText dependency property.
         /// </summary>
         public static readonly DependencyProperty PlaceholderTextProperty =
-            DependencyProperty.Register("PlaceholderText", typeof(string), typeof(TextBox), new PropertyMetadata(string.Empty) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("PlaceholderText", typeof(string), typeof(TextBox), new PropertyMetadata(string.Empty));
 
         #endregion
 
@@ -168,17 +175,36 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
         /// Identifies the Text dependency property.
         /// </summary>
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof(string), typeof(TextBox), new PropertyMetadata(string.Empty, Text_Changed) { CoerceValueCallback = CoerceText });
+            DependencyProperty.Register("Text", typeof(string), typeof(TextBox), new PropertyMetadata(string.Empty, Text_Changed, CoerceText) { MethodToUpdateDom = UpdateDomText });
         static void Text_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var textBox = (TextBox)d;
             if (!textBox._isUserChangingText)
             {
-                textBox._isCodeProgrammaticallyChangingText = true; // So that when the c# caller sets the text programmatically, it does not get set multiple times.
-                string newText = e.NewValue as string ?? string.Empty;
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(textBox) && textBox._contentEditableDiv != null)
-                    INTERNAL_HtmlDomManager.SetContentString(textBox, newText);
-                textBox._isCodeProgrammaticallyChangingText = false;
+                //textBox._isCodeProgrammaticallyChangingText = true; // So that when the c# caller sets the text programmatically, it does not get set multiple times.
+                //string newText = e.NewValue as string ?? string.Empty;
+                //if (INTERNAL_VisualTreeManager.IsElementInVisualTree(textBox) && textBox._contentEditableDiv != null)
+                //{
+                //INTERNAL_HtmlDomManager.SetContentString(textBox, newText);
+                textBox.OnTextChanged(new TextChangedEventArgs() { OriginalSource = textBox });
+                //}
+                //textBox._isCodeProgrammaticallyChangingText = false;
+            }
+        }
+
+        private static void UpdateDomText(DependencyObject d, object newValue)
+        {
+            var textBox = (TextBox)d;
+            if (!textBox._isUserChangingText)
+            {
+                string displayedText = INTERNAL_HtmlDomManager.GetTextBoxText(textBox.INTERNAL_InnerDomElement);
+                string text = textBox.Text ?? string.Empty;
+                if (displayedText != text)
+                {
+                    textBox._isCodeProgrammaticallyChangingText = true;
+                    INTERNAL_HtmlDomManager.SetContentString(textBox, text);
+                    textBox._isCodeProgrammaticallyChangingText = false;
+                }
             }
         }
 
@@ -219,7 +245,8 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
         /// Identifies the TextAlignment dependency property.
         /// </summary>
         public static readonly DependencyProperty TextAlignmentProperty =
-            DependencyProperty.Register("TextAlignment", typeof(TextAlignment), typeof(TextBox), new PropertyMetadata(TextAlignment.Left) { MethodToUpdateDom = TextAlignment_MethodToUpdateDom });
+            DependencyProperty.Register("TextAlignment", typeof(TextAlignment), typeof(TextBox), new PropertyMetadata(TextAlignment.Left) { MethodToUpdateDom = TextAlignment_MethodToUpdateDom,
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void TextAlignment_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -299,7 +326,8 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                         Name = new List<String> { "caretColor", "colorAlpha" },
                         ApplyAlsoWhenThereIsAControlTemplate = false,
                     };
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             });
         #endregion
 
@@ -366,7 +394,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             _contentEditableDiv = contentEditableDiv;
             contentEditableDivStyle.width = "100%";
             contentEditableDivStyle.height = "100%";
-            contentEditableDivStyle.whiteSpace = "normal"; // Because by default we have decided to make the TextBox wrap, because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
+            contentEditableDivStyle.whiteSpace = "pre-wrap"; // Because by default we have decided to make the TextBox wrap, because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
             contentEditableDivStyle.overflowX = "hidden"; // Note: this is because the default HorizontalScrollBarVisibility in "Hidden"
             contentEditableDivStyle.overflowY = "hidden"; // Note: this is because the default VerticalScrollBarVisibility in "Hidden"
             if (isTemplated) //When templated, we remove the outlining that apears when the element has the focus:
@@ -1040,7 +1068,8 @@ return globalIndexes;
             DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBox), new PropertyMetadata(
                 TextWrapping.Wrap) // Note: we have made "Wrap" the default value because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
             {
-                MethodToUpdateDom = TextWrapping_MethodToUpdateDom
+                MethodToUpdateDom = TextWrapping_MethodToUpdateDom,
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             });
 
         static void TextWrapping_MethodToUpdateDom(DependencyObject d, object newValue)
@@ -1100,7 +1129,8 @@ return globalIndexes;
             DependencyProperty.Register("HorizontalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(TextBox), new PropertyMetadata(
                 ScrollBarVisibility.Hidden)
             {
-                MethodToUpdateDom = HorizontalScrollBarVisibility_MethodToUpdateDom
+                MethodToUpdateDom = HorizontalScrollBarVisibility_MethodToUpdateDom,
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             });
 
         static void HorizontalScrollBarVisibility_MethodToUpdateDom(DependencyObject d, object newValue)
@@ -1151,7 +1181,8 @@ return globalIndexes;
             DependencyProperty.Register("VerticalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(TextBox), new PropertyMetadata(
                 ScrollBarVisibility.Hidden)
             {
-                MethodToUpdateDom = VerticalScrollBarVisibility_MethodToUpdateDom
+                MethodToUpdateDom = VerticalScrollBarVisibility_MethodToUpdateDom,
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             });
 
         static void VerticalScrollBarVisibility_MethodToUpdateDom(DependencyObject d, object newValue)
@@ -1199,7 +1230,8 @@ return globalIndexes;
         /// Identifies the MaxLength dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxLengthProperty =
-            DependencyProperty.Register("MaxLength", typeof(int), typeof(TextBox), new PropertyMetadata(0, MaxLength_Changed));
+            DependencyProperty.Register("MaxLength", typeof(int), typeof(TextBox), new PropertyMetadata(0, MaxLength_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         //Note: Setting MaxLength only keeps the user from typing any more characters when the count is reached. It does NOT remove any character that are already typed in.
         //      It also does NOT keep the text from being programmatically changed (so you can programmatically set the Text property to a longer text than normally authorized).
         //      if acceptsReturn is true, the new lines count as 2 characters.
@@ -1242,7 +1274,11 @@ element.setAttribute(""data-maxlength"", ""{1}"");
         public new static readonly DependencyProperty TextDecorationsProperty = DependencyProperty.Register("TextDecorations",
                                                                                                         typeof(TextDecorationCollection),
                                                                                                         typeof(TextBox),
-                                                                                                        new PropertyMetadata(null) { MethodToUpdateDom = TextDecorations_MethodToUpdateDom });
+                                                                                                        new PropertyMetadata(null) 
+                                                                                                        { 
+                                                                                                            MethodToUpdateDom = TextDecorations_MethodToUpdateDom,
+                                                                                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                                                                                                        });
 
         static void TextDecorations_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -1281,7 +1317,8 @@ element.setAttribute(""data-maxlength"", ""{1}"");
         /// Identifies the TextDecorations dependency property.
         /// </summary>
         public new static readonly DependencyProperty TextDecorationsProperty =
-            DependencyProperty.Register("TextDecorations", typeof(TextDecorations?), typeof(TextBox), new PropertyMetadata(null) { MethodToUpdateDom = TextDecorations_MethodToUpdateDom });
+            DependencyProperty.Register("TextDecorations", typeof(TextDecorations?), typeof(TextBox), new PropertyMetadata(null) { MethodToUpdateDom = TextDecorations_MethodToUpdateDom,
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void TextDecorations_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -1388,7 +1425,8 @@ element.setAttribute(""data-maxlength"", ""{1}"");
 
         // Using a DependencyProperty as the backing store for IsReadOnly.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsReadOnlyProperty =
-            DependencyProperty.Register("IsReadOnly", typeof(bool), typeof(TextBox), new PropertyMetadata(false, IsReadOnly_changed));
+            DependencyProperty.Register("IsReadOnly", typeof(bool), typeof(TextBox), new PropertyMetadata(false, IsReadOnly_changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void IsReadOnly_changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

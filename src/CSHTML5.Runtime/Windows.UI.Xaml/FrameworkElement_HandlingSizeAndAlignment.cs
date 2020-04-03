@@ -123,7 +123,8 @@ namespace Windows.UI.Xaml
                         Name = new List<string> { "height" },
                         ApplyAlsoWhenThereIsAControlTemplate = true
                     };
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             });
 
         private static void Height_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -210,7 +211,8 @@ namespace Windows.UI.Xaml
                         Name = new List<string> { "width" },
                         ApplyAlsoWhenThereIsAControlTemplate = true
                     };
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             });
         internal static void Width_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1060,7 +1062,11 @@ if ($0.tagName.toLowerCase() != 'span')
         /// Identifies the Margin dependency property.
         /// </summary>
         public static readonly DependencyProperty MarginProperty =
-            DependencyProperty.Register("Margin", typeof(Thickness), typeof(FrameworkElement), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = Margin_MethodToUpdateDom });
+            DependencyProperty.Register("Margin", typeof(Thickness), typeof(FrameworkElement), new PropertyMetadata(new Thickness())
+            {
+                MethodToUpdateDom = Margin_MethodToUpdateDom,
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+            });
 
         internal static void Margin_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -1185,7 +1191,8 @@ if ($0.tagName.toLowerCase() != 'span')
         /// Identifies the MinHeight dependency property.
         /// </summary>
         public static readonly DependencyProperty MinHeightProperty =
-            DependencyProperty.Register("MinHeight", typeof(double), typeof(FrameworkElement), new PropertyMetadata(0d, MinHeight_Changed));
+            DependencyProperty.Register("MinHeight", typeof(double), typeof(FrameworkElement), new PropertyMetadata(0d, MinHeight_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void MinHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1221,7 +1228,8 @@ if ($0.tagName.toLowerCase() != 'span')
         /// Identifies the MinWidth dependency property.
         /// </summary>
         public static readonly DependencyProperty MinWidthProperty =
-            DependencyProperty.Register("MinWidth", typeof(double), typeof(FrameworkElement), new PropertyMetadata(0d, MinWidth_Changed));
+            DependencyProperty.Register("MinWidth", typeof(double), typeof(FrameworkElement), new PropertyMetadata(0d, MinWidth_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void MinWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1254,7 +1262,8 @@ if ($0.tagName.toLowerCase() != 'span')
         /// Identifies the MaxHeight dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxHeightProperty =
-            DependencyProperty.Register("MaxHeight", typeof(double), typeof(FrameworkElement), new PropertyMetadata(double.PositiveInfinity, MaxHeight_Changed));
+            DependencyProperty.Register("MaxHeight", typeof(double), typeof(FrameworkElement), new PropertyMetadata(double.PositiveInfinity, MaxHeight_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void MaxHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1290,7 +1299,8 @@ if ($0.tagName.toLowerCase() != 'span')
         /// Identifies the MaxWidth dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxWidthProperty =
-            DependencyProperty.Register("MaxWidth", typeof(double), typeof(FrameworkElement), new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed));
+            DependencyProperty.Register("MaxWidth", typeof(double), typeof(FrameworkElement), new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void MaxWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1436,71 +1446,30 @@ if ($0.tagName.toLowerCase() != 'span')
 
         #region SizeChanged
 
-        // In the current implementation, we listed to the Window "SizeChanged" event, and raise the FrameworkElement SizeChanged event if the size of the FrameworkElement has changed since the last time that the event was raised.
-        List<SizeChangedEventHandler> _sizeChangedEventHandlers;
-        bool _isListeningToWindowSizeChangedEvent = false;
-        Size _valueOfLastSizeChanged = new Size(double.NaN, double.NaN);
+        Size _valueOfLastSizeChanged = Size.Empty;
+        private List<SizeChangedEventHandler> _sizeChangedEventHandlers;
+        private object _resizeSensor;
 
-        /// <summary>
-        /// Occurs when either the ActualHeight or the ActualWidth property changes value on a FrameworkElement.
-        /// </summary>
-        public event SizeChangedEventHandler SizeChanged
+        private void HandleSizeChanged()
         {
-            add
-            {
-                if (_sizeChangedEventHandlers == null)
-                    _sizeChangedEventHandlers = new List<SizeChangedEventHandler>();
-
-                _sizeChangedEventHandlers.Add(value);
-
-                // In the current implementation, we listen to the Window "SizeChanged" event, and raise the FrameworkElement SizeChanged event if the size of the FrameworkElement has changed since the last time that the event was raised.
-                if (!_isListeningToWindowSizeChangedEvent)
-                {
-                    Window.Current.SizeChanged += Window_SizeChanged;
-                    _isListeningToWindowSizeChangedEvent = true;
-                }
-            }
-            remove
-            {
-                if (_sizeChangedEventHandlers != null)
-                {
-                    _sizeChangedEventHandlers.Remove(value);
-
-                    // Stop listening to the Window SizeChanged event (read note above):
-                    if (_sizeChangedEventHandlers.Count == 0 && _isListeningToWindowSizeChangedEvent)
-                    {
-                        Window.Current.SizeChanged -= Window_SizeChanged;
-                        _isListeningToWindowSizeChangedEvent = false;
-                    }
-                }
-            }
-        }
-
-        void Window_SizeChanged(object sender, WindowSizeChangedEventArgs e)
-        {
-            // See the comment in "HandleSizeChanged".
-
-            HandleSizeChanged();
-        }
-
-        void HandleSizeChanged()
-        {
-            if (_sizeChangedEventHandlers != null
-                && _sizeChangedEventHandlers.Count > 0
-                && INTERNAL_VisualTreeManager.IsElementInVisualTree(this)
-                && this._isLoaded)
+            if (this._sizeChangedEventHandlers != null
+               && this._sizeChangedEventHandlers.Count > 0
+               && INTERNAL_VisualTreeManager.IsElementInVisualTree(this)
+               && this._isLoaded)
             {
                 // In the current implementation, we raise the SizeChanged event only if the size has changed since the last time that we were supposed to raise the event:
 
-                var currentSize = this.INTERNAL_GetActualWidthAndHeight();
+                Size currentSize = this.INTERNAL_GetActualWidthAndHeight();
 
-                if (!INTERNAL_SizeComparisonHelpers.AreSizesEqual(currentSize, _valueOfLastSizeChanged))
+                if (!Size.Equals(this._valueOfLastSizeChanged, currentSize))
                 {
-                    _valueOfLastSizeChanged = currentSize;
+                    this._valueOfLastSizeChanged = currentSize;
 
                     // Raise the "SizeChanged" event of all the listeners:
-                    foreach (var sizeChangedEventHandler in _sizeChangedEventHandlers)
+                    foreach (var sizeChangedEventHandler in this._sizeChangedEventHandlers)
+                    {
                         sizeChangedEventHandler(this, new SizeChangedEventArgs(currentSize));
+                    }
                 }
             }
         }
@@ -1508,12 +1477,42 @@ if ($0.tagName.toLowerCase() != 'span')
         internal void INTERNAL_SizeChangedWhenAttachedToVisualTree() // Intended to be called by the "VisualTreeManager" when the FrameworkElement is attached to the visual tree.
         {
             // We reset the previous size value so that the SizeChanged event can be called (see the comment in "HandleSizeChanged"):
-            _valueOfLastSizeChanged = new Size(double.NaN, double.NaN);
+            _valueOfLastSizeChanged = Size.Empty;
             HandleSizeChanged();
         }
 
-        #endregion
+        public event SizeChangedEventHandler SizeChanged
+        {
+            add
+            {
+                if (this._sizeChangedEventHandlers == null)
+                {
+                    this._sizeChangedEventHandlers = new List<SizeChangedEventHandler>();
+                }
+                if (this._sizeChangedEventHandlers.Count == 0 && this.INTERNAL_OuterDomElement != null)
+                {
+                    CSHTML5.Interop.ExecuteJavaScript(@"$0 = new ResizeSensor($1, $2)", this._resizeSensor, this.INTERNAL_OuterDomElement, (Action)this.HandleSizeChanged);
+                }
+                this._sizeChangedEventHandlers.Add(value);
+            }
+            remove
+            {
+                if (this._sizeChangedEventHandlers == null)
+                {
+                    return;
+                }
 
+                if (this._sizeChangedEventHandlers.Remove(value))
+                {
+                    if (this._sizeChangedEventHandlers.Count == 0 && this._resizeSensor != null)
+                    {
+                        CSHTML5.Interop.ExecuteJavaScript("$0.detach($1)", this._resizeSensor, this.INTERNAL_OuterDomElement);
+                    }
+                }
+            }
+        }
+        
+        #endregion
 
         #region ContextMenu
 
@@ -1534,8 +1533,9 @@ if ($0.tagName.toLowerCase() != 'span')
         /// Identifies the ContextMenu dependency property.
         /// </summary>
         public static readonly DependencyProperty ContextMenuProperty =
-            DependencyProperty.Register("ContextMenu", typeof(ContextMenu), typeof(FrameworkElement), new PropertyMetadata(null, ContextMenu_Changed));
-        
+            DependencyProperty.Register("ContextMenu", typeof(ContextMenu), typeof(FrameworkElement), new PropertyMetadata(null, ContextMenu_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+
         private static void ContextMenu_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var frameworkElement = (FrameworkElement)d;

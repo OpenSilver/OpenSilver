@@ -35,7 +35,7 @@ namespace System.Windows.Interactivity
         /// attached property.
         /// </summary>
         public static readonly DependencyProperty BehaviorsProperty =
-            DependencyProperty.RegisterAttached("Behaviors", typeof(BehaviorCollection), typeof(Interaction), new PropertyMetadata(null));
+            DependencyProperty.RegisterAttached("Behaviors", typeof(BehaviorCollection), typeof(Interaction), new PropertyMetadata(null) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Gets the System.Windows.Interactivity.BehaviorCollection associated with
@@ -62,7 +62,8 @@ namespace System.Windows.Interactivity
         /// This property is used as the internal backing store for the public Triggers attached property.
         /// </summary>
         public static readonly DependencyProperty TriggersProperty =
-            DependencyProperty.RegisterAttached("Triggers", typeof(TriggerCollection), typeof(Interaction), new PropertyMetadata(null, new PropertyChangedCallback(Interaction.OnTriggersChanged)));
+            DependencyProperty.RegisterAttached("Triggers", typeof(TriggerCollection), typeof(Interaction), new PropertyMetadata(null, new PropertyChangedCallback(Interaction.OnTriggersChanged))
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Gets the TriggerCollection containing the triggers associated with the specified object.

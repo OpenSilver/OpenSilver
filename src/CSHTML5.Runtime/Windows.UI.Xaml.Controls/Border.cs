@@ -88,7 +88,11 @@ namespace Windows.UI.Xaml.Controls
                 if (this._isLoaded)
                 {
                     INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
+#if REWORKLOADED
+                    this.AddVisualChild(value);
+#else
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
+#endif
                 }
                 _child = value;
             }
@@ -96,7 +100,16 @@ namespace Windows.UI.Xaml.Controls
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
+            if (this.BorderBrush == null)
+            {
+                INTERNAL_PropertyStore.ApplyCssChanges(null, null, Border.BorderBrushProperty.GetMetadata(typeof(Border)), this);
+            }
+
+#if REWORKLOADED
+            this.AddVisualChild(this._child);
+#else
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
+#endif
         }
 
 
@@ -124,7 +137,8 @@ namespace Windows.UI.Xaml.Controls
                     {
                         Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
                     };
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 
@@ -153,9 +167,21 @@ namespace Windows.UI.Xaml.Controls
                 {
                     return new CSSEquivalent()
                     {
+                        Value = (inst, value) =>
+                        {
+                            if (value == null)
+                            {
+                                return "transparent";
+                            }
+                            else
+                            {
+                                return value;
+                            }
+                        },
                         Name = new List<string> { "borderColor" },
                     };
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 
@@ -171,7 +197,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the BorderThickness dependency property.
         /// </summary>
         public static readonly DependencyProperty BorderThicknessProperty =
-            DependencyProperty.Register("BorderThickness", typeof(Thickness), typeof(Border), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = BorderThickness_MethodToUpdateDom });
+            DependencyProperty.Register("BorderThickness", typeof(Thickness), typeof(Border), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = BorderThickness_MethodToUpdateDom,
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void BorderThickness_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -203,7 +230,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the CornerRadius dependency property.
         /// </summary>
         public static readonly DependencyProperty CornerRadiusProperty =
-            DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(Border), new PropertyMetadata(new CornerRadius()) { MethodToUpdateDom = CornerRadius_MethodToUpdateDom });
+            DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(Border), new PropertyMetadata(new CornerRadius()) { MethodToUpdateDom = CornerRadius_MethodToUpdateDom,
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void CornerRadius_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -233,7 +261,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Padding dependency property.
         /// </summary>
         public static readonly DependencyProperty PaddingProperty =
-            DependencyProperty.Register("Padding", typeof(Thickness), typeof(Border), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = Padding_MethodToUpdateDom });
+            DependencyProperty.Register("Padding", typeof(Thickness), typeof(Border), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = Padding_MethodToUpdateDom, 
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet  });
 
         private static void Padding_MethodToUpdateDom(DependencyObject d, object newValue)
         {

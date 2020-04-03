@@ -50,42 +50,23 @@ namespace Windows.UI.Xaml.Controls
     [ContentProperty("Inlines")]
     public partial class TextBlock : Control //todo: this is supposed to inherit from FrameworkElement but Control has the implementations of FontSize, FontWeight, Foreground, etc. Maybe use an intermediate class between FrameworkElement and Control or add the implementation here too.
     {
-        private readonly InlineCollection _inlines;
         private bool _isTextChanging;
 
         public TextBlock()
         {
             this.IsTabStop = false; //we want to avoid stopping on this element's div when pressing tab.
-            this._inlines = new InlineCollection(this);
+            this.Inlines = new InlineCollection(this);
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            object outerDiv;
-            object middleDiv;
-            object childrenContainerDiv;
-            dynamic outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
-            dynamic middleDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out middleDiv);
-            dynamic childrenContainerDivDtyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", middleDiv, this, out childrenContainerDiv);
-            if (TextWrapping == TextWrapping.NoWrap)
-            {
-                outerDivStyle.whiteSpace = "pre"; //nowrap + preserve whitespaces
-            }
-            else //so that we are sure that it will behave the same on all browsers
-            {
-                outerDivStyle.whiteSpace = "pre-wrap"; //wrap and preserve whitespaces
-            }
-            outerDivStyle.overflow = "hidden"; //keeps the text from overflowing despite the TextBlock's size limitations.
-            outerDivStyle.textAlign = "left"; // this is the default value.
-            middleDivStyle.width = "inherit";
-            middleDivStyle.height = "inherit";
-            childrenContainerDivDtyle.width = "inherit";
-            childrenContainerDivDtyle.height = "inherit";
-            childrenContainerDivDtyle.overflowX = "hidden";
-            childrenContainerDivDtyle.overflowY = "hidden";
-            domElementWhereToPlaceChildren = childrenContainerDiv;
-
-            return outerDiv;
+            dynamic div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            dynamic divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+            divStyle.whiteSpace = TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap";
+            divStyle.overflow = "hidden"; //keeps the text from overflowing despite the TextBlock's size limitations.
+            divStyle.textAlign = "left"; // this is the default value.
+            domElementWhereToPlaceChildren = div;
+            return div;
         }
 
         /// <summary>
@@ -100,7 +81,10 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Text dependency property.
         /// </summary>
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(TextBlock), new PropertyMetadata(string.Empty, OnTextPropertyChanged) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text",
+                                                                                             typeof(string),
+                                                                                             typeof(TextBlock),
+                                                                                             new PropertyMetadata(string.Empty, OnTextPropertyChanged));
 
         private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -138,22 +122,19 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the TextAlignment dependency property.
         /// </summary>
-        public static readonly DependencyProperty TextAlignmentProperty =
-            DependencyProperty.Register("TextAlignment", typeof(TextAlignment), typeof(TextBlock), new PropertyMetadata(TextAlignment.Left) { MethodToUpdateDom = TextAlignment_MethodToUpdateDom });
+        public static readonly DependencyProperty TextAlignmentProperty = DependencyProperty.Register("TextAlignment", 
+                                                                                                      typeof(TextAlignment), 
+                                                                                                      typeof(TextBlock), 
+                                                                                                      new PropertyMetadata(TextAlignment.Left) 
+                                                                                                      { 
+                                                                                                          MethodToUpdateDom = TextAlignment_MethodToUpdateDom,
+                                                                                                          CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                                                                                                      });
 
         static void TextAlignment_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             var textBlock = (TextBlock)d;
-            TextAlignment newTextAlignment;
-            if (newValue is TextAlignment)
-            {
-                newTextAlignment = (TextAlignment)newValue;
-            }
-            else
-            {
-                newTextAlignment = TextAlignment.Left;
-            }
-            switch (newTextAlignment)
+            switch ((TextAlignment)newValue)
             {
                 case TextAlignment.Center:
                     INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(textBlock).textAlign = "center";
@@ -205,31 +186,41 @@ namespace Windows.UI.Xaml.Controls
                             },
                         Name = new List<string> { "whiteSpace" },
                     };
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             }
             );
 
         #endregion
 
-        public InlineCollection Inlines
-        {
-            get
-            {
-                return this._inlines;
-            }
-        }
+        public InlineCollection Inlines { get; }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
-            foreach (Inline child in this._inlines)
+            base.INTERNAL_OnAttachedToVisualTree();
+            foreach (Inline child in this.Inlines)
             {
+#if REWORKLOADED
+                this.AddVisualChild(child);
+#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
+#endif
             }
+        }
+
+        internal override void UpdateTabIndex(bool isTabStop, int tabIndex)
+        {
+            // we don't do anything since TextBlock is not supposed to be a Control in the first place
+            // and it is not supposed to be counted in tabbing
+            return;
         }
 #if WORKINPROGRESS
 
         // There is an implementation for TextTrimming in the shelvesheets
-        public static readonly DependencyProperty TextTrimmingProperty = DependencyProperty.Register("TextTrimming", typeof(TextTrimming), typeof(TextBlock), new PropertyMetadata(TextTrimming.None));
+        public static readonly DependencyProperty TextTrimmingProperty = DependencyProperty.Register("TextTrimming",
+                                                                                                     typeof(TextTrimming),
+                                                                                                     typeof(TextBlock),
+                                                                                                     new PropertyMetadata(TextTrimming.None));
 
         /// <summary>
         /// Gets or sets how the TextBlock trims text.
@@ -242,7 +233,10 @@ namespace Windows.UI.Xaml.Controls
 
         public double BaselineOffset { get; private set; }
 
-        public static readonly DependencyProperty CharacterSpacingProperty = DependencyProperty.Register("CharacterSpacing", typeof(int), typeof(TextBlock), null);
+        public static readonly DependencyProperty CharacterSpacingProperty = DependencyProperty.Register("CharacterSpacing",
+                                                                                                         typeof(int),
+                                                                                                         typeof(TextBlock),
+                                                                                                         new PropertyMetadata(0));
         public int CharacterSpacing
         {
             get { return (int)this.GetValue(CharacterSpacingProperty); }

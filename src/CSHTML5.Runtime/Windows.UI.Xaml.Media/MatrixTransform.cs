@@ -50,7 +50,8 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the Matrix dependency property.
         /// </summary>
         public static readonly DependencyProperty MatrixProperty =
-            DependencyProperty.Register("Matrix", typeof(Matrix), typeof(MatrixTransform), new PropertyMetadata(Matrix.Identity));
+            DependencyProperty.Register("Matrix", typeof(Matrix), typeof(MatrixTransform), new PropertyMetadata(Matrix.Identity)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         //{
         //    GetCSSEquivalent = (instance) =>
         //    {

@@ -36,8 +36,27 @@ namespace Windows.UI.Xaml.Data
         public static BindingExpression SetBinding(DependencyObject target, DependencyProperty dp, Binding binding)
         {
             //todo: the signature of this method is slightly different: it takes a "Binding" instead of "BindingBase", and it returns a "BindingExpression" instead of a "BindingExpressionBase".
+            if (target == null)
+            {
+                throw new ArgumentNullException("target");
+            }
+            if (dp == null)
+            {
+                throw new ArgumentNullException("dp");
+            }
+            if (binding == null)
+            {
+                throw new ArgumentNullException("binding");
+            }
 
-            return target.SetBinding(dp, binding);
+            // Create the BindingExpression from the Binding:
+            BindingExpression newBindingExpression = new BindingExpression(binding, target, dp);
+
+            // Apply the BindingExpression:
+            target.ApplyBindingExpression(dp, newBindingExpression);
+
+            // Return the newly created BindingExpression:
+            return newBindingExpression;
         }
     }
 }

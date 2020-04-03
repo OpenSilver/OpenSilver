@@ -172,11 +172,8 @@ namespace Windows.UI.Xaml.Data
             set
             {
                 _path = value;
-                INTERNAL_ComputedPath = value;
             }
         }
-
-        internal PropertyPath INTERNAL_ComputedPath; // If the Source is not specified, it means that we want to bind to the DataContext (eg. <TextBox Text={Binding}/>, so we automatically add "DataContext." to the Path (the result is called "ComputedPath") and we automatically set the Source to the Target of the Binding (the new source is called "ComputedSource") when calling SetBinding.
 
         /// <summary>
         /// Gets or sets the binding source by specifying its location relative to the position of the binding target.
@@ -198,11 +195,8 @@ namespace Windows.UI.Xaml.Data
             set
             {
                 _source = value;
-                INTERNAL_ComputedSource = value;
             }
         }
-
-        internal object INTERNAL_ComputedSource; // If the Source is not specified, it means that we want to bind to the DataContext (eg. <TextBox Text={Binding}/>, so we automatically add "DataContext." to the Path (the result is called "ComputedPath") and we automatically set the Source to the Target of the Binding (the new source is called "ComputedSource") when calling SetBinding.
 
         /// <summary>
         /// Update type

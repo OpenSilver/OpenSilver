@@ -67,7 +67,8 @@ namespace Windows.UI.Xaml.Media
                         };
                     }
                     return null;
-                }
+                },
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             });
 
         private void ApplyCSSChanges(RotateTransform rotateTransform, double angle)
@@ -165,7 +166,8 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        public static readonly DependencyProperty CenterXProperty = DependencyProperty.Register("CenterX", typeof(double), typeof(RotateTransform), new PropertyMetadata(null));
+        public static readonly DependencyProperty CenterXProperty = DependencyProperty.Register("CenterX", typeof(double), typeof(RotateTransform), new PropertyMetadata(null)
+        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         ///     CenterY - double.  Default value is 0.0.
@@ -182,7 +184,8 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        public static readonly DependencyProperty CenterYProperty = DependencyProperty.Register("CenterY", typeof(double), typeof(RotateTransform), new PropertyMetadata(null));
+        public static readonly DependencyProperty CenterYProperty = DependencyProperty.Register("CenterY", typeof(double), typeof(RotateTransform), new PropertyMetadata(null)
+        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         public override GeneralTransform Inverse
         {

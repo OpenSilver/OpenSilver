@@ -54,11 +54,22 @@ namespace System.Net
         public virtual HttpStatusCode StatusCode { get { throw new NotImplementedException(); } } //todo: maybe implement this in another way?
         
 #else
+#if WORKINPROGRESS
+        public virtual HttpStatusCode StatusCode
+        {
+            get
+            {
+                int statusCode = Convert.ToInt32(CSHTML5.Interop.ExecuteJavaScript("$0.status", _xmlHttpRequest));
+                return (HttpStatusCode)statusCode;
+            }
+        }
+#else
         public virtual HttpStatusCode StatusCode()
         {
             int statusCode = Convert.ToInt32(CSHTML5.Interop.ExecuteJavaScript("$0.status", _xmlHttpRequest));
             return (HttpStatusCode)statusCode;
         }
+#endif
 #endif
 
         // Exceptions:

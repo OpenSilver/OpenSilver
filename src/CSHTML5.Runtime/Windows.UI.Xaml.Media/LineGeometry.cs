@@ -56,7 +56,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the EndPoint dependency property.
         /// </summary>
         public static readonly DependencyProperty EndPointProperty =
-            DependencyProperty.Register("EndPoint", typeof(Point), typeof(LineGeometry), new PropertyMetadata(new Point(), EndPoint_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("EndPoint", typeof(Point), typeof(LineGeometry), new PropertyMetadata(new Point(), EndPoint_Changed));
 
         private static void EndPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -81,7 +81,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the StartPoint dependency property.
         /// </summary>
         public static readonly DependencyProperty StartPointProperty =
-            DependencyProperty.Register("StartPoint", typeof(Point), typeof(LineGeometry), new PropertyMetadata(new Point(), StartPoint_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("StartPoint", typeof(Point), typeof(LineGeometry), new PropertyMetadata(new Point(), StartPoint_Changed));
 
         private static void StartPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

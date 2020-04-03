@@ -44,6 +44,13 @@ namespace Windows.UI.Xaml.Controls
         object _iFrame;
         string _htmlString;
 
+#if REVAMPPOINTEREVENTS
+        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        {
+            return true;
+        }
+#endif
+
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             object outerDiv;
@@ -92,9 +99,11 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty SourceProperty =
 #if MIGRATION
-            DependencyProperty.Register("Source", typeof(Uri), typeof(WebBrowser), new PropertyMetadata(null, Source_Changed));
+            DependencyProperty.Register("Source", typeof(Uri), typeof(WebBrowser), new PropertyMetadata(null, Source_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 #else
-            DependencyProperty.Register("Source", typeof(Uri), typeof(WebView), new PropertyMetadata(null, Source_Changed));
+            DependencyProperty.Register("Source", typeof(Uri), typeof(WebView), new PropertyMetadata(null, Source_Changed)
+        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 #endif
 
         private static void Source_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)

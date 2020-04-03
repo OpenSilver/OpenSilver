@@ -60,6 +60,11 @@ namespace Windows.UI.Xaml.Controls
     /// </example>
     public partial class CheckBox : ToggleButton
     {
+        internal sealed override bool INTERNAL_GetFocusInBrowser
+        {
+            get { return true; }
+        }
+
         /// <summary>
         /// Initializes a new instance of the CheckBox class.
         /// </summary>

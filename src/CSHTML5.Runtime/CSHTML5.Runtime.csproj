@@ -27,25 +27,25 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <AssemblyName>CSHTML5</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;BRIDGE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;REWORKLOADED</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>$(BinFolder)\Debug\CSHTML5.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' ">
     <AssemblyName>CSHTML5</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;BRIDGE;WORKINPROGRESS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;WORKINPROGRESS;REWORKLOADED</DefineConstants>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>$(BinFolder)\Debug.WorkInProgress\CSHTML5.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">
     <AssemblyName>CSHTML5.Migration</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION;REWORKLOADED</DefineConstants>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>$(BinFolder)\Migration\CSHTML5.Migration.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">
     <AssemblyName>CSHTML5.Migration</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS;</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS;REWORKLOADED</DefineConstants>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>$(BinFolder)\Migration.WorkInProgress\CSHTML5.Migration.xml</DocumentationFile>
   </PropertyGroup>
@@ -83,12 +83,15 @@
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction.cs" />
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\BusyIndicator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DescriptionViewer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Frame.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Page.cs" />
     <Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Toolkit\ItemsControlExtensions.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\Binding.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\CollectionViewSource.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\PagedCollectionView.cs" />
@@ -922,6 +925,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Content Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
     <Page Include="DefaultStyles\INTERNAL_DefaultButtonStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

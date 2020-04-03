@@ -76,7 +76,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.Validation.Errors attached property.
         /// </summary>
         public static readonly DependencyProperty ErrorsProperty =
-            DependencyProperty.RegisterAttached("Errors", typeof(ObservableCollection<ValidationError>), typeof(Validation), new PropertyMetadata(null));
+            DependencyProperty.RegisterAttached("Errors", typeof(ObservableCollection<ValidationError>), typeof(Validation), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         // Exceptions:
         //   System.ArgumentNullException:
@@ -107,7 +108,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.Validation.HasError attached property.
         /// </summary>
         public static readonly DependencyProperty HasErrorProperty =
-            DependencyProperty.RegisterAttached("HasError", typeof(bool), typeof(Validation), new PropertyMetadata(false));
+            DependencyProperty.RegisterAttached("HasError", typeof(bool), typeof(Validation), new PropertyMetadata(false)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         // Exceptions:
         //   System.ArgumentNullException:

@@ -228,7 +228,11 @@ namespace Windows.UI.Xaml
                 base.OnContentChanged(oldContent, newContent);
 #else
                 INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldContent as UIElement, this);
+#if REWORKLOADED
+                this.AddVisualChild(newContent as UIElement);
+#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newContent as UIElement, this);
+#endif
 #endif
                 // We can now revert the "ParentWindow" to null (cf. comment above):
                 this.INTERNAL_ParentWindow = null;
@@ -261,7 +265,8 @@ namespace Windows.UI.Xaml
         /// Identifies the Content dependency property.
         /// </summary>
         public static readonly DependencyProperty ContentProperty =
-            DependencyProperty.Register("Content", typeof(FrameworkElement), typeof(Window), new PropertyMetadata(null, Content_Changed));
+            DependencyProperty.Register("Content", typeof(FrameworkElement), typeof(Window), new PropertyMetadata(null, Content_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static internal void Content_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -281,7 +286,8 @@ namespace Windows.UI.Xaml
         /// Identifies the Content dependency property.
         /// </summary>
         public static readonly DependencyProperty ContentProperty =
-            DependencyProperty.Register("Content", typeof(object), typeof(Window), new PropertyMetadata(null, Content_Changed));
+            DependencyProperty.Register("Content", typeof(object), typeof(Window), new PropertyMetadata(null, Content_Changed)
+        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static internal void Content_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

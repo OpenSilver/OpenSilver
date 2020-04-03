@@ -208,6 +208,17 @@ namespace Windows.UI.Xaml
 
         }
 
+        /// <summary>
+        /// Attaches a binding to a FrameworkElement, using the provided binding object.
+        /// </summary>
+        /// <param name="dependencyProperty">The dependency property identifier of the property that is data bound.</param>
+        /// <param name="binding">The binding to use for the property.</param>
+        /// <returns>The BindingExpression created.</returns>
+        public BindingExpression SetBinding(DependencyProperty dependencyProperty, Binding binding)
+        {
+            return BindingOperations.SetBinding(this, dependencyProperty, binding);
+        }
+
         #region Cursor
 
         // Returns:
@@ -224,7 +235,11 @@ namespace Windows.UI.Xaml
             set { SetValue(CursorProperty, value); }
         }
         public static readonly DependencyProperty CursorProperty =
-            DependencyProperty.Register("Cursor", typeof(Cursor), typeof(FrameworkElement), new PropertyMetadata() { MethodToUpdateDom = Cursor_MethodToUpdateDom });
+            DependencyProperty.Register("Cursor", typeof(Cursor), typeof(FrameworkElement), new PropertyMetadata()
+            {
+                MethodToUpdateDom = Cursor_MethodToUpdateDom,
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+            });
 
         private static void Cursor_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -304,9 +319,9 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        #endregion
 
-#region Names handling
+        #region Names handling
 
         /// <summary>
         /// Retrieves an object that has the specified identifier name.
@@ -346,11 +361,20 @@ namespace Windows.UI.Xaml
         /// Identifies the Name dependency property.
         /// </summary>
         public static readonly DependencyProperty NameProperty =
-            DependencyProperty.Register("Name", typeof(string), typeof(FrameworkElement), new PropertyMetadata(string.Empty));
+            DependencyProperty.Register("Name", typeof(string), typeof(FrameworkElement), new PropertyMetadata(string.Empty)
+            {
+                MethodToUpdateDom = OnNameChanged_MethodToUpdateDom,
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+            });
 
-#endregion
+        private static void OnNameChanged_MethodToUpdateDom(DependencyObject d, object value)
+        {
+            var @this = (FrameworkElement)d;
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(@this.INTERNAL_OuterDomElement, "dataId", (value ?? string.Empty).ToString());
+        }
+        #endregion
 
-#region DataContext
+        #region DataContext
 
         /// <summary>
         /// Gets or sets the data context for a FrameworkElement when it participates
@@ -364,13 +388,33 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Identifies the DataContext dependency property.
         /// </summary>
-        public static readonly DependencyProperty DataContextProperty =
-            DependencyProperty.Register("DataContext", typeof(object), typeof(FrameworkElement), new PropertyMetadata() { Inherits = true });
+        public static readonly DependencyProperty DataContextProperty = DependencyProperty.Register("DataContext", 
+                                                                                                    typeof(object), 
+                                                                                                    typeof(FrameworkElement), 
+                                                                                                    new PropertyMetadata(null, OnDataContextPropertyChanged)
+                                                                                                    {
+                                                                                                        Inherits = true
+                                                                                                    });
 
-#endregion
+        private static void OnDataContextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((FrameworkElement)d).RaiseDataContextChangedEvent(e);
+        }
+
+        private void RaiseDataContextChangedEvent(DependencyPropertyChangedEventArgs e)
+        {
+            if (this.DataContextChanged != null)
+            {
+                this.DataContextChanged(this, e);
+            }
+        }
+
+        /// <summary>Occurs when the data context for this element changes. </summary>
+        public event DependencyPropertyChangedEventHandler DataContextChanged;
+        #endregion
 
 #if WORKINPROGRESS
-#region Triggers (not implemented)
+        #region Triggers (not implemented)
 
         public TriggerCollection Triggers
         {
@@ -380,7 +424,8 @@ namespace Windows.UI.Xaml
             }
         }
 
-        public static DependencyProperty TriggersProperty = DependencyProperty.Register("Triggers", typeof(TriggerCollection), typeof(FrameworkElement), new PropertyMetadata(new TriggerCollection()));
+        public static DependencyProperty TriggersProperty = DependencyProperty.Register("Triggers", typeof(TriggerCollection), typeof(FrameworkElement), new PropertyMetadata(new TriggerCollection())
+        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         #endregion
 
@@ -436,11 +481,12 @@ namespace Windows.UI.Xaml
         /// Identifies the Tag dependency property.
         /// </summary>
         public static readonly DependencyProperty TagProperty =
-            DependencyProperty.Register("Tag", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null, null));
+            DependencyProperty.Register("Tag", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
-#endregion
+        #endregion
 
-#region Handling Styles
+        #region Handling Styles
 
         protected void INTERNAL_SetDefaultStyle(Style defaultStyle)
         {
@@ -463,10 +509,8 @@ namespace Windows.UI.Xaml
         /// Identifies the Style dependency property.
         /// </summary>
         public static readonly DependencyProperty StyleProperty =
-            DependencyProperty.Register("Style", typeof(Style), typeof(FrameworkElement), new PropertyMetadata(null, Style_Changed)
-            {
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never
-            });
+            DependencyProperty.Register("Style", typeof(Style), typeof(FrameworkElement), new PropertyMetadata(null, Style_Changed));
+
         private static void Style_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var frameworkElement = (FrameworkElement)d;
@@ -513,12 +557,12 @@ namespace Windows.UI.Xaml
                 {
                     if (oldSetter.Property != null) // Note: it can be null for example in the XAML text editor during design time, because the "DependencyPropertyConverter" class returns "null".
                     {
-                        if (!newStyleDictionary.ContainsKey(oldSetter.Property))
+                        if (!newStyleDictionary.ContainsKey(oldSetter.Property)) // only handle this property here if it is not going set by the new style
                         {
-                            INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorageIfExists(d, oldSetter.Property);
-                            if (storage != null)
+                            INTERNAL_PropertyStorage storage;
+                            if (INTERNAL_PropertyStore.TryGetStorage(d, oldSetter.Property, false/*don't create*/, out storage))
                             {
-                                INTERNAL_PropertyStore.ResetLocalStyleValue(storage);
+                                INTERNAL_PropertyStore.ResetLocalStyleValue(storage, true);
                             }
                         }
                     }
@@ -539,7 +583,8 @@ namespace Windows.UI.Xaml
                     {
                         if (!oldStyleDictionary.ContainsKey(newSetter.Property) || oldStyleDictionary[newSetter.Property] != newSetter.Value)
                         {
-                            INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(frameworkElement, newSetter.Property);
+                            INTERNAL_PropertyStorage storage;
+                            INTERNAL_PropertyStore.TryGetStorage(frameworkElement, newSetter.Property, true/*create*/, out storage);
                             INTERNAL_PropertyStore.SetLocalStyleValue(storage, newSetter.Value);
                         }
                     }
@@ -580,13 +625,14 @@ namespace Windows.UI.Xaml
             Setter setter = (Setter)sender;
             if (setter.Property != null) // Note: it can be null for example in the XAML text editor during design time, because the "DependencyPropertyConverter" class returns "null".
             {
-                INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(this, setter.Property);
+                INTERNAL_PropertyStorage storage;
+                INTERNAL_PropertyStore.TryGetStorage(this, setter.Property, true/*create*/, out storage);
                 HashSet2<Style> stylesAlreadyVisited = new HashSet2<Style>(); // Note: "stylesAlreadyVisited" is here to prevent an infinite recursion.
                 INTERNAL_PropertyStore.SetLocalStyleValue(storage, Style.GetActiveValue(setter.Property, stylesAlreadyVisited));
             }
         }
 
-#region DefaultStyleKey
+        #region DefaultStyleKey
 
         // Returns:
         //     The key that references the default style for the control. To work correctly
@@ -606,7 +652,7 @@ namespace Windows.UI.Xaml
         /// property.
         /// </summary>
         public static readonly DependencyProperty DefaultStyleKeyProperty =
-            DependencyProperty.Register("DefaultStyleKey", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null, DefaultStyleKey_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never });
+            DependencyProperty.Register("DefaultStyleKey", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null, DefaultStyleKey_Changed));
 
         private static void DefaultStyleKey_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -619,7 +665,7 @@ namespace Windows.UI.Xaml
                 // if we don't find it in the element assembly then we try to find it in the assembly where newValue is defined (since newValue is supposed to be a Type)
                 if (newStyle == null)
                 {
-                    if(newValue is Type)
+                    if (newValue is Type)
                     {
                         newStyle = Application.Current.XamlResourcesHandler.TryFindResourceInGenericXaml(((Type)newValue).Assembly, newValue) as Style;
                     }
@@ -634,11 +680,11 @@ namespace Windows.UI.Xaml
         }
 
 
-#endregion
+        #endregion
 
-#endregion
+        #endregion
 
-#region Loaded/Unloaded events
+        #region Loaded/Unloaded events
 
         /// <summary>
         /// Occurs when a FrameworkElement has been constructed and added to the object tree.
@@ -662,9 +708,9 @@ namespace Windows.UI.Xaml
                 Unloaded(this, new RoutedEventArgs());
         }
 
-#endregion
+        #endregion
 
-#region BindingValidationError event
+        #region BindingValidationError event
 
         internal bool INTERNAL_AreThereAnyBindingValidationErrorHandlers = false;
 
@@ -716,18 +762,15 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-#endregion
+        #endregion
 
 
 #if WORKINPROGRESS
 
         public event EventHandler LayoutUpdated;
 
-        /// <summary>Occurs when the data context for this element changes. </summary>
-        public event DependencyPropertyChangedEventHandler DataContextChanged;
-
-
-        public static readonly DependencyProperty FlowDirectionProperty = DependencyProperty.Register("FlowDirection", typeof(FlowDirection), typeof(FrameworkElement), new PropertyMetadata(FlowDirection.LeftToRight));
+        public static readonly DependencyProperty FlowDirectionProperty = DependencyProperty.Register("FlowDirection", typeof(FlowDirection), typeof(FrameworkElement), new PropertyMetadata(FlowDirection.LeftToRight)
+        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>Gets or sets the direction that text and other user interface elements flow within any parent element that controls their layout.</summary>
         /// <returns>The direction that text and other UI elements flow within their parent element, as a value of the enumeration. The default value is <see cref="F:System.Windows.FlowDirection.LeftToRight" />.</returns>
@@ -749,6 +792,28 @@ namespace Windows.UI.Xaml
         {
             get { return (XmlLanguage)this.GetValue(LanguageProperty); }
             set { this.SetValue(LanguageProperty, value); }
+        }
+#endif
+
+#if REWORKLOADED
+        internal override void INTERNAL_FinalizeAttachToParent()
+        {
+            this.INTERNAL_SizeChangedWhenAttachedToVisualTree(); // Raise SizeChanged event
+            this.INTERNAL_RaiseLoadedEvent(); // Raise Loaded event
+
+            // Start listening to size changes
+            if (this._sizeChangedEventHandlers != null && this._sizeChangedEventHandlers.Count > 0)
+            {
+                if (this._resizeSensor == null)
+                {
+                    this._resizeSensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action)this.HandleSizeChanged);
+                }
+            }
+        }
+
+        protected internal override void INTERNAL_OnDetachedFromVisualTree()
+        {
+            base.INTERNAL_OnDetachedFromVisualTree();
         }
 #endif
     }

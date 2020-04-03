@@ -41,13 +41,15 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the ToolTipService.Placement XAML attached property.
         /// </summary>
         public static readonly DependencyProperty PlacementProperty =
-            DependencyProperty.RegisterAttached("Placement", typeof(PlacementMode), typeof(ToolTipService), new PropertyMetadata(PlacementMode.Bottom));
+            DependencyProperty.RegisterAttached("Placement", typeof(PlacementMode), typeof(ToolTipService), new PropertyMetadata(PlacementMode.Bottom)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Identifies the ToolTipService.PlacementTarget XAML attached property.
         /// </summary>
         public static readonly DependencyProperty PlacementTargetProperty =
-            DependencyProperty.RegisterAttached("PlacementTarget", typeof(UIElement), typeof(ToolTipService), new PropertyMetadata(null));
+            DependencyProperty.RegisterAttached("PlacementTarget", typeof(UIElement), typeof(ToolTipService), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Identifies the ToolTipService.ToolTip XAML attached property.

@@ -52,7 +52,10 @@ namespace Windows.UI.Xaml.Controls
 
         private string[] TextAreaContainerNames = { "ContentElement", "PART_ContentHost" };
 
-
+        internal sealed override bool INTERNAL_GetFocusInBrowser
+        {
+            get { return true; }
+        }
 
         public PasswordBox()
         {
@@ -75,7 +78,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the MaxLength dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxLengthProperty =
-            DependencyProperty.Register("MaxLength", typeof(int), typeof(PasswordBox), new PropertyMetadata(null) { MethodToUpdateDom = MaxLength_MethodToUpdateDom });
+            DependencyProperty.Register("MaxLength", typeof(int), typeof(PasswordBox), new PropertyMetadata(null) { MethodToUpdateDom = MaxLength_MethodToUpdateDom,
+            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void MaxLength_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -100,7 +104,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Password dependency property.
         /// </summary>
         public static readonly DependencyProperty PasswordProperty =
-            DependencyProperty.Register("Password", typeof(string), typeof(PasswordBox), new PropertyMetadata(string.Empty, Password_Changed));
+            DependencyProperty.Register("Password", typeof(string), typeof(PasswordBox), new PropertyMetadata(string.Empty, Password_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         static void Password_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var passwordBox = (PasswordBox)d;

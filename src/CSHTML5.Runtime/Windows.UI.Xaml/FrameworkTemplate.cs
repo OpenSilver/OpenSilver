@@ -63,39 +63,37 @@ namespace Windows.UI.Xaml
         /// <returns>The instantiated control template.</returns>
         internal FrameworkElement INTERNAL_InstantiateAndAttachControlTemplate(Control templateOwner)
         {
-#if CSHTML5BLAZOR && DEBUG
-            Console.WriteLine("OPEN SILVER DEBUG: FrameworkTemplate: INTERNAL_InstantiateAndAttachControlTemplate:" +
-                " template owner = " + templateOwner +
-                " template owner hash = " + (templateOwner != null ? templateOwner.GetHashCode().ToString() : ""));
-#endif
+            if (templateOwner == null)
+            {
+                throw new ArgumentNullException("templateOwner");
+            }
+
             if (_methodToInstantiateFrameworkTemplate != null)
             {
+                templateOwner.INTERNAL_IsTemplated = true;
+
+                // Instantiate the ControlTemplate:
+                TemplateInstance templateInstance = _methodToInstantiateFrameworkTemplate(templateOwner);
+
+                // Attach it:
+#if REWORKLOADED
+                templateOwner.AddVisualChild(templateInstance.TemplateContent);
+#else
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(templateInstance.TemplateContent, templateOwner);
+#endif
+
+                // Raise the "OnApplyTemplate" property:
                 if (templateOwner != null)
                 {
-                    // Instantiate the ControlTemplate:
-                    TemplateInstance templateInstance = _methodToInstantiateFrameworkTemplate(templateOwner);
-
-                    // Attach it:
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(templateInstance.TemplateContent, templateOwner);
-
-                    // Raise the "OnApplyTemplate" property:
-                    if (templateOwner != null)
-                    {
-                        templateOwner.RaiseOnApplyTemplate();
-                    }
-#if CSHTML5BLAZOR && DEBUG
-                    else
-                    {
-                        Console.WriteLine("OPEN SILVER DEBUG: FrameworkTemplate: INTERNAL_InstantiateAndAttachControlTemplate: template owner is null");
-                    }
-#endif
-                    return templateInstance.TemplateContent;
+                    templateOwner.RaiseOnApplyTemplate();
                 }
-                else
-                    throw new ArgumentNullException("templateOwner");
+                return templateInstance.TemplateContent;
             }
             else
-                throw new Exception("The FrameworkTemplate was not properly initialized.");
+            {
+                templateOwner.INTERNAL_IsTemplated = false;
+                return null;
+            }
         }
 
         /// <summary>
@@ -120,7 +118,7 @@ namespace Windows.UI.Xaml
         }
         /// <exclude/>
         public static readonly DependencyProperty ContentPropertyUsefulOnlyDuringTheCompilationProperty =
-            DependencyProperty.Register("ContentPropertyUsefulOnlyDuringTheCompilation", typeof(UIElement), typeof(FrameworkTemplate), new PropertyMetadata(null, null));
+            DependencyProperty.Register("ContentPropertyUsefulOnlyDuringTheCompilation", typeof(UIElement), typeof(FrameworkTemplate), new PropertyMetadata(null));
 
         bool _isSealed = false;
         /// <summary>
@@ -130,7 +128,7 @@ namespace Windows.UI.Xaml
         {
             _isSealed = true;
         }
-       
+
         /// <summary>
         /// Gets a value that indicates whether this object is in an immutable state
         /// so it cannot be changed.

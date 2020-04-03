@@ -245,7 +245,7 @@ var radios = document.getElementsByName( $0 );
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
-            if (INTERNAL_IsTemplated)
+            if (this.HasTemplate)
             {
                 //there is a template so we need to make specific changes to make it work with the other RadioButtons
                 this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = this.INTERNAL_OuterDomElement;
@@ -283,7 +283,8 @@ var radios = document.getElementsByName( $0 );
         /// Identifies the GroupName dependency property.
         /// </summary>
         public static readonly DependencyProperty GroupNameProperty =
-            DependencyProperty.Register("GroupName", typeof(string), typeof(RadioButton), new PropertyMetadata(null, GroupName_Changed));
+            DependencyProperty.Register("GroupName", typeof(string), typeof(RadioButton), new PropertyMetadata(null, GroupName_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void GroupName_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

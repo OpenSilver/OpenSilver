@@ -71,7 +71,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the CommandParameter dependency property.
         /// </summary>
         public static readonly DependencyProperty CommandParameterProperty =
-            DependencyProperty.Register("CommandParameter", typeof(object), typeof(ButtonBase), new PropertyMetadata());
+            DependencyProperty.Register("CommandParameter", typeof(object), typeof(ButtonBase), new PropertyMetadata(null)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         
         /// <summary>
@@ -87,7 +88,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the Command dependency property.
         /// </summary>
         public static readonly DependencyProperty CommandProperty =
-            DependencyProperty.Register("Command", typeof(ICommand), typeof(ButtonBase), new PropertyMetadata(null, Command_Changed));
+            DependencyProperty.Register("Command", typeof(ICommand), typeof(ButtonBase), new PropertyMetadata(null, Command_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 #if WORKINPROGRESS
         //
@@ -299,7 +301,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the IsPressed dependency property.
         /// </summary>
         public static readonly DependencyProperty IsPressedProperty =
-            DependencyProperty.Register("IsPressed", typeof(bool), typeof(ButtonBase), new PropertyMetadata(false));
+            DependencyProperty.Register("IsPressed", typeof(bool), typeof(ButtonBase), new PropertyMetadata(false)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
 
@@ -316,7 +319,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the ClickMode dependency property.
         /// </summary>
         public static readonly DependencyProperty ClickModeProperty =
-            DependencyProperty.Register("ClickMode", typeof(ClickMode), typeof(ButtonBase), new PropertyMetadata(ClickMode.Release));
+            DependencyProperty.Register("ClickMode", typeof(ClickMode), typeof(ButtonBase), new PropertyMetadata(ClickMode.Release)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         #region handling the behavior towards keyboard events
 

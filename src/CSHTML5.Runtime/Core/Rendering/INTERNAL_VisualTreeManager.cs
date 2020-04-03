@@ -198,13 +198,14 @@ namespace CSHTML5.Internal
                     EndTransactionToOptimizeSimulatorPerformance();
 #endif
                 }
-                else if (child.INTERNAL_VisualParent != parent)
+                else if (!object.ReferenceEquals(child.INTERNAL_VisualParent, parent))
                 {
                     throw new InvalidOperationException("The element already has a parent. An element cannot appear in multiple locations in the Visual Tree. Remove the element from the Visual Tree before adding it elsewhere.");
                 }
                 else
                 {
                     // Nothing to do: the element is already attached to the specified parent.
+                    return; //prevent from useless call to INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE().
                 }
 
                 INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
@@ -348,7 +349,8 @@ namespace CSHTML5.Internal
                             childDefaultStyle.SetterValueChanged -= childAsFrameworkElement.StyleSetterValueChanged;
                             childDefaultStyle.SetterValueChanged += childAsFrameworkElement.StyleSetterValueChanged;
 
-                            INTERNAL_PropertyStorage storage = INTERNAL_PropertyStore.GetStorageOrCreateNewIfNotExists(childAsFrameworkElement, setter.Property);
+                            INTERNAL_PropertyStorage storage;
+                            INTERNAL_PropertyStore.TryGetStorage(childAsFrameworkElement, setter.Property, true/*create*/, out storage);
                             INTERNAL_PropertyStore.SetLocalStyleValue(storage, setter.Value);
                         }
                     }
@@ -420,6 +422,12 @@ namespace CSHTML5.Internal
             object wrapperForChild
             )
         {
+#if REWORKLOADED
+            if (INTERNAL_VisualTreeOperation.Current.Root == null)
+            {
+                INTERNAL_VisualTreeOperation.Current.Root = parent;
+            }
+#endif
             //#if CSHTML5BLAZOR && DEBUG
             //            string childIndentity = child + (child != null ? " (" + child.GetHashCode() + ")" : "");
             //            string parentIndentity = parent + (parent != null ? " (" + parent.GetHashCode() + ")" : "");
@@ -618,21 +626,18 @@ namespace CSHTML5.Internal
 #endif
 
             // Get the Inherited properties and pass them to the direct children:
-            if (parent.INTERNAL_AllInheritedProperties != null)
-            {
-                foreach (DependencyProperty dependencyProperty in
+            foreach (DependencyProperty dependencyProperty in
 #if BRIDGE
-                    INTERNAL_BridgeWorkarounds.GetDictionaryKeys_SimulatorCompatible(parent.INTERNAL_AllInheritedProperties)
+                INTERNAL_BridgeWorkarounds.GetDictionaryKeys_SimulatorCompatible(parent.INTERNAL_AllInheritedProperties)
 #else
-                    parent.INTERNAL_AllInheritedProperties.Keys
+                parent.INTERNAL_AllInheritedProperties.Keys
 #endif
-                    )
-                {
-                    bool recursively = false; // We don't want a recursion here because the "Attach" method is already recursive due to the fact that we raise property changed on the Children property, which causes to reattach the subtree.
-                    INTERNAL_PropertyStorage storage = parent.INTERNAL_AllInheritedProperties[dependencyProperty];
-                    PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(storage.Owner.GetType());
-                    child.SetInheritedValue(dependencyProperty, INTERNAL_PropertyStore.GetValue(storage, typeMetadata), recursively);
-                }
+                )
+            {
+                bool recursively = false; // We don't want a recursion here because the "Attach" method is already recursive due to the fact that we raise property changed on the Children property, which causes to reattach the subtree.
+                INTERNAL_PropertyStorage storage = parent.INTERNAL_AllInheritedProperties[dependencyProperty];
+                PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(storage.Owner.GetType());
+                child.SetInheritedValue(dependencyProperty, INTERNAL_PropertyStore.GetValue(storage, typeMetadata), recursively);
             }
 
 #if PERFSTAT
@@ -681,6 +686,7 @@ namespace CSHTML5.Internal
             // it (unless IsTabStop is False) to its current value (default is Int32.MaxValue). At the time when this code was
             // written, there was no way to automatically call the "OnChanged" on a dependency property if no value was set.
 
+#if !REWORKLOADED
             // IMPORTANT: This needs to be done AFTER the "OnApplyTemplate" (for example, the TextBox sets the "INTERNAL_OptionalSpecifyDomElementConcernedByFocus" in the "OnApplyTemplate").
             if (isChildAControl)
             {
@@ -689,12 +695,12 @@ namespace CSHTML5.Internal
                     Control.TabIndexProperty_MethodToUpdateDom(child, ((Control)child).TabIndex);
                 }
             }
-
+#endif
 
             //--------------------------------------------------------
             // RAISE THE "SIZECHANGED" EVENT:
             //--------------------------------------------------------
-
+#if !REWORKLOADED
 #if PERFSTAT
             var t10 = Performance.now();
 #endif
@@ -713,7 +719,6 @@ namespace CSHTML5.Internal
             //--------------------------------------------------------
             // RAISE THE "LOADED" EVENT:
             //--------------------------------------------------------
-
 #if PERFSTAT
             var t11 = Performance.now();
 #endif
@@ -728,6 +733,10 @@ namespace CSHTML5.Internal
 
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Raise Loaded event", t11);
+#endif
+
+#else
+            INTERNAL_VisualTreeOperation.Current.Enqueue(child);
 #endif
         }
 
@@ -752,107 +761,104 @@ namespace CSHTML5.Internal
             //------------------------------------------------------------------------------------------------------------------
 
             // This is used to force a redraw of all the properties that are set on the object (including Attached Properties!). For example, if a Border has a colored background, this is the moment when that color will be applied. Properties that have no value set by the user are not concerned (their default state is rendered elsewhere).
-            if (dependencyObject.INTERNAL_PropertyStorageDictionary != null)
+#if PERFSTAT
+            var t0 = Performance.now();
+#endif
+            var list = dependencyObject.INTERNAL_PropertyStorageDictionary.ToList(); //we copy the Dictionary so that the foreach doesn't break when we modify a DependencyProperty inside the Changed of another one (which causes it to be added to the Dictionary).
+#if PERFSTAT
+            Performance.Counter("VisualTreeManager: Copy list of properties", t0);
+#endif
+            foreach (KeyValuePair<DependencyProperty, INTERNAL_PropertyStorage> propertiesAndTheirStorage in list)
             {
+                // Read the value:
+                DependencyProperty property = propertiesAndTheirStorage.Key;
+
 #if PERFSTAT
-                var t0 = Performance.now();
+                var t1 = Performance.now();
 #endif
-                var list = dependencyObject.INTERNAL_PropertyStorageDictionary.ToList<KeyValuePair<DependencyProperty, INTERNAL_PropertyStorage>>(); //we copy the Dictionary so that the foreach doesn't break when we modify a DependencyProperty inside the Changed of another one (which causes it to be added to the Dictionary).
-#if PERFSTAT
-                Performance.Counter("VisualTreeManager: Copy list of properties", t0);
-#endif
-                foreach (KeyValuePair<DependencyProperty, INTERNAL_PropertyStorage> propertiesAndTheirStorage in list)
+
+                PropertyMetadata propertyMetadata = property.GetTypeMetaData(dependencyObject.GetType());
+                //#if CSHTML5BLAZOR && DEBUG
+                //                    string prettyPrintProperty = property.Name + (property != null ? "(" + property.GetHashCode().ToString() + ")" : "");
+                //                    Console.WriteLine("OPENSILVER DEBUG: VisualTreeManager: RenderElementsAndRaiseChangedEventOnAllDependencyProperties:"
+                //                        + " dependencyObject:" + prettyPrintDependencyObject
+                //                        + " property:" + prettyPrintProperty
+                //                        + " MSG: " + (propertyMetadata != null ? "has" : "has not") + " a propertyMetadata");
+                //#endif
+                if (propertyMetadata != null)
                 {
-                    // Read the value:
-                    DependencyProperty property = propertiesAndTheirStorage.Key;
+                    INTERNAL_PropertyStorage storage = propertiesAndTheirStorage.Value;
+                    object value = null;
+                    bool valueWasRetrieved = false;
 
-#if PERFSTAT
-                    var t1 = Performance.now();
-#endif
-
-                    PropertyMetadata propertyMetadata = property.GetTypeMetaData(dependencyObject.GetType());
-                    //#if CSHTML5BLAZOR && DEBUG
-                    //                    string prettyPrintProperty = property.Name + (property != null ? "(" + property.GetHashCode().ToString() + ")" : "");
-                    //                    Console.WriteLine("OPENSILVER DEBUG: VisualTreeManager: RenderElementsAndRaiseChangedEventOnAllDependencyProperties:"
-                    //                        + " dependencyObject:" + prettyPrintDependencyObject
-                    //                        + " property:" + prettyPrintProperty
-                    //                        + " MSG: " + (propertyMetadata != null ? "has" : "has not") + " a propertyMetadata");
-                    //#endif
-                    if (propertyMetadata != null)
+                    //--------------------
+                    // Call "Apply CSS", which uses "GetCSSEquivalent/s":
+                    //--------------------
+                    if (propertyMetadata.GetCSSEquivalent != null || propertyMetadata.GetCSSEquivalents != null)
                     {
-                        INTERNAL_PropertyStorage storage = propertiesAndTheirStorage.Value;
-                        object value = null;
-                        bool valueWasRetrieved = false;
-
-                        //--------------------
-                        // Call "Apply CSS", which uses "GetCSSEquivalent/s":
-                        //--------------------
-                        if (propertyMetadata.GetCSSEquivalent != null || propertyMetadata.GetCSSEquivalents != null)
+                        if (!valueWasRetrieved)
                         {
-                            if (!valueWasRetrieved)
-                            {
-                                value = INTERNAL_PropertyStore.GetValue(storage, propertyMetadata);
-                                valueWasRetrieved = true;
-                            }
-
-                            INTERNAL_PropertyStore.ApplyCssChanges(value, value, propertyMetadata, storage.Owner);
+                            value = storage.ActualValue;
+                            valueWasRetrieved = true;
                         }
 
-                        //--------------------
-                        // Call "MethodToUpdateDom":
-                        //--------------------
-                        if (propertyMetadata.MethodToUpdateDom != null)
-                        {
-                            if (!valueWasRetrieved)
-                            {
-                                value = INTERNAL_PropertyStore.GetValue(storage, propertyMetadata);
-                                valueWasRetrieved = true;
-                            }
-
-                            // Call the "Method to update DOM":
-                            propertyMetadata.MethodToUpdateDom(storage.Owner, value);
-                        }
-
-                        //--------------------
-                        // Call PropertyChanged:
-                        //--------------------
-                        //#if CSHTML5BLAZOR && DEBUG
-                        //                        string prettyPrintPropertyMetadata = propertyMetadata + (propertyMetadata != null ? propertyMetadata.GetHashCode().ToString() : "");
-                        //                        Console.WriteLine("OPENSILVER DEBUG: VisualTreeManager: RenderElementsAndRaiseChangedEventOnAllDependencyProperties:"
-                        //                            + " dependencyObject:" + prettyPrintDependencyObject
-                        //                            + " property:" + prettyPrintProperty
-                        //                            + " propertyMetadata:" + propertyMetadata
-                        //                            + " MSG: " + (propertyMetadata.PropertyChangedCallback != null ? "has" : "has not") + " a PropertyChangedCallback" );
-                        //#endif
-                        if (propertyMetadata.PropertyChangedCallback != null
-                            && propertyMetadata.CallPropertyChangedWhenLoadedIntoVisualTree != WhenToCallPropertyChangedEnum.Never)
-                        {
-                            if (!valueWasRetrieved)
-                            {
-                                value = INTERNAL_PropertyStore.GetValue(storage, propertyMetadata);
-                                valueWasRetrieved = true;
-                            }
-
-                            //#if CSHTML5BLAZOR && DEBUG
-                            //                            Console.WriteLine("OPENSILVER DEBUG: VisualTreeManager: RenderElementsAndRaiseChangedEventOnAllDependencyProperties:" 
-                            //                                + " dependencyObject:" + prettyPrintDependencyObject 
-                            //                                + " property:" + prettyPrintProperty 
-                            //                                + " propertyMetadata:" + propertyMetadata
-                            //                                + " MSG: is raising PropertyChangedCallback)");
-                            //#endif
-                            // Raise the "PropertyChanged" event:
-                            propertyMetadata.PropertyChangedCallback(storage.Owner, new DependencyPropertyChangedEventArgs(value, value, property));
-
-                            // Remember that we raised the event, to avoid raising it again in the code below:
-                            //propertiesForWhichTheEventHasAlreadyBeenRaised.Add(property, property); //commented since the "code below" is commented
-                        }
+                        INTERNAL_PropertyStore.ApplyCssChanges(value, value, propertyMetadata, storage.Owner);
                     }
 
+                    //--------------------
+                    // Call "MethodToUpdateDom":
+                    //--------------------
+                    if (propertyMetadata.MethodToUpdateDom != null)
+                    {
+                        if (!valueWasRetrieved)
+                        {
+                            value = storage.ActualValue;
+                            valueWasRetrieved = true;
+                        }
+
+                        // Call the "Method to update DOM":
+                        propertyMetadata.MethodToUpdateDom(storage.Owner, value);
+                    }
+
+                    //--------------------
+                    // Call PropertyChanged:
+                    //--------------------
+                    //#if CSHTML5BLAZOR && DEBUG
+                    //                        string prettyPrintPropertyMetadata = propertyMetadata + (propertyMetadata != null ? propertyMetadata.GetHashCode().ToString() : "");
+                    //                        Console.WriteLine("OPENSILVER DEBUG: VisualTreeManager: RenderElementsAndRaiseChangedEventOnAllDependencyProperties:"
+                    //                            + " dependencyObject:" + prettyPrintDependencyObject
+                    //                            + " property:" + prettyPrintProperty
+                    //                            + " propertyMetadata:" + propertyMetadata
+                    //                            + " MSG: " + (propertyMetadata.PropertyChangedCallback != null ? "has" : "has not") + " a PropertyChangedCallback" );
+                    //#endif
+                    if (propertyMetadata.PropertyChangedCallback != null
+                        && propertyMetadata.CallPropertyChangedWhenLoadedIntoVisualTree != WhenToCallPropertyChangedEnum.Never)
+                    {
+                        if (!valueWasRetrieved)
+                        {
+                            value = storage.ActualValue;
+                            valueWasRetrieved = true;
+                        }
+
+                        //#if CSHTML5BLAZOR && DEBUG
+                        //                            Console.WriteLine("OPENSILVER DEBUG: VisualTreeManager: RenderElementsAndRaiseChangedEventOnAllDependencyProperties:" 
+                        //                                + " dependencyObject:" + prettyPrintDependencyObject 
+                        //                                + " property:" + prettyPrintProperty 
+                        //                                + " propertyMetadata:" + propertyMetadata
+                        //                                + " MSG: is raising PropertyChangedCallback)");
+                        //#endif
+                        // Raise the "PropertyChanged" event:
+                        propertyMetadata.PropertyChangedCallback(storage.Owner, new DependencyPropertyChangedEventArgs(value, value, property));
+
+                        // Remember that we raised the event, to avoid raising it again in the code below:
+                        //propertiesForWhichTheEventHasAlreadyBeenRaised.Add(property, property); //commented since the "code below" is commented
+                    }
+                }
+
 
 #if PERFSTAT
-                    Performance.Counter("VisualTreeManager: RaisePropertyChanged for property '" + property.Name + "'", t1);
+                Performance.Counter("VisualTreeManager: RaisePropertyChanged for property '" + property.Name + "'", t1);
 #endif
-                }
             }
             /*
             //------------------------------------------------------------------------------------
@@ -935,4 +941,44 @@ namespace CSHTML5.Internal
             return null;
         }
     }
+
+#if REWORKLOADED
+    internal sealed class INTERNAL_VisualTreeOperation
+    {
+        private readonly Queue<UIElement> visualElements;
+
+        static INTERNAL_VisualTreeOperation()
+        {
+            Current = new INTERNAL_VisualTreeOperation();
+        }
+
+        private INTERNAL_VisualTreeOperation()
+        {
+            this.visualElements = new Queue<UIElement>();
+        }
+
+        public static INTERNAL_VisualTreeOperation Current { get; private set; }
+
+        public UIElement Root { get; set; }
+
+        public void Enqueue(UIElement uiE)
+        {
+            this.visualElements.Enqueue(uiE);
+        }
+
+        public void Complete()
+        {
+            while (this.visualElements.Count > 0)
+            {
+                UIElement uiE = this.visualElements.Dequeue();
+                if (uiE._isLoaded)
+                {
+                    uiE.INTERNAL_FinalizeAttachToParent();
+                    uiE.StartManagingPointerPositionForPointerExitedEventIfNeeded();
+                }
+            }
+            this.Root = null;
+        }
+    }
+#endif
 }

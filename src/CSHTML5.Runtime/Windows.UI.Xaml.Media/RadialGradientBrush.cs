@@ -80,7 +80,8 @@ namespace Windows.UI.Xaml.Media
         /// property.
         /// </summary>
         public static readonly DependencyProperty CenterProperty =
-            DependencyProperty.Register("Center", typeof(Point), typeof(RadialGradientBrush), new PropertyMetadata(new Point(0.5,0.5)));
+            DependencyProperty.Register("Center", typeof(Point), typeof(RadialGradientBrush), new PropertyMetadata(new Point(0.5,0.5))
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
         // Returns:
@@ -100,7 +101,8 @@ namespace Windows.UI.Xaml.Media
         /// property.
         /// </summary>
         public static readonly DependencyProperty GradientOriginProperty =
-            DependencyProperty.Register("GradientOrigin", typeof(Point), typeof(RadialGradientBrush), new PropertyMetadata(new Point(0.5, 0.5)));
+            DependencyProperty.Register("GradientOrigin", typeof(Point), typeof(RadialGradientBrush), new PropertyMetadata(new Point(0.5, 0.5))
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Gets or sets the horizontal radius of the outermost circle of the radial
@@ -116,7 +118,8 @@ namespace Windows.UI.Xaml.Media
         /// property.
         /// </summary>
         public static readonly DependencyProperty RadiusXProperty =
-            DependencyProperty.Register("RadiusX", typeof(double), typeof(RadialGradientBrush), new PropertyMetadata(0.5));
+            DependencyProperty.Register("RadiusX", typeof(double), typeof(RadialGradientBrush), new PropertyMetadata(0.5)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// Gets or sets the vertical radius of the outermost circle of a radial gradient.
@@ -131,7 +134,8 @@ namespace Windows.UI.Xaml.Media
         /// property.
         /// </summary>
         public static readonly DependencyProperty RadiusYProperty =
-            DependencyProperty.Register("RadiusY", typeof(double), typeof(RadialGradientBrush), new PropertyMetadata(0.5));
+            DependencyProperty.Register("RadiusY", typeof(double), typeof(RadialGradientBrush), new PropertyMetadata(0.5)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
 

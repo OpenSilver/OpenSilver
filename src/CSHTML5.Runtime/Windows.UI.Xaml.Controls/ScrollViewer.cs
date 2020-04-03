@@ -141,7 +141,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the HorizontalScrollBarVisibility dependency property.
         /// </summary>
         public static readonly DependencyProperty HorizontalScrollBarVisibilityProperty =
-            DependencyProperty.Register("HorizontalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer), new PropertyMetadata(ScrollBarVisibility.Disabled, HorizontalScrollBarVisibility_Changed));
+            DependencyProperty.Register("HorizontalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer), new PropertyMetadata(ScrollBarVisibility.Disabled, HorizontalScrollBarVisibility_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         static void HorizontalScrollBarVisibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is ScrollViewer)
@@ -481,7 +482,9 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the VerticalScrollBarVisibility dependency property.
         /// </summary>
         public static readonly DependencyProperty VerticalScrollBarVisibilityProperty =
-            DependencyProperty.Register("VerticalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer), new PropertyMetadata(ScrollBarVisibility.Visible, VerticalScrollBarVisibility_Changed));
+            DependencyProperty.Register("VerticalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer), new PropertyMetadata(ScrollBarVisibility.Visible, VerticalScrollBarVisibility_Changed)
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+        
         static void VerticalScrollBarVisibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is ScrollViewer)
