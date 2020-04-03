@@ -37,11 +37,19 @@ namespace Windows.Foundation
 #endif
     public partial struct Size
     {
-        double _width;
-        double _height;
+        // Caching is actually over twice faster than creating a new Size, even though it is a Value Type
+        private static readonly Size emptySize;
+        
+        private double _width;
+        private double _height;
 
         static Size()
         {
+            emptySize = new Size
+            {
+                _width = double.NegativeInfinity,
+                _height = double.NegativeInfinity
+            };
             TypeFromStringConverters.RegisterConverter(typeof(Size), s => Parse(s));
         }
 
@@ -104,11 +112,7 @@ namespace Windows.Foundation
         {
             get
             {
-                return new Size
-                {
-                    _width = double.NegativeInfinity,
-                    _height = double.NegativeInfinity
-                };
+                return emptySize;
             }
         }
 
