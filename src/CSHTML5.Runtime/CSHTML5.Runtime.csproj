@@ -67,6 +67,8 @@
     <Compile Include="System.ComponentModel\WORKINPROGRESS\SortDescription.cs" />
     <Compile Include="System.ComponentModel\WORKINPROGRESS\SortDescriptionCollection.cs" />
     <Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageSettings.cs" />
+    <Compile Include="System.Net\SecurityProtocolType.cs" />
+    <Compile Include="System.Net\ServicePointManager.cs" />
     <Compile Include="System.Net\WORKINPROGRESS\HttpWebRequest.cs" />
     <Compile Include="System.Net\WORKINPROGRESS\WebRequest.cs" />
     <Compile Include="System.Resources\ResourceManager.cs" />
