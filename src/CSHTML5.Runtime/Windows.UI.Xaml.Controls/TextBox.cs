@@ -1092,7 +1092,7 @@ return globalIndexes;
                         INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBox._contentEditableDiv).whiteSpace = "nowrap";
                         break;
                     case TextWrapping.Wrap:
-                        INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBox._contentEditableDiv).whiteSpace = "normal";
+                        INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBox._contentEditableDiv).whiteSpace = "pre-wrap";
                         //todo: once we find how to make the note work, apply the same thing to the TextBlock.
                         //Note: the following line would be useful to break the words when they are too long without spaces.
                         //      unfortunately, it only works in chrome.
