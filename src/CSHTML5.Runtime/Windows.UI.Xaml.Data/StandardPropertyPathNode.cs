@@ -118,16 +118,8 @@ namespace Windows.UI.Xaml.Data
 
         internal override void OnSourceChanged(object oldvalue, object newValue)
         {
-            DependencyObject oldSource = null;
-            DependencyObject newSource = null;
-            if (oldvalue is DependencyObject)
-            {
-                oldSource = (DependencyObject)oldvalue;
-            }
-            if (newValue is DependencyObject)
-            {
-                newSource = (DependencyObject)newValue;
-            }
+            DependencyObject oldSource = oldvalue as DependencyObject;
+            DependencyObject newSource = newValue as DependencyObject;
 
             var listener = _dependencyPropertyListener;
             if (listener != null)
@@ -147,7 +139,7 @@ namespace Windows.UI.Xaml.Data
                 if (!BindsDirectlyToSource)
                 {
                     DependencyProperty dependencyProperty;
-                    if (_propertyName == "DataContext") // Note: we handle the special case of the DataContext because the "DataContext" property is defined in the "UIElement" class, and some classes such as "RotateTransform" inherit the DataContext property even though they are not UIElements, so if we looked for the "DataContext" property in the type (and its base types) we wouldn't find it.
+                    if (_propertyName == "DataContext")
                     {
                         dependencyProperty = FrameworkElement.DataContextProperty;
                     }

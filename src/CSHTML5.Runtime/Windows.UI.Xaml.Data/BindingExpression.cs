@@ -82,9 +82,14 @@ namespace Windows.UI.Xaml.Data
         private object _bindingSource;
 
         internal BindingExpression(Binding binding, DependencyObject target, DependencyProperty property)
+            : this(binding, property)
+        {
+            this.Target = target;
+        }
+
+        internal BindingExpression(Binding binding, DependencyProperty property)
         {
             ParentBinding = binding;
-            Target = target;
             TargetProperty = property;
 
             if (binding.ElementName == null && binding.Source == null && binding.RelativeSource == null) //this means that it is bound to current DataContext.
@@ -322,6 +327,7 @@ namespace Windows.UI.Xaml.Data
 
         internal bool INTERNAL_ForceValidateOnNextSetValue = false; //This boolean is set to true in OnAttached to force Validation at the next UpdateSourceObject. Its purpose is to force the Validation only once to avoid hindering performances.
 
+        private bool _isAttaching;
 
 
         internal void OnAttached(DependencyObject target)
@@ -331,7 +337,9 @@ namespace Windows.UI.Xaml.Data
                 return;
             }
 
-            IsAttached = true;
+            this._isAttaching = IsAttached = true;
+
+            this.Target = target;
 
             this.FindSource();
 
@@ -348,6 +356,8 @@ namespace Windows.UI.Xaml.Data
                     INTERNAL_ForceValidateOnNextSetValue = true;
                 }
             }
+
+            this._isAttaching = false;
         }
 
         /// <summary>
@@ -706,6 +716,10 @@ namespace Windows.UI.Xaml.Data
 
         private void Refresh()
         {
+            if (this._isAttaching)
+            {
+                return;
+            }
             if (IsAttached)
             {
                 bool oldIsUpdating = IsUpdating;

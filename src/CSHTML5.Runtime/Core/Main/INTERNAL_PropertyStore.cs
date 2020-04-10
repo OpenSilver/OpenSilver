@@ -1,19 +1,4 @@
-﻿
-
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
-
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 #if MIGRATION
 using System.Windows;
@@ -21,17 +6,19 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 #else
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
-using Windows.UI;
+using Windows.UI.Xaml.Media;
 #endif
-
 
 namespace CSHTML5.Internal
 {
     internal static class INTERNAL_PropertyStore
     {
+        #region Internal Methods
+
         /// <summary>
         /// Attempt to get a Property Storage
         /// </summary>
@@ -125,408 +112,404 @@ namespace CSHTML5.Internal
             return createIfNotFoud;
         }
 
-        [Obsolete("use TryGetStorage")]
-        public static INTERNAL_PropertyStorage GetStorageIfExists(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
+        internal static void SetValueCommon(INTERNAL_PropertyStorage storage,
+                                            object newValue,
+                                            bool coerceWithCurrentValue)
         {
-            INTERNAL_PropertyStorage storage;
-            TryGetStorage(dependencyObject, dependencyProperty, false /*don't create*/, out storage);
-            return storage;
-        }
-
-        [Obsolete("use TryGetStorage")]
-        public static INTERNAL_PropertyStorage GetStorageOrCreateNewIfNotExists(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
-        {
-            INTERNAL_PropertyStorage storage;
-            TryGetStorage(dependencyObject, dependencyProperty, true /*create*/, out storage);
-            return storage;
-        }
-
-        [Obsolete("use TryGetInheritedPropertyStorage")]
-        internal static INTERNAL_PropertyStorage GetInheritedPropertyStorageOrCreateNewIfNotFound(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
-        {
-            // Create the Storage if it does not already exist
-            INTERNAL_PropertyStorage storage;
-            if (!dependencyObject.INTERNAL_AllInheritedProperties.TryGetValue(dependencyProperty, out storage))
+            if (newValue == INTERNAL_NoValue.NoValue)
             {
-                // Get the storage or create a new one:
-                if (!dependencyObject.INTERNAL_PropertyStorageDictionary.TryGetValue(dependencyProperty, out storage))
-                {
-                    // Get the type metadata (if any):
-                    PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(dependencyObject.GetType());
-
-                    // Create the storage:
-                    storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty, typeMetadata);
-
-                    //-----------------------
-                    // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
-                    //-----------------------
-                    //below: we check if the property is useful to the current DependencyObject, in which case we set it as its inheritedValue in "PropertyStorageDictionary"
-                    if (dependencyProperty.OwnerType.IsAssignableFrom(dependencyObject.GetType()))
-                    {
-                        //-----------------------
-                        // ADD THE STORAGE TO "INTERNAL_PropertyStorageDictionary"
-                        //-----------------------
-                        dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
-                    }
-                }
-                dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);                
+                global::System.Diagnostics.Debug.Assert(!coerceWithCurrentValue, "Don't call SetCurrentValue with UnsetValue");
+                ClearValueCommon(storage);
+                return;
             }
 
-            return storage;
-
-
-#region OldStuff
-            /*
-            // This method ensures that the two dictionaries ("INTERNAL_PropertyStorageDictionary" and "INTERNAL_AllInheritedProperties") always share the same instances of Storages (for properties that are in common):
-            // This is how it works:
-            // - If both in INTERNAL_PropertyStorageDictionary and in INTERNAL_AllInheritedProperties, return any one
-            // - If in INTERNAL_PropertyStorageDictionary but not in INTERNAL_AllInheritedProperties, copy it to INTERNAL_AllInheritedProperties and return it
-            // - If in INTERNAL_AllInheritedProperties but not in INTERNAL_PropertyStorageDictionary, AND the property belongs to the object (or one of its ancestors), copy it to INTERNAL_PropertyStorageDictionary and return it
-            // - If in neither INTERNAL_PropertyStorageDictionary nor INTERNAL_AllInheritedProperties, create it in INTERNAL_AllInheritedProperties, and, if the property belongs to the object (or one of its ancestors), copy it to INTERNAL_PropertyStorageDictionary and return it
-
-            if (dependencyObject.INTERNAL_PropertyStorageDictionary != null && dependencyObject.INTERNAL_PropertyStorageDictionary.ContainsKey(dependencyProperty))
+            if (!coerceWithCurrentValue)
             {
-                if (dependencyObject.INTERNAL_AllInheritedProperties != null && dependencyObject.INTERNAL_AllInheritedProperties.ContainsKey(dependencyProperty))
+                if (storage.BaseValueSourceInternal == BaseValueSourceInternal.Local)
                 {
-                    //--------------------------------------------
-                    // The property storage is in both INTERNAL_PropertyStorageDictionary and INTERNAL_AllInheritedProperties, so we return any one:
-                    //--------------------------------------------
-                    return dependencyObject.INTERNAL_AllInheritedProperties[dependencyProperty];
-                }
-                else
-                {
-                    //--------------------------------------------
-                    // The property storage is in INTERNAL_PropertyStorageDictionary but not in INTERNAL_AllInheritedProperties, so we copy it to INTERNAL_AllInheritedProperties and return it:
-                    //--------------------------------------------
-                    var storage = dependencyObject.INTERNAL_PropertyStorageDictionary[dependencyProperty];
-                    if (createAndSaveNewStorageIfNotExists)
+                    // Detach the previous BindingExpression if any
+                    // If the effective value is not the local value, the binding expression is already detached
+                    BindingExpression oldExpr = storage.IsExpression ? storage.LocalValue as BindingExpression : null;
+                    if (oldExpr != null)
                     {
-                        if (dependencyObject.INTERNAL_AllInheritedProperties == null)
-                            dependencyObject.INTERNAL_AllInheritedProperties = new Dictionary<DependencyProperty,INTERNAL_PropertyStorage>();
-                        dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);
+                        oldExpr.OnDetached(storage.Owner);
                     }
-                    return storage;
                 }
+
+                // Set the new local value
+                storage.LocalValue = newValue;
+            }
+
+            UpdateEffectiveValue(storage,
+                                 newValue,
+                                 BaseValueSourceInternal.Local,
+                                 coerceWithCurrentValue, // coerceWithCurrentValue
+                                 false, // coerceValue
+                                 false, // clearValue
+                                 true); // propagateChanges
+        }
+
+        internal static void RefreshBindingExpressionCommon(INTERNAL_PropertyStorage storage, BindingExpression expression)
+        {
+            global::System.Diagnostics.Debug.Assert(expression != null, "Expression should not be null");
+            global::System.Diagnostics.Debug.Assert(storage.IsExpression || storage.IsExpressionFromStyle, "Property base value is not a BindingExpression !");
+
+            UpdateEffectiveValue(storage,
+                                 expression,
+                                 BaseValueSourceInternal.Local,
+                                 false, // coerceWithCurrentValue
+                                 false, // coerceValue
+                                 false, // clearValue
+                                 true); // propagateChanges
+        }
+
+        internal static void ClearValueCommon(INTERNAL_PropertyStorage storage)
+        {
+            // Check for binding expression
+            BindingExpression currentExpr = storage.IsExpression
+                                            ? storage.LocalValue as BindingExpression
+                                            : null;
+            if (currentExpr != null)
+            {
+                currentExpr.OnDetached(storage.Owner);
+            }
+
+            // Reset local value
+            storage.LocalValue = INTERNAL_NoValue.NoValue;
+
+            UpdateEffectiveValue(storage,
+                                 INTERNAL_NoValue.NoValue,
+                                 BaseValueSourceInternal.Local,
+                                 false, // coerceWithCurrentValue
+                                 false, // coerceValue
+                                 true, // clearValue
+                                 true); // propagateChanges
+        }
+
+        internal static void CoerceValueCommon(INTERNAL_PropertyStorage storage)
+        {
+            if (storage.IsCoercedWithCurrentValue)
+            {
+                SetValueCommon(storage, storage.ModifiedValue.CoercedValue, true);
+                return;
+            }
+
+            UpdateEffectiveValue(storage,
+                                 null, //unused for coerce operation 
+                                 BaseValueSourceInternal.Local,
+                                 false, // coerceWithCurrentValue
+                                 true, // coerceValue
+                                 false, // clearValue
+                                 true); // propagateChanges
+        }
+
+        internal static object GetEffectiveValue(INTERNAL_PropertyStorage storage)
+        {
+            if (storage.HasModifiers)
+            {
+                return (storage.IsCoercedWithCurrentValue || storage.IsCoerced)
+                       ? storage.ModifiedValue.CoercedValue
+                       : storage.ModifiedValue.ExpressionValue;
             }
             else
             {
-                if (dependencyObject.INTERNAL_AllInheritedProperties != null && dependencyObject.INTERNAL_AllInheritedProperties.ContainsKey(dependencyProperty))
+                return storage.Value;
+            }
+        }
+
+        internal static void SetAnimationValue(INTERNAL_PropertyStorage storage,
+                                               object value)
+        {
+            if (storage.IsExpression || storage.IsExpressionFromStyle)
+            {
+                BindingExpression currentExpr = storage.ModifiedValue.BaseValue as BindingExpression;
+                if (currentExpr != null)
                 {
-                    //--------------------------------------------
-                    // The property storage is in INTERNAL_AllInheritedProperties but not in INTERNAL_PropertyStorageDictionary, therefore, if the property belongs to the object (or one of its ancestors), we copy it to INTERNAL_PropertyStorageDictionary and we return it
-                    //--------------------------------------------
-                    var storage = dependencyObject.INTERNAL_AllInheritedProperties[dependencyProperty];
-                    if (createAndSaveNewStorageIfNotExists && dependencyProperty.OwnerType.IsAssignableFrom(dependencyObject.GetType())) // The second condition checks if the property belongs to the object (or one of its ancestors)
-                    {
-                        if (dependencyObject.INTERNAL_PropertyStorageDictionary == null)
-                            dependencyObject.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty,INTERNAL_PropertyStorage>();
-                        dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
-                    }
-                    return storage;
+                    currentExpr.OnDetached(storage.Owner);
+                }
+            }
+
+            storage.AnimatedValue = value;
+
+            UpdateEffectiveValue(storage,
+                                 value,
+                                 BaseValueSourceInternal.Animated,
+                                 false, // coerceWithCurrentValue
+                                 false, // coerceValue
+                                 value == INTERNAL_NoValue.NoValue, // clearValue
+                                 true); // propagateChanges
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private static void ComputeEffectiveValue(INTERNAL_PropertyStorage storage,
+                                                  out object effectiveValue,
+                                                  out BaseValueSourceInternal kind)
+        {
+            /*if ((effectiveValue = storage.VisualStateValue) != INTERNAL_NoValue.NoValue)
+            {
+                kind = KindOfValue.VisualState;
+            }
+            else */
+            if (!storage.IsAnimatedOverLocal &&
+               (effectiveValue = storage.LocalValue) != INTERNAL_NoValue.NoValue)
+            {
+                kind = BaseValueSourceInternal.Local;
+            }
+            else if (storage.IsAnimatedOverLocal &&
+                    (effectiveValue = storage.AnimatedValue) != INTERNAL_NoValue.NoValue)
+            {
+                kind = BaseValueSourceInternal.Animated;
+            }
+            else if ((effectiveValue = storage.LocalStyleValue) != INTERNAL_NoValue.NoValue)
+            {
+                kind = BaseValueSourceInternal.LocalStyle;
+            }
+            else if ((effectiveValue = storage.ImplicitStyleValue) != INTERNAL_NoValue.NoValue)
+            {
+                kind = BaseValueSourceInternal.ImplicitStyle;
+            }
+            else if ((effectiveValue = storage.InheritedValue) != INTERNAL_NoValue.NoValue)
+            {
+                kind = BaseValueSourceInternal.Inherited;
+            }
+            else // Property default value
+            {
+                effectiveValue = storage.TypeMetadata.DefaultValue;
+                kind = BaseValueSourceInternal.Default;
+            }
+        }
+
+        private static void UpdateEffectiveValue(INTERNAL_PropertyStorage storage,
+                                                 object newValue,
+                                                 BaseValueSourceInternal newValueSource,
+                                                 bool coerceWithCurrentValue,
+                                                 bool coerceValue,
+                                                 bool clearValue,
+                                                 bool propagateChanges)
+        {
+            global::System.Diagnostics.Debug.Assert((coerceWithCurrentValue == coerceValue && !coerceValue) || coerceValue != coerceWithCurrentValue);
+
+            bool isCoerceOperation = coerceValue || coerceWithCurrentValue;
+            BaseValueSourceInternal oldBaseValueSource = storage.BaseValueSourceInternal;
+
+            object oldValue;
+            BindingExpression currentExpr = null;
+
+            // Compute new value
+            object effectiveValue;
+            BaseValueSourceInternal effectiveValueKind;
+            if (isCoerceOperation)
+            {
+                // Source and base value are unchanged during coercion operation
+                effectiveValue = newValue;
+                effectiveValueKind = oldBaseValueSource;
+
+                // Get old value before it gets overriden
+                oldValue = GetEffectiveValue(storage);
+            }
+            else
+            {
+                ComputeEffectiveValue(storage, out effectiveValue, out effectiveValueKind);
+
+                // Check for early exit if effective value is not impacted (if we are doing 
+                // a coerce operation, we have to go through the update process)
+                //   - If we are clearing an entry, the effective value is only impacted if 
+                //   the current base value source is of higher priority than the cleared entry.
+                //   - If we are setting a new value in an entry, the effective value is only
+                //   impacted if the newly computed base value is of higher priority (strictly) 
+                //   than the current base value source.
+                if (clearValue ? oldBaseValueSource > newValueSource
+                               : (oldBaseValueSource > effectiveValueKind &&
+                                 !(oldBaseValueSource == BaseValueSourceInternal.Local && newValueSource == BaseValueSourceInternal.Animated)))
+                {
+                    return;
+                }
+
+                // Get old value before it gets overriden
+                oldValue = GetEffectiveValue(storage);
+
+                currentExpr = (storage.IsExpression || storage.IsExpressionFromStyle) ? storage.ModifiedValue.BaseValue as BindingExpression : null;
+
+                // If the current base value is a BindingExpression, it should have been detached by now
+                // Or is the same instance as 'effectiveValue' (this occurs when we update a property bound to a
+                // BindingExpression)
+                global::System.Diagnostics.Debug.Assert(currentExpr == null ||
+                                                        !currentExpr.IsAttached ||
+                                                        object.ReferenceEquals(currentExpr, effectiveValue), "Binding expression should be detached.");
+
+                storage.ResetValue();
+
+                // Update the base value source
+                storage.BaseValueSourceInternal = effectiveValueKind;
+            }
+
+            object computedValue;
+
+            if (!isCoerceOperation)
+            {
+                BindingExpression newExpr = effectiveValue as BindingExpression;
+                if (newExpr == null)
+                {
+                    computedValue = storage.Property.PropertyType == typeof(string)
+                                    ? effectiveValue?.ToString()
+                                    : effectiveValue;
+                    storage.Value = computedValue;
                 }
                 else
                 {
-                    //--------------------------------------------
-                    // The property storage is in neither INTERNAL_PropertyStorageDictionary nor INTERNAL_AllInheritedProperties, therefore, we create it in INTERNAL_AllInheritedProperties, and, if the property belongs to the object (or one of its ancestors), we copy it to INTERNAL_PropertyStorageDictionary and return it:
-                    //--------------------------------------------
-                    var storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty);
-                    if (createAndSaveNewStorageIfNotExists)
-                    {
-                        if (dependencyObject.INTERNAL_AllInheritedProperties == null)
-                                dependencyObject.INTERNAL_AllInheritedProperties = new Dictionary<DependencyProperty,INTERNAL_PropertyStorage>();
-                        dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);
+                    global::System.Diagnostics.Debug.Assert(effectiveValueKind == BaseValueSourceInternal.Local || effectiveValueKind == BaseValueSourceInternal.LocalStyle);
 
-                        if (dependencyProperty.OwnerType.IsAssignableFrom(dependencyObject.GetType())) // This checks if the property belongs to the object (or one of its ancestors)
+                    // If the new BindingExpression is the same as the current one,
+                    // the BindingExpression is already attached
+                    if (!object.ReferenceEquals(currentExpr, newExpr))
+                    {
+                        if (newExpr.IsAttached)
                         {
-                            if (dependencyObject.INTERNAL_PropertyStorageDictionary == null)
-                                dependencyObject.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty,INTERNAL_PropertyStorage>();
-                            dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
+                            throw new InvalidOperationException(string.Format("Cannot attach an instance of '{0}' multiple times", typeof(BindingExpression)));
                         }
-                    }
-                    return storage;
-                }
-            }
-            */
-#endregion
-        }
-
-        public static object GetValue(INTERNAL_PropertyStorage storage, PropertyMetadata typeMetadata)
-        {
-            if (storage == null)
-            {
-                throw new ArgumentNullException("storage");
-            }
-            return storage.ActualValue;
-        }
-
-        public static object ComputeActualValue(INTERNAL_PropertyStorage storage, PropertyMetadata typeMetadata, bool ignoreCoercedValue)
-        {
-            object actualValue;
-
-            if (storage._isIsEnabledOrIsHitTestVisibleProperty)
-            {
-                if ((actualValue = storage.InheritedValue) != INTERNAL_NoValue.NoValue && actualValue != null && ((bool)actualValue) == false)
-                {
-                    return false;
-                }
-            }
-
-            if ((!ignoreCoercedValue && (actualValue = storage.CoercedValue) != INTERNAL_NoValue.NoValue)
-            || ((actualValue = storage.VisualStateValue) != INTERNAL_NoValue.NoValue)
-            || (storage.ActiveLocalValue.ActiveValue == KindOfValue.Local && (actualValue = storage.Local) != INTERNAL_NoValue.NoValue)
-            || (storage.ActiveLocalValue.ActiveValue == KindOfValue.Animated && (actualValue = storage.AnimationValue) != INTERNAL_NoValue.NoValue)
-            || ((actualValue = storage.LocalStyleValue) != INTERNAL_NoValue.NoValue)
-            || ((actualValue = storage.ImplicitStyleValue) != INTERNAL_NoValue.NoValue)
-            || ((actualValue = storage.InheritedValue) != INTERNAL_NoValue.NoValue))
-            {
-                return actualValue;
-            }
-            else
-            {
-                // Return the default value:
-                return (typeMetadata != null) ? typeMetadata.DefaultValue : null;
-            }
-        }
-
-        internal static void SetSpecificValue(INTERNAL_PropertyStorage storage, KindOfValue kindOfValueToSet, object newValue)
-        {
-            PropertyMetadata typeMetadata = storage.TypeMetadata;
-            //-----------------------
-            // SET THE VALUE IN THE STORAGE:
-            //-----------------------
-            object oldValue;
-            if (storage.SetValue(newValue, kindOfValueToSet, out oldValue)) // is greather priority
-            {
-                // If we are removing the value by setting it to "NoValue", we need to recompute the ActualValue:
-                if (newValue == INTERNAL_NoValue.NoValue)
-                {
-                    // Update the ActualValue to the one with the highest priority that is not set to "INTERNAL_NoValue.NoValue"
-                    newValue = ComputeActualValue(storage, typeMetadata, true);
-                }
-
-                //if the new Value changes the actual value and is coerced, we compute the coerced value and set it.
-                if (typeMetadata.CoerceValueCallback != null && kindOfValueToSet != KindOfValue.Coerced)
-                {
-                    // Compute the coerced value
-                    newValue = typeMetadata.CoerceValueCallback(storage.Owner, newValue);
-
-                    // Remember the coerced value
-                    storage.CoercedValue = newValue;
-                    storage.ActualValue = newValue;
-                }
-                else
-                {
-                    storage.ActualValue = newValue;
-                }
-
-                //-----------------------
-                // Reset old value inheritance context
-                //-----------------------
-                if (oldValue is DependencyObject oldValueDO && !(oldValueDO is FrameworkElement))
-                {
-                    oldValueDO.SetInheritanceContext(null);
-                }
-
-                //-----------------------
-                // Set new value inheritance context
-                //-----------------------
-                if (newValue is DependencyObject newValueDO && !(newValueDO is FrameworkElement))
-                {
-                    newValueDO.SetInheritanceContext(storage.Owner);
-                }
-
-                //-----------------------
-                // HANDLE SOME SPECIAL Cases where we don't want to propagate the changes
-                //-----------------------
-                if (storage._isIsEnabledOrIsHitTestVisibleProperty)
-                {
-                    object value;
-                    if ((value = storage.InheritedValue) != INTERNAL_NoValue.NoValue && value != null && (((bool)value) == false))
-                    {
-                        return;
-                    }
-                }
-
-                if (!ArePropertiesEqual(oldValue, newValue, storage.Property.PropertyType))
-                {
-                    //-----------------------
-                    // RAISE THE "PROPERTYCHANGED" EVENT:
-                    //-----------------------
-                    if (!typeMetadata.Inherits || ShouldRaisePropertyChanged(storage))
-                    {
-                        OnPropertyChanged(storage, oldValue, newValue);
+                        newExpr.OnAttached(storage.Owner);
+                        storage.Value = newExpr; // Set the new base value
                     }
 
-                    //-----------------------
-                    // PROPAGATE TO CHILDREN (INHERITED PROPERTIES ONLY):
-                    //-----------------------
-                    if (typeMetadata.Inherits)
+                    if (effectiveValueKind == BaseValueSourceInternal.Local)
                     {
-                        CascadeInheritedPropertyToChildren(storage, newValue);
-                    }
-                }
-            }
-        }
-
-        internal static void SetInheritedValue(INTERNAL_PropertyStorage storage, object newValue, bool recursively)
-        {
-            PropertyMetadata typeMetadata = storage.TypeMetadata;
-            //-----------------------
-            // CHECK THAT A LOCAL OR STYLE VALUE DOES NOT EXIST 
-            // (otherwise the local/style values superset the inherited value, 
-            // and we don't want to raise PropertyChanged, nor continue the recursion)
-            //-----------------------
-            object oldValue;
-            if (storage.SetInheritedValue(newValue, out oldValue)) // Actual value is impacted
-            {
-                newValue = ComputeActualValue(storage, typeMetadata, true);
-                if (typeMetadata != null && typeMetadata.CoerceValueCallback != null)
-                {
-                    // Compute the coerced value:
-                    newValue = typeMetadata.CoerceValueCallback(storage.Owner, newValue);
-
-                    // Remember the coerced value:
-                    storage.CoercedValue = newValue;
-                    storage.ActualValue = newValue;
-                }
-                else
-                {
-                    storage.ActualValue = newValue;
-                }
-
-                //-----------------------
-                // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
-                //-----------------------
-                //we only do the following inside the "if" because otherwise, the children's inherithed property would not change anyway
-                if (!ArePropertiesEqual(oldValue, newValue, storage.Property.PropertyType))
-                {
-                    if (ShouldRaisePropertyChanged(storage))
-                    {
-                        OnPropertyChanged(storage, oldValue, newValue);
-                    }
-                    if (recursively)
-                    {
-                        CascadeInheritedPropertyToChildren(storage, newValue);
-                    }
-                }
-            }
-            else if (storage._isIsEnabledOrIsHitTestVisibleProperty) //todo: if we decide to make coercion possible on IsHitTestVisible or IsEnabled, change the "newValue" below into "coercedNewValue" (probably)
-            {
-                if ((bool)newValue)
-                {
-                    storage.ActualValueIsDirty = true; //The actual value is Dirty because it didn't take into consideration the values that usually have priority over the inherited value (i.e: local) and since the newValue is "true", it now needs to take them into consideration.
-                    INTERNAL_PropertyStorage otherStorage;
-                    if (TryGetStorage(storage.Owner, storage.Property, false/*don't create*/, out otherStorage))
-                    {
-                        newValue = otherStorage.ActualValue;
+                        storage.SetExpressionValue(storage.TypeMetadata.DefaultValue, newExpr);
                     }
                     else
                     {
-                        newValue = typeMetadata.DefaultValue;
+                        storage.SetExpressionFromStyleValue(storage.TypeMetadata.DefaultValue, newExpr);
                     }
+
+                    computedValue = newExpr.GetValue(storage.Property, storage.Owner.GetType());
+                    computedValue = storage.Property.PropertyType == typeof(string)
+                                    ? computedValue?.ToString()
+                                    : computedValue;
+                    storage.ModifiedValue.ExpressionValue = computedValue;
                 }
-                if (!object.Equals(oldValue, newValue)) // note: No need to call 'ArePropertiesEqual' since we know we are dealing with Booleans.
-                {
-                    storage.ActualValue = newValue; // Make sure Storage.ActualValue is up to date.
-                    if (ShouldRaisePropertyChanged(storage))
-                    {
-                        OnPropertyChanged(storage, oldValue, newValue);
-                    }
-                    if (recursively)
-                    {
-                        CascadeInheritedPropertyToChildren(storage, newValue);
-                    }
-                }
-            }
-        }
-        
-        internal static bool ArePropertiesEqual(object obj1, object obj2, Type type)
-        {
-            // Note: In Silverlight, a DependencyProperty callback is only called if one of the following condition is met :
-            // - The Property type is a value type or a string and the old and new value are not equal (by value)
-            // - The Property type is a reference and the old value and new value are not the same object
-            // - The Property is the DataContext DependencyProperty (in this case the event 'DataContextChanged' is always raised) (Not handled in this method)
-            if (type.IsValueType || type == typeof(string))
-            {
-                return object.Equals(obj1, obj2);
-            }
-            return object.ReferenceEquals(obj1, obj2);
-        }
-
-        internal static bool ShouldRaisePropertyChanged(INTERNAL_PropertyStorage storage)
-        {
-            // Note: we only want to call "OnPropertyChanged" when the property is used by the current DependencyObject or if it is the DataContext property.
-            if (!storage.Property.IsAttached)
-            {
-                return storage.Property.OwnerType.IsAssignableFrom(storage.Owner.GetType()) || storage.Property == FrameworkElement.DataContextProperty;
-            }
-            return true;
-        }
-
-        internal static void SetLocalStyleValue(INTERNAL_PropertyStorage storage, object newValue)
-        {
-            SetSpecificValue(storage, KindOfValue.LocalStyle, newValue);
-        }
-
-        internal static void CascadeInheritedPropertyToChildren(INTERNAL_PropertyStorage storage, object newValue)
-        {
-            DependencyObject dependencyObject = storage.Owner;
-
-            // Set Inherited Value on the children:
-            if (dependencyObject is UIElement)
-            {
-                UIElement parent = (UIElement)dependencyObject;
-                if (parent.INTERNAL_VisualChildrenInformation != null)
-                {
-                    foreach (UIElement child in parent.INTERNAL_VisualChildrenInformation.Keys) //all the children should in there
-                    {
-                        child.SetInheritedValue(storage.Property, newValue, true);
-                    }
-                }
-            }
-        }
-
-        internal static void ResetInheritedValue(INTERNAL_PropertyStorage storage)
-        {
-            storage.InheritedValue = INTERNAL_NoValue.NoValue; //this only occurs when we detach an item so there is no need to care about the propertyChanged event.
-            storage.ActualValueIsDirty = true;
-        }
-
-        internal static void ResetLocalStyleValue(INTERNAL_PropertyStorage storage)
-        {
-            ResetLocalStyleValue(storage, false);
-        }
-
-        internal static void ResetLocalStyleValue(INTERNAL_PropertyStorage storage, bool dontRefresh)
-        {
-            if (dontRefresh)
-            {
-                storage.LocalStyleValue = INTERNAL_NoValue.NoValue;
-                storage.ActualValueIsDirty = true;
             }
             else
             {
-                // we need to refresh the actual value if we switch from an old style to a new one. for instance:
-                // old style :
-                // <Style>
-                //   <Style.Setters>
-                //     <Setter Property="Property1" Value="Value1">
-                //   <Style.Setters>
-                // <Style>
-                // new style :
-                // <Style>
-                //   <Style.Setters>
-                //     <Setter Property="Property2" Value="Value2">
-                //   <Style.Setters>
-                // <Style>
-                // if we switch from old style to new style we need to force the refresh or the Property1 property would still have
-                // its value set to Value1.
-                SetLocalStyleValue(storage, INTERNAL_NoValue.NoValue);
+                computedValue = coerceWithCurrentValue ? newValue : GetCoercionBaseValue(storage);
+                if (coerceValue)
+                {
+                    storage.ResetCoercedValue();
+                }
+            }
+
+            // Coerce to current value
+            if (coerceWithCurrentValue)
+            {
+                object baseValue = GetCoercionBaseValue(storage);
+                ProcessCoerceValue(storage,
+                                   ref computedValue,
+                                   oldValue,
+                                   baseValue,
+                                   true);
+            }
+
+            // Coerce Value
+            // We don't want to coerce the value if it's being reset to the property's default value
+            if (storage.TypeMetadata.CoerceValueCallback != null && !(clearValue && storage.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default))
+            {
+                object baseValue = GetCoercionBaseValue(storage);
+                ProcessCoerceValue(storage,
+                                   ref computedValue,
+                                   oldValue,
+                                   baseValue,
+                                   false);
+            }
+
+            // Reset old value inheritance context
+            if (oldValue is DependencyObject oldValueDO && !(oldValueDO is FrameworkElement))
+            {
+                oldValueDO.SetInheritanceContext(null);
+            }
+
+            // Set new value inheritance context
+            if (computedValue is DependencyObject computedValueDO && !(computedValueDO is FrameworkElement))
+            {
+                computedValueDO.SetInheritanceContext(storage.Owner);
+            }
+
+            if (!ArePropertiesEqual(oldValue, computedValue, storage.Property.PropertyType))
+            {
+                // Raise the PropertyChanged event
+                if (!storage.TypeMetadata.Inherits || ShouldRaisePropertyChanged(storage))
+                {
+                    OnPropertyChanged(storage, oldValue, computedValue);
+                }
+
+                // Propagate to children if property is inherited
+                if (storage.TypeMetadata.Inherits && propagateChanges)
+                {
+                    CascadeInheritedPropertyToChildren(storage, computedValue);
+                }
+            }
+
+            // Update the source of the Binding, in case the previous value of a property was a Binding and the Mode was "TwoWay":
+            if (currentExpr != null && currentExpr.ParentBinding.Mode == BindingMode.TwoWay) //note: we know that oldBindingExpression.IsUpdating is false because oldBindingExpression is only set in that case (otherwise, it is null).
+            {
+                currentExpr.TryUpdateSourceObject(computedValue);
             }
         }
 
+        private static void ProcessCoerceValue(INTERNAL_PropertyStorage storage,
+                                               ref object newValue,
+                                               object oldValue,
+                                               object baseValue,
+                                               bool coerceWithCurrentValue)
+        {
+            newValue = coerceWithCurrentValue ? newValue : storage.TypeMetadata.CoerceValueCallback(storage.Owner, newValue);
 
-        internal static void OnPropertyChanged(INTERNAL_PropertyStorage storage, object oldValue, object newValue) // "raiseEvenIfNewValueIsSameAsOldValue" is used to force refresh.
+            if (!ArePropertiesEqual(newValue, baseValue, storage.Property.PropertyType))
+            {
+                // returning DependencyProperty.UnsetValue from a Coercion callback means "don't do the set" ...
+                // or "use previous value"
+                if (newValue == INTERNAL_NoValue.NoValue)
+                {
+                    newValue = oldValue;
+                }
+
+                storage.SetCoercedValue(newValue, baseValue, coerceWithCurrentValue);
+            }
+        }
+
+        private static object GetCoercionBaseValue(INTERNAL_PropertyStorage storage)
+        {
+            object baseValue;
+            if (!storage.HasModifiers)
+            {
+                baseValue = storage.Value;
+            }
+            else if (storage.IsCoerced)
+            {
+                if (storage.IsCoercedWithCurrentValue)
+                {
+                    baseValue = storage.ModifiedValue.CoercedValue;
+                }
+                else if (storage.IsExpression/* || storage.IsExpressionFromStyle*/)
+                {
+                    baseValue = storage.ModifiedValue.ExpressionValue;
+                }
+                else
+                {
+                    //global::System.Diagnostics.Debug.Assert(!storage.IsExpressionFromStyle);
+                    // Only modifier is Coerced
+                    baseValue = storage.ModifiedValue.BaseValue;
+                }
+            }
+            else
+            {
+                global::System.Diagnostics.Debug.Assert(storage.IsExpression /* || storage.IsExpressionFromStyle*/);
+                baseValue = storage.ModifiedValue.ExpressionValue;
+            }
+            return baseValue;
+        }
+
+        private static void OnPropertyChanged(INTERNAL_PropertyStorage storage, object oldValue, object newValue)
         {
             DependencyObject sender = storage.Owner;
 
@@ -587,6 +570,98 @@ namespace CSHTML5.Internal
             }
         }
 
+        private static void CascadeInheritedPropertyToChildren(INTERNAL_PropertyStorage storage, object newValue)
+        {
+            DependencyObject dependencyObject = storage.Owner;
+
+            // Set Inherited Value on the children:
+            if (dependencyObject is UIElement parentUIE)
+            {
+                if (parentUIE.INTERNAL_VisualChildrenInformation != null)
+                {
+                    foreach (UIElement child in parentUIE.INTERNAL_VisualChildrenInformation.Keys) //all the children should be in there
+                    {
+                        child.SetInheritedValue(storage.Property, newValue, true);
+                    }
+                }
+            }
+        }
+
+        private static bool ArePropertiesEqual(object obj1, object obj2, Type type)
+        {
+            // Note: In Silverlight (and WPF), a DependencyProperty callback is only called if one of the following condition is met :
+            // - The Property type is a value type or a string and the old and new value are not equal (by value)
+            // - The Property type is a reference and the old value and new value are not the same object
+            // - The Property is the DataContext DependencyProperty (in this case the event 'DataContextChanged' is always raised) (Not handled in this method)
+            if (type.IsValueType || type == typeof(string))
+            {
+                return object.Equals(obj1, obj2);
+            }
+            return object.ReferenceEquals(obj1, obj2);
+        }
+
+        private static bool ShouldRaisePropertyChanged(INTERNAL_PropertyStorage storage)
+        {
+            // Note: we only want to call "OnPropertyChanged" when the property is used by the current DependencyObject or if it is the DataContext property.
+            if (!storage.Property.IsAttached)
+            {
+                return storage.Property.OwnerType.IsAssignableFrom(storage.Owner.GetType()) || storage.Property == FrameworkElement.DataContextProperty;
+            }
+            return true;
+        }
+
+        #endregion
+
+        internal static void SetInheritedValue(INTERNAL_PropertyStorage storage, object newValue, bool recursively)
+        {
+            storage.InheritedValue = newValue;
+
+            UpdateEffectiveValue(storage,
+                                 newValue,
+                                 BaseValueSourceInternal.Inherited,
+                                 false, // coerceWithCurrentValue
+                                 false, // coerceValue
+                                 false, // clearValue
+                                 recursively); // propagateChanges
+        }
+
+        internal static void ResetInheritedValue(INTERNAL_PropertyStorage storage)
+        {
+            storage.InheritedValue = INTERNAL_NoValue.NoValue;
+
+            //UpdateEffectiveValue(storage,
+            //                     INTERNAL_NoValue.NoValue,
+            //                     KindOfValue.Inherited,
+            //                     false, // coerceWithCurrentValue
+            //                     false, // coerceValue
+            //                     true, // clearValue
+            //                     false); // propagateChanges
+        }
+
+        internal static void SetLocalStyleValue(INTERNAL_PropertyStorage storage, object newValue)
+        {
+            if (storage.BaseValueSourceInternal == BaseValueSourceInternal.LocalStyle)
+            {
+                BindingExpression oldExpr = storage.IsExpressionFromStyle ? storage.LocalStyleValue as BindingExpression : null;
+                if (oldExpr != null)
+                {
+                    oldExpr.OnDetached(storage.Owner);
+                }
+            }
+
+            storage.LocalStyleValue = newValue;
+
+            UpdateEffectiveValue(storage,
+                                 newValue,
+                                 BaseValueSourceInternal.LocalStyle,
+                                 false, // coerceWithCurrentValue
+                                 false, // coerceValue
+                                 false, // clearValue
+                                 true); // propagateChanges
+        }
+
+
+
         internal static void ApplyCssChanges(object oldValue, object newValue, PropertyMetadata typeMetadata, DependencyObject sender)
         {
             if (typeMetadata.GetCSSEquivalent != null)
@@ -611,7 +686,7 @@ namespace CSHTML5.Internal
             }
         }
 
-        static void ApplyPropertyChanged(DependencyObject sender, CSSEquivalent cssEquivalent, object oldValue, object newValue)
+        private static void ApplyPropertyChanged(DependencyObject sender, CSSEquivalent cssEquivalent, object oldValue, object newValue)
         {
             //if (cssEquivalent.ApplyWhenControlHasTemplate) //Note: this is to handle the case of a Control with a ControlTemplate (some properties must not be applied on the control itself)
 
@@ -732,17 +807,15 @@ namespace CSHTML5.Internal
             return listener;
         }
 
-        internal static void CoerceCurrentValue(INTERNAL_PropertyStorage storage)
+        internal static void ResetLocalStyleValue(INTERNAL_PropertyStorage storage)
         {
-            var typeMetadata = storage.TypeMetadata;
-            if (typeMetadata == null || typeMetadata.CoerceValueCallback == null)
-            {
-                return; //we should not arrive here in this case but we make sure to not do anything should that happen.
-            }
-            object oldValue = storage.Local == INTERNAL_NoValue.NoValue ? (typeMetadata != null ? typeMetadata.DefaultValue : null) : storage.Local;
-            object currentValue = ComputeActualValue(storage, typeMetadata, true); //Note: we do not need to know where this value comes from (Local, VisualState, etc.) since calling this method means that it has not been modified and we only need to update the coerced value.
-            object coercedNewValue = typeMetadata.CoerceValueCallback(storage.Owner, currentValue);
-            SetSpecificValue(storage, KindOfValue.Coerced, coercedNewValue);
+
         }
+
+        internal static void ResetLocalStyleValue(INTERNAL_PropertyStorage storage, bool dontRefresh)
+        {
+
+        }
+
     }
 }

@@ -219,6 +219,11 @@ namespace Windows.UI.Xaml
             return BindingOperations.SetBinding(this, dependencyProperty, binding);
         }
 
+        public BindingExpression GetBindingExpression(DependencyProperty dp)
+        {
+            return BindingOperations.GetBindingExpression(this, dp);
+        }
+
         #region Cursor
 
         // Returns:
@@ -272,10 +277,13 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Identifies the IsEnabled dependency property.
         /// </summary>
-        public static readonly DependencyProperty IsEnabledProperty =
-            DependencyProperty.Register("IsEnabled", typeof(bool), typeof(FrameworkElement), new PropertyMetadata(true, IsEnabled_Changed) { MethodToUpdateDom = IsEnabled_MethodToUpdateDom, Inherits = true });
-
-
+        public static readonly DependencyProperty IsEnabledProperty = DependencyProperty.Register("IsEnabled", 
+                                                                                                  typeof(bool), 
+                                                                                                  typeof(FrameworkElement), 
+                                                                                                  new PropertyMetadata(true, IsEnabled_Changed, CoerceIsEnabledProperty)
+                                                                                                  {
+                                                                                                      MethodToUpdateDom = IsEnabled_MethodToUpdateDom,
+                                                                                                  });
 
         private static void IsEnabled_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -284,7 +292,36 @@ namespace Windows.UI.Xaml
             {
                 frameworkElement.IsEnabledChanged(frameworkElement, e);
             }
+            UIElement.InvalidateForceInheritPropertyOnChildren(frameworkElement, e.Property);
         }
+
+        private static object CoerceIsEnabledProperty(DependencyObject d, object baseValue)
+        {
+            FrameworkElement @this = (FrameworkElement)d;
+
+            // We must be false if our parent is false, but we can be
+            // either true or false if our parent is true.
+            //
+            // Another way of saying this is that we can only be true
+            // if our parent is true, but we can always be false.
+            if ((bool)baseValue)
+            {
+                DependencyObject parent = @this.Parent;
+                if (parent == null || (bool)parent.GetValue(IsEnabledProperty))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// Occurs when the IsEnabled property changes.
         /// </summary>
@@ -632,7 +669,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #region DefaultStyleKey
+#region DefaultStyleKey
 
         // Returns:
         //     The key that references the default style for the control. To work correctly
@@ -680,11 +717,11 @@ namespace Windows.UI.Xaml
         }
 
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region Loaded/Unloaded events
+#region Loaded/Unloaded events
 
         /// <summary>
         /// Occurs when a FrameworkElement has been constructed and added to the object tree.
@@ -708,9 +745,9 @@ namespace Windows.UI.Xaml
                 Unloaded(this, new RoutedEventArgs());
         }
 
-        #endregion
+#endregion
 
-        #region BindingValidationError event
+#region BindingValidationError event
 
         internal bool INTERNAL_AreThereAnyBindingValidationErrorHandlers = false;
 
@@ -762,7 +799,7 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-        #endregion
+#endregion
 
 
 #if WORKINPROGRESS

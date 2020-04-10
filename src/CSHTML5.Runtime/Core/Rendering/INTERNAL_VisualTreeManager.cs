@@ -625,6 +625,8 @@ namespace CSHTML5.Internal
             var t6 = Performance.now();
 #endif
 
+            UIElement.SynchronizeForceInheritProperties(child, parent);
+
             // Get the Inherited properties and pass them to the direct children:
             foreach (DependencyProperty dependencyProperty in
 #if BRIDGE
@@ -636,8 +638,7 @@ namespace CSHTML5.Internal
             {
                 bool recursively = false; // We don't want a recursion here because the "Attach" method is already recursive due to the fact that we raise property changed on the Children property, which causes to reattach the subtree.
                 INTERNAL_PropertyStorage storage = parent.INTERNAL_AllInheritedProperties[dependencyProperty];
-                PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(storage.Owner.GetType());
-                child.SetInheritedValue(dependencyProperty, INTERNAL_PropertyStore.GetValue(storage, typeMetadata), recursively);
+                child.SetInheritedValue(dependencyProperty, INTERNAL_PropertyStore.GetEffectiveValue(storage), recursively);
             }
 
 #if PERFSTAT
@@ -768,6 +769,7 @@ namespace CSHTML5.Internal
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Copy list of properties", t0);
 #endif
+
             foreach (KeyValuePair<DependencyProperty, INTERNAL_PropertyStorage> propertiesAndTheirStorage in list)
             {
                 // Read the value:
@@ -798,7 +800,7 @@ namespace CSHTML5.Internal
                     {
                         if (!valueWasRetrieved)
                         {
-                            value = storage.ActualValue;
+                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage);
                             valueWasRetrieved = true;
                         }
 
@@ -812,7 +814,7 @@ namespace CSHTML5.Internal
                     {
                         if (!valueWasRetrieved)
                         {
-                            value = storage.ActualValue;
+                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage);
                             valueWasRetrieved = true;
                         }
 
@@ -836,7 +838,7 @@ namespace CSHTML5.Internal
                     {
                         if (!valueWasRetrieved)
                         {
-                            value = storage.ActualValue;
+                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage);
                             valueWasRetrieved = true;
                         }
 
