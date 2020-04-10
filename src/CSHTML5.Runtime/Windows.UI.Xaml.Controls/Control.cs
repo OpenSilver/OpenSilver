@@ -43,6 +43,23 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public partial class Control : FrameworkElement
     {
+
+        //COMMENT 26.03.2020:
+        // ERROR DESCRIPTION:
+        //  see Ticket #1711, problem about icons not appearing:
+        //    In the project that was sent to us on the 26th of March 2020:
+        //    BasePage.xaml -> ItemsControl named "icSubNavigation" -> ItemTemplate Property -> DataTemplate with the key: dtSubNavigationIcon:
+        //      Properly generated in C# but when translated into js, the first letter of the methods that are called is lowercased.
+        //  I could not find the conditions nor the reasons for such a case to appear so I settled with the following workaround:
+        // WORKAROUND:
+        //  Create an additional private method with the same signature except with the first character of its name lowercased, that calls the original one.
+        // NOTE:
+        //  This workaround was used only for the methods that were in that specific case, so we might need to use it for other methods if other cases appear.
+        //  Workaround currently used on:
+        //      - INTERNAL_GetVisualStateGroups
+        //      - RegisterName
+        //END OF COMMENT
+
         private UIElement _renderedControlTemplate = null;
         private bool _isDisabled = false;
 
@@ -815,6 +832,14 @@ namespace Windows.UI.Xaml.Controls
             _nameScopeDictionary[name] = scopedElement;
         }
 
+#if BRIDGE
+        // find "COMMENT 26.03.2020" at the beginning of this class for the reason of the existence of the method below:
+        private void registerName(string name, object scopedElement)
+        {
+            RegisterName(name, scopedElement);
+        }
+#endif
+
         public void UnregisterName(string name)
         {
             if (!_nameScopeDictionary.ContainsKey(name))
@@ -888,11 +913,19 @@ namespace Windows.UI.Xaml.Controls
             return _visualStateGroups;
         }
 
+#if BRIDGE
+        // find "COMMENT 26.03.2020" at the beginning of this class for the reason of the existence of the method below:
+        private INTERNAL_VisualStateGroupCollection iNTERNAL_GetVisualStateGroups()
+        {
+            return INTERNAL_GetVisualStateGroups();
+        }
+#endif
+
 
 #if MIGRATION
         public override void OnApplyTemplate()
 #else
-protected override void OnApplyTemplate()
+        protected override void OnApplyTemplate()
 #endif
         {
             base.OnApplyTemplate();
