@@ -20,9 +20,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
-#if MIGRATION
-using CSHTML5.Internal;
-#endif
 
 #if MIGRATION
 namespace System.Windows
@@ -42,7 +39,7 @@ namespace Windows.UI.Xaml
     {
         private static readonly Type nullableType;
 
-        public static readonly object UnsetValue = INTERNAL_NoValue.NoValue;
+        public static readonly object UnsetValue = new INTERNAL_NamedObject("DependencyProperty.UnsetValue");
 
         internal string Name { get; set; }
         internal Type PropertyType { get; set; }
@@ -175,7 +172,7 @@ namespace Windows.UI.Xaml
 
         private static bool IsValueTypeValid(object value, Type type)
         {
-            if (object.ReferenceEquals(value, INTERNAL_NoValue.NoValue))
+            if (object.ReferenceEquals(value, DependencyProperty.UnsetValue))
             {
                 return false;
             }

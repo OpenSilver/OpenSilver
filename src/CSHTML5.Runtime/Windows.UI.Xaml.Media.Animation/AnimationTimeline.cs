@@ -123,7 +123,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
         private void UnApply(bool isVisualStateChange)
         {
-            AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, INTERNAL_NoValue.NoValue, isVisualStateChange);
+            AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, DependencyProperty.UnsetValue, isVisualStateChange);
             //_targetProperty.INTERNAL_PropertySetAnimationValue(_propertyContainer, INTERNAL_NoValue.NoValue);
         }
     }

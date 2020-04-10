@@ -188,7 +188,7 @@ namespace Windows.UI.Xaml
             INTERNAL_PropertyStorage storage;
             if (INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, false/*don't create*/, out storage))
             {
-                if (storage.LocalValue == INTERNAL_NoValue.NoValue)
+                if (storage.LocalValue == DependencyProperty.UnsetValue)
                 {
                     // In silverlight ReadLocalValue returns a BindingExpression if the value 
                     // is a BindingExpression set from a style's setter and the "real" local
@@ -200,7 +200,7 @@ namespace Windows.UI.Xaml
                 }
                 return storage.LocalValue;
             }
-            return INTERNAL_NoValue.NoValue;
+            return DependencyProperty.UnsetValue;
         }
 
         public object GetVisualStateValue(DependencyProperty dependencyProperty) //todo: see if this is actually useful (to get specifically the VisualStateValue) and if so, change the GetValue into a GetVisualStateValue at the "return" line.

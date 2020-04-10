@@ -116,7 +116,7 @@ namespace CSHTML5.Internal
                                             object newValue,
                                             bool coerceWithCurrentValue)
         {
-            if (newValue == INTERNAL_NoValue.NoValue)
+            if (newValue == DependencyProperty.UnsetValue)
             {
                 global::System.Diagnostics.Debug.Assert(!coerceWithCurrentValue, "Don't call SetCurrentValue with UnsetValue");
                 ClearValueCommon(storage);
@@ -175,10 +175,10 @@ namespace CSHTML5.Internal
             }
 
             // Reset local value
-            storage.LocalValue = INTERNAL_NoValue.NoValue;
+            storage.LocalValue = DependencyProperty.UnsetValue;
 
             UpdateEffectiveValue(storage,
-                                 INTERNAL_NoValue.NoValue,
+                                 DependencyProperty.UnsetValue,
                                  BaseValueSourceInternal.Local,
                                  false, // coerceWithCurrentValue
                                  false, // coerceValue
@@ -236,7 +236,7 @@ namespace CSHTML5.Internal
                                  BaseValueSourceInternal.Animated,
                                  false, // coerceWithCurrentValue
                                  false, // coerceValue
-                                 value == INTERNAL_NoValue.NoValue, // clearValue
+                                 value == DependencyProperty.UnsetValue, // clearValue
                                  true); // propagateChanges
         }
 
@@ -254,24 +254,24 @@ namespace CSHTML5.Internal
             }
             else */
             if (!storage.IsAnimatedOverLocal &&
-               (effectiveValue = storage.LocalValue) != INTERNAL_NoValue.NoValue)
+               (effectiveValue = storage.LocalValue) != DependencyProperty.UnsetValue)
             {
                 kind = BaseValueSourceInternal.Local;
             }
             else if (storage.IsAnimatedOverLocal &&
-                    (effectiveValue = storage.AnimatedValue) != INTERNAL_NoValue.NoValue)
+                    (effectiveValue = storage.AnimatedValue) != DependencyProperty.UnsetValue)
             {
                 kind = BaseValueSourceInternal.Animated;
             }
-            else if ((effectiveValue = storage.LocalStyleValue) != INTERNAL_NoValue.NoValue)
+            else if ((effectiveValue = storage.LocalStyleValue) != DependencyProperty.UnsetValue)
             {
                 kind = BaseValueSourceInternal.LocalStyle;
             }
-            else if ((effectiveValue = storage.ImplicitStyleValue) != INTERNAL_NoValue.NoValue)
+            else if ((effectiveValue = storage.ImplicitStyleValue) != DependencyProperty.UnsetValue)
             {
                 kind = BaseValueSourceInternal.ImplicitStyle;
             }
-            else if ((effectiveValue = storage.InheritedValue) != INTERNAL_NoValue.NoValue)
+            else if ((effectiveValue = storage.InheritedValue) != DependencyProperty.UnsetValue)
             {
                 kind = BaseValueSourceInternal.Inherited;
             }
@@ -468,7 +468,7 @@ namespace CSHTML5.Internal
             {
                 // returning DependencyProperty.UnsetValue from a Coercion callback means "don't do the set" ...
                 // or "use previous value"
-                if (newValue == INTERNAL_NoValue.NoValue)
+                if (newValue == DependencyProperty.UnsetValue)
                 {
                     newValue = oldValue;
                 }
@@ -627,7 +627,7 @@ namespace CSHTML5.Internal
 
         internal static void ResetInheritedValue(INTERNAL_PropertyStorage storage)
         {
-            storage.InheritedValue = INTERNAL_NoValue.NoValue;
+            storage.InheritedValue = DependencyProperty.UnsetValue;
 
             //UpdateEffectiveValue(storage,
             //                     INTERNAL_NoValue.NoValue,
