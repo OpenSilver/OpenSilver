@@ -22,7 +22,16 @@ namespace Windows.UI.Xaml.Controls
 			get;
 			private set;
 		}
-		
+
+		// Summary:
+		//     Gets or sets the default file name extension applied to files that are saved
+		//     with the System.Windows.Controls.SaveFileDialog.
+		//
+		// Returns:
+		//     The default file name extension applied to files that are saved with the System.Windows.Controls.SaveFileDialog,
+		//     which can optionally include the dot character (.).
+		public string DefaultExt { get; set; }
+
 		//
 		// Summary:
 		//     Gets or sets the file name used if a file name is not specified by the user.
