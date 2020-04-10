@@ -50,6 +50,7 @@
     <DocumentationFile>$(BinFolder)\Migration.WorkInProgress\CSHTML5.Migration.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
     <Compile Include="System.Collections.ObjectModel\WORKINPROGRESS\ReadOnlyObservableCollection_1.cs" />
     <Compile Include="System.ComponentModel\IPagedCollectionView.cs" />
@@ -109,7 +110,6 @@
     <Compile Include="Core\Main\DelegateUtility.cs" />
     <Compile Include="Core\Main\INameScope.cs" />
     <Compile Include="Core\Main\INTERNAL_ListsHelper.cs" />
-    <Compile Include="Core\Main\INTERNAL_NoValue.cs" />
     <Compile Include="Core\Main\INTERNAL_PropertyStorage.cs" />
     <Compile Include="Core\Main\INTERNAL_PropertyStore.cs" />
     <Compile Include="Core\Main\INTERNAL_Simulator.cs" />

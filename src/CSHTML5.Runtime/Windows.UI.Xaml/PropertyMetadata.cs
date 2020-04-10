@@ -63,7 +63,7 @@ namespace Windows.UI.Xaml
             }
             set
             {
-                if (value == INTERNAL_NoValue.NoValue)
+                if (value == DependencyProperty.UnsetValue)
                 {
                     throw new ArgumentException("Default value cannot be 'Unset'.");
                 }

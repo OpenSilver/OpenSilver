@@ -26,12 +26,12 @@ namespace CSHTML5.Internal
         {
             this._values = new object[6] 
             {
-                INTERNAL_NoValue.NoValue, //VisualState
-                INTERNAL_NoValue.NoValue, //Local
-                INTERNAL_NoValue.NoValue, //Animated
-                INTERNAL_NoValue.NoValue, //LocalStyle
-                INTERNAL_NoValue.NoValue, //ImplicitStyle
-                INTERNAL_NoValue.NoValue, //Inherited
+                DependencyProperty.UnsetValue, //VisualState
+                DependencyProperty.UnsetValue, //Local
+                DependencyProperty.UnsetValue, //Animated
+                DependencyProperty.UnsetValue, //LocalStyle
+                DependencyProperty.UnsetValue, //ImplicitStyle
+                DependencyProperty.UnsetValue, //Inherited
             };
             this._source = (FullValueSource)BaseValueSourceInternal.Default;
             this.Owner = owner;
@@ -54,7 +54,7 @@ namespace CSHTML5.Internal
             set
             {
                 this._values[4] = value;
-                this.IsAnimatedOverLocal = (value == INTERNAL_NoValue.NoValue && this.AnimatedValue != INTERNAL_NoValue.NoValue);
+                this.IsAnimatedOverLocal = (value == DependencyProperty.UnsetValue && this.AnimatedValue != DependencyProperty.UnsetValue);
             }
         }
         internal object AnimatedValue
@@ -63,7 +63,7 @@ namespace CSHTML5.Internal
             set
             {
                 this._values[3] = value;
-                this.IsAnimatedOverLocal = (value != INTERNAL_NoValue.NoValue);
+                this.IsAnimatedOverLocal = (value != DependencyProperty.UnsetValue);
             }
         }
         internal object LocalStyleValue

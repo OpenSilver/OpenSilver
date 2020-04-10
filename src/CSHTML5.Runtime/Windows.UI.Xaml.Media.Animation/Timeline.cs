@@ -294,14 +294,14 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <param name="frameworkElement"></param>
         internal void UnApply(FrameworkElement frameworkElement)
         {
-            DependencyObject target = default(DependencyObject);
-            PropertyPath propertyPath = default(PropertyPath);
             Control frameworkElementAsControl = frameworkElement as Control;
             if (frameworkElementAsControl != null)
             {
+                DependencyObject target;
+                PropertyPath propertyPath;
                 GetTargetElementAndPropertyInfo(frameworkElement, out target, out propertyPath);
                 //DependencyObject lastElementBeforeProperty = propertyPath.INTERNAL_AccessPropertyContainer(target);
-                propertyPath.INTERNAL_PropertySetVisualState(target, CSHTML5.Internal.INTERNAL_NoValue.NoValue);
+                propertyPath.INTERNAL_PropertySetVisualState(target, DependencyProperty.UnsetValue);
             }
         }
 
@@ -427,7 +427,8 @@ namespace Windows.UI.Xaml.Media.Animation
             }
 
             Type srcType = source.GetType();
-            if (srcType == nonNullableDestType || nonNullableDestType.IsAssignableFrom(srcType) || (nonNullableDestType == typeof(double) && srcType == typeof(int))) return source;
+            if (srcType == nonNullableDestType || nonNullableDestType.IsAssignableFrom(srcType) || (nonNullableDestType == typeof(double) && srcType == typeof(int)))
+                return source;
 
             var paramTypes = new Type[] { srcType };
             MethodInfo cast = nonNullableDestType.GetMethod("op_Implicit", paramTypes);
@@ -447,7 +448,8 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
             }
 
-            if (cast != null) return cast.Invoke(null, new object[] { source });
+            if (cast != null)
+                return cast.Invoke(null, new object[] { source });
 
             //BRIDGETODO : implemente Enum.ToObject
 #if !BRIDGE
