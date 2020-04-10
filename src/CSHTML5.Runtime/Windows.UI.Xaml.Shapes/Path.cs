@@ -92,20 +92,27 @@ namespace Windows.UI.Xaml.Shapes
             Geometry oldgeometry = (Geometry)e.OldValue;
             Geometry newgeometry = (Geometry)e.NewValue;
             Path path = (Path)d;
-            if (e.NewValue != e.OldValue && path._isLoaded)
+            if (path._isLoaded)
             {
                 if (oldgeometry != null)
                 {
                     oldgeometry.SetParentPath(null);
                 }
-                newgeometry.SetParentPath(path);
+                if (newgeometry != null)
+                {
+                    newgeometry.SetParentPath(path);
+                }
                 path.ScheduleRedraw();
             }
         }
 
         internal void RefreshChildrenParent()
         {
-            Data.SetParentPath(this);
+            Geometry data = this.Data;
+            if (data != null)
+            {
+                data.SetParentPath(this);
+            }
         }
 
 
