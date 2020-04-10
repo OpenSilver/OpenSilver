@@ -118,7 +118,6 @@
     <Compile Include="Core\Main\INTERNAL_TypeToDependencyPropertiesThatRequirePropertyChanged.cs" />
     <Compile Include="Core\Main\INTERNAL_TypeToStringToDependencyProperty.cs" />
     <Compile Include="Core\Main\INTERNAL_UriHelper.cs" />
-    <Compile Include="Core\Main\KindOfValue.cs" />
     <Compile Include="Core\Main\NamespacesDocumentation.cs" />
     <Compile Include="Core\Main\SupportsDirectContentViaTypeFromStringConvertersAttribute.cs" />
     <Compile Include="Core\Main\TypeFromStringConverters.cs" />

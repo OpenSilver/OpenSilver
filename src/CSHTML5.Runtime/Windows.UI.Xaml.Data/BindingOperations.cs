@@ -50,13 +50,25 @@ namespace Windows.UI.Xaml.Data
             }
 
             // Create the BindingExpression from the Binding:
-            BindingExpression newBindingExpression = new BindingExpression(binding, target, dp);
+            BindingExpression newBindingExpression = new BindingExpression(binding, dp);
+            target.SetValue(dp, newBindingExpression);
 
-            // Apply the BindingExpression:
-            target.ApplyBindingExpression(dp, newBindingExpression);
 
             // Return the newly created BindingExpression:
             return newBindingExpression;
+        }
+
+        public static BindingExpression GetBindingExpression(DependencyObject target, DependencyProperty dp)
+        {
+            if (target == null)
+            {
+                throw new ArgumentNullException("target");
+            }
+            if (dp == null)
+            {
+                throw new ArgumentNullException("dp");
+            }
+            return target.ReadLocalValue(dp) as BindingExpression;
         }
     }
 }

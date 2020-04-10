@@ -522,8 +522,19 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Identifies the IsHitTestVisible property.
         /// </summary>
-        public static readonly DependencyProperty IsHitTestVisibleProperty =
-            DependencyProperty.Register("IsHitTestVisible", typeof(bool), typeof(UIElement), new PropertyMetadata(true) { MethodToUpdateDom = IsHitTestVisible_MethodToUpdateDom, Inherits = true });
+        public static readonly DependencyProperty IsHitTestVisibleProperty = DependencyProperty.Register("IsHitTestVisible", 
+                                                                                                         typeof(bool), 
+                                                                                                         typeof(UIElement), 
+                                                                                                         new PropertyMetadata(true, OnIsHitTestVisiblePropertyChanged, CoerceIsHitTestVisibleProperty)
+                                                                                                         {
+                                                                                                             MethodToUpdateDom = IsHitTestVisible_MethodToUpdateDom,
+                                                                                                         });
+
+        private static void OnIsHitTestVisiblePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            // Invalidate the children so that they will inherit the new value.
+            InvalidateForceInheritPropertyOnChildren((UIElement)d, e.Property);
+        }
 
         private static void IsHitTestVisible_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -536,6 +547,33 @@ namespace Windows.UI.Xaml
                 isEnabled: element is FrameworkElement ? ((FrameworkElement)element).IsEnabled : true);
 #endif
 
+        }
+
+        private static object CoerceIsHitTestVisibleProperty(DependencyObject d, object baseValue)
+        {
+            UIElement @this = (UIElement)d;
+
+            // We must be false if our parent is false, but we can be
+            // either true or false if our parent is true.
+            //
+            // Another way of saying this is that we can only be true
+            // if our parent is true, but we can always be false.
+            if ((bool)baseValue)
+            {
+                DependencyObject parent = @this.INTERNAL_VisualParent;
+                if (parent == null || (bool)parent.GetValue(IsHitTestVisibleProperty))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
         }
 
 #if REVAMPPOINTEREVENTS
@@ -1091,5 +1129,37 @@ namespace Windows.UI.Xaml
             }
         }
 #endif
+
+        #region ForceInherit property support
+
+        internal static void SynchronizeForceInheritProperties(UIElement uiE, DependencyObject parent)
+        {
+            // IsEnabledProperty
+            if (!(bool)parent.GetValue(FrameworkElement.IsEnabledProperty))
+            {
+                uiE.CoerceValue(FrameworkElement.IsEnabledProperty);
+            }
+
+            // IsHitTestVisibleProperty
+            if (!(bool)parent.GetValue(IsHitTestVisibleProperty))
+            {
+                uiE.CoerceValue(IsHitTestVisibleProperty);
+            }
+        }
+
+        internal static void InvalidateForceInheritPropertyOnChildren(UIElement uiE, DependencyProperty property)
+        {
+            if (uiE.INTERNAL_VisualChildrenInformation == null)
+            {
+                return;
+            }
+
+            foreach (UIElement child in uiE.INTERNAL_VisualChildrenInformation.Select(kp => kp.Key))
+            {
+                child.CoerceValue(property);
+            }
+        }
+
+        #endregion
     }
 }
