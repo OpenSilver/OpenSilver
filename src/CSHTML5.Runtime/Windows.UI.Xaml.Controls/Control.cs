@@ -832,11 +832,13 @@ namespace Windows.UI.Xaml.Controls
             _nameScopeDictionary[name] = scopedElement;
         }
 
+#if BRIDGE
         // find "COMMENT 26.03.2020" at the beginning of this class for the reason of the existence of the method below:
         private void registerName(string name, object scopedElement)
         {
             RegisterName(name, scopedElement);
         }
+#endif
 
         public void UnregisterName(string name)
         {
@@ -911,17 +913,19 @@ namespace Windows.UI.Xaml.Controls
             return _visualStateGroups;
         }
 
+#if BRIDGE
         // find "COMMENT 26.03.2020" at the beginning of this class for the reason of the existence of the method below:
         private INTERNAL_VisualStateGroupCollection iNTERNAL_GetVisualStateGroups()
         {
             return INTERNAL_GetVisualStateGroups();
         }
+#endif
 
 
 #if MIGRATION
         public override void OnApplyTemplate()
 #else
-protected override void OnApplyTemplate()
+        protected override void OnApplyTemplate()
 #endif
         {
             base.OnApplyTemplate();
