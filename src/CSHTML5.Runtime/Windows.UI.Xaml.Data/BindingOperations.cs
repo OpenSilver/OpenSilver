@@ -35,7 +35,8 @@ namespace Windows.UI.Xaml.Data
         /// <returns>An object that contains information about the binding.</returns>
         public static BindingExpression SetBinding(DependencyObject target, DependencyProperty dp, Binding binding)
         {
-            //todo: the signature of this method is slightly different: it takes a "Binding" instead of "BindingBase", and it returns a "BindingExpression" instead of a "BindingExpressionBase".
+            // the signature of this method is slightly different: it takes a "Binding" instead of "BindingBase", 
+            // and it returns a "BindingExpression" instead of a "BindingExpressionBase".
             if (target == null)
             {
                 throw new ArgumentNullException("target");
@@ -49,13 +50,22 @@ namespace Windows.UI.Xaml.Data
                 throw new ArgumentNullException("binding");
             }
 
-            // Create the BindingExpression from the Binding:
-            BindingExpression newBindingExpression = new BindingExpression(binding, dp);
-            target.SetValue(dp, newBindingExpression);
+            // Create the BindingExpression from the Binding
+            BindingExpression expr;
 
+            if (dp == Setter.ValueProperty)
+            {
+                binding._isInStyle = true;
+                expr = new BindingExpression(binding, ((Setter)target).Property);
+            }
+            else
+            {
+                expr = new BindingExpression(binding, dp);
+            }
+            target.SetValue(dp, expr);
 
-            // Return the newly created BindingExpression:
-            return newBindingExpression;
+            // Return the newly created BindingExpression
+            return expr;
         }
 
         public static BindingExpression GetBindingExpression(DependencyObject target, DependencyProperty dp)

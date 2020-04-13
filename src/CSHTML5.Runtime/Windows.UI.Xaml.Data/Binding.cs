@@ -82,6 +82,8 @@ namespace Windows.UI.Xaml.Data
     [ContentProperty("Path")]
     public partial class Binding : BindingBase
     {
+        internal bool _isInStyle;
+
         /// <summary>
         /// Initializes a new instance of the Binding class.
         /// </summary>
@@ -247,6 +249,7 @@ namespace Windows.UI.Xaml.Data
             target.Source = this.Source;
             target.UpdateSourceTrigger = this.UpdateSourceTrigger;
             target.StringFormat = this.StringFormat;
+            target._isInStyle = this._isInStyle;
         }
 
         /// <summary>

@@ -41,6 +41,7 @@ namespace Windows.UI.Xaml
     public partial class DependencyObject
     {
         #region Inheritance Context
+        internal bool _needInheritanceContext = true;
         private DependencyObject _inheritanceContext;
         private FrameworkElement _inheritanceContextRoot;
         private bool _inheritanceContextRootDirty;
@@ -49,6 +50,11 @@ namespace Windows.UI.Xaml
 
         internal void SetInheritanceContext(DependencyObject context)
         {
+            if (!this._needInheritanceContext)
+            {
+                return;
+            }
+
             DependencyObject oldContext = this._inheritanceContext;
             this._inheritanceContext = context;
             this._inheritanceContextRootDirty = true;
@@ -142,7 +148,7 @@ namespace Windows.UI.Xaml
             {
                 return INTERNAL_PropertyStore.GetEffectiveValue(storage);
             }
-            return dependencyProperty.GetTypeMetaData(this.GetType()).DefaultValue;         
+            return dependencyProperty.GetTypeMetaData(this.GetType()).DefaultValue;
         }
 
         /// <summary>
@@ -165,6 +171,7 @@ namespace Windows.UI.Xaml
             INTERNAL_PropertyStore.SetValueCommon(storage, value, true);
         }
 
+        [Obsolete("Use CoerceValue")]
         public void CoerceCurrentValue(DependencyProperty dependencyProperty, PropertyMetadata propertyMetadata)
         {
             INTERNAL_PropertyStorage storage;
@@ -259,19 +266,28 @@ namespace Windows.UI.Xaml
             INTERNAL_PropertyStore.SetValueCommon(storage, value, false);
         }
 
+        internal void SetLocalStyleValue(DependencyProperty dp, object value)
+        {
+            INTERNAL_PropertyStorage storage;
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, value != DependencyProperty.UnsetValue/*create*/, out storage))
+            {
+                INTERNAL_PropertyStore.SetLocalStyleValue(storage, value);
+            }
+        }
+
         /// <summary>
         /// Sets the inherited value of a dependency property on a DependencyObject. Do not use this method.
         /// </summary>
-        /// <param name="dependencyProperty">The identifier of the dependency property to set.</param>
+        /// <param name="dp">The identifier of the dependency property to set.</param>
         /// <param name="value">The new local value.</param>
         /// <param name="recursively">Specifies if the inherited value must be applied to the children of this DependencyObject.</param>
-        internal void SetInheritedValue(DependencyProperty dependencyProperty, object value, bool recursively)
+        internal void SetInheritedValue(DependencyProperty dp, object value, bool recursively)
         {
             //-----------------------
             // CALL "SET INHERITED VALUE" ON THE STORAGE:
             //-----------------------
             INTERNAL_PropertyStorage storage;
-            INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(this, dependencyProperty, true/*create*/, out storage);
+            INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(this, dp, true/*create*/, out storage);
             INTERNAL_PropertyStore.SetInheritedValue(storage, value, recursively);
         }
 
@@ -287,6 +303,11 @@ namespace Windows.UI.Xaml
 
         public void CoerceValue(DependencyProperty dp)
         {
+            if (dp == null)
+            {
+                throw new ArgumentNullException("No property specified.");
+            }
+
             INTERNAL_PropertyStorage storage;
             INTERNAL_PropertyStore.TryGetStorage(this, dp, true/*create*/, out storage);
             INTERNAL_PropertyStore.CoerceValueCommon(storage);
@@ -326,11 +347,11 @@ namespace Windows.UI.Xaml
         }
 
 
-#region Binding related elements
+        #region Binding related elements
 
         internal Binding INTERNAL_GetBinding(DependencyProperty dependencyProperty)
         {
-            BindingExpression expr = BindingOperations.GetBindingExpression(this, dependencyProperty); 
+            BindingExpression expr = BindingOperations.GetBindingExpression(this, dependencyProperty);
             if (expr != null)
             {
                 return expr.ParentBinding.Clone();
@@ -348,7 +369,7 @@ namespace Windows.UI.Xaml
 
         internal void INTERNAL_UpdateBindingsSource()
         {
-            foreach(INTERNAL_PropertyStorage storage in this.INTERNAL_PropertyStorageDictionary.Select(kp => kp.Value))
+            foreach (INTERNAL_PropertyStorage storage in this.INTERNAL_PropertyStorageDictionary.Select(kp => kp.Value))
             {
                 if (storage.IsExpression)
                 {
@@ -373,7 +394,7 @@ namespace Windows.UI.Xaml
             // This is particularly useful for elements to clear any references they have to DOM elements. For example, the Grid will use it to set its _tableDiv to null.
         }
 
-#endregion
+        #endregion
 
         //
         // Summary:
