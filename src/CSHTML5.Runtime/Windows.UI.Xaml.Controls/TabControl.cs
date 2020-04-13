@@ -712,9 +712,9 @@ namespace Windows.UI.Xaml.Controls
             // Ensure that, when an item is removed from the list of items, we deselect it:
             if (this.SelectedItem == item)
             {
-                SetLocalValue(SelectedIndexProperty, -1); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                SetLocalValue(SelectedItemProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                SetLocalValue(SelectedContentProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                SetCurrentValue(SelectedIndexProperty, -1); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                SetCurrentValue(SelectedItemProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                SetCurrentValue(SelectedContentProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
 
                 //todo: update binding of SelectedIndex, SelectedValue, and SelectedItem
             }

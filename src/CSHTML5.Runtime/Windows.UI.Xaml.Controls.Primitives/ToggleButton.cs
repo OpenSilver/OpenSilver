@@ -362,20 +362,20 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 if (IsThreeState)
                 {
-                    SetLocalValue(IsCheckedProperty, null);
+                    SetCurrentValue(IsCheckedProperty, null);
                 }
                 else
                 {
-                    SetLocalValue(IsCheckedProperty, false);
+                    SetCurrentValue(IsCheckedProperty, false);
                 }
             }
             else if (IsChecked == null)
             {
-                SetLocalValue(IsCheckedProperty, false);
+                SetCurrentValue(IsCheckedProperty, false);
             }
             else
             {
-                SetLocalValue(IsCheckedProperty, true);
+                SetCurrentValue(IsCheckedProperty, true);
             }
         }
 

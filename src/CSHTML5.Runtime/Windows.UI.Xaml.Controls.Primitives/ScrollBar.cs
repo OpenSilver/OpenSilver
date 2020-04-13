@@ -228,7 +228,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             double newValue = CoerceValue(this.Value + amountByWhichToIncreaseOrDecreaseTheValue);
             if (newValue != this.Value)
             {
-                this.SetLocalValue(RangeBase.ValueProperty, newValue); // Note: we do not use "this.Value = newValue" because it deletes any bindings that the user may have set to the scrollbar with <ScrollBar Value="{Binding...}"/>.
+                this.SetCurrentValue(RangeBase.ValueProperty, newValue); // Note: we do not use "this.Value = newValue" because it deletes any bindings that the user may have set to the scrollbar with <ScrollBar Value="{Binding...}"/>.
                 if (this.Scroll != null)
                     this.Scroll(this, new ScrollEventArgs(newValue, scrollEventType));
             }
@@ -300,7 +300,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 // Apply the change to the value of the ScrollBar, and update the Thumb position accordingly:
                 if (newValue != this.Value)
                 {
-                    this.SetLocalValue(RangeBase.ValueProperty, newValue); // Note: we do not use "this.Value = newValue" because it deletes any bindings that the user may have set to the scrollbar with <ScrollBar Value="{Binding...}"/>.
+                    this.SetCurrentValue(RangeBase.ValueProperty, newValue); // Note: we do not use "this.Value = newValue" because it deletes any bindings that the user may have set to the scrollbar with <ScrollBar Value="{Binding...}"/>.
 
                     // Update the position of the Thumb based on the new value:
                     UpdateThumbPositionAndSize(totalControlSizeInMainDirection);

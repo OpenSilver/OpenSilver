@@ -181,7 +181,7 @@ namespace Windows.UI.Xaml.Controls
                     ChangingSelectionInHtml = true;
                     int selectedIndexInNativeHtmlDom = GetSelectedIndexInNativeHtmlDom();
 
-                    SetLocalValue(SelectedIndexProperty, selectedIndexInNativeHtmlDom); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                    SetCurrentValue(SelectedIndexProperty, selectedIndexInNativeHtmlDom); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
                     //SelectedIndex = GetSelectedIndex(element);
                     ChangingSelectionInHtml = false;
                     OnSelectionChanged(eventArgs);

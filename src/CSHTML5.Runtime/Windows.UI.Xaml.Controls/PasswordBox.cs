@@ -151,7 +151,7 @@ namespace Windows.UI.Xaml.Controls
                     string text = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0['value'] || ''", this.INTERNAL_InnerDomElement));
                     _isUserChangingPassword = true; //To prevent reentrance (infinite loop) when user types some text.
                     //Text = text;
-                    SetLocalValue(PasswordProperty, text); //we call SetLocalvalue directly to avoid replacing the BindingExpression
+                    SetCurrentValue(PasswordProperty, text); //we call SetLocalvalue directly to avoid replacing the BindingExpression
                     _isUserChangingPassword = false;
                     OnPasswordChanged(new RoutedEventArgs() { OriginalSource = this });
                 }

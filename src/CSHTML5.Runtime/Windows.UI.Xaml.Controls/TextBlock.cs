@@ -103,7 +103,7 @@ namespace Windows.UI.Xaml.Controls
             if (!this._isTextChanging)
             {
                 this._isTextChanging = true;
-                this.SetLocalValue(TextProperty, text);
+                this.SetCurrentValue(TextProperty, text);
                 this._isTextChanging = false;
             }
         }

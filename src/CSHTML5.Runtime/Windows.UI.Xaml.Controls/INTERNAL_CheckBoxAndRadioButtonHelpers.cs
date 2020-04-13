@@ -133,17 +133,17 @@ namespace Windows.UI.Xaml.Controls
                     checkBoxOrRadioButton.INTERNAL_IsCodeProgrammaticallyChangingIsChecked = true; //To prevent reentrance (infinite loop) when user clicks.
                     if (formerIsChecked == null)
                     {
-                        checkBoxOrRadioButton.SetLocalValue(ToggleButton.IsCheckedProperty, false); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                        checkBoxOrRadioButton.SetCurrentValue(ToggleButton.IsCheckedProperty, false); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
                     }
                     else
                     {
                         if (checkBoxOrRadioButton.IsThreeState && formerIsChecked == true)
                         {
-                            checkBoxOrRadioButton.SetLocalValue(ToggleButton.IsCheckedProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                            checkBoxOrRadioButton.SetCurrentValue(ToggleButton.IsCheckedProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
                         }
                         else
                         {
-                            checkBoxOrRadioButton.SetLocalValue(ToggleButton.IsCheckedProperty, !(bool)formerIsChecked); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                            checkBoxOrRadioButton.SetCurrentValue(ToggleButton.IsCheckedProperty, !(bool)formerIsChecked); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
                         }
                     }
                     checkBoxOrRadioButton.INTERNAL_IsCodeProgrammaticallyChangingIsChecked = false;
