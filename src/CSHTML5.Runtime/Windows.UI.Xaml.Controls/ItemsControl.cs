@@ -638,6 +638,8 @@ namespace Windows.UI.Xaml.Controls
                             // If we arrive here, it means that either the newContent is already a container (of the correct type), or a new container was generated.
                             //-----------------------------
 
+                            containerIfAny.DataContext = item;
+
                             //if the user defined a style for the container, we apply it:
                             if (ItemContainerStyle != null)
                             {
