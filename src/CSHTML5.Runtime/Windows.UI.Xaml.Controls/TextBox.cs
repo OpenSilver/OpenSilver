@@ -350,7 +350,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                         text = text.Replace("\n", "").Replace("\r", "");
                     _isUserChangingText = true; //To prevent reentrance (infinite loop) when user types some text.
                     //Text = text;
-                    SetLocalValue(TextProperty, text); //we call SetLocalvalue directly to avoid replacing the BindingExpression
+                    SetCurrentValue(TextProperty, text); //we call SetLocalvalue directly to avoid replacing the BindingExpression
                     _isUserChangingText = false;
                     OnTextChanged(new TextChangedEventArgs() { OriginalSource = this });
                 }

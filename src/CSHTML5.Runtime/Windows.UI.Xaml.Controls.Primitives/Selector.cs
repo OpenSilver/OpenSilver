@@ -114,8 +114,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                         _selectionChangeIsOnIndex = true;
                         if (newValue == -1)
                         {
-                            SetLocalValue(SelectedItemProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                            SetLocalValue(SelectedValueProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                            SetCurrentValue(SelectedItemProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                            SetCurrentValue(SelectedValueProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
 
                             //todo: update binding of SelectedIndex
 
@@ -125,8 +125,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                         else
                         {
                             object item = Items[newValue]; //todo: make sure that the index always corresponds (I think it does but I didn't check)
-                            SetLocalValue(SelectedItemProperty, item); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                            SetLocalValue(SelectedValueProperty, PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(item, SelectedValuePath)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                            SetCurrentValue(SelectedItemProperty, item); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                            SetCurrentValue(SelectedValueProperty, PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(item, SelectedValuePath)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
 
                             //todo: update binding of SelectedIndex
 
@@ -164,9 +164,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
             // Ensure that, when an item is removed from the list of items, we deselect it:
             if (this.SelectedItem == item)
             {
-                SetLocalValue(SelectedIndexProperty, -1); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                SetLocalValue(SelectedItemProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                SetLocalValue(SelectedValueProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                SetCurrentValue(SelectedIndexProperty, -1); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                SetCurrentValue(SelectedItemProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                SetCurrentValue(SelectedValueProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
 
                 //todo: update binding of SelectedIndex, SelectedValue, and SelectedItem
             }
@@ -202,8 +202,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     selector._selectionChangeIsOnItem = true;
                     if (newValue == null)
                     {
-                        selector.SetLocalValue(SelectedIndexProperty, -1); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                        selector.SetLocalValue(SelectedValueProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                        selector.SetCurrentValue(SelectedIndexProperty, -1); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                        selector.SetCurrentValue(SelectedValueProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
 
                         //todo: update binding of SelectedIndex
 
@@ -212,8 +212,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     }
                     else
                     {
-                        selector.SetLocalValue(SelectedIndexProperty, GetIndexOfElementInItems(selector, newValue)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                        selector.SetLocalValue(SelectedValueProperty, PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(newValue, selector.SelectedValuePath)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                        selector.SetCurrentValue(SelectedIndexProperty, GetIndexOfElementInItems(selector, newValue)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                        selector.SetCurrentValue(SelectedValueProperty, PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(newValue, selector.SelectedValuePath)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
 
                         //todo: update binding of SelectedIndex
 
@@ -263,8 +263,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     selector._selectionChangeIsOnValue = true;
                     if (newValue == null)
                     {
-                        selector.SetLocalValue(SelectedIndexProperty, -1); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                        selector.SetLocalValue(SelectedItemProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                        selector.SetCurrentValue(SelectedIndexProperty, -1); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                        selector.SetCurrentValue(SelectedItemProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
 
                         //todo: update binding of SelectedIndex
 
@@ -275,8 +275,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     {
                         var selectedPropertyPath = selector.SelectedValuePath;
                         object item = selector.Items.FirstOrDefault(element => Object.Equals(PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(element, selectedPropertyPath), newValue)); //todo: perf? //Note: there is no way we can know which value was intended in the case of multiple items with the same values.
-                        selector.SetLocalValue(SelectedIndexProperty, GetIndexOfElementInItems(selector, item)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                        selector.SetLocalValue(SelectedItemProperty, item); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                        selector.SetCurrentValue(SelectedIndexProperty, GetIndexOfElementInItems(selector, item)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                        selector.SetCurrentValue(SelectedItemProperty, item); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
 
                         //todo: update binding of SelectedIndex
 

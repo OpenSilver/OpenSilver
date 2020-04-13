@@ -84,7 +84,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             double newMax = newValue is double ? (double)newValue : double.NaN;
             double oldMax = e.OldValue is double ? (double)e.OldValue : double.NaN;
 
-            rangeBase.Coerce(ValueProperty);
+            rangeBase.CoerceValue(ValueProperty);
             rangeBase.OnMaximumChanged(oldMax, newMax);
         }
 
@@ -112,8 +112,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             double oldMin = oldValue is double ? (double)oldValue : double.NaN;
             double newMin = newValue is double ? (double)newValue : double.NaN;
 
-            rangeBase.Coerce(MaximumProperty);
-            rangeBase.Coerce(ValueProperty);
+            rangeBase.CoerceValue(MaximumProperty);
+            rangeBase.CoerceValue(ValueProperty);
             rangeBase.OnMinimumChanged(oldMin, newMin);
         }
 

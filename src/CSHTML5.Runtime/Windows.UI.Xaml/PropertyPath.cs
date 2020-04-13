@@ -97,7 +97,7 @@ namespace Windows.UI.Xaml
         {
             if (INTERNAL_IsDirectlyDependencyPropertyPath)
             {
-                (finalTargetInstance).SetLocalValue(INTERNAL_DependencyProperty, value);
+                (finalTargetInstance).SetCurrentValue(INTERNAL_DependencyProperty, value);
             }
             else
             {
