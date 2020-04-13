@@ -31,6 +31,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Input;
+using System.Windows.Data;
 #else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -40,6 +41,7 @@ using Windows.UI.Xaml.Media;
 using Windows.Foundation;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Data;
 #endif
 
 namespace CSHTML5.Internal
@@ -284,7 +286,6 @@ namespace CSHTML5.Internal
 #if PERFSTAT
             var t = Performance.now();
 #endif
-
             //See if the child has a Style, if not, try to find an implicitStyle for its Type.
             FrameworkElement childAsFrameworkElement = child as FrameworkElement;
             if (childAsFrameworkElement != null)
@@ -334,13 +335,7 @@ namespace CSHTML5.Internal
                     Dictionary<DependencyProperty, Setter> defaultStyleDictionary = childDefaultStyle.GetDictionaryOfSettersFromStyle();
 
                     //for all the setters the default style has, that are not on properties already affected by the normal style, we apply them like a normal style (we basically do the same as what we do on each setter in FrameworkElement.Style_Changed):
-                    foreach (DependencyProperty prop in
-#if BRIDGE
-                        INTERNAL_BridgeWorkarounds.GetDictionaryKeys_SimulatorCompatible(defaultStyleDictionary)
-#else
-                        defaultStyleDictionary.Keys
-#endif
-                        )
+                    foreach (DependencyProperty prop in defaultStyleDictionary.Select(kp => kp.Key))
                     {
                         if (!childHasStyle || !normalStyleDictionary.ContainsKey(prop))
                         {
@@ -349,9 +344,21 @@ namespace CSHTML5.Internal
                             childDefaultStyle.SetterValueChanged -= childAsFrameworkElement.StyleSetterValueChanged;
                             childDefaultStyle.SetterValueChanged += childAsFrameworkElement.StyleSetterValueChanged;
 
-                            INTERNAL_PropertyStorage storage;
-                            INTERNAL_PropertyStore.TryGetStorage(childAsFrameworkElement, setter.Property, true/*create*/, out storage);
-                            INTERNAL_PropertyStore.SetLocalStyleValue(storage, setter.Value);
+                            object baseValue = setter.ReadLocalValue(Setter.ValueProperty);
+                            if (baseValue != DependencyProperty.UnsetValue)
+                            {
+                                object value;
+                                if (baseValue is BindingExpression expr)
+                                {
+                                    value = new BindingExpression(expr.ParentBinding.Clone(), expr.TargetProperty);
+                                }
+                                else
+                                {
+                                    value = setter.Value;
+                                }
+
+                                childAsFrameworkElement.SetLocalStyleValue(setter.Property, value);
+                            }
                         }
                     }
                 }

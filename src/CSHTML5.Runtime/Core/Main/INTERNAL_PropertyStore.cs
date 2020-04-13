@@ -156,7 +156,7 @@ namespace CSHTML5.Internal
 
             UpdateEffectiveValue(storage,
                                  expression,
-                                 BaseValueSourceInternal.Local,
+                                 expression.ParentBinding._isInStyle ? BaseValueSourceInternal.LocalStyle : BaseValueSourceInternal.Local,
                                  false, // coerceWithCurrentValue
                                  false, // coerceValue
                                  false, // clearValue
@@ -656,7 +656,7 @@ namespace CSHTML5.Internal
                                  BaseValueSourceInternal.LocalStyle,
                                  false, // coerceWithCurrentValue
                                  false, // coerceValue
-                                 false, // clearValue
+                                 newValue == DependencyProperty.UnsetValue, // clearValue
                                  true); // propagateChanges
         }
 
@@ -806,16 +806,5 @@ namespace CSHTML5.Internal
             listeners.Add(listener);
             return listener;
         }
-
-        internal static void ResetLocalStyleValue(INTERNAL_PropertyStorage storage)
-        {
-
-        }
-
-        internal static void ResetLocalStyleValue(INTERNAL_PropertyStorage storage, bool dontRefresh)
-        {
-
-        }
-
     }
 }

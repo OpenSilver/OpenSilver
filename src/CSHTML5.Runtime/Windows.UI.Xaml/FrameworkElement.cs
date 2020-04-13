@@ -277,9 +277,9 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Identifies the IsEnabled dependency property.
         /// </summary>
-        public static readonly DependencyProperty IsEnabledProperty = DependencyProperty.Register("IsEnabled", 
-                                                                                                  typeof(bool), 
-                                                                                                  typeof(FrameworkElement), 
+        public static readonly DependencyProperty IsEnabledProperty = DependencyProperty.Register("IsEnabled",
+                                                                                                  typeof(bool),
+                                                                                                  typeof(FrameworkElement),
                                                                                                   new PropertyMetadata(true, IsEnabled_Changed, CoerceIsEnabledProperty)
                                                                                                   {
                                                                                                       MethodToUpdateDom = IsEnabled_MethodToUpdateDom,
@@ -425,9 +425,9 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Identifies the DataContext dependency property.
         /// </summary>
-        public static readonly DependencyProperty DataContextProperty = DependencyProperty.Register("DataContext", 
-                                                                                                    typeof(object), 
-                                                                                                    typeof(FrameworkElement), 
+        public static readonly DependencyProperty DataContextProperty = DependencyProperty.Register("DataContext",
+                                                                                                    typeof(object),
+                                                                                                    typeof(FrameworkElement),
                                                                                                     new PropertyMetadata(null, OnDataContextPropertyChanged)
                                                                                                     {
                                                                                                         Inherits = true
@@ -584,23 +584,13 @@ namespace Windows.UI.Xaml
                 Performance.Counter("RecursivelyRegisterToStyleChangedEvents", t1);
 #endif
 
-                foreach (Setter oldSetter in
-#if BRIDGE
-                    INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(oldStyleDictionary)
-#else
-                    oldStyleDictionary.Values
-#endif
-                    )
+                foreach (Setter oldSetter in oldStyleDictionary.Select(kp => kp.Value))
                 {
                     if (oldSetter.Property != null) // Note: it can be null for example in the XAML text editor during design time, because the "DependencyPropertyConverter" class returns "null".
                     {
                         if (!newStyleDictionary.ContainsKey(oldSetter.Property)) // only handle this property here if it is not going set by the new style
                         {
-                            INTERNAL_PropertyStorage storage;
-                            if (INTERNAL_PropertyStore.TryGetStorage(d, oldSetter.Property, false/*don't create*/, out storage))
-                            {
-                                INTERNAL_PropertyStore.ResetLocalStyleValue(storage, true);
-                            }
+                            d.SetLocalStyleValue(oldSetter.Property, DependencyProperty.UnsetValue);
                         }
                     }
 
@@ -608,21 +598,23 @@ namespace Windows.UI.Xaml
                     oldSetter.INTERNAL_ParentStyle = null;
                 }
 
-                foreach (Setter newSetter in
-#if BRIDGE
-                    INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(newStyleDictionary)
-#else
-                    newStyleDictionary.Values
-#endif
-                    )
+                foreach (Setter newSetter in newStyleDictionary.Select(kp => kp.Value))
                 {
                     if (newSetter.Property != null) // Note: it can be null for example in the XAML text editor during design time, because the "DependencyPropertyConverter" class returns "null".
                     {
-                        if (!oldStyleDictionary.ContainsKey(newSetter.Property) || oldStyleDictionary[newSetter.Property] != newSetter.Value)
+                        object baseValue = newSetter.ReadLocalValue(Setter.ValueProperty);
+                        if (baseValue != DependencyProperty.UnsetValue)
                         {
-                            INTERNAL_PropertyStorage storage;
-                            INTERNAL_PropertyStore.TryGetStorage(frameworkElement, newSetter.Property, true/*create*/, out storage);
-                            INTERNAL_PropertyStore.SetLocalStyleValue(storage, newSetter.Value);
+                            object value;
+                            if (baseValue is BindingExpression expr)
+                            {
+                                value = new BindingExpression(expr.ParentBinding.Clone(), expr.TargetProperty);
+                            }
+                            else
+                            {
+                                value = newSetter.Value;
+                            }
+                            frameworkElement.SetLocalStyleValue(newSetter.Property, value);
                         }
                     }
 
@@ -662,14 +654,17 @@ namespace Windows.UI.Xaml
             Setter setter = (Setter)sender;
             if (setter.Property != null) // Note: it can be null for example in the XAML text editor during design time, because the "DependencyPropertyConverter" class returns "null".
             {
-                INTERNAL_PropertyStorage storage;
-                INTERNAL_PropertyStore.TryGetStorage(this, setter.Property, true/*create*/, out storage);
                 HashSet2<Style> stylesAlreadyVisited = new HashSet2<Style>(); // Note: "stylesAlreadyVisited" is here to prevent an infinite recursion.
-                INTERNAL_PropertyStore.SetLocalStyleValue(storage, Style.GetActiveValue(setter.Property, stylesAlreadyVisited));
+                object value = Style.GetActiveValue(setter.Property, stylesAlreadyVisited);
+                // just ignore the value change if it is a BindingExpression
+                if (!(value is BindingExpression))
+                {
+                    this.SetLocalStyleValue(setter.Property, value);
+                }
             }
         }
 
-#region DefaultStyleKey
+        #region DefaultStyleKey
 
         // Returns:
         //     The key that references the default style for the control. To work correctly
@@ -717,11 +712,11 @@ namespace Windows.UI.Xaml
         }
 
 
-#endregion
+        #endregion
 
-#endregion
+        #endregion
 
-#region Loaded/Unloaded events
+        #region Loaded/Unloaded events
 
         /// <summary>
         /// Occurs when a FrameworkElement has been constructed and added to the object tree.
@@ -745,9 +740,9 @@ namespace Windows.UI.Xaml
                 Unloaded(this, new RoutedEventArgs());
         }
 
-#endregion
+        #endregion
 
-#region BindingValidationError event
+        #region BindingValidationError event
 
         internal bool INTERNAL_AreThereAnyBindingValidationErrorHandlers = false;
 
@@ -799,7 +794,7 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-#endregion
+        #endregion
 
 
 #if WORKINPROGRESS
