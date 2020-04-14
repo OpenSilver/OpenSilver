@@ -69,8 +69,12 @@ namespace Windows.UI.Xaml
                 }
 
                 this.CheckSealed();
-                _defaultValue = value;
-                IsDefaultValueModified = true;
+                
+                if (_defaultValue != value)
+                {
+                    _defaultValue = value;
+                    IsDefaultValueModified = true; 
+                }
             }
         }
 
