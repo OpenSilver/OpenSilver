@@ -361,7 +361,6 @@ namespace Windows.UI.Xaml
 
         internal void ApplyBindingExpression(DependencyProperty dp, BindingExpression expression)
         {
-            //todo: implement this
             INTERNAL_PropertyStorage storage;
             INTERNAL_PropertyStore.TryGetStorage(this, dp, true/*create*/, out storage);
             INTERNAL_PropertyStore.RefreshBindingExpressionCommon(storage, expression); // Set LocalStyle if Binding is from style.

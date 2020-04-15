@@ -125,19 +125,36 @@ namespace CSHTML5.Internal
 
             if (!coerceWithCurrentValue)
             {
+                object newLocalValue = newValue;
+
                 if (storage.BaseValueSourceInternal == BaseValueSourceInternal.Local)
                 {
-                    // Detach the previous BindingExpression if any
-                    // If the effective value is not the local value, the binding expression is already detached
-                    BindingExpression oldExpr = storage.IsExpression ? storage.LocalValue as BindingExpression : null;
-                    if (oldExpr != null)
+                    BindingExpression currentExpr = storage.LocalValue as BindingExpression;
+                    if (currentExpr != null)
                     {
-                        oldExpr.OnDetached(storage.Owner);
+                        BindingExpression newExpr = newValue as BindingExpression;
+                        if (currentExpr == newExpr)
+                        {
+                            global::System.Diagnostics.Debug.Assert(newExpr.IsAttached);
+                            RefreshBindingExpressionCommon(storage, newExpr);
+                            return;
+                        }
+
+                        // if the current BindingExpression is a TwoWay binding, we don't want to remove the binding 
+                        // unless we are overriding it with a new BindingExpression.
+                        if (newExpr != null || currentExpr.ParentBinding.Mode != BindingMode.TwoWay)
+                        {
+                            currentExpr.OnDetached(storage.Owner);
+                        }
+                        else
+                        {
+                            newLocalValue = currentExpr;
+                        }
                     }
                 }
 
                 // Set the new local value
-                storage.LocalValue = newValue;
+                storage.LocalValue = newLocalValue;
             }
 
             UpdateEffectiveValue(storage,
@@ -316,15 +333,11 @@ namespace CSHTML5.Internal
 
                 // Check for early exit if effective value is not impacted (if we are doing 
                 // a coerce operation, we have to go through the update process)
-                //   - If we are clearing an entry, the effective value is only impacted if 
-                //   the current base value source is of higher priority than the cleared entry.
-                //   - If we are setting a new value in an entry, the effective value is only
-                //   impacted if the newly computed base value is of higher priority (strictly) 
-                //   than the current base value source.
-                if (clearValue ? oldBaseValueSource > newValueSource
-                               : (oldBaseValueSource > effectiveValueKind &&
-                                 !(oldBaseValueSource == BaseValueSourceInternal.Local && newValueSource == BaseValueSourceInternal.Animated)))
+                if (effectiveValueKind == oldBaseValueSource &&
+                    newValueSource < effectiveValueKind)
                 {
+                    // value source remains the same.
+                    // Exit if the newly set value is of lower precedence than the effective value.
                     return;
                 }
 
@@ -364,7 +377,8 @@ namespace CSHTML5.Internal
 
                     // If the new BindingExpression is the same as the current one,
                     // the BindingExpression is already attached
-                    if (!object.ReferenceEquals(currentExpr, newExpr))
+                    bool isNewBinding = !object.ReferenceEquals(currentExpr, newExpr);
+                    if (isNewBinding)
                     {
                         if (newExpr.IsAttached)
                         {
@@ -383,7 +397,14 @@ namespace CSHTML5.Internal
                         storage.SetExpressionFromStyleValue(storage.TypeMetadata.DefaultValue, newExpr);
                     }
 
-                    computedValue = newExpr.GetValue(storage.Property, storage.Owner.GetType());
+                    // 1- 'isNewBinding == true' means that we are attaching a new BindingExpression.
+                    // 2- 'newValue is BindingExpression == true' means that we are re-evaluating a BindingEpression
+                    // (usually by calling RefreshBindingExpressionCommon)
+                    // 3- Otherwise we are trying to change the value of a TwoWay binding.
+                    // In that case we have to preserve the BindingExpression (this is not the case if the first two 
+                    // situations), hence the following line :
+                    computedValue = isNewBinding || newValue is BindingExpression ? newExpr.GetValue(storage.Property, storage.Owner.GetType())
+                                                                                  : newValue;
                     computedValue = storage.Property.PropertyType == typeof(string)
                                     ? computedValue?.ToString()
                                     : computedValue;
