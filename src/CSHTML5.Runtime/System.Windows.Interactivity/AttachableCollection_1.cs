@@ -50,7 +50,9 @@ namespace System.Windows.Interactivity
         {
             if(_associatedObject != null)
             {
+#if !GD_WIP
                 throw new InvalidOperationException("The AttachableCollection is already attached to a different object.");
+#endif
             }
             _associatedObject = dependencyObject;
             foreach(T element in this)
