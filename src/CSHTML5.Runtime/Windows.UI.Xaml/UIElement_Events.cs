@@ -1,4 +1,4 @@
-
+﻿
 
 /*===================================================================================
 * 
@@ -167,7 +167,7 @@ namespace Windows.UI.Xaml
         //
         // Returns:
         //     The identifier for the System.Windows.UIElement.MouseRightButtonDown routed event.
-        public static readonly RoutedEvent MouseRightButtonDownEvent;
+        public static readonly RoutedEvent MouseRightButtonDownEvent = new RoutedEvent("MouseRightButtonDownEvent");
 #endif
 #endif
 
