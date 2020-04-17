@@ -85,7 +85,6 @@ namespace System.Net
         //todo: handle the DownloadStringCompletedEventArgs properly when in javascript (otherwise, this whole thing is pretty much useless : people want to know when an error has occured while downloading the resource or when the downloading has been cancelled)
 
 
-        INTERNAL_WebRequestHelper_JSOnly _webRequestHelper = new INTERNAL_WebRequestHelper_JSOnly();
 
         // Returns:
         //     A System.Text.Encoding that is used to encode strings. The default value
@@ -175,16 +174,19 @@ namespace System.Net
             {
                 throw new ArgumentNullException("The address parameter in DownloadString cannot be null");
             }
+            Guid guid = Guid.NewGuid();
 
-            _webRequestHelper.DownloadStringCompleted -= OnDownloadStringCompleted;
-            _webRequestHelper.DownloadStringCompleted += OnDownloadStringCompleted;
+            INTERNAL_WebRequestHelper_JSOnly webRequestHelper = new INTERNAL_WebRequestHelper_JSOnly();
+
+            webRequestHelper.DownloadStringCompleted -= OnDownloadStringCompleted;
+            webRequestHelper.DownloadStringCompleted += OnDownloadStringCompleted;
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
             foreach (string key in _headers.AllKeys)
             {
                 headers.Add(key, _headers.Get(key)); //todo-perf: improve performance?
             }
-            return _webRequestHelper.MakeRequest(address, "GET", this, headers, null, OnDownloadStringCompleted, false, GetCredentialsMode());
+            return webRequestHelper.MakeRequest(address, "GET", this, headers, null, OnDownloadStringCompleted, false, GetCredentialsMode());
         }
 
         // Exceptions:
@@ -220,6 +222,7 @@ namespace System.Net
             {
                 throw new ArgumentNullException("The address parameter in DownloadStringAsync cannot be null");
             }
+            INTERNAL_WebRequestHelper_JSOnly webRequestHelper = new INTERNAL_WebRequestHelper_JSOnly();
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
             foreach (string key in _headers.AllKeys)
@@ -227,7 +230,7 @@ namespace System.Net
                 headers.Add(key, _headers.Get(key)); //todo-perf: improve performance?
             }
 
-            _webRequestHelper.MakeRequest(address, "GET", this, headers, null, OnDownloadStringCompleted, true, GetCredentialsMode());
+            webRequestHelper.MakeRequest(address, "GET", this, headers, null, OnDownloadStringCompleted, true, GetCredentialsMode());
 
 
             //define the XMLHttpRequest:
@@ -263,6 +266,8 @@ namespace System.Net
         /// <returns>Returns the resource as <see cref="System.Threading.Tasks.Task{TResult}"/>.</returns>
         public Task<string> DownloadStringTaskAsync(Uri address)
         {
+            INTERNAL_WebRequestHelper_JSOnly webRequestHelper = new INTERNAL_WebRequestHelper_JSOnly();
+
             Dictionary<string, string> headers = new Dictionary<string, string>();
             foreach (string key in _headers.AllKeys)
             {
@@ -270,7 +275,7 @@ namespace System.Net
             }
 
             var taskCompletionSource = new TaskCompletionSource<string>();
-            _webRequestHelper.MakeRequest(address, "GET", this, headers, null, (sender, args) => TriggerDownloadStringTaskCompleted(taskCompletionSource, args), true, GetCredentialsMode());
+            webRequestHelper.MakeRequest(address, "GET", this, headers, null, (sender, args) => TriggerDownloadStringTaskCompleted(taskCompletionSource, args), true, GetCredentialsMode());
 
             return taskCompletionSource.Task;
         }
@@ -436,6 +441,8 @@ namespace System.Net
 
         private string UploadString(Uri address, string method, string data, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler onCompleted, bool isAsync) //todo: see if we should use UploadStringCompletedEventHandler instead
         {
+            INTERNAL_WebRequestHelper_JSOnly webRequestHelper = new INTERNAL_WebRequestHelper_JSOnly();
+
             Dictionary<string, string> headers = new Dictionary<string, string>();
             // Don't add the content-length we get the error :Refused to set unsafe header "Content-Length"
             //if (data != null && data.Length > 0)
@@ -447,7 +454,7 @@ namespace System.Net
             {
                 headers.Add(key, _headers.Get(key)); //todo-perf: improve performance?
             }
-            return _webRequestHelper.MakeRequest(address, method, this, headers, data, onCompleted, isAsync, GetCredentialsMode());
+            return webRequestHelper.MakeRequest(address, method, this, headers, data, onCompleted, isAsync, GetCredentialsMode());
         }
 
 
@@ -588,6 +595,8 @@ namespace System.Net
         /// </returns>
         public Task<string> UploadStringTaskAsync(Uri address, string method, string data)
         {
+            INTERNAL_WebRequestHelper_JSOnly webRequestHelper = new INTERNAL_WebRequestHelper_JSOnly();
+
             Dictionary<string, string> headers = new Dictionary<string, string>();
             // Don't add the content-length we get the error :Refused to set unsafe header "Content-Length"
             //if (data != null && data.Length > 0)
@@ -601,7 +610,7 @@ namespace System.Net
             }
 
             var taskCompletionSource = new TaskCompletionSource<string>();
-            _webRequestHelper.MakeRequest(address, method, this, headers, data, (sender, args) => TriggerUploadStringTaskCompleted(taskCompletionSource, args), true, GetCredentialsMode());
+            webRequestHelper.MakeRequest(address, method, this, headers, data, (sender, args) => TriggerUploadStringTaskCompleted(taskCompletionSource, args), true, GetCredentialsMode());
 
             return taskCompletionSource.Task;
         }
