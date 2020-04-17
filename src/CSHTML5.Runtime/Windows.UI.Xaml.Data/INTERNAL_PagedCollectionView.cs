@@ -40,10 +40,18 @@ namespace Windows.UI.Xaml.Data
     /// <remarks>
     /// <p>the order of the operations is: Filtering, Sorting, Grouping</p>
     /// </remarks>
+#if WORKINPROGRESS
+#if MIGRATION
+    public partial class INTERNAL_PagedCollectionView : IEnumerable, INotifyCollectionChanged, IPagedCollectionView, INotifyPropertyChanged
+#else
+    internal partial class INTERNAL_PagedCollectionView : IEnumerable, INotifyCollectionChanged, IPagedCollectionView, INotifyPropertyChanged
+#endif
+#else
 #if MIGRATION
     public partial class INTERNAL_PagedCollectionView : IEnumerable, INotifyCollectionChanged
 #else
     internal partial class INTERNAL_PagedCollectionView : IEnumerable, INotifyCollectionChanged
+#endif
 #endif
     {
         // the child views
@@ -78,7 +86,7 @@ namespace Windows.UI.Xaml.Data
             Refresh();
         }
 
-        #region Internal and Private Methods
+#region Internal and Private Methods
 
         // add a new child view in the paged collection (not necessarily a leaf)
         internal void AddView(CollectionViewGroupInternal view)
@@ -299,9 +307,9 @@ namespace Windows.UI.Xaml.Data
             return indexRequested;
         }
 
-        #endregion
+#endregion
 
-        #region Events
+#region Events
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
