@@ -33,8 +33,24 @@ namespace Windows.UI.Xaml
     public partial class PropertyMetadata
     {
         private object _defaultValue;
+        private bool _inherits;
+        private WhenToCallPropertyChangedEnum _callPropertyChangedWhenLoadedIntoVisualTree;
+        private PropertyChangedCallback _propertyChangedCallback;
+        private MethodToUpdateDom _methodToUpdateDom;
+        private CoerceValueCallback _coerceValueCallback;
 
         internal bool IsDefaultValueModified { get; private set; }
+        internal bool Sealed { get; private set; }
+
+        internal void Seal()
+        {
+            this.Sealed = true;
+        }
+
+        protected bool IsSealed
+        {
+            get { return this.Sealed; }
+        }
 
         /// <summary>
         /// Gets the default value for the dependency property.
@@ -49,9 +65,11 @@ namespace Windows.UI.Xaml
             {
                 if (value == INTERNAL_NoValue.NoValue)
                 {
-                    throw new ArgumentException("Default Value may not be Unset");
+                    throw new ArgumentException("Default value cannot be 'Unset'.");
                 }
 
+                this.CheckSealed();
+                
                 if (_defaultValue != value)
                 {
                     _defaultValue = value;
@@ -63,23 +81,78 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Gets the method that is called when the property value changes.
         /// </summary>
-        public PropertyChangedCallback PropertyChangedCallback { get; set; }
+        public PropertyChangedCallback PropertyChangedCallback
+        {
+            get
+            {
+                return this._propertyChangedCallback;
+            }
+            set
+            {
+                this.CheckSealed();
+                this._propertyChangedCallback = value;
+            }
+        }
         /// <summary>
         /// Gets the method that is called when the object is added to the visual tree, and when the property value changes while the object is already in the visual tree.
         /// </summary>
-        public MethodToUpdateDom MethodToUpdateDom { get; set; }
+        public MethodToUpdateDom MethodToUpdateDom
+        {
+            get
+            {
+                return this._methodToUpdateDom;
+            }
+            set
+            {
+                this.CheckSealed();
+                this._methodToUpdateDom = value;
+            }
+        }
         /// <summary>
         /// Gets the method that will be called on update of value.
         /// </summary>
-        public CoerceValueCallback CoerceValueCallback { get; set; }
+        public CoerceValueCallback CoerceValueCallback
+        {
+            get
+            {
+                return this._coerceValueCallback;
+            }
+            set
+            {
+                this.CheckSealed();
+                this._coerceValueCallback = value;
+            }
+        }
         /// <summary>
         /// Determines if the property's value can be inherited from a parent element to a child element.
         /// </summary>
-        public bool Inherits { get; set; }
+        public bool Inherits
+        {
+            get
+            {
+                return this._inherits;
+            }
+            set
+            {
+                this.CheckSealed();
+                this._inherits = value;
+            }
+        }
         /// <summary>
         /// Determines if the callback method should be called when the element is added to the visual tree.
         /// </summary>
-        public WhenToCallPropertyChangedEnum CallPropertyChangedWhenLoadedIntoVisualTree { get; set; }
+        public WhenToCallPropertyChangedEnum CallPropertyChangedWhenLoadedIntoVisualTree
+        {
+            get
+            {
+                return this._callPropertyChangedWhenLoadedIntoVisualTree;
+            }
+            set
+            {
+                this.CheckSealed();
+                this._callPropertyChangedWhenLoadedIntoVisualTree = value;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of Windows.UI.Xaml.PropertyMetadata.
@@ -135,10 +208,17 @@ namespace Windows.UI.Xaml
 
         internal CSSEquivalentGetter GetCSSEquivalent;
         internal CSSEquivalentsGetter GetCSSEquivalents;
+
+        internal void CheckSealed()
+        {
+            if (this.Sealed)
+            {
+                throw new InvalidOperationException("Cannot change property metadata after it has been associated with a property.");
+            }
+        }
     }
 
     internal delegate CSSEquivalent CSSEquivalentGetter(DependencyObject d);
     internal delegate List<CSSEquivalent> CSSEquivalentsGetter(DependencyObject d);
     public delegate void MethodToUpdateDom(DependencyObject d, object newValue);
-
 }
