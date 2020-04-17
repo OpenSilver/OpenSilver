@@ -33,6 +33,11 @@ namespace System.Runtime.Serialization
 
         internal static object DeserializeToCSharpObject(IEnumerable<XNode> content, Type resultType, XElement parentElement, IReadOnlyList<Type> knownTypes, bool ignoreErrors, bool useXmlSerializerFormat)
         {
+            if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                resultType = resultType.GetGenericArguments()[0];
+            }
+
             Type itemsType;
 
             //if (resultType.IsValueType || resultType == typeof(string))
