@@ -315,7 +315,7 @@ namespace Windows.UI.Xaml.Data
 
         public event EventHandler<EventArgs> PageChanged;
 
-#if WORKINPROGRESS && !CSHTML5NETSTANDARD
+#if WORKINPROGRESS
         public event EventHandler<PageChangingEventArgs> PageChanging;
         public event PropertyChangedEventHandler PropertyChanged;
 
