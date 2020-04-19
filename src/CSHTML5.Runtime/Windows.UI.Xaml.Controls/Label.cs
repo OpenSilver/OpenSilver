@@ -29,6 +29,9 @@ namespace Windows.UI.Xaml.Controls
 	/// </summary>
 	public partial class Label : ContentControl
 	{
-
+		public Label()
+		{
+			this.DefaultStyleKey = typeof(Label);
+		}
 	}
 }
