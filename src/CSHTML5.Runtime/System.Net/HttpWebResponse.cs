@@ -72,17 +72,40 @@ namespace System.Net
 #endif
 #endif
 
-        // Exceptions:
-        //   System.Net.ProtocolViolationException:
-        //     There is no response stream.
+
+#if !BRIDGE && !NETSTANDARD // This is the JSIL version, which doesn't have access to the "CSHTML5.Interop" class because we are in the project "DotNetForHtml5.System.dll".
+        [JSIL.Meta.JSReplacement("$xmlHttpRequest.statusText")]
+        public virtual string StatusDescription { get { throw new NotImplementedException(); } } //todo: maybe implement this in another way?
+
+#else
+        // Returns:
+        //     A string that describes the status of the response.
         //
+        // Exceptions:
         //   System.ObjectDisposedException:
         //     The current instance has been disposed.
         /// <summary>
-        /// Gets the stream that is used to read the body of the response from the server.
+        /// Gets the status description returned with the response.
         /// </summary>
-        /// <returns>A System.IO.Stream containing the body of the response.</returns>
-        public override Stream GetResponseStream()
+        public virtual string StatusDescription { 
+            get
+            {
+                return Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.statusText", _xmlHttpRequest));
+            }
+        }
+#endif
+
+    // Exceptions:
+    //   System.Net.ProtocolViolationException:
+    //     There is no response stream.
+    //
+    //   System.ObjectDisposedException:
+    //     The current instance has been disposed.
+    /// <summary>
+    /// Gets the stream that is used to read the body of the response from the server.
+    /// </summary>
+    /// <returns>A System.IO.Stream containing the body of the response.</returns>
+    public override Stream GetResponseStream()
         {
             MemoryStream stream = new MemoryStream();
             StreamWriter writer = new StreamWriter(stream);
@@ -244,17 +267,6 @@ namespace System.Net
         ////     The current instance has been disposed.
         //public string Server { get; }
         
-        ////
-        //// Summary:
-        ////     Gets the status description returned with the response.
-        ////
-        //// Returns:
-        ////     A string that describes the status of the response.
-        ////
-        //// Exceptions:
-        ////   System.ObjectDisposedException:
-        ////     The current instance has been disposed.
-        //public virtual string StatusDescription { get; }
         ////
         ////
         //// Returns:
