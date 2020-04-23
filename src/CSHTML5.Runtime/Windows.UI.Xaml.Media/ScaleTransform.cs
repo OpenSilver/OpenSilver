@@ -212,9 +212,17 @@ namespace Windows.UI.Xaml.Media
             set { this.SetValue(CenterYProperty, value); }
         }
 
+        //TODO: needs verification
         public override GeneralTransform Inverse
         {
-            get { return null; }
+            get
+            {
+                return new ScaleTransform()
+                {
+                    ScaleX = 1/ScaleX,
+                    ScaleY = 1/ScaleY
+                };
+            }
         }
 
         public override Rect TransformBounds(Rect rect)
