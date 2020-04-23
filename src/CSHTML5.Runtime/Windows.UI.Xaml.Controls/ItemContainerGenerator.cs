@@ -51,7 +51,7 @@ namespace Windows.UI.Xaml.Controls
 
         public object INTERNAL_ContainerFromItem(object item) //Note: this signature is needed (at least) for the native ComboBox. The only difference is that we [do not need to]/[we cannot] cast the result into a DependencyObject
         {
-            if (_itemsToContainers.ContainsKey(item))
+            if (item != null && _itemsToContainers.ContainsKey(item))
             {
                 List<object> containersAssociatedToTheItem = _itemsToContainers[item];
                 if (containersAssociatedToTheItem != null && containersAssociatedToTheItem.Count > 0)
