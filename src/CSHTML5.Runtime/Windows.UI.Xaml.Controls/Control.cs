@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Media;
@@ -412,6 +413,16 @@ namespace Windows.UI.Xaml.Controls
                     {
                         Value = (inst, value) =>
                         {
+#if GD_WIP
+                            if (value is Binding binding)
+                            {
+                                value = binding.Source;
+                                binding.Path.Path.Split('.')
+                                    .ForEach(p => 
+                                        value = value.GetType().GetProperty(p).GetValue(value)
+                                    );
+                            }
+#endif
                             return (Math.Floor((double)value * 1000) / 1000).ToString() + "px"; // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most.
                         },
                         Name = new List<string> { "fontSize" },
