@@ -124,11 +124,31 @@ namespace Windows.UI.Xaml.Shapes
                     double minY = double.MaxValue;
                     double maxX = double.MinValue;
                     double maxY = double.MinValue;
-                    if (Data is PathGeometry)
+                    if (Data is PathGeometry pathGeometry)
                     {
-                        ((PathGeometry)Data).UpdateStrokeThickness(StrokeThickness);
+                        if (pathGeometry.Figures == null || pathGeometry.Figures.Count == 0)
+                        {
+                            return;
+                        }
+                        pathGeometry.UpdateStrokeThickness(StrokeThickness);
                     }
                     Data.GetMinMaxXY(ref minX, ref maxX, ref minY, ref maxY);
+
+#if WORKINPROGRESS
+                    if (Data.Transform != null)
+                    {
+                        // todo: appying the transform to the min/max is accurate only for Scale and 
+                        // translate transforms. For other transforms such as rotate, the min/max is incorrect. 
+                        // For a correct result, we should apply the transform to each point of the figure.
+
+                        Point tmp1 = Data.Transform.Transform(new Point(minX, minY));
+                        Point tmp2 = Data.Transform.Transform(new Point(maxX, maxY));
+                        minX = tmp1._x;
+                        minY = tmp1._y;
+                        maxX = tmp2._x;
+                        maxY = tmp2._y;
+                    }
+#endif
 
                     Size shapeActualSize;
                     INTERNAL_ShapesDrawHelpers.PrepareStretch(this, _canvasDomElement, minX, maxX, minY, maxY, Stretch, out shapeActualSize);
