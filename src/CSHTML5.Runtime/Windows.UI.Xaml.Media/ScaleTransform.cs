@@ -219,8 +219,8 @@ namespace Windows.UI.Xaml.Media
             {
                 return new ScaleTransform()
                 {
-                    ScaleX = 1/ScaleX,
-                    ScaleY = 1/ScaleY
+                    ScaleX = ScaleX != 0 ? 1/ScaleX : 0,
+                    ScaleY = ScaleY != 0 ? 1/ScaleY : 0
                 };
             }
         }
