@@ -26,15 +26,8 @@ namespace System.ComponentModel
 
         event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
         {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
+            add => PropertyChanged += value;
+            remove => PropertyChanged -= value;
         }
 
         //

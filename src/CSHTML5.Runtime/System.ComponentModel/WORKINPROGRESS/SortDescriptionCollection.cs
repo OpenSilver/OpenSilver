@@ -33,15 +33,8 @@ namespace System.ComponentModel
 
         event NotifyCollectionChangedEventHandler INotifyCollectionChanged.CollectionChanged
         {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
+            add => CollectionChanged += value;
+            remove => CollectionChanged -= value;
         }
 
         //

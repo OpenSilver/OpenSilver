@@ -189,12 +189,12 @@ namespace Windows.UI.Xaml
 
 		public IEnumerator<T> GetEnumerator()
 		{
-			return null;
+			return new List<T>().GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return null;
+			return GetEnumerator();
 		}
 	}
 }

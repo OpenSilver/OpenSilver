@@ -167,7 +167,7 @@ namespace Windows.UI.Xaml
         //
         // Returns:
         //     The identifier for the System.Windows.UIElement.MouseRightButtonDown routed event.
-        public static readonly RoutedEvent MouseRightButtonDownEvent;
+        public static readonly RoutedEvent MouseRightButtonDownEvent = new RoutedEvent("MouseRightButtonDownEvent");
 #endif
 #endif
 
@@ -1763,6 +1763,16 @@ namespace Windows.UI.Xaml
             {
                 TappedEventManager.Add((TappedEventHandler)handler, handledEventsToo: handledEventsToo);
             }
+#if GD_WIP
+            else if (routedEvent == UIElement.MouseRightButtonDownEvent)
+            {
+                
+            }
+            else if (routedEvent == UIElement.MouseWheelEvent)
+            {
+                
+            }
+#endif
 #if MIGRATION
             else if (routedEvent == UIElement.MouseRightButtonUpEvent)
 #else
@@ -1870,6 +1880,16 @@ namespace Windows.UI.Xaml
             {
                 TappedEventManager.Remove((TappedEventHandler)handler);
             }
+#if GD_WIP
+            else if (routedEvent == UIElement.MouseRightButtonDownEvent)
+            {
+                
+            }
+            else if (routedEvent == UIElement.MouseWheelEvent)
+            {
+                
+            }
+#endif
 #if MIGRATION
             else if (routedEvent == UIElement.MouseRightButtonUpEvent)
 #else

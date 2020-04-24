@@ -206,9 +206,17 @@ namespace Windows.UI.Xaml.Media
         }
 
 #if WORKINPROGRESS
+        //TODO: needs verification
         public override GeneralTransform Inverse
         {
-            get { return null; }
+            get
+            {
+                return new TranslateTransform()
+                {
+                    X = -X,
+                    Y = -Y
+                };
+            }
         }
 
         public override Rect TransformBounds(Rect rect)

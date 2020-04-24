@@ -24,7 +24,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
     internal partial class PopupRoot : FrameworkElement
     {
         internal string INTERNAL_UniqueIndentifier { get; set; }
-        internal Window INTERNAL_ParentWindow { get; set; }
 
         internal Popup INTERNAL_LinkedPopup { get; set; }
 

@@ -104,7 +104,9 @@ namespace System.Windows.Interactivity
             }
             if (triggerCollection2.AssociatedObject != null)
             {
+#if !GD_WIP
                 throw new InvalidOperationException("Cannot Host TriggerCollection Multiple Times");
+#endif
             }
             FrameworkElement fElement = obj as FrameworkElement;
             if (fElement == null)
