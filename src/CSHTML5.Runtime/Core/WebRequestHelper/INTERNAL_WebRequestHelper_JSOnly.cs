@@ -138,11 +138,14 @@ namespace System
             {
                 if (result.IndexOf(":Fault>") == -1) // We make a special case to not consider FaultExceptions as a server Internal error. The error will be handled later in CSHTML5_ClientBase.WebMethodsCaller.ReadAndPrepareResponse
                 {
-                    //todo: test the following that replaces the commented code below it. Also, "WebExceptionStatus.ProtocolError" should be dependent on the actual error.
-                    string errorMessage = "The remote server has returned an error: (" + GetCurrentStatus((object)_xmlHttpRequest) + ") " + GetCurrentStatusText((object)_xmlHttpRequest) + ".";
-                    WebException exception = new WebException(errorMessage, null, WebExceptionStatus.ProtocolError, new HttpWebResponse(this.GetXmlHttpRequest())); //todo: put the correct error type depending on the error (I'm guessing we can know what type it should be by using the statuscode. The test with an error 400 bad request I made was a ProtocolError so I put this here.
-                    throw exception;
-                    //throw new Exception("The remote server has returned an error: (" + GetCurrentStatus((object)_xmlHttpRequest) + ") " + GetCurrentStatusText((object)_xmlHttpRequest) + ".");
+#if OPENSILVER
+	                throw new Exception("The remote server has returned an error: (" + GetCurrentStatus((object)_xmlHttpRequest) + ") " + GetCurrentStatusText((object)_xmlHttpRequest) + ".");
+#else
+	                //todo: test the following that replaces the commented code below it. Also, "WebExceptionStatus.ProtocolError" should be dependent on the actual error.
+	                string errorMessage = "The remote server has returned an error: (" + GetCurrentStatus((object)_xmlHttpRequest) + ") " + GetCurrentStatusText((object)_xmlHttpRequest) + ".";
+	                WebException exception = new WebException(errorMessage, null, WebExceptionStatus.ProtocolError, new HttpWebResponse(this.GetXmlHttpRequest())); //todo: put the correct error type depending on the error (I'm guessing we can know what type it should be by using the statuscode. The test with an error 400 bad request I made was a ProtocolError so I put this here.
+	                throw exception;
+#endif
                 }
             }
             else
@@ -420,7 +423,11 @@ namespace System
             }
             if(errorMessage != null)
             {
-                WebException exception = new WebException(errorMessage, null, WebExceptionStatus.ProtocolError, new HttpWebResponse(this.GetXmlHttpRequest())); //todo: put the correct error type depending on the error (I'm guessing we can know what type it should be by using the statuscode. The test with an error 400 bad request I made was a ProtocolError so I put this here.
+#if OPENSILVER
+	            Exception exception = new Exception("An Error has occured while submitting your request.");
+#else
+	            WebException exception = new WebException(errorMessage, null, WebExceptionStatus.ProtocolError, new HttpWebResponse(this.GetXmlHttpRequest())); //todo: put the correct error type depending on the error (I'm guessing we can know what type it should be by using the statuscode. The test with an error 400 bad request I made was a ProtocolError so I put this here.
+#endif
                 e.Error = exception;
             }
             e.Result = GetResult((object)_xmlHttpRequest);
