@@ -64,7 +64,18 @@ namespace Windows.UI.Xaml
 
         public bool HasElevatedPermissions { get; set; }
 
-        public IList ApplicationLifetimeObjects { get; }
+        ApplicationLifetimeObjectsCollection lifetime_objects;
+        public IList ApplicationLifetimeObjects {
+            get 
+            {
+                if(lifetime_objects == null)
+                {
+                    lifetime_objects = new ApplicationLifetimeObjectsCollection();
+                }
+
+                return lifetime_objects; 
+            } 
+        }
     }
 }
 
