@@ -501,7 +501,7 @@ namespace Windows.UI.Xaml.Controls
                 // Compare with the current URL and navigate only if it is different:
                 if (Source != null && !string.IsNullOrWhiteSpace(Source.ToString()))
                 {
-                    Navigate_BrowserJournalVersion(null, false);
+                    Navigate_BrowserJournalVersion(Source, false);
                 }
             }
         }
