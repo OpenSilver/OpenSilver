@@ -389,9 +389,21 @@ namespace Windows.UI.Xaml.Media
         //}
 
 #if WORKINPROGRESS
+        internal void MultiplyPoint(ref double x, ref double y)
+        {
+            double xadd = y * _m21 + _offsetX;
+            double yadd = x * _m12 + _offsetY;
+            x *= _m11;
+            x += xadd;
+            y *= _m22;
+            y += yadd;
+        }
+
         public Point Transform(Point point)
         {
-            return new Point();
+            Point newPoint = point;
+            MultiplyPoint(ref newPoint._x, ref newPoint._y);
+            return newPoint;
         }
 #endif
     }

@@ -53,6 +53,7 @@ namespace CSHTML5.Internal
                 _parent = value;
                 if (_parent != null)
                     _parent.FirstChild = this; //what happens when we have multiple children? (is it even possible?)
+                //TODO: a DOM element can indeed have multiple children, so this probably doesn't works. The FirstChild property should be replaced with an array of children or smth like that.
             }
         }
 

@@ -187,9 +187,16 @@ namespace Windows.UI.Xaml.Media
         public static readonly DependencyProperty CenterYProperty = DependencyProperty.Register("CenterY", typeof(double), typeof(RotateTransform), new PropertyMetadata(null)
         { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
+        //TODO: needs verification
         public override GeneralTransform Inverse
         {
-            get { return null; }
+            get
+            {
+                return new RotateTransform()
+                {
+                    Angle = -Angle
+                };
+            }
         }
 
         public override Rect TransformBounds(Rect rect)

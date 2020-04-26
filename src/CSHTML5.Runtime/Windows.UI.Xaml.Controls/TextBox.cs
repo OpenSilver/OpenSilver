@@ -201,9 +201,12 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                 string text = textBox.Text ?? string.Empty;
                 if (displayedText != text)
                 {
-                    textBox._isCodeProgrammaticallyChangingText = true;
-                    INTERNAL_HtmlDomManager.SetContentString(textBox, text);
-                    textBox._isCodeProgrammaticallyChangingText = false;
+                    if (textBox._contentEditableDiv != null || textBox.Template == null)
+                    {
+                        textBox._isCodeProgrammaticallyChangingText = true;
+                        INTERNAL_HtmlDomManager.SetContentString(textBox, text);
+                        textBox._isCodeProgrammaticallyChangingText = false;
+                    }
                 }
             }
         }
@@ -887,6 +890,7 @@ var range,selection;
                 {
                     Text_Changed(this, new DependencyPropertyChangedEventArgs(text, text, TextProperty));
                 }
+                UpdateDomText(this, text);
             }
         }
 

@@ -166,7 +166,11 @@ namespace Windows.UI.Xaml.Media
 
         protected override Point INTERNAL_TransformPoint(Point point)
         {
+#if WORKINPROGRESS
+            return this.Matrix.Transform(point);
+#else
             throw new NotImplementedException("Please contact support@cshtml5.com");
+#endif
         }
 
 #if WORKINPROGRESS

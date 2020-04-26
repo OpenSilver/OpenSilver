@@ -42,8 +42,8 @@ namespace Windows.Foundation
     {
         //todo: Add the interface IFormattable
 
-        double _x;
-        double _y;
+        internal double _x;
+        internal double _y;
 
         /// <summary>
         /// Initializes a Windows.Foundation.Point structure that
@@ -53,11 +53,8 @@ namespace Windows.Foundation
         /// <param name="y">The y-coordinate value of the Windows.Foundation.Point structure.</param>
         public Point(double x, double y)
         {
-            _x = 0d;
-            _y = 0d;
-
-            X = x;
-            Y = y;
+            _x = x;
+            _y = y;
         }
 
         /// <summary>

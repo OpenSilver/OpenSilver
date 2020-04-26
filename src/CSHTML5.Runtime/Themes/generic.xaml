@@ -10,6 +10,7 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultExpanderStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultGridSplitterStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultHyperlinkButtonStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultLabelStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultMenuItemStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultNumericUpDownStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultSliderStyle.xaml" />

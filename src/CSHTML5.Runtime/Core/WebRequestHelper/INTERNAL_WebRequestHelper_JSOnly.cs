@@ -138,7 +138,14 @@ namespace System
             {
                 if (result.IndexOf(":Fault>") == -1) // We make a special case to not consider FaultExceptions as a server Internal error. The error will be handled later in CSHTML5_ClientBase.WebMethodsCaller.ReadAndPrepareResponse
                 {
-                    throw new Exception("The remote server has returned an error: (" + GetCurrentStatus((object)_xmlHttpRequest) + ") " + GetCurrentStatusText((object)_xmlHttpRequest) + ".");
+#if OPENSILVER
+	                throw new Exception("The remote server has returned an error: (" + GetCurrentStatus((object)_xmlHttpRequest) + ") " + GetCurrentStatusText((object)_xmlHttpRequest) + ".");
+#else
+	                //todo: test the following that replaces the commented code below it. Also, "WebExceptionStatus.ProtocolError" should be dependent on the actual error.
+	                string errorMessage = "The remote server has returned an error: (" + GetCurrentStatus((object)_xmlHttpRequest) + ") " + GetCurrentStatusText((object)_xmlHttpRequest) + ".";
+	                WebException exception = new WebException(errorMessage, null, WebExceptionStatus.ProtocolError, new HttpWebResponse(this.GetXmlHttpRequest())); //todo: put the correct error type depending on the error (I'm guessing we can know what type it should be by using the statuscode. The test with an error 400 bad request I made was a ProtocolError so I put this here.
+	                throw exception;
+#endif
                 }
             }
             else
@@ -392,42 +399,36 @@ namespace System
         {
             int currentReadyState = GetCurrentReadyState((object)_xmlHttpRequest);
             int currentStatus = GetCurrentStatus((object)_xmlHttpRequest);
-            if (currentStatus == 400)
+            string errorMessage = null;
+            if (GetHasError((object)_xmlHttpRequest))
             {
-                e.Error = new Exception("400 - Bad Request");
-            }
-            
-            else if (currentStatus == 401)
-            {
-                e.Error = new Exception("401 - Unauthorized ");
-            }
-            else if (currentStatus == 403)
-            {
-                e.Error = new Exception("403 - Forbidden");
-            }
-            else if (currentStatus == 404)
-            {
-                e.Error = new Exception("404 - Page not found");
-            }
-            else if (currentStatus == 500)
-            {
-                e.Error = new Exception("500 - Internal Server Error");
+                //cases where current status represents an error (like 404 for page not found)
+                errorMessage = string.Format("{0} - {1}",currentStatus, GetCurrentStatusText((object)_xmlHttpRequest));
             }
             else if (currentReadyState == 0 && !e.Cancelled)
             {
-                e.Error = new Exception("Request not initialized");
+                errorMessage ="Request not initialized";
             }
             else if ((currentStatus == 0 && !GetIsFileProtocol()) && (currentReadyState == 4 || currentReadyState == 1)) //Note: we check whether the file protocol is file: because apparently, browsers return 0 as the status on a successful call.
             {
-                e.Error = new Exception("An error occured. Please make sure that the target Url is available.");
+                errorMessage = "An error occured. Please make sure that the target Url is available.";
             }
             else if (currentReadyState == 1 && !e.Cancelled)
             {
-                e.Error = new Exception("An Error occured. Cross-Site Http Request might not be allowed at the target Url. If you own the domain of the Url, consider adding the header \"Access-Control-Allow-Origin\" to enable requests to be done at this Url.");
+                errorMessage = "An Error occured. Cross-Site Http Request might not be allowed at the target Url. If you own the domain of the Url, consider adding the header \"Access-Control-Allow-Origin\" to enable requests to be done at this Url.";
             }
             else if (currentReadyState != 4)
             {
-                e.Error = new Exception("An Error has occured while submitting your request.");
+                errorMessage = "An Error has occured while submitting your request.";
+            }
+            if(errorMessage != null)
+            {
+#if OPENSILVER
+	            Exception exception = new Exception("An Error has occured while submitting your request.");
+#else
+	            WebException exception = new WebException(errorMessage, null, WebExceptionStatus.ProtocolError, new HttpWebResponse(this.GetXmlHttpRequest())); //todo: put the correct error type depending on the error (I'm guessing we can know what type it should be by using the statuscode. The test with an error 400 bad request I made was a ProtocolError so I put this here.
+#endif
+                e.Error = exception;
             }
             e.Result = GetResult((object)_xmlHttpRequest);
         }
@@ -469,10 +470,10 @@ namespace System
 #else
         [Template("{xmlHttpRequest}.statusText")]
 #endif
-        private static int GetCurrentStatusText(object xmlHttpRequest)
+        private static string GetCurrentStatusText(object xmlHttpRequest)
         {
 #if BRIDGE || CSHTML5BLAZOR
-            return Convert.ToInt32(Interop.ExecuteJavaScript("$0.statusText", xmlHttpRequest));
+            return Convert.ToString(Interop.ExecuteJavaScript("$0.statusText", xmlHttpRequest));
 #else
             throw new InvalidOperationException(); //We should never arrive here.
 #endif

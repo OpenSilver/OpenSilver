@@ -306,7 +306,6 @@
 		<Compile Include="Core\Events\INTERNAL_EventsHelper.cs" />
 		<Compile Include="Core\Main\DelegateUtility.cs" />
 		<Compile Include="Core\Main\INameScope.cs" />
-		<Compile Include="Core\Main\INTERNAL_DefaultValueProvider.cs" />
 		<Compile Include="Core\Main\INTERNAL_ListsHelper.cs" />
 		<Compile Include="Core\Main\INTERNAL_NoValue.cs" />
 		<Compile Include="Core\Main\INTERNAL_PropertyStorage.cs" />
@@ -1079,6 +1078,11 @@
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="OpenSilver.Runtime.licenseheader" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Include="DefaultStyles\INTERNAL_DefaultLabelStyle.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 
 	<!-- See ths comment on the first <Import> -->
