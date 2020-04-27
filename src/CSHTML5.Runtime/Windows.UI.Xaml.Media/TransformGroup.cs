@@ -34,12 +34,21 @@ namespace Windows.UI.Xaml.Media
     {
         public TransformGroup()
         {
-            Children = TransformCollection.Empty;
+
         }
         
         public TransformCollection Children
         {
-            get { return (TransformCollection)GetValue(ChildrenProperty); }
+            get
+            {
+                var collection = (TransformCollection)GetValue(ChildrenProperty);
+                if (collection == null)
+                {
+                    collection = new TransformCollection();
+                    SetValue(ChildrenProperty, collection);
+                }
+                return collection;
+            }
             set { SetValue(ChildrenProperty, value); }
         }
 

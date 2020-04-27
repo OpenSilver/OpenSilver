@@ -20,10 +20,10 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.UI.Xaml.Shapes;
-#else
+#if MIGRATION
 using System.Windows.Shapes;
+#else
+using Windows.UI.Xaml.Shapes;
 #endif
 
 #if MIGRATION
@@ -32,6 +32,149 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+    /// <summary>
+    /// Represents a collection of PathSegment objects that can be individually accessed
+    /// by index.
+    /// </summary>
+    public sealed partial class PathSegmentCollection : PresentationFrameworkCollection<PathSegment>
+    {
+        #region Data
+
+        private Path _parentPath;
+
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance that is empty.
+        /// </summary>
+        public PathSegmentCollection()
+        {
+
+        }
+
+        /// <summary>
+        /// Initializes a new instance that is empty and has the specified initial capacity.
+        /// </summary>
+        /// <param name="capacity"> int - The number of elements that the new list is initially capable of storing. </param>
+        public PathSegmentCollection(int capacity) : base(capacity)
+        {
+
+        }
+
+        /// <summary>
+        /// Creates a PathSegmentCollection with all of the same elements as collection
+        /// </summary>
+        public PathSegmentCollection(IEnumerable<PathSegment> segments) : base(segments)
+        {
+
+        }
+
+        #endregion
+
+        #region Overriden Methods
+
+        internal override void AddOverride(PathSegment segment)
+        {
+            if (segment == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+            if (this._parentPath != null)
+            {
+                segment.SetParentPath(this._parentPath);
+            }
+            this.AddInternal(segment);
+            this.NotifyCollectionChanged();
+        }
+
+        internal override bool RemoveOverride(PathSegment segment)
+        {
+            if (this.RemoveInternal(segment))
+            {
+                segment.SetParentPath(null);
+                this.NotifyCollectionChanged();
+                return true;
+            }
+            return false;
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            if (index < 0 || index >= this.Count)
+            {
+                throw new ArgumentOutOfRangeException("index");
+            }
+            this.GetItemInternal(index).SetParentPath(null);
+            this.RemoveAtInternal(index);
+            this.NotifyCollectionChanged();
+        }
+
+        internal override void InsertOverride(int index, PathSegment segment)
+        {
+            if (segment == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+            if (this._parentPath != null)
+            {
+                segment.SetParentPath(this._parentPath);
+            }
+            this.InsertInternal(index, segment);
+            this.NotifyCollectionChanged();
+        }
+
+        internal override void ClearOverride()
+        {
+            foreach (PathSegment segment in this)
+            {
+                segment.SetParentPath(null);
+            }
+            this.ClearInternal();
+            this.NotifyCollectionChanged();
+        }
+
+        internal override void SetItemOverride(int index, PathSegment segment)
+        {
+            if (this._parentPath != null)
+            {
+                PathSegment oldItem = this[index];
+                oldItem.SetParentPath(null);
+                segment.SetParentPath(this._parentPath);
+            }
+            this.SetItemInternal(index, segment);
+            this.NotifyCollectionChanged();
+        }
+
+        #endregion
+
+        #region Internal Methods
+
+        internal void SetParentPath(Path path)
+        {
+            if (this._parentPath != path)
+            {
+                this._parentPath = path;
+                foreach (PathSegment segment in this)
+                {
+                    segment.SetParentPath(path);
+                }
+            }
+        }
+
+        private void NotifyCollectionChanged()
+        {
+            if (this._parentPath != null)
+            {
+                this._parentPath.ScheduleRedraw();
+            }
+        }
+
+        #endregion
+    }
+
+#if no
     /// <summary>
     /// Represents a collection of PathSegment objects that can be individually accessed
     /// by index.
@@ -62,25 +205,6 @@ namespace Windows.UI.Xaml.Media
                 segment.SetParentPath(path);
             }
         }
-
-               
-        //public int Count { get; }
-        //public bool IsReadOnly { get; }
-               
-        //public PathSegment this[int index] { get; set; }
-               
-        //public void Add(PathSegment item);
-        ///// <summary>
-        ///// Removes all items from the collection.
-        ///// </summary>
-        //public void Clear();
-        //public bool Contains(PathSegment item);
-        //public void CopyTo(PathSegment[] array, int arrayIndex);
-        //public int IndexOf(PathSegment item);
-        //public void Insert(int index, PathSegment item);
-        //public bool Remove(PathSegment item);
-        //public void RemoveAt(int index);
-
-
     }
+#endif
 }

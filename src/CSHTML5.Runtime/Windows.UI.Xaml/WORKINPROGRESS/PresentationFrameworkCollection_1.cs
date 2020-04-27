@@ -30,428 +30,351 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if WORKINPROGRESS
-    // Summary:
-    //     Provides a common collection class for Silverlight collections.
-    //
-    // Type parameters:
-    //   T:
-    //     Type constraint for type safety of the constrained collection implementation.
-    public abstract partial class PresentationFrameworkCollection<T> : DependencyObject, INotifyPropertyChanged, INotifyCollectionChanged, IList<T>, ICollection<T>, IEnumerable<T>, IList, ICollection, IEnumerable
+    /// <summary>
+    /// Provides a common collection class for Silverlight collections.
+    /// </summary>
+    /// <typeparam name="T">Type constraint for type safety of the constrained collection implementation.</typeparam>
+    public abstract partial class PresentationFrameworkCollection<T> : DependencyObject, IList<T>, ICollection<T>, IEnumerable<T>, IList, ICollection, IEnumerable
     {
-        public PresentationFrameworkCollection()
+        #region Data
+        private readonly List<T> _collection;
+
+        public static readonly DependencyProperty CountProperty = DependencyProperty.Register("Count",
+                                                                                              typeof(int),
+                                                                                              typeof(PresentationFrameworkCollection<T>),
+                                                                                              new PropertyMetadata(0));
+        #endregion
+
+        #region Constructor
+
+        internal PresentationFrameworkCollection()
         {
-            _collection = new List<T>();
+            this._collection = new List<T>();
+            this.UpdateCountProperty();
         }
 
-        // Summary:
-        //     Identifies the System.Windows.PresentationFrameworkCollection<T>.Count dependency
-        //     property.
-        //
-        // Returns:
-        //     The identifier for the System.Windows.PresentationFrameworkCollection<T>.Count
-        //     dependency property.
-        public static readonly DependencyProperty CountProperty;
-
-        private List<T> _collection;
-        private List<T> Collection
+        internal PresentationFrameworkCollection(int capacity)
         {
-            get
-            {
-                if(_collection == null)
-                {
-                    _collection = new List<T>();
-                }
-                return _collection;
-            }
-            set 
-            {
-                _collection = value;
-            }
+            this._collection = new List<T>(capacity);
+            this.UpdateCountProperty();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-        /// <summary>
-        /// Raises the event to call when the collection has changed.
-        /// </summary>
-        /// <param name="e"></param>
-        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        internal PresentationFrameworkCollection(IEnumerable<T> source)
         {
-            if (this.CollectionChanged != null)
-            {
-                this.CollectionChanged((object)this, e);
-            }
+            this._collection = new List<T>(source);
+            this.UpdateCountProperty();
         }
 
-        /// <summary>
-        /// Raises the event to call when the property has changed
-        /// </summary>
-        /// <param name="e"></param>
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
-        {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged((object)this, e);
-            }
-        }
+        #endregion
 
-        /// <summary>
-        /// Helper to raise a PropertyChanged event  />).
-        /// </summary>
-        private void OnPropertyChanged(string propertyName)
-        {
-            OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
-        }
+        #region Public Properties
 
-        // Summary:
-        //     Gets the number of elements contained in the System.Windows.PresentationFrameworkCollection<T>.
-        //
-        // Returns:
-        //     The number of elements contained in the System.Windows.PresentationFrameworkCollection<T>.
         public int Count
         {
-            get
-            {
-                return Collection.Count;
-            }
+            get { return (int)this.GetValue(CountProperty); }
         }
 
-        // Summary:
-        //     Gets a value indicating whether the System.Windows.PresentationFrameworkCollection<T>
-        //     has a fixed size.
-        //
-        // Returns:
-        //     true if the System.Windows.PresentationFrameworkCollection<T> has a fixed
-        //     size; otherwise, false.
-        public bool IsFixedSize
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        // Summary:
-        //     Gets a value indicating whether the System.Windows.PresentationFrameworkCollection<T>
-        //     is read-only.
-        //
-        // Returns:
-        //     true if the System.Windows.PresentationFrameworkCollection<T> is read-only;
-        //     otherwise, false.
-        public bool IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        // Summary:
-        //     Gets a value indicating whether access to the System.Windows.PresentationFrameworkCollection<T>
-        //     is synchronized (thread safe).
-        //
-        // Returns:
-        //     true if access to the System.Windows.PresentationFrameworkCollection<T> is
-        //     synchronized (thread safe); otherwise, false.
-        public bool IsSynchronized
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        // Summary:
-        //     Gets an object that can be used to synchronize access to the System.Windows.PresentationFrameworkCollection<T>
-        //     .
-        //
-        // Returns:
-        //     An object that can be used to synchronize access to the System.Windows.PresentationFrameworkCollection<T>.
-        public object SyncRoot
-        {
-            get
-            {
-                return this;
-            }
-        }
-
-        // Summary:
-        //     Gets or sets the element at the specified index.
-        //
-        // Parameters:
-        //   index:
-        //     The zero-based index of the element to get or set.
-        //
-        // Returns:
-        //     The element at the specified index.
         public T this[int index]
         {
-            get
-            {
-                return Collection[index];
-            }
-            set
-            {
-                Collection[index] = value;
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (object)value, index));
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (object)value, index));
-                OnPropertyChanged("Count");
-                OnPropertyChanged("Item[]");
-            }
-        }
-
-        // Summary:
-        //     Adds an item to the System.Windows.PresentationFrameworkCollection<T>.
-        //
-        // Parameters:
-        //   value:
-        //     The object to add.
-        public void Add(T value)
-        {
-            this.AddInternal(value);
-        }
-
-        internal virtual void AddInternal(T value)
-        {
-            Collection.Add(value);
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (object)value));
-            OnPropertyChanged("Count");
-            OnPropertyChanged("Item[]");
-        }
-
-        // Summary:
-        //     Removes all items from the System.Windows.PresentationFrameworkCollection<T>.
-        public void Clear()
-        {
-            Collection.Clear();
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-            OnPropertyChanged("Count");
-            OnPropertyChanged("Item[]");
+            get { return this.GetItemInternal(index); }
+            set { this.SetItemOverride(index, value); }
         }
 
         /// <summary>
-        /// Removes all items from System.Windows.PresentationFrameworkCollection<T>.
+        /// Gets a value indicating whether the System.Windows.PresentationFrameworkCollection`1
+        /// has a fixed size.
         /// </summary>
-        protected virtual void ClearItems()
+        /// <returns>
+        /// true if the System.Windows.PresentationFrameworkCollection`1 has a fixed size;
+        /// otherwise, false.
+        /// </returns>
+        public bool IsFixedSize
         {
-            Clear();
+            get { return false; }
         }
 
-        // Summary:
-        //     Determines whether the System.Windows.PresentationFrameworkCollection<T>
-        //     contains a specific value.
-        //
-        // Parameters:
-        //   value:
-        //     The object to locate in the System.Windows.PresentationFrameworkCollection<T>.
-        //
-        // Returns:
-        //     true if the object is found in the System.Windows.PresentationFrameworkCollection<T>;
-        //     otherwise, false.
-        public bool Contains(T value)
+        /// <summary>
+        /// Gets a value indicating whether the System.Windows.PresentationFrameworkCollection`1
+        /// is read-only.
+        /// </summary>
+        /// <returns>
+        /// true if the System.Windows.PresentationFrameworkCollection`1 is read-only; otherwise,
+        /// false.
+        /// </returns>
+        public bool IsReadOnly
         {
-            return Collection.Contains(value);
+            get { return false; }
         }
 
-        // Summary:
-        //     Copies the elements of the System.Windows.PresentationFrameworkCollection<T>
-        //     to an System.Array, starting at a particular System.Array index.
-        //
-        // Parameters:
-        //   array:
-        //     The one-dimensional System.Array that is the destination of the elements
-        //     copied from the System.Windows.PresentationFrameworkCollection<T>. The System.Array
-        //     must have zero-based indexing.
-        //
-        //   index:
-        //     The zero-based index in array at which copying begins.
-        public void CopyTo(Array array, int index)
+        /// <summary>
+        /// Gets a value indicating whether access to the System.Windows.PresentationFrameworkCollection`1
+        /// is synchronized (thread safe).
+        /// </summary>
+        /// <returns>
+        /// true if access to the System.Windows.PresentationFrameworkCollection`1 is synchronized
+        /// (thread safe); otherwise, false.
+        /// </returns>
+        public bool IsSynchronized
         {
-            for (int i = 0; i < Collection.Count; i++)
-            {
-                array.SetValue((object)Collection[i], index + i);
-            }
+            get { return true; }
         }
 
-        // Summary:
-        //     Copies the elements of the System.Windows.PresentationFrameworkCollection<T>
-        //     to an System.Array, starting at a particular System.Array index.
-        //
-        // Parameters:
-        //   array:
-        //     The one-dimensional System.Array that is the destination of the elements
-        //     copied from the System.Windows.PresentationFrameworkCollection<T>. The System.Array
-        //     must have zero-based indexing.
-        //
-        //   index:
-        //     The zero-based index in array at which copying begins.
-        public void CopyTo(T[] array, int index)
+        /// <summary>
+        /// Gets an object that can be used to synchronize access to the System.Windows.PresentationFrameworkCollection`1.
+        /// </summary>
+        /// <returns>
+        /// An object that can be used to synchronize access to the System.Windows.PresentationFrameworkCollection`1.
+        /// </returns>
+        public object SyncRoot
         {
-            Collection.CopyTo(array, index);
+            get { return this; }
         }
+        #endregion
 
-        // Summary:
-        //     Returns an enumerator that iterates through a collection.
-        //
-        // Returns:
-        //     An System.Collections.IEnumerator object that can be used to iterate through
-        //     the collection.
+        #region Public Methods
+        /// <summary>
+        /// Returns an enumerator that iterates through a collection.
+        /// </summary>
+        /// <returns>
+        /// An System.Collections.IEnumerator object that can be used to iterate through
+        /// the collection.
+        /// </returns>
         public IEnumerator<T> GetEnumerator()
         {
-            return Collection.GetEnumerator();
+            return this._collection.GetEnumerator();
         }
 
-        // Summary:
-        //     Determines the index of a specific item in the System.Windows.PresentationFrameworkCollection<T>.
-        //
-        // Parameters:
-        //   value:
-        //     The object to locate in the System.Windows.PresentationFrameworkCollection<T>.
-        //
-        // Returns:
-        //     The index of value if found in the list; otherwise, an exception.
-        //
-        // Exceptions:
-        //   System.ArgumentException:
-        //     The object was not found in the list.
+        /// <summary>
+        /// Adds an item to the System.Windows.PresentationFrameworkCollection`1.
+        /// </summary>
+        /// <param name="value">The object to add.</param>
+        public void Add(T value)
+        {
+            this.AddOverride(value);
+        }
+
+        /// <summary>
+        /// Removes all items from the System.Windows.PresentationFrameworkCollection`1.
+        /// </summary>
+        public void Clear()
+        {
+            this.ClearOverride();
+        }
+
+
+        /// <summary>
+        /// Determines whether the System.Windows.PresentationFrameworkCollection`1 contains
+        /// a specific value.
+        /// </summary>
+        /// <param name="value">The object to locate in the System.Windows.PresentationFrameworkCollection`1.</param>
+        /// <returns>
+        /// true if the object is found in the System.Windows.PresentationFrameworkCollection`1;
+        /// otherwise, false.
+        /// </returns>
+        public bool Contains(T value)
+        {
+            return this._collection.Contains(value);
+        }
+
+        /// <summary>
+        /// Copies the elements of the System.Windows.PresentationFrameworkCollection`1 to
+        /// an System.Array, starting at a particular System.Array index.
+        /// </summary>
+        /// <param name="array">
+        /// The one-dimensional System.Array that is the destination of the elements copied
+        /// from the System.Windows.PresentationFrameworkCollection`1. The System.Array must
+        /// have zero-based indexing.
+        /// </param>
+        /// <param name="index">The zero-based index in array at which copying begins.</param>
+        public void CopyTo(Array array, int index)
+        {
+            ((ICollection)_collection).CopyTo(array, index);
+        }
+
+        /// <summary>
+        /// Copies the elements of the System.Windows.PresentationFrameworkCollection`1 to
+        /// an System.Array, starting at a particular System.Array index.
+        /// </summary>
+        /// <param name="array">
+        /// The one-dimensional System.Array that is the destination of the elements copied
+        /// from the System.Windows.PresentationFrameworkCollection`1. The System.Array must
+        /// have zero-based indexing.
+        /// </param>
+        /// <param name="index">The zero-based index in array at which copying begins.</param>
+        public void CopyTo(T[] array, int index)
+        {
+            this._collection.CopyTo(array, index);
+        }
+
+        /// <summary>
+        /// Determines the index of a specific item in the System.Windows.PresentationFrameworkCollection`1.
+        /// </summary>
+        /// <param name="value">The object to locate in the System.Windows.PresentationFrameworkCollection`1.</param>
+        /// <returns>The index of value if found in the list; otherwise, an exception.</returns>
+        /// <exception cref="System.ArgumentException">
+        /// The object was not found in the list.
+        /// </exception>
         public int IndexOf(T value)
         {
-            return Collection.IndexOf(value);
+            return this._collection.IndexOf(value);
         }
 
-        // Summary:
-        //     Inserts an item to the System.Windows.PresentationFrameworkCollection<T>
-        //     at the specified index.
-        //
-        // Parameters:
-        //   index:
-        //     The zero-based index at which value should be inserted.
-        //
-        //   value:
-        //     The object to insert into the System.Windows.PresentationFrameworkCollection<T>.
+        /// <summary>
+        /// Inserts an item to the System.Windows.PresentationFrameworkCollection`1 at the
+        /// specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index at which value should be inserted.</param>
+        /// <param name="value">The object to insert into the System.Windows.PresentationFrameworkCollection`1.</param>
         public void Insert(int index, T value)
         {
-            Collection.Insert(index, value);
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (object)value, index));
-            OnPropertyChanged("Count");
-            OnPropertyChanged("Item[]");
+            this.InsertOverride(index, value);
         }
 
-        // Summary:
-        //     Removes the first occurrence of a specific object from the System.Windows.PresentationFrameworkCollection<T>.
-        //
-        // Parameters:
-        //   value:
-        //     The object to remove from the System.Windows.PresentationFrameworkCollection<T>.
-        //
-        // Returns:
-        //     true if an object was removed; otherwise, false.
+        /// <summary>
+        /// Removes the first occurrence of a specific object from the System.Windows.PresentationFrameworkCollection`1.
+        /// </summary>
+        /// <param name="value">The object to remove from the System.Windows.PresentationFrameworkCollection`1.</param>
+        /// <returns>true if an object was removed; otherwise, false.</returns>
         public bool Remove(T value)
         {
-            bool hasChanged = Collection.Remove(value);
-            if (hasChanged)
-            {
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (object)value));
-                OnPropertyChanged("Count");
-                OnPropertyChanged("Item[]");
-            }
-            return hasChanged;
+            return this.RemoveOverride(value);
         }
 
-        // Summary:
-        //     Removes the item at the specified index.
-        //
-        // Parameters:
-        //   index:
-        //     The zero-based index of the item to remove.
+        /// <summary>
+        /// Removes the item at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index of the item to remove.</param>
         public void RemoveAt(int index)
         {
-            Collection.RemoveAt(index);
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, index));
-            OnPropertyChanged("Count");
-            OnPropertyChanged("Item[]");
+            this.RemoveAtOverride(index);
+        }
+
+        #endregion
+
+        #region Explicit Interface implementation
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
 
         int IList.Add(object value)
         {
-            if(!(value is T))
-            {
-                throw new ArgumentException("Invalid argument", "value");
-            }
-            Collection.Add((T)value);
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value));
-            OnPropertyChanged("Count");
-            OnPropertyChanged("Item[]");
-            return 1;
-        }
-
-        bool IList.Contains(object value)
-        {
-            if (value is T)
-            {
-                return Collection.Contains((T)value);
-            }
-            return false;
-        }
-
-        int IList.IndexOf(object value)
-        {
-            if (value is T)
-            {
-                return Collection.IndexOf((T)value);
-            }
-            return -1;
-        }
-
-        void IList.Insert(int index, object value)
-        {
-            if (value is T)
-            {
-                Collection.Insert(index, (T)value);
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value));
-                OnPropertyChanged("Count");
-                OnPropertyChanged("Item[]");
-            }
+            this.Add((T)value);
+            return this.Count;
         }
 
         void IList.Remove(object value)
         {
-            if (value is T)
-            {
-                if (Collection.Remove((T)value))
-                {
-                    this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, value));
-                    OnPropertyChanged("Count");
-                    OnPropertyChanged("Item[]");
-                }
-            }
+            this.Remove((T)value);
+        }
+
+        void IList.RemoveAt(int index)
+        {
+            this.RemoveAt(index);
+        }
+
+        void IList.Insert(int index, object value)
+        {
+            this.Insert(index, (T)value);
+        }
+
+        int IList.IndexOf(object value)
+        {
+            return this.IndexOf((T)value);
+        }
+
+        bool IList.Contains(object value)
+        {
+            return this.Contains((T)value);
         }
 
         object IList.this[int index]
         {
             get
             {
-                return (object)Collection[index];
+                return this[index];
             }
             set
             {
-                if (value is T)
-                {
-                    Collection[index] = (T)value;
-                    this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, index));
-                    OnPropertyChanged("Count");
-                    OnPropertyChanged("Item[]");
-                }
+                this[index] = (T)value;
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        #endregion
+
+        #region Internal API
+
+        #region Abstract Methods
+
+        internal abstract void AddOverride(T value);
+
+        internal abstract void ClearOverride();
+
+        internal abstract void InsertOverride(int index, T value);
+
+        internal abstract void RemoveAtOverride(int index);
+
+        internal abstract bool RemoveOverride(T value);
+
+        internal abstract void SetItemOverride(int index, T value);
+
+        #endregion
+
+        internal int CountInternal
         {
-            return (IEnumerator)this.GetEnumerator();
+            get { return this._collection.Count; }
         }
+
+        internal void AddInternal(T value)
+        {
+            this._collection.Add(value);
+            this.UpdateCountProperty();
+        }
+
+        internal void ClearInternal()
+        {
+            this._collection.Clear();
+            this.UpdateCountProperty();
+        }
+
+        internal void InsertInternal(int index, T value)
+        {
+            this._collection.Insert(index, value);
+            this.UpdateCountProperty();
+        }
+
+        internal void RemoveAtInternal(int index)
+        {
+            this._collection.RemoveAt(index);
+            this.UpdateCountProperty();
+        }
+
+        internal bool RemoveInternal(T value)
+        {
+            if (this._collection.Remove(value))
+            {
+                this.UpdateCountProperty();
+                return true;
+            }
+            return false;
+        }
+
+        internal T GetItemInternal(int index)
+        {
+            return this._collection[index];
+        }
+
+        internal void SetItemInternal(int index, T value)
+        {
+            this._collection[index] = value;
+        }
+
+        private void UpdateCountProperty()
+        {
+            this.SetValue(CountProperty, this.CountInternal);
+        }
+
+        #endregion
     }
-#endif
 }

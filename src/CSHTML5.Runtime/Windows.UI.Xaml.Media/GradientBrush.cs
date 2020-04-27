@@ -62,26 +62,16 @@ namespace Windows.UI.Xaml.Media
         {
             get
             {
-                GradientStopCollection collection;
-                if (GetValue(GradientStopsProperty) == null)
+                GradientStopCollection collection = (GradientStopCollection)GetValue(GradientStopsProperty);
+                if (collection == null)
                 {
                     collection = new GradientStopCollection();
-#if WORKINPROGRESS
-                    collection.INTERNAL_ParentBrush = this;
-#endif
                     SetValue(GradientStopsProperty, collection);
-                }
-                else
-                {
-                    collection = (GradientStopCollection)GetValue(GradientStopsProperty);
                 }
                 return collection;
             }
             set
             {
-#if WORKINPROGRESS
-                value.INTERNAL_ParentBrush = this;
-#endif
                 SetValue(GradientStopsProperty, value);
             }
         }
@@ -90,10 +80,23 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the GradientStops dependency property.
         /// </summary>
         public static readonly DependencyProperty GradientStopsProperty =
-            DependencyProperty.Register("GradientStops", typeof(GradientStopCollection), typeof(GradientBrush), new PropertyMetadata(null)
+            DependencyProperty.Register("GradientStops", typeof(GradientStopCollection), typeof(GradientBrush), new PropertyMetadata(null, OnGradientStopsChanged)
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
-
+        private static void OnGradientStopsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+#if WORKINPROGRESS
+            GradientBrush gradientBrush = (GradientBrush)d;
+            if (null != e.OldValue)
+            {
+                ((GradientStopCollection)e.OldValue).SetParentBrush(null);
+            }
+            if (null != e.NewValue)
+            {
+                ((GradientStopCollection)e.NewValue).SetParentBrush(gradientBrush);
+            }
+#endif
+        }
 
         /// <summary>
         /// Gets or sets a BrushMappingMode enumeration value that specifies whether

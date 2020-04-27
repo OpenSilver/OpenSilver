@@ -33,16 +33,84 @@ namespace Windows.UI.Xaml.Media
 #endif
     {
 #if WORKINPROGRESS
-        internal Brush INTERNAL_ParentBrush;
+        private Brush _parentBrush;
 
-
-        //// Summary:
-        ////     Initializes a new instance of the GradientStopCollection class.
-        //public GradientStopCollection();
-        internal override void AddInternal(GradientStop value)
+        internal void SetParentBrush(Brush brush)
         {
-            base.AddInternal(value);
-            value.INTERNAL_ParentBrush = INTERNAL_ParentBrush;
+            if (this._parentBrush != brush)
+            {
+                this._parentBrush = brush;
+                foreach (GradientStop gs in this)
+                {
+                    gs.INTERNAL_ParentBrush = brush;
+                }
+            }
+        }
+
+        internal override void AddOverride(GradientStop gradientStop)
+        {
+            if (gradientStop == null)
+            {
+                throw new ArgumentNullException("gradientStop");
+            }
+            this.AddInternal(gradientStop);
+            gradientStop.INTERNAL_ParentBrush = this._parentBrush;
+        }
+
+        internal override void ClearOverride()
+        {
+            if (this._parentBrush != null)
+            {
+                foreach (GradientStop gs in this)
+                {
+                    gs.INTERNAL_ParentBrush = null;
+                }
+            }
+            this.ClearInternal();
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            if (index < 0 || index >= this.CountInternal)
+            {
+                throw new ArgumentOutOfRangeException("index");
+            }
+            this.GetItemInternal(index).INTERNAL_ParentBrush = null;
+            this.RemoveAtInternal(index);
+        }
+
+        internal override void InsertOverride(int index, GradientStop gradientStop)
+        {
+            if (gradientStop == null)
+            {
+                throw new ArgumentNullException("gradientStop");
+            }
+            if (this._parentBrush != null)
+            {
+                gradientStop.INTERNAL_ParentBrush = this._parentBrush;
+            }
+            this.InsertInternal(index, gradientStop);
+        }
+
+        internal override bool RemoveOverride(GradientStop gradientStop)
+        {
+            if (this.RemoveInternal(gradientStop))
+            {
+                gradientStop.INTERNAL_ParentBrush = null;
+                return true;
+            }
+            return false;
+        }
+
+        internal override void SetItemOverride(int index, GradientStop gradientStop)
+        {
+            if (this._parentBrush != null)
+            {
+                GradientStop oldItem = this.GetItemInternal(index);
+                oldItem.INTERNAL_ParentBrush = null;
+                gradientStop.INTERNAL_ParentBrush = this._parentBrush;
+            }
+            this.SetItemInternal(index, gradientStop);
         }
 #endif
     }

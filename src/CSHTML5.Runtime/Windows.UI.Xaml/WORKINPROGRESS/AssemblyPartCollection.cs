@@ -29,7 +29,35 @@ namespace Windows.UI.Xaml
 {
     public sealed partial class AssemblyPartCollection : PresentationFrameworkCollection<AssemblyPart>
     {
+        internal override void AddOverride(AssemblyPart value)
+        {
+            this.AddInternal(value);
+        }
 
+        internal override void ClearOverride()
+        {
+            this.ClearInternal();
+        }
+
+        internal override void InsertOverride(int index, AssemblyPart value)
+        {
+            this.InsertInternal(index, value);
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            this.RemoveAtInternal(index);
+        }
+
+        internal override bool RemoveOverride(AssemblyPart value)
+        {
+            return this.RemoveInternal(value);
+        }
+
+        internal override void SetItemOverride(int index, AssemblyPart value)
+        {
+            this.SetItemInternal(index, value);
+        }
     }
 }
 #endif

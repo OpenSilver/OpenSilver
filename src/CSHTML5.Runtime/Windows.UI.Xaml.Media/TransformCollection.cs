@@ -31,12 +31,36 @@ namespace Windows.UI.Xaml.Media
     public sealed partial class TransformCollection : List<Transform>
 #endif
     {
-        internal static TransformCollection Empty
+#if WORKINPROGRESS
+        internal override void AddOverride(Transform value)
         {
-            get
-            {
-                return new TransformCollection();
-            }
+            this.AddInternal(value);
         }
+
+        internal override void ClearOverride()
+        {
+            this.ClearInternal();
+        }
+
+        internal override void InsertOverride(int index, Transform value)
+        {
+            this.InsertInternal(index, value);
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            this.RemoveAtInternal(index);
+        }
+
+        internal override bool RemoveOverride(Transform value)
+        {
+            return this.RemoveOverride(value);
+        }
+
+        internal override void SetItemOverride(int index, Transform value)
+        {
+            this.SetItemInternal(index, value);
+        }
+#endif
     }
 }

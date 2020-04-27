@@ -33,5 +33,36 @@ namespace Windows.UI.Xaml.Media.Animation
     public sealed partial class DoubleKeyFrameCollection : List<DoubleKeyFrame>
 #endif
     {
+#if WORKINPROGRESS
+        internal override void AddOverride(DoubleKeyFrame keyFrame)
+        {
+            this.AddInternal(keyFrame);
+        }
+
+        internal override void ClearOverride()
+        {
+            this.ClearInternal();
+        }
+
+        internal override void InsertOverride(int index, DoubleKeyFrame keyFrame)
+        {
+            this.InsertInternal(index, keyFrame);
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            this.RemoveAtInternal(index);
+        }
+
+        internal override bool RemoveOverride(DoubleKeyFrame keyFrame)
+        {
+            return this.RemoveInternal(keyFrame);
+        }
+
+        internal override void SetItemOverride(int index, DoubleKeyFrame keyFrame)
+        {
+            this.SetItemInternal(index, keyFrame);
+        }
+#endif
     }
 }

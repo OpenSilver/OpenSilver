@@ -25,6 +25,35 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>Represents a collection of <see cref="T:System.Windows.Media.Animation.ColorKeyFrame" /> objects that can be individually accessed by index. </summary>
     public sealed partial class ColorKeyFrameCollection : PresentationFrameworkCollection<ColorKeyFrame>
     {
+        internal override void AddOverride(ColorKeyFrame keyFrame)
+        {
+            this.AddInternal(keyFrame);
+        }
+
+        internal override void ClearOverride()
+        {
+            this.ClearInternal();
+        }
+
+        internal override void InsertOverride(int index, ColorKeyFrame keyFrame)
+        {
+            this.InsertInternal(index, keyFrame);
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            this.RemoveAtInternal(index);
+        }
+
+        internal override bool RemoveOverride(ColorKeyFrame keyFrame)
+        {
+            return this.RemoveInternal(keyFrame);
+        }
+
+        internal override void SetItemOverride(int index, ColorKeyFrame keyFrame)
+        {
+            this.SetItemInternal(index, keyFrame);
+        }
     }
 #endif
 }

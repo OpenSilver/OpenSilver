@@ -19,7 +19,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Shapes;
+#else
+using Windows.UI.Xaml.Shapes;
 using Windows.Foundation;
 #endif
 
@@ -29,6 +32,106 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+    public sealed partial class PointCollection : PresentationFrameworkCollection<Point>
+    {
+        #region Data
+
+        private Path _parentPath;
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance that is empty.
+        /// </summary>
+        public PointCollection()
+        {
+
+        }
+
+        /// <summary>
+        /// Initializes a new instance that is empty and has the specified initial capacity.
+        /// </summary>
+        /// <param name="capacity">int - The number of elements that the new list is initially capable of storing.</param>
+        public PointCollection(int capacity) : base(capacity)
+        {
+
+        }
+
+        /// <summary>
+        /// Creates a PointCollection with all of the same elements as collection
+        /// </summary>
+        public PointCollection(IEnumerable<Point> points) : base(points)
+        {
+
+        }
+
+        #endregion
+
+        #region Overriden Methods
+
+        internal override void AddOverride(Point point)
+        {
+            this.AddInternal(point);
+            this.NotifyCollectionChanged();
+        }
+
+        internal override void ClearOverride()
+        {
+            this.ClearInternal();
+            this.NotifyCollectionChanged();
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            this.RemoveAtInternal(index);
+            this.NotifyCollectionChanged();
+        }
+
+        internal override bool RemoveOverride(Point point)
+        {
+            if (this.RemoveInternal(point))
+            {
+                this.NotifyCollectionChanged();
+                return true;
+            }
+            return false;
+        }
+
+        internal override void InsertOverride(int index, Point point)
+        {
+            this.InsertInternal(index, point);
+            this.NotifyCollectionChanged();
+        }
+
+        internal override void SetItemOverride(int index, Point point)
+        {
+            this.SetItemInternal(index, point);
+            this.NotifyCollectionChanged();
+        }
+
+        #endregion
+
+        #region Internal Methods
+
+        internal void SetParentPath(Path path)
+        {
+            this._parentPath = path;
+        }
+
+        private void NotifyCollectionChanged()
+        {
+            if (this._parentPath != null)
+            {
+                this._parentPath.ScheduleRedraw();
+            }
+        }
+
+        #endregion
+    }
+
+#if no
     /// <summary>
     /// Represents a collection of Point values that can be individually accessed
     /// by index.
@@ -59,4 +162,5 @@ namespace Windows.UI.Xaml.Media
         //public bool Remove(Point item);
         //public void RemoveAt(int index);
     }
+#endif
 }

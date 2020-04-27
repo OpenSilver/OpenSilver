@@ -13,6 +13,36 @@ namespace Windows.UI.Xaml.Input
 		internal TouchPointCollection()
 		{
 		}
-	}
+
+        internal override void AddOverride(TouchPoint value)
+        {
+            this.AddInternal(value);
+        }
+
+        internal override void ClearOverride()
+        {
+            this.ClearInternal();
+        }
+
+        internal override void InsertOverride(int index, TouchPoint value)
+        {
+            this.InsertInternal(index, value);
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            this.RemoveAtInternal(index);
+        }
+
+        internal override bool RemoveOverride(TouchPoint value)
+        {
+            return this.RemoveOverride(value);
+        }
+
+        internal override void SetItemOverride(int index, TouchPoint value)
+        {
+            this.SetItemInternal(index, value);
+        }
+    }
 }
 #endif

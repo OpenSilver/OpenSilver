@@ -35,10 +35,18 @@ namespace Windows.UI.Xaml.Media
     /// Represents a collection of PathFigure objects that collectively make up the
     /// geometry of a PathGeometry.
     /// </summary>
-    public sealed partial class PathFigureCollection : List<PathFigure> // : IList<PathFigure>, IEnumerable<PathFigure>
+    public sealed partial class PathFigureCollection : PresentationFrameworkCollection<PathFigure>
     {
+        #region Data
+
+        private Path _parentPath;
+
+        #endregion
+
+        #region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the PathFigureCollection class.
+        /// Initializes a new instance that is empty.
         /// </summary>
         public PathFigureCollection()
         {
@@ -48,18 +56,120 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Initializes a new instance that is empty and has the specified initial capacity.
         /// </summary>
-        /// <param name="capacity"> int - The number of elements that the new list is initially capable of storing. </param>
+        /// <param name="capacity">int - The number of elements that the new list is initially capable of storing.</param>
         public PathFigureCollection(int capacity) : base(capacity)
         {
 
         }
 
-        internal void SetParentPath(Path path)
+        /// <summary>
+        /// Creates a PathFigureCollection with all of the same elements as collection
+        /// </summary>
+        public PathFigureCollection(IEnumerable<PathFigure> figures) : base(figures)
+        {
+
+        }
+
+        #endregion
+
+        #region Overriden Methods
+
+        internal override void AddOverride(PathFigure figure)
+        {
+            if (figure == null)
+            {
+                throw new ArgumentNullException("figure");
+            }
+            if (this._parentPath != null)
+            {
+                figure.SetParentPath(this._parentPath);
+            }
+            this.AddInternal(figure);
+            this.NotifyCollectionChanged();
+        }
+
+        internal override bool RemoveOverride(PathFigure figure)
+        {
+            if (this.RemoveInternal(figure))
+            {
+                figure.SetParentPath(null);
+                this.NotifyCollectionChanged();
+                return true;
+            }
+            return false;
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            if (index < 0 || index >= this.CountInternal)
+            {
+                throw new ArgumentOutOfRangeException("index");
+            }
+            this.GetItemInternal(index).SetParentPath(null);
+            this.RemoveAtInternal(index);
+            this.NotifyCollectionChanged();
+        }
+
+        internal override void InsertOverride(int index, PathFigure figure)
+        {
+            if (figure == null)
+            {
+                throw new ArgumentNullException("figure");
+            }
+            if (this._parentPath != null)
+            {
+                figure.SetParentPath(this._parentPath);
+            }
+            this.InsertInternal(index, figure);
+            this.NotifyCollectionChanged();
+        }
+
+        internal override void ClearOverride()
         {
             foreach (PathFigure figure in this)
             {
-                figure.SetParentPath(path);
+                figure.SetParentPath(null);
+            }
+            this.ClearInternal();
+            this.NotifyCollectionChanged();
+        }
+
+        internal override void SetItemOverride(int index, PathFigure figure)
+        {
+            if (this._parentPath != null)
+            {
+                PathFigure oldItem = this.GetItemInternal(index);
+                oldItem.SetParentPath(null);
+                figure.SetParentPath(this._parentPath);
+            }
+            this.SetItemInternal(index, figure);
+            this.NotifyCollectionChanged();
+        }
+
+        #endregion
+
+        #region Internal Methods
+
+        internal void SetParentPath(Path path)
+        {
+            if (this._parentPath != path)
+            {
+                this._parentPath = path;
+                foreach (PathFigure figure in this)
+                {
+                    figure.SetParentPath(path);
+                }
             }
         }
+
+        private void NotifyCollectionChanged()
+        {
+            if (this._parentPath != null)
+            {
+                this._parentPath.ScheduleRedraw();
+            }
+        }
+
+        #endregion
     }
 }

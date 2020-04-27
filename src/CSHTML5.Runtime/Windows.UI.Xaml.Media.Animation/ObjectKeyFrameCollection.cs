@@ -36,25 +36,36 @@ namespace Windows.UI.Xaml.Media.Animation
     public sealed partial class ObjectKeyFrameCollection : List<ObjectKeyFrame> //: IList<ObjectKeyFrame>, IEnumerable<ObjectKeyFrame>
 #endif
     {
-        //// Summary:
-        ////     Initializes a new instance of the ObjectKeyFrameCollection class.
-        //public ObjectKeyFrameCollection();
+#if WORKINPROGRESS
+        internal override void AddOverride(ObjectKeyFrame keyFrame)
+        {
+            this.AddInternal(keyFrame);
+        }
 
-        //int Count { get; }
-        //bool IsReadOnly { get; }
+        internal override void ClearOverride()
+        {
+            this.ClearInternal();
+        }
 
-        //ObjectKeyFrame this[int index] { get; set; }
+        internal override void InsertOverride(int index, ObjectKeyFrame keyFrame)
+        {
+            this.InsertInternal(index, keyFrame);
+        }
 
-        //void Add(ObjectKeyFrame item);
-        ////
-        //// Summary:
-        ////     Removes all items from the collection.
-        //void Clear();
-        //bool Contains(ObjectKeyFrame item);
-        //void CopyTo(ObjectKeyFrame[] array, int arrayIndex);
-        //int IndexOf(ObjectKeyFrame item);
-        //void Insert(int index, ObjectKeyFrame item);
-        //bool Remove(ObjectKeyFrame item);
-        //void RemoveAt(int index);
+        internal override void RemoveAtOverride(int index)
+        {
+            this.RemoveAtInternal(index);
+        }
+
+        internal override bool RemoveOverride(ObjectKeyFrame keyFrame)
+        {
+            return this.RemoveInternal(keyFrame);
+        }
+
+        internal override void SetItemOverride(int index, ObjectKeyFrame keyFrame)
+        {
+            this.SetItemInternal(index, keyFrame);
+        }
+#endif
     }
 }
