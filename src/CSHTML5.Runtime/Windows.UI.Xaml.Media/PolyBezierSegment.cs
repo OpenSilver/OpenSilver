@@ -20,7 +20,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Shapes;
+#else
+using Windows.UI.Xaml.Shapes;
 using Windows.Foundation;
 #endif
 
@@ -36,41 +39,72 @@ namespace Windows.UI.Xaml.Media
     [ContentProperty("Points")]
     public sealed partial class PolyBezierSegment : PathSegment
     {
-        ///// <summary>
-        ///// Initializes a new instance of the PolyBezierSegment class.
-        ///// </summary>
-        //public PolyBezierSegment();
+        #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of the PolyBezierSegment class.
+        /// </summary>
+        public PolyBezierSegment()
+        {
+
+        }
+
+        #endregion
+
+        #region Dependency Properties
 
         /// <summary>
         /// Gets or sets the Point collection that defines this PolyBezierSegment object.
         /// </summary>
         public PointCollection Points
         {
-            get { return (PointCollection)GetValue(PointsProperty); }
+            get
+            {
+                PointCollection points = (PointCollection)GetValue(PointsProperty);
+                if (points == null)
+                {
+                    points = new PointCollection();
+                    SetValue(PointsProperty, points);
+                }
+                return points;
+            }
             set { SetValue(PointsProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Points dependency property.
         /// </summary>
         public static readonly DependencyProperty PointsProperty =
-            DependencyProperty.Register("Points", typeof(PointCollection), typeof(PolyBezierSegment), new PropertyMetadata(new PointCollection(), Points_Changed));
+            DependencyProperty.Register("Points", typeof(PointCollection), typeof(PolyBezierSegment), new PropertyMetadata(null, Points_Changed));
 
         private static void Points_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             //todo: find a way to know when the points changed in the collection
             PolyBezierSegment segment = (PolyBezierSegment)d;
-            PointCollection oldCollection = (PointCollection)e.OldValue;
-            PointCollection newCollection = (PointCollection)e.NewValue;
-            if (oldCollection != newCollection)
+            if (segment.ParentPath != null)
             {
-                if (e.NewValue != e.OldValue && segment.INTERNAL_parentPath != null && segment.INTERNAL_parentPath._isLoaded)
-                {
-                    segment.INTERNAL_parentPath.ScheduleRedraw();
-                }
+                segment.ParentPath.ScheduleRedraw();
             }
         }
 
-        internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, double horizontalMultiplicator, double verticalMultiplicator, object canvasDomElement, Point previousLastPoint)
+        #endregion
+
+        #region Overriden Methods
+
+        internal override void SetParentPath(Path path)
+        {
+            base.SetParentPath(path);
+            Points.SetParentPath(path);
+        }
+
+        internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication,
+                                               double yOffsetToApplyBeforeMultiplication,
+                                               double xOffsetToApplyAfterMultiplication,
+                                               double yOffsetToApplyAfterMultiplication,
+                                               double horizontalMultiplicator,
+                                               double verticalMultiplicator,
+                                               object canvasDomElement,
+                                               Point previousLastPoint)
         {
             dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
             int i = 0;
@@ -87,17 +121,23 @@ namespace Windows.UI.Xaml.Media
                 double endPointX = lastPoint.X;
                 double endPointY = lastPoint.Y;
                 ++i;
+
+                // tell the context that there should be a cubic bezier curve from the 
+                // starting point to this point, with the two previous points as control points.
                 context.bezierCurveTo(
-                    (controlPoint1X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, (controlPoint1Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication,
-                    (controlPoint2X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, (controlPoint2Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication,
-                    (endPointX + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, (endPointY + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication); // tell the context that there should be a cubic bezier curve from the starting point to this point, with the two previous points as control points.
+                    (controlPoint1X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication,
+                    (controlPoint1Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication,
+                    (controlPoint2X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication,
+                    (controlPoint2Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication,
+                    (endPointX + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication,
+                    (endPointY + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
             }
             return lastPoint;
         }
 
         internal override Point GetMaxXY() //todo: make this give the size of the actual curve, not the control points.
         {
-            Point currentMax = new Point();
+            Point currentMax = new Point(double.NegativeInfinity, double.NegativeInfinity);
             foreach (Point point in Points)
             {
                 if (point.X > currentMax.X)
@@ -112,31 +152,23 @@ namespace Windows.UI.Xaml.Media
             return currentMax;
         }
 
-        internal override Point GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY, Point startingPoint)
+        internal override Point GetMinMaxXY(ref double minX, 
+                                            ref double maxX, 
+                                            ref double minY, 
+                                            ref double maxY, 
+                                            Point startingPoint)
         {
-            Point lastPoint = startingPoint;
             foreach (Point point in Points)
             {
-                if (minX > point.X)
-                {
-                    minX = point.X;
-                }
-                if (maxX < point.X)
-                {
-                    maxX = point.X;
-                }
-                if (minY > point.Y)
-                {
-                    minY = point.Y;
-                }
-                if (maxY < point.Y)
-                {
-                    maxY = point.Y;
-                }
-                lastPoint = point;
+                minX = Math.Min(minX, point.X);
+                maxX = Math.Max(maxX, point.X);
+                minY = Math.Min(minY, point.Y);
+                maxY = Math.Max(maxY, point.Y);
             }
-            return lastPoint;
+            return Points.Count == 0 ? startingPoint : Points[Points.Count - 1];
         }
+
+        #endregion
     }
 }
 

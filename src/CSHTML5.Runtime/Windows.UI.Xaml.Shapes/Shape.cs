@@ -46,24 +46,21 @@ namespace Windows.UI.Xaml.Shapes
     /// </summary>
     public abstract partial class Shape : FrameworkElement
     {
+        #region Data
+
         internal protected object _canvasDomElement;
-        internal protected Point _marginOffsets;//this is for the case where we have negative positions in the shapes.
-        bool _isListeningToAncestorsVisibilityChanged; // This is for the case where the HTML canvas is hidden when we want to draw (due to a "Display:none" on one of the ancestors), so we need to wait for the HTML canvas to become visible in order to draw.
+        internal protected Point _marginOffsets; // This is for the case where we have negative positions in the shapes.
 
-        //No need for the overrideMetadata on width and height because they call frameworkElement.HandleSizeChanged(); which causes a redraw.
-        //static Shape()
-        //{
-        //    PropertyMetadata propertyMetadata = FrameworkElement.WidthProperty.GetTypeMetaData(typeof(FrameworkElement)).Clone();
-        //    propertyMetadata.PropertyChangedCallback = Shape.Width_Changed;
-        //    Shape.WidthProperty.OverrideMetadata(typeof(Shape), propertyMetadata);
-        //}
+        // This is for the case where the HTML canvas is hidden when we want to draw 
+        // (due to a "Display:none" on one of the ancestors), so we need to wait for 
+        // the HTML canvas to become visible in order to draw.
+        private bool _isListeningToAncestorsVisibilityChanged;
 
-#if REVAMPPOINTEREVENTS
-        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
-        {
-            return Fill != null;
-        }
-#endif
+        private bool _redrawPending = false;
+        
+        #endregion
+
+        #region Constructor
 
         /// <summary>
         /// Provides base class initialization behavior for Shape derived classes.
@@ -76,29 +73,19 @@ namespace Windows.UI.Xaml.Shapes
             if (!Grid_InternalHelpers.isCSSGridSupported())
             {
                 Window.Current.SizeChanged += Current_SizeChanged; //this is to make sure that the canvas does not block redimensionning when changing the window size.
-                //Note: this still does not solve the issue we have when shrinking a parent element of the shape when the shape is stretched.
-                //To reproduce the issue:
+                // Note: this still does not solve the issue we have when shrinking a parent element of the shape when the shape is stretched.
+                // To reproduce the issue:
                 // <Grid Width="300">
                 //   <Rectangle Width="Auto" Stretch="Fill"/>
                 // </Grid>
-                // Then, after this has been drawn, programmatically reduce the size of the border => the rectangle will not become smaller because its inner html <canvas> has a fixed size and prevents its container from being smaller.
+                // Then, after this has been drawn, programmatically reduce the size of the border => the rectangle will not become smaller because 
+                // its inner html <canvas> has a fixed size and prevents its container from being smaller.
             }
         }
 
-        void Current_SizeChanged(object sender, WindowSizeChangedEventArgs e)
-        {
-            // Only cases where resizing the window MAY resize the shape is if the shape is "Stretched" AND it does not have a size in pixels defined:
-            if ((this.HorizontalAlignment == HorizontalAlignment.Stretch && double.IsNaN(this.Width))
-                || (this.VerticalAlignment == VerticalAlignment.Stretch && double.IsNaN(this.Height)))
-            {
-                ScheduleRedraw();
-            }
-        }
+        #endregion
 
-        void Shape_SizeChanged(object sender, SizeChangedEventArgs e) //Note: this is called when adding the shape into the visual tree.
-        {
-            ScheduleRedraw();
-        }
+        #region Dependency Properties
 
         /// <summary>
         /// Gets or sets the Brush that specifies how to paint the interior of the shape.
@@ -113,7 +100,8 @@ namespace Windows.UI.Xaml.Shapes
         /// </summary>
         public static readonly DependencyProperty FillProperty =
             DependencyProperty.Register("Fill", typeof(Brush), typeof(Shape), new PropertyMetadata(null, Fill_Changed));
-        static void Fill_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+
+        private static void Fill_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var shape = (Shape)d;
 #if REVAMPPOINTEREVENTS
@@ -121,16 +109,6 @@ namespace Windows.UI.Xaml.Shapes
 #endif
             shape.ScheduleRedraw();
         }
-
-        //
-        // Summary:
-        //     Gets a value that represents a Transform that is applied to the geometry
-        //     of a Shape before it is drawn.
-        //
-        // Returns:
-        //     A Transform that is applied to the geometry of a Shape before it is drawn.
-        //public Transform GeometryTransform { get; }
-
 
         /// <summary>
         /// Gets or sets a Stretch enumeration value that describes how the shape fills
@@ -146,18 +124,17 @@ namespace Windows.UI.Xaml.Shapes
         /// </summary>
         public static readonly DependencyProperty StretchProperty =
             DependencyProperty.Register("Stretch", typeof(Stretch), typeof(Shape), new PropertyMetadata(Stretch.None, Stretch_Changed));
+
         internal protected static void Stretch_Changed(DependencyObject i, DependencyPropertyChangedEventArgs e)
         {
             //note: Stretch is actually more implemented in the Redraw method of the classes that inherit from shape (Line, Ellipse, Path, Rectangle)
 
-            //todo: remove this method?
-
             var shape = (Shape)i;
-            Stretch newValue = (Stretch)e.NewValue;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(shape))
             {
                 dynamic shapeDom = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(shape);
 
+                Stretch newValue = (Stretch)e.NewValue;
                 if (double.IsNaN(shape.Width))
                 {
                     switch (newValue)
@@ -203,7 +180,6 @@ namespace Windows.UI.Xaml.Shapes
             }
         }
 
-
         /// <summary>
         /// Gets or sets the Brush that specifies how the Shape outline is painted.
         /// </summary>
@@ -223,12 +199,6 @@ namespace Windows.UI.Xaml.Shapes
             ((Shape)d).ManageStrokeChanged();
         }
 
-        internal protected virtual void ManageStrokeChanged()
-        {
-            ScheduleRedraw();
-        }
-
-
         /// <summary>
         /// Gets or sets the width of the Shape stroke outline.
         /// </summary>
@@ -246,87 +216,6 @@ namespace Windows.UI.Xaml.Shapes
         private static void StrokeThickness_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((Shape)d).ManageStrokeThicknessChanged();
-        }
-
-        internal protected virtual void ManageStrokeThicknessChanged()
-        {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
-                context.lineWidth = StrokeThickness + "";
-                ScheduleRedraw();
-            }
-        }
-
-        bool _redrawPending = false;
-        /// <summary>
-        /// This is used to redraw only once instead of on every property change.
-        /// </summary>
-        internal void ScheduleRedraw()
-        {
-            if (!_redrawPending) // This ensures that the "BeginInvoke" method is only called once, and it is not called again until its delegate has been executed.
-            {
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-                {
-                    _redrawPending = true;
-                    INTERNAL_DispatcherHelpers.QueueAction(() => // We use a dispatcher to avoid redrawing every time that a dependency property is set (the result is as if we waited for the last property to be set). We use "INTERNAL_DispatcherHelpers.QueueAction" instead of "Dispatcher.BeginInvoke" because it has better performance than calling Dispatcher.BeginInvoke directly.
-                        {
-                            _redrawPending = false;
-
-                            // We check whether the Shape is visible in the HTML DOM tree, because if the HTML canvas is hidden (due to a "Dispay:none" on one of the ancestors), we cannot draw on it (this can be seen by hiding a canvas, drawing, and then showing it: it will appear empty):
-                            if (INTERNAL_VisibilityChangedNotifier.IsElementVisible(this))
-                            {
-                                Redraw();
-
-                                // Stop listening to the ancestors' Visibility_Changed, if it was listening:
-                                if (_isListeningToAncestorsVisibilityChanged)
-                                    INTERNAL_VisibilityChangedNotifier.StopListeningToAncestorsVisibilityChanged(this);
-                                _isListeningToAncestorsVisibilityChanged = false;
-                            }
-                            else
-                            {
-                                // We listen to the Visibility_Changed event of the ancestors so as try again if a parent becomes visible:
-                                if (!_isListeningToAncestorsVisibilityChanged)
-                                {
-                                    _isListeningToAncestorsVisibilityChanged = true;
-                                    INTERNAL_VisibilityChangedNotifier.StartListeningToAncestorsVisibilityChanged(this,
-                                    () =>
-                                    {
-                                        // Stop listening to the ancestors' Visibility_Changed:
-                                        if (_isListeningToAncestorsVisibilityChanged)
-                                            INTERNAL_VisibilityChangedNotifier.StopListeningToAncestorsVisibilityChanged(this);
-                                        _isListeningToAncestorsVisibilityChanged = false;
-
-                                        // Try again:
-                                        ScheduleRedraw();
-                                    });
-                                }
-                            }
-                        });
-                }
-            }
-        }
-
-        protected internal override void INTERNAL_OnDetachedFromVisualTree()
-        {
-            // Stop listening to the ancestors' Visibility_Changed event, if it was listening:
-            if (_isListeningToAncestorsVisibilityChanged)
-                INTERNAL_VisibilityChangedNotifier.StopListeningToAncestorsVisibilityChanged(this);
-            _isListeningToAncestorsVisibilityChanged = false;
-
-            base.INTERNAL_OnDetachedFromVisualTree();
-        }
-
-        internal protected virtual void Redraw() { } //implemented in classes that inherit from Shape.
-
-
-        public void Refresh() // Public method that end-users are supposed to call if they change the geometry and want to redraw the Path.
-        {
-            if (this is Path)
-            {
-                ((Path)this).RefreshChildrenParent();
-            }
-            this.ScheduleRedraw();
         }
 
         /// <summary>
@@ -378,8 +267,6 @@ namespace Windows.UI.Xaml.Shapes
         public static readonly DependencyProperty StrokeLineJoinProperty =
             DependencyProperty.Register("StrokeLineJoin", typeof(PenLineJoin), typeof(Shape), new PropertyMetadata(PenLineJoin.Miter));
 
-
-
         /// <summary>
         /// Gets or sets a limit on the ratio of the miter length to half the StrokeThickness
         /// of a Shape element. This value is always a positive number that is greater than
@@ -397,7 +284,211 @@ namespace Windows.UI.Xaml.Shapes
         public static readonly DependencyProperty StrokeMiterLimitProperty =
             DependencyProperty.Register("StrokeMiterLimit", typeof(double), typeof(Shape), new PropertyMetadata(0d));
 
-        internal static void GetShapeInfos(Shape shape, out double xOffsetToApplyBeforeMultiplication, out double yOffsetToApplyBeforeMultiplication, out double xOffsetToApplyAfterMultiplication, out double yOffsetToApplyAfterMultiplication, out double sizeX, out double sizeY, out double horizontalMultiplicator, out double verticalMultiplicator, out Size shapeActualSize)
+        /// <summary>
+        /// Gets or sets a collection of Double values that indicates the pattern of
+        /// dashes and gaps that is used to outline shapes.
+        /// </summary>
+        public DoubleCollection StrokeDashArray
+        {
+            get
+            {
+                var collection = (DoubleCollection)GetValue(StrokeDashArrayProperty);
+                if (collection == null)
+                {
+                    collection = new DoubleCollection();
+                    SetValue(StrokeDashArrayProperty, collection);
+                }
+                return collection;
+            }
+            set { SetValue(StrokeDashArrayProperty, value); }
+        }
+        /// <summary>
+        /// Identifies the StrokeDashArray dependency property.
+        /// </summary>
+        public static readonly DependencyProperty StrokeDashArrayProperty =
+            DependencyProperty.Register("StrokeDashArray", typeof(DoubleCollection), typeof(Shape), new PropertyMetadata(null, StrokeDashArray_Changed));
+
+        private static void StrokeDashArray_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Shape shape = (Shape)d;
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(shape))
+            {
+                shape.ScheduleRedraw();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value that specifies the distance within the dash pattern
+        /// where a dash begins.
+        /// </summary>
+        public double StrokeDashOffset
+        {
+            get { return (double)GetValue(StrokeDashOffsetProperty); }
+            set { SetValue(StrokeDashOffsetProperty, value); }
+        }
+        /// <summary>
+        /// Identifies the StrokeDashOffset dependency property.
+        /// </summary>
+        public static readonly DependencyProperty StrokeDashOffsetProperty =
+            DependencyProperty.Register("StrokeDashOffset", typeof(double), typeof(Shape), new PropertyMetadata(0d, StrokeDashOffset_Changed));
+
+        private static void StrokeDashOffset_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Shape shape = (Shape)d;
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(shape))
+            {
+                if (shape._canvasDomElement != null)
+                {
+                    dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(shape._canvasDomElement);
+                    context.lineDashOffset = shape.StrokeDashOffset.ToString();
+                }
+            }
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// method that end-users are supposed to call if they change the geometry and want to redraw the Path.
+        /// </summary>
+        public void Refresh()
+        {
+            this.RefreshOverride();
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        internal protected virtual void Redraw()
+        {
+
+        }
+
+        internal protected virtual void ManageStrokeChanged()
+        {
+            ScheduleRedraw();
+        }
+
+        internal protected virtual void ManageStrokeThicknessChanged()
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
+                context.lineWidth = StrokeThickness + "";
+                ScheduleRedraw();
+            }
+        }
+
+        protected internal override void INTERNAL_OnDetachedFromVisualTree()
+        {
+            // Stop listening to the ancestors' Visibility_Changed event, if it was listening:
+            if (_isListeningToAncestorsVisibilityChanged)
+                INTERNAL_VisibilityChangedNotifier.StopListeningToAncestorsVisibilityChanged(this);
+            _isListeningToAncestorsVisibilityChanged = false;
+
+            base.INTERNAL_OnDetachedFromVisualTree();
+        }
+
+        #endregion
+
+        #region Internal API
+
+#if REVAMPPOINTEREVENTS
+        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        {
+            return Fill != null;
+        }
+#endif
+
+        internal virtual void RefreshOverride()
+        {
+            this.ScheduleRedraw();
+        }
+
+        /// <summary>
+        /// This is used to redraw only once instead of on every property change.
+        /// </summary>
+        internal void ScheduleRedraw()
+        {
+            if (!_redrawPending) // This ensures that the "BeginInvoke" method is only called once, and it is not called again until its delegate has been executed.
+            {
+                if (_isLoaded)
+                {
+                    _redrawPending = true;
+                    // We use a dispatcher to avoid redrawing every time that a dependency property is set 
+                    // (the result is as if we waited for the last property to be set). We use "INTERNAL_DispatcherHelpers.QueueAction" 
+                    // instead of "Dispatcher.BeginInvoke" because it has better performance than calling Dispatcher.BeginInvoke directly.
+                    INTERNAL_DispatcherHelpers.QueueAction(() =>
+                    {
+                        _redrawPending = false;
+
+                        // We check whether the Shape is visible in the HTML DOM tree, because if the HTML canvas is hidden 
+                        // (due to a "Dispay:none" on one of the ancestors), we cannot draw on it 
+                        // (this can be seen by hiding a canvas, drawing, and then showing it: it will appear empty):
+                        if (INTERNAL_VisibilityChangedNotifier.IsElementVisible(this))
+                        {
+                            Redraw();
+
+                            // Stop listening to the ancestors' Visibility_Changed, if it was listening:
+                            if (_isListeningToAncestorsVisibilityChanged)
+                                INTERNAL_VisibilityChangedNotifier.StopListeningToAncestorsVisibilityChanged(this);
+                            _isListeningToAncestorsVisibilityChanged = false;
+                        }
+                        else
+                        {
+                            // We listen to the Visibility_Changed event of the ancestors so as try again if a parent becomes visible:
+                            if (!_isListeningToAncestorsVisibilityChanged)
+                            {
+                                _isListeningToAncestorsVisibilityChanged = true;
+                                INTERNAL_VisibilityChangedNotifier.StartListeningToAncestorsVisibilityChanged(this,
+                                () =>
+                                {
+                                        // Stop listening to the ancestors' Visibility_Changed:
+                                        if (_isListeningToAncestorsVisibilityChanged)
+                                        INTERNAL_VisibilityChangedNotifier.StopListeningToAncestorsVisibilityChanged(this);
+                                    _isListeningToAncestorsVisibilityChanged = false;
+
+                                        // Try again:
+                                        ScheduleRedraw();
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        private void Current_SizeChanged(object sender, WindowSizeChangedEventArgs e)
+        {
+            // Only cases where resizing the window MAY resize the shape is if the shape is "Stretched" AND it does not have a size in pixels defined:
+            if ((this.HorizontalAlignment == HorizontalAlignment.Stretch && double.IsNaN(this.Width))
+                || (this.VerticalAlignment == VerticalAlignment.Stretch && double.IsNaN(this.Height)))
+            {
+                ScheduleRedraw();
+            }
+        }
+
+        private void Shape_SizeChanged(object sender, SizeChangedEventArgs e) //Note: this is called when adding the shape into the visual tree.
+        {
+            ScheduleRedraw();
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        internal static void GetShapeInfos(Shape shape, 
+                                           out double xOffsetToApplyBeforeMultiplication, 
+                                           out double yOffsetToApplyBeforeMultiplication, 
+                                           out double xOffsetToApplyAfterMultiplication, 
+                                           out double yOffsetToApplyAfterMultiplication, 
+                                           out double sizeX, 
+                                           out double sizeY, 
+                                           out double horizontalMultiplicator, 
+                                           out double verticalMultiplicator, 
+                                           out Size shapeActualSize)
         {
             double width = shape.Width;
             double height = shape.Height;
@@ -416,7 +507,21 @@ namespace Windows.UI.Xaml.Shapes
                 strokeThickness = 0;
             }
 
-            INTERNAL_ShapesDrawHelpers.GetMultiplicatorsAndOffsetForStretch(shape, strokeThickness, minX, maxX, minY, maxY, strech, shapeActualSize, out horizontalMultiplicator, out verticalMultiplicator, out xOffsetToApplyBeforeMultiplication, out yOffsetToApplyBeforeMultiplication, out xOffsetToApplyAfterMultiplication, out yOffsetToApplyAfterMultiplication, out shape._marginOffsets);
+            INTERNAL_ShapesDrawHelpers.GetMultiplicatorsAndOffsetForStretch(shape, 
+                                                                            strokeThickness, 
+                                                                            minX, 
+                                                                            maxX, 
+                                                                            minY, 
+                                                                            maxY, 
+                                                                            strech, 
+                                                                            shapeActualSize, 
+                                                                            out horizontalMultiplicator, 
+                                                                            out verticalMultiplicator, 
+                                                                            out xOffsetToApplyBeforeMultiplication, 
+                                                                            out yOffsetToApplyBeforeMultiplication, 
+                                                                            out xOffsetToApplyAfterMultiplication, 
+                                                                            out yOffsetToApplyAfterMultiplication, 
+                                                                            out shape._marginOffsets);
 
             if (strech == Stretch.None)
             {
@@ -444,48 +549,80 @@ namespace Windows.UI.Xaml.Shapes
         /// <param name="xOffsetToApplyBeforeMultiplication"></param>
         /// <param name="yOffsetToApplyBeforeMultiplication"></param>
         /// <param name="shapeActualSize"></param>
-        internal static void DrawFillAndStroke(Shape shape, string fillRule, double minX, double minY, double maxX, double maxY, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, Size shapeActualSize)
+        internal static void DrawFillAndStroke(Shape shape, 
+                                               string fillRule, 
+                                               double minX, 
+                                               double minY, 
+                                               double maxX, 
+                                               double maxY, 
+                                               double horizontalMultiplicator, 
+                                               double verticalMultiplicator, 
+                                               double xOffsetToApplyBeforeMultiplication, 
+                                               double yOffsetToApplyBeforeMultiplication, 
+                                               Size shapeActualSize)
         {
-            object context = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", shape._canvasDomElement); //Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
+            // Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need 
+            // to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
+            object context = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", shape._canvasDomElement);
 
-            //we remove the previous drawing:
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.clearRect(0, 0, $1, $2)", context, shapeActualSize.Width, shapeActualSize.Height); //todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
+            // we remove the previous drawing:
+            // todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
+            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.clearRect(0, 0, $1, $2)", context, shapeActualSize.Width, shapeActualSize.Height); 
 
 
-            //context.save() for the fill
+            // context.save() for the fill
             CSHTML5.Interop.ExecuteJavaScriptAsync(@"
 $0.save()", context);
 
-            //FillStyle:
+            // FillStyle:
             double opacity = shape.Fill == null ? 1 : shape.Fill.Opacity;
-            object fillValue = GetHtmlBrush(shape, shape.Fill, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
+            object fillValue = GetHtmlBrush(shape, 
+                                            shape.Fill, 
+                                            opacity, 
+                                            minX, 
+                                            minY, 
+                                            maxX, 
+                                            maxY, 
+                                            horizontalMultiplicator, 
+                                            verticalMultiplicator, 
+                                            xOffsetToApplyBeforeMultiplication, 
+                                            yOffsetToApplyBeforeMultiplication, 
+                                            shapeActualSize);
 
             if (fillValue != null)
             {
-                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.fillStyle = $1", context, fillValue);
+                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.fillStyle = $1", context, fillValue);
             }
             else
             {
-                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.fillStyle = ''", context);
+                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.fillStyle = ''", context);
             }
 
             if (shape.Fill != null)
             {
-                //Note: I am not sure that calling fill("evenodd") works properly in Edge, the canvasRenderingContext2d has a msfillRule property which might be the intended way to use the evenodd rule when in Edge.
-                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.fill($1)", context, fillRule); 
+                // Note: I am not sure that calling fill("evenodd") works properly in Edge, the canvasRenderingContext2d 
+                // has a msfillRule property which might be the intended way to use the evenodd rule when in Edge.
+                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.fill($1)", context, fillRule); 
             }
 
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.restore();
-$0.save()", context); //restore after fill then save before stroke
+            // restore after fill then save before stroke
+            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.restore(); $0.save()", context); 
 
             //stroke
             object strokeValue = null;
             opacity = shape.Stroke == null ? 1 : shape.Stroke.Opacity;
-            strokeValue = GetHtmlBrush(shape, shape.Stroke, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
+            strokeValue = GetHtmlBrush(shape, 
+                                       shape.Stroke, 
+                                       opacity, 
+                                       minX, 
+                                       minY, 
+                                       maxX, 
+                                       maxY, 
+                                       horizontalMultiplicator, 
+                                       verticalMultiplicator, 
+                                       xOffsetToApplyBeforeMultiplication, 
+                                       yOffsetToApplyBeforeMultiplication, 
+                                       shapeActualSize);
 
             double strokeThickness = shape.StrokeThickness;
             if (shape.Stroke == null)
@@ -493,83 +630,72 @@ $0.save()", context); //restore after fill then save before stroke
                 strokeThickness = 0;
             }
 
-            //we set the colors and style of the shape:
+            // we set the colors and style of the shape:
             if (strokeValue != null && strokeThickness > 0)
             {
                 double thickness = shape.StrokeThickness;
-                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.strokeStyle = $1", context, strokeValue);
-                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.lineWidth = $1", context, strokeThickness);
+                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.strokeStyle = $1", context, strokeValue);
+                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.lineWidth = $1", context, strokeThickness);
                 DoubleCollection strokeDashArray = shape.StrokeDashArray;
                 if (strokeDashArray != null)
                 {
                     if (CSHTML5.Interop.IsRunningInTheSimulator)
                     {
-                        //todo: put a message saying that it doesn't work in certain browsers (maybe use a static boolean to put that message only once)
+                        // todo: put a message saying that it doesn't work in certain browsers (maybe use a static boolean to put that message only once)
                     }
                     else
                     {
                         object options = CSHTML5.Interop.ExecuteJavaScript(@"new Array()");
                         for (int i = 0; i < strokeDashArray.Count; ++i)
                         {
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0[$1] = $2;
-", options, i, strokeDashArray[i] * thickness);
+                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", 
+                                                                   options, 
+                                                                   i, 
+                                                                   strokeDashArray[i] * thickness);
                         }
 
-
-                        //string str = "[";
-                        //bool first = true;
-                        //foreach (double length in strokeDashArray)
-                        //{
-                        //    if (first)
-                        //    {
-                        //        first = false;
-                        //    }
-                        //    else
-                        //    {
-                        //        str += ",";
-                        //    }
-                        //    str += length;
-                        //}
-                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-if ($0.setLineDash)
-    $0.setLineDash($1)", context, options);
-                        //context.setLineDash(str + "]");
+                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"if ($0.setLineDash) $0.setLineDash($1)", context, options);
                     }
                 }
 
                 if (shape.Stroke != null && shape.StrokeThickness > 0)
                 {
-                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.stroke()", context);
-                    //context.stroke(); //todo: test if this won't cause a problem with a potential transparent brush (drawing multiple times so the shape is less transparent).
+                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.stroke()", context);
                 }
 
-                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.restore()", context);
+                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.restore()", context);
             }
-            //context.strokeStyle = strokeValue;
 
-            //context.fillStyle = fillValue;
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.lineWidth = $1", context, shape.StrokeThickness + ""); //todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
-            //context.lineWidth = shape.StrokeThickness + "";
+            //todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
+            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.lineWidth = $1", context, shape.StrokeThickness + "");
         }
 
 
-        internal static object GetHtmlBrush(Shape shape, Brush brush, double opacity, double minX, double minY, double maxX, double maxY, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, Size shapeActualSize)
+        internal static object GetHtmlBrush(Shape shape, 
+                                            Brush brush, 
+                                            double opacity, 
+                                            double minX, 
+                                            double minY, 
+                                            double maxX, 
+                                            double maxY, 
+                                            double horizontalMultiplicator, 
+                                            double verticalMultiplicator, 
+                                            double xOffsetToApplyBeforeMultiplication, 
+                                            double yOffsetToApplyBeforeMultiplication, 
+                                            Size shapeActualSize)
         {
-            object context = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", shape._canvasDomElement); //Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
-
+            // Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need 
+            // to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
+            object context = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", shape._canvasDomElement);
 
             object returnValue = null;
-            if (brush == null || brush is SolidColorBrush) //todo: make sure we want the same behaviour when it is null and when it is a SolidColorBrush (basically, check if null means default value)
+            // todo: make sure we want the same behaviour when it is null and when it is a SolidColorBrush 
+            // (basically, check if null means default value)
+            if (brush == null || brush is SolidColorBrush) 
             {
                 if (brush != null) //if stroke is null, we want to set it as an empty string, otherwise, it is a SolidColorBrush and we want to get its color.
                 {
                     returnValue = ((SolidColorBrush)brush).INTERNAL_ToHtmlString();
-                    //CSHTML5.Interop.ExecuteJavaScript(@"$0.fillStyle = $1", context, fillAsString);
                 }
             }
             else if (brush is LinearGradientBrush)
@@ -591,8 +717,7 @@ $0.restore()", context);
 
                 if (fillAsLinearGradientBrush.SpreadMethod == GradientSpreadMethod.Pad)
                 {
-                    returnValue = CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.createLinearGradient($1,$2,$3,$4)", context, x0, y0, x1, y1);
+                    returnValue = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.createLinearGradient($1,$2,$3,$4)", context, x0, y0, x1, y1);
 
                     foreach (GradientStop gradientStop in fillAsLinearGradientBrush.GradientStops)
                     {
@@ -649,14 +774,15 @@ $0.createLinearGradient($1,$2,$3,$4)", context, x0, y0, x1, y1);
                     }
                     else
                     {
-                        angle = Math.Atan2((fillAsLinearGradientBrush.EndPoint.Y - fillAsLinearGradientBrush.StartPoint.Y) * (maxY - minY), (fillAsLinearGradientBrush.EndPoint.X - fillAsLinearGradientBrush.StartPoint.X) * (maxX - minX)); //I think that this is the correct angle.
+                        angle = Math.Atan2((fillAsLinearGradientBrush.EndPoint.Y - fillAsLinearGradientBrush.StartPoint.Y) * (maxY - minY),
+                                           (fillAsLinearGradientBrush.EndPoint.X - fillAsLinearGradientBrush.StartPoint.X) * (maxX - minX));
                     }
 
                     double distance = Math.Sqrt(Math.Pow((x1 - x0), 2) + Math.Pow((y1 - y0), 2));
 
 
-                    //now all we need is the offset:
-                    double m = (y1 - y0) / (x1 - x0); //this the slope of the line that passes through StartPoint and EndPoint
+                    // now all we need is the offset:
+                    double m = (y1 - y0) / (x1 - x0); // this the slope of the line that passes through StartPoint and EndPoint
                     double perpM = -1 / m; // this is the slope of any line perpendicular to the one defined above.
 
                     //the line passing through StartPoint is so that y0 = perpM * x0 + k
@@ -757,12 +883,16 @@ $0.createPattern($1, 'repeat')", context, canvas);
                     r = r * (yOffsetToApplyBeforeMultiplication + maxY - minY) * verticalMultiplicator + minY;
                 }
 
-                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.scale($1,1)", context, radiusScaling);
+                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.scale($1,1)", context, radiusScaling);
                 if (fillAsRadialGradientBrush.SpreadMethod == GradientSpreadMethod.Pad)
                 {
-                    returnValue = CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.createRadialGradient($1,$2,0,$3,$4,$5)", context, gradientOriginX, gradientOriginY, centerX, centerY, r);
+                    returnValue = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.createRadialGradient($1,$2,0,$3,$4,$5)", 
+                                                                         context, 
+                                                                         gradientOriginX, 
+                                                                         gradientOriginY, 
+                                                                         centerX, 
+                                                                         centerY, 
+                                                                         r);
 
                     foreach (GradientStop gradientStop in fillAsRadialGradientBrush.GradientStops.OrderBy((element) => { return element.Offset; }))
                     {
@@ -792,8 +922,13 @@ $0.createRadialGradient($1,$2,0,$3,$4,$5)", context, gradientOriginX, gradientOr
                     }
                     int additionalRepetitions = repeatingTimes - 1;
 
-                    returnValue = CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.createRadialGradient($1,$2,0,$3,$4,$5)", context, gradientOriginX, gradientOriginY, centerX - xCorrection * additionalRepetitions * r, centerY - yCorrection * additionalRepetitions * r, r + additionalRepetitions * r);
+                    returnValue = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.createRadialGradient($1,$2,0,$3,$4,$5)", 
+                                                                         context, 
+                                                                         gradientOriginX, 
+                                                                         gradientOriginY, 
+                                                                         centerX - xCorrection * additionalRepetitions * r, 
+                                                                         centerY - yCorrection * additionalRepetitions * r, 
+                                                                         r + additionalRepetitions * r);
 
                     var orderedGradients = fillAsRadialGradientBrush.GradientStops.OrderBy((element) => { return element.Offset; });
                     double repetitionOffset = 1.0 / repeatingTimes;
@@ -802,29 +937,13 @@ $0.createRadialGradient($1,$2,0,$3,$4,$5)", context, gradientOriginX, gradientOr
                     {
                         foreach (GradientStop gradientStop in orderedGradients)
                         {
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.addColorStop($1,$2)", returnValue, gradientStop.Offset / repeatingTimes + i * repetitionOffset, gradientStop.Color.INTERNAL_ToHtmlString(opacity));
+                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.addColorStop($1,$2)", 
+                                                                   returnValue, 
+                                                                   gradientStop.Offset / repeatingTimes + i * repetitionOffset, 
+                                                                   gradientStop.Color.INTERNAL_ToHtmlString(opacity));
                         }
                     }
                 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             }
             else
             {
@@ -833,109 +952,6 @@ $0.createRadialGradient($1,$2,0,$3,$4,$5)", context, gradientOriginX, gradientOr
             return returnValue;
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("return")]
-#else
-        [External]
-#endif
-        void ExecuteJS_SimulatorOnly(string javascript, object canvasDomElement)
-        {
-            string str = string.Format(@"
-{0}
-var cvas = document.getElementById(""{1}"");
-if(cvas != undefined && cvas != null) {{
-var context = cvas.getContext('2d');
-context.save();
-context.rotate(angle);
-context.translate(offset, 0);
-var pat = context.createPattern(canvas, 'repeat');
-
-context.fillStyle = pat;
-context.fill();
-context.restore();
-}}", javascript, ((INTERNAL_HtmlDomElementReference)canvasDomElement).UniqueIdentifier);
-            INTERNAL_HtmlDomManager.ExecuteJavaScript(str);
-        }
-
-        /// <summary>
-        /// Gets or sets a collection of Double values that indicates the pattern of
-        /// dashes and gaps that is used to outline shapes.
-        /// </summary>
-        public DoubleCollection StrokeDashArray
-        {
-            get
-            {
-                var collection = (DoubleCollection)GetValue(StrokeDashArrayProperty);
-                if (collection == null)
-                {
-                    collection = new DoubleCollection();
-                    SetValue(StrokeDashArrayProperty, collection);
-                }
-                return collection;
-            }
-            set { SetValue(StrokeDashArrayProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the StrokeDashArray dependency property.
-        /// </summary>
-        public static readonly DependencyProperty StrokeDashArrayProperty =
-            DependencyProperty.Register("StrokeDashArray", typeof(DoubleCollection), typeof(Shape), new PropertyMetadata(null, StrokeDashArray_Changed));
-
-        private static void StrokeDashArray_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            Shape shape = (Shape)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(shape))
-            {
-                shape.ScheduleRedraw();
-                //if (shape._canvasDomElement != null)
-                //{
-                //    dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(shape._canvasDomElement);
-                //    string str = "[";
-                //    bool first = true;
-                //    foreach(double length in shape.StrokeDashArray)
-                //    {
-                //        if(first)
-                //        {
-                //            first = false;
-                //        }
-                //        else
-                //        {
-                //            str += ",";
-                //        }
-                //        str += length;
-                //    }
-                //    context.setLineDash = str + "]";
-                //}
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a value that specifies the distance within the dash pattern
-        /// where a dash begins.
-        /// </summary>
-        public double StrokeDashOffset
-        {
-            get { return (double)GetValue(StrokeDashOffsetProperty); }
-            set { SetValue(StrokeDashOffsetProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the StrokeDashOffset dependency property.
-        /// </summary>
-        public static readonly DependencyProperty StrokeDashOffsetProperty =
-            DependencyProperty.Register("StrokeDashOffset", typeof(double), typeof(Shape), new PropertyMetadata(0d, StrokeDashOffset_Changed));
-
-        private static void StrokeDashOffset_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            Shape shape = (Shape)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(shape))
-            {
-                if (shape._canvasDomElement != null)
-                {
-                    dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(shape._canvasDomElement);
-                    context.lineDashOffset = shape.StrokeDashOffset.ToString();
-                }
-            }
-        }
 
         internal void ApplyMarginToFixNegativeCoordinates(Point newFixingMargin)
         {
@@ -971,32 +987,57 @@ context.restore();
             }
         }
 
+#if !BRIDGE
+        [JSIL.Meta.JSReplacement("return")]
+#else
+        [External]
+#endif
+        private void ExecuteJS_SimulatorOnly(string javascript, object canvasDomElement)
+        {
+            string str = string.Format(@"
+{0}
+var cvas = document.getElementById(""{1}"");
+if(cvas != undefined && cvas != null) {{
+var context = cvas.getContext('2d');
+context.save();
+context.rotate(angle);
+context.translate(offset, 0);
+var pat = context.createPattern(canvas, 'repeat');
+
+context.fillStyle = pat;
+context.fill();
+context.restore();
+}}", javascript, ((INTERNAL_HtmlDomElementReference)canvasDomElement).UniqueIdentifier);
+
+            INTERNAL_HtmlDomManager.ExecuteJavaScript(str);
+        }
+
+        #endregion
+
 #if WORKINPROGRESS
-        #region Not supported yet
-        
-        //
-        // Summary:
-        //     Gets or sets a PenLineCap enumeration value that specifies how the ends of
-        //     a dash are drawn.
-        //
-        // Returns:
-        //     One of the enumeration values for PenLineCap. The default is Flat.
+
+        /// <summary>
+        /// Gets or sets a PenLineCap enumeration value that specifies how the ends of
+        /// a dash are drawn.
+        /// </summary>
+        /// <returns>
+        /// One of the enumeration values for PenLineCap. The default is Flat.
+        /// </returns>
         public PenLineCap StrokeDashCap
         {
             get { return (PenLineCap)GetValue(StrokeDashCapProperty); }
             set { SetValue(StrokeStartLineCapProperty, value); }
         }
-        //
-        // Summary:
-        //     Identifies the StrokeDashCap dependency property.
-        //
-        // Returns:
-        //     The identifier for the StrokeDashCap dependency property.
-        public static readonly DependencyProperty StrokeDashCapProperty = DependencyProperty.Register("StrokeDashCap", typeof(PenLineCap), typeof(Shape), new PropertyMetadata(PenLineCap.Flat)
-        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-        
-        
-        #endregion
+
+        /// <summary>
+        /// Identifies the StrokeDashCap dependency property.
+        /// </summary>
+        /// <returns>
+        /// The identifier for the StrokeDashCap dependency property.
+        /// </returns>
+        public static readonly DependencyProperty StrokeDashCapProperty =
+            DependencyProperty.Register("StrokeDashCap", typeof(PenLineCap), typeof(Shape), new PropertyMetadata(PenLineCap.Flat));
+
 #endif
 
     }

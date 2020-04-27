@@ -31,7 +31,15 @@ namespace Windows.UI.Xaml.Media
 #if WORKINPROGRESS
     public sealed partial class RectangleGeometry : Geometry
     {
-        internal protected override void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize)
+        internal protected override void DefineInCanvas(Path path, 
+                                                        object canvasDomElement, 
+                                                        double horizontalMultiplicator, 
+                                                        double verticalMultiplicator, 
+                                                        double xOffsetToApplyBeforeMultiplication, 
+                                                        double yOffsetToApplyBeforeMultiplication, 
+                                                        double xOffsetToApplyAfterMultiplication, 
+                                                        double yOffsetToApplyAfterMultiplication, 
+                                                        Size shapeActualSize)
         {
             throw new NotImplementedException();
         }
@@ -46,15 +54,12 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public Rect Rect
         {
-            get
-            {
-                return (Rect)GetValue(RectProperty);
-            }
-            set
-            {
-                SetValue(RectProperty, value);
-            }
+            get { return (Rect)GetValue(RectProperty); }
+            set { SetValue(RectProperty, value); }
         }
+
+        public static readonly DependencyProperty RectProperty = DependencyProperty.Register("Rect", typeof(Rect), typeof(RectangleGeometry), null);
+
 
 #if WORKINPROGRESS
         // Summary:
@@ -76,7 +81,6 @@ namespace Windows.UI.Xaml.Media
         public double RadiusY { get; set; }
 #endif
 
-        public static readonly DependencyProperty RectProperty = DependencyProperty.Register("Rect", typeof(Rect), typeof(RectangleGeometry), null);
 
     }
 #endif

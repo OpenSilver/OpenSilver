@@ -34,13 +34,20 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents a segment of a PathFigure object.
     /// </summary>
-    public partial class PathSegment : DependencyObject
+    public abstract partial class PathSegment : DependencyObject
     {
-        internal Path INTERNAL_parentPath = null;
-        internal void SetParentPath(Path path)
+        #region Constructor
+
+        internal PathSegment()
         {
-            INTERNAL_parentPath = path;
+
         }
+
+        #endregion
+
+        #region Internal API
+
+        internal Path ParentPath { get; private set; }
 
         /// <summary>
         /// Defines the segment in the canvas, then returns the position of the last point of the segment.
@@ -54,19 +61,28 @@ namespace Windows.UI.Xaml.Media
         /// <param name="canvasDomElement"></param>
         /// <param name="previousLastPOint"></param>
         /// <returns>The position of the last point of the segment (that will be the starting position for the next segment).</returns>
-        internal virtual Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, double horizontalMultiplicator, double verticalMultiplicator, object canvasDomElement, Point previousLastPOint)
+        internal abstract Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, 
+                                               double yOffsetToApplyBeforeMultiplication, 
+                                               double xOffsetToApplyAfterMultiplication, 
+                                               double yOffsetToApplyAfterMultiplication, 
+                                               double horizontalMultiplicator, 
+                                               double verticalMultiplicator, 
+                                               object canvasDomElement, 
+                                               Point previousLastPOint);
+
+        internal abstract Point GetMinMaxXY(ref double minX,
+                                            ref double maxX,
+                                            ref double minY,
+                                            ref double maxY,
+                                            Point startingPoint);
+
+        internal abstract Point GetMaxXY();
+
+        internal virtual void SetParentPath(Path path)
         {
-            throw new NotImplementedException();
+            ParentPath = path;
         }
 
-        internal virtual Point GetMaxXY()
-        {
-            throw new NotImplementedException();
-        }
-
-        internal virtual Point GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY, Point startingPoint)
-        {
-            throw new NotImplementedException();
-        }
+        #endregion
     }
 }

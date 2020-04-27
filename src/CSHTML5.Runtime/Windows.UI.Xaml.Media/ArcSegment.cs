@@ -34,18 +34,42 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public sealed partial class ArcSegment : PathSegment
     {
-        private double _strokeThickness; //Note: this is required for GetMinMaxXY because for some reason, the stroke thickness needs to go on both side of the stroke instead of towards the inside like every other shape thingy.
+        #region Data
+
         private Point _ellipseCenterInCircleCoordinates;
-        private double _angle1, _angle2;
-        private double _additionalScalingForShapetoSmallToReachEndPoint = 1; //this is for the case where the user defines start and endPoints that are too far away from each other for an ellipse of the given size to reach both points.
-        private double _minX, _minY, _maxX, _maxY;
-        private bool _isUpToDate = false;
+        private double _angle1;
+        private double _angle2;
+        private double _minX;
+        private double _minY;
+        private double _maxX;
+        private double _maxY;
         private Point _startingPoint;
 
-        ///// <summary>
-        ///// Initializes a new instance of the ArcSegment class.
-        ///// </summary>
-        //public ArcSegment();
+        // this is for the case where the user defines start and endPoints that are too far away from 
+        // each other for an ellipse of the given size to reach both points.
+        private double _additionalScalingForShapetoSmallToReachEndPoint = 1;
+
+        // Note: this is required for GetMinMaxXY because for some reason, the stroke thickness needs 
+        // to go on both side of the stroke instead of towards the inside like every other shape thingy.
+        private double _strokeThickness;
+
+        private bool _isUpToDate = false;
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of the ArcSegment class.
+        /// </summary>
+        public ArcSegment()
+        {
+
+        }
+
+        #endregion
+
+        #region Dependency Properties
 
         /// <summary>
         /// Gets or sets a value that indicates whether the arc should be greater than
@@ -56,6 +80,7 @@ namespace Windows.UI.Xaml.Media
             get { return (bool)GetValue(IsLargeArcProperty); }
             set { SetValue(IsLargeArcProperty, value); }
         }
+
         /// <summary>
         /// Identifies the IsLargeArc dependency property.
         /// </summary>
@@ -65,22 +90,20 @@ namespace Windows.UI.Xaml.Media
         private static void IsLargeArc_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ArcSegment arc = (ArcSegment)d;
-            if (e.NewValue != e.OldValue)
-            {
-                arc._isUpToDate = false;
+            arc._isUpToDate = false;
 
-                if (arc.INTERNAL_parentPath != null && arc.INTERNAL_parentPath._isLoaded)
-                {
-                    arc.INTERNAL_parentPath.ScheduleRedraw();
-                }
+            if (arc.ParentPath != null)
+            {
+                arc.ParentPath.ScheduleRedraw();
             }
         }
 
-        // Returns:
-        //     The point to which the arc is drawn. The default is a Point with value 0,0.
         /// <summary>
         /// Gets or sets the endpoint of the elliptical arc.
         /// </summary>
+        /// <returns>
+        /// The point to which the arc is drawn. The default is a Point with value 0,0.
+        /// </returns>
         public Point Point
         {
             get { return (Point)GetValue(PointProperty); }
@@ -95,14 +118,11 @@ namespace Windows.UI.Xaml.Media
         private static void Point_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ArcSegment arc = (ArcSegment)d;
-            if (e.NewValue != e.OldValue)
-            {
-                arc._isUpToDate = false; //see if it is ok to remove this line (it was not there before ading the call to ScheduleRedraw).
+            arc._isUpToDate = false; //see if it is ok to remove this line (it was not there before ading the call to ScheduleRedraw).
 
-                if (arc.INTERNAL_parentPath != null && arc.INTERNAL_parentPath._isLoaded)
-                {
-                    arc.INTERNAL_parentPath.ScheduleRedraw();
-                }
+            if (arc.ParentPath != null)
+            {
+                arc.ParentPath.ScheduleRedraw();
             }
         }
 
@@ -115,6 +135,7 @@ namespace Windows.UI.Xaml.Media
             get { return (double)GetValue(RotationAngleProperty); }
             set { SetValue(RotationAngleProperty, value); }
         }
+
         /// <summary>
         /// Identifies the RotationAngle dependency property.
         /// </summary>
@@ -124,29 +145,28 @@ namespace Windows.UI.Xaml.Media
         private static void RotationAngle_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ArcSegment arc = (ArcSegment)d;
-            if (e.NewValue != e.OldValue)
-            {
-                arc._isUpToDate = false; //see if it is ok to remove this line (it was not there before ading the call to ScheduleRedraw).
+            arc._isUpToDate = false; //see if it is ok to remove this line (it was not there before ading the call to ScheduleRedraw).
 
-                if (arc.INTERNAL_parentPath != null && arc.INTERNAL_parentPath._isLoaded)
-                {
-                    arc.INTERNAL_parentPath.ScheduleRedraw();
-                }
+            if (arc.ParentPath != null)
+            {
+                arc.ParentPath.ScheduleRedraw();
             }
         }
 
-        // Returns:
-        //     A Size structure that describes the x-radius and y-radius of the elliptical
-        //     arc. The Size structure's Width value specifies the arc's x-radius; its Height
-        //     value specifies the arc's y-radius. The default is a Size with value 0,0.
         /// <summary>
         /// Gets or sets the x-radius and y-radius of the arc as a Size structure.
         /// </summary>
+        /// <returns>
+        /// A Size structure that describes the x-radius and y-radius of the elliptical
+        /// arc. The Size structure's Width value specifies the arc's x-radius; its Height
+        /// value specifies the arc's y-radius. The default is a Size with value 0,0.
+        /// </returns>
         public Size Size
         {
             get { return (Size)GetValue(SizeProperty); }
             set { SetValue(SizeProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Size dependency property.
         /// </summary>
@@ -156,14 +176,11 @@ namespace Windows.UI.Xaml.Media
         private static void Size_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ArcSegment arc = (ArcSegment)d;
-            if (e.NewValue != e.OldValue)
-            {
-                arc._isUpToDate = false; //see if it is ok to remove this line (it was not there before ading the call to ScheduleRedraw).
+            arc._isUpToDate = false; //see if it is ok to remove this line (it was not there before ading the call to ScheduleRedraw).
 
-                if (arc.INTERNAL_parentPath != null && arc.INTERNAL_parentPath._isLoaded)
-                {
-                    arc.INTERNAL_parentPath.ScheduleRedraw();
-                }
+            if (arc.ParentPath != null)
+            {
+                arc.ParentPath.ScheduleRedraw();
             }
         }
 
@@ -176,6 +193,7 @@ namespace Windows.UI.Xaml.Media
             get { return (SweepDirection)GetValue(SweepDirectionProperty); }
             set { SetValue(SweepDirectionProperty, value); }
         }
+
         /// <summary>
         /// Identifies the SweepDirection dependency property.
         /// </summary>
@@ -185,19 +203,26 @@ namespace Windows.UI.Xaml.Media
         private static void SweepDirection_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ArcSegment arc = (ArcSegment)d;
-            if (e.NewValue != e.OldValue)
-            {
-                arc._isUpToDate = false; //see if it is ok to remove this line (it was not there before ading the call to ScheduleRedraw).
+            arc._isUpToDate = false; //see if it is ok to remove this line (it was not there before ading the call to ScheduleRedraw).
 
-                if (arc.INTERNAL_parentPath != null && arc.INTERNAL_parentPath._isLoaded)
-                {
-                    arc.INTERNAL_parentPath.ScheduleRedraw();
-                }
+            if (arc.ParentPath != null)
+            {
+                arc.ParentPath.ScheduleRedraw();
             }
         }
 
+        #endregion
 
-        internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, double horizontalMultiplicator, double verticalMultiplicator, object canvasDomElement, Point previousLastPoint)
+        #region Overriden Methods
+
+        internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, 
+                                               double yOffsetToApplyBeforeMultiplication, 
+                                               double xOffsetToApplyAfterMultiplication, 
+                                               double yOffsetToApplyAfterMultiplication, 
+                                               double horizontalMultiplicator, 
+                                               double verticalMultiplicator, 
+                                               object canvasDomElement, 
+                                               Point previousLastPoint)
         {
             //HOW IT WORKS IN WINRT:
             //  - Starting point and ending point are two fixed points that will belong to the curve
@@ -224,33 +249,76 @@ namespace Windows.UI.Xaml.Media
             //}
             //END OF JAVASCRIPT
 
+            UpdateStartPosition(previousLastPoint);
+            UpdateStrokeThickness(this.ParentPath.StrokeThickness);
+
             UpdateArcData();
 
 
             dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
             context.save(); // save state
-            context.translate(xOffsetToApplyBeforeMultiplication * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, yOffsetToApplyBeforeMultiplication * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
+            context.translate(xOffsetToApplyBeforeMultiplication * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
+                              yOffsetToApplyBeforeMultiplication * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
             context.scale(horizontalMultiplicator, verticalMultiplicator);
             context.rotate(RotationAngle * Math.PI / 180);
             double horizontalScaling = (Size.Width) / (Size.Height);
             context.scale(horizontalScaling, 1);
-            //double centerX = ((center.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication);
-            //double centerY = (center.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication;
-            //double centerX = center.X;
-            //double centerY = center.Y;
+
             double centerX = _ellipseCenterInCircleCoordinates.X;
             double centerY = _ellipseCenterInCircleCoordinates.Y;
-            context.arc(centerX, centerY, Size.Height * _additionalScalingForShapetoSmallToReachEndPoint, _angle1, _angle2, SweepDirection == SweepDirection.Counterclockwise);
-            //ctx.arc(centerX, centerY, Radius, StartingAngle, EndAngle, isCounterClockwise)
+            context.arc(centerX, 
+                        centerY, 
+                        Size.Height * _additionalScalingForShapetoSmallToReachEndPoint, 
+                        _angle1, 
+                        _angle2, 
+                        SweepDirection == SweepDirection.Counterclockwise);
+
             context.restore(); // restore to original state
             context.stroke();
 
             return Point;
         }
 
-        void FlattenArc(Point originalPt1, Point originalPt2,
-                double radiusX, double radiusY, double angleRotation,
-                bool isLargeArc, bool isCounterclockwise, bool saveChanges, out Point center, out double angle1, out double angle2)
+        internal override Point GetMinMaxXY(ref double minX, 
+                                            ref double maxX, 
+                                            ref double minY, 
+                                            ref double maxY, 
+                                            Point startingPoint)
+        {
+            UpdateStartPosition(startingPoint);
+            UpdateStrokeThickness(this.ParentPath.StrokeThickness);
+
+            UpdateArcData();
+
+            minX = Math.Min(minX, _minX);
+            maxX = Math.Max(maxX, _maxX);
+            minY = Math.Min(minY, _minY);
+            maxY = Math.Max(maxY, _maxY);
+
+            return Point;
+        }
+
+        internal override Point GetMaxXY()
+        {
+            UpdateArcData();
+            return new Point(_maxX, _maxY);
+        }
+
+        #endregion
+
+        #region Internal Methods
+
+        private void FlattenArc(Point originalPt1, 
+                                Point originalPt2,
+                                double radiusX, 
+                                double radiusY, 
+                                double angleRotation,
+                                bool isLargeArc, 
+                                bool isCounterclockwise, 
+                                bool saveChanges, 
+                                out Point center, 
+                                out double angle1, 
+                                out double angle2)
         {
             _startingPoint = originalPt1; //we remember the startingPoint
             _additionalScalingForShapetoSmallToReachEndPoint = 1; //resetting the scaling.
@@ -332,7 +400,7 @@ namespace Windows.UI.Xaml.Media
             // Calculate center point
             //centerPoint = midPoint + centerDistance * vectRotated; //------------------------------------------CENTER POINTS --> needed
             center = new Point(midPoint.X + centerDistance * vectRotated.X,
-                                        midPoint.Y + centerDistance * vectRotated.Y);
+                               midPoint.Y + centerDistance * vectRotated.Y);
             if (saveChanges)
             {
                 _ellipseCenterInCircleCoordinates = center;
@@ -484,9 +552,13 @@ namespace Windows.UI.Xaml.Media
         }
 
 
-        private void PutPointInCorrectGroup(double equationA, double equationB, Point point, List<Point> groupAbove, List<Point> groupBelow)
+        private void PutPointInCorrectGroup(double equationA, 
+                                            double equationB, 
+                                            Point point, 
+                                            List<Point> groupAbove, 
+                                            List<Point> groupBelow)
         {
-            if (!(equationA == double.MaxValue))
+            if (!double.IsPositiveInfinity(equationA))
             {
                 double OrdinateOnXOnReferenceLine = equationA * _minX + equationB;
                 if (point.Y > OrdinateOnXOnReferenceLine)
@@ -511,13 +583,27 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        internal override Point GetMaxXY()
+        internal void UpdateArcData()
         {
-            UpdateArcData();
-            return new Point(_maxX, _maxY);
+            if (!_isUpToDate)
+            {
+                double angle1, angle2;
+                Point point;
+                FlattenArc(_startingPoint, 
+                           Point, 
+                           Size.Width, 
+                           Size.Height, 
+                           RotationAngle, 
+                           IsLargeArc, 
+                           SweepDirection == Media.SweepDirection.Counterclockwise, 
+                           true, 
+                           out point, 
+                           out angle1, 
+                           out angle2);
+            }
         }
 
-        internal void UpdateStartPosition(Point newStartingPoint)
+        private void UpdateStartPosition(Point newStartingPoint)
         {
             if (_startingPoint != newStartingPoint)
             {
@@ -526,18 +612,7 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-
-        internal void UpdateArcData()
-        {
-            if (!_isUpToDate)
-            {
-                double angle1, angle2;
-                Point point;
-                FlattenArc(_startingPoint, Point, Size.Width, Size.Height, RotationAngle, IsLargeArc, SweepDirection == Media.SweepDirection.Counterclockwise, true, out point, out angle1, out angle2);
-            }
-        }
-
-        internal void UpdateStrokeThickness(double newStrokeThickness)
+        private void UpdateStrokeThickness(double newStrokeThickness)
         {
             if (newStrokeThickness != _strokeThickness)
             {
@@ -546,28 +621,6 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        internal override Point GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY, Point startingPoint)
-        {
-            UpdateArcData();
-            if (minX > _minX)
-            {
-                minX = _minX;
-            }
-            if (maxX < _maxX)
-            {
-                maxX = _maxX;
-            }
-            if (minY > _minY)
-            {
-                minY = _minY;
-            }
-            if (maxY < _maxY)
-            {
-                maxY = _maxY;
-            }
-
-            return Point;
-        }
+        #endregion
     }
-
 }

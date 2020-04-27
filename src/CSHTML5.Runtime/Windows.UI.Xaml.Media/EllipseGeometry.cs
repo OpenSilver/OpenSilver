@@ -34,10 +34,13 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public sealed partial class EllipseGeometry : Geometry
     {
-        ///// <summary>
-        ///// Initializes a new instance of the EllipseGeometry class.
-        ///// </summary>
-        //public EllipseGeometry();
+        /// <summary>
+        /// Initializes a new instance of the EllipseGeometry class.
+        /// </summary>
+        public EllipseGeometry()
+        {
+
+        }
 
         /// <summary>
         /// Gets or sets the center point of the EllipseGeometry.
@@ -56,9 +59,9 @@ namespace Windows.UI.Xaml.Media
         private static void Point_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             EllipseGeometry geometry = (EllipseGeometry)d;
-            if (e.NewValue != e.OldValue && geometry.INTERNAL_parentPath != null && geometry.INTERNAL_parentPath._isLoaded)
+            if (geometry.ParentPath != null && geometry.ParentPath._isLoaded)
             {
-                geometry.INTERNAL_parentPath.ScheduleRedraw();
+                geometry.ParentPath.ScheduleRedraw();
             }
         }
 
@@ -79,13 +82,11 @@ namespace Windows.UI.Xaml.Media
         private static void RadiusX_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             EllipseGeometry geometry = (EllipseGeometry)d;
-            if (e.NewValue != e.OldValue && geometry.INTERNAL_parentPath != null && geometry.INTERNAL_parentPath._isLoaded)
+            if (geometry.ParentPath != null && geometry.ParentPath._isLoaded)
             {
-                geometry.INTERNAL_parentPath.ScheduleRedraw();
+                geometry.ParentPath.ScheduleRedraw();
             }
         }
-
-
 
         /// <summary>
         /// Gets or sets the y-radius value of the EllipseGeometry.
@@ -104,9 +105,9 @@ namespace Windows.UI.Xaml.Media
         private static void RadiusY_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             EllipseGeometry geometry = (EllipseGeometry)d;
-            if (e.NewValue != e.OldValue && geometry.INTERNAL_parentPath != null && geometry.INTERNAL_parentPath._isLoaded)
+            if (geometry.ParentPath != null && geometry.ParentPath._isLoaded)
             {
-                geometry.INTERNAL_parentPath.ScheduleRedraw();
+                geometry.ParentPath.ScheduleRedraw();
             }
         }
 
@@ -116,30 +117,29 @@ namespace Windows.UI.Xaml.Media
             double minAbs = Center.X - RadiusX;
             double minOrd = Center.Y - RadiusY;
             double maxOrd = Center.Y + RadiusY;
-            if (maxX < maxAbs)
-            {
-                maxX = maxAbs;
-            }
-            if (maxY < maxOrd)
-            {
-                maxY = maxOrd;
-            }
-            if (minX > minAbs)
-            {
-                minX = minAbs;
-            }
-            if (minY > minOrd)
-            {
-                minY = minOrd;
-            }
+            minX = Math.Min(minX, minAbs);
+            maxX = Math.Max(maxX, maxAbs);
+            minY = Math.Min(minY, minOrd);
+            maxY = Math.Max(maxY, maxOrd);
         }
 
-        internal protected override void DefineInCanvas(Shapes.Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize)
+        internal protected override void DefineInCanvas(Shapes.Path path, 
+                                                        object canvasDomElement, 
+                                                        double horizontalMultiplicator, 
+                                                        double verticalMultiplicator, 
+                                                        double xOffsetToApplyBeforeMultiplication, 
+                                                        double yOffsetToApplyBeforeMultiplication, 
+                                                        double xOffsetToApplyAfterMultiplication, 
+                                                        double yOffsetToApplyAfterMultiplication, 
+                                                        Size shapeActualSize)
         {
             string strokeAsString = string.Empty;
-            if (path.Stroke == null || path.Stroke is SolidColorBrush) //todo: make sure we want the same behaviour when it is null and when it is a SolidColorBrush (basically, check if null means default value)
+
+            // todo: make sure we want the same behaviour when it is null and when it is a SolidColorBrush (basically, check if null means default value)
+            if (path.Stroke == null || path.Stroke is SolidColorBrush) 
             {
-                if (path.Stroke != null) //if stroke is null, we want to set it as an empty string, otherwise, it is a SolidColorBrush and we want to get its color.
+                // if stroke is null, we want to set it as an empty string, otherwise, it is a SolidColorBrush and we want to get its color.
+                if (path.Stroke != null) 
                 {
                     strokeAsString = ((SolidColorBrush)path.Stroke).INTERNAL_ToHtmlString();
                 }
@@ -152,7 +152,11 @@ namespace Windows.UI.Xaml.Media
             double actualWidth = RadiusX * 2; //it's a radius and we want the whole width (basically a "diameter")
             double actualHeight = RadiusY * 2; //it's a radius and we want the whole height
 
-            INTERNAL_ShapesDrawHelpers.PrepareEllipse(canvasDomElement, actualWidth, actualHeight, Center.X + xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication, Center.Y + yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication);
+            INTERNAL_ShapesDrawHelpers.PrepareEllipse(canvasDomElement, 
+                                                      actualWidth, 
+                                                      actualHeight, 
+                                                      Center.X + xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication, 
+                                                      Center.Y + yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication);
             context.strokeStyle = strokeAsString;
         }
     }

@@ -34,10 +34,19 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public sealed partial class QuadraticBezierSegment : PathSegment
     {
-        ///// <summary>
-        ///// Initializes a new instance of the QuadraticBezierSegment class.
-        ///// </summary>
-        //public QuadraticBezierSegment();
+        #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of the QuadraticBezierSegment class.
+        /// </summary>
+        public QuadraticBezierSegment()
+        {
+
+        }
+
+        #endregion
+
+        #region Dependency Properties
 
         /// <summary>
         /// Gets or sets the control point of the curve.
@@ -47,6 +56,7 @@ namespace Windows.UI.Xaml.Media
             get { return (Point)GetValue(Point1Property); }
             set { SetValue(Point1Property, value); }
         }
+
         /// <summary>
         /// Identifies the Point1 dependency property.
         /// </summary>
@@ -56,9 +66,9 @@ namespace Windows.UI.Xaml.Media
         private static void Point1_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             QuadraticBezierSegment segment = (QuadraticBezierSegment)d;
-            if (e.NewValue != e.OldValue && segment.INTERNAL_parentPath != null && segment.INTERNAL_parentPath._isLoaded)
+            if (segment.ParentPath != null)
             {
-                segment.INTERNAL_parentPath.ScheduleRedraw();
+                segment.ParentPath.ScheduleRedraw();
             }
         }
 
@@ -70,6 +80,7 @@ namespace Windows.UI.Xaml.Media
             get { return (Point)GetValue(Point2Property); }
             set { SetValue(Point2Property, value); }
         }
+
         /// <summary>
         /// Identifies the Point2 dependency property.
         /// </summary>
@@ -79,17 +90,34 @@ namespace Windows.UI.Xaml.Media
         private static void Point2_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             QuadraticBezierSegment segment = (QuadraticBezierSegment)d;
-            if (e.NewValue != e.OldValue && segment.INTERNAL_parentPath != null && segment.INTERNAL_parentPath._isLoaded)
+            if (segment.ParentPath != null)
             {
-                segment.INTERNAL_parentPath.ScheduleRedraw();
+                segment.ParentPath.ScheduleRedraw();
             }
         }
 
-        internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, double horizontalMultiplicator, double verticalMultiplicator, object canvasDomElement, Point previousLastPoint)
+        #endregion
+
+        #region Overriden Methods
+
+        internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, 
+                                               double yOffsetToApplyBeforeMultiplication, 
+                                               double xOffsetToApplyAfterMultiplication, 
+                                               double yOffsetToApplyAfterMultiplication, 
+                                               double horizontalMultiplicator, 
+                                               double verticalMultiplicator, 
+                                               object canvasDomElement, 
+                                               Point previousLastPoint)
         {
             dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
-            context.quadraticCurveTo((Point1.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, (Point1.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication,
-                   (Point2.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, (Point2.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication); // tell the context that there should be a quadratic bezier curve from the starting point to this point, with the previous point as control point.
+
+            // tell the context that there should be a quadratic bezier curve from the starting 
+            // point to this point, with the previous point as control point.
+            context.quadraticCurveTo(
+                (Point1.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
+                (Point1.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication,
+                (Point2.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
+                (Point2.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
             return Point2;
         }
 
@@ -110,41 +138,13 @@ namespace Windows.UI.Xaml.Media
 
         internal override Point GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY, Point startingPoint)
         {
-            if (minX > Point1.X)
-            {
-                minX = Point1.X;
-            }
-            if (maxX < Point1.X)
-            {
-                maxX = Point1.X;
-            }
-            if (minY > Point1.Y)
-            {
-                minY = Point1.Y;
-            }
-            if (maxY < Point1.Y)
-            {
-                maxY = Point1.Y;
-            }
-
-            if (minX > Point2.X)
-            {
-                minX = Point2.X;
-            }
-            if (maxX < Point2.X)
-            {
-                maxX = Point2.X;
-            }
-            if (minY > Point2.Y)
-            {
-                minY = Point2.Y;
-            }
-            if (maxY < Point2.Y)
-            {
-                maxY = Point2.Y;
-            }
+            minX = Math.Min(minX, Math.Min(Point1.X, Point2.X));
+            maxX = Math.Max(maxX, Math.Max(Point1.X, Point2.X));
+            minY = Math.Min(minY, Math.Min(Point1.Y, Point2.Y));
+            maxY = Math.Max(maxY, Math.Max(Point1.Y, Point2.Y));
             return Point2;
         }
 
+        #endregion
     }
 }

@@ -35,10 +35,19 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public sealed partial class LineSegment : PathSegment
     {
-        ///// <summary>
-        ///// Initializes a new instance of the LineSegment class.
-        ///// </summary>
-        //public LineSegment();
+        #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of the LineSegment class.
+        /// </summary>
+        public LineSegment()
+        {
+
+        }
+
+        #endregion
+
+        #region Dependency Properties
 
         /// <summary>
         /// Gets or sets the end point of the line segment.
@@ -48,6 +57,7 @@ namespace Windows.UI.Xaml.Media
             get { return (Point)GetValue(PointProperty); }
             set { SetValue(PointProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Point dependency property.
         /// </summary>
@@ -57,16 +67,30 @@ namespace Windows.UI.Xaml.Media
         private static void Point_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             LineSegment segment = (LineSegment)d;
-            if (e.NewValue != e.OldValue && segment.INTERNAL_parentPath != null && segment.INTERNAL_parentPath._isLoaded)
+            if (segment.ParentPath != null)
             {
-                segment.INTERNAL_parentPath.ScheduleRedraw();
+                segment.ParentPath.ScheduleRedraw();
             }
         }
 
-        internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, double horizontalMultiplicator, double verticalMultiplicator, object canvasDomElement, Point previousLastPoint)
+        #endregion
+
+        #region Overriden Methods
+
+        internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, 
+                                               double yOffsetToApplyBeforeMultiplication, 
+                                               double xOffsetToApplyAfterMultiplication, 
+                                               double yOffsetToApplyAfterMultiplication, 
+                                               double horizontalMultiplicator, 
+                                               double verticalMultiplicator, 
+                                               object canvasDomElement, 
+                                               Point previousLastPoint)
         {
             dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
-            context.lineTo((Point.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, (Point.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication); // tell the context that there should be a line from the starting point to this point
+
+            // tell the context that there should be a line from the starting point to this point
+            context.lineTo((Point.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
+                           (Point.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
             return Point;
         }
 
@@ -75,26 +99,20 @@ namespace Windows.UI.Xaml.Media
             return new Point(Point.X, Point.X);
         }
 
-        internal override Point GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY, Point startingPoint)
+        internal override Point GetMinMaxXY(ref double minX, 
+                                            ref double maxX, 
+                                            ref double minY, 
+                                            ref double maxY, 
+                                            Point startingPoint)
         {
-            if (minX > Point.X)
-            {
-                minX = Point.X;
-            }
-            if (maxX < Point.X)
-            {
-                maxX = Point.X;
-            }
-            if (minY > Point.Y)
-            {
-                minY = Point.Y;
-            }
-            if (maxY < Point.Y)
-            {
-                maxY = Point.Y;
-            }
+            minX = Math.Min(minX, Point.X);
+            maxX = Math.Max(maxX, Point.X);
+            minY = Math.Min(minY, Point.Y);
+            maxY = Math.Max(maxY, Point.Y);
             return Point;
         }
+
+        #endregion
 
     }
 }

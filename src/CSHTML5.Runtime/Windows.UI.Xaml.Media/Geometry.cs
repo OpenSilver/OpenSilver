@@ -44,63 +44,43 @@ namespace Windows.UI.Xaml.Media
 #endif
     public abstract partial class Geometry : DependencyObject
     {
-        internal Path INTERNAL_parentPath = null;
-        internal virtual void SetParentPath(Path path)
+        static Geometry()
         {
-            INTERNAL_parentPath = path;
+            TypeFromStringConverters.RegisterConverter(typeof(Geometry), INTERNAL_ConvertFromString);
         }
 
-        ///// <summary>
-        ///// Gets a Rect that specifies the axis-aligned bounding box of the Geometry.
-        ///// </summary>
-        //public Rect Bounds { get; }
+        internal Geometry()
+        {
 
-        ///// <summary>
-        ///// Gets an empty geometry object.
-        ///// </summary>
-        //public static Geometry Empty { get; }
+        }
 
-        //// Returns:
-        ////     The standard tolerance. The default value is 0.25.
-        ///// <summary>
-        ///// Gets the standard tolerance used for polygonal approximation.
-        ///// </summary>
-        //public static double StandardFlatteningTolerance { get; }
+        internal Path ParentPath { get; private set; }
 
-        //// Returns:
-        ////     The transformation applied to the Geometry. Note that this value may be a
-        ////     single Transform or a list of Transform items.
-        ///// <summary>
-        ///// Gets or sets the Transform object applied to a Geometry.
-        ///// </summary>
-        //public Transform Transform
-        //{
-        //    get { return (Transform)GetValue(TransformProperty); }
-        //    set { SetValue(TransformProperty, value); }
-        //}
-        ///// <summary>
-        ///// Identifies the Transform dependency property.
-        ///// </summary>
-        //public static readonly DependencyProperty TransformProperty =
-        //    DependencyProperty.Register("Transform", typeof(Transform), typeof(Geometry), new PropertyMetadata(null, Transform_Changed));
-
-        //private static void Transform_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        internal virtual void SetParentPath(Path path)
+        {
+            ParentPath = path;
+        }
 
         /// <summary>
         /// Draws the Geometry on the canvas.
         /// </summary>
-        internal protected abstract void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize);
-        internal protected abstract void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY);
+        internal protected abstract void DefineInCanvas(Path path, 
+                                                        object canvasDomElement, 
+                                                        double horizontalMultiplicator, 
+                                                        double verticalMultiplicator, 
+                                                        double xOffsetToApplyBeforeMultiplication, 
+                                                        double yOffsetToApplyBeforeMultiplication, 
+                                                        double xOffsetToApplyAfterMultiplication, 
+                                                        double yOffsetToApplyAfterMultiplication, 
+                                                        Size shapeActualSize);
+        internal protected abstract void GetMinMaxXY(ref double minX, 
+                                                     ref double maxX, 
+                                                     ref double minY, 
+                                                     ref double maxY);
 
-        //internal abstract void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize);
-        //internal abstract void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY);
-
-        static Geometry()
+        internal virtual string GetFillRuleAsString()
         {
-            TypeFromStringConverters.RegisterConverter(typeof(Geometry), INTERNAL_ConvertFromString);
+            return "evenodd";
         }
 
         internal static object INTERNAL_ConvertFromString(string pathAsString)
@@ -108,22 +88,27 @@ namespace Windows.UI.Xaml.Media
             return PathGeometry.INTERNAL_ConvertFromString(pathAsString);
         }
 
-
-        internal virtual void SetFill(bool newIsFilled)
-        {
-        }
-
-        internal virtual string GetFillRuleAsString()
-        {
-            return "evenodd";
-        }
-
 #if WORKINPROGRESS
-        public static readonly DependencyProperty TransformProperty = DependencyProperty.Register("Transform", typeof(Transform), typeof(Geometry), null);
+        public static readonly DependencyProperty TransformProperty = DependencyProperty.Register("Transform", 
+                                                                                                  typeof(Transform), 
+                                                                                                  typeof(Geometry), 
+                                                                                                  new PropertyMetadata(null, OnTransformPropertyChanged));
         public Transform Transform
         {
             get { return (Transform)this.GetValue(TransformProperty); }
             set { this.SetValue(TransformProperty, value); }
+        }
+
+        private static void OnTransformPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            // note: currently we can't detect when the transform's property are changing
+            // (for instance changing the X property of a TranslateTransform won't refresh
+            // the shape)
+            Geometry geometry = (Geometry)d;
+            if (geometry.ParentPath != null)
+            {
+                geometry.ParentPath.ScheduleRedraw();
+            }
         }
 
         public Rect Bounds { get; private set; }

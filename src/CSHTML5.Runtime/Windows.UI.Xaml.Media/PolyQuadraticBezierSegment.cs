@@ -20,8 +20,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Shapes;
+#else
 using Windows.Foundation;
+using Windows.UI.Xaml.Shapes;
 #endif
 
 #if MIGRATION
@@ -30,15 +33,25 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    // Summary:
-    //     Represents a set of quadratic Bezier segments.
+    /// <summary>
+    /// Represents a set of quadratic Bezier segments.
+    /// </summary>
     [ContentProperty("Points")]
     public sealed partial class PolyQuadraticBezierSegment : PathSegment
     {
-        ///// <summary>
-        ///// Initializes a new instance of the PolyQuadraticBezierSegment class.
-        ///// </summary>
-        //public PolyQuadraticBezierSegment();
+        #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of the PolyQuadraticBezierSegment class.
+        /// </summary>
+        public PolyQuadraticBezierSegment()
+        {
+
+        }
+
+        #endregion
+
+        #region Dependency Properties
 
         /// <summary>
         /// Gets or sets the Point collection that defines this PolyQuadraticBezierSegment
@@ -49,6 +62,7 @@ namespace Windows.UI.Xaml.Media
             get { return (PointCollection)GetValue(PointsProperty); }
             set { SetValue(PointsProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Points dependency property.
         /// </summary>
@@ -59,18 +73,30 @@ namespace Windows.UI.Xaml.Media
         {
             //todo: find a way to know when the points changed in the collection
             PolyQuadraticBezierSegment segment = (PolyQuadraticBezierSegment)d;
-            PointCollection oldCollection = (PointCollection)e.OldValue;
-            PointCollection newCollection = (PointCollection)e.NewValue;
-            if (oldCollection != newCollection)
+            if (segment.ParentPath != null)
             {
-                if (e.NewValue != e.OldValue && segment.INTERNAL_parentPath != null && segment.INTERNAL_parentPath._isLoaded)
-                {
-                    segment.INTERNAL_parentPath.ScheduleRedraw();
-                }
+                segment.ParentPath.ScheduleRedraw();
             }
         }
 
-        internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, double horizontalMultiplicator, double verticalMultiplicator, object canvasDomElement, Point previousLastPoint)
+        #endregion
+
+        #region Overriden Methods
+
+        internal override void SetParentPath(Path path)
+        {
+            base.SetParentPath(path);
+            Points.SetParentPath(path);
+        }
+
+        internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, 
+                                               double yOffsetToApplyBeforeMultiplication, 
+                                               double xOffsetToApplyAfterMultiplication, 
+                                               double yOffsetToApplyAfterMultiplication, 
+                                               double horizontalMultiplicator, 
+                                               double verticalMultiplicator, 
+                                               object canvasDomElement, 
+                                               Point previousLastPoint)
         {
             dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
             int i = 0;
@@ -84,15 +110,21 @@ namespace Windows.UI.Xaml.Media
                 double endPointX = lastPoint.X;
                 double endPointY = lastPoint.Y;
                 ++i;
-                context.quadraticCurveTo((controlPoint1X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, (controlPoint1Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication,
-                    (endPointX + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, (endPointY + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication); // tell the context that there should be a cubic bezier curve from the starting point to this point, with the two previous points as control points.
+
+                // tell the context that there should be a cubic bezier curve from the starting 
+                // point to this point, with the two previous points as control points.
+                context.quadraticCurveTo(
+                    (controlPoint1X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
+                    (controlPoint1Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication,
+                    (endPointX + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
+                    (endPointY + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
             }
             return lastPoint;
         }
 
         internal override Point GetMaxXY() //todo: make this give the size of the actual curve, not the control points.
         {
-            Point currentMax = new Point(0, 0);
+            Point currentMax = new Point(double.NegativeInfinity, double.NegativeInfinity);
             foreach (Point point in Points)
             {
                 if (point.X > currentMax.X)
@@ -107,30 +139,22 @@ namespace Windows.UI.Xaml.Media
             return currentMax;
         }
 
-        internal override Point GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY, Point startingPoint)
+        internal override Point GetMinMaxXY(ref double minX, 
+                                            ref double maxX, 
+                                            ref double minY, 
+                                            ref double maxY, 
+                                            Point startingPoint)
         {
-            Point lastPoint = startingPoint;
             foreach (Point point in Points)
             {
-                if (minX > point.X)
-                {
-                    minX = point.X;
-                }
-                if (maxX < point.X)
-                {
-                    maxX = point.X;
-                }
-                if (minY > point.Y)
-                {
-                    minY = point.Y;
-                }
-                if (maxY < point.Y)
-                {
-                    maxY = point.Y;
-                }
-                lastPoint = point;
+                minX = Math.Min(minX, point.X);
+                maxX = Math.Max(maxX, point.X);
+                minY = Math.Min(minY, point.Y);
+                maxY = Math.Max(maxY, point.Y);
             }
-            return lastPoint;
+            return Points.Count == 0 ? startingPoint : Points[Points.Count - 1];
         }
+
+        #endregion
     }
 }

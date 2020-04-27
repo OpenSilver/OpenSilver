@@ -40,17 +40,25 @@ namespace Windows.UI.Xaml.Media
     [ContentProperty("Segments")]
     public sealed partial class PathFigure : DependencyObject
     {
-        internal Path INTERNAL_parentPath = null;
-        internal void SetParentPath(Path path)
+        #region Data
+
+        private Path _parentPath = null;
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of the PathFigure class.
+        /// </summary>
+        public PathFigure()
         {
-            INTERNAL_parentPath = path;
-            Segments.SetParentPath(path);
+
         }
 
-        ///// <summary>
-        ///// Initializes a new instance of the PathFigure class.
-        ///// </summary>
-        //public PathFigure();
+        #endregion
+
+        #region Dependency Properties
 
         /// <summary>
         /// Gets or sets a value that indicates whether this figure's first and last
@@ -70,9 +78,9 @@ namespace Windows.UI.Xaml.Media
         private static void IsClosed_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             PathFigure figure = (PathFigure)d;
-            if (e.NewValue != e.OldValue && figure.INTERNAL_parentPath != null && figure.INTERNAL_parentPath._isLoaded)
+            if (figure._parentPath != null)
             {
-                figure.INTERNAL_parentPath.ScheduleRedraw();
+                figure._parentPath.ScheduleRedraw();
             }
         }
 
@@ -95,9 +103,9 @@ namespace Windows.UI.Xaml.Media
         {
             //note: this doesn't currently work, we need extra work to make it work (see DefineInCanvas in this class).
             PathFigure figure = (PathFigure)d;
-            if (e.NewValue != e.OldValue && figure.INTERNAL_parentPath != null && figure.INTERNAL_parentPath._isLoaded)
+            if (figure._parentPath != null)
             {
-                figure.INTERNAL_parentPath.ScheduleRedraw();
+                figure._parentPath.ScheduleRedraw();
             }
         }
 
@@ -128,20 +136,18 @@ namespace Windows.UI.Xaml.Media
         private static void Segments_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             PathFigure figure = (PathFigure)d;
-            PathSegmentCollection oldCollection = (PathSegmentCollection)e.OldValue;
-            PathSegmentCollection newCollection = (PathSegmentCollection)e.NewValue;
-            if (oldCollection != null)
+            if (null != e.OldValue)
             {
-                oldCollection.SetParentPath(null);
+                ((PathSegmentCollection)e.OldValue).SetParentPath(null);
             }
-            if (figure.INTERNAL_parentPath != null && figure.INTERNAL_parentPath._isLoaded)
+            if (figure._parentPath != null)
             {
-                if (newCollection != null)
+                if (null != e.NewValue)
                 {
-                    newCollection.SetParentPath(figure.INTERNAL_parentPath);
+                    ((PathSegmentCollection)e.NewValue).SetParentPath(figure._parentPath);
                 }
 
-                figure.INTERNAL_parentPath.ScheduleRedraw();
+                figure._parentPath.ScheduleRedraw();
             }
         }
 
@@ -162,32 +168,75 @@ namespace Windows.UI.Xaml.Media
         private static void StartPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             PathFigure figure = (PathFigure)d;
-            if (e.NewValue != e.OldValue && figure.INTERNAL_parentPath != null && figure.INTERNAL_parentPath._isLoaded)
+            if (figure._parentPath != null)
             {
-                figure.INTERNAL_parentPath.ScheduleRedraw();
+                figure._parentPath.ScheduleRedraw();
             }
         }
 
+        #endregion
 
-        internal void DefineInCanvas(double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, double horizontalMultiplicator, double verticalMultiplicator, object canvasDomElement, double strokeThickness, Size shapeActualSize)
+        #region Internal Methods
+
+        internal void SetParentPath(Path path)
+        {
+            if (_parentPath != path)
+            {
+                _parentPath = path;
+                Segments.SetParentPath(path);
+            }
+        }
+
+        internal void DefineInCanvas(double xOffsetToApplyBeforeMultiplication, 
+                                     double yOffsetToApplyBeforeMultiplication, 
+                                     double xOffsetToApplyAfterMultiplication, 
+                                     double yOffsetToApplyAfterMultiplication, 
+                                     double horizontalMultiplicator, 
+                                     double verticalMultiplicator, 
+                                     object canvasDomElement, 
+                                     double strokeThickness, 
+                                     Size shapeActualSize)
         {
             dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
-            //todo: In order to support IsFilled, add a call to context.beginPath() here (instead the call to beginPath() that is located in "Path.cs") and handle the filling here (in the PathFigure) instead of in the Redraw of the Path.
+            // todo: In order to support IsFilled, add a call to context.beginPath() here 
+            // (instead the call to beginPath() that is located in "Path.cs") and handle 
+            // the filling here (in the PathFigure) instead of in the Redraw of the Path.
+
             Point segmentStartingPosition = new Point(StartPoint.X, StartPoint.Y);
-            context.moveTo((StartPoint.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, (StartPoint.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication); // tell the context that there should be a line from the starting point to this point
+            
+            // tell the context that there should be a line from the starting point to this point
+            context.moveTo((StartPoint.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
+                           (StartPoint.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
             foreach (PathSegment segment in Segments)
             {
-                if (segment is ArcSegment)
-                {
-                    ((ArcSegment)segment).UpdateStartPosition(segmentStartingPosition);
-                    ((ArcSegment)segment).UpdateStrokeThickness(strokeThickness);
-                }
-                segmentStartingPosition = segment.DefineInCanvas(xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, xOffsetToApplyAfterMultiplication, yOffsetToApplyAfterMultiplication, horizontalMultiplicator, verticalMultiplicator, canvasDomElement, segmentStartingPosition);
+                segmentStartingPosition = segment.DefineInCanvas(xOffsetToApplyBeforeMultiplication, 
+                                                                 yOffsetToApplyBeforeMultiplication, 
+                                                                 xOffsetToApplyAfterMultiplication, 
+                                                                 yOffsetToApplyAfterMultiplication, 
+                                                                 horizontalMultiplicator, 
+                                                                 verticalMultiplicator, 
+                                                                 canvasDomElement, 
+                                                                 segmentStartingPosition);
             }
-            if (IsClosed) //we close the figure:
+            if (IsClosed) // we close the figure:
             {
-                context.closePath(); // tell the context that there should be a line from the starting point to this point
+                // tell the context that there should be a line from the starting point to this point
+                context.closePath();
+            }
+        }
+
+        internal void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
+        {
+            minX = Math.Min(minX, StartPoint.X);
+            maxX = Math.Max(maxX, StartPoint.X);
+            minY = Math.Min(minY, StartPoint.Y);
+            maxY = Math.Max(maxY, StartPoint.Y);
+
+            Point segmentStartingPosition = new Point(StartPoint.X, StartPoint.Y);
+            foreach (PathSegment segment in Segments)
+            {
+                segmentStartingPosition = segment.GetMinMaxXY(ref minX, ref maxX, ref minY, ref maxY, segmentStartingPosition);
             }
         }
 
@@ -209,36 +258,6 @@ namespace Windows.UI.Xaml.Media
             return globalMax;
         }
 
-        internal void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY, double strokeThickness)
-        {
-            if (minX > StartPoint.X)
-            {
-                minX = StartPoint.X;
-            }
-            if (maxX < StartPoint.X)
-            {
-                maxX = StartPoint.X;
-            }
-            if (minY > StartPoint.Y)
-            {
-                minY = StartPoint.Y;
-            }
-            if (maxY < StartPoint.Y)
-            {
-                maxY = StartPoint.Y;
-            }
-
-            Point segmentStartingPosition = new Point(StartPoint.X, StartPoint.Y);
-            foreach (PathSegment segment in Segments)
-            {
-                if (segment is ArcSegment)
-                {
-                    ((ArcSegment)segment).UpdateStartPosition(segmentStartingPosition);
-                    ((ArcSegment)segment).UpdateStrokeThickness(strokeThickness);
-                    
-                }
-                segmentStartingPosition = segment.GetMinMaxXY(ref minX, ref maxX, ref minY, ref maxY, segmentStartingPosition);
-            }
-        }
+        #endregion
     }
 }

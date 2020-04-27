@@ -37,10 +37,22 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public sealed partial class LineGeometry : Geometry
     {
-        //// <summary>
-        //// Initializes a new instance of the LineGeometry class that has no length.
-        //// </summary>
-        //public LineGeometry();
+        // <summary>
+        // Initializes a new instance of the LineGeometry class that has no length.
+        // </summary>
+        public LineGeometry()
+        {
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public LineGeometry(Point startPoint, Point endPoint)
+        {
+            StartPoint = startPoint;
+            EndPoint = endPoint;
+        }
 
         // Returns:
         //     The end point of the line. The default is a Point with value 0,0.
@@ -61,9 +73,9 @@ namespace Windows.UI.Xaml.Media
         private static void EndPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             LineGeometry geometry = (LineGeometry)d;
-            if (e.NewValue != e.OldValue && geometry.INTERNAL_parentPath != null && geometry.INTERNAL_parentPath._isLoaded)
+            if (geometry.ParentPath != null)
             {
-                geometry.INTERNAL_parentPath.ScheduleRedraw();
+                geometry.ParentPath.ScheduleRedraw();
             }
         }
 
@@ -86,9 +98,9 @@ namespace Windows.UI.Xaml.Media
         private static void StartPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             LineGeometry geometry = (LineGeometry)d;
-            if (e.NewValue != e.OldValue && geometry.INTERNAL_parentPath != null && geometry.INTERNAL_parentPath._isLoaded)
+            if (geometry.ParentPath != null)
             {
-                geometry.INTERNAL_parentPath.ScheduleRedraw();
+                geometry.ParentPath.ScheduleRedraw();
             }
         }
 
@@ -116,21 +128,19 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        internal protected override void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize) //note: we only define the line. Erasing the previous one (if any) and actually drawing the new one should be made directly by the container.
+        // note: we only define the line. Erasing the previous one (if any) and actually drawing the 
+        // new one should be made directly by the container.
+        internal protected override void DefineInCanvas(Path path, 
+                                                        object canvasDomElement, 
+                                                        double horizontalMultiplicator, 
+                                                        double verticalMultiplicator, 
+                                                        double xOffsetToApplyBeforeMultiplication, 
+                                                        double yOffsetToApplyBeforeMultiplication, 
+                                                        double xOffsetToApplyAfterMultiplication, 
+                                                        double yOffsetToApplyAfterMultiplication, 
+                                                        Size shapeActualSize)
         {
             string strokeAsString = string.Empty;
-            //if (path.Stroke == null || path.Stroke is SolidColorBrush) //todo: make sure we want the same behaviour when it is null and when it is a SolidColorBrush (basically, check if null means default value)
-            //{
-            //    if (path.Stroke != null) //if stroke is null, we want to set it as an empty string, otherwise, it is a SolidColorBrush and we want to get its color.
-            //    {
-            //        strokeAsString = ((SolidColorBrush)path.Stroke).Color.INTERNAL_ToHtmlString();
-            //    }
-            //}
-            //else
-            //{
-            //    throw new NotSupportedException("The specified brush is not supported.");
-            //}
-
 
             INTERNAL_ShapesDrawHelpers.PrepareLine(path._canvasDomElement, StartPoint, EndPoint);
 

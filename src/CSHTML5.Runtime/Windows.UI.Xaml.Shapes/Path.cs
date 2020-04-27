@@ -37,10 +37,8 @@ namespace Windows.UI.Xaml.Shapes
     /// are declared through the Data property, and can be specified either with
     /// a path-specific mini-language, or with an object model.
     /// </summary>
-    public partial class Path : Shape
+    public sealed partial class Path : Shape
     {
-        //internal dynamic canvasDomElement;
-
         //todo: Set the default Stretch to none and position to top left (if not already top left)
         // Stretch behaviour:
         // - None: no stretch, potential clipping when size explicitely defined
@@ -89,30 +87,17 @@ namespace Windows.UI.Xaml.Shapes
 
         private static void Data_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            Geometry oldgeometry = (Geometry)e.OldValue;
-            Geometry newgeometry = (Geometry)e.NewValue;
             Path path = (Path)d;
-            if (e.NewValue != e.OldValue && path._isLoaded)
+            if (null != e.OldValue)
             {
-                if (oldgeometry != null)
-                {
-                    oldgeometry.SetParentPath(null);
-                }
-                newgeometry.SetParentPath(path);
-                path.ScheduleRedraw();
+                ((Geometry)e.OldValue).SetParentPath(null);
             }
+            if (null != e.NewValue)
+            {
+                ((Geometry)e.NewValue).SetParentPath(path);
+            }
+            path.ScheduleRedraw();
         }
-
-        internal void RefreshChildrenParent()
-        {
-            Data.SetParentPath(this);
-        }
-
-
-        //protected internal override void INTERNAL_OnAttachedToVisualTree()
-        //{
-        //    ScheduleRedraw();
-        //}
 
         protected internal override void Redraw()
         {
@@ -130,7 +115,6 @@ namespace Windows.UI.Xaml.Shapes
                         {
                             return;
                         }
-                        pathGeometry.UpdateStrokeThickness(StrokeThickness);
                     }
                     Data.GetMinMaxXY(ref minX, ref maxX, ref minY, ref maxY);
 
@@ -152,19 +136,29 @@ namespace Windows.UI.Xaml.Shapes
 
                     Size shapeActualSize;
                     INTERNAL_ShapesDrawHelpers.PrepareStretch(this, _canvasDomElement, minX, maxX, minY, maxY, Stretch, out shapeActualSize);
+
                     double horizontalMultiplicator;
                     double verticalMultiplicator;
                     double xOffsetToApplyBeforeMultiplication;
                     double yOffsetToApplyBeforeMultiplication;
                     double xOffsetToApplyAfterMultiplication;
                     double yOffsetToApplyAfterMultiplication;
-                    double strokeThickness = StrokeThickness;
-                    if (Stroke == null)
-                    {
-                        strokeThickness = 0;
-                    }
-
-                    INTERNAL_ShapesDrawHelpers.GetMultiplicatorsAndOffsetForStretch(this, strokeThickness, minX, maxX, minY, maxY, Stretch, shapeActualSize, out horizontalMultiplicator, out verticalMultiplicator, out xOffsetToApplyBeforeMultiplication, out yOffsetToApplyBeforeMultiplication, out xOffsetToApplyAfterMultiplication, out yOffsetToApplyAfterMultiplication, out _marginOffsets);
+                    double strokeThickness = Stroke == null ? 0d : StrokeThickness;
+                    INTERNAL_ShapesDrawHelpers.GetMultiplicatorsAndOffsetForStretch(this, 
+                                                                                    strokeThickness, 
+                                                                                    minX, 
+                                                                                    maxX, 
+                                                                                    minY, 
+                                                                                    maxY, 
+                                                                                    Stretch, 
+                                                                                    shapeActualSize, 
+                                                                                    out horizontalMultiplicator, 
+                                                                                    out verticalMultiplicator, 
+                                                                                    out xOffsetToApplyBeforeMultiplication, 
+                                                                                    out yOffsetToApplyBeforeMultiplication, 
+                                                                                    out xOffsetToApplyAfterMultiplication, 
+                                                                                    out yOffsetToApplyAfterMultiplication, 
+                                                                                    out _marginOffsets);
 
                     ApplyMarginToFixNegativeCoordinates(new Point());
                     if (Stretch == Stretch.None)
@@ -176,10 +170,39 @@ namespace Windows.UI.Xaml.Shapes
                     CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d').beginPath()", _canvasDomElement);
 
                     //problem here: the shape seems to be overall smaller than intended due to the edges of the path not being sharp?
-                    Data.DefineInCanvas(this, _canvasDomElement, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, xOffsetToApplyAfterMultiplication, yOffsetToApplyAfterMultiplication, shapeActualSize); //puts the lines and stuff in the context
-                    Shape.DrawFillAndStroke(this, Data.GetFillRuleAsString(), minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
+                    Data.DefineInCanvas(this, 
+                                        _canvasDomElement, 
+                                        horizontalMultiplicator, 
+                                        verticalMultiplicator, 
+                                        xOffsetToApplyBeforeMultiplication, 
+                                        yOffsetToApplyBeforeMultiplication, 
+                                        xOffsetToApplyAfterMultiplication, 
+                                        yOffsetToApplyAfterMultiplication, 
+                                        shapeActualSize);
+
+                    Shape.DrawFillAndStroke(this, 
+                                            Data.GetFillRuleAsString(), 
+                                            minX, 
+                                            minY, 
+                                            maxX, 
+                                            maxY, 
+                                            horizontalMultiplicator, 
+                                            verticalMultiplicator, 
+                                            xOffsetToApplyBeforeMultiplication, 
+                                            yOffsetToApplyBeforeMultiplication, 
+                                            shapeActualSize);
                 }
             }
         }
+
+        internal override void RefreshOverride()
+        {
+            if (this.Data != null)
+            {
+                this.Data.SetParentPath(this);
+            }
+            base.RefreshOverride();
+        }
+
     }
 }
