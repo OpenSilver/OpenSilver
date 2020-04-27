@@ -836,6 +836,7 @@
     <Compile Include="Windows.UI.Xaml\Window.cs" />
     <Compile Include="Windows.UI.Xaml\WindowSizeChangedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\Application.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationLifetimeObjectsCollection .cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationUnhandledExceptionEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\AssemblyPart.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\AssemblyPartCollection.cs" />
