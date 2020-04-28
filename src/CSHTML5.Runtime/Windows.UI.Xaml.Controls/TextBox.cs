@@ -574,15 +574,12 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
 
     if((e.keyCode == 13 || e.keyCode == 32 || e.keyCode > 47) && maxLength != 0)
     {{
-        var text = element_InsideEventHandler.innerText;
-
+        var text = getTextAreaInnerText(element_InsideEventHandler);
         if (!acceptsReturn) {{
             text = text.replace(""\n"", """").replace(""\r"", """");
         }}
 
-        var correctionDueToNewLines = text.split(""\n"").length;
-        --correctionDueToNewLines; //for n lines, we have n-1 ""\r\n""
-            
+        var correctionDueToNewLines = 0;
         if (e.keyCode == 13)
         {{
             ++correctionDueToNewLines; //because adding a new line takes 2 characters instead of 1.
@@ -682,6 +679,7 @@ $0.addEventListener('paste', function(e) {
 }, false);", contentEditableDiv);
 #else
                 var acceptsReturn = this.AcceptsReturn;
+                //todo: shouldn't we add a check for maxlength in the script below like in the other versions of this addEventListenter (in the simulator version below and in the #if !BRIDGE part above)?
                 Script.Write(@"
 {0}.addEventListener('paste', function(e) {
     var isReadOnly= {1};
@@ -762,12 +760,13 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
                 content = content.replace(/\n/g, '').replace(/\r/g, '');
             }}
             if(maxLength != 0) {{
-                var text = element_InsideEventHandler.innerText;
+                var text = getTextAreaInnerText(element_InsideEventHandler);
+                //var text = element_InsideEventHandler.innerText;
                 if (!acceptsReturn) {{
                     text = text.replace(""\n"", """").replace(""\r"", """");
                 }}
-                var correctionDueToNewLines = text.split(""\n"").length;
-                --correctionDueToNewLines; //for n lines, we have n-1 ""\r\n""
+
+                var correctionDueToNewLines = 0;
                 var textBoxTextLength = text.length + correctionDueToNewLines;
                 var lengthComparison = maxLength - (content.length + textBoxTextLength);
                 if(lengthComparison < 0) {{
@@ -901,7 +900,7 @@ var range,selection;
         void InternetExplorer_GotFocus(object sender, RoutedEventArgs e)
         {
 #if !CSHTML5NETSTANDARD //todo: fixme
-            previousInnerText = this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus.innerText;
+            previousInnerText = Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus).ToString();
 #endif
         }
 
@@ -913,7 +912,7 @@ var range,selection;
         void InternetExplorer_RaiseTextChangedIfNecessary()
         {
 #if !CSHTML5NETSTANDARD //todo: fixme
-            string newInnerText = this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus.innerText;
+            string newInnerText = Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus).ToString();
             if (newInnerText != previousInnerText)
             {
                 TextAreaValueChanged();

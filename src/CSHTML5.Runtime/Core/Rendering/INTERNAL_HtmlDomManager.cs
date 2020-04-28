@@ -394,15 +394,7 @@ element.style.visibility=""collapse"";
                 object domElement = Interop.ExecuteJavaScriptAsync(@"document.getElementById($0)", uniqueIdentifier);
                 //todo-perfs: replace the code above with a call to the faster "ExecuteJavaScript" method instead of "ExecuteJavaScriptWithResult". To do so, see other methods in this class, or see the class "INTERNAL_HtmlDomStyleReference.cs".
 
-                string innerText = Interop.ExecuteJavaScript("$0.innerText", domElement).ToString();
-
-                // Make sure that all line returns are in the form of "\r\n" like in WPF, WinRT and UWP (only Silverlight uses "\r" alone):
-                innerText = Regex.Replace(innerText, @"\r\n|\n\r|\n|\r", "\r\n");
-
-                // Remove the last line break (apparently, in case of multi-line text, Chrome and Firefox always add a line break at the end):
-                innerText = Regex.Replace(innerText, @"\r\n$", "");
-
-                return innerText;
+                return Interop.ExecuteJavaScript("getTextAreaInnerText($0)", domElement).ToString();
 #if !CSHTML5NETSTANDARD
             }
 #endif
@@ -413,49 +405,13 @@ element.style.visibility=""collapse"";
 
 #if !BRIDGE
             JSIL.Verbatim.Expression(@"
-var innerText;
-if ('innerText' in $0)
-{
-    // --- CHROME & IE: ---
-    innerText = $0.innerText;
-}
-else
-{
-    // --- FIREFOX: ---
-    var newDiv = document.createElement('div');
-    newDiv.innerHTML = $0.innerHTML.replace(/<br>/g,'\n')
-    innerText = newDiv.textContent;
-}
-
-// Make sure that all line returns are in the form of '\r\n' like in WPF, WinRT and UWP (only Silverlight uses '\r' alone):
-innerText = innerText.replace(new RegExp(""\r\n|\n\r|\n|\r"", ""g""), ""\r\n"")
-
-// Remove the last line break (apparently, in case of multi-line text, Chrome and Firefox always add a line break at the end):
-innerText = innerText.replace(/\r\n$$/, """"); // Note: dollar sign was doubled due to JSIL verbatim.
+var innerText = getTextAreaInnerText($0);
 
 return innerText;
 ", domElementRef);
 #else
             Script.Write(@"
-                var innerText;
-                if ('innerText' in {0})
-                {
-                    // --- CHROME & IE: ---
-                    innerText = {0}.innerText;
-                }
-                else
-                {
-                    // --- FIREFOX: ---
-                    var newDiv = document.createElement('div');
-                    newDiv.innerHTML = {0}.innerHTML.replace(/<br>/g,'\n')
-                    innerText = newDiv.textContent;
-                }
-
-                // Make sure that all line returns are in the form of '\r\n' like in WPF, WinRT and UWP (only Silverlight uses '\r' alone):
-                innerText = innerText.replace(new RegExp(""\r\n|\n\r|\n|\r"", ""g""), ""\r\n"")
-
-                // Remove the last line break (apparently, in case of multi-line text, Chrome and Firefox always add a line break at the end):
-                innerText = innerText.replace(/\r\n$$/, """"); // Note: dollar sign was doubled due to JSIL verbatim.
+                var innerText = getTextAreaInnerText({0});
 
                 return innerText;
                 ", domElementRef);
