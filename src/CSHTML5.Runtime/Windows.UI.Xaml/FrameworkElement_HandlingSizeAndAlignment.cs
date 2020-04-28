@@ -1446,7 +1446,7 @@ if ($0.tagName.toLowerCase() != 'span')
 
         #region SizeChanged
 
-        Size _valueOfLastSizeChanged = Size.Empty;
+        Size _valueOfLastSizeChanged = new Size(0d, 0d);
         private List<SizeChangedEventHandler> _sizeChangedEventHandlers;
         private object _resizeSensor;
 
