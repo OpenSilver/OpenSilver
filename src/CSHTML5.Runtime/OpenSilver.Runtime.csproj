@@ -137,7 +137,7 @@
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TextOptions.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TextRenderingMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\VisualTreeHelper.cs" />
-		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationLifetimeObjectsCollection .cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationLifetimeObjectsCollection.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DataTemplate.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\LineStackingStrategy.cs" />
