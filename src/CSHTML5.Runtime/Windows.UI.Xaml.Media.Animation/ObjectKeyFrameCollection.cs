@@ -33,38 +33,38 @@ namespace Windows.UI.Xaml.Media.Animation
 #if WORKINPROGRESS
     public sealed partial class ObjectKeyFrameCollection : PresentationFrameworkCollection<ObjectKeyFrame>
 #else
-    public sealed partial class ObjectKeyFrameCollection : List<ObjectKeyFrame> //: IList<ObjectKeyFrame>, IEnumerable<ObjectKeyFrame>
+    public sealed partial class ObjectKeyFrameCollection : List<ObjectKeyFrame>
 #endif
     {
 #if WORKINPROGRESS
         internal override void AddOverride(ObjectKeyFrame keyFrame)
         {
-            this.AddInternal(keyFrame);
+            this.AddDependencyObjectInternal(keyFrame);
         }
 
         internal override void ClearOverride()
         {
-            this.ClearInternal();
+            this.ClearDependencyObjectInternal();
         }
 
         internal override void InsertOverride(int index, ObjectKeyFrame keyFrame)
         {
-            this.InsertInternal(index, keyFrame);
+            this.InsertDependencyObjectInternal(index, keyFrame);
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            this.RemoveAtInternal(index);
+            this.RemoveAtDependencyObjectInternal(index);
         }
 
         internal override bool RemoveOverride(ObjectKeyFrame keyFrame)
         {
-            return this.RemoveInternal(keyFrame);
+            return this.RemoveDependencyObjectInternal(keyFrame);
         }
 
         internal override void SetItemOverride(int index, ObjectKeyFrame keyFrame)
         {
-            this.SetItemInternal(index, keyFrame);
+            this.SetItemDependencyObjectInternal(index, keyFrame);
         }
 #endif
     }

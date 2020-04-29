@@ -27,32 +27,32 @@ namespace Windows.UI.Xaml.Media.Animation
     {
         internal override void AddOverride(ColorKeyFrame keyFrame)
         {
-            this.AddInternal(keyFrame);
+            this.AddDependencyObjectInternal(keyFrame);
         }
 
         internal override void ClearOverride()
         {
-            this.ClearInternal();
+            this.ClearDependencyObjectInternal();
         }
 
         internal override void InsertOverride(int index, ColorKeyFrame keyFrame)
         {
-            this.InsertInternal(index, keyFrame);
+            this.InsertDependencyObjectInternal(index, keyFrame);
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            this.RemoveAtInternal(index);
+            this.RemoveAtDependencyObjectInternal(index);
         }
 
         internal override bool RemoveOverride(ColorKeyFrame keyFrame)
         {
-            return this.RemoveInternal(keyFrame);
+            return this.RemoveDependencyObjectInternal(keyFrame);
         }
 
         internal override void SetItemOverride(int index, ColorKeyFrame keyFrame)
         {
-            this.SetItemInternal(index, keyFrame);
+            this.SetItemDependencyObjectInternal(index, keyFrame);
         }
     }
 #endif

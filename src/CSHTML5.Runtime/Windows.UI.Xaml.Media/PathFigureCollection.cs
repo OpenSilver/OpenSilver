@@ -80,17 +80,14 @@ namespace Windows.UI.Xaml.Media
             {
                 throw new ArgumentNullException("figure");
             }
-            if (this._parentPath != null)
-            {
-                figure.SetParentPath(this._parentPath);
-            }
-            this.AddInternal(figure);
+            figure.SetParentPath(this._parentPath);
+            this.AddDependencyObjectInternal(figure);
             this.NotifyCollectionChanged();
         }
 
         internal override bool RemoveOverride(PathFigure figure)
         {
-            if (this.RemoveInternal(figure))
+            if (this.RemoveDependencyObjectInternal(figure))
             {
                 figure.SetParentPath(null);
                 this.NotifyCollectionChanged();
@@ -106,7 +103,7 @@ namespace Windows.UI.Xaml.Media
                 throw new ArgumentOutOfRangeException("index");
             }
             this.GetItemInternal(index).SetParentPath(null);
-            this.RemoveAtInternal(index);
+            this.RemoveAtDependencyObjectInternal(index);
             this.NotifyCollectionChanged();
         }
 
@@ -116,11 +113,8 @@ namespace Windows.UI.Xaml.Media
             {
                 throw new ArgumentNullException("figure");
             }
-            if (this._parentPath != null)
-            {
-                figure.SetParentPath(this._parentPath);
-            }
-            this.InsertInternal(index, figure);
+            figure.SetParentPath(this._parentPath);
+            this.InsertDependencyObjectInternal(index, figure);
             this.NotifyCollectionChanged();
         }
 
@@ -130,19 +124,16 @@ namespace Windows.UI.Xaml.Media
             {
                 figure.SetParentPath(null);
             }
-            this.ClearInternal();
+            this.ClearDependencyObjectInternal();
             this.NotifyCollectionChanged();
         }
 
         internal override void SetItemOverride(int index, PathFigure figure)
         {
-            if (this._parentPath != null)
-            {
-                PathFigure oldItem = this.GetItemInternal(index);
-                oldItem.SetParentPath(null);
-                figure.SetParentPath(this._parentPath);
-            }
-            this.SetItemInternal(index, figure);
+            PathFigure oldItem = this.GetItemInternal(index);
+            oldItem.SetParentPath(null);
+            figure.SetParentPath(this._parentPath);
+            this.SetItemDependencyObjectInternal(index, figure);
             this.NotifyCollectionChanged();
         }
 

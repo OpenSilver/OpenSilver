@@ -58,12 +58,6 @@ namespace Windows.UI.Xaml.Controls
 
         void RowDefinitions_CollectionChanged_CSSVersion(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems != null)
-            {
-                foreach (RowDefinition rowDefinition in e.NewItems)
-                    rowDefinition.Parent = this;
-            }
-
             if (this._isLoaded)
             {
                 Grid_InternalHelpers.RefreshAllRowsHeight_CSSVersion(this);

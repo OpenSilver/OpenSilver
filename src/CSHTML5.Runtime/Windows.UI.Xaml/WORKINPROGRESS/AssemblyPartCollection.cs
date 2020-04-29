@@ -31,32 +31,32 @@ namespace Windows.UI.Xaml
     {
         internal override void AddOverride(AssemblyPart value)
         {
-            this.AddInternal(value);
+            this.AddDependencyObjectInternal(value);
         }
 
         internal override void ClearOverride()
         {
-            this.ClearInternal();
+            this.ClearDependencyObjectInternal();
         }
 
         internal override void InsertOverride(int index, AssemblyPart value)
         {
-            this.InsertInternal(index, value);
+            this.InsertDependencyObjectInternal(index, value);
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            this.RemoveAtInternal(index);
+            this.RemoveAtDependencyObjectInternal(index);
         }
 
         internal override bool RemoveOverride(AssemblyPart value)
         {
-            return this.RemoveInternal(value);
+            return this.RemoveDependencyObjectInternal(value);
         }
 
         internal override void SetItemOverride(int index, AssemblyPart value)
         {
-            this.SetItemInternal(index, value);
+            this.SetItemDependencyObjectInternal(index, value);
         }
     }
 }

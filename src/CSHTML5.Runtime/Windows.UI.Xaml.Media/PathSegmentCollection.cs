@@ -85,13 +85,13 @@ namespace Windows.UI.Xaml.Media
             {
                 segment.SetParentPath(this._parentPath);
             }
-            this.AddInternal(segment);
+            this.AddDependencyObjectInternal(segment);
             this.NotifyCollectionChanged();
         }
 
         internal override bool RemoveOverride(PathSegment segment)
         {
-            if (this.RemoveInternal(segment))
+            if (this.RemoveDependencyObjectInternal(segment))
             {
                 segment.SetParentPath(null);
                 this.NotifyCollectionChanged();
@@ -107,7 +107,7 @@ namespace Windows.UI.Xaml.Media
                 throw new ArgumentOutOfRangeException("index");
             }
             this.GetItemInternal(index).SetParentPath(null);
-            this.RemoveAtInternal(index);
+            this.RemoveAtDependencyObjectInternal(index);
             this.NotifyCollectionChanged();
         }
 
@@ -121,7 +121,7 @@ namespace Windows.UI.Xaml.Media
             {
                 segment.SetParentPath(this._parentPath);
             }
-            this.InsertInternal(index, segment);
+            this.InsertDependencyObjectInternal(index, segment);
             this.NotifyCollectionChanged();
         }
 
@@ -131,7 +131,7 @@ namespace Windows.UI.Xaml.Media
             {
                 segment.SetParentPath(null);
             }
-            this.ClearInternal();
+            this.ClearDependencyObjectInternal();
             this.NotifyCollectionChanged();
         }
 
@@ -143,7 +143,7 @@ namespace Windows.UI.Xaml.Media
                 oldItem.SetParentPath(null);
                 segment.SetParentPath(this._parentPath);
             }
-            this.SetItemInternal(index, segment);
+            this.SetItemDependencyObjectInternal(index, segment);
             this.NotifyCollectionChanged();
         }
 

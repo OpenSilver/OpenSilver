@@ -29,129 +29,36 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    public sealed partial class GeometryCollection : Animatable, IList, IList<Geometry>
+    public sealed partial class GeometryCollection : PresentationFrameworkCollection<Geometry>
     {
-        public int IndexOf(Geometry item)
+        internal override void AddOverride(Geometry value)
         {
-            return default(int);
+            this.AddDependencyObjectInternal(value);
         }
 
-        public void Insert(int index, Geometry item)
+        internal override void ClearOverride()
         {
-            
+            this.ClearDependencyObjectInternal();
         }
 
-        public void RemoveAt(int index)
+        internal override void InsertOverride(int index, Geometry value)
         {
-            
+            this.InsertDependencyObjectInternal(index, value);
         }
 
-        public Geometry this[int index]
+        internal override void RemoveAtOverride(int index)
         {
-            get { return default(Geometry); }
-            set
-            {
-                
-            }
+            this.RemoveAtDependencyObjectInternal(index);
         }
 
-        public void Add(Geometry item)
+        internal override bool RemoveOverride(Geometry value)
         {
-            
+            return this.RemoveDependencyObjectInternal(value);
         }
 
-        public void Clear()
+        internal override void SetItemOverride(int index, Geometry value)
         {
-            
-        }
-
-        public bool Contains(Geometry item)
-        {
-            return default(bool);
-        }
-
-        public void CopyTo(Geometry[] array, int arrayIndex)
-        {
-            
-        }
-
-        public int Count
-        {
-            get;
-        }
-
-        public bool IsReadOnly
-        {
-            get;
-        }
-
-        public bool Remove(Geometry item)
-        {
-            return default(bool);
-        }
-
-        public IEnumerator<Geometry> GetEnumerator()
-        {
-            return default(IEnumerator<Geometry>);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return default(IEnumerator);
-        }
-
-        public int Add(object value)
-        {
-            return default(int);
-        }
-
-        public bool Contains(object value)
-        {
-            return default(bool);
-        }
-
-        public int IndexOf(object value)
-        {
-            return default(int);
-        }
-
-        public void Insert(int index, object value)
-        {
-            
-        }
-
-        public bool IsFixedSize
-        {
-            get;
-        }
-
-        public void Remove(object value)
-        {
-            
-        }
-
-        object IList.this[int index]
-        {
-            get { return default(object); }
-            set
-            {
-                
-            }
-        }
-
-        public void CopyTo(Array array, int index)
-        {
-            
-        }
-
-        public bool IsSynchronized
-        {
-            get;
-        }
-
-        public object SyncRoot
-        {
-            get;
+            this.SetItemDependencyObjectInternal(index, value);
         }
     }
 }

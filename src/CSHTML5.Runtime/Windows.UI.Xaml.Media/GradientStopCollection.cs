@@ -53,7 +53,7 @@ namespace Windows.UI.Xaml.Media
             {
                 throw new ArgumentNullException("gradientStop");
             }
-            this.AddInternal(gradientStop);
+            this.AddDependencyObjectInternal(gradientStop);
             gradientStop.INTERNAL_ParentBrush = this._parentBrush;
         }
 
@@ -66,7 +66,7 @@ namespace Windows.UI.Xaml.Media
                     gs.INTERNAL_ParentBrush = null;
                 }
             }
-            this.ClearInternal();
+            this.ClearDependencyObjectInternal();
         }
 
         internal override void RemoveAtOverride(int index)
@@ -76,7 +76,7 @@ namespace Windows.UI.Xaml.Media
                 throw new ArgumentOutOfRangeException("index");
             }
             this.GetItemInternal(index).INTERNAL_ParentBrush = null;
-            this.RemoveAtInternal(index);
+            this.RemoveAtDependencyObjectInternal(index);
         }
 
         internal override void InsertOverride(int index, GradientStop gradientStop)
@@ -85,16 +85,13 @@ namespace Windows.UI.Xaml.Media
             {
                 throw new ArgumentNullException("gradientStop");
             }
-            if (this._parentBrush != null)
-            {
-                gradientStop.INTERNAL_ParentBrush = this._parentBrush;
-            }
-            this.InsertInternal(index, gradientStop);
+            gradientStop.INTERNAL_ParentBrush = this._parentBrush;
+            this.InsertDependencyObjectInternal(index, gradientStop);
         }
 
         internal override bool RemoveOverride(GradientStop gradientStop)
         {
-            if (this.RemoveInternal(gradientStop))
+            if (this.RemoveDependencyObjectInternal(gradientStop))
             {
                 gradientStop.INTERNAL_ParentBrush = null;
                 return true;
@@ -104,13 +101,10 @@ namespace Windows.UI.Xaml.Media
 
         internal override void SetItemOverride(int index, GradientStop gradientStop)
         {
-            if (this._parentBrush != null)
-            {
-                GradientStop oldItem = this.GetItemInternal(index);
-                oldItem.INTERNAL_ParentBrush = null;
-                gradientStop.INTERNAL_ParentBrush = this._parentBrush;
-            }
-            this.SetItemInternal(index, gradientStop);
+            GradientStop oldItem = this.GetItemInternal(index);
+            oldItem.INTERNAL_ParentBrush = null;
+            gradientStop.INTERNAL_ParentBrush = this._parentBrush;
+            this.SetItemDependencyObjectInternal(index, gradientStop);
         }
 #endif
     }

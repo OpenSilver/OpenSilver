@@ -17,6 +17,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,126 +28,188 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
+#if WORKINPROGRESS
+    /// <exclude/>
+    public sealed partial class RowDefinitionCollection : PresentationFrameworkCollection<RowDefinition>
+    {
+        #region Data
+
+        internal Grid _parentGrid;
+        private SimpleMonitor _monitor = new SimpleMonitor();
+
+        #endregion
+
+        #region Constructors
+
+        internal RowDefinitionCollection()
+        {
+
+        }
+
+        internal RowDefinitionCollection(Grid parent)
+        {
+            this._parentGrid = parent;
+            this.SetInheritanceContext(parent);
+        }
+
+        #endregion
+
+        #region Events (CollectionChanged)
+
+        internal event NotifyCollectionChangedEventHandler CollectionChangedInternal;
+
+        #endregion
+
+        #region Overriden Methods
+
+        internal override void AddOverride(RowDefinition value)
+        {
+            this.CheckReentrancy();
+            if (value == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+            this.AddDependencyObjectInternal(value);
+            value.Parent = this._parentGrid;
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value, this.CountInternal - 1));
+        }
+
+        internal override void ClearOverride()
+        {
+            this.CheckReentrancy();
+            if (this._parentGrid != null)
+            {
+                foreach (RowDefinition column in this)
+                {
+                    column.Parent = null;
+                }
+            }
+            this.ClearDependencyObjectInternal();
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+        internal override void InsertOverride(int index, RowDefinition value)
+        {
+            this.CheckReentrancy();
+            if (value == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+            value.Parent = this._parentGrid;
+            this.InsertDependencyObjectInternal(index, value);
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value, index));
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            this.CheckReentrancy();
+            RowDefinition removedRow = this.GetItemInternal(index);
+            removedRow.Parent = null;
+            this.RemoveAtDependencyObjectInternal(index);
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removedRow, index));
+        }
+
+        internal override bool RemoveOverride(RowDefinition value)
+        {
+            this.CheckReentrancy();
+            int index = this.IndexOf(value);
+            if (index > -1)
+            {
+                this.GetItemInternal(index).Parent = null;
+                this.RemoveAtDependencyObjectInternal(index);
+                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, value, index));
+                return true;
+            }
+            return false;
+        }
+
+        internal override void SetItemOverride(int index, RowDefinition value)
+        {
+            this.CheckReentrancy();
+            RowDefinition originalItem = this.GetItemInternal(index);
+            originalItem.Parent = null;
+            this.SetItemDependencyObjectInternal(index, value);
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, originalItem, value, index));
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            if (this.CollectionChangedInternal != null)
+            {
+                using (this.BlockReentrancy())
+                {
+                    this.CollectionChangedInternal(this, e);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Disallow reentrant attempts to change this collection. E.g. a event handler
+        /// of the CollectionChanged event is not allowed to make changes to this collection.
+        /// </summary>
+        /// <remarks>
+        /// typical usage is to wrap e.g. a OnCollectionChanged call with a using() scope:
+        /// <code>
+        ///         using (BlockReentrancy())
+        ///         {
+        ///             CollectionChanged(this, new NotifyCollectionChangedEventArgs(action, item, index));
+        ///         }
+        /// </code>
+        /// </remarks>
+        private IDisposable BlockReentrancy()
+        {
+            _monitor.Enter();
+            return _monitor;
+        }
+
+        /// <summary> Check and assert for reentrant attempts to change this collection. </summary>
+        /// <exception cref="InvalidOperationException"> raised when changing the collection
+        /// while another collection change is still being notified to other listeners </exception>
+        private void CheckReentrancy()
+        {
+            if (_monitor.Busy)
+            {
+                // we can allow changes if there's only one listener - the problem
+                // only arises if reentrant changes make the original event args
+                // invalid for later listeners.  This keeps existing code working
+                // (e.g. Selector.SelectedItems).
+                if ((CollectionChangedInternal != null) && (CollectionChangedInternal.GetInvocationList().Length > 1))
+                    throw new InvalidOperationException("RowDefinitionCollection Reentrancy not allowed");
+            }
+        }
+
+        #endregion
+
+        #region Private classes
+
+        private class SimpleMonitor : IDisposable
+        {
+            public void Enter()
+            {
+                ++_busyCount;
+            }
+
+            public void Dispose()
+            {
+                --_busyCount;
+            }
+
+            public bool Busy { get { return _busyCount > 0; } }
+
+            int _busyCount;
+        }
+
+        #endregion
+    }
+#else
     /// <exclude/>
     public sealed partial class RowDefinitionCollection : ObservableCollection<RowDefinition> //IList<RowDefinition>, IEnumerable<RowDefinition>
     {
-        //Collection<RowDefinition> _collection;
-
-        //int Count
-        //{
-        //    get { return _collection.Count; }
-        //}
-
-        //void Add(RowDefinition item)
-        //{
-        //    _collection.Add(item);
-        //}
-
-        //void Clear()
-        //{
-        //    _collection.Clear();
-        //}
-        //bool Contains(RowDefinition item)
-        //{
-        //    return _collection.Contains(item);
-        //}
-        //void CopyTo(RowDefinition[] array, int arrayIndex)
-        //{
-        //    _collection.CopyTo(array, arrayIndex);
-        //}
-        //int IndexOf(RowDefinition item)
-        //{
-        //    return _collection.IndexOf(item);
-        //}
-        //void Insert(int index, RowDefinition item)
-        //{
-        //    _collection.Insert(index, item);
-        //}
-        //bool Remove(RowDefinition item)
-        //{
-        //    return _collection.Remove(item);
-        //}
-        //void RemoveAt(int index)
-        //{
-        //    _collection.RemoveAt(index);
-        //}
-
-
-        //public IEnumerator<RowDefinition> GetEnumerator()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //IEnumerator IEnumerable.GetEnumerator()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //IEnumerator<RowDefinition> IEnumerable<RowDefinition>.GetEnumerator()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //int IList<RowDefinition>.IndexOf(RowDefinition item)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //void IList<RowDefinition>.Insert(int index, RowDefinition item)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //void IList<RowDefinition>.RemoveAt(int index)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public RowDefinition this[int index]
-        //{
-        //    get
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-        //    set
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-        //}
-
-        //void ICollection<RowDefinition>.Add(RowDefinition item)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //void ICollection<RowDefinition>.Clear()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //bool ICollection<RowDefinition>.Contains(RowDefinition item)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //void ICollection<RowDefinition>.CopyTo(RowDefinition[] array, int arrayIndex)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //int ICollection<RowDefinition>.Count
-        //{
-        //    get { throw new NotImplementedException(); }
-        //}
-
-        //public bool IsReadOnly
-        //{
-        //    get { throw new NotImplementedException(); }
-        //}
-
-        //bool ICollection<RowDefinition>.Remove(RowDefinition item)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        
     }
+#endif
 }

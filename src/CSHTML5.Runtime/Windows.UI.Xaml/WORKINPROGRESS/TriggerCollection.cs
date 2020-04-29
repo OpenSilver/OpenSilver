@@ -26,32 +26,32 @@ namespace Windows.UI.Xaml
     {
         internal override void AddOverride(TriggerBase value)
         {
-            this.AddInternal(value);
+            this.AddDependencyObjectInternal(value);
         }
 
         internal override void ClearOverride()
         {
-            this.ClearInternal();
+            this.ClearDependencyObjectInternal();
         }
 
         internal override void InsertOverride(int index, TriggerBase value)
         {
-            this.InsertInternal(index, value);
+            this.InsertDependencyObjectInternal(index, value);
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            this.RemoveAtInternal(index);
+            this.RemoveAtDependencyObjectInternal(index);
         }
 
         internal override bool RemoveOverride(TriggerBase value)
         {
-            return this.RemoveInternal(value);
+            return this.RemoveDependencyObjectInternal(value);
         }
 
         internal override void SetItemOverride(int index, TriggerBase value)
         {
-            this.SetItemInternal(index, value);
+            this.SetItemDependencyObjectInternal(index, value);
         }
     }
 #endif
