@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml
         /// </summary>
         public DependencyObjectCollection()
         {
-            this._collection = new DependencyObjectCollectionInternal();
+            this._collection = new DependencyObjectCollectionInternal(this);
         }
 
         #endregion
@@ -345,43 +345,6 @@ namespace Windows.UI.Xaml
 
         #region Private classes
 
-        private class DependencyObjectCollectionInternal : PresentationFrameworkCollection<DependencyObject>
-        {
-            #region Overriden Methods
-
-            internal override void AddOverride(DependencyObject value)
-            {
-                this.AddDependencyObjectInternal(value);
-            }
-
-            internal override void ClearOverride()
-            {
-                this.ClearDependencyObjectInternal();
-            }
-
-            internal override void InsertOverride(int index, DependencyObject value)
-            {
-                this.InsertDependencyObjectInternal(index, value);
-            }
-
-            internal override void RemoveAtOverride(int index)
-            {
-                this.RemoveAtDependencyObjectInternal(index);
-            }
-
-            internal override bool RemoveOverride(DependencyObject value)
-            {
-                return this.RemoveDependencyObjectInternal(value);
-            }
-
-            internal override void SetItemOverride(int index, DependencyObject value)
-            {
-                this.SetItemDependencyObjectInternal(index, value);
-            }
-
-            #endregion
-        }
-
         private class SimpleMonitor : IDisposable
         {
             public void Enter()
@@ -404,5 +367,51 @@ namespace Windows.UI.Xaml
 
         #endregion
 
+    }
+
+    internal class DependencyObjectCollectionInternal : PresentationFrameworkCollection<DependencyObject>
+    {
+        #region Constructor
+
+        internal DependencyObjectCollectionInternal(DependencyObject owner)
+        {
+            this.SetInheritanceContext(owner);
+        }
+
+        #endregion
+
+        #region Overriden Methods
+
+        internal override void AddOverride(DependencyObject value)
+        {
+            this.AddDependencyObjectInternal(value);
+        }
+
+        internal override void ClearOverride()
+        {
+            this.ClearDependencyObjectInternal();
+        }
+
+        internal override void InsertOverride(int index, DependencyObject value)
+        {
+            this.InsertDependencyObjectInternal(index, value);
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            this.RemoveAtDependencyObjectInternal(index);
+        }
+
+        internal override bool RemoveOverride(DependencyObject value)
+        {
+            return this.RemoveDependencyObjectInternal(value);
+        }
+
+        internal override void SetItemOverride(int index, DependencyObject value)
+        {
+            this.SetItemDependencyObjectInternal(index, value);
+        }
+
+        #endregion
     }
 }
