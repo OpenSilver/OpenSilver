@@ -840,7 +840,7 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationUnhandledExceptionEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\AssemblyPart.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\AssemblyPartCollection.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DependencyObjectCollection.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DependencyObjectCollection_1.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\EventTrigger.cs" />
