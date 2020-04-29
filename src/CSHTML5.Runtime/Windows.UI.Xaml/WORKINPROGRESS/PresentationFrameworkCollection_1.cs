@@ -321,35 +321,48 @@ namespace Windows.UI.Xaml
 
         #endregion
 
-        internal int CountInternal
-        {
-            get { return this._collection.Count; }
-        }
+        #region Generic collection manipulation methods
 
+        /// <summary>
+        /// Call the Add method of underlying List<typeparamref name="T"/> collection.
+        /// </summary>
+        /// <param name="value"></param>
         internal void AddInternal(T value)
         {
             this._collection.Add(value);
             this.UpdateCountProperty();
         }
 
+        /// <summary>
+        /// Call the Clear method of underlying List<typeparamref name="T"/> collection.
+        /// </summary>
         internal void ClearInternal()
         {
             this._collection.Clear();
             this.UpdateCountProperty();
         }
 
+        /// <summary>
+        /// Call the Insert method of underlying List<typeparamref name="T"/> collection.
+        /// </summary>
         internal void InsertInternal(int index, T value)
         {
             this._collection.Insert(index, value);
             this.UpdateCountProperty();
         }
 
+        /// <summary>
+        /// Call the RemoveAt method of underlying List<typeparamref name="T"/> collection.
+        /// </summary>
         internal void RemoveAtInternal(int index)
         {
             this._collection.RemoveAt(index);
             this.UpdateCountProperty();
         }
 
+        /// <summary>
+        /// Call the Remove method of underlying List<typeparamref name="T"/> collection.
+        /// </summary>
         internal bool RemoveInternal(T value)
         {
             if (this._collection.Remove(value))
@@ -360,14 +373,133 @@ namespace Windows.UI.Xaml
             return false;
         }
 
+        /// <summary>
+        /// Call the Indexer (getter) property of underlying List<typeparamref name="T"/> collection.
+        /// </summary>
         internal T GetItemInternal(int index)
         {
             return this._collection[index];
         }
 
+        /// <summary>
+        /// Call the Indexer (setter) property of underlying List<typeparamref name="T"/> collection.
+        /// </summary>
         internal void SetItemInternal(int index, T value)
         {
             this._collection[index] = value;
+        }
+
+        #endregion
+
+        #region DependencyObject collection manipulation methods
+
+        // ----------------------------------------------------------------- //
+        // The following methods should be used when you want the elements 
+        // of this collection to inherit context from this object. This 
+        // enable binding for properties defined in DependencyObjects who are 
+        // not FrameworkElements (and have no DataContext as a consequence).
+        // ----------------------------------------------------------------- //
+
+        private DependencyObject CastDO(T value)
+        {
+            if (!(value is DependencyObject valueDO))
+            {
+                throw new ArgumentException(string.Format("'{0}' does not derive from {1}.", typeof(T).Name, typeof(DependencyObject).Name));
+            }
+            return valueDO;
+        }
+
+        /// <summary>
+        /// Call the Add method of underlying List<typeparamref name="T"/> collection
+        /// and update inheritance context to match this object.
+        /// </summary>
+        /// <param name="value"></param>
+        internal void AddDependencyObjectInternal(T value)
+        {
+            DependencyObject valueDO = this.CastDO(value);
+            valueDO.SetInheritanceContext(this);
+            this._collection.Add(value);
+            this.UpdateCountProperty();
+        }
+
+        /// <summary>
+        /// Call the Clear method of underlying List<typeparamref name="T"/> collection
+        /// and update inheritance context to match this object.
+        /// </summary>
+        internal void ClearDependencyObjectInternal()
+        {
+            foreach (DependencyObject valueDO in this.Select(v => this.CastDO(v)))
+            {
+                valueDO.SetInheritanceContext(null);
+            }
+            this._collection.Clear();
+            this.UpdateCountProperty();
+        }
+
+        /// <summary>
+        /// Call the Insert method of underlying List<typeparamref name="T"/> collection
+        /// and update inheritance context to match this object.
+        /// </summary>
+        internal void InsertDependencyObjectInternal(int index, T value)
+        {
+            DependencyObject valueDO = this.CastDO(value);
+            valueDO.SetInheritanceContext(this);
+            this._collection.Insert(index, value);
+            this.UpdateCountProperty();
+        }
+
+        /// <summary>
+        /// Call the RemoveAt method of underlying List<typeparamref name="T"/> collection
+        /// and update inheritance context to match this object.
+        /// </summary>
+        internal void RemoveAtDependencyObjectInternal(int index)
+        {
+            DependencyObject removedDO = this.CastDO(this._collection[index]);
+            removedDO.SetInheritanceContext(null);
+            this._collection.RemoveAt(index);
+            this.UpdateCountProperty();
+        }
+
+        /// <summary>
+        /// Call the Remove method of underlying List<typeparamref name="T"/> collection
+        /// and update inheritance context to match this object.
+        /// </summary>
+        internal bool RemoveDependencyObjectInternal(T value)
+        {
+            int index = this._collection.IndexOf(value);
+            if (index > -1)
+            {
+                DependencyObject removedDO = this.CastDO(this._collection[index]);
+                removedDO.SetInheritanceContext(null);
+                this._collection.RemoveAt(index);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Call the Indexer (setter) property of underlying List<typeparamref name="T"/> collection
+        /// and update inheritance context to match this object.
+        /// </summary>
+        internal void SetItemDependencyObjectInternal(int index, T value)
+        {
+            DependencyObject originalDO = this.CastDO(this._collection[index]);
+            DependencyObject newDO = this.CastDO(value);
+            originalDO.SetInheritanceContext(null);
+            newDO.SetInheritanceContext(this);
+            this._collection[index] = value;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Get the Count of the underlying List<typeparamref name="T"/> collection.
+        /// This property returns the same value as the Count property and is only here
+        /// for performances.
+        /// </summary>
+        internal int CountInternal
+        {
+            get { return this._collection.Count; }
         }
 
         private void UpdateCountProperty()
