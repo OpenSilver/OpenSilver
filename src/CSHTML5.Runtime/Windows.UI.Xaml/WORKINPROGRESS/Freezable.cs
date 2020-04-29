@@ -26,9 +26,11 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
+#if false
 #if WORKINPROGRESS
     public abstract partial class Freezable : DependencyObject
     {
     }
+#endif
 #endif
 }

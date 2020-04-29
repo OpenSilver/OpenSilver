@@ -30,12 +30,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// An abstract class that defines an animation segment with its own target value
     /// and interpolation method for a DoubleAnimationUsingKeyFrames.
     /// </summary>
-
-#if WORKINPROGRESS
-    public abstract partial class DoubleKeyFrame : Freezable, IKeyFrame
-#else
     public abstract partial class DoubleKeyFrame : DependencyObject, IKeyFrame
-#endif
     {
         public static readonly DependencyProperty KeyTimeProperty = DependencyProperty.Register("KeyTime", typeof(KeyTime), typeof(DoubleKeyFrame), new PropertyMetadata(new KeyTime())
         { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });

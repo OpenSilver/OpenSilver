@@ -26,10 +26,12 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
+#if false
 #if WORKINPROGRESS
     public abstract partial class Animatable : Freezable, IAnimatable
     {
 
     }
+#endif
 #endif
 }
