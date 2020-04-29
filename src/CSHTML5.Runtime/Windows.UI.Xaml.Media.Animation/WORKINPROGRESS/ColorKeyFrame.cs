@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml.Media.Animation
 {
 #if WORKINPROGRESS
     /// <summary>Provides a base class for specific animation key-frame techniques that define an animation segment with a <see cref="T:System.Windows.Media.Color" /> target value. Derived classes each provide a different key-frame interpolation method for a <see cref="T:System.Windows.Media.Color" /> value that is provided for a <see cref="T:System.Windows.Media.Animation.ColorAnimationUsingKeyFrames" /> animation. </summary>
-    public abstract partial class ColorKeyFrame : DependencyObject
+    public abstract partial class ColorKeyFrame : DependencyObject, IKeyFrame
     {
         public static readonly DependencyProperty KeyTimeProperty = DependencyProperty.Register("KeyTime", typeof(KeyTime), typeof(ColorKeyFrame), null);
         /// <summary>Gets or sets the time at which the key frame's target <see cref="P:System.Windows.Media.Animation.ColorKeyFrame.Value" /> should be reached. </summary>
@@ -42,6 +42,12 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             get { return (Color)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
+        }
+
+        object IKeyFrame.Value
+        {
+            get { return this.Value; }
+            set { this.Value = (Color)value; }
         }
     }
 #endif
