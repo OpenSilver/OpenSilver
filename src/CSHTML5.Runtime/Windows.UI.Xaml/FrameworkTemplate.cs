@@ -37,9 +37,14 @@ namespace Windows.UI.Xaml
     /// Creates an element tree of elements.
     /// </summary>
     [ContentProperty("ContentPropertyUsefulOnlyDuringTheCompilation")]
-    public partial class FrameworkTemplate : DependencyObject
+    public abstract partial class FrameworkTemplate : DependencyObject
     {
         internal Func<Control, TemplateInstance> _methodToInstantiateFrameworkTemplate;
+
+        protected FrameworkTemplate()
+        {
+            this.CanBeInheritanceContext = false;
+        }
 
         /// <summary>
         /// Creates an instance of the Template. Intented to be called for templates that have no owner, such as DataTemplates (not ControlTemplates).

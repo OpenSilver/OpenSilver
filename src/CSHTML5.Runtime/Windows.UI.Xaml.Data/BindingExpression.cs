@@ -476,7 +476,7 @@ namespace Windows.UI.Xaml.Data
                 else
                 {
                     this.Target.InheritedContextChanged += new EventHandler(this.OnTargetInheritedContextChanged);
-                    this._bindingSource = this.Target.GetInheritedContext();
+                    this._bindingSource = this.Target.InheritedParent;
                 }
             }
             else if (ParentBinding.Source != null)

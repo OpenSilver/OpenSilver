@@ -28,9 +28,14 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Represents the base class for value setters.
     /// </summary>
-    public partial class SetterBase : DependencyObject
+    public abstract partial class SetterBase : DependencyObject
     {
         private bool _isSealed;
+
+        internal SetterBase()
+        {
+            this.CanBeInheritanceContext = false;
+        }
 
         public bool IsSealed
         {

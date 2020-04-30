@@ -49,7 +49,7 @@ namespace Windows.UI.Xaml.Controls
         internal RowDefinitionCollection(Grid parent)
         {
             this._parentGrid = parent;
-            this.SetInheritanceContext(parent);
+            parent.ProvideSelfAsInheritanceContext(this, null);
         }
 
         #endregion

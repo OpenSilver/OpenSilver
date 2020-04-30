@@ -375,7 +375,8 @@ namespace Windows.UI.Xaml
 
         internal DependencyObjectCollectionInternal(DependencyObject owner)
         {
-            this.SetInheritanceContext(owner);
+            owner.ProvideSelfAsInheritanceContext(this, null);
+            this.IsInheritanceContextSealed = true;
         }
 
         #endregion

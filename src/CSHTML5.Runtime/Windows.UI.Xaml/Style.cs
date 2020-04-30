@@ -41,7 +41,7 @@ namespace Windows.UI.Xaml
         /// </summary>
         public Style()
         {
-            this._needInheritanceContext = false;
+            this.CanBeInheritanceContext = false;
             _setters = new SetterBaseCollection();
         }
 

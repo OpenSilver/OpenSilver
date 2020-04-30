@@ -48,7 +48,7 @@ namespace Windows.UI.Xaml.Controls
         internal ColumnDefinitionCollection(Grid parent)
         {
             this._parentGrid = parent;
-            this.SetInheritanceContext(parent);
+            parent.ProvideSelfAsInheritanceContext(this, null);
         }
 
         #endregion

@@ -41,41 +41,157 @@ namespace Windows.UI.Xaml
     public partial class DependencyObject
     {
         #region Inheritance Context
-        internal bool _needInheritanceContext = true;
+
         private DependencyObject _inheritanceContext;
-        private FrameworkElement _inheritanceContextRoot;
-        private bool _inheritanceContextRootDirty;
+        private FrameworkElement _inheritedParent;
         private readonly HashSet<DependencyObject> _contextListeners = new HashSet<DependencyObject>();
         internal event EventHandler InheritedContextChanged;
 
-        internal void SetInheritanceContext(DependencyObject context)
+        internal FrameworkElement InheritedParent
         {
-            if (!this._needInheritanceContext)
-            {
-                return;
-            }
-
-            DependencyObject oldContext = this._inheritanceContext;
-            this._inheritanceContext = context;
-            this._inheritanceContextRootDirty = true;
-
-            // stop listening to old context changes
-            if (oldContext != null)
-            {
-                oldContext.StopListeningToInheritanceContextChanges(this);
-            }
-
-            // start listening to context changes
-            if (context != null)
-            {
-                context.ListenToInheritanceContextChanges(this);
-            }
-
-            // Notify listeners that inheritance context changed
-            this.OnInheritedContextChanged();
+            get { return this._inheritedParent; }
         }
 
-        private void OnInheritedContextChanged()
+        internal DependencyObject InheritanceContext
+        {
+            get { return this._inheritanceContext; }
+        }
+
+        internal bool CanBeInheritanceContext { get; set; }
+
+        internal bool IsInheritanceContextSealed { get; set; }
+
+        internal bool ShouldProvideInheritanceContext(DependencyObject target, DependencyProperty property)
+        {
+            // We never provide an inherited context for a FrameworkElement because the DataContext takes
+            // priority over inherited context.
+            return !(target is FrameworkElement);
+        }
+
+        // Note: the DependencyProperty parameter is here simply to keep the logic defined in the WPF 
+        // implementation and is not used here
+        internal bool RemoveSelfAsInheritanceContext(object value, DependencyProperty dp)
+        {
+            DependencyObject doValue = value as DependencyObject;
+            if (doValue != null)
+            {
+                return RemoveSelfAsInheritanceContext(doValue, dp);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // Note: the DependencyProperty parameter is here simply to keep the logic defined in the WPF 
+        // implementation and is not used here
+        internal bool RemoveSelfAsInheritanceContext(DependencyObject doValue, DependencyProperty dp)
+        {
+            if (doValue != null
+                && this.ShouldProvideInheritanceContext(doValue, dp)
+                && this.CanBeInheritanceContext
+                && !doValue.IsInheritanceContextSealed)
+            {
+                DependencyObject oldInheritanceContext = doValue.InheritanceContext;
+                if (this == oldInheritanceContext)
+                {
+                    doValue.RemoveInheritanceContext(this, dp);
+
+                    // Context changed
+                    return true;
+                }
+                else
+                {
+                    // this object is not the inherited context for doValue
+                    // Context did not change
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private void RemoveInheritanceContext(DependencyObject context, DependencyProperty property)
+        {
+            // Stop listening for context changes
+            context.StopListeningToInheritanceContextChanges(this);
+
+            // Reset inheritance context
+            this._inheritanceContext = null;
+
+            // Reset inherited parent
+            this._inheritedParent = null;
+
+            // Notify listeners that inheritance context changed
+            this.OnInheritedContextChanged(null);
+        }
+
+        // Note: the DependencyProperty parameter is here simply to keep the logic defined in the WPF 
+        // implementation and is not used here
+        internal bool ProvideSelfAsInheritanceContext(object value, DependencyProperty dp)
+        {
+            DependencyObject doValue = value as DependencyObject;
+            if (doValue != null)
+            {
+                return ProvideSelfAsInheritanceContext(doValue, dp);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // Note: the DependencyProperty parameter is here simply to keep the logic defined in the WPF 
+        // implementation and is not used here
+        internal bool ProvideSelfAsInheritanceContext(DependencyObject doValue, DependencyProperty dp)
+        {
+            if (doValue != null
+                && this.ShouldProvideInheritanceContext(doValue, dp)
+                && this.CanBeInheritanceContext
+                && !doValue.IsInheritanceContextSealed)
+
+            {
+                if (doValue.InheritanceContext != null)
+                {
+                    // In silverlight, there is only one inherited context for a given DependencyObject.
+                    // We can only set an inherited context if there is no inherited context for the
+                    // DependencyObject.
+                    return false;
+                }
+                else
+                {
+                    doValue.AddInheritanceContext(this, dp);
+
+                    // Context changed
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // Note: the DependencyProperty parameter is here simply to keep the logic defined in the WPF 
+        // implementation and is not used here
+        private void AddInheritanceContext(DependencyObject context, DependencyProperty property)
+        {
+            // Start listening for context changes
+            context.ListenToInheritanceContextChanges(this);
+
+            // Set the new context
+            this._inheritanceContext = context;
+
+            // Find the new inherited parent
+            this._inheritedParent = this.ComputeInheritedParent();
+
+            // Notify listeners that inheritance context changed
+            this.OnInheritedContextChanged(this._inheritedParent);
+        }
+
+        private void OnInheritedContextChanged(FrameworkElement newParent)
         {
             if (this.InheritedContextChanged != null)
             {
@@ -83,9 +199,22 @@ namespace Windows.UI.Xaml
             }
             foreach (DependencyObject listener in this._contextListeners)
             {
-                listener._inheritanceContextRootDirty = true;
-                listener.OnInheritedContextChanged();
+                listener._inheritedParent = newParent;
+                listener.OnInheritedContextChanged(newParent);
             }
+        }
+
+        private FrameworkElement ComputeInheritedParent()
+        {
+            FrameworkElement inheritedParent;
+            for (DependencyObject contextDO = this._inheritanceContext; contextDO != null; contextDO = contextDO._inheritanceContext)
+            {
+                if ((inheritedParent = contextDO as FrameworkElement) != null)
+                {
+                    return inheritedParent;
+                }
+            }
+            return null;
         }
 
         private void ListenToInheritanceContextChanges(DependencyObject listener)
@@ -102,21 +231,6 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal virtual FrameworkElement GetInheritedContext()
-        {
-            if (this._inheritanceContextRootDirty)
-            {
-                for (DependencyObject contextDO = this; contextDO != null; contextDO = contextDO._inheritanceContext)
-                {
-                    if ((this._inheritanceContextRoot = contextDO as FrameworkElement) != null)
-                    {
-                        break;
-                    }
-                }
-                this._inheritanceContextRootDirty = false;
-            }
-            return this._inheritanceContextRoot;
-        }
         #endregion
 
         internal Dictionary<DependencyProperty, INTERNAL_PropertyStorage> INTERNAL_PropertyStorageDictionary { get; } // Contains all the properties that are either not in INTERNAL_AllInheritedProperties or in INTERNAL_UsefulInheritedProperties
@@ -127,6 +241,7 @@ namespace Windows.UI.Xaml
         #region Constructor
         public DependencyObject()
         {
+            this.CanBeInheritanceContext = true;
             this.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
             this.INTERNAL_AllInheritedProperties = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
         }

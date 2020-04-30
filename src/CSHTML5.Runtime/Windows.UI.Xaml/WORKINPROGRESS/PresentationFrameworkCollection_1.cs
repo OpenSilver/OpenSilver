@@ -417,7 +417,7 @@ namespace Windows.UI.Xaml
         internal void AddDependencyObjectInternal(T value)
         {
             DependencyObject valueDO = this.CastDO(value);
-            valueDO.SetInheritanceContext(this);
+            this.ProvideSelfAsInheritanceContext(valueDO, null);
             this._collection.Add(value);
             this.UpdateCountProperty();
         }
@@ -430,7 +430,7 @@ namespace Windows.UI.Xaml
         {
             foreach (DependencyObject valueDO in this.Select(v => this.CastDO(v)))
             {
-                valueDO.SetInheritanceContext(null);
+                this.RemoveSelfAsInheritanceContext(valueDO, null);
             }
             this._collection.Clear();
             this.UpdateCountProperty();
@@ -443,7 +443,7 @@ namespace Windows.UI.Xaml
         internal void InsertDependencyObjectInternal(int index, T value)
         {
             DependencyObject valueDO = this.CastDO(value);
-            valueDO.SetInheritanceContext(this);
+            this.ProvideSelfAsInheritanceContext(valueDO, null);
             this._collection.Insert(index, value);
             this.UpdateCountProperty();
         }
@@ -455,7 +455,7 @@ namespace Windows.UI.Xaml
         internal void RemoveAtDependencyObjectInternal(int index)
         {
             DependencyObject removedDO = this.CastDO(this._collection[index]);
-            removedDO.SetInheritanceContext(null);
+            this.RemoveSelfAsInheritanceContext(removedDO, null);
             this._collection.RemoveAt(index);
             this.UpdateCountProperty();
         }
@@ -470,7 +470,7 @@ namespace Windows.UI.Xaml
             if (index > -1)
             {
                 DependencyObject removedDO = this.CastDO(this._collection[index]);
-                removedDO.SetInheritanceContext(null);
+                this.RemoveSelfAsInheritanceContext(removedDO, null);
                 this._collection.RemoveAt(index);
                 return true;
             }
@@ -485,8 +485,8 @@ namespace Windows.UI.Xaml
         {
             DependencyObject originalDO = this.CastDO(this._collection[index]);
             DependencyObject newDO = this.CastDO(value);
-            originalDO.SetInheritanceContext(null);
-            newDO.SetInheritanceContext(this);
+            this.RemoveSelfAsInheritanceContext(originalDO, null);
+            this.ProvideSelfAsInheritanceContext(newDO, null);
             this._collection[index] = value;
         }
 

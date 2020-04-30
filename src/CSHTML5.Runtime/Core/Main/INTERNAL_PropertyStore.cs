@@ -444,15 +444,20 @@ namespace CSHTML5.Internal
             }
 
             // Reset old value inheritance context
-            if (oldValue is DependencyObject oldValueDO && !(oldValueDO is FrameworkElement))
+            if (oldBaseValueSource == BaseValueSourceInternal.Local)
             {
-                oldValueDO.SetInheritanceContext(null);
+                // Notes:
+                // - Inheritance context is only handled by local value
+                // - We use null instead of the actual DependencyProperty
+                // as the parameter is ignored in the current implentation.
+                storage.Owner.RemoveSelfAsInheritanceContext(oldValue, null/*storage.Property*/);
             }
 
             // Set new value inheritance context
-            if (computedValue is DependencyObject computedValueDO && !(computedValueDO is FrameworkElement))
+            if (effectiveValueKind == BaseValueSourceInternal.Local)
             {
-                computedValueDO.SetInheritanceContext(storage.Owner);
+                // Check above
+                storage.Owner.ProvideSelfAsInheritanceContext(computedValue, null/*storage.Property*/);
             }
 
             if (!ArePropertiesEqual(oldValue, computedValue, storage.Property.PropertyType))
