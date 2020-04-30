@@ -31,6 +31,7 @@ using System.Windows.Media;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using CSHTML5;
 #endif
 
 #if MIGRATION
@@ -141,6 +142,26 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
         }
 
         #endregion
+
+
+        #region AcceptsTab
+        /// <summary>
+        /// Gets or sets the value that determines whether pressing tab while the TextBox has the focus will add a tabulation in the text or set the focus to the next element.
+        /// True to add a tabulation, false to set the focus to the next element.
+        /// </summary>
+        public bool AcceptsTab
+        {
+            get { return (bool)GetValue(AcceptsTabProperty); }
+            set { SetValue(AcceptsTabProperty, value); }
+        }
+        /// <summary>
+        /// Identifies the AcceptsReturn dependency property.
+        /// </summary>
+        public static readonly DependencyProperty AcceptsTabProperty =
+            DependencyProperty.Register("AcceptsTab", typeof(bool), typeof(TextBox), new PropertyMetadata(false)); 
+        #endregion
+
+
 
         #region PlaceholderText
 
@@ -477,6 +498,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
 
             //-----------------------
             // Prevent pressing Enter for line break when "AcceptsReturn" is false and prevent pressing any other key than backspace when "MaxLength" is reached:
+            // Also prevent the default event when pressing tab and add "\t" when "AcceptsTab" is set to true:
             //-----------------------
             if (IsRunningInJavaScript())
             {
@@ -491,7 +513,9 @@ $0.addEventListener('keydown', function(e) {
         return false;
     }
 
-    if((e.keyCode == 13 || e.keyCode == 32 || e.keyCode > 47) && instance['get_MaxLength']() != 0)
+    var isAddingTabulation = e.keyCode == 9 && instance['get_AcceptsTab']() == true;
+
+    if((isAddingTabulation || e.keyCode == 13 || e.keyCode == 32 || e.keyCode > 47) && instance['get_MaxLength']() != 0)
     {
         var textLength = instance.GetTextLengthIncludingNewLineCompensation();
 
@@ -504,6 +528,28 @@ $0.addEventListener('keydown', function(e) {
             e.preventDefault();
             return false;
         }
+    }
+    if(isAddingTabulation)
+    {
+        //we need to add '\t' where the cursor is, prevent the event (which would change the focus) and dispatch the event for the text changed:
+        var sel, range;
+        if (window.getSelection) {
+            sel = window.getSelection();
+            if (sel.rangeCount) {
+                range = sel.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode('\t'));
+                sel.collapseToEnd();
+            }
+        } else if (document.selection && document.selection.createRange) {
+            range = document.selection.createRange();
+            range.text = '\t';
+            document.selection.collapseToEnd();
+        }
+        
+        instance.TextAreaValueChanged(); //todo: test this.
+        e.preventDefault();
+            return false;
     }
 }, false);", contentEditableDiv);
 #else
@@ -522,7 +568,14 @@ $0.addEventListener('keydown', function(e) {
         return false;
     }
 
-    if((e.keyCode == 13 || e.keyCode == 32 || e.keyCode > 47) && instance.MaxLength != 0)
+    var isAddingTabulation = e.keyCode == 9 && instance.AcceptsTab == true;
+    var isRemovingTabulation = isAddingTabulation && e.shiftKey;
+    if(isRemovingTabulation)
+    {
+        isAddingTabulation = false
+    }
+
+    if((isAddingTabulation || e.keyCode == 13 || e.keyCode == 32 || e.keyCode > 47) && instance.MaxLength != 0)
     {
         var textLength = instance.GetTextLengthIncludingNewLineCompensation();
 
@@ -536,6 +589,97 @@ $0.addEventListener('keydown', function(e) {
             return false;
         }
     }
+
+    if(isAddingTabulation)
+    {
+        //we need to add '\t' where the cursor is, prevent the event (which would change the focus) and dispatch the event for the text changed:
+        var sel, range;
+        if (window.getSelection) {
+            sel = window.getSelection();
+            if (sel.rangeCount) {
+                range = sel.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode('\t'));
+                sel.collapseToEnd();
+            }
+        } else if (document.selection && document.selection.createRange) {
+            range = document.selection.createRange();
+            range.text = '\t';
+            document.selection.collapseToEnd();
+        }
+        
+        instance.TextAreaValueChanged(); //todo: test this.
+        e.preventDefault();
+            return false;
+    }
+    if (isRemovingTabulation)
+    {
+        var sel, range;
+        if (window.getSelection) {
+            sel = window.getSelection();
+            if (sel.rangeCount) {
+                range = sel.getRangeAt(0);
+                if(range.collapsed)
+                {
+                    //if the previous character is a '\t', we want to remove it:
+                    var rangeStartContainer = range.startContainer;
+                    var rangeStartOffset = range.startOffset;
+
+                    //we get the node that contains the text that needs changing and the index of the character to remove:
+                    var textNodeToModify = undefined;
+                    var indexToRemove = -1;
+                    if(rangeStartContainer.nodeType == Node.TEXT_NODE && rangeStartOffset > 0)
+                    {
+        
+                        textNodeToModify = rangeStartContainer;
+                        indexToRemove = rangeStartOffset - 1;
+                    }
+                    else //The potential tab to remove is in the node that is right before the selection(caret) so we look at the last character of the 'previous sibling':
+                    {
+                        var previousSibling = undefined;
+
+                        // we get the previous node:
+                        if(rangeStartContainer.nodeType == Node.TEXT_NODE) //the caret was right before the first element of a textNode. I am not sure if we can arrive here since this case seems to be considered as 'the caret is between the nodes' instead of 'the caret is in the node but before the first character'
+                        {
+                            previousSibling = rangeStartContainer.previousSibling;
+                        }
+                        else //the caret is considered between nodes so the range container is the element that contains the text nodes.
+                        {
+                            if(rangeStartOffset > 0) //otherwise, we are at the first character inside a new div (or p), which means at the start of a new line so nothing to remove.
+                            {
+                                previousSibling = rangeStartContainer.childNodes[rangeStartOffset -1];
+                            }
+                        }
+
+                        //We update the node and index to modify:
+                        if(previousSibling != undefined && previousSibling.nodeType == Node.TEXT_NODE)
+                        {
+                            textNodeToModify = previousSibling;
+                            indexToRemove = previousSibling.textContent.length - 1;
+                        } //else, the previous node was not a text node so there has to be a new line between the caret and the previous text so nothing to remove here.
+                    }
+        
+                    if(textNodeToModify != undefined && indexToRemove != -1)
+                    {
+                        //range.startContainer.textContent = range.startContainer.textContent.substring(rangeStartOffset)
+                        var textContent = textNodeToModify.textContent;
+                        if(textContent[indexToRemove] == '\t')
+                        {
+                            var resultingString = textContent.substring(0, indexToRemove); //note: text.substring(0,-1) returns ""
+                            resultingString += textContent.substring(indexToRemove + 1); //note: 'aaa'.substring(25) returns ""
+                            textNodeToModify.textContent = resultingString;
+                        }
+                    }
+    
+                }
+            }
+        }
+        //todo: else.
+        instance.TextAreaValueChanged(); //todo: test this.
+        e.preventDefault();
+            return false;
+    }
+
 }, false);", contentEditableDiv, this);//AcceptsReturn, MaxLength
 #endif
             }
@@ -551,7 +695,8 @@ var element = document.getElementById(""{0}"");
 element.setAttribute(""data-acceptsreturn"", ""{1}"");
 element.setAttribute(""data-maxlength"", ""{2}"");
 element.setAttribute(""data-isreadonly"",""{3}"");
-", ((INTERNAL_HtmlDomElementReference)contentEditableDiv).UniqueIdentifier, this.AcceptsReturn.ToString().ToLower(), this.MaxLength, isReadOnly.ToString().ToLower()));
+element.setAttribute(""data-acceptstab"", ""{4}"");
+", ((INTERNAL_HtmlDomElementReference)contentEditableDiv).UniqueIdentifier, this.AcceptsReturn.ToString().ToLower(), this.MaxLength, isReadOnly.ToString().ToLower(), this.AcceptsTab.ToString().ToLower()));
 
                 // Register the "keydown" javascript event:
                 INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
@@ -561,6 +706,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
     var element_InsideEventHandler = document.getElementById(""{0}""); // For some reason we need to get again the reference to the element.
     var acceptsReturn = element_InsideEventHandler.getAttribute(""data-acceptsreturn"");
     var maxLength = element_InsideEventHandler.getAttribute(""data-maxlength"");
+    var acceptsTab = element_InsideEventHandler.getAttribute(""data-acceptstab"");
 
     if (e.keyCode == 13)
     {{
@@ -571,7 +717,10 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
         }}
     }}
 
-    if((e.keyCode == 13 || e.keyCode == 32 || e.keyCode > 47) && maxLength != 0)
+    var isAddingTabulation = e.keyCode == 9 && acceptsTab == ""true"";
+    alert(isAddingTabulation);
+
+    if((isAddingTabulation || e.keyCode == 13 || e.keyCode == 32 || e.keyCode > 47) && maxLength != 0)
     {{
         var text = getTextAreaInnerText(element_InsideEventHandler);
         if (!acceptsReturn) {{
@@ -588,6 +737,29 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
             e.preventDefault();
             return false;
         }}
+    }}
+
+    if(isAddingTabulation)
+    {{
+        //we need to add '\t' where the cursor is, prevent the event (which would change the focus) and dispatch the event for the text changed:
+        var sel, range;
+        if (window.getSelection) {{
+            sel = window.getSelection();
+            if (sel.rangeCount) {{
+                range = sel.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode('\t'));
+                sel.collapseToEnd();
+            }}
+        }} else if (document.selection && document.selection.createRange) {{
+            range = document.selection.createRange();
+            range.text = '\t';
+            document.selection.collapseToEnd();
+        }}
+        
+        instance.TextAreaValueChanged(); //todo: test this.
+        e.preventDefault();
+            return false;
     }}
 }}, false);
 ", ((INTERNAL_HtmlDomElementReference)contentEditableDiv).UniqueIdentifier));//comma added on purpose because we need to get maxLength somehow (see how we did for acceptsReturn).
@@ -899,7 +1071,7 @@ var range,selection;
         void InternetExplorer_GotFocus(object sender, RoutedEventArgs e)
         {
 #if !CSHTML5NETSTANDARD //todo: fixme
-            previousInnerText = CSHTML5.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus)();
+            previousInnerText = Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
 #endif
         }
 
@@ -911,7 +1083,7 @@ var range,selection;
         void InternetExplorer_RaiseTextChangedIfNecessary()
         {
 #if !CSHTML5NETSTANDARD //todo: fixme
-            string newInnerText = CSHTML5.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus)();
+            string newInnerText = Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
             if (newInnerText != previousInnerText)
             {
                 TextAreaValueChanged();
