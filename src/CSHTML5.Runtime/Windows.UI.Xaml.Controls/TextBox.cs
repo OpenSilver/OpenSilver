@@ -899,7 +899,7 @@ var range,selection;
         void InternetExplorer_GotFocus(object sender, RoutedEventArgs e)
         {
 #if !CSHTML5NETSTANDARD //todo: fixme
-            previousInnerText = CSHTML5.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus).ToString();
+            previousInnerText = CSHTML5.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus)();
 #endif
         }
 
@@ -911,7 +911,7 @@ var range,selection;
         void InternetExplorer_RaiseTextChangedIfNecessary()
         {
 #if !CSHTML5NETSTANDARD //todo: fixme
-            string newInnerText = CSHTML5.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus).ToString();
+            string newInnerText = CSHTML5.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus)();
             if (newInnerText != previousInnerText)
             {
                 TextAreaValueChanged();
