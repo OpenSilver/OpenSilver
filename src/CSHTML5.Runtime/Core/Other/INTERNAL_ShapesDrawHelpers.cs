@@ -387,5 +387,89 @@ namespace CSHTML5.Internal
             #endregion
 
         }
+
+        internal static void ApplyTransformToCanvas(Transform transform, object canvasDomElement)
+        {
+            MatrixTransform matrixTransform = transform as MatrixTransform;
+            if (matrixTransform != null)
+            {
+                Matrix m = matrixTransform.Matrix;
+
+                // todo: this line gets called AFTER "translate(0.5, 0.5)" (in "INTERNAL_ShapesDrawHelpers.cs"), 
+                // but instead we should apply it BEFORE, otherwise the (0.5, 0.5) translation may get amplified/distorted 
+                // by the subsequent transform.
+
+                dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+                context.transform(m.M11, m.M12, m.M21, m.M22, m.OffsetX, m.OffsetY);
+
+                //todo: also apply the transform to other geometry types.
+            }
+            else
+            {
+                if (transform != null)
+                {
+                    throw new NotSupportedException(string.Format("'{0}' is not currently supported in PathGeometry.", transform.GetType()));
+                }
+            }
+        }
+
+        internal static void FixCoordinatesGreaterThanInt32MaxValue(double minX, double minY, double maxX, double maxY, ref Transform actualTransform, ref double int32FactorX, ref double int32FactorY)
+        {
+            const Int32 maxValue = Int32.MaxValue;
+
+            //---------------------------
+            // Check the X axis:
+            //---------------------------
+            if (Math.Abs(minX) > maxValue || Math.Abs(maxX) > maxValue)
+            {
+                // Take the biggest number and caculate a factor so that it stays withing the range of Int32:
+                double max = Math.Max(Math.Abs(minX), Math.Abs(maxX));
+                int32FactorX = (maxValue / max) * 0.99; // Note: we multiply by 0.99 for a conservative margin, to make sure that the final points are not equal to maxValue.
+                double invertedInt32FactorX = 1 / int32FactorX;
+                Matrix scaleTransformMatrix = new Matrix(invertedInt32FactorX, 0, 0, 1, 0, 0);
+                if (actualTransform != null)
+                {
+                    if (actualTransform is MatrixTransform)
+                    {
+                        actualTransform = new MatrixTransform() { Matrix = Matrix.Multiply(scaleTransformMatrix, ((MatrixTransform)actualTransform).Matrix) };
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("The size of the shape exceeds Int32. This is currently supported only if the Transform is null or a MatrixTransform.");
+                    }
+                }
+                else
+                {
+                    actualTransform = new MatrixTransform() { Matrix = scaleTransformMatrix };
+                }
+            }
+
+            //---------------------------
+            // Check the Y axis:
+            //---------------------------
+            if (Math.Abs(minY) > maxValue || Math.Abs(maxY) > maxValue)
+            {
+                // Take the biggest number and caculate a factor so that it stays withing the range of Int32:
+                double max = Math.Max(Math.Abs(minY), Math.Abs(maxY));
+                int32FactorY = (maxValue / max) * 0.99; // Note: we multiply by 0.99 for a conservative margin, to make sure that the final points are not equal to maxValue.
+                double invertedInt32FactorY = 1 / int32FactorY;
+                Matrix scaleTransformMatrix = new Matrix(1, 0, 0, invertedInt32FactorY, 0, 0);
+                if (actualTransform != null)
+                {
+                    if (actualTransform is MatrixTransform)
+                    {
+                        actualTransform = new MatrixTransform() { Matrix = Matrix.Multiply(scaleTransformMatrix, ((MatrixTransform)actualTransform).Matrix) };
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("The size of the shape exceeds Int32. This is currently supported only if the Transform is null or a MatrixTransform.");
+                    }
+                }
+                else
+                {
+                    actualTransform = new MatrixTransform() { Matrix = scaleTransformMatrix };
+                }
+            }
+        }
     }
 }

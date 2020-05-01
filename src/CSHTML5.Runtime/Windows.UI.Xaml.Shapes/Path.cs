@@ -118,21 +118,34 @@ namespace Windows.UI.Xaml.Shapes
                     }
                     Data.GetMinMaxXY(ref minX, ref maxX, ref minY, ref maxY);
 
-#if WORKINPROGRESS
-                    if (Data.Transform != null)
+
+                    // If the rare case that the shape is so big (in terms of coordinates of the points, prior to any transform) that it exceeds the size of Int32 (for an example, refer to the charts in "Client_LD"), we need to make it smaller so that the HTML <canvas> control is able to draw it. We compensate by applying a ScaleTransform to the Data.Tranform:
+                    Transform originalTransform = Data.Transform;
+                    Transform actualTransform = originalTransform;
+                    double int32FactorX = 1d;
+                    double int32FactorY = 1d;
+                    INTERNAL_ShapesDrawHelpers.FixCoordinatesGreaterThanInt32MaxValue(minX,
+                                                                                      minY,
+                                                                                      maxX,
+                                                                                      maxY,
+                                                                                      ref actualTransform,
+                                                                                      ref int32FactorX,
+                                                                                      ref int32FactorY);
+
+                    // Apply the transform to the min/max:
+                    if (originalTransform != null)
                     {
                         // todo: appying the transform to the min/max is accurate only for Scale and 
                         // translate transforms. For other transforms such as rotate, the min/max is incorrect. 
                         // For a correct result, we should apply the transform to each point of the figure.
 
-                        Point tmp1 = Data.Transform.Transform(new Point(minX, minY));
-                        Point tmp2 = Data.Transform.Transform(new Point(maxX, maxY));
+                        Point tmp1 = originalTransform.Transform(new Point(minX, minY));
+                        Point tmp2 = originalTransform.Transform(new Point(maxX, maxY));
                         minX = tmp1._x;
                         minY = tmp1._y;
                         maxX = tmp2._x;
                         maxY = tmp2._y;
                     }
-#endif
 
                     Size shapeActualSize;
                     INTERNAL_ShapesDrawHelpers.PrepareStretch(this, _canvasDomElement, minX, maxX, minY, maxY, Stretch, out shapeActualSize);
@@ -144,20 +157,20 @@ namespace Windows.UI.Xaml.Shapes
                     double xOffsetToApplyAfterMultiplication;
                     double yOffsetToApplyAfterMultiplication;
                     double strokeThickness = Stroke == null ? 0d : StrokeThickness;
-                    INTERNAL_ShapesDrawHelpers.GetMultiplicatorsAndOffsetForStretch(this, 
-                                                                                    strokeThickness, 
-                                                                                    minX, 
-                                                                                    maxX, 
-                                                                                    minY, 
-                                                                                    maxY, 
-                                                                                    Stretch, 
-                                                                                    shapeActualSize, 
-                                                                                    out horizontalMultiplicator, 
-                                                                                    out verticalMultiplicator, 
-                                                                                    out xOffsetToApplyBeforeMultiplication, 
-                                                                                    out yOffsetToApplyBeforeMultiplication, 
-                                                                                    out xOffsetToApplyAfterMultiplication, 
-                                                                                    out yOffsetToApplyAfterMultiplication, 
+                    INTERNAL_ShapesDrawHelpers.GetMultiplicatorsAndOffsetForStretch(this,
+                                                                                    strokeThickness,
+                                                                                    minX,
+                                                                                    maxX,
+                                                                                    minY,
+                                                                                    maxY,
+                                                                                    Stretch,
+                                                                                    shapeActualSize,
+                                                                                    out horizontalMultiplicator,
+                                                                                    out verticalMultiplicator,
+                                                                                    out xOffsetToApplyBeforeMultiplication,
+                                                                                    out yOffsetToApplyBeforeMultiplication,
+                                                                                    out xOffsetToApplyAfterMultiplication,
+                                                                                    out yOffsetToApplyAfterMultiplication,
                                                                                     out _marginOffsets);
 
                     ApplyMarginToFixNegativeCoordinates(new Point());
@@ -169,27 +182,38 @@ namespace Windows.UI.Xaml.Shapes
                     // A call to "context.beginPath" is required on IE and Edge for the figures to be drawn properly (cf. ZenDesk #971):
                     CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d').beginPath()", _canvasDomElement);
 
+                    dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
+
+                    // We want the Transform to be applied only while drawing with the "DefineInCanvas" method, not when applying the stroke and fill, so that the Stroke Thickness does not get affected by the transform (like in Silverlight). To do so, we save the current canvas context, then apply the transform, then draw, and then restore to the original state before applying the stroke:
+                    context.save();
+
+                    // Apply the transform if any:
+                    INTERNAL_ShapesDrawHelpers.ApplyTransformToCanvas(actualTransform, _canvasDomElement);
+
                     //problem here: the shape seems to be overall smaller than intended due to the edges of the path not being sharp?
-                    Data.DefineInCanvas(this, 
-                                        _canvasDomElement, 
-                                        horizontalMultiplicator, 
-                                        verticalMultiplicator, 
-                                        xOffsetToApplyBeforeMultiplication, 
-                                        yOffsetToApplyBeforeMultiplication, 
-                                        xOffsetToApplyAfterMultiplication, 
-                                        yOffsetToApplyAfterMultiplication, 
+                    Data.DefineInCanvas(this,
+                                        _canvasDomElement,
+                                        horizontalMultiplicator * int32FactorX,
+                                        verticalMultiplicator * int32FactorY,
+                                        xOffsetToApplyBeforeMultiplication,
+                                        yOffsetToApplyBeforeMultiplication,
+                                        xOffsetToApplyAfterMultiplication,
+                                        yOffsetToApplyAfterMultiplication,
                                         shapeActualSize);
 
-                    Shape.DrawFillAndStroke(this, 
-                                            Data.GetFillRuleAsString(), 
-                                            minX, 
-                                            minY, 
-                                            maxX, 
-                                            maxY, 
-                                            horizontalMultiplicator, 
-                                            verticalMultiplicator, 
-                                            xOffsetToApplyBeforeMultiplication, 
-                                            yOffsetToApplyBeforeMultiplication, 
+                    // Read the comment near the "save()" above to know what this "restore" is here for.
+                    context.restore();
+
+                    Shape.DrawFillAndStroke(this,
+                                            Data.GetFillRuleAsString(),
+                                            minX,
+                                            minY,
+                                            maxX,
+                                            maxY,
+                                            horizontalMultiplicator,  // Note: here we do not multiply by "int32Factor" because we do not want to affect the tickness
+                                            verticalMultiplicator, // Note: here we do not multiply by "int32Factor" because we do not want to affect the tickness
+                                            xOffsetToApplyBeforeMultiplication,
+                                            yOffsetToApplyBeforeMultiplication,
                                             shapeActualSize);
                 }
             }

@@ -208,10 +208,15 @@ namespace Windows.UI.Xaml.Shapes
                 CSHTML5.Interop.ExecuteJavaScriptAsync("$0.clearRect(0,0, $1, $2)", context, shapeActualSize.Width, shapeActualSize.Height);
 
 
-                double preparedX1 = (X1 + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication;
-                double preparedX2 = (X2 + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication;
-                double preparedY1 = (Y1 + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication;
-                double preparedY2 = (Y2 + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication;
+                //double preparedX1 = (X1 + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication;
+                //double preparedX2 = (X2 + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication;
+                //double preparedY1 = (Y1 + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication;
+                //double preparedY2 = (Y2 + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication;
+                //Note: we replaced the code above with the one below because Bridge.NET has an issue when adding "0" to an Int64 (as of May 1st, 2020), so it is better to first multiply and then add, rather than the contrary:
+                double preparedX1 = X1 * horizontalMultiplicator + xOffsetToApplyBeforeMultiplication * horizontalMultiplicator + xOffsetToApplyAfterMultiplication;
+                double preparedX2 = X2 * horizontalMultiplicator + xOffsetToApplyBeforeMultiplication * horizontalMultiplicator + xOffsetToApplyAfterMultiplication;
+                double preparedY1 = Y1 * verticalMultiplicator + yOffsetToApplyBeforeMultiplication * verticalMultiplicator + yOffsetToApplyAfterMultiplication;
+                double preparedY2 = Y2 * verticalMultiplicator + yOffsetToApplyBeforeMultiplication * verticalMultiplicator + yOffsetToApplyAfterMultiplication;
 
                 //todo: if possible, manage strokeStyle and lineWidth in their respective methods (Stroke_Changed and StrokeThickness_Changed) then use context.save() and context.restore() (can't get it to work yet).
                 double opacity = Stroke == null ? 1 : Stroke.Opacity;

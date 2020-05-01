@@ -183,28 +183,6 @@ namespace Windows.UI.Xaml.Media
 
             if (shapeActualSize.Width > 0 && shapeActualSize.Height > 0)
             {
-                dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
-
-#if WORKINPROGRESS
-                MatrixTransform transform = this.Transform as MatrixTransform;
-                if (transform != null)
-                {
-                    Matrix m = transform.Matrix;
-
-                    // todo: this line gets called AFTER "translate(0.5, 0.5)" (in "INTERNAL_ShapesDrawHelpers.cs"), 
-                    // but instead we should apply it BEFORE, otherwise the (0.5, 0.5) translation may get amplified/distorted 
-                    // by the subsequent transform.
-
-                    context.transform(m.M11, m.M12, m.M21, m.M22, m.OffsetX, m.OffsetY);
-                }
-                else
-                {
-                    if (this.Transform != null)
-                    {
-                        throw new NotSupportedException(string.Format("'{0}' is not currently supported in PathGeometry.", this.Transform.GetType()));
-                    }
-                }
-#endif
 
                 //this will change the context in the canvas to draw itself.
                 foreach (PathFigure figure in Figures)

@@ -88,7 +88,6 @@ namespace Windows.UI.Xaml.Media
             return PathGeometry.INTERNAL_ConvertFromString(pathAsString);
         }
 
-#if WORKINPROGRESS
         public static readonly DependencyProperty TransformProperty = DependencyProperty.Register("Transform", 
                                                                                                   typeof(Transform), 
                                                                                                   typeof(Geometry), 
@@ -111,6 +110,7 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
+#if WORKINPROGRESS
         public Rect Bounds { get; private set; }
 #endif
     }

@@ -204,10 +204,14 @@ namespace Windows.UI.Xaml.Media
             // the filling here (in the PathFigure) instead of in the Redraw of the Path.
 
             Point segmentStartingPosition = new Point(StartPoint.X, StartPoint.Y);
-            
+
             // tell the context that there should be a line from the starting point to this point
-            context.moveTo((StartPoint.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
-                           (StartPoint.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
+            //context.moveTo((StartPoint.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
+            //               (StartPoint.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
+            //Note: we replaced the code above with the one below because Bridge.NET has an issue when adding "0" to an Int64 (as of May 1st, 2020), so it is better to first multiply and then add, rather than the contrary:
+            context.moveTo(StartPoint.X * horizontalMultiplicator + xOffsetToApplyBeforeMultiplication * horizontalMultiplicator + xOffsetToApplyAfterMultiplication,
+                           StartPoint.Y * verticalMultiplicator + yOffsetToApplyBeforeMultiplication * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
+
             foreach (PathSegment segment in Segments)
             {
                 segmentStartingPosition = segment.DefineInCanvas(xOffsetToApplyBeforeMultiplication, 

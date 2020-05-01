@@ -89,8 +89,12 @@ namespace Windows.UI.Xaml.Media
             dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
             // tell the context that there should be a line from the starting point to this point
-            context.lineTo((Point.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
-                           (Point.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
+            //context.lineTo((Point.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
+            //               (Point.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
+            //Note: we replaced the code above with the one below because Bridge.NET has an issue when adding "0" to an Int64 (as of May 1st, 2020), so it is better to first multiply and then add, rather than the contrary:
+            context.lineTo(Point.X * horizontalMultiplicator + xOffsetToApplyBeforeMultiplication * horizontalMultiplicator + xOffsetToApplyAfterMultiplication,
+                           Point.Y * verticalMultiplicator  + yOffsetToApplyBeforeMultiplication * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
+
             return Point;
         }
 
