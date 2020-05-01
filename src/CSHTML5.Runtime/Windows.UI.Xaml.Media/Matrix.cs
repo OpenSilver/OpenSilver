@@ -388,7 +388,6 @@ namespace Windows.UI.Xaml.Media
         //    throw new NotImplementedException();
         //}
 
-#if WORKINPROGRESS
         internal void MultiplyPoint(ref double x, ref double y)
         {
             double xadd = y * _m21 + _offsetX;
@@ -405,7 +404,17 @@ namespace Windows.UI.Xaml.Media
             MultiplyPoint(ref newPoint._x, ref newPoint._y);
             return newPoint;
         }
-#endif
+
+        internal static Matrix Multiply(Matrix matrix1, Matrix matrix2)
+        {
+            return new Matrix(
+                (matrix1.M11 * matrix2.M11) + (matrix1.M12 * matrix2.M21),
+                (matrix1.M11 * matrix2.M12) + (matrix1.M12 * matrix2.M22),
+                (matrix1.M21 * matrix2.M11) + (matrix1.M22 * matrix2.M21),
+                (matrix1.M21 * matrix2.M12) + (matrix1.M22 * matrix2.M22),
+                ((matrix1.OffsetX * matrix2.M11) + (matrix1.OffsetY * matrix2.M21)) + matrix2.OffsetX,
+                ((matrix1.OffsetX * matrix2.M12) + (matrix1.OffsetY * matrix2.M22)) + matrix2.OffsetY);
+        }
     }
 
 }
