@@ -31,7 +31,6 @@ using System.Windows.Media;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using CSHTML5;
 #endif
 
 #if MIGRATION
@@ -1071,7 +1070,7 @@ var range,selection;
         void InternetExplorer_GotFocus(object sender, RoutedEventArgs e)
         {
 #if !CSHTML5NETSTANDARD //todo: fixme
-            previousInnerText = Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
+            previousInnerText = CSHTML5.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
 #endif
         }
 
@@ -1083,7 +1082,7 @@ var range,selection;
         void InternetExplorer_RaiseTextChangedIfNecessary()
         {
 #if !CSHTML5NETSTANDARD //todo: fixme
-            string newInnerText = Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
+            string newInnerText = CSHTML5.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
             if (newInnerText != previousInnerText)
             {
                 TextAreaValueChanged();
