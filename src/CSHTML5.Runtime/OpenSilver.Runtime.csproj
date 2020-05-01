@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
 	<PropertyGroup>
 		<BaseIntermediateOutputPath>obj\OpenSilver</BaseIntermediateOutputPath>
 	</PropertyGroup>
@@ -52,6 +52,7 @@
 		<PackageReference Include="System.Text.Json" Version="4.7.0" />
 	</ItemGroup>
 	<ItemGroup>
+		<Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ChangePropertyAction.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ComparisonConditionType.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ControlStoryboardAction.cs" />
@@ -307,7 +308,6 @@
 		<Compile Include="Core\Main\DelegateUtility.cs" />
 		<Compile Include="Core\Main\INameScope.cs" />
 		<Compile Include="Core\Main\INTERNAL_ListsHelper.cs" />
-		<Compile Include="Core\Main\INTERNAL_NoValue.cs" />
 		<Compile Include="Core\Main\INTERNAL_PropertyStorage.cs" />
 		<Compile Include="Core\Main\INTERNAL_PropertyStore.cs" />
 		<Compile Include="Core\Main\INTERNAL_Simulator.cs" />
@@ -316,7 +316,6 @@
 		<Compile Include="Core\Main\INTERNAL_TypeToDependencyPropertiesThatRequirePropertyChanged.cs" />
 		<Compile Include="Core\Main\INTERNAL_TypeToStringToDependencyProperty.cs" />
 		<Compile Include="Core\Main\INTERNAL_UriHelper.cs" />
-		<Compile Include="Core\Main\KindOfValue.cs" />
 		<Compile Include="Core\Main\NamespacesDocumentation.cs" />
 		<Compile Include="Core\Main\SupportsDirectContentViaTypeFromStringConvertersAttribute.cs" />
 		<Compile Include="Core\Main\TypeFromStringConverters.cs" />
