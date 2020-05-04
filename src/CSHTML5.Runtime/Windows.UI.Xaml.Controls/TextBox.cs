@@ -414,6 +414,12 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             object contentEditableDiv;
             var contentEditableDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", middleDiv, this, out contentEditableDiv);
             _contentEditableDiv = contentEditableDiv;
+            if (INTERNAL_HtmlDomManager.IsInternetExplorer())
+            {
+                //set the class to remove margins on <p> inside the contentEditableDiv
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.classList.add(""ie_set_p_margins_to_zero"")", contentEditableDiv);
+            }
+
             contentEditableDivStyle.width = "100%";
             contentEditableDivStyle.height = "100%";
             contentEditableDivStyle.whiteSpace = "pre-wrap"; // Because by default we have decided to make the TextBox wrap, because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
