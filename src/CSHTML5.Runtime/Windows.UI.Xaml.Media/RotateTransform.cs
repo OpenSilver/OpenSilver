@@ -73,7 +73,7 @@ namespace Windows.UI.Xaml.Media
 
         private void ApplyCSSChanges(RotateTransform rotateTransform, double angle)
         {
-            CSSEquivalent anglecssEquivalent = AngleProperty.GetTypeMetaData(typeof(TranslateTransform)).GetCSSEquivalent(rotateTransform);
+            CSSEquivalent anglecssEquivalent = AngleProperty.GetTypeMetaData(typeof(RotateTransform)).GetCSSEquivalent(rotateTransform);
             object domElement = anglecssEquivalent.DomElement;
             if (angle != _appliedCssAngle || (_domElementToWhichTheCssWasApplied != null && domElement != _domElementToWhichTheCssWasApplied)) // Optimization to avoid setting the transform if the value is 0 or if it is the same as the last time.
             {
