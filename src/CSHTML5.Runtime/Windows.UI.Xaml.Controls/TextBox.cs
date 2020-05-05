@@ -545,13 +545,19 @@ $0.addEventListener('keydown', function(e) {
                 range.deleteContents();
                 range.insertNode(document.createTextNode('\t'));
                 sel.collapseToEnd();
+                range.collapse(false); //for IE
             }
         } else if (document.selection && document.selection.createRange) {
             range = document.selection.createRange();
             range.text = '\t';
             document.selection.collapseToEnd();
         }
-        
+        if (window.IS_EDGE)
+        {
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+
         instance.TextAreaValueChanged(); //todo: test this.
         e.preventDefault();
             return false;
@@ -606,13 +612,19 @@ $0.addEventListener('keydown', function(e) {
                 range.deleteContents();
                 range.insertNode(document.createTextNode('\t'));
                 sel.collapseToEnd();
+                range.collapse(false); //for IE
             }
         } else if (document.selection && document.selection.createRange) {
             range = document.selection.createRange();
             range.text = '\t';
             document.selection.collapseToEnd();
         }
-        
+        if (window.IS_EDGE)
+        {
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+
         instance.TextAreaValueChanged(); //todo: test this.
         e.preventDefault();
             return false;
@@ -755,13 +767,19 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
                 range.deleteContents();
                 range.insertNode(document.createTextNode('\t'));
                 sel.collapseToEnd();
+                range.collapse(false); //for IE
             }}
         }} else if (document.selection && document.selection.createRange) {{
             range = document.selection.createRange();
             range.text = '\t';
             document.selection.collapseToEnd();
         }}
-        
+        if (window.IS_EDGE)
+        {{
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }}
+
         instance.TextAreaValueChanged(); //todo: test this.
         e.preventDefault();
             return false;
