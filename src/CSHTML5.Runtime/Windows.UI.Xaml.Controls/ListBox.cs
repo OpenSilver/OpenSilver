@@ -103,6 +103,11 @@ namespace Windows.UI.Xaml.Controls
             ListBoxItem listBoxItem = item as ListBoxItem ?? new ListBoxItem();
             listBoxItem.INTERNAL_CorrespondingItem = item;
             listBoxItem.INTERNAL_ParentSelectorControl = this;
+            if(SelectedItems.Contains(item))
+            {
+                //todo if possible: reuse the former items if they were already created rather than recreating them. It would actually be necessary to avoir errors like item is a string and there are two items with the same string, but only one of them is selected. Both will be considered (un)selected.
+                listBoxItem.IsSelected = true; //this can be needed when the SelectedItems collection was modified before the ListBox.Loaded event happened (which leads to an ItemsControl.UpdateItemsPanel, which then leads here).
+            }
             listBoxItem.Click += listBoxItem_Click;
             return listBoxItem;
         }
@@ -139,14 +144,15 @@ namespace Windows.UI.Xaml.Controls
             if (e.NewValue != null && e.NewValue is int && Convert.ToInt32(e.NewValue) >= 0)
             {
                 int newValue = Convert.ToInt32(e.NewValue);
+                object item = Items[newValue];
                 if (SelectionMode == SelectionMode.Single)
                 {
                     INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
-                    SelectedItems.Add(Items[newValue]);
+                    SelectedItems.Add(item);
                 }
-                else if (!INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(SelectedItems, e.NewValue))
+                else if (!INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(SelectedItems, item))
                 {
-                    SelectedItems.Add(Items[newValue]);
+                    SelectedItems.Add(item);
                 }
             }
         }
@@ -283,6 +289,15 @@ namespace Windows.UI.Xaml.Controls
                 if (newState)
                 {
                     SelectedItem = item;
+                }
+                else
+                {
+                    //trigger the OnSelectionChanged event:
+                    List<object> oldItems = new List<object>();
+                    oldItems.Add(item);
+                    List<object> newItems = new List<object>();
+                    //newItems.Add(null);
+                    OnSelectionChanged(new SelectionChangedEventArgs(oldItems, newItems));
                 }
                 //else
                 //{
