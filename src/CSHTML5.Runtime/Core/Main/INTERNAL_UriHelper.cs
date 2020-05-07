@@ -162,14 +162,14 @@ namespace CSHTML5.Internal
 
                 return html5Path;
             }
-            else if (uri.Contains(@";component/"))
+            else if (originalStringLowercase.Contains(@";component/"))
             {
                 //----------------
                 // This is the Silverlight/WPF syntax for files in the app package (absolute paths).
                 //----------------
 
                 string componentKeyword = @";component/";
-                int indexOfComponentKeyword = uri.IndexOf(componentKeyword);
+                int indexOfComponentKeyword = originalStringLowercase.IndexOf(componentKeyword); //We use the lowercase version of the uri to get the index, so "Component" can work. The index will still be the same.
                 string assemblyName = uri.Substring(0, indexOfComponentKeyword);
                 assemblyName = TrimStartChars(TrimStartChars(assemblyName, '/'), '\\');
                 assemblyName = TrimEndChars(TrimEndChars(assemblyName, '/'), '\\');
