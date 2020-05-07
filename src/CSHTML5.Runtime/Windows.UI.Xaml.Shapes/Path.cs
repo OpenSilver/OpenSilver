@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml.Shapes
     /// are declared through the Data property, and can be specified either with
     /// a path-specific mini-language, or with an object model.
     /// </summary>
-    public sealed partial class Path : Shape
+    public partial class Path : Shape
     {
         //todo: Set the default Stretch to none and position to top left (if not already top left)
         // Stretch behaviour:
