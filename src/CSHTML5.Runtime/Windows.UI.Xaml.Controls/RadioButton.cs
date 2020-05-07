@@ -253,6 +253,10 @@ var radios = document.getElementsByName( $0 );
                 INTERNAL_CheckBoxAndRadioButtonHelpers.SubscribeToBasicEventsForRadioButton(this, this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus, this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
                 UpdateDomBasedOnCheckedState(IsChecked);
             }
+            else
+            {
+                base.INTERNAL_OnAttachedToVisualTree();
+            }
 
             if (string.IsNullOrWhiteSpace(GroupName))
             {
