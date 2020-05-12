@@ -27,85 +27,122 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    /// <exclude/>
-    public sealed partial class SetterBaseCollection : List<Setter> //ObservableCollection<Setter> // IList<SetterBase>, IEnumerable<SetterBase>
+    /// <summary>
+    /// Represents a collection of objects that inherit from System.Windows.SetterBase.
+    /// </summary>
+    public sealed partial class SetterBaseCollection : PresentationFrameworkCollection<SetterBase>
     {
-        //todo: once this will be changed into an ObservableCollection, so that it updates its _dictionaryOfSetters with the changes that are made on Style.Setters
+        #region Data
 
+        private bool _sealed;
 
+        #endregion Data
 
-        //List<SetterBase> _list = new List<SetterBase>();
-        //public int IndexOf(SetterBase item)
-        //{
-        //    return _list.IndexOf(item);
-        //}
+        #region Constructor
 
-        //public void Insert(int index, SetterBase item)
-        //{
-        //    _list.Insert(index,item);
-        //}
+        /// <summary>
+        /// Initializes a new instance of the System.Windows.SetterBaseCollection class.
+        /// </summary>
+        public SetterBaseCollection()
+        {
 
-        //public void RemoveAt(int index)
-        //{
-        //    _list.RemoveAt(index);
-        //}
+        }
 
-        //public SetterBase this[int index]
-        //{
-        //    get
-        //    {
-        //        return _list[index];
-        //    }
-        //    set
-        //    {
-        //        _list[index] = value;
-        //    }
-        //}
+        #endregion
 
-        //public void Add(SetterBase item)
-        //{
-        //    _list.Add(item);
-        //}
+        #region Public Properties
 
-        //public void Clear()
-        //{
-        //    _list.Clear();
-        //}
+        /// <summary>
+        ///     Returns the sealed state of this object.  If true, any attempt
+        ///     at modifying the state of this object will trigger an exception.
+        /// </summary>
+        public bool IsSealed
+        {
+            get
+            {
+                return _sealed;
+            }
+        }
 
-        //public bool Contains(SetterBase item)
-        //{
-        //    return _list.Contains(item);
-        //}
+        #endregion
 
-        //public void CopyTo(SetterBase[] array, int arrayIndex)
-        //{
-        //    _list.CopyTo(array, arrayIndex);
-        //}
+        #region Overriden Methods
 
-        //public int Count
-        //{
-        //    get { return _list.Count; }
-        //}
+        // Note: Even if SetterBase derives from DependencyObject, we don't use
+        // the methods that are supposed to handle collections of DependencyObject
+        // as we don't want the inheritance context to be propagated to Setters.
 
-        //public bool Remove(SetterBase item)
-        //{
-        //    return _list.Remove(item);
-        //}
+        internal override void AddOverride(SetterBase value)
+        {
+            this.CheckSealed();
+            this.SetterBaseValidation(value);
+            this.AddInternal(value);
+        }
 
-        //public IEnumerator<SetterBase> GetEnumerator()
-        //{
-        //    return _list.GetEnumerator();
-        //}
+        internal override void ClearOverride()
+        {
+            this.CheckSealed();
+            this.ClearInternal();
+        }
 
-        //IEnumerator IEnumerable.GetEnumerator()
-        //{
-        //    return _list.GetEnumerator();
-        //}
+        internal override void InsertOverride(int index, SetterBase value)
+        {
+            this.CheckSealed();
+            this.SetterBaseValidation(value);
+            this.InsertInternal(index, value);
+        }
 
+        internal override void RemoveAtOverride(int index)
+        {
+            this.CheckSealed();
+            this.RemoveAtInternal(index);
+        }
 
-        //public bool IsReadOnly
-        //{
-        //    get { throw new NotImplementedException(); }
-        //}
+        internal override bool RemoveOverride(SetterBase value)
+        {
+            this.CheckSealed();
+            this.SetterBaseValidation(value);
+            return this.RemoveInternal(value);
+        }
+
+        internal override void SetItemOverride(int index, SetterBase value)
+        {
+            this.CheckSealed();
+            this.SetterBaseValidation(value);
+            this.SetItemInternal(index, value);
+        }
+
+        #endregion
+
+        #region Internal Methods
+
+        internal void Seal()
+        {
+            _sealed = true;
+
+            // Seal all the setters
+            for (int i = 0; i < Count; i++)
+            {
+                this[i].Seal();
+            }
+        }
+
+        private void CheckSealed()
+        {
+            if (_sealed)
+            {
+                throw new InvalidOperationException(string.Format("Cannot modify a '{0}' after it is sealed.", "SetterBaseCollection"));
+            }
+        }
+
+        private void SetterBaseValidation(SetterBase setterBase)
+        {
+            if (setterBase == null)
+            {
+                throw new ArgumentNullException("setterBase");
+            }
+        }
+
+        #endregion
     }
 }

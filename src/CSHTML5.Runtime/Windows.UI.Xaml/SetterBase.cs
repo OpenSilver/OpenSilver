@@ -30,38 +30,42 @@ namespace Windows.UI.Xaml
     /// </summary>
     public abstract partial class SetterBase : DependencyObject
     {
-        private bool _isSealed;
-
+        /// <summary>
+        ///     SetterBase construction
+        /// </summary>
         internal SetterBase()
         {
-            this.CanBeInheritanceContext = false;
         }
 
+        /// <summary>
+        ///     Returns the sealed state of this object.  If true, any attempt
+        /// at modifying the state of this object will trigger an exception.
+        /// </summary>
         public bool IsSealed
         {
             get
             {
-                return this._isSealed;
+                return _sealed;
             }
         }
-        ///// <summary>
-        ///// Gets a value that indicates whether this object is in an immutable state.
-        ///// </summary>
-        //public bool IsSealed
-        //{
-        //    get { return (bool)GetValue(IsSealedProperty); }
-        //    internal set { SetValue(IsSealedProperty, value); }
-        //}
-        ///// <summary>
-        ///// Identifies the IsSealed dependency property.
-        ///// </summary>
-        //public static readonly DependencyProperty IsSealedProperty =
-        //    DependencyProperty.Register("IsSealed", typeof(bool), typeof(SetterBase), new PropertyMetadata(null, IsSealed_Changed));
 
+        internal virtual void Seal()
+        {
+            _sealed = true;
+        }
 
-        //static void IsSealed_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        //{
-        //    //todo: fill this
-        //}
+        /// <summary>
+        ///  Subclasses need to call this method before any changes to their state.
+        /// </summary>
+        protected void CheckSealed()
+        {
+            if (_sealed)
+            {
+                throw new InvalidOperationException(string.Format("Cannot modify a '{0}' after it is sealed.", "SetterBase"));
+            }
+        }
+
+        // Derived
+        private bool _sealed;
     }
 }

@@ -56,9 +56,19 @@ namespace Windows.UI.Xaml
         // Note: this is a "partial" class. For anything related to Size and Alignment, please refer to the other file ("FrameworkElement_HandlingSizeAndAlignment.cs").
         //--------------------------------------
 
-        internal bool INTERNAL_IsImplicitStyle = false; //note: this is used to be able to tell whether the style applied on the FrameworkElement is an ImplicitStyle, which means that it must be removed from the element when it is detached from the visual tree.
-        internal bool INTERNAL_ForceEnableAllPointerEvents = false; //Note: this is used by the PopupRoot to ensure that the PopupRoot has no pointer events while the container has. //todo: replace with another technique to achieve the same result.
+        // Note: this is used to be able to tell whether the style applied on 
+        // the FrameworkElement is an ImplicitStyle, which means that it must 
+        // be removed from the element when it is detached from the visual tree.
+        //internal bool INTERNAL_IsImplicitStyle = false;
+
+        // Note: this is used by the PopupRoot to ensure that the PopupRoot 
+        // has no pointer events while the container has. 
+        // todo: replace with another technique to achieve the same result.
+        internal bool INTERNAL_ForceEnableAllPointerEvents = false;
+
+        [Obsolete]
         internal Style INTERNAL_defaultStyle;
+
         private ResourceDictionary _resources;
 
         /// <summary>
@@ -72,6 +82,20 @@ namespace Windows.UI.Xaml
         /// </summary>
         public FrameworkElement()
         {
+            // Initialize the _styleCache to the default value for StyleProperty.
+            // If the default value is non-null then wire it to the current instance.
+            PropertyMetadata metadata = StyleProperty.GetMetadata(this.GetType());
+            Style defaultValue = (Style) metadata.DefaultValue;
+            if (defaultValue != null)
+            {
+                OnStyleChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, StyleProperty));
+            }
+
+            Application app = Application.Current;
+            if (app != null && app.Resources.INTERNAL_HasImplicitStyles)
+            {
+                ShouldLookupImplicitStyles = true;
+            }
         }
 
 #if REVAMPPOINTEREVENTS
@@ -106,14 +130,36 @@ namespace Windows.UI.Xaml
             }
             set
             {
+                ResourceDictionary oldResources = Resources;
                 _resources = value;
+
+                if (oldResources == value)
+                {
+                    return;
+                }
+
+                if (value != null)
+                {
+                    if (value.INTERNAL_HasImplicitStyles)
+                    {
+                        ShouldLookupImplicitStyles = true;
+                    }
+                }
+
+                HasStyleInvalidated = false;
+
+                if (HasImplicitStyleFromResources == true && 
+                    (oldResources.Contains(GetType()) || Style == StyleProperty.GetMetadata(GetType()).DefaultValue))
+                {
+                    UpdateStyleProperty();
+                }
             }
         }
         /// <summary>
         /// Returns a list of the parents' resourceDictionaries that contain at least one implicit Style.
         /// It excludes this FrameworkElement's own Resources so that we don't have to get the list from the parent.
         /// </summary>
-        internal List<ResourceDictionary> INTERNAL_InheritedImplicitStyles = null; //this is set in the INTERNAL_VisualTreeManager.AttachVisualChild_Private(UIElement child, UIElement parent) method
+        //internal List<ResourceDictionary> INTERNAL_InheritedImplicitStyles = null; //this is set in the INTERNAL_VisualTreeManager.AttachVisualChild_Private(UIElement child, UIElement parent) method
 
         #endregion
 
@@ -528,151 +574,213 @@ namespace Windows.UI.Xaml
 
         #region Handling Styles
 
+        [Obsolete("Use DefaultStyleKey")]
         protected void INTERNAL_SetDefaultStyle(Style defaultStyle)
         {
             INTERNAL_defaultStyle = defaultStyle;
         }
+
+        // Style/Template state (internals maintained by Style, per-instance data in StyleDataField)
+        private Style _styleCache;
+
+        // ThemeStyle used only when a ThemeStyleKey is specified (per-instance data in ThemeStyleDataField)
+        private Style _themeStyleCache;
 
         /// <summary>
         /// Gets or sets an instance Style that is applied for this object during rendering.
         /// </summary>
         public Style Style
         {
-            get { return (Style)GetValue(StyleProperty); }
-            set
-            {
-                SetValue(StyleProperty, value);
-                INTERNAL_IsImplicitStyle = false; //set to false so that we do not mistakenly remove a style (when detaching it from the visual tree) that might have been applied on an element that had an implicit Style.
-            }
+            get { return _styleCache; }
+            set { SetValue(StyleProperty, value); }
         }
         /// <summary>
         /// Identifies the Style dependency property.
         /// </summary>
         public static readonly DependencyProperty StyleProperty =
-            DependencyProperty.Register("Style", typeof(Style), typeof(FrameworkElement), new PropertyMetadata(null, Style_Changed));
+            DependencyProperty.Register("Style", typeof(Style), typeof(FrameworkElement), new PropertyMetadata(null, OnStyleChanged));
 
-        private static void Style_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var frameworkElement = (FrameworkElement)d;
+            FrameworkElement fe = (FrameworkElement)d;
+            fe.HasLocalStyle = fe.ReadLocalValue(StyleProperty) != DependencyProperty.UnsetValue;
+            UpdateStyleCache(fe, (Style)e.OldValue, (Style)e.NewValue, ref fe._styleCache);
+        }
 
-            if (!frameworkElement.INTERNAL_DoNotApplyStyle)
+        //
+        //  This method
+        //  1. Updates the style cache for the given fe
+        //
+        private static void UpdateStyleCache(
+            FrameworkElement fe,
+            Style oldStyle,
+            Style newStyle,
+            ref Style styleCache)
+        {
+            Dictionary<DependencyProperty, object> newStylePropertyValues = null;
+            if (newStyle != null)
             {
-                Style newStyle = (Style)e.NewValue;
-                Style oldStyle = (Style)e.OldValue;
+                // We have a new style.  Make sure it's targeting the right
+                // type, and then seal it.
 
-                Dictionary<DependencyProperty, Setter> oldStyleDictionary = new Dictionary<DependencyProperty, Setter>();
-                if (oldStyle != null)
+                newStyle.CheckTargetType(fe);
+                newStyle.Seal();
+                newStylePropertyValues = newStyle.EffectiveValues;
+            }
+
+            styleCache = newStyle;
+
+            if (oldStyle != null)
+            {
+                // Clear old style values
+                // if a property is about to be set again in the new style
+                // we don't unset the value directly to prevent from potientially
+                // firing the DependencyPropertyChanged callback twice.                
+                Dictionary<DependencyProperty, object> oldStylePropertyValues = oldStyle.EffectiveValues;
+                IEnumerable<DependencyProperty> removedProperties = oldStylePropertyValues.Where(kp => newStylePropertyValues == null || !newStylePropertyValues.ContainsKey(kp.Key))
+                                                                                          .Select(kp => kp.Key);
+                foreach (var property in removedProperties)
                 {
-                    oldStyleDictionary = oldStyle.GetDictionaryOfSettersFromStyle();
+                    fe.SetLocalStyleValue(property, DependencyProperty.UnsetValue);
                 }
-                Dictionary<DependencyProperty, Setter> newStyleDictionary = new Dictionary<DependencyProperty, Setter>();
-                if (newStyle != null)
+            }
+
+            if (newStyle != null)
+            {
+                foreach (var propertyValue in newStylePropertyValues)
                 {
-                    newStyleDictionary = newStyle.GetDictionaryOfSettersFromStyle();
-                }
-
-#if PERFSTAT
-                var t0 = Performance.now();
-#endif
-                frameworkElement.RecursivelyUnregisterFromStyleChangedEvents(oldStyle);
-#if PERFSTAT
-                Performance.Counter("RecursivelyUnregisterFromStyleChangedEvents", t0);
-#endif
-
-#if PERFSTAT
-                var t1 = Performance.now();
-#endif
-                frameworkElement.RecursivelyRegisterToStyleChangedEvents(newStyle);
-#if PERFSTAT
-                Performance.Counter("RecursivelyRegisterToStyleChangedEvents", t1);
-#endif
-
-                foreach (Setter oldSetter in oldStyleDictionary.Select(kp => kp.Value))
-                {
-                    if (oldSetter.Property != null) // Note: it can be null for example in the XAML text editor during design time, because the "DependencyPropertyConverter" class returns "null".
+                    object value;
+                    BindingExpression expr = propertyValue.Value as BindingExpression;
+                    if (expr != null)
                     {
-                        if (!newStyleDictionary.ContainsKey(oldSetter.Property)) // only handle this property here if it is not going set by the new style
+                        value = new BindingExpression(expr.ParentBinding.Clone(), propertyValue.Key);
+                    }
+                    else
+                    {
+                        value = propertyValue.Value;
+                    }
+                    fe.SetLocalStyleValue(propertyValue.Key, value);
+                }
+            }
+        }
+
+        // Indicates if the StyleProperty has been invalidated during a tree walk
+        internal bool HasStyleInvalidated
+        {
+            get { return ReadInternalFlag(InternalFlags.HasStyleInvalidated); }
+            set { WriteInternalFlag(InternalFlags.HasStyleInvalidated, value); }
+        }
+
+        // Indicates if the Style is being re-evaluated
+        internal bool IsStyleUpdateInProgress
+        {
+            get { return ReadInternalFlag(InternalFlags.IsStyleUpdateInProgress); }
+            set { WriteInternalFlag(InternalFlags.IsStyleUpdateInProgress, value); }
+        }
+
+        // Indicates if there are any implicit styles in the ancestry
+        internal bool ShouldLookupImplicitStyles
+        {
+            get { return ReadInternalFlag(InternalFlags.ShouldLookupImplicitStyles); }
+            set { WriteInternalFlag(InternalFlags.ShouldLookupImplicitStyles, value); }
+        }
+
+        // Note: this is used to be able to tell whether the style applied on 
+        // the FrameworkElement is an ImplicitStyle, which means that it must 
+        // be removed from the element when it is detached from the visual tree.
+
+        // Indicates if this instance has an implicit style
+        internal bool HasImplicitStyleFromResources
+        {
+            get { return ReadInternalFlag(InternalFlags.HasImplicitStyleFromResources); }
+            set { WriteInternalFlag(InternalFlags.HasImplicitStyleFromResources, value); }
+        }
+
+        internal void UpdateStyleProperty()
+        {
+            if (!HasStyleInvalidated)
+            {
+                if (IsStyleUpdateInProgress == false)
+                {
+                    IsStyleUpdateInProgress = true;
+                    try
+                    {
+                        // Try to find an implicit style
+                        object implicitStyle = FrameworkElement.FindImplicitStyleResource(this, this.GetType());
+                        if (implicitStyle != DependencyProperty.UnsetValue)
                         {
-                            d.SetLocalStyleValue(oldSetter.Property, DependencyProperty.UnsetValue);
+                            // An implicit style was found
+                            HasImplicitStyleFromResources = true;
+                            Style = (Style)implicitStyle;
+                        }
+                        HasStyleInvalidated = true;
+                    }
+                    finally
+                    {
+                        IsStyleUpdateInProgress = false;
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException(string.Format("Cyclic reference found while evaluating the Style property on element '{0}'.", this));
+                }
+            }
+        }
+
+        internal static object FindImplicitStyleResource(FrameworkElement fe, object resourceKey)
+        {
+            if (fe.ShouldLookupImplicitStyles)
+            {
+                object implicitStyle;
+                // First, try to find an implicit style in parents' resources.
+                for (FrameworkElement f = fe; f != null; f = (FrameworkElement)f.Parent)
+                {
+                    if (f.Resources.INTERNAL_HasImplicitStyles)
+                    {
+                        if (f.Resources.TryGetValue(resourceKey, out implicitStyle))
+                        {
+                            return implicitStyle;
                         }
                     }
-
-                    // Reset the information that tells which Style the Setter belongs to (this is used so that when the Value of the Setter changes, the Setter can notify its parent Style):
-                    oldSetter.INTERNAL_ParentStyle = null;
                 }
-
-                foreach (Setter newSetter in newStyleDictionary.Select(kp => kp.Value))
+                // Then we try to find the resource in the App's Resources
+                // if we can't find it in the parents.
+                Application app = Application.Current;
+                if (app != null)
                 {
-                    if (newSetter.Property != null) // Note: it can be null for example in the XAML text editor during design time, because the "DependencyPropertyConverter" class returns "null".
+                    if (app.Resources.TryGetValue(resourceKey, out implicitStyle))
                     {
-                        object baseValue = newSetter.ReadLocalValue(Setter.ValueProperty);
-                        if (baseValue != DependencyProperty.UnsetValue)
-                        {
-                            object value;
-                            if (baseValue is BindingExpression expr)
-                            {
-                                value = new BindingExpression(expr.ParentBinding.Clone(), expr.TargetProperty);
-                            }
-                            else
-                            {
-                                value = newSetter.Value;
-                            }
-                            frameworkElement.SetLocalStyleValue(newSetter.Property, value);
-                        }
+                        return implicitStyle;
                     }
-
-                    // Tell the setter which Style it belongs to, so that when the Value of the Setter changes, it can notify the parent Style:
-                    newSetter.INTERNAL_ParentStyle = newStyle;
                 }
             }
-        }
-
-        private void RecursivelyRegisterToStyleChangedEvents(Style newStyle)
-        {
-            // We traverse the Style hierarchy with the "BasedOn" property:
-            HashSet2<Style> stylesAlreadyVisited = new HashSet2<Style>(); // This is to prevent an infinite loop below.
-            while (newStyle != null && !stylesAlreadyVisited.Contains(newStyle))
-            {
-                newStyle.SetterValueChanged -= StyleSetterValueChanged;
-                newStyle.SetterValueChanged += StyleSetterValueChanged;
-                stylesAlreadyVisited.Add(newStyle);
-                newStyle = newStyle.BasedOn;
-            }
-        }
-
-        private void RecursivelyUnregisterFromStyleChangedEvents(Style oldStyle)
-        {
-            // We traverse the Style hierarchy with the "BasedOn" property:
-            HashSet2<Style> stylesAlreadyVisited = new HashSet2<Style>(); // This is to prevent an infinite loop below.
-            while (oldStyle != null && !stylesAlreadyVisited.Contains(oldStyle))
-            {
-                oldStyle.SetterValueChanged -= StyleSetterValueChanged;
-                stylesAlreadyVisited.Add(oldStyle);
-                oldStyle = oldStyle.BasedOn;
-            }
-        }
-
-        internal void StyleSetterValueChanged(object sender, RoutedEventArgs e)
-        {
-            Setter setter = (Setter)sender;
-            if (setter.Property != null) // Note: it can be null for example in the XAML text editor during design time, because the "DependencyPropertyConverter" class returns "null".
-            {
-                HashSet2<Style> stylesAlreadyVisited = new HashSet2<Style>(); // Note: "stylesAlreadyVisited" is here to prevent an infinite recursion.
-                object value = Style.GetActiveValue(setter.Property, stylesAlreadyVisited);
-                // just ignore the value change if it is a BindingExpression
-                if (!(value is BindingExpression))
-                {
-                    this.SetLocalStyleValue(setter.Property, value);
-                }
-            }
+            return DependencyProperty.UnsetValue;
         }
 
         #region DefaultStyleKey
 
-        // Returns:
-        //     The key that references the default style for the control. To work correctly
-        //     as part of theme style lookup, this value is expected to be the System.Type
-        //     of the control being styled.
+        // Indicates if the ThemeStyle is being re-evaluated
+        internal bool IsThemeStyleUpdateInProgress
+        {
+            get { return ReadInternalFlag(InternalFlags.IsThemeStyleUpdateInProgress); }
+            set { WriteInternalFlag(InternalFlags.IsThemeStyleUpdateInProgress, value); }
+        }
+
+        // Indicates that the ThemeStyleProperty full fetch has been
+        // performed atleast once on this node
+        internal bool HasThemeStyleEverBeenFetched
+        {
+            get { return ReadInternalFlag(InternalFlags.HasThemeStyleEverBeenFetched); }
+            set { WriteInternalFlag(InternalFlags.HasThemeStyleEverBeenFetched, value); }
+        }
+
+        // Indicates that the StyleProperty has been set locally on this element
+        internal bool HasLocalStyle
+        {
+            get { return ReadInternalFlag(InternalFlags.HasLocalStyle); }
+            set { WriteInternalFlag(InternalFlags.HasLocalStyle, value); }
+        }
+
         /// <summary>
         /// Gets or sets the key that references the default style for the control.
         /// </summary>
@@ -687,33 +795,179 @@ namespace Windows.UI.Xaml
         /// property.
         /// </summary>
         public static readonly DependencyProperty DefaultStyleKeyProperty =
-            DependencyProperty.Register("DefaultStyleKey", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null, DefaultStyleKey_Changed));
+            DependencyProperty.Register("DefaultStyleKey", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null, OnThemeStyleKeyChanged));
 
-        private static void DefaultStyleKey_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnThemeStyleKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            FrameworkElement element = (FrameworkElement)d;
-            object newValue = e.NewValue;
-            if (newValue != null)
+            // Re-evaluate ThemeStyle because it is
+            // a factor of the ThemeStyleKey property
+            ((FrameworkElement)d).UpdateThemeStyleProperty();
+        }
+
+        /// <summary>
+        ///     This method causes the ThemeStyleProperty to be re-evaluated
+        /// </summary>
+        internal void UpdateThemeStyleProperty()
+        {
+            if (IsThemeStyleUpdateInProgress == false)
             {
-                // we start by looking for the generic.xaml file defined in the assembly where the control is defined.
-                Style newStyle = Application.Current.XamlResourcesHandler.TryFindResourceInGenericXaml(element.GetType().Assembly, newValue) as Style;
-                // if we don't find it in the element assembly then we try to find it in the assembly where newValue is defined (since newValue is supposed to be a Type)
-                if (newStyle == null)
+                IsThemeStyleUpdateInProgress = true;
+                try
                 {
-                    if (newValue is Type)
-                    {
-                        newStyle = Application.Current.XamlResourcesHandler.TryFindResourceInGenericXaml(((Type)newValue).Assembly, newValue) as Style;
-                    }
+                    FrameworkElement.GetThemeStyle(this);
                 }
-                //todo: if it can be somewhere else than in themes/generic.xaml, find out how and deal with that case.
-                element.INTERNAL_SetDefaultStyle(newStyle);
+                finally
+                {
+                    IsThemeStyleUpdateInProgress = false;
+                }
             }
             else
             {
-                element.INTERNAL_SetDefaultStyle(null);
+                throw new InvalidOperationException(string.Format("Cyclic reference found while evaluating the ThemeStyle property on element '{0}'.", this));
             }
         }
 
+        internal static Style GetThemeStyle(FrameworkElement fe)
+        {
+            // If this is the first time that the ThemeStyleProperty
+            // is being fetched then mark it such
+            fe.HasThemeStyleEverBeenFetched = true;
+
+            // Fetch the DefaultStyleKey and the self Style for
+            // the given FrameworkElement
+            object themeStyleKey = fe.DefaultStyleKey;
+            //Style selfStyle = fe.Style;
+            Style oldThemeStyle = fe.ThemeStyle;
+            Style newThemeStyle = null;
+
+            // Don't lookup properties from the themes if user has specified OverridesDefaultStyle
+            // or DefaultStyleKey = null
+            if (themeStyleKey != null)
+            {
+                // First look for an applicable style in system resources
+                object styleLookup;
+                // Regular lookup based on the DefaultStyleKey. Involves locking and Hashtable lookup
+
+                Type typeKey = themeStyleKey as Type;
+                if (typeKey != null)
+                {
+                    styleLookup = Application.Current.XamlResourcesHandler.TryFindResourceInGenericXaml(typeKey.Assembly, themeStyleKey);
+                }
+                else
+                {
+                    styleLookup = null;
+                }
+
+                if (styleLookup != null)
+                {
+                    if (styleLookup is Style)
+                    {
+                        // We have found an applicable Style in system resources
+                        //  let's us use that as second stop to find property values.
+                        newThemeStyle = (Style)styleLookup;
+                    }
+                    else
+                    {
+                        // We found something keyed to the ThemeStyleKey, but it's not
+                        //  a style.  This is a problem, throw an exception here.
+                        throw new InvalidOperationException(string.Format("System resource for type '{0}' is not a Style object.", themeStyleKey));
+                    }
+                }
+
+                if (newThemeStyle == null)
+                {
+                    // No style in system resources, try to retrieve the default
+                    // style for the target type.
+                    Type themeStyleTypeKey = themeStyleKey as Type;
+                    if (themeStyleTypeKey != null)
+                    {
+                        PropertyMetadata styleMetadata = FrameworkElement.StyleProperty.GetMetadata(themeStyleTypeKey);
+
+                        if (styleMetadata != null)
+                        {
+                            // Have a metadata object, get the default style (if any)
+                            newThemeStyle = styleMetadata.DefaultValue as Style;
+                        }
+                    }
+                }
+            }
+
+            // Propagate change notification
+            if (oldThemeStyle != newThemeStyle)
+            {
+                FrameworkElement.OnThemeStyleChanged(fe, oldThemeStyle, newThemeStyle);
+            }
+
+            return newThemeStyle;
+        }
+
+        // Invoked when the ThemeStyle property is changed
+        internal static void OnThemeStyleChanged(DependencyObject d, object oldValue, object newValue)
+        {
+            FrameworkElement fe = (FrameworkElement)d;
+            UpdateThemeStyleCache(fe, (Style)oldValue, (Style)newValue, ref fe._themeStyleCache);
+        }
+
+        internal static void UpdateThemeStyleCache(
+             FrameworkElement fe,
+             Style oldThemeStyle,
+             Style newThemeStyle,
+             ref Style themeStyleCache)
+        {
+            //Dictionary<DependencyProperty, Setter> newStyleSetters = null;
+            Dictionary<DependencyProperty, object> newStylePropertyValues = null;
+            if (newThemeStyle != null)
+            {
+                // We have a new style.  Make sure it's targeting the right
+                // type, and then seal it.
+
+                newThemeStyle.CheckTargetType(fe);
+                newThemeStyle.Seal();
+                //newStyleSetters = newThemeStyle.GetDictionaryOfSettersFromStyle();
+                newStylePropertyValues = newThemeStyle.EffectiveValues;
+            }
+
+            themeStyleCache = newThemeStyle;
+
+            if (oldThemeStyle != null)
+            {
+                // Clear old theme style values
+                // if a property is about to be set again in the new theme style
+                // we don't unset the value directly to prevent from potientially
+                // firing the DependencyPropertyChanged callback twice.
+                Dictionary<DependencyProperty, object> oldStylePropertyValues = oldThemeStyle.EffectiveValues;
+                IEnumerable<DependencyProperty> removedProperties = oldStylePropertyValues.Where(kp => newStylePropertyValues == null || !newStylePropertyValues.ContainsKey(kp.Key))
+                                                                                          .Select(kp => kp.Key);
+                foreach (var property in removedProperties)
+                {
+                    fe.SetThemeStyleValue(property, DependencyProperty.UnsetValue);
+                }
+            }
+
+            if (newThemeStyle != null)
+            {
+                foreach (var propertyValue in newStylePropertyValues)
+                {
+                    object value;
+                    BindingExpression expr = propertyValue.Value as BindingExpression;
+                    if (expr != null)
+                    {
+                        value = new BindingExpression(expr.ParentBinding.Clone(), propertyValue.Key);
+                    }
+                    else
+                    {
+                        value = propertyValue.Value;
+                    }
+                    fe.SetThemeStyleValue(propertyValue.Key, value);
+                }
+            }
+        }
+
+        // Cache the ThemeStyle for the current instance if there is a DefaultStyleKey specified for it
+        internal Style ThemeStyle
+        {
+            get { return _themeStyleCache; }
+        }
 
         #endregion
 
@@ -845,11 +1099,124 @@ namespace Windows.UI.Xaml
                 }
             }
         }
+#endif
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
             base.INTERNAL_OnDetachedFromVisualTree();
+            HasStyleInvalidated = false;
         }
-#endif
+
+        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        {
+            base.INTERNAL_OnAttachedToVisualTree();
+            // look for implicit style
+            if (!HasLocalStyle)
+            {
+                UpdateStyleProperty();
+            }
+        }
+
+        // Extracts the required flag and returns
+        // bool to indicate if it is set or unset
+        internal bool ReadInternalFlag(InternalFlags reqFlag)
+        {
+            return (_flags & reqFlag) != 0;
+        }
+
+        // Sets or Unsets the required flag based on
+        // the bool argument
+        internal void WriteInternalFlag(InternalFlags reqFlag, bool set)
+        {
+            if (set)
+            {
+                _flags |= reqFlag;
+            }
+            else
+            {
+                _flags &= (~reqFlag);
+            }
+        }
+
+        private InternalFlags _flags = 0; // Stores Flags (see Flags enum)
+    }
+
+    internal enum InternalFlags : uint
+    {
+        //// Does the instance have ResourceReference properties
+        //HasResourceReferences = 0x00000001,
+
+        //HasNumberSubstitutionChanged = 0x00000002,
+
+        // Is the style for this instance obtained from a
+        // typed-style declared in the Resources
+        HasImplicitStyleFromResources = 0x00000004,
+        //InheritanceBehavior0 = 0x00000008,
+        //InheritanceBehavior1 = 0x00000010,
+        //InheritanceBehavior2 = 0x00000020,
+
+        IsStyleUpdateInProgress = 0x00000040,
+        IsThemeStyleUpdateInProgress = 0x00000080,
+        //StoresParentTemplateValues = 0x00000100,
+
+        // free bit = 0x00000200,
+        //NeedsClipBounds = 0x00000400,
+
+        //HasWidthEverChanged = 0x00000800,
+        //HasHeightEverChanged = 0x00001000,
+        // free bit = 0x00002000,
+        // free bit = 0x00004000,
+
+        // Has this instance been initialized
+        //IsInitialized = 0x00008000,
+
+        // Set on BeginInit and reset on EndInit
+        //InitPending = 0x00010000,
+
+        //IsResourceParentValid = 0x00020000,
+        // free bit                     0x00040000,
+
+        // This flag is set to true when this FrameworkElement is in the middle
+        //  of an invalidation storm caused by InvalidateTree for ancestor change,
+        //  so we know not to trigger another one.
+        //AncestorChangeInProgress = 0x00080000,
+
+        // This is used when we know that we're in a subtree whose visibility
+        //  is collapsed.  A false here does not indicate otherwise.  A false
+        //  merely indicates "we don't know".
+        //InVisibilityCollapsedTree = 0x00100000,
+
+        HasStyleEverBeenFetched = 0x00200000,
+        HasThemeStyleEverBeenFetched = 0x00400000,
+
+        HasLocalStyle = 0x00800000,
+
+        // This instance's Visual or logical Tree was generated by a Template
+        //HasTemplateGeneratedSubTree = 0x01000000,
+
+        // free bit   = 0x02000000,
+        //Remove this entry later since it is supposed to be in InternalFlags2
+        HasStyleInvalidated = 0x02000000,
+
+        //HasLogicalChildren = 0x04000000,
+
+        // Are we in the process of iterating the logical children.
+        // This flag is set during a descendents walk, for property invalidation.
+        //IsLogicalChildrenIterationInProgress = 0x08000000,
+
+        //Are we creating a new root after system metrics have changed?
+        //CreatingRoot = 0x10000000,
+
+        // FlowDirection is set to RightToLeft (0 == LeftToRight, 1 == RightToLeft)
+        // This is an optimization to speed reading the FlowDirection property
+        //IsRightToLeft = 0x20000000,
+
+        ShouldLookupImplicitStyles = 0x40000000,
+
+        // This flag is set to true there are mentees listening to either the
+        // InheritedPropertyChanged event or the ResourcesChanged event. Once
+        // this flag is set to true it does not get reset after that.
+
+        //PotentiallyHasMentees = 0x80000000,
     }
 }

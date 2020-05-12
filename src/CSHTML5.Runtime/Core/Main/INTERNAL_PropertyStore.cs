@@ -284,9 +284,9 @@ namespace CSHTML5.Internal
             {
                 kind = BaseValueSourceInternal.LocalStyle;
             }
-            else if ((effectiveValue = storage.ImplicitStyleValue) != DependencyProperty.UnsetValue)
+            else if ((effectiveValue = storage.ThemeStyleValue) != DependencyProperty.UnsetValue)
             {
-                kind = BaseValueSourceInternal.ImplicitStyle;
+                kind = BaseValueSourceInternal.ThemeStyle;
             }
             else if ((effectiveValue = storage.InheritedValue) != DependencyProperty.UnsetValue)
             {
@@ -686,7 +686,27 @@ namespace CSHTML5.Internal
                                  true); // propagateChanges
         }
 
+        internal static void SetThemeStyleValue(INTERNAL_PropertyStorage storage, object newValue)
+        {
+            if (storage.BaseValueSourceInternal == BaseValueSourceInternal.ThemeStyle)
+            {
+                BindingExpression oldExpr = storage.IsExpressionFromStyle ? storage.ThemeStyleValue as BindingExpression : null;
+                if (oldExpr != null)
+                {
+                    oldExpr.OnDetached(storage.Owner);
+                }
+            }
 
+            storage.ThemeStyleValue = newValue;
+
+            UpdateEffectiveValue(storage,
+                                 newValue,
+                                 BaseValueSourceInternal.ThemeStyle,
+                                 false, // coerceWithCurrentValue
+                                 false, // coerceValue
+                                 newValue == DependencyProperty.UnsetValue, // clearValue
+                                 true); // propagateChanges
+        }
 
         internal static void ApplyCssChanges(object oldValue, object newValue, PropertyMetadata typeMetadata, DependencyObject sender)
         {

@@ -310,12 +310,25 @@ namespace Windows.UI.Xaml
             INTERNAL_PropertyStorage storage;
             if (INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, false/*don't create*/, out storage))
             {
-                if (storage.LocalValue == DependencyProperty.UnsetValue)
+                // In silverlight ReadLocalValue returns a BindingExpression if the value
+                // is a BindingExpression set from a style's setter and the "real" local
+                // value in unset. (This is not the case in WPF)
+                if (storage.LocalValue != DependencyProperty.UnsetValue)
                 {
-                    // In silverlight ReadLocalValue returns a BindingExpression if the value 
-                    // is a BindingExpression set from a style's setter and the "real" local
-                    // value in unset. (This is not the case in WPF)
-                    if (storage.LocalStyleValue is BindingExpression be)
+                    return storage.LocalValue;
+                }
+                else if (storage.LocalStyleValue != DependencyProperty.UnsetValue)
+                {
+                    BindingExpression be = storage.LocalStyleValue as BindingExpression;
+                    if (be != null)
+                    {
+                        return be;
+                    }
+                }
+                else
+                {
+                    BindingExpression be = storage.ThemeStyleValue as BindingExpression;
+                    if (be != null)
                     {
                         return be;
                     }
@@ -387,6 +400,15 @@ namespace Windows.UI.Xaml
             if (INTERNAL_PropertyStore.TryGetStorage(this, dp, value != DependencyProperty.UnsetValue/*create*/, out storage))
             {
                 INTERNAL_PropertyStore.SetLocalStyleValue(storage, value);
+            }
+        }
+
+        internal void SetThemeStyleValue(DependencyProperty dp, object value)
+        {
+            INTERNAL_PropertyStorage storage;
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, value != DependencyProperty.UnsetValue/*create*/, out storage))
+            {
+                INTERNAL_PropertyStore.SetThemeStyleValue(storage, value);
             }
         }
 
@@ -473,7 +495,8 @@ namespace Windows.UI.Xaml
 
         internal void INTERNAL_UpdateBindingsSource()
         {
-            INTERNAL_PropertyStorage[] copyOfCollection = this.INTERNAL_PropertyStorageDictionary.Select(kp => kp.Value).ToArray(); // Note: we make a copy to avoid any errors related to the collection being modified during the "foreach" below.
+            // Note: we make a copy to avoid any errors related to the collection being modified during the "foreach" below.
+            INTERNAL_PropertyStorage[] copyOfCollection = this.INTERNAL_PropertyStorageDictionary.Select(kp => kp.Value).ToArray();
             foreach (INTERNAL_PropertyStorage storage in copyOfCollection)
             {
                 if (storage.IsExpression)
@@ -482,7 +505,7 @@ namespace Windows.UI.Xaml
                 }
                 else if (storage.IsExpressionFromStyle)
                 {
-                    ((BindingExpression)storage.LocalStyleValue).OnSourceAvailable();
+                    ((BindingExpression)storage.ModifiedValue.BaseValue).OnSourceAvailable();
                 }
             }
         }
@@ -501,14 +524,9 @@ namespace Windows.UI.Xaml
 
         #endregion
 
-        //
-        // Summary:
-        //     Clears the local value of a dependency property.
-        //
-        // Parameters:
-        //   dp:
-        //     The System.Windows.DependencyProperty identifier of the property to clear the
-        //     value for.
+        /// <summary>
+        /// Clears the local value of a property
+        /// </summary>
         public void ClearValue(DependencyProperty dp)
         {
             INTERNAL_PropertyStorage storage;

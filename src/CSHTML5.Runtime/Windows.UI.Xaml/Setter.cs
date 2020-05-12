@@ -13,11 +13,8 @@
 \*====================================================================================*/
 
 
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows
@@ -30,7 +27,14 @@ namespace Windows.UI.Xaml
     /// </summary>
     public sealed partial class Setter : SetterBase
     {
-        internal Style INTERNAL_ParentStyle;
+        #region Data
+
+        private DependencyProperty _property;
+        private bool _throwOnNextValueChange; // used to validate setter value
+
+        #endregion
+
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the Setter class with no initial Property or
@@ -44,24 +48,41 @@ namespace Windows.UI.Xaml
         /// Initializes a new instance of the Setter class with initial Property and
         /// Value information.
         /// </summary>
-        /// <param name="targetProperty">The dependency property identifier for the property that is being styled.</param>
+        /// <param name="property">The dependency property identifier for the property that is being styled.</param>
         /// <param name="value">The value to assign to the value when the Setter applies.</param>
-        public Setter(DependencyProperty targetProperty, object value)
+        public Setter(DependencyProperty property, object value)
         {
-            Property = targetProperty;
+            if (value == DependencyProperty.UnsetValue)
+            {
+                throw new ArgumentException("Cannot unset a Setter value.");
+            }
+            CheckValidProperty(property);
+
+            Property = property;
             Value = value;
         }
+
+        #endregion
+
+        #region Public Properties
 
         /// <summary>
         /// Gets or sets the property to apply the Value to. The default is null.
         /// </summary>
-        public DependencyProperty Property { get; set; }
+        public DependencyProperty Property
+        {
+            get
+            {
+                return _property;
+            }
+            set
+            {
+                CheckValidProperty(value);
+                CheckSealed();
+                _property = value;
+            }
+        }
 
-
-
-
-        // Returns:
-        //     The value to apply to the property that is specified by the Setter.
         /// <summary>
         /// Gets or sets the value to apply to the property that is specified by the
         /// Setter.
@@ -72,25 +93,82 @@ namespace Windows.UI.Xaml
             set { SetValue(ValueProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Value.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register("Value", typeof(object), typeof(Setter), new PropertyMetadata(null, Value_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+           DependencyProperty.Register("Value", typeof(object), typeof(Setter), new PropertyMetadata(null, OnValueChanged));
 
-        private static void Value_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            // Note: This callback only purpose is to validate the value change.
+            // The value change is not acceptable if one the the two conditions
+            // below is met :
+            // 1 - the new value is DependencyProperty.UnsetValue.
+            // 2 - the setter is sealed.
+            // We reset the value to the old value and throw an exception if one
+            // of these conditions is verified.
             Setter setter = (Setter)d;
-            if (setter.INTERNAL_ParentStyle != null)
+            if (setter._throwOnNextValueChange)
             {
-                setter.INTERNAL_ParentStyle.NotifySetterValueChanged(setter);
+                setter._throwOnNextValueChange = false;
+                setter.CheckSealed();
+                throw new InvalidOperationException("Cannot unset a Setter value.");
             }
-            else
+            if (setter.IsSealed || e.NewValue == DependencyProperty.UnsetValue)
             {
-                //it could be nice to  know if the Setter is in a Style yet or not so we can throw an exception when needed... but we can't know.
-                //throw new Exception("The Setter's Value could not be set through its style.");
+                setter._throwOnNextValueChange = true;
+                setter.Value = e.OldValue;
             }
         }
 
+        #endregion
 
+        #region Internal Methods
+
+        /// <summary>
+        ///     Seals this setter
+        /// </summary>
+        internal override void Seal()
+        {
+            // Do the validation that can't be done until we know all of the property
+            // values.
+
+            DependencyProperty dp = Property;
+            object value = Value;
+
+            if (dp == null)
+            {
+                throw new ArgumentException(string.Format("Must have non-null value for '{0}'.", "Setter.Property"));
+            }
+
+            //todo: add the following when refactoring of DependencyProperty/PropertyMetadata is done.
+            //if (!dp.IsValidValue(value))
+            //{
+            //    // The only markup extensions supported by styles is resources and bindings.
+            //    if (value is MarkupExtension)
+            //    {
+            //        if (!(value is DynamicResourceExtension) && !(value is System.Windows.Data.BindingBase))
+            //        {
+            //            throw new ArgumentException(SR.Get(SRID.SetterValueOfMarkupExtensionNotSupported,
+            //                                               value.GetType().Name));
+            //        }
+            //    }
+            //}
+
+            base.Seal();
+        }
+
+        private void CheckValidProperty(DependencyProperty property)
+        {
+            if (property == null)
+            {
+                throw new ArgumentNullException("property");
+            }
+
+            if (property == FrameworkElement.NameProperty)
+            {
+                throw new InvalidOperationException(string.Format("'{0}' property cannot be set in the current element's Style.", FrameworkElement.NameProperty.Name));
+            }
+        }
+
+        #endregion
     }
 }

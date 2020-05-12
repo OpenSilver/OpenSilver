@@ -79,13 +79,6 @@ namespace CSHTML5.Internal
                     // Detach the element as well as all the children recursively:
                     DetachVisualChidrenRecursively(child);
 
-                    //remove the Style from the child if it was an implicit Style:
-                    FrameworkElement childAsFrameworkElement = child as FrameworkElement;
-                    if (childAsFrameworkElement.INTERNAL_IsImplicitStyle)
-                    {
-                        childAsFrameworkElement.Style = null;
-                        //no need to set childAsFrameworkElement.INTERNAL_IsImplicitStyle to false since it is done in the Style Setter.
-                    }
 
                     INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
                 }
@@ -269,35 +262,6 @@ if(nextSibling != undefined) {
             INTERNAL_SimulatorPerformanceOptimizer.EndTransaction();
         }
 #endif
-        /// <returns>True if there are implicit styles (including from the parents)</returns>
-        internal static bool UpdateElementInheritedImplicitStyles(FrameworkElement element, FrameworkElement parent)
-        {
-            if (parent != null)
-            {
-                //Note: the order (of the three ifs below) is important because an style defined lower in the visual tree should have priority over one (with the same key) defined higher.
-                if (parent.Resources != null && parent.Resources.INTERNAL_HasImplicitStyles)
-                {
-                    element.INTERNAL_InheritedImplicitStyles = new List<ResourceDictionary>();
-                    element.INTERNAL_InheritedImplicitStyles.Add(parent.Resources);
-                    if (parent.INTERNAL_InheritedImplicitStyles != null)
-                    {
-                        foreach (ResourceDictionary resourceDictionary in parent.INTERNAL_InheritedImplicitStyles)
-                        {
-                            element.INTERNAL_InheritedImplicitStyles.Add(resourceDictionary);
-                        }
-                    }
-                    return true;
-                }
-                if (parent.INTERNAL_InheritedImplicitStyles != null)
-                {
-                    element.INTERNAL_InheritedImplicitStyles = parent.INTERNAL_InheritedImplicitStyles;
-                    return true;
-                }
-            }
-
-            element.INTERNAL_InheritedImplicitStyles = null; //this is in case the element had a parent that defined implicit styles then moved to another parent that doesn't: we need to remove the former list.
-            return false; //result is false here only if 1) the direct parent didn't define an implicit Style, 2) the parent didn't inherit implicit Styles from its parents.
-        }
 
         static void AttachVisualChild_Private(UIElement child, UIElement parent, int index)
         {
@@ -312,90 +276,6 @@ if(nextSibling != undefined) {
             //
 
 
-            //--------------------------------------------------------
-            // APPLY IMPLICIT AND DEFAULT STYLES:
-            //--------------------------------------------------------
-
-#if PERFSTAT
-            var t = Performance.now();
-#endif
-            //See if the child has a Style, if not, try to find an implicitStyle for its Type.
-            FrameworkElement childAsFrameworkElement = child as FrameworkElement;
-            if (childAsFrameworkElement != null)
-            {
-                if (childAsFrameworkElement.Style == null)
-                {
-                    //-----------------------------
-                    // APPLY IMPLICIT STYLE IF ANY:
-                    //-----------------------------
-
-                    Style style = null;
-                    //Note if anyone wonders: if type B inherits from type A, an Implicit Style defined for type A is ignored by elements of type B (tested in an SL project).
-                    if (UpdateElementInheritedImplicitStyles(childAsFrameworkElement, (FrameworkElement)parent))
-                    {
-                        Type childType = child.GetType();
-                        foreach (ResourceDictionary resourceDictionary in childAsFrameworkElement.INTERNAL_InheritedImplicitStyles) // Note: "INTERNAL_InheritedImplicitStyles" is not null because the method above returned True.
-                        {
-                            if (resourceDictionary.ContainsKey(childType))
-                            {
-                                style = resourceDictionary[childType] as Style;
-                                break;
-                            }
-                        }
-                    }
-                    if (style != null)
-                    {
-                        childAsFrameworkElement.Style = style;
-                        childAsFrameworkElement.INTERNAL_IsImplicitStyle = true; //Note: it is important that we do this AFTER setting the Style property to the ImplicitStyle because the setter of the Style Property sets it to false to avoid removing styles that are not implicit.
-                    }
-                }
-
-                //Add the effect of the setters of the default Style on the child:
-                Style childDefaultStyle = childAsFrameworkElement.INTERNAL_defaultStyle;
-                if (childDefaultStyle != null)
-                {
-                    //----------------------------
-                    // APPLY DEFAULT STYLE IF ANY:
-                    //----------------------------
-
-                    //get the list of setters of the currently applied style on the element and of the default style:
-                    Dictionary<DependencyProperty, Setter> normalStyleDictionary = null;
-                    bool childHasStyle = childAsFrameworkElement.Style != null;
-                    if (childHasStyle)
-                    {
-                        normalStyleDictionary = childAsFrameworkElement.Style.GetDictionaryOfSettersFromStyle();
-                    }
-                    Dictionary<DependencyProperty, Setter> defaultStyleDictionary = childDefaultStyle.GetDictionaryOfSettersFromStyle();
-
-                    //for all the setters the default style has, that are not on properties already affected by the normal style, we apply them like a normal style (we basically do the same as what we do on each setter in FrameworkElement.Style_Changed):
-                    foreach (DependencyProperty prop in defaultStyleDictionary.Select(kp => kp.Key))
-                    {
-                        if (!childHasStyle || !normalStyleDictionary.ContainsKey(prop))
-                        {
-                            Setter setter = defaultStyleDictionary[prop];
-
-                            childDefaultStyle.SetterValueChanged -= childAsFrameworkElement.StyleSetterValueChanged;
-                            childDefaultStyle.SetterValueChanged += childAsFrameworkElement.StyleSetterValueChanged;
-
-                            object baseValue = setter.ReadLocalValue(Setter.ValueProperty);
-                            if (baseValue != DependencyProperty.UnsetValue)
-                            {
-                                object value;
-                                if (baseValue is BindingExpression expr)
-                                {
-                                    value = new BindingExpression(expr.ParentBinding.Clone(), expr.TargetProperty);
-                                }
-                                else
-                                {
-                                    value = setter.Value;
-                                }
-
-                                childAsFrameworkElement.SetLocalStyleValue(setter.Property, value);
-                            }
-                        }
-                    }
-                }
-            }
 
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Apply implicit and default styles", t);

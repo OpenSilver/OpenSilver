@@ -146,16 +146,6 @@ $1.appendChild(popupRoot);
                 = popupRootDiv;
 
             //--------------------------------------
-            // Handle implicit styles:
-            //--------------------------------------
-
-            if (Application.Current.Resources.INTERNAL_HasImplicitStyles)
-            {
-                popupRoot.INTERNAL_InheritedImplicitStyles = new List<ResourceDictionary>();
-                popupRoot.INTERNAL_InheritedImplicitStyles.Add(Application.Current.Resources);
-            }
-
-            //--------------------------------------
             // Listen to clicks anywhere in the popup (this is used to close other popups that are not supposed to stay open):
             //--------------------------------------
 

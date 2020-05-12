@@ -24,13 +24,12 @@ namespace CSHTML5.Internal
 
         public INTERNAL_PropertyStorage(DependencyObject owner, DependencyProperty property, PropertyMetadata typeMetadata)
         {
-            this._values = new object[6] 
+            this._values = new object[5] 
             {
-                DependencyProperty.UnsetValue, //VisualState
                 DependencyProperty.UnsetValue, //Local
                 DependencyProperty.UnsetValue, //Animated
                 DependencyProperty.UnsetValue, //LocalStyle
-                DependencyProperty.UnsetValue, //ImplicitStyle
+                DependencyProperty.UnsetValue, //ThemeStyle
                 DependencyProperty.UnsetValue, //Inherited
             };
             this._source = (FullValueSource)BaseValueSourceInternal.Default;
@@ -71,7 +70,7 @@ namespace CSHTML5.Internal
             get { return this._values[2]; }
             set { this._values[2] = value; }
         }
-        internal object ImplicitStyleValue
+        internal object ThemeStyleValue
         {
             get { return this._values[1]; }
             set { this._values[1] = value; }
@@ -102,11 +101,6 @@ namespace CSHTML5.Internal
         #endregion
 
         #region Methods
-
-        internal void SetValueInternal(object value, BaseValueSourceInternal kind)
-        {
-            this._values[(int)kind - 1] = value;
-        }
 
         private void WritePrivateFlag(FullValueSource bit, bool value)
         {
@@ -319,9 +313,9 @@ namespace CSHTML5.Internal
     {
         Default = 0,
         Inherited = 1,
-        ImplicitStyle = 2, // Unused
-        LocalStyle = 3,
-        Animated = 4, // in WPF, animated values are stored in the ModifiedValue
+        LocalStyle = 2,
+        ThemeStyle = 3,
+        Animated = 4, // Note: in WPF, animated values are stored in the ModifiedValue
         Local = 5,
     }
 }

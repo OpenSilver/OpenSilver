@@ -217,12 +217,6 @@ namespace Windows.UI.Xaml
                 // then gets passed to the children recursively:
                 this.INTERNAL_ParentWindow = this;
 
-                if (Application.Current.Resources.INTERNAL_HasImplicitStyles)
-                {
-                    this.INTERNAL_InheritedImplicitStyles = new List<ResourceDictionary>();
-                    this.INTERNAL_InheritedImplicitStyles.Add(Application.Current.Resources);
-                }
-
                 // Attach the child UI element:
 #if RECURSIVE_CONSTRUCTION_FIXED
                 base.OnContentChanged(oldContent, newContent);
