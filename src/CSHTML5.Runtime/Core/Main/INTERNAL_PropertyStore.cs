@@ -265,31 +265,36 @@ namespace CSHTML5.Internal
                                                   out object effectiveValue,
                                                   out BaseValueSourceInternal kind)
         {
-            /*if ((effectiveValue = storage.VisualStateValue) != INTERNAL_NoValue.NoValue)
-            {
-                kind = KindOfValue.VisualState;
-            }
-            else */
             if (!storage.IsAnimatedOverLocal &&
-               (effectiveValue = storage.LocalValue) != DependencyProperty.UnsetValue)
+                 storage.LocalValue != DependencyProperty.UnsetValue)
             {
+                effectiveValue = storage.LocalValue;
                 kind = BaseValueSourceInternal.Local;
             }
             else if (storage.IsAnimatedOverLocal &&
-                    (effectiveValue = storage.AnimatedValue) != DependencyProperty.UnsetValue)
+                     storage.AnimatedValue != DependencyProperty.UnsetValue)
             {
+                effectiveValue = storage.AnimatedValue;
                 kind = BaseValueSourceInternal.Animated;
             }
-            else if ((effectiveValue = storage.LocalStyleValue) != DependencyProperty.UnsetValue)
+            else if (storage.ImplicitReferenceValue != DependencyProperty.UnsetValue)
             {
+                effectiveValue = storage.ImplicitReferenceValue;
+                kind = BaseValueSourceInternal.ImplicitReference;
+            }
+            else if (storage.LocalStyleValue != DependencyProperty.UnsetValue)
+            {
+                effectiveValue = storage.LocalStyleValue;
                 kind = BaseValueSourceInternal.LocalStyle;
             }
-            else if ((effectiveValue = storage.ThemeStyleValue) != DependencyProperty.UnsetValue)
+            else if (storage.ThemeStyleValue != DependencyProperty.UnsetValue)
             {
+                effectiveValue = storage.ThemeStyleValue;
                 kind = BaseValueSourceInternal.ThemeStyle;
             }
-            else if ((effectiveValue = storage.InheritedValue) != DependencyProperty.UnsetValue)
+            else if (storage.InheritedValue != DependencyProperty.UnsetValue)
             {
+                effectiveValue = storage.InheritedValue;
                 kind = BaseValueSourceInternal.Inherited;
             }
             else // Property default value
@@ -656,8 +661,8 @@ namespace CSHTML5.Internal
             storage.InheritedValue = DependencyProperty.UnsetValue;
 
             //UpdateEffectiveValue(storage,
-            //                     INTERNAL_NoValue.NoValue,
-            //                     KindOfValue.Inherited,
+            //                     DependencyProperty.UnsetValue,
+            //                     BaseValueSourceInternal.Inherited,
             //                     false, // coerceWithCurrentValue
             //                     false, // coerceValue
             //                     true, // clearValue
@@ -680,6 +685,19 @@ namespace CSHTML5.Internal
             UpdateEffectiveValue(storage,
                                  newValue,
                                  BaseValueSourceInternal.LocalStyle,
+                                 false, // coerceWithCurrentValue
+                                 false, // coerceValue
+                                 newValue == DependencyProperty.UnsetValue, // clearValue
+                                 true); // propagateChanges
+        }
+
+        internal static void SetImplicitReferenceValue(INTERNAL_PropertyStorage storage, object newValue)
+        {
+            storage.ImplicitReferenceValue = newValue;
+
+            UpdateEffectiveValue(storage,
+                                 newValue,
+                                 BaseValueSourceInternal.ImplicitReference,
                                  false, // coerceWithCurrentValue
                                  false, // coerceValue
                                  newValue == DependencyProperty.UnsetValue, // clearValue

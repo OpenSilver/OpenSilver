@@ -162,6 +162,7 @@ namespace Windows.UI.Xaml.Controls
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
+            base.INTERNAL_OnAttachedToVisualTree();
             if (_children != null)
             {
                 _children.CollectionChanged -= Children_CollectionChanged;

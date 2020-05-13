@@ -297,7 +297,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Returns the local value of a dependency property, if a local value is set.
         /// </summary>
-        /// <param name="dependencyProperty">
+        /// <param name="dp">
         /// The DependencyProperty identifier of the property for which to retrieve the
         /// local value.
         /// </param>
@@ -305,10 +305,10 @@ namespace Windows.UI.Xaml
         /// Returns the local value, or returns the sentinel value UnsetValue if no local
         /// value is set.
         /// </returns>
-        public object ReadLocalValue(DependencyProperty dependencyProperty)
+        public object ReadLocalValue(DependencyProperty dp)
         {
             INTERNAL_PropertyStorage storage;
-            if (INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, false/*don't create*/, out storage))
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, false/*don't create*/, out storage))
             {
                 // In silverlight ReadLocalValue returns a BindingExpression if the value
                 // is a BindingExpression set from a style's setter and the "real" local
@@ -333,6 +333,19 @@ namespace Windows.UI.Xaml
                         return be;
                     }
                 }
+                return storage.LocalValue;
+            }
+            return DependencyProperty.UnsetValue;
+        }
+
+        // This method is here to workaround the fact that in Silverlight, ReadLocalValue()
+        // can return a value set from a style if it is a BindingExpression, while in WPF
+        // ReadLocalValue() will only return the local value
+        internal object ReadLocalValueInternal(DependencyProperty dp)
+        {
+            INTERNAL_PropertyStorage storage;
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, false/*don't create*/, out storage))
+            {
                 return storage.LocalValue;
             }
             return DependencyProperty.UnsetValue;
@@ -400,6 +413,15 @@ namespace Windows.UI.Xaml
             if (INTERNAL_PropertyStore.TryGetStorage(this, dp, value != DependencyProperty.UnsetValue/*create*/, out storage))
             {
                 INTERNAL_PropertyStore.SetLocalStyleValue(storage, value);
+            }
+        }
+
+        internal void SetImplicitReferenceValue(DependencyProperty dp, object value)
+        {
+            INTERNAL_PropertyStorage storage;
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, value != DependencyProperty.UnsetValue/*create*/, out storage))
+            {
+                INTERNAL_PropertyStore.SetImplicitReferenceValue(storage, value);
             }
         }
 

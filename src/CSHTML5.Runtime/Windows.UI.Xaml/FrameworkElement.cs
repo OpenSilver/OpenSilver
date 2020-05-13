@@ -91,11 +91,18 @@ namespace Windows.UI.Xaml
                 OnStyleChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, StyleProperty));
             }
 
+#if false
             Application app = Application.Current;
             if (app != null && app.Resources.INTERNAL_HasImplicitStyles)
             {
                 ShouldLookupImplicitStyles = true;
             }
+#else
+            // Note: for now ResourceDictionary.INTERNAL_HasImplicitStyles at compile time.
+            // Adding an implicit resources at runtime will be undetected so we have to set
+            // the flag to true at all time to be sure we are not skipping an implicit style.
+            ShouldLookupImplicitStyles = true;
+#endif
         }
 
 #if REVAMPPOINTEREVENTS
@@ -113,7 +120,7 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-        #region Resources
+#region Resources
 
         /// <summary>
         /// Gets the locally defined resource dictionary. In XAML, you can establish
@@ -138,17 +145,14 @@ namespace Windows.UI.Xaml
                     return;
                 }
 
-                if (value != null)
+                if (value != null && value.INTERNAL_HasImplicitStyles)
                 {
-                    if (value.INTERNAL_HasImplicitStyles)
-                    {
-                        ShouldLookupImplicitStyles = true;
-                    }
+                    ShouldLookupImplicitStyles = true;
                 }
 
                 HasStyleInvalidated = false;
 
-                if (HasImplicitStyleFromResources == true && 
+                if (HasImplicitStyleFromResources == true &&
                     (oldResources.Contains(GetType()) || Style == StyleProperty.GetMetadata(GetType()).DefaultValue))
                 {
                     UpdateStyleProperty();
@@ -161,7 +165,7 @@ namespace Windows.UI.Xaml
         /// </summary>
         //internal List<ResourceDictionary> INTERNAL_InheritedImplicitStyles = null; //this is set in the INTERNAL_VisualTreeManager.AttachVisualChild_Private(UIElement child, UIElement parent) method
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Gets the parent object of this FrameworkElement in the object tree.
@@ -270,7 +274,7 @@ namespace Windows.UI.Xaml
             return BindingOperations.GetBindingExpression(this, dp);
         }
 
-        #region Cursor
+#region Cursor
 
         // Returns:
         //     The cursor to display. The default value is defined as null per this dependency
@@ -308,9 +312,9 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
-        #region IsEnabled
+#region IsEnabled
 
         /// <summary>
         /// Gets or sets a value indicating whether the user can interact with the control.
@@ -405,9 +409,9 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
-        #region Names handling
+#region Names handling
 
         /// <summary>
         /// Retrieves an object that has the specified identifier name.
@@ -458,9 +462,9 @@ namespace Windows.UI.Xaml
             var @this = (FrameworkElement)d;
             INTERNAL_HtmlDomManager.SetDomElementAttribute(@this.INTERNAL_OuterDomElement, "dataId", (value ?? string.Empty).ToString());
         }
-        #endregion
+#endregion
 
-        #region DataContext
+#region DataContext
 
         /// <summary>
         /// Gets or sets the data context for a FrameworkElement when it participates
@@ -497,10 +501,10 @@ namespace Windows.UI.Xaml
 
         /// <summary>Occurs when the data context for this element changes. </summary>
         public event DependencyPropertyChangedEventHandler DataContextChanged;
-        #endregion
+#endregion
 
 #if WORKINPROGRESS
-        #region Triggers (not implemented)
+#region Triggers (not implemented)
 
         public TriggerCollection Triggers
         {
@@ -513,7 +517,7 @@ namespace Windows.UI.Xaml
         public static DependencyProperty TriggersProperty = DependencyProperty.Register("Triggers", typeof(TriggerCollection), typeof(FrameworkElement), new PropertyMetadata(new TriggerCollection())
         { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
-        #endregion
+#endregion
 
         //
         // Summary:
@@ -552,7 +556,7 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-        #region Tag
+#region Tag
 
         /// <summary>
         /// Gets or sets an arbitrary object value that can be used to store custom information
@@ -570,9 +574,9 @@ namespace Windows.UI.Xaml
             DependencyProperty.Register("Tag", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null)
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
-        #endregion
+#endregion
 
-        #region Handling Styles
+#region Handling Styles
 
         [Obsolete("Use DefaultStyleKey")]
         protected void INTERNAL_SetDefaultStyle(Style defaultStyle)
@@ -603,7 +607,7 @@ namespace Windows.UI.Xaml
         private static void OnStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             FrameworkElement fe = (FrameworkElement)d;
-            fe.HasLocalStyle = fe.ReadLocalValue(StyleProperty) != DependencyProperty.UnsetValue;
+            fe.HasLocalStyle = fe.ReadLocalValueInternal(StyleProperty) != DependencyProperty.UnsetValue;          
             UpdateStyleCache(fe, (Style)e.OldValue, (Style)e.NewValue, ref fe._styleCache);
         }
 
@@ -620,7 +624,7 @@ namespace Windows.UI.Xaml
             Dictionary<DependencyProperty, object> newStylePropertyValues = null;
             if (newStyle != null)
             {
-                // We have a new style.  Make sure it's targeting the right
+                // We have a new style. Make sure it's targeting the right
                 // type, and then seal it.
 
                 newStyle.CheckTargetType(fe);
@@ -696,6 +700,16 @@ namespace Windows.UI.Xaml
             set { WriteInternalFlag(InternalFlags.HasImplicitStyleFromResources, value); }
         }
 
+        private void InvalidateStyleProperty()
+        {
+            // Try to find an implicit style
+            object implicitStyle = FrameworkElement.FindImplicitStyleResource(this, GetType());
+
+            // Set the flag associated with the StyleProperty
+            HasImplicitStyleFromResources = implicitStyle != DependencyProperty.UnsetValue;
+            SetImplicitReferenceValue(StyleProperty, implicitStyle);            
+        }
+
         internal void UpdateStyleProperty()
         {
             if (!HasStyleInvalidated)
@@ -705,14 +719,7 @@ namespace Windows.UI.Xaml
                     IsStyleUpdateInProgress = true;
                     try
                     {
-                        // Try to find an implicit style
-                        object implicitStyle = FrameworkElement.FindImplicitStyleResource(this, this.GetType());
-                        if (implicitStyle != DependencyProperty.UnsetValue)
-                        {
-                            // An implicit style was found
-                            HasImplicitStyleFromResources = true;
-                            Style = (Style)implicitStyle;
-                        }
+                        InvalidateStyleProperty();
                         HasStyleInvalidated = true;
                     }
                     finally
@@ -735,6 +742,9 @@ namespace Windows.UI.Xaml
                 // First, try to find an implicit style in parents' resources.
                 for (FrameworkElement f = fe; f != null; f = (FrameworkElement)f.Parent)
                 {
+                    // Note: INTERNAL_HasImplicitStyles is set at compile time
+                    // and not updated at runtime
+#if false
                     if (f.Resources.INTERNAL_HasImplicitStyles)
                     {
                         if (f.Resources.TryGetValue(resourceKey, out implicitStyle))
@@ -742,6 +752,12 @@ namespace Windows.UI.Xaml
                             return implicitStyle;
                         }
                     }
+#else
+                    if (f.Resources.TryGetValue(resourceKey, out implicitStyle))
+                    {
+                        return implicitStyle;
+                    }
+#endif
                 }
                 // Then we try to find the resource in the App's Resources
                 // if we can't find it in the parents.
@@ -757,7 +773,7 @@ namespace Windows.UI.Xaml
             return DependencyProperty.UnsetValue;
         }
 
-        #region DefaultStyleKey
+#region DefaultStyleKey
 
         // Indicates if the ThemeStyle is being re-evaluated
         internal bool IsThemeStyleUpdateInProgress
@@ -914,7 +930,6 @@ namespace Windows.UI.Xaml
              Style newThemeStyle,
              ref Style themeStyleCache)
         {
-            //Dictionary<DependencyProperty, Setter> newStyleSetters = null;
             Dictionary<DependencyProperty, object> newStylePropertyValues = null;
             if (newThemeStyle != null)
             {
@@ -923,7 +938,6 @@ namespace Windows.UI.Xaml
 
                 newThemeStyle.CheckTargetType(fe);
                 newThemeStyle.Seal();
-                //newStyleSetters = newThemeStyle.GetDictionaryOfSettersFromStyle();
                 newStylePropertyValues = newThemeStyle.EffectiveValues;
             }
 
@@ -969,11 +983,11 @@ namespace Windows.UI.Xaml
             get { return _themeStyleCache; }
         }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region Loaded/Unloaded events
+#region Loaded/Unloaded events
 
         /// <summary>
         /// Occurs when a FrameworkElement has been constructed and added to the object tree.
@@ -997,9 +1011,9 @@ namespace Windows.UI.Xaml
                 Unloaded(this, new RoutedEventArgs());
         }
 
-        #endregion
+#endregion
 
-        #region BindingValidationError event
+#region BindingValidationError event
 
         internal bool INTERNAL_AreThereAnyBindingValidationErrorHandlers = false;
 
@@ -1051,7 +1065,7 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-        #endregion
+#endregion
 
 
 #if WORKINPROGRESS
@@ -1104,16 +1118,29 @@ namespace Windows.UI.Xaml
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
             base.INTERNAL_OnDetachedFromVisualTree();
-            HasStyleInvalidated = false;
+            if (HasImplicitStyleFromResources && !Resources.Contains(GetType()))
+            {
+                HasStyleInvalidated = false;
+                UpdateStyleProperty();
+            }
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
-            // look for implicit style
-            if (!HasLocalStyle)
+
+            // Fetch the implicit style
+            // If this element's ResourceDictionary contains the
+            // implicit style, it has already been retrieved.
+            if (!HasImplicitStyleFromResources || !Resources.Contains(GetType()))
             {
+                HasStyleInvalidated = false;
                 UpdateStyleProperty();
+            }
+
+            if (!HasThemeStyleEverBeenFetched)
+            {
+                UpdateThemeStyleProperty();
             }
         }
 
@@ -1186,7 +1213,7 @@ namespace Windows.UI.Xaml
         //  merely indicates "we don't know".
         //InVisibilityCollapsedTree = 0x00100000,
 
-        HasStyleEverBeenFetched = 0x00200000,
+        //HasStyleEverBeenFetched = 0x00200000,
         HasThemeStyleEverBeenFetched = 0x00400000,
 
         HasLocalStyle = 0x00800000,
