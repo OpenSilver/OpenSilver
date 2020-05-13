@@ -158,6 +158,11 @@ namespace CSHTML5.Internal
 #if !CSHTML5NETSTANDARD
                 // Support running in the simulator (note: the following method is not translated to JavaScript, so it only runs in the Simulator):
                 html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
+#else
+                if(Interop.IsRunningInTheSimulator_WorkAround)
+                {
+                    html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
+                }
 #endif
 
                 return html5Path;
@@ -187,6 +192,11 @@ namespace CSHTML5.Internal
 #if !CSHTML5NETSTANDARD
                 // Support running in the simulator:
                 html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
+#else
+                if (Interop.IsRunningInTheSimulator_WorkAround)
+                {
+                    html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
+                }
 #endif
 
                 return html5Path;
