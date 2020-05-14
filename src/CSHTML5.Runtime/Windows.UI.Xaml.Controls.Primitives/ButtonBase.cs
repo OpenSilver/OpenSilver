@@ -91,18 +91,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             DependencyProperty.Register("Command", typeof(ICommand), typeof(ButtonBase), new PropertyMetadata(null, Command_Changed)
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
-#if WORKINPROGRESS
-        //
-        // Summary:
-        //     Identifies the System.Windows.Controls.Primitives.ButtonBase.IsMouseOver dependency
-        //     property.
-        //
-        // Returns:
-        //     The identifier for the System.Windows.Controls.Primitives.ButtonBase.IsMouseOver
-        //     dependency property.
-        public static readonly DependencyProperty IsMouseOverProperty;
-#endif
-
         static void Command_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ButtonBase buttonBase = (ButtonBase)d;
@@ -210,23 +198,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             this.IsPressed = false;
         }
 
-#if WORKINPROGRESS
-#if MIGRATION
-        //
-        // Summary:
-        //     Called when the value of the System.Windows.Controls.Primitives.ButtonBase.IsPressed
-        //     property changes.
-        //
-        // Parameters:
-        //   e:
-        //     The data for System.Windows.DependencyPropertyChangedEventArgs.
-        protected virtual void OnIsPressedChanged(DependencyPropertyChangedEventArgs e)
-        {
-            
-        }
-#endif
-#endif
-
         void StopPointerCapture()
         {
             _timerToReleaseCaptureAutomaticallyIfNoMouseUpEvent.Stop();
@@ -265,27 +236,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         #endregion
-
-
-#if WORKINPROGRESS
-        //
-        // Summary:
-        //     Gets a value that determines whether the button has focus.
-        //
-        // Returns:
-        //     true if the control has focus; otherwise, false. The default is false.
-        public bool IsFocused { get; }
-
-        //
-        // Summary:
-        //     Gets a value indicating whether the mouse pointer is located over this button
-        //     control.
-        //
-        // Returns:
-        //     true to indicate the mouse pointer is over the button control, otherwise false.
-        //     The default is false.
-        public bool IsMouseOver { get; }
-#endif
 
         /// <summary>
         /// Gets a value that indicates whether a ButtonBase is currently in a pressed state.
@@ -424,6 +374,55 @@ namespace Windows.UI.Xaml.Controls.Primitives
             if (_clickEventManager != null)
                 _clickEventManager.DetachFromDomEvents();
         }
+
+#endif
+
+#if WORKINPROGRESS
+
+        /// <summary>
+        /// Identifies the <see cref="ButtonBase.IsFocused"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsFocusedProperty =
+            DependencyProperty.Register("IsFocused",
+                                        typeof(bool),
+                                        typeof(ButtonBase),
+                                        new PropertyMetadata(false));
+
+        /// <summary>
+        /// Identifies the <see cref="ButtonBase.IsMouseOver"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsMouseOverProperty =
+            DependencyProperty.Register("IsMouseOver",
+                                        typeof(bool),
+                                        typeof(ButtonBase),
+                                        new PropertyMetadata(false));
+
+        /// <summary>
+        /// Gets a value that determines whether the button has focus.
+        /// </summary>
+        public bool IsFocused
+        {
+            get { return (bool)GetValue(IsFocusedProperty); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the mouse pointer is located over this button control.
+        /// </summary>
+        public bool IsMouseOver
+        {
+            get { return (bool)GetValue(IsMouseOverProperty); }
+        }
+
+#if MIGRATION
+        /// <summary>
+        /// Called when the value of the <see cref="ButtonBase.IsPressed"/> property changes.
+        /// </summary>
+        /// <param name="e">The data for <see cref="DependencyPropertyChangedEventArgs"/></param>
+        protected virtual void OnIsPressedChanged(DependencyPropertyChangedEventArgs e)
+        {
+
+        }
+#endif
 
 #endif
     }
