@@ -1,4 +1,5 @@
 #if WORKINPROGRESS
+#if !OPENSILVER
 namespace System.ServiceModel
 {
     //
@@ -54,4 +55,5 @@ namespace System.ServiceModel
     }
 }
 
+#endif
 #endif
