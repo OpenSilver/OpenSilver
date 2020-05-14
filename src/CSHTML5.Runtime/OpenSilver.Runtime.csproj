@@ -1082,6 +1082,9 @@
 	  <Page Include="DefaultStyles\INTERNAL_DefaultLabelStyle.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
+	  <Page Include="DefaultStyles\INTERNAL_DefaultRepeatButtonStyle.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 
 	<!-- See ths comment on the first <Import> -->
