@@ -227,7 +227,7 @@ namespace Windows.UI.Xaml.Media
 
         public override Rect TransformBounds(Rect rect)
         {
-            return Rect.Empty;
+            return new Rect();
         }
 
         public override bool TryTransform(Point inPoint, out Point outPoint)
