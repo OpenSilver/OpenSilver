@@ -32,20 +32,60 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents an ordered collection of Double values.
     /// </summary>
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(DoubleCollectionConverter))]
-#endif
-    public sealed partial class DoubleCollection : List<double> //: IList<double>, IEnumerable<double>
+    public sealed class DoubleCollection : PresentationFrameworkCollection<double>
     {
+        #region Constructor
+
         static DoubleCollection()
         {
             TypeFromStringConverters.RegisterConverter(typeof(DoubleCollection), INTERNAL_ConvertFromString);
         }
 
+        public DoubleCollection()
+        {
+
+        }
+
+        #endregion
+
+        #region Overriden Methods
+
+        internal override void AddOverride(double value)
+        {
+            this.AddInternal(value);
+        }
+
+        internal override void ClearOverride()
+        {
+            this.ClearInternal();
+        }
+
+        internal override void InsertOverride(int index, double value)
+        {
+            this.InsertInternal(index, value);
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            this.RemoveAtInternal(index);
+        }
+
+        internal override bool RemoveOverride(double value)
+        {
+            return this.RemoveInternal(value);
+        }
+
+        internal override void SetItemOverride(int index, double value)
+        {
+            this.SetItemInternal(index, value);
+        }
+
+        #endregion
+
         internal static object INTERNAL_ConvertFromString(string doubleCollectionAsString)
         {
             char separator = ' ';
-            if(doubleCollectionAsString.Trim().Contains(","))
+            if (doubleCollectionAsString.Trim().Contains(","))
             {
                 separator = ',';
             }
@@ -60,26 +100,5 @@ namespace Windows.UI.Xaml.Media
             }
             return doubleCollection;
         }
-
-        //// Summary:
-        ////     Initializes a new instance of the DoubleCollection class.
-        //public DoubleCollection();
-
-        //int Count { get; }
-        //bool IsReadOnly { get; }
-
-        //double this[int index] { get; set; }
-
-        //void Add(double item);
-        ////
-        //// Summary:
-        ////     Removes all items from the collection.
-        //void Clear();
-        //bool Contains(double item);
-        //void CopyTo(double[] array, int arrayIndex);
-        //int IndexOf(double item);
-        //void Insert(int index, double item);
-        //bool Remove(double item);
-        //void RemoveAt(int index);
     }
 }
