@@ -27,7 +27,7 @@ namespace System.ServiceModel
         // WCF METHODS WHICH RETURN A VALUE
         //------------------------------------------
 
-        public static Task<RETURN_TYPE> CallWebMethodAsync<RETURN_TYPE, INTERFACE_TYPE>(CSHTML5_ClientBase<INTERFACE_TYPE> clientBase, string methodName, Dictionary<string, Tuple<Type, object>> requestParameters) where INTERFACE_TYPE : class
+        public static Task<RETURN_TYPE> CallWebMethodAsync<RETURN_TYPE, INTERFACE_TYPE>(string endpointAddress, string methodName, Dictionary<string, Tuple<Type, object>> requestParameters) where INTERFACE_TYPE : class
         {
 #if !FOR_DESIGN_TIME
             // Remove the word "Async" from the method name (this is because the method called on the server's side is the one without "Async" at the end)
@@ -35,17 +35,17 @@ namespace System.ServiceModel
                 methodName = methodName.Remove(methodName.Length - 5);
 
             // Call the web method:
-            var webMethodsCaller = new CSHTML5_ClientBase<INTERFACE_TYPE>.WebMethodsCaller(clientBase.INTERNAL_RemoteAddressAsString);
+            var webMethodsCaller = new CSHTML5_ClientBase<INTERFACE_TYPE>.WebMethodsCaller(endpointAddress);
             return webMethodsCaller.CallWebMethodAsync<RETURN_TYPE>(methodName, typeof(INTERFACE_TYPE), typeof(RETURN_TYPE), requestParameters);
 #else
             return null;
 #endif
         }
 
-        public static RETURN_TYPE CallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(CSHTML5_ClientBase<INTERFACE_TYPE> clientBase, string methodName, Dictionary<string, Tuple<Type, object>> requestParameters) where INTERFACE_TYPE : class
+        public static RETURN_TYPE CallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(string endpointAddress, string methodName, Dictionary<string, Tuple<Type, object>> requestParameters) where INTERFACE_TYPE : class
         {
 #if !FOR_DESIGN_TIME
-            var webMethodsCaller = new CSHTML5_ClientBase<INTERFACE_TYPE>.WebMethodsCaller(clientBase.INTERNAL_RemoteAddressAsString);
+            var webMethodsCaller = new CSHTML5_ClientBase<INTERFACE_TYPE>.WebMethodsCaller(endpointAddress);
             return (RETURN_TYPE)webMethodsCaller.CallWebMethod(methodName, typeof(INTERFACE_TYPE), typeof(RETURN_TYPE), requestParameters);
 #else
             return default(RETURN_TYPE);
@@ -63,7 +63,7 @@ namespace System.ServiceModel
             }
         }
 
-        public static System.IAsyncResult BeginCallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(CSHTML5_ClientBase<INTERFACE_TYPE> clientBase, string methodName, Dictionary<string, Tuple<Type, object>> requestParameters) where INTERFACE_TYPE : class
+        public static System.IAsyncResult BeginCallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(string endpointAddress, string methodName, Dictionary<string, Tuple<Type, object>> requestParameters) where INTERFACE_TYPE : class
         {
 #if !FOR_DESIGN_TIME
             // Read the parameters:
@@ -80,7 +80,7 @@ namespace System.ServiceModel
                 methodName = methodName.Substring(5);
 
             // Call the server:
-            var webMethodsCaller = new CSHTML5_ClientBase<INTERFACE_TYPE>.WebMethodsCaller(clientBase.INTERNAL_RemoteAddressAsString);
+            var webMethodsCaller = new CSHTML5_ClientBase<INTERFACE_TYPE>.WebMethodsCaller(endpointAddress);
             var webMethodAsyncResult = new WebMethodAsyncResult(callback, asyncState);
             webMethodsCaller.BeginCallWebMethod(methodName, typeof(INTERFACE_TYPE), typeof(RETURN_TYPE), requestParameters,
                 (xmlReturnedFromTheServer) =>
@@ -98,7 +98,7 @@ namespace System.ServiceModel
 #endif
         }
 
-        public static RETURN_TYPE EndCallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(CSHTML5_ClientBase<INTERFACE_TYPE> clientBase, string methodName, Dictionary<string, Tuple<Type, object>> requestParameters) where INTERFACE_TYPE : class
+        public static RETURN_TYPE EndCallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(string endpointAddress, string methodName, Dictionary<string, Tuple<Type, object>> requestParameters) where INTERFACE_TYPE : class
         {
 #if !FOR_DESIGN_TIME
             // Remove the word "End" from the method name (this is because the method called on the server's side is the one without "End")
@@ -111,7 +111,7 @@ namespace System.ServiceModel
             string xmlReturnedFromTheServer = webMethodAsyncResult.XmlReturnedFromTheServer;
 
             // Call "EndCallWebMethod" to deserialize the result: 
-            var webMethodsCaller = new CSHTML5_ClientBase<INTERFACE_TYPE>.WebMethodsCaller(clientBase.INTERNAL_RemoteAddressAsString);
+            var webMethodsCaller = new CSHTML5_ClientBase<INTERFACE_TYPE>.WebMethodsCaller(endpointAddress);
             RETURN_TYPE result = webMethodsCaller.EndCallWebMethod<RETURN_TYPE>(methodName, typeof(INTERFACE_TYPE), xmlReturnedFromTheServer);
 
             // Return the deserialized result:
@@ -125,21 +125,21 @@ namespace System.ServiceModel
         // WCF METHODS WHICH DO NOT RETURN ANY VALUE
         //------------------------------------------
 
-        public static Task CallWebMethodAsync_WithoutReturnValue<INTERFACE_TYPE>(CSHTML5_ClientBase<INTERFACE_TYPE> clientBase, string methodName, Dictionary<string, Tuple<Type, object>> requestParameters) where INTERFACE_TYPE : class
+        public static Task CallWebMethodAsync_WithoutReturnValue<INTERFACE_TYPE>(string endpointAddress, string methodName, Dictionary<string, Tuple<Type, object>> requestParameters) where INTERFACE_TYPE : class
         {
             // The following call works fine because "Task<object>" inherits from "Task".
 
-            return CallWebMethodAsync<object, INTERFACE_TYPE>(clientBase, methodName, requestParameters);
+            return CallWebMethodAsync<object, INTERFACE_TYPE>(endpointAddress, methodName, requestParameters);
         }
 
-        public static void CallWebMethod_WithoutReturnValue<INTERFACE_TYPE>(CSHTML5_ClientBase<INTERFACE_TYPE> clientBase, string methodName, Dictionary<string, Tuple<Type, object>> requestParameters) where INTERFACE_TYPE : class
+        public static void CallWebMethod_WithoutReturnValue<INTERFACE_TYPE>(string endpointAddress, string methodName, Dictionary<string, Tuple<Type, object>> requestParameters) where INTERFACE_TYPE : class
         {
-            CallWebMethod<object, INTERFACE_TYPE>(clientBase, methodName, requestParameters);
+            CallWebMethod<object, INTERFACE_TYPE>(endpointAddress, methodName, requestParameters);
         }
 
-        public static void EndCallWebMethod_WithoutReturnValue<INTERFACE_TYPE>(CSHTML5_ClientBase<INTERFACE_TYPE> clientBase, string methodName, Dictionary<string, Tuple<Type, object>> requestParameters) where INTERFACE_TYPE : class
+        public static void EndCallWebMethod_WithoutReturnValue<INTERFACE_TYPE>(string endpointAddress, string methodName, Dictionary<string, Tuple<Type, object>> requestParameters) where INTERFACE_TYPE : class
         {
-            EndCallWebMethod<object, INTERFACE_TYPE>(clientBase, methodName, requestParameters);
+            EndCallWebMethod<object, INTERFACE_TYPE>(endpointAddress, methodName, requestParameters);
         }
     }
 }

@@ -261,7 +261,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             }
         }
 
-        internal string INTERNAL_RemoteAddressAsString
+        public string INTERNAL_RemoteAddressAsString
         {
             get
             {
@@ -704,6 +704,9 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
             private void PrepareRequest(string methodName, Type interfaceType, Dictionary<string, Tuple<Type, object>> requestParameters, bool isXmlSerializerRatherThanDataContractSerializer, out Dictionary<string, string> headers, out string request)
             {
+                //todo: This was added for Client_GD (because of the "Begin/End async pattern") but it may cause issues on other projects if there are web methods which name starts with "Begin".
+                if (methodName.StartsWith("Begin"))
+                    methodName = methodName.Substring(5);
                 string interfaceTypeName = interfaceType.Name;
                 string interfaceTypeNamespace = "http://tempuri.org/";
                 string soapActionPrefix = string.Empty; // initial value // This is used to determine the SOAPAction header to send to the server, by concatenating the soapActionPrefix and the method name.
@@ -749,9 +752,22 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 #endif
 
                 headers = new Dictionary<string, string>();
-                headers.Add("Content-Type", @"text/xml; charset=utf-8");
-                headers.Add("SOAPAction", @"""" + soapActionPrefix + methodName + "\"");
-                request = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body>";//<" + methodName + @" xmlns=""" + interfaceTypeNamespace + "\">";
+                
+                //TODO: implement a real way to find the soap version used
+                const string SOAP_VERSION = "1.1";
+                switch (SOAP_VERSION)
+                {
+                    case "1.1":
+                        headers.Add("Content-Type", @"text/xml; charset=utf-8");
+                        headers.Add("SOAPAction", @"""" + soapActionPrefix + methodName + "\"");
+                        request = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body>";//<" + methodName + @" xmlns=""" + interfaceTypeNamespace + "\">";
+                        break;
+                    case "1.2":
+                        headers.Add("Content-Type", @"application/soap+xml; charset=utf-8");
+                        request = $@"<s:Envelope xmlns:a=""http://www.w3.org/2005/08/addressing"" xmlns:s=""http://www.w3.org/2003/05/soap-envelope""><s:Header><a:Action>http://tempuri.org/ServiceHost/{methodName}</a:Action></s:Header><s:Body>";//<" + methodName + @" xmlns=""" + interfaceTypeNamespace + "\">";
+                        break;
+                }
+                
                 XElement methodNameElement = new XElement(XNamespace.Get(interfaceTypeNamespace).GetName(methodName)); //in every case, we want the name of the method as a XElement
 
                 //Note: now we want to add the parameters of the method:
