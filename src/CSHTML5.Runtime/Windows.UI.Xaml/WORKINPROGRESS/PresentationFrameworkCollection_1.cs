@@ -81,11 +81,11 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Gets a value indicating whether the System.Windows.PresentationFrameworkCollection`1
+        /// Gets a value indicating whether the <see cref="PresentationFrameworkCollection{T}"/>
         /// has a fixed size.
         /// </summary>
         /// <returns>
-        /// true if the System.Windows.PresentationFrameworkCollection`1 has a fixed size;
+        /// true if the <see cref="PresentationFrameworkCollection{T}"/> has a fixed size;
         /// otherwise, false.
         /// </returns>
         public bool IsFixedSize
@@ -94,11 +94,11 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Gets a value indicating whether the System.Windows.PresentationFrameworkCollection`1
+        /// Gets a value indicating whether the <see cref="PresentationFrameworkCollection{T}"/>
         /// is read-only.
         /// </summary>
         /// <returns>
-        /// true if the System.Windows.PresentationFrameworkCollection`1 is read-only; otherwise,
+        /// true if the <see cref="PresentationFrameworkCollection{T}"/> is read-only; otherwise,
         /// false.
         /// </returns>
         public bool IsReadOnly
@@ -107,11 +107,11 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Gets a value indicating whether access to the System.Windows.PresentationFrameworkCollection`1
+        /// Gets a value indicating whether access to the <see cref="PresentationFrameworkCollection{T}"/>
         /// is synchronized (thread safe).
         /// </summary>
         /// <returns>
-        /// true if access to the System.Windows.PresentationFrameworkCollection`1 is synchronized
+        /// true if access to the <see cref="PresentationFrameworkCollection{T}"/> is synchronized
         /// (thread safe); otherwise, false.
         /// </returns>
         public bool IsSynchronized
@@ -120,10 +120,10 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Gets an object that can be used to synchronize access to the System.Windows.PresentationFrameworkCollection`1.
+        /// Gets an object that can be used to synchronize access to the <see cref="PresentationFrameworkCollection{T}"/>.
         /// </summary>
         /// <returns>
-        /// An object that can be used to synchronize access to the System.Windows.PresentationFrameworkCollection`1.
+        /// An object that can be used to synchronize access to the <see cref="PresentationFrameworkCollection{T}"/>.
         /// </returns>
         public object SyncRoot
         {
@@ -136,7 +136,7 @@ namespace Windows.UI.Xaml
         /// Returns an enumerator that iterates through a collection.
         /// </summary>
         /// <returns>
-        /// An System.Collections.IEnumerator object that can be used to iterate through
+        /// An <see cref="IEnumerator"/> object that can be used to iterate through
         /// the collection.
         /// </returns>
         public IEnumerator<T> GetEnumerator()
@@ -145,7 +145,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Adds an item to the System.Windows.PresentationFrameworkCollection`1.
+        /// Adds an item to the <see cref="PresentationFrameworkCollection{T}"/>.
         /// </summary>
         /// <param name="value">The object to add.</param>
         public void Add(T value)
@@ -154,7 +154,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Removes all items from the System.Windows.PresentationFrameworkCollection`1.
+        /// Removes all items from the <see cref="PresentationFrameworkCollection{T}"/>.
         /// </summary>
         public void Clear()
         {
@@ -163,12 +163,12 @@ namespace Windows.UI.Xaml
 
 
         /// <summary>
-        /// Determines whether the System.Windows.PresentationFrameworkCollection`1 contains
+        /// Determines whether the <see cref="PresentationFrameworkCollection{T}"/> contains
         /// a specific value.
         /// </summary>
-        /// <param name="value">The object to locate in the System.Windows.PresentationFrameworkCollection`1.</param>
+        /// <param name="value">The object to locate in the <see cref="PresentationFrameworkCollection{T}"/>.</param>
         /// <returns>
-        /// true if the object is found in the System.Windows.PresentationFrameworkCollection`1;
+        /// true if the object is found in the <see cref="PresentationFrameworkCollection{T}"/>;
         /// otherwise, false.
         /// </returns>
         public bool Contains(T value)
@@ -177,12 +177,12 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Copies the elements of the System.Windows.PresentationFrameworkCollection`1 to
-        /// an System.Array, starting at a particular System.Array index.
+        /// Copies the elements of the <see cref="PresentationFrameworkCollection{T}"/> to
+        /// an <see cref="Array"/>, starting at a particular <see cref="Array"/> index.
         /// </summary>
         /// <param name="array">
-        /// The one-dimensional System.Array that is the destination of the elements copied
-        /// from the System.Windows.PresentationFrameworkCollection`1. The System.Array must
+        /// The one-dimensional <see cref="Array"/> that is the destination of the elements copied
+        /// from the <see cref="PresentationFrameworkCollection{T}"/>. The <see cref="Array"/> must
         /// have zero-based indexing.
         /// </param>
         /// <param name="index">The zero-based index in array at which copying begins.</param>
@@ -192,12 +192,12 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Copies the elements of the System.Windows.PresentationFrameworkCollection`1 to
-        /// an System.Array, starting at a particular System.Array index.
+        /// Copies the elements of the <see cref="PresentationFrameworkCollection{T}"/> to
+        /// an <see cref="Array"/>, starting at a particular <see cref="Array"/> index.
         /// </summary>
         /// <param name="array">
-        /// The one-dimensional System.Array that is the destination of the elements copied
-        /// from the System.Windows.PresentationFrameworkCollection`1. The System.Array must
+        /// The one-dimensional <see cref="Array"/> that is the destination of the elements copied
+        /// from the <see cref="PresentationFrameworkCollection{T}"/>. The <see cref="Array"/> must
         /// have zero-based indexing.
         /// </param>
         /// <param name="index">The zero-based index in array at which copying begins.</param>
@@ -207,9 +207,9 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Determines the index of a specific item in the System.Windows.PresentationFrameworkCollection`1.
+        /// Determines the index of a specific item in the <see cref="PresentationFrameworkCollection{T}"/>.
         /// </summary>
-        /// <param name="value">The object to locate in the System.Windows.PresentationFrameworkCollection`1.</param>
+        /// <param name="value">The object to locate in the <see cref="PresentationFrameworkCollection{T}"/>.</param>
         /// <returns>The index of value if found in the list; otherwise, an exception.</returns>
         /// <exception cref="System.ArgumentException">
         /// The object was not found in the list.
@@ -220,20 +220,20 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Inserts an item to the System.Windows.PresentationFrameworkCollection`1 at the
+        /// Inserts an item to the <see cref="PresentationFrameworkCollection{T}"/> at the
         /// specified index.
         /// </summary>
         /// <param name="index">The zero-based index at which value should be inserted.</param>
-        /// <param name="value">The object to insert into the System.Windows.PresentationFrameworkCollection`1.</param>
+        /// <param name="value">The object to insert into the <see cref="PresentationFrameworkCollection{T}"/>.</param>
         public void Insert(int index, T value)
         {
             this.InsertOverride(index, value);
         }
 
         /// <summary>
-        /// Removes the first occurrence of a specific object from the System.Windows.PresentationFrameworkCollection`1.
+        /// Removes the first occurrence of a specific object from the <see cref="PresentationFrameworkCollection{T}"/>.
         /// </summary>
-        /// <param name="value">The object to remove from the System.Windows.PresentationFrameworkCollection`1.</param>
+        /// <param name="value">The object to remove from the <see cref="PresentationFrameworkCollection{T}"/>.</param>
         /// <returns>true if an object was removed; otherwise, false.</returns>
         public bool Remove(T value)
         {
@@ -324,7 +324,7 @@ namespace Windows.UI.Xaml
         #region Generic collection manipulation methods
 
         /// <summary>
-        /// Call the Add method of underlying List<typeparamref name="T"/> collection.
+        /// Call the Add method of underlying <see cref="List{T}"/> collection.
         /// </summary>
         /// <param name="value"></param>
         internal void AddInternal(T value)
@@ -334,7 +334,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Call the Clear method of underlying List<typeparamref name="T"/> collection.
+        /// Call the Clear method of underlying <see cref="List{T}"/> collection.
         /// </summary>
         internal void ClearInternal()
         {
@@ -343,7 +343,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Call the Insert method of underlying List<typeparamref name="T"/> collection.
+        /// Call the Insert method of underlying <see cref="List{T}"/> collection.
         /// </summary>
         internal void InsertInternal(int index, T value)
         {
@@ -352,7 +352,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Call the RemoveAt method of underlying List<typeparamref name="T"/> collection.
+        /// Call the RemoveAt method of underlying <see cref="List{T}"/> collection.
         /// </summary>
         internal void RemoveAtInternal(int index)
         {
@@ -361,7 +361,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Call the Remove method of underlying List<typeparamref name="T"/> collection.
+        /// Call the Remove method of underlying <see cref="List{T}"/> collection.
         /// </summary>
         internal bool RemoveInternal(T value)
         {
@@ -374,7 +374,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Call the Indexer (getter) property of underlying List<typeparamref name="T"/> collection.
+        /// Call the Indexer (getter) property of underlying <see cref="List{T}"/> collection.
         /// </summary>
         internal T GetItemInternal(int index)
         {
@@ -382,7 +382,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Call the Indexer (setter) property of underlying List<typeparamref name="T"/> collection.
+        /// Call the Indexer (setter) property of underlying <see cref="List{T}"/> collection.
         /// </summary>
         internal void SetItemInternal(int index, T value)
         {
@@ -410,7 +410,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Call the Add method of underlying List<typeparamref name="T"/> collection
+        /// Call the Add method of underlying <see cref="List{T}"/> collection
         /// and update inheritance context to match this object.
         /// </summary>
         /// <param name="value"></param>
@@ -423,7 +423,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Call the Clear method of underlying List<typeparamref name="T"/> collection
+        /// Call the Clear method of underlying <see cref="List{T}"/> collection
         /// and update inheritance context to match this object.
         /// </summary>
         internal void ClearDependencyObjectInternal()
@@ -437,7 +437,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Call the Insert method of underlying List<typeparamref name="T"/> collection
+        /// Call the Insert method of underlying <see cref="List{T}"/> collection
         /// and update inheritance context to match this object.
         /// </summary>
         internal void InsertDependencyObjectInternal(int index, T value)
@@ -449,7 +449,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Call the RemoveAt method of underlying List<typeparamref name="T"/> collection
+        /// Call the RemoveAt method of underlying <see cref="List{T}"/> collection
         /// and update inheritance context to match this object.
         /// </summary>
         internal void RemoveAtDependencyObjectInternal(int index)
@@ -461,7 +461,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Call the Remove method of underlying List<typeparamref name="T"/> collection
+        /// Call the Remove method of underlying <see cref="List{T}"/> collection
         /// and update inheritance context to match this object.
         /// </summary>
         internal bool RemoveDependencyObjectInternal(T value)
@@ -478,7 +478,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Call the Indexer (setter) property of underlying List<typeparamref name="T"/> collection
+        /// Call the Indexer (setter) property of underlying <see cref="List{T}"/> collection
         /// and update inheritance context to match this object.
         /// </summary>
         internal void SetItemDependencyObjectInternal(int index, T value)
@@ -493,7 +493,7 @@ namespace Windows.UI.Xaml
         #endregion
 
         /// <summary>
-        /// Get the Count of the underlying List<typeparamref name="T"/> collection.
+        /// Get the Count of the underlying <see cref="List{T}"/> collection.
         /// This property returns the same value as the Count property and is only here
         /// for performances.
         /// </summary>
