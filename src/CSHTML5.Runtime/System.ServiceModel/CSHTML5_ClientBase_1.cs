@@ -1,4 +1,4 @@
-﻿
+
 
 /*===================================================================================
 * 
@@ -989,7 +989,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
                         FaultCode faultCode = new FaultCode(codeElement.Elements().First().Value);
                         FaultReason faultReason = new FaultReason(reasonElement.Elements().First().Value);
-                        string action = headerElement.Element(XName.Get("Action", NS)).Value;
+                        string action = headerElement.Element(XName.Get("Action", "http://www.w3.org/2005/08/addressing")).Value;
                         
                         FaultException faultException;
                         
