@@ -101,11 +101,6 @@ namespace System.ServiceModel
         public System.ServiceModel.Description.ClientCredentials ClientCredentials { get; } = new Description.ClientCredentials();
 #endif
         string _remoteAddressAsString;
-        
-#if OPENSILVER
-        //TODO: implement a real way to find the soap version used
-        private const string SOAP_VERSION = "1.1";
-#endif
 
         private TChannel channel;
         public TChannel Channel
@@ -505,13 +500,13 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 _addressOfService = addressOfService;
             }
 
-            public void BeginCallWebMethod(string methodName, Type interfaceType, Type methodReturnType, Dictionary<string, Tuple<Type, object>> originalRequestObject, Action<string> callback)
+            public void BeginCallWebMethod(string methodName, Type interfaceType, Type methodReturnType, Dictionary<string, Tuple<Type, object>> originalRequestObject, Action<string> callback, string soapVersion)
             {
                 bool isXmlSerializerRatherThanDataContractSerializer = IsXmlSerializerRatherThanDataContractSerializer(methodName, methodReturnType, originalRequestObject);
 
                 Dictionary<string, string> headers;
                 string request;
-                PrepareRequest(methodName, interfaceType, originalRequestObject, isXmlSerializerRatherThanDataContractSerializer, out headers, out request);
+                PrepareRequest(methodName, interfaceType, originalRequestObject, isXmlSerializerRatherThanDataContractSerializer, out headers, soapVersion, out request);
 
                 // Make the actual web service call:
                 if (CSHTML5.Interop.IsRunningInTheSimulator)
@@ -557,11 +552,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 }
             }
 
-            public RETURN_TYPE EndCallWebMethod<RETURN_TYPE>(string methodName, Type interfaceType, string xmlReturnedFromTheServer)
+            public RETURN_TYPE EndCallWebMethod<RETURN_TYPE>(string methodName, Type interfaceType, string xmlReturnedFromTheServer, string soapVersion)
             {
                 bool isXmlSerializerRatherThanDataContractSerializer = IsXmlSerializerRatherThanDataContractSerializer(methodName, typeof(RETURN_TYPE), null);
 
-                RETURN_TYPE requestResponse = (RETURN_TYPE)ReadAndPrepareResponse(xmlReturnedFromTheServer, interfaceType, typeof(RETURN_TYPE), faultException => { throw faultException; }, isXmlSerializerRatherThanDataContractSerializer);
+                RETURN_TYPE requestResponse = (RETURN_TYPE)ReadAndPrepareResponse(xmlReturnedFromTheServer, interfaceType, typeof(RETURN_TYPE), faultException => { throw faultException; }, isXmlSerializerRatherThanDataContractSerializer, soapVersion);
 
                 return requestResponse;
             }
@@ -576,28 +571,28 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             /// <param name="methodReturnType">The return Type of the method</param>
             /// <param name="originalRequestObject">The additional arguments of the method</param>
             /// <returns>The result of the call of the method.</returns>
-            public Task<T> CallWebMethodAsync<T>(string methodName, Type interfaceType, Type methodReturnType, Dictionary<string, Tuple<Type, object>> originalRequestObject) // Note: we don't arrive here using c#
+            public Task<T> CallWebMethodAsync<T>(string methodName, Type interfaceType, Type methodReturnType, Dictionary<string, Tuple<Type, object>> originalRequestObject, string soapVersion) // Note: we don't arrive here using c#
             {
                 //todo: find out what happens with methods that take multiple arguments (if possible) and change the parameterName to a string[].
                 Dictionary<string, string> headers;
                 string request;
                 bool isXmlSerializerRatherThanDataContractSerializer = IsXmlSerializerRatherThanDataContractSerializer(methodName, methodReturnType, originalRequestObject);
 
-                PrepareRequest(methodName, interfaceType, originalRequestObject, isXmlSerializerRatherThanDataContractSerializer, out headers, out request);
+                PrepareRequest(methodName, interfaceType, originalRequestObject, isXmlSerializerRatherThanDataContractSerializer, out headers, soapVersion, out request);
                 string response = null;
 
                 var taskCompletionSource = new TaskCompletionSource<T>(); //todo: here we need to change object to the return type
                 if (CSHTML5.Interop.IsRunningInTheSimulator)
                 {
 #if BRIDGE || CSHTML5BLAZOR
-                    response = _webRequestHelper_JSVersion.MakeRequest(new Uri(_addressOfService), "POST", this, headers, request, (sender, args2) => ReadAndPrepareResponseGeneric_JSVersion(taskCompletionSource, args2, interfaceType, methodReturnType, isXmlSerializerRatherThanDataContractSerializer), true, Application.Current.Host.Settings.DefaultSoapCredentialsMode);
+                    response = _webRequestHelper_JSVersion.MakeRequest(new Uri(_addressOfService), "POST", this, headers, request, (sender, args2) => ReadAndPrepareResponseGeneric_JSVersion(taskCompletionSource, args2, interfaceType, methodReturnType, isXmlSerializerRatherThanDataContractSerializer, soapVersion), true, Application.Current.Host.Settings.DefaultSoapCredentialsMode);
 #else
                     _webRequestHelper.MakeRequestAsync_CSharpVersion(new Uri(_addressOfService), headers, request, (sender, args2) => ReadAndPrepareResponseGeneric(taskCompletionSource, args2, interfaceType, methodReturnType, isXmlSerializerRatherThanDataContractSerializer));
 #endif
                 }
                 else
                 {
-                    response = _webRequestHelper_JSVersion.MakeRequest(new Uri(_addressOfService), "POST", this, headers, request, (sender, args2) => ReadAndPrepareResponseGeneric_JSVersion(taskCompletionSource, args2, interfaceType, methodReturnType, isXmlSerializerRatherThanDataContractSerializer), true, Application.Current.Host.Settings.DefaultSoapCredentialsMode);
+                    response = _webRequestHelper_JSVersion.MakeRequest(new Uri(_addressOfService), "POST", this, headers, request, (sender, args2) => ReadAndPrepareResponseGeneric_JSVersion(taskCompletionSource, args2, interfaceType, methodReturnType, isXmlSerializerRatherThanDataContractSerializer, soapVersion), true, Application.Current.Host.Settings.DefaultSoapCredentialsMode);
                 }
 
                 return taskCompletionSource.Task;
@@ -611,7 +606,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             /// <param name="methodReturnType"></param>
             /// <param name="originalRequestObject"></param>
             /// <returns>The result of the call of the method.</returns>
-            public object CallWebMethod(string methodName, Type interfaceType, Type methodReturnType, Dictionary<string, Tuple<Type, object>> originalRequestObject) // Note: we don't arrive here using c#.
+            public object CallWebMethod(string methodName, Type interfaceType, Type methodReturnType, Dictionary<string, Tuple<Type, object>> originalRequestObject, string soapVersion) // Note: we don't arrive here using c#.
             {
                 //**************************************
                 // What the request should look like in case of classes or strings:
@@ -651,7 +646,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 Dictionary<string, string> headers;
                 string request;
                 bool isXmlSerializerRatherThanDataContractSerializer = IsXmlSerializerRatherThanDataContractSerializer(methodName, methodReturnType, originalRequestObject);
-                PrepareRequest(methodName, interfaceType, originalRequestObject, isXmlSerializerRatherThanDataContractSerializer, out headers, out request);
+                PrepareRequest(methodName, interfaceType, originalRequestObject, isXmlSerializerRatherThanDataContractSerializer, out headers, soapVersion, out request);
                 string response = null;
 
                 if (CSHTML5.Interop.IsRunningInTheSimulator)
@@ -669,7 +664,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 }
 
                 Type requestResponseType = methodReturnType; //GetReturnType(); //return type is of type XXXResponse
-                return ReadAndPrepareResponse(response, interfaceType, requestResponseType, faultException => { throw faultException; }, isXmlSerializerRatherThanDataContractSerializer);
+                return ReadAndPrepareResponse(response, interfaceType, requestResponseType, faultException => { throw faultException; }, isXmlSerializerRatherThanDataContractSerializer, soapVersion);
             }
 
             private static bool IsXmlSerializerRatherThanDataContractSerializer(string methodName, Type methodReturnType, object originalRequestObject)
@@ -707,7 +702,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 #endif
             }
 
-            private void PrepareRequest(string methodName, Type interfaceType, Dictionary<string, Tuple<Type, object>> requestParameters, bool isXmlSerializerRatherThanDataContractSerializer, out Dictionary<string, string> headers, out string request)
+            private void PrepareRequest(string methodName, Type interfaceType, Dictionary<string, Tuple<Type, object>> requestParameters, bool isXmlSerializerRatherThanDataContractSerializer, out Dictionary<string, string> headers, string soapVersion, out string request)
             {
                 //todo: This was added for Client_GD (because of the "Begin/End async pattern") but it may cause issues on other projects if there are web methods which name starts with "Begin".
                 if (methodName.StartsWith("Begin"))
@@ -758,8 +753,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
                 headers = new Dictionary<string, string>();
                 
-#if OPENSILVER
-                switch (SOAP_VERSION)
+                switch (soapVersion)
                 {
                     case "1.1":
                         headers.Add("Content-Type", @"text/xml; charset=utf-8");
@@ -770,12 +764,9 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         headers.Add("Content-Type", @"application/soap+xml; charset=utf-8");
                         request = $@"<s:Envelope xmlns:a=""http://www.w3.org/2005/08/addressing"" xmlns:s=""http://www.w3.org/2003/05/soap-envelope""><s:Header><a:Action>http://tempuri.org/ServiceHost/{methodName}</a:Action></s:Header><s:Body>";//<" + methodName + @" xmlns=""" + interfaceTypeNamespace + "\">";
                         break;
+                    default:
+                        throw new InvalidOperationException($"SOAP version not supported: {soapVersion}");
                 }
-#else
-                headers.Add("Content-Type", @"text/xml; charset=utf-8");
-                headers.Add("SOAPAction", @"""" + soapActionPrefix + methodName + "\"");
-                request = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body>";//<" + methodName + @" xmlns=""" + interfaceTypeNamespace + "\">";
-#endif
                 
                 XElement methodNameElement = new XElement(XNamespace.Get(interfaceTypeNamespace).GetName(methodName)); //in every case, we want the name of the method as a XElement
 
@@ -907,11 +898,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 }
             }
 
-            private void ReadAndPrepareResponseGeneric<T>(TaskCompletionSource<T> taskCompletionSource, UploadStringCompletedEventArgs e, Type interfaceType, Type requestResponseType, bool isXmlSerializerRatherThanDataContractSerializer)
+            private void ReadAndPrepareResponseGeneric<T>(TaskCompletionSource<T> taskCompletionSource, UploadStringCompletedEventArgs e, Type interfaceType, Type requestResponseType, bool isXmlSerializerRatherThanDataContractSerializer, string soapVersion)
             {
                 if (e.Error == null)
                 {
-                    T requestResponse = (T)ReadAndPrepareResponse(e.Result, interfaceType, requestResponseType, faultException => taskCompletionSource.TrySetException(faultException), isXmlSerializerRatherThanDataContractSerializer);
+                    T requestResponse = (T)ReadAndPrepareResponse(e.Result, interfaceType, requestResponseType, faultException => taskCompletionSource.TrySetException(faultException), isXmlSerializerRatherThanDataContractSerializer, soapVersion);
                     if (!taskCompletionSource.Task.IsCompleted) //Note: this Task.IsCompleted can be true if we met an exception which triggered a call to TrySetException (above).
                         taskCompletionSource.SetResult(requestResponse);
                 }
@@ -921,11 +912,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 }
             }
 
-            private void ReadAndPrepareResponseGeneric_JSVersion<T>(TaskCompletionSource<T> taskCompletionSource, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs e, Type interfaceType, Type requestResponseType, bool isXmlSerializerRatherThanDataContractSerializer)
+            private void ReadAndPrepareResponseGeneric_JSVersion<T>(TaskCompletionSource<T> taskCompletionSource, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs e, Type interfaceType, Type requestResponseType, bool isXmlSerializerRatherThanDataContractSerializer, string soapVersion)
             {
                 if (e.Error == null)
                 {
-                    T requestResponse = (T)ReadAndPrepareResponse(e.Result, interfaceType, requestResponseType, faultException => taskCompletionSource.TrySetException(faultException), isXmlSerializerRatherThanDataContractSerializer);
+                    T requestResponse = (T)ReadAndPrepareResponse(e.Result, interfaceType, requestResponseType, faultException => taskCompletionSource.TrySetException(faultException), isXmlSerializerRatherThanDataContractSerializer, soapVersion);
                     if (!taskCompletionSource.Task.IsCompleted) //Note: this Task.IsCompleted can be true if we met an exception which triggered a call to TrySetException (above).
                         taskCompletionSource.SetResult(requestResponse);
                 }
@@ -935,7 +926,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 }
             }
 
-            private object ReadAndPrepareResponse(string responseAsString, Type interfaceType, Type requestResponseType, Action<FaultException> raiseFaultException, bool isXmlSerializerRatherThanDataContractSerializer)
+            private object ReadAndPrepareResponse(string responseAsString, Type interfaceType, Type requestResponseType, Action<FaultException> raiseFaultException, bool isXmlSerializerRatherThanDataContractSerializer, string soapVersion)
             {
                 //**************************************
                 // What the response should look like in case of classes or strings:
@@ -971,7 +962,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 //we make our own exception. Because it is easier that way (it will probably require an actual deserialization of the users' FaultException later on, to be able to support their custom ones).
 #if OPENSILVER
                 // Error parsing, if applicable
-                if (SOAP_VERSION == "1.2")
+                if (soapVersion == "1.2")
                 {
                     const string NS = "http://www.w3.org/2003/05/soap-envelope";
                     
