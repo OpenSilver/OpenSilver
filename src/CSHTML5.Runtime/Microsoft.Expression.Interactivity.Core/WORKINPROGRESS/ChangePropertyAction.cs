@@ -12,11 +12,31 @@ namespace Microsoft.Expression.Interactivity.Core
 	//     An action that will change a specified property to a specified value when invoked.
 	public partial class ChangePropertyAction : TargetedTriggerAction<object>
 	{
-		public static readonly DependencyProperty DurationProperty;
-		public static readonly DependencyProperty EaseProperty;
-		public static readonly DependencyProperty IncrementProperty;
-		public static readonly DependencyProperty PropertyNameProperty;
-		public static readonly DependencyProperty ValueProperty;
+		public static readonly DependencyProperty DurationProperty =
+			DependencyProperty.Register("Duration", 
+										typeof(Duration), 
+										typeof(ChangePropertyAction), 
+										null);
+		public static readonly DependencyProperty EaseProperty =
+			DependencyProperty.Register("Ease",
+										typeof(IEasingFunction),
+										typeof(ChangePropertyAction),
+										null);
+		public static readonly DependencyProperty IncrementProperty =
+			DependencyProperty.Register("Increment",
+										typeof(bool),
+										typeof(ChangePropertyAction),
+										null);
+		public static readonly DependencyProperty PropertyNameProperty =
+			DependencyProperty.Register("PropertyName",
+										typeof(string),
+										typeof(ChangePropertyAction),
+										null);
+		public static readonly DependencyProperty ValueProperty =
+			DependencyProperty.Register("Value",
+										typeof(object),
+										typeof(ChangePropertyAction),
+										null);
 
 		//
 		// Summary:
@@ -32,25 +52,45 @@ namespace Microsoft.Expression.Interactivity.Core
 		//     Gets or sets the duration of the animation that will occur when the ChangePropertyAction
 		//     is invoked. This is a dependency property. If the duration is unset, no animation
 		//     will be applied.
-		public Duration Duration { get; set; }
+		public Duration Duration
+		{
+			get { return (Duration)GetValue(DurationProperty); }
+			set { SetValue(DurationProperty, value); }
+		}
 		//
 		// Summary:
 		//     Gets or sets the easing function to use with the animation when the ChangePropertyAction
 		//     is invoked. This is a dependency property.
-		public IEasingFunction Ease { get; set; }
+		public IEasingFunction Ease
+		{
+			get { return (IEasingFunction)GetValue(EaseProperty); }
+			set { SetValue(EaseProperty, value); }
+		}
 		//
 		// Summary:
 		//     Increment by Value if true; otherwise, set the value directly. If the property
 		//     cannot be incremented, it will instead try to set the value directly.
-		public bool Increment { get; set; }
+		public bool Increment
+		{
+			get { return (bool)GetValue(IncrementProperty); }
+			set { SetValue(IncrementProperty, value); }
+		}
 		//
 		// Summary:
 		//     Gets or sets the name of the property to change. This is a dependency property.
-		public string PropertyName { get; set; }
+		public string PropertyName
+		{
+			get { return (string)GetValue(PropertyNameProperty); }
+			set { SetValue(PropertyNameProperty, value); }
+		}
 		//
 		// Summary:
 		//     Gets or sets the value to set. This is a dependency property.
-		public object Value { get; set; }
+		public object Value
+		{
+			get { return (object)GetValue(ValueProperty); }
+			set { SetValue(ValueProperty, value); }
+		}
 
 		//
 		// Summary:

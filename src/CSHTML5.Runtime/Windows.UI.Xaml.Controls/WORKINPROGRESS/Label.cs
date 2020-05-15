@@ -20,14 +20,22 @@ namespace Windows.UI.Xaml.Controls
 		//
 		// Returns:
 		//     The identifier for the System.Windows.Controls.Label.IsRequired dependency property.
-		public static readonly DependencyProperty IsRequiredProperty;
+		public static readonly DependencyProperty IsRequiredProperty =
+			DependencyProperty.Register("IsRequired",
+										typeof(bool),
+										typeof(Label),
+										new PropertyMetadata(false));
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.Label.IsValid dependency property.
 		//
 		// Returns:
 		//     The identifier for the System.Windows.Controls.Label.IsValid dependency property.
-		public static readonly DependencyProperty IsValidProperty;
+		public static readonly DependencyProperty IsValidProperty =
+			DependencyProperty.Register("IsValid",
+										typeof(bool),
+										typeof(Label),
+										new PropertyMetadata(true));
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.Label.PropertyPath dependency property.
@@ -35,9 +43,17 @@ namespace Windows.UI.Xaml.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.Label.PropertyPath dependency
 		//     property.
-		public static readonly DependencyProperty PropertyPathProperty;
+		public static readonly DependencyProperty PropertyPathProperty =
+			DependencyProperty.Register("PropertyPath",
+										typeof(string),
+										typeof(Label),
+										null);
 
-		public static readonly DependencyProperty TargetProperty;
+		public static readonly DependencyProperty TargetProperty =
+			DependencyProperty.Register("Target",
+										typeof(FrameworkElement),
+										typeof(Label),
+										null);
 
 		//
 		// Summary:
@@ -46,7 +62,11 @@ namespace Windows.UI.Xaml.Controls
 		//
 		// Returns:
 		//     true if the field is required; otherwise, false. The default is false.
-		public bool IsRequired { get; set; }
+		public bool IsRequired
+		{
+			get { return (bool)GetValue(IsRequiredProperty); }
+			set { SetValue(IsRequiredProperty, value); }
+		}
 		//
 		// Summary:
 		//     Gets a value that indicates whether the System.Windows.Controls.Label.Target
@@ -54,7 +74,10 @@ namespace Windows.UI.Xaml.Controls
 		//
 		// Returns:
 		//     true if the field data is valid; otherwise, false. The default is true.
-		public bool IsValid { get; }
+		public bool IsValid
+		{
+			get { return (bool)GetValue(IsValidProperty); }
+		}
 		//
 		// Summary:
 		//     Gets or sets the path to the dependency property on the System.Windows.FrameworkElement.DataContext
@@ -65,7 +88,11 @@ namespace Windows.UI.Xaml.Controls
 		//     The path to the dependency property on the System.Windows.FrameworkElement.DataContext
 		//     of the System.Windows.Controls.Label.Target control that this System.Windows.Controls.Label
 		//     is associated with. The default is null.
-		public string PropertyPath { get; set; }
+		public string PropertyPath
+		{
+			get { return (string)GetValue(PropertyPathProperty); }
+			set { SetValue(PropertyPathProperty, value); }
+		}
 		//
 		// Summary:
 		//     Gets or sets the control that this System.Windows.Controls.Label is associated
@@ -73,7 +100,11 @@ namespace Windows.UI.Xaml.Controls
 		//
 		// Returns:
 		//     The control that this System.Windows.Controls.Label is associated with.
-		public FrameworkElement Target { get; set; }
+		public FrameworkElement Target
+		{
+			get { return (FrameworkElement)GetValue(TargetProperty); }
+			set { SetValue(TargetProperty, value); }
+		}
 
 		//
 		// Summary:

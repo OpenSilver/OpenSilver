@@ -21,7 +21,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.AllowDownloading
 		//     dependency property.
-		public static readonly DependencyProperty AllowDownloadingProperty;
+		public static readonly DependencyProperty AllowDownloadingProperty =
+			DependencyProperty.Register("AllowDownloading",
+										typeof(bool),
+										typeof(MultiScaleImage),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.MultiScaleImage.AspectRatio dependency
@@ -30,7 +34,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.AspectRatio dependency
 		//     property.
-		public static readonly DependencyProperty AspectRatioProperty;
+		public static readonly DependencyProperty AspectRatioProperty =
+			DependencyProperty.Register("AspectRatio",
+										typeof(double),
+										typeof(MultiScaleImage),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.MultiScaleImage.BlurFactor dependency
@@ -39,7 +47,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.BlurFactor dependency
 		//     property.
-		public static readonly DependencyProperty BlurFactorProperty;
+		public static readonly DependencyProperty BlurFactorProperty =
+			DependencyProperty.Register("BlurFactor",
+										typeof(double),
+										typeof(MultiScaleImage),
+										new PropertyMetadata(1d));
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.MultiScaleImage.IsDownloading dependency
@@ -48,7 +60,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.IsDownloading
 		//     dependency property.
-		public static readonly DependencyProperty IsDownloadingProperty;
+		public static readonly DependencyProperty IsDownloadingProperty =
+			DependencyProperty.Register("IsDownloading",
+										typeof(bool),
+										typeof(MultiScaleImage),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.MultiScaleImage.IsIdle dependency property.
@@ -56,7 +72,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.IsIdle dependency
 		//     property.
-		public static readonly DependencyProperty IsIdleProperty;
+		public static readonly DependencyProperty IsIdleProperty =
+			DependencyProperty.Register("IsIdle",
+										typeof(bool),
+										typeof(MultiScaleImage),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.MultiScaleImage.OriginalPixelHeight dependency
@@ -65,7 +85,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.OriginalPixelHeight
 		//     dependency property.
-		public static readonly DependencyProperty OriginalPixelHeightProperty;
+		public static readonly DependencyProperty OriginalPixelHeightProperty =
+			DependencyProperty.Register("OriginalPixelHeight",
+										typeof(int),
+										typeof(MultiScaleImage),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.MultiScaleImage.OriginalPixelWidth dependency
@@ -74,7 +98,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.OriginalPixelWidth
 		//     dependency property.
-		public static readonly DependencyProperty OriginalPixelWidthProperty;
+		public static readonly DependencyProperty OriginalPixelWidthProperty =
+			DependencyProperty.Register("OriginalPixelWidth",
+										typeof(int),
+										typeof(MultiScaleImage),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.MultiScaleImage.SkipLevels dependency
@@ -83,7 +111,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.SkipLevels dependency
 		//     property.
-		public static readonly DependencyProperty SkipLevelsProperty;
+		public static readonly DependencyProperty SkipLevelsProperty =
+			DependencyProperty.Register("SkipLevels",
+										typeof(int),
+										typeof(MultiScaleImage),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.MultiScaleImage.Source dependency property.
@@ -91,7 +123,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.Source dependency
 		//     property.
-		public static readonly DependencyProperty SourceProperty;
+		public static readonly DependencyProperty SourceProperty =
+			DependencyProperty.Register("Source",
+										typeof(MultiScaleTileSource),
+										typeof(MultiScaleImage),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.MultiScaleImage.SubImages dependency property.
@@ -99,7 +135,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.SubImages dependency
 		//     property.
-		public static readonly DependencyProperty SubImagesProperty;
+		public static readonly DependencyProperty SubImagesProperty =
+			DependencyProperty.Register("SubImages",
+										typeof(ReadOnlyCollection<MultiScaleSubImage>),
+										typeof(MultiScaleImage),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.MultiScaleImage.UseSprings dependency
@@ -108,7 +148,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.UseSprings dependency
 		//     property.
-		public static readonly DependencyProperty UseSpringsProperty;
+		public static readonly DependencyProperty UseSpringsProperty =
+			DependencyProperty.Register("UseSprings",
+										typeof(bool),
+										typeof(MultiScaleImage),
+										new PropertyMetadata(true));
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.MultiScaleImage.ViewportOrigin dependency
@@ -117,7 +161,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.ViewportOrigin
 		//     dependency property.
-		public static readonly DependencyProperty ViewportOriginProperty;
+		public static readonly DependencyProperty ViewportOriginProperty =
+			DependencyProperty.Register("ViewportOrigin",
+										typeof(Point),
+										typeof(MultiScaleImage),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.MultiScaleImage.ViewportWidth dependency
@@ -126,7 +174,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.ViewportWidth
 		//     dependency property.
-		public static readonly DependencyProperty ViewportWidthProperty;
+		public static readonly DependencyProperty ViewportWidthProperty =
+			DependencyProperty.Register("ViewportWidth",
+										typeof(double),
+										typeof(MultiScaleImage),
+										null);
 
 		//
 		// Summary:
@@ -144,7 +196,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     true if downloading is permitted by this System.Windows.Controls.MultiScaleImage.
 		//     false if downloading is not permitted by this System.Windows.Controls.MultiScaleImage.
-		public bool AllowDownloading { get; set; }
+		public bool AllowDownloading
+		{
+			get { return (bool)GetValue(AllowDownloadingProperty); }
+			set { SetValue(AllowDownloadingProperty, value); }
+		}
 		//
 		// Summary:
 		//     Gets the aspect ratio of the image used as the source of the System.Windows.Controls.MultiScaleImage.
@@ -153,7 +209,10 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The aspect ratio of the image used as the source of the System.Windows.Controls.MultiScaleImage.
 		//     The aspect ratio is the width of the image divided by its height.
-		public double AspectRatio { get; }
+		public double AspectRatio
+		{
+			get { return (double)GetValue(AspectRatioProperty); }
+		}
 		//
 		// Summary:
 		//     Gets or sets the extent that data is blurred while rendering.
@@ -162,7 +221,11 @@ namespace System.Windows.Controls
 		//     The extent that data is blurred while rendering. A value of 2 means that data
 		//     is twice as blurry (one level lower), while a value of 0.5 means that data is
 		//     sharper (one level higher). The default is 1.
-		public double BlurFactor { get; set; }
+		public double BlurFactor
+		{
+			get { return (double)GetValue(BlurFactorProperty); }
+			set { SetValue(BlurFactorProperty, value); }
+		}
 		//
 		// Summary:
 		//     Gets a value that indicates whether the image is still downloading.
@@ -171,7 +234,10 @@ namespace System.Windows.Controls
 		//     true if the image is still downloading. false if all the needed tiles have been
 		//     downloaded. If the image is moved, System.Windows.Controls.MultiScaleImage.IsDownloading
 		//     may become true again.
-		public bool IsDownloading { get; }
+		public bool IsDownloading
+		{
+			get { return (bool)GetValue(IsDownloadingProperty); }
+		}
 		//
 		// Summary:
 		//     Gets a value that indicates whether Deep Zoom is done downloading, decoding,
@@ -180,28 +246,41 @@ namespace System.Windows.Controls
 		// Returns:
 		//     true, if Deep Zoom is done downloading, decoding, blending, and animating (if
 		//     springs are being used) images. Otherwise, false.
-		public bool IsIdle { get; }
+		public bool IsIdle
+		{
+			get { return (bool)GetValue(IsIdleProperty); }
+		}
 		//
 		// Summary:
 		//     Gets the original height of the image used as the source of the System.Windows.Controls.MultiScaleImage.
 		//
 		// Returns:
 		//     The height of the image used as the source of the System.Windows.Controls.MultiScaleImage.
-		public int OriginalPixelHeight { get; }
+		public int OriginalPixelHeight
+		{
+			get { return (int)GetValue(OriginalPixelHeightProperty); }
+		}
 		//
 		// Summary:
 		//     Gets the original width of the image used as the source of the System.Windows.Controls.MultiScaleImage.
 		//
 		// Returns:
 		//     Returns System.Int32.
-		public int OriginalPixelWidth { get; }
+		public int OriginalPixelWidth
+		{
+			get { return (int)GetValue(OriginalPixelWidthProperty); }
+		}
 		//
 		// Summary:
 		//     Gets or sets a value that indicates levels to be skipped while loading a System.Windows.Controls.MultiScaleImage.
 		//
 		// Returns:
 		//     An integer that represents the levels that are skipped while loading a System.Windows.Controls.MultiScaleImage.
-		public int SkipLevels { get; set; }
+		public int SkipLevels
+		{
+			get { return (int)GetValue(SkipLevelsProperty); }
+			set { SetValue(SkipLevelsProperty, value); }
+		}
 		//
 		// Summary:
 		//     Gets or sets the System.Windows.Media.MultiScaleTileSource object that is used
@@ -210,7 +289,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The System.Windows.Media.MultiScaleTileSource object that is used as the source
 		//     for the System.Windows.Controls.MultiScaleImage.
-		public MultiScaleTileSource Source { get; set; }
+		public MultiScaleTileSource Source
+		{
+			get { return (MultiScaleTileSource)GetValue(SourceProperty); }
+			set { SetValue(SourceProperty, value); }
+		}
 		//
 		// Summary:
 		//     Gets the collection of System.Windows.Controls.MultiScaleSubImage objects within
@@ -219,7 +302,10 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The collection of System.Windows.Controls.MultiScaleSubImage objects within the
 		//     multiresolution image that is used by the System.Windows.Controls.MultiScaleImage.
-		public ReadOnlyCollection<MultiScaleSubImage> SubImages { get; }
+		public ReadOnlyCollection<MultiScaleSubImage> SubImages
+		{
+			get { return (ReadOnlyCollection<MultiScaleSubImage>)GetValue(SubImagesProperty); }
+		}
 		//
 		// Summary:
 		//     Gets or sets a value that indicates whether the System.Windows.Controls.MultiScaleImage
@@ -228,21 +314,33 @@ namespace System.Windows.Controls
 		// Returns:
 		//     true if the System.Windows.Controls.MultiScaleImage uses spring animations; otherwise,
 		//     false. The default value is true.
-		public bool UseSprings { get; set; }
+		public bool UseSprings
+		{
+			get { return (bool)GetValue(UseSpringsProperty); }
+			set { SetValue(UseSpringsProperty, value); }
+		}
 		//
 		// Summary:
 		//     Gets or sets the top-left corner of the area of the image to be displayed.
 		//
 		// Returns:
 		//     The top-left corner of the rectangular area of the image to be displayed.
-		public Point ViewportOrigin { get; set; }
+		public Point ViewportOrigin
+		{
+			get { return (Point)GetValue(ViewportOriginProperty); }
+			set { SetValue(ViewportOriginProperty, value); }
+		}
 		//
 		// Summary:
 		//     Gets or sets the width of the area of the image displayed.
 		//
 		// Returns:
 		//     The width of the area of the image displayed.
-		public double ViewportWidth { get; set; }
+		public double ViewportWidth
+		{
+			get { return (double)GetValue(ViewportWidthProperty); }
+			set { SetValue(ViewportWidthProperty, value); }
+		}
 
 		//
 		// Summary:

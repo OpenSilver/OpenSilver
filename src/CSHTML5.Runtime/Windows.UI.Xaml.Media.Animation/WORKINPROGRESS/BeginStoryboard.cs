@@ -23,7 +23,11 @@ namespace Windows.UI.Xaml.Media.Animation
 		// Returns:
 		//     The identifier for the System.Windows.Media.Animation.BeginStoryboard.Storyboard
 		//     dependency property.
-		public static readonly DependencyProperty StoryboardProperty;
+		public static readonly DependencyProperty StoryboardProperty =
+			DependencyProperty.Register("Storyboard",
+										typeof(Storyboard),
+										typeof(BeginStoryboard),
+										null);
 
 		//
 		// Summary:
@@ -42,7 +46,11 @@ namespace Windows.UI.Xaml.Media.Animation
 		// Returns:
 		//     The System.Windows.Media.Animation.Storyboard that the System.Windows.Media.Animation.BeginStoryboard
 		//     starts. The default is null.
-		public Storyboard Storyboard { get; set; }
+		public Storyboard Storyboard
+		{
+			get { return (Storyboard)GetValue(StoryboardProperty); }
+			set { SetValue(StoryboardProperty, value); }
+		}
 	}
 }
 

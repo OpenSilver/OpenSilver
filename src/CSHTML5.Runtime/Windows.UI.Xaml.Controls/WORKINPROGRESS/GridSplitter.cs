@@ -13,15 +13,23 @@ namespace System.Windows.Controls
 		// Returns:
 		//     An identifier for the System.Windows.Controls.GridSplitter.PreviewStyle dependency
 		//     property.
-		public static readonly DependencyProperty PreviewStyleProperty;
-		
+		public static readonly DependencyProperty PreviewStyleProperty =
+			DependencyProperty.Register("PreviewStyle",
+										typeof(Style),
+										typeof(GridSplitter),
+										null);
+
 		//
 		// Summary:
 		//     Gets or sets the System.Windows.Style that is used for previewing changes.
 		//
 		// Returns:
 		//     The style that is used to preview changes.
-		public Style PreviewStyle { get; set; }
+		public Style PreviewStyle
+		{
+			get { return (Style)GetValue(PreviewStyleProperty); }
+			set { SetValue(PreviewStyleProperty, value); }
+		}
 	}
 }
 

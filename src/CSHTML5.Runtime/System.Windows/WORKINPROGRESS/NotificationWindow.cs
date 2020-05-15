@@ -19,21 +19,33 @@ namespace System.Windows
 		//
 		// Returns:
 		//     The identifier for the System.Windows.NotificationWindow.Content dependency property.
-		public static readonly DependencyProperty ContentProperty;
+		public static readonly DependencyProperty ContentProperty =
+			DependencyProperty.Register("Content",
+										typeof(FrameworkElement),
+										typeof(NotificationWindow),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.NotificationWindow.Height dependency property.
 		//
 		// Returns:
 		//     The identifier for the System.Windows.NotificationWindow.Height dependency property.
-		public static readonly DependencyProperty HeightProperty;
+		public static readonly DependencyProperty HeightProperty =
+			DependencyProperty.Register("Height",
+										typeof(double),
+										typeof(NotificationWindow),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.NotificationWindow.Width dependency property.
 		//
 		// Returns:
 		//     The identifier for the System.Windows.NotificationWindow.Width dependency property.
-		public static readonly DependencyProperty WidthProperty;
+		public static readonly DependencyProperty WidthProperty =
+			DependencyProperty.Register("Width",
+										typeof(double),
+										typeof(NotificationWindow),
+										null);
 
 		//
 		// Summary:
@@ -50,7 +62,11 @@ namespace System.Windows
 		// Returns:
 		//     A single System.Windows.FrameworkElement that includes the root of a visual tree.
 		//     The visual tree defines the visual look of the notification.
-		public FrameworkElement Content { get; set; }
+		public FrameworkElement Content
+		{
+			get { return (FrameworkElement)GetValue(ContentProperty); }
+			set { SetValue(ContentProperty, value); }
+		}
 		//
 		// Summary:
 		//     Gets or sets the height, in pixels, of this notification window. See Remarks.
@@ -64,7 +80,11 @@ namespace System.Windows
 		//
 		//   T:System.InvalidOperationException:
 		//     Attempted to set value while notification window is visible.
-		public double Height { get; set; }
+		public double Height
+		{
+			get { return (double)GetValue(HeightProperty); }
+			set { SetValue(HeightProperty, value); }
+		}
 		//
 		// Summary:
 		//     Gets a value that determines whether this notification is currently being displayed.
@@ -85,7 +105,11 @@ namespace System.Windows
 		//
 		//   T:System.InvalidOperationException:
 		//     Attempted to set value while notification window is visible.
-		public double Width { get; set; }
+		public double Width
+		{
+			get { return (double)GetValue(WidthProperty); }
+			set { SetValue(WidthProperty, value); }
+		}
 
 		//
 		// Summary:

@@ -12,7 +12,11 @@ namespace Microsoft.Expression.Interactivity.Core
 	//     Represents a trigger that performs actions when the bound data have changed.
 	public partial class PropertyChangedTrigger : TriggerBase<DependencyObject>
 	{
-		public static readonly DependencyProperty BindingProperty;
+		public static readonly DependencyProperty BindingProperty =
+			DependencyProperty.Register("Binding",
+										typeof(object),
+										typeof(PropertyChangedTrigger),
+										null);
 
 		public PropertyChangedTrigger()
 		{
@@ -23,7 +27,11 @@ namespace Microsoft.Expression.Interactivity.Core
 		// Summary:
 		//     A binding object that the trigger will listen to, and that causes the trigger
 		//     to fire when it changes.
-		public object Binding { get; set; }
+		public object Binding
+		{
+			get { return (object)GetValue(BindingProperty); }
+			set { SetValue(BindingProperty, value); }
+		}
 
 		//
 		// Summary:

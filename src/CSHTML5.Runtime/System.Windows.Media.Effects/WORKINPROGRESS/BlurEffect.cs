@@ -19,7 +19,11 @@ namespace System.Windows.Media.Effects
 		// Returns:
 		//     The identifier for the System.Windows.Media.Effects.BlurEffect.Radius dependency
 		//     property.
-		public static readonly DependencyProperty RadiusProperty;
+		public static readonly DependencyProperty RadiusProperty =
+			DependencyProperty.Register("Radius",
+										typeof(double),
+										typeof(BlurEffect),
+										new PropertyMetadata(5d));
 
 		//
 		// Summary:
@@ -35,7 +39,11 @@ namespace System.Windows.Media.Effects
 		//
 		// Returns:
 		//     The radius used in the blur, as a pixel-based factor. The default is 5.
-		public double Radius { get; set; }
+		public double Radius
+		{
+			get { return (double)GetValue(RadiusProperty); }
+			set { SetValue(RadiusProperty, value); }
+		}
 	}
 }
 

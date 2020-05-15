@@ -11,8 +11,16 @@ namespace Microsoft.Expression.Interactivity.Core
 	//     condition.
 	public partial class DataTrigger : PropertyChangedTrigger
 	{
-		public static readonly DependencyProperty ComparisonProperty;
-		public static readonly DependencyProperty ValueProperty;
+		public static readonly DependencyProperty ComparisonProperty =
+			DependencyProperty.Register("Comparison",
+										typeof(ComparisonConditionType),
+										typeof(DataTrigger),
+										new PropertyMetadata(ComparisonConditionType.Equal));
+		public static readonly DependencyProperty ValueProperty =
+			DependencyProperty.Register("Value",
+										typeof(object),
+										typeof(DataTrigger),
+										null);
 
 		public DataTrigger()
 		{
@@ -23,12 +31,20 @@ namespace Microsoft.Expression.Interactivity.Core
 		// Summary:
 		//     Gets or sets the type of comparison to be performed between the specified values.
 		//     This is a dependency property.
-		public ComparisonConditionType Comparison { get; set; }
+		public ComparisonConditionType Comparison
+		{
+			get { return (ComparisonConditionType)GetValue(ComparisonProperty); }
+			set { SetValue(ComparisonProperty, value); }
+		}
 		//
 		// Summary:
 		//     Gets or sets the value to be compared with the property value of the data object.
 		//     This is a dependency property.
-		public object Value { get; set; }
+		public object Value
+		{
+			get { return (object)GetValue(ValueProperty); }
+			set { SetValue(ValueProperty, value); }
+		}
 
 		//
 		// Summary:

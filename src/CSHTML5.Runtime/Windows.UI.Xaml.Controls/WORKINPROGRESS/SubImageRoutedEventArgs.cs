@@ -17,7 +17,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.SubImageRoutedEventArgs.SubImage
 		//     dependency property.
-		public static readonly DependencyProperty SubImageProperty;
+		public static readonly DependencyProperty SubImageProperty =
+			DependencyProperty.Register("SubImage",
+										typeof(MultiScaleSubImage),
+										typeof(SubImageRoutedEventArgs),
+										null);
 
 		//
 		// Summary:
@@ -34,7 +38,10 @@ namespace System.Windows.Controls
 		//
 		// Returns:
 		//     The sub-image that is opened.
-		public MultiScaleSubImage SubImage { get; }
+		public MultiScaleSubImage SubImage
+		{
+			get { return null; }
+		}
 	}
 }
 #endif

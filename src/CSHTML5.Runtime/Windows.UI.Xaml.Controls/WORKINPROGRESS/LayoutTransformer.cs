@@ -30,7 +30,11 @@ namespace System.Windows.Controls
         //
         // Summary:
         //     Identifies the LayoutTransform DependencyProperty.
-        public static readonly DependencyProperty LayoutTransformProperty;
+        public static readonly DependencyProperty LayoutTransformProperty =
+            DependencyProperty.Register("LayoutTransform",
+                                        typeof(Transform),
+                                        typeof(LayoutTransformer),
+                                        null);
 
         //
         // Summary:
@@ -46,7 +50,11 @@ namespace System.Windows.Controls
         //
         // Remarks:
         //     Corresponds to UIElement.LayoutTransform.
-        public Transform LayoutTransform { get; set; }
+        public Transform LayoutTransform
+        {
+            get { return (Transform)GetValue(LayoutTransformProperty); }
+            set { SetValue(LayoutTransformProperty, value); }
+        }
 
         //
         // Summary:

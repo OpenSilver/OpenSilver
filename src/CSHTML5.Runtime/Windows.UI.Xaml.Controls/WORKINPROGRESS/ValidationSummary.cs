@@ -26,7 +26,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.ValidationSummary.ErrorStyle dependency
 		//     property.
-		public static readonly DependencyProperty ErrorStyleProperty;
+		public static readonly DependencyProperty ErrorStyleProperty =
+			DependencyProperty.Register("ErrorStyle",
+										typeof(Style),
+										typeof(ValidationSummary),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.ValidationSummary.Filter dependency property.
@@ -34,7 +38,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.ValidationSummary.Filter dependency
 		//     property.
-		public static readonly DependencyProperty FilterProperty;
+		public static readonly DependencyProperty FilterProperty =
+			DependencyProperty.Register("Filter",
+										typeof(ValidationSummaryFilters),
+										typeof(ValidationSummary),
+										new PropertyMetadata(ValidationSummaryFilters.All));
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.ValidationSummary.FocusControlsOnClick
@@ -43,7 +51,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.ValidationSummary.FocusControlsOnClick
 		//     dependency property.
-		public static readonly DependencyProperty FocusControlsOnClickProperty;
+		public static readonly DependencyProperty FocusControlsOnClickProperty =
+			DependencyProperty.Register("FocusControlsOnClick",
+										typeof(bool),
+										typeof(ValidationSummary),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.ValidationSummary.HasDisplayedErrors dependency
@@ -52,7 +64,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.ValidationSummary.HasDisplayedErrors
 		//     dependency property.
-		public static readonly DependencyProperty HasDisplayedErrorsProperty;
+		public static readonly DependencyProperty HasDisplayedErrorsProperty =
+			DependencyProperty.Register("HasDisplayedErrors",
+										typeof(bool),
+										typeof(ValidationSummary),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.ValidationSummary.HasErrors dependency
@@ -61,7 +77,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.ValidationSummary.HasErrors dependency
 		//     property.
-		public static readonly DependencyProperty HasErrorsProperty;
+		public static readonly DependencyProperty HasErrorsProperty =
+			DependencyProperty.Register("HasErrors",
+										typeof(bool),
+										typeof(ValidationSummary),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.ValidationSummary.Header dependency property.
@@ -69,7 +89,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.ValidationSummary.Header dependency
 		//     property.
-		public static readonly DependencyProperty HeaderProperty;
+		public static readonly DependencyProperty HeaderProperty =
+			DependencyProperty.Register("Header",
+										typeof(object),
+										typeof(ValidationSummary),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.ValidationSummary.HeaderTemplate dependency
@@ -78,7 +102,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.ValidationSummary.HeaderTemplate
 		//     dependency property.
-		public static readonly DependencyProperty HeaderTemplateProperty;
+		public static readonly DependencyProperty HeaderTemplateProperty =
+			DependencyProperty.Register("HeaderTemplate",
+										typeof(DataTemplate),
+										typeof(ValidationSummary),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.ValidationSummary.ShowErrorsInSummary
@@ -87,7 +115,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.ValidationSummary.ShowErrorsInSummary
 		//     attached property.
-		public static readonly DependencyProperty ShowErrorsInSummaryProperty;
+		public static readonly DependencyProperty ShowErrorsInSummaryProperty =
+			DependencyProperty.RegisterAttached("ShowErrorsInSummary",
+												typeof(bool),
+												typeof(ValidationSummary),
+												null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.ValidationSummary.SummaryListBoxStyle
@@ -96,7 +128,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.ValidationSummary.SummaryListBoxStyle
 		//     dependency property.
-		public static readonly DependencyProperty SummaryListBoxStyleProperty;
+		public static readonly DependencyProperty SummaryListBoxStyleProperty =
+			DependencyProperty.Register("SummaryListBoxStyle",
+										typeof(Style),
+										typeof(ValidationSummary),
+										null);
 		//
 		// Summary:
 		//     Identifies the System.Windows.Controls.ValidationSummary.Target dependency property.
@@ -104,7 +140,11 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.ValidationSummary.Target dependency
 		//     property.
-		public static readonly DependencyProperty TargetProperty;
+		public static readonly DependencyProperty TargetProperty =
+			DependencyProperty.Register("Target",
+										typeof(UIElement),
+										typeof(ValidationSummary),
+										null);
 		//
 		// Summary:
 		//     Initializes a new instance of the System.Windows.Controls.ValidationSummary class.
@@ -144,8 +184,8 @@ namespace System.Windows.Controls
 		//     The style used for the error's item container.
 		public Style ErrorStyle
 		{
-			get;
-			set;
+			get { return (Style)GetValue(ErrorStyleProperty); }
+			set { SetValue(ErrorStyleProperty, value); }
 		}
 
 		//
@@ -157,8 +197,8 @@ namespace System.Windows.Controls
 		//     The default is System.Windows.Controls.ValidationSummaryFilters.All.
 		public ValidationSummaryFilters Filter
 		{
-			get;
-			set;
+			get { return (ValidationSummaryFilters)GetValue(FilterProperty); }
+			set { SetValue(FilterProperty, value); }
 		}
 
 		//
@@ -171,8 +211,8 @@ namespace System.Windows.Controls
 		//     false. The default is true.
 		public bool FocusControlsOnClick
 		{
-			get;
-			set;
+			get { return (bool)GetValue(FocusControlsOnClickProperty); }
+			set { SetValue(FocusControlsOnClickProperty, value); }
 		}
 
 		//
@@ -185,7 +225,7 @@ namespace System.Windows.Controls
 		//     false. The default is false.
 		public bool HasDisplayedErrors
 		{
-			get;
+			get { return (bool)GetValue(HasDisplayedErrorsProperty); }
 		}
 
 		//
@@ -198,7 +238,7 @@ namespace System.Windows.Controls
 		//     false. The default is false.
 		public bool HasErrors
 		{
-			get;
+			get { return (bool)GetValue(HasErrorsProperty); }
 		}
 
 		//
@@ -210,8 +250,8 @@ namespace System.Windows.Controls
 		//     is null.
 		public object Header
 		{
-			get;
-			set;
+			get { return (object)GetValue(HeaderProperty); }
+			set { SetValue(HeaderProperty, value); }
 		}
 
 		//
@@ -222,8 +262,8 @@ namespace System.Windows.Controls
 		//     The template that is used to display the content of the header.
 		public DataTemplate HeaderTemplate
 		{
-			get;
-			set;
+			get { return (DataTemplate)GetValue(HeaderTemplateProperty); }
+			set { SetValue(HeaderTemplateProperty, value); }
 		}
 
 		//
@@ -236,8 +276,8 @@ namespace System.Windows.Controls
 		//     The default is null.
 		public Style SummaryListBoxStyle
 		{
-			get;
-			set;
+			get { return (Style)GetValue(SummaryListBoxStyleProperty); }
+			set { SetValue(SummaryListBoxStyleProperty, value); }
 		}
 
 		//
@@ -250,8 +290,8 @@ namespace System.Windows.Controls
 		//     the summary. The default is null.
 		public UIElement Target
 		{
-			get;
-			set;
+			get { return (UIElement)GetValue(TargetProperty); }
+			set { SetValue(TargetProperty, value); }
 		}
 
 		//

@@ -9,17 +9,24 @@ namespace Microsoft.Expression.Interactivity.Core
 	//
 	// Summary:
 	//     An action that will change the state of a targeted storyboard when invoked.
-	[CLSCompliant(false)]
 	public partial class ControlStoryboardAction : StoryboardAction
 	{
-		public static readonly DependencyProperty ControlStoryboardProperty;
+		public static readonly DependencyProperty ControlStoryboardProperty =
+			DependencyProperty.Register("ControlStoryboard",
+										typeof(ControlStoryboardOption),
+										typeof(ControlStoryboardAction),
+										null);
 
 		public ControlStoryboardAction()
 		{
 			
 		}
 
-		public ControlStoryboardOption ControlStoryboardOption { get; set; }
+		public ControlStoryboardOption ControlStoryboardOption
+		{
+			get { return (ControlStoryboardOption)GetValue(ControlStoryboardProperty); }
+			set { SetValue(ControlStoryboardProperty, value); }
+		}
 
 		//
 		// Summary:

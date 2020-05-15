@@ -34,11 +34,19 @@ namespace Windows.UI.Xaml.Data
         //
         // Summary:
         //     Identifies the System.Windows.Data.CollectionViewSource.Source dependency property.
-        public static readonly DependencyProperty SourceProperty;
+        public static readonly DependencyProperty SourceProperty =
+            DependencyProperty.Register("Source",
+                                        typeof(object),
+                                        typeof(CollectionViewSource),
+                                        null);
         //
         // Summary:
         //     Identifies the System.Windows.Data.CollectionViewSource.View dependency property.
-        public static readonly DependencyProperty ViewProperty;
+        public static readonly DependencyProperty ViewProperty =
+            DependencyProperty.Register("View",
+                                        typeof(ICollectionView),
+                                        typeof(CollectionViewSource),
+                                        null);
 
         //
         // Summary:
@@ -94,14 +102,21 @@ namespace Windows.UI.Xaml.Data
         //     is false but System.ComponentModel.ICollectionView.Filter is not null.System.ComponentModel.ICollectionView.CanSort
         //     is false but System.ComponentModel.ICollectionView.SortDescriptions is not empty.System.ComponentModel.ICollectionView.CanGroup
         //     is false but System.ComponentModel.ICollectionView.GroupDescriptions is not empty.
-        public object Source { get; set; }
+        public object Source
+        {
+            get { return (object)GetValue(SourceProperty); }
+            set { SetValue(SourceProperty, value); }
+        }
         //
         // Summary:
         //     Gets the view object that is currently associated with this instance of System.Windows.Data.CollectionViewSource.
         //
         // Returns:
         //     The view object that is currently associated with this instance of System.Windows.Data.CollectionViewSource.
-        public ICollectionView View { get; }
+        public ICollectionView View
+        {
+            get { return (ICollectionView)GetValue(ViewProperty); }
+        }
 
         //
         // Summary:

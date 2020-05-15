@@ -22,8 +22,12 @@ namespace Windows.UI.Xaml.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.RichTextBox.IsReadOnly dependency
 		//     property.
-		public static readonly DependencyProperty IsReadOnlyProperty;
-		
+		public static readonly DependencyProperty IsReadOnlyProperty =
+			DependencyProperty.Register("IsReadOnly",
+										typeof(bool),
+										typeof(RichTextBox),
+										new PropertyMetadata(false));
+
 		public string Xaml
 		{
 			get;
@@ -109,7 +113,11 @@ namespace Windows.UI.Xaml.Controls
 		// Returns:
 		//     true if the System.Windows.Controls.RichTextBox is read-only; otherwise, false.
 		//     The default is false.
-		public bool IsReadOnly { get; set; }
+		public bool IsReadOnly
+		{
+			get { return (bool)GetValue(IsReadOnlyProperty); }
+			set { SetValue(IsReadOnlyProperty, value); }
+		}
 	}
 }
 #endif

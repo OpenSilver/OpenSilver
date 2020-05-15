@@ -17,7 +17,11 @@ namespace Microsoft.Expression.Interactivity.Core
 	//     inherit from this action, thereby improving the designer experience.
 	public abstract partial class StoryboardAction : TriggerAction<DependencyObject>
 	{
-		public static readonly DependencyProperty StoryboardProperty;
+		public static readonly DependencyProperty StoryboardProperty =
+			DependencyProperty.Register("Storyboard",
+										typeof(Storyboard),
+										typeof(StoryboardAction),
+										null);
 
 		protected StoryboardAction()
 		{
@@ -27,7 +31,11 @@ namespace Microsoft.Expression.Interactivity.Core
 		//
 		// Summary:
 		//     The targeted Storyboard. This is a dependency property.
-		public Storyboard Storyboard { get; set; }
+		public Storyboard Storyboard
+		{
+			get { return (Storyboard)GetValue(StoryboardProperty); }
+			set { SetValue(StoryboardProperty, value); }
+		}
 
 		//
 		// Summary:
