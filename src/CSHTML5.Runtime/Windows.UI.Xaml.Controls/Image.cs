@@ -289,7 +289,7 @@ namespace Windows.UI.Xaml.Controls
                         // Commented because it should be the same as the one set by the FrameworkElement Width/Height.
                         //img.width = "100%";
                         //img.height = "100%";
-                        objectFitvalue = "100% 100%";
+                        objectFitvalue = "fill";
                         objectPosition = "center center";
                         break;
                     case Stretch.Uniform: //todo: make it work when the image needs to be made bigger to fill the container
@@ -553,14 +553,16 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
         {
             //<img style="width: 100%; height: 100%;" src="C:\Users\Sylvain\Documents\Adventure Maker v4.7\Projects\ASA_game\Icons\settings.ico" alt="settings" />
             var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            var intermediaryDomStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+            intermediaryDomStyle.lineHeight = "0px"; //this one is to fix in Firefox the few pixels gap that appears below the image whith certain displays (table, table-cell and possibly some others)
 
             var img = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("img", div, this);
             INTERNAL_HtmlDomManager.SetDomElementAttribute(img, "alt", " "); //the text displayed when the image cannot be found. We set it as an empty string since there is nothing in Xaml
 
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(img);
             style.display = "block"; //this is to avoid a random few pixels wide gap below the image.
-            style.width = "100%";
-            style.height = "100%";
+            style.width = "inherit";
+            style.height = "inherit";
             style.objectPosition = "center top";
 
             CSHTML5.Interop.ExecuteJavaScriptAsync(@"
