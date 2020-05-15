@@ -73,7 +73,9 @@ namespace Windows.UI.Xaml.Controls
             {
                 //todo: refresh the whole stackpanel (so that we display the children in the right orientation)
 
+#if !GD_WIP
                 throw new NotSupportedException("Changing the orientation of a StackPanel while it is in the visual tree is not yet supported.");
+#endif
             }
         }
 

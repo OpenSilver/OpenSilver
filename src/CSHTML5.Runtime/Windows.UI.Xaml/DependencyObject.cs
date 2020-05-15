@@ -483,6 +483,9 @@ namespace Windows.UI.Xaml
 
         internal void INTERNAL_UpdateBindingsSource()
         {
+#if GD_WIP
+            return;
+#endif
             foreach (INTERNAL_PropertyStorage storage in this.INTERNAL_PropertyStorageDictionary.Select(kp => kp.Value))
             {
                 if (storage.IsExpression)
