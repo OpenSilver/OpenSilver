@@ -54,6 +54,9 @@ namespace Windows.UI.Xaml
         static Dictionary<string, string> _resourcesCache = null;
         INTERNAL_XamlResourcesHandler _xamlResourcesHandler = new INTERNAL_XamlResourcesHandler();
 
+        // Says if App.Resources has any implicit styles
+        internal bool HasImplicitStylesInResources { get; set; }
+
         /// <summary>
         /// Gets the Application object for the current application.
         /// </summary>
@@ -217,12 +220,38 @@ namespace Windows.UI.Xaml
             get
             {
                 if (_resources == null)
+                {
                     _resources = new ResourceDictionary();
+                    _resources.AddOwner(this);
+                }
                 return _resources;
             }
             set
             {
+                ResourceDictionary oldValue = _resources;
                 _resources = value;
+
+                if (oldValue != null)
+                {
+                    // This app is no longer an owner for the old ResourceDictionary
+                    oldValue.RemoveOwner(this);
+                }
+
+                if (value != null)
+                {
+                    if (!value.ContainsOwner(this))
+                    {
+                        // This app is an owner for the new ResourceDictionary
+                        value.AddOwner(this);
+                    }
+                }
+
+                // todo: implement this.
+                // this notify all window in the app that Application resources changed
+                //if (oldValue != value)
+                //{
+                //    InvalidateResourceReferences(new ResourcesChangeInfo(oldValue, value));
+                //}
             }
         }
 

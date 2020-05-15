@@ -52,7 +52,10 @@
 		<PackageReference Include="System.Text.Json" Version="4.7.0" />
 	</ItemGroup>
 	<ItemGroup>
+		<Compile Include="Core\Main\CopyOnWriteList.cs" />
 		<Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
+		<Compile Include="Core\Main\WeakReferenceList.cs" />
+		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ChangePropertyAction.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ComparisonConditionType.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ControlStoryboardAction.cs" />
@@ -143,6 +146,8 @@
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TextOptions.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TextRenderingMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\VisualTreeHelper.cs" />
+		<Compile Include="Windows.UI.Xaml\ResourceDictionaryCollection.cs" />
+		<Compile Include="Windows.UI.Xaml\ResourcesChangeInfo.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationLifetimeObjectsCollection.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DataTemplate.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventHandler.cs" />

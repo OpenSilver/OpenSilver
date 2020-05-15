@@ -54,6 +54,7 @@
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
     <Compile Include="System.Collections.ObjectModel\WORKINPROGRESS\ReadOnlyObservableCollection_1.cs" />
     <Compile Include="System.ComponentModel\IPagedCollectionView.cs" />
+    <Compile Include="System.ComponentModel\ISupportInitialize.cs" />
     <Compile Include="System.ComponentModel\ListSortDirection.cs" />
     <Compile Include="System.ComponentModel\PageChangingEventArgs.cs" />
     <Compile Include="System.ComponentModel\ReadOnlyAttribute.cs" />
@@ -62,7 +63,6 @@
     <Compile Include="System.ComponentModel\WORKINPROGRESS\GroupDescription.cs" />
     <Compile Include="System.ComponentModel\WORKINPROGRESS\ICollectionView.cs" />
     <Compile Include="System.ComponentModel\WORKINPROGRESS\IEditableCollectionView.cs" />
-    <Compile Include="System.ComponentModel\WORKINPROGRESS\ISupportInitialize.cs" />
     <Compile Include="System.ComponentModel\WORKINPROGRESS\NewItemPlaceholderPosition.cs" />
     <Compile Include="System.ComponentModel\WORKINPROGRESS\SortDescription.cs" />
     <Compile Include="System.ComponentModel\WORKINPROGRESS\SortDescriptionCollection.cs" />
@@ -801,6 +801,8 @@
     <Compile Include="Windows.UI.Xaml\PropertyPathConverter.cs" />
     <Compile Include="Windows.UI.Xaml\PropertyPathHelper.cs" />
     <Compile Include="Windows.UI.Xaml\ResourceDictionary.cs" />
+    <Compile Include="Windows.UI.Xaml\ResourceDictionaryCollection.cs" />
+    <Compile Include="Windows.UI.Xaml\ResourcesChangeInfo.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEvent.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEventHandler.cs" />

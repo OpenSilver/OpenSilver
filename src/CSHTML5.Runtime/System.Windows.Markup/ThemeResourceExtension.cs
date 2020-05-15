@@ -95,11 +95,12 @@ namespace System.Windows.Markup
                         {
                             resourceDictionary = (ResourceDictionary)parentElement;
                         }
-                        else if (parentElement is FrameworkElement)
+                        else if (parentElement is FrameworkElement parentFE)
                         {
-                            resourceDictionary = ((FrameworkElement)parentElement).Resources;
+                            resourceDictionary = parentFE.HasResources ? parentFE.Resources
+                                                                       : null;
                         }
-                        if (resourceDictionary != null && resourceDictionary.ContainsKey(ResourceKey))
+                        if (resourceDictionary != null && resourceDictionary.Contains(ResourceKey))
                         {
                             object returnElement = resourceDictionary[ResourceKey];
                             if (returnElement != elementItself)
@@ -110,7 +111,7 @@ namespace System.Windows.Markup
                     }
                     isFirst = false;
                 }
-                if (Application.Current.Resources != null && Application.Current.Resources.ContainsKey(ResourceKey))
+                if (Application.Current.Resources != null && Application.Current.Resources.Contains(ResourceKey))
                 {
                     return Application.Current.Resources[ResourceKey];
                 }
@@ -150,7 +151,7 @@ namespace System.Windows.Markup
                         if(resourceDictionary != null && resourceDictionary.ThemeDictionaries.ContainsKey("Default"))
                         {
                             ResourceDictionary themeDictionary = (ResourceDictionary)resourceDictionary.ThemeDictionaries["Default"];
-                            if(themeDictionary.ContainsKey(ResourceKey))
+                            if(themeDictionary.Contains(ResourceKey))
                             {
                                 object returnElement = themeDictionary[ResourceKey];
                                 if (returnElement != elementItself)
@@ -160,7 +161,7 @@ namespace System.Windows.Markup
                             }
                         }
                         else
-                        if(resourceDictionary != null && resourceDictionary.ContainsKey(ResourceKey))
+                        if(resourceDictionary != null && resourceDictionary.Contains(ResourceKey))
                         {
                             object result = resourceDictionary[ResourceKey];
                             return resourceDictionary[ResourceKey];
@@ -168,7 +169,7 @@ namespace System.Windows.Markup
                     }
                     isFirst = false;
                 }
-                if (Application.Current.Resources != null && Application.Current.Resources.ContainsKey(ResourceKey))
+                if (Application.Current.Resources != null && Application.Current.Resources.Contains(ResourceKey))
                 {
                     return Application.Current.Resources[ResourceKey];
                 }

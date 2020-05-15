@@ -64,7 +64,7 @@ namespace System.Windows.Markup
         {
             ServiceProvider serviceProviderAsServiceProvider = (ServiceProvider)serviceProvider;
             Type targetType;
-            if(serviceProviderAsServiceProvider.TargetProperty as DependencyProperty != null)
+            if (serviceProviderAsServiceProvider.TargetProperty as DependencyProperty != null)
             {
                 targetType = ((DependencyProperty)serviceProviderAsServiceProvider.TargetProperty).PropertyType;
             }
@@ -85,12 +85,13 @@ namespace System.Windows.Markup
                     ResourceDictionary resourceDictionary = null;
                     if ((resourceDictionary = parentElement as ResourceDictionary) == null)
                     {
-                        if (parentElement is FrameworkElement parentAsFrameworkElement)
+                        if (parentElement is FrameworkElement parentFE)
                         {
-                            resourceDictionary = parentAsFrameworkElement.Resources;
+                            resourceDictionary = parentFE.HasResources ? parentFE.Resources
+                                                                       : null;
                         }
                     }
-                    if (resourceDictionary != null && resourceDictionary.ContainsKey(ResourceKey))
+                    if (resourceDictionary != null && resourceDictionary.Contains(ResourceKey))
                     {
                         object returnElement = resourceDictionary[ResourceKey];
                         if (!object.Equals(returnElement, elementItself))
@@ -101,7 +102,7 @@ namespace System.Windows.Markup
                 }
                 isFirst = false;
             }
-            if (Application.Current.Resources.ContainsKey(ResourceKey))
+            if (Application.Current.Resources.Contains(ResourceKey))
             {
                 return this.EnsurePropertyType(Application.Current.Resources[ResourceKey], targetType);
             }
@@ -120,7 +121,7 @@ namespace System.Windows.Markup
 
         private object EnsurePropertyType(object item, Type targetType)
         {
-            if(targetType == null || item == null)
+            if (targetType == null || item == null)
             {
                 return item;
             }
