@@ -101,6 +101,11 @@ namespace System.ServiceModel
         public System.ServiceModel.Description.ClientCredentials ClientCredentials { get; } = new Description.ClientCredentials();
 #endif
         string _remoteAddressAsString;
+        
+#if OPENSILVER
+        //TODO: implement a real way to find the soap version used
+        private const string SOAP_VERSION = "1.1";
+#endif
 
         private TChannel channel;
         public TChannel Channel
@@ -753,8 +758,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
                 headers = new Dictionary<string, string>();
                 
-                //TODO: implement a real way to find the soap version used
-                const string SOAP_VERSION = "1.1";
+#if OPENSILVER
                 switch (SOAP_VERSION)
                 {
                     case "1.1":
@@ -767,6 +771,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         request = $@"<s:Envelope xmlns:a=""http://www.w3.org/2005/08/addressing"" xmlns:s=""http://www.w3.org/2003/05/soap-envelope""><s:Header><a:Action>http://tempuri.org/ServiceHost/{methodName}</a:Action></s:Header><s:Body>";//<" + methodName + @" xmlns=""" + interfaceTypeNamespace + "\">";
                         break;
                 }
+#else
+                headers.Add("Content-Type", @"text/xml; charset=utf-8");
+                headers.Add("SOAPAction", @"""" + soapActionPrefix + methodName + "\"");
+                request = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body>";//<" + methodName + @" xmlns=""" + interfaceTypeNamespace + "\">";
+#endif
                 
                 XElement methodNameElement = new XElement(XNamespace.Get(interfaceTypeNamespace).GetName(methodName)); //in every case, we want the name of the method as a XElement
 
@@ -960,7 +969,109 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 //    <faultstring xml:lang="fr-FR">id already exists</faultstring>
                 //</s:Fault>
                 //we make our own exception. Because it is easier that way (it will probably require an actual deserialization of the users' FaultException later on, to be able to support their custom ones).
+#if OPENSILVER
+                // Error parsing, if applicable
+                if (SOAP_VERSION == "1.2")
+                {
+                    const string NS = "http://www.w3.org/2003/05/soap-envelope";
+                    
+                    XElement envelopeElement = XDocument.Parse(responseAsString).Element(XName.Get("Envelope", NS));
+                    XElement headerElement = envelopeElement.Element(XName.Get("Header", NS));
+                    XElement bodyElement = envelopeElement.Element(XName.Get("Body", NS));
 
+                    XElement faultElement = bodyElement.Element(XName.Get("Fault", NS));
+                    
+                    if (faultElement != null)
+                    {
+                        XElement codeElement = faultElement.Element(XName.Get("Code", NS));
+                        XElement reasonElement = faultElement.Element(XName.Get("Reason", NS));
+                        XElement detailElement = faultElement.Element(XName.Get("Detail", NS));
+
+                        FaultCode faultCode = new FaultCode(codeElement.Elements().First().Value);
+                        FaultReason faultReason = new FaultReason(reasonElement.Elements().First().Value);
+                        string action = headerElement.Element(XName.Get("Action", NS)).Value;
+                        
+                        FaultException faultException;
+                        
+                        if (detailElement != null)
+                        {
+                            XElement innerExceptionElement = detailElement.Elements().First();
+                            Type innerExceptionType = ResolveType(innerExceptionElement.Name.LocalName);
+                            Type faultExceptionType = typeof(FaultException<>).MakeGenericType(innerExceptionType);
+                        
+                            object innerException = Activator.CreateInstance(innerExceptionType);
+
+                            foreach (XElement element in innerExceptionElement.Elements())
+                            {
+                                PropertyInfo elementProperty = innerExceptionType.GetProperty(element.Name.LocalName);
+                            
+                                XAttribute isNullAttribute = element.Attributes().FirstOrDefault(a => a.Name.LocalName == "nil");
+                                if (isNullAttribute != null && isNullAttribute.Value == "true")
+                                {
+                                    elementProperty.SetValue(innerException, null);
+                                }
+                                else
+                                {
+                                    elementProperty.SetValue(innerException, element.Value);
+                                }
+                            }
+
+                            faultException = (FaultException)Activator.CreateInstance(faultExceptionType, innerException, faultReason, faultCode, action);
+                        }
+                        else
+                        {
+                            faultException = new FaultException(faultReason, faultCode, action);
+                        }
+                        
+                        
+                        raiseFaultException(faultException);
+                        return null;
+                    }
+
+                    Type ResolveType(string name)
+                    {
+                        Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                        int asemblyCount = assemblies.Length;
+                        for (int i = 0; i < asemblyCount; i++)
+                        {
+                            Type[] types = assemblies[i].GetTypes();
+                            int typeCount = types.Length;
+                            for (int j = 0; j < typeCount; j++)
+                            {
+                                if (types[j].Name == name) return types[j];
+                            }
+                        }
+
+                        return null;
+                    }
+                }
+                else
+                {
+                    int m = responseAsString.IndexOf(":Fault>");
+                    if (m == -1)
+                    {
+                        m = responseAsString.IndexOf("<Fault>");
+                    }
+                    if (m != -1)
+                    {
+                        m = responseAsString.IndexOf("<faultstring", m);
+                        if (m != -1) //this might seem redundant but with that we have more chances to have an actual FaultException
+                        {
+                            m = responseAsString.IndexOf('>', m);
+                            responseAsString = responseAsString.Remove(0, m + 1);
+                            m = responseAsString.IndexOf("</faultstring");
+                            responseAsString = responseAsString.Remove(m);
+#if OPENSILVER
+                            FaultException fe = new FaultException(); //todo: Add the message that is in responseAsString.
+#else
+                        FaultException fe = new FaultException(responseAsString);
+#endif
+                            raiseFaultException(fe);
+                            return null;
+                        }
+                    }
+                }
+#else
                 int m = responseAsString.IndexOf(":Fault>");
                 if (m == -1)
                 {
@@ -984,6 +1095,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         return null;
                     }
                 }
+#endif
 
                 object requestResponse = null;
 
