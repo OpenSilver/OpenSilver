@@ -483,10 +483,8 @@ namespace Windows.UI.Xaml
 
         internal void INTERNAL_UpdateBindingsSource()
         {
-#if GD_WIP
-            return;
-#endif
-            foreach (INTERNAL_PropertyStorage storage in this.INTERNAL_PropertyStorageDictionary.Select(kp => kp.Value))
+            INTERNAL_PropertyStorage[] copyOfCollection = this.INTERNAL_PropertyStorageDictionary.Select(kp => kp.Value).ToArray(); // Note: we make a copy to avoid any errors related to the collection being modified during the "foreach" below.
+            foreach (INTERNAL_PropertyStorage storage in copyOfCollection)
             {
                 if (storage.IsExpression)
                 {
