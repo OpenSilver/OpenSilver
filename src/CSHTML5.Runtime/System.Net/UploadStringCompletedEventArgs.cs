@@ -23,7 +23,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if OPENSILVER
+using System.Net;
+#endif
+
+#if OPENSILVER
+namespace OpenSilver.Compatibility
+#else
 namespace System.Net
+#endif
 {
     // Summary:
     //     

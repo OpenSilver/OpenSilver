@@ -23,7 +23,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if OPENSILVER
+namespace OpenSilver.Compatibility
+#else
 namespace System.Net
+#endif
 {
     /// <summary>
     /// Represents the method that will handle the System.Net.WebClient.DownloadStringCompleted

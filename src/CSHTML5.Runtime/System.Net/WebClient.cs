@@ -24,13 +24,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if OPENSILVER
+using System.Net;
+#endif
+
 #if BRIDGE
 using Bridge;
 #endif
 //using custom::System.ComponentModel;
 //using custom::System.Net;
 
+#if OPENSILVER
+namespace OpenSilver.Compatibility
+#else
 namespace System.Net
+#endif
 {
     /// <summary>
     /// Provides common methods for sending data to and receiving data from a resource
@@ -326,7 +334,7 @@ namespace System.Net
         private CredentialsMode GetCredentialsMode()
         {
 
-            Reflection.PropertyInfo credentialMode = this.GetType().GetProperty("CredentialsMode");
+            System.Reflection.PropertyInfo credentialMode = this.GetType().GetProperty("CredentialsMode");
 
             if (credentialMode != null)
             {

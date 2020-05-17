@@ -64,6 +64,11 @@
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\DeploymentCatalog.cs" />
 		<Compile Include="System.ComponentModel.Composition\WORKINPROGRESS\CompositionInitializer.cs" />
 		<Compile Include="System.ComponentModel.Composition\WORKINPROGRESS\ICompositionService.cs" />
+		<Compile Include="System.Net\DownloadStringCompletedEventArgs.cs" />
+		<Compile Include="System.Net\DownloadStringCompletedEventHandler.cs" />
+		<Compile Include="System.Net\UploadStringCompletedEventArgs.cs" />
+		<Compile Include="System.Net\UploadStringCompletedEventHandler.cs" />
+		<Compile Include="System.Net\WebClient.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\ComInterfaces.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\CustomAttributeBuilder.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\DynamicMethod.cs" />
