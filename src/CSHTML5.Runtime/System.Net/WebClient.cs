@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CSHTML5;
 
 #if OPENSILVER
 using System.Net;
@@ -178,6 +179,14 @@ namespace System.Net
         /// <returns>A System.String containing the requested resource.</returns>
         public string DownloadString(Uri address)
         {
+#if OPENSILVER
+            if (Interop.IsRunningInTheSimulator_WorkAround)
+            {
+                // When running in the Simulator, we use the WebClient implementation provided by WPF:
+                var netStandardWebClient = new System.Net.WebClient();
+                return netStandardWebClient.DownloadString(address);
+            }
+#endif
             if (address == null)
             {
                 throw new ArgumentNullException("The address parameter in DownloadString cannot be null");
@@ -226,6 +235,25 @@ namespace System.Net
         /// </param>
         private void DownloadStringAsync(Uri address, object userToken)
         {
+#if OPENSILVER
+            if (Interop.IsRunningInTheSimulator_WorkAround)
+            {
+                // When running in the Simulator, we use the WebClient implementation provided by WPF:
+                var netStandardWebClient = new System.Net.WebClient();
+                netStandardWebClient.DownloadStringCompleted += (s, e) =>
+                 {
+                     OnDownloadStringCompleted(this, new INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs()
+                     {
+                         Result = e.Result,
+                         Cancelled = e.Cancelled,
+                         Error = e.Error,
+                         UserState = e.UserState
+                     });
+                 };
+                netStandardWebClient.DownloadStringAsync(address);
+                return;
+            }
+#endif
             if (address == null)
             {
                 throw new ArgumentNullException("The address parameter in DownloadStringAsync cannot be null");
@@ -274,6 +302,15 @@ namespace System.Net
         /// <returns>Returns the resource as <see cref="System.Threading.Tasks.Task{TResult}"/>.</returns>
         public Task<string> DownloadStringTaskAsync(Uri address)
         {
+#if OPENSILVER
+            if (Interop.IsRunningInTheSimulator_WorkAround)
+            {
+                // When running in the Simulator, we use the WebClient implementation provided by WPF:
+                var netStandardWebClient = new System.Net.WebClient();
+                return netStandardWebClient.DownloadStringTaskAsync(address);
+            }
+#endif
+
             INTERNAL_WebRequestHelper_JSOnly webRequestHelper = new INTERNAL_WebRequestHelper_JSOnly();
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
