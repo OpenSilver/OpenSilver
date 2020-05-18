@@ -735,7 +735,6 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
     }}
 
     var isAddingTabulation = e.keyCode == 9 && acceptsTab == ""true"";
-    alert(isAddingTabulation);
 
     if((isAddingTabulation || e.keyCode == 13 || e.keyCode == 32 || e.keyCode > 47) && maxLength != 0)
     {{
