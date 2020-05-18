@@ -116,6 +116,13 @@ namespace DotNetForHtml5.Core
             }
         }
 
+        static private dynamic webClientFactory;
+        public static dynamic WebClientFactory
+        {
+            get { return webClientFactory; }
+            set { webClientFactory = value; }
+        }
+
         static dynamic clipboardHandler;
         public static dynamic ClipboardHandler
         {

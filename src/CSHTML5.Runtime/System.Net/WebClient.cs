@@ -15,7 +15,7 @@
 //
 //===============================================================================
 
-
+#define USEWPFWEBCLIENT
 
 //extern alias custom;
 using System;
@@ -24,6 +24,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSHTML5;
+using DotNetForHtml5.Core;
+using System.Reflection;
 
 #if OPENSILVER
 using System.Net;
@@ -186,6 +188,14 @@ namespace System.Net
                 var netStandardWebClient = new System.Net.WebClient();
                 return netStandardWebClient.DownloadString(address);
             }
+#elif USEWPFWEBCLIENT
+            if (Interop.IsRunningInTheSimulator)
+            {
+                dynamic wc = INTERNAL_Simulator.WebClientFactory.Create();
+                wc.Encoding = Encoding;
+                wc.Headers = Headers;
+                return wc.DownloadString(address);
+            }
 #endif
             if (address == null)
             {
@@ -251,6 +261,27 @@ namespace System.Net
                      });
                  };
                 netStandardWebClient.DownloadStringAsync(address);
+                return;
+            }
+#elif USEWPFWEBCLIENT
+            if (Interop.IsRunningInTheSimulator)
+            {
+                dynamic wc = INTERNAL_Simulator.WebClientFactory.Create();
+                wc.Encoding = Encoding;
+                wc.Headers = Headers;
+                Type t = wc.GetType();
+                EventInfo eInfo = t.GetEvent("DownloadStringCompleted");
+                Action<object, dynamic> del = (s, e) =>
+                {
+                    OnDownloadStringCompleted(this, new INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs()
+                    {
+                        Result = e.Result,
+                        Cancelled = e.Cancelled,
+                        Error = e.Error,
+                        UserState = e.UserState
+                    });
+                };
+                eInfo.AddEventHandler(wc, del);
                 return;
             }
 #endif
@@ -640,6 +671,17 @@ namespace System.Net
         /// </returns>
         public Task<string> UploadStringTaskAsync(Uri address, string method, string data)
         {
+#if !OPENSILVER && USEWPFWEBCLIENT
+            if (Interop.IsRunningInTheSimulator)
+            {
+                var wcFactory = INTERNAL_Simulator.WebClientFactory;
+                dynamic wc = wcFactory.Create();
+                wc.Encoding = Encoding;
+                wc.Headers = Headers;
+                return wc.UploadStringTaskAsync(address, method, data);
+            }
+#endif
+
             INTERNAL_WebRequestHelper_JSOnly webRequestHelper = new INTERNAL_WebRequestHelper_JSOnly();
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
