@@ -299,6 +299,9 @@ namespace Windows.UI.Xaml
         {
             FrameworkElement @this = (FrameworkElement)d;
 
+            if (!(baseValue is bool)) //todo: this is a temporary workaround to avoid an invalid cast exception. Fix this by investigating why sometimes baseValue is not a bool, such as a Binding (eg. Client_GD).
+                return true;
+
             // We must be false if our parent is false, but we can be
             // either true or false if our parent is true.
             //
