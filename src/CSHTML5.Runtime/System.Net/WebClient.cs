@@ -191,10 +191,9 @@ namespace System.Net
 #elif USEWPFWEBCLIENT
             if (Interop.IsRunningInTheSimulator)
             {
-                dynamic wc = INTERNAL_Simulator.WebClientFactory.Create();
-                wc.Encoding = Encoding;
-                wc.Headers = Headers;
-                return wc.DownloadString(address);
+                var wcFactory = INTERNAL_Simulator.WebClientFactory;
+                //todo: Encoding
+                return wcFactory.DownloadString(Headers._headers, address);
             }
 #endif
             if (address == null)
@@ -266,11 +265,8 @@ namespace System.Net
 #elif USEWPFWEBCLIENT
             if (Interop.IsRunningInTheSimulator)
             {
-                dynamic wc = INTERNAL_Simulator.WebClientFactory.Create();
-                wc.Encoding = Encoding;
-                wc.Headers = Headers;
-                Type t = wc.GetType();
-                EventInfo eInfo = t.GetEvent("DownloadStringCompleted");
+                var wcFactory = INTERNAL_Simulator.WebClientFactory;
+                //todo: Encoding
                 Action<object, dynamic> del = (s, e) =>
                 {
                     OnDownloadStringCompleted(this, new INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs()
@@ -281,11 +277,11 @@ namespace System.Net
                         UserState = e.UserState
                     });
                 };
-                eInfo.AddEventHandler(wc, del);
+                wcFactory.DownloadStringAsync(Headers._headers, del, address, userToken);
                 return;
             }
 #endif
-            if (address == null)
+                if (address == null)
             {
                 throw new ArgumentNullException("The address parameter in DownloadStringAsync cannot be null");
             }
@@ -339,6 +335,13 @@ namespace System.Net
                 // When running in the Simulator, we use the WebClient implementation provided by WPF:
                 var netStandardWebClient = new System.Net.WebClient();
                 return netStandardWebClient.DownloadStringTaskAsync(address);
+            }
+#elif USEWPFWEBCLIENT
+            if (Interop.IsRunningInTheSimulator)
+            {
+                var wcFactory = INTERNAL_Simulator.WebClientFactory;
+                //todo: Encoding
+                return wcFactory.DownloadStringTaskAsync(Headers._headers, address);
             }
 #endif
 
@@ -517,6 +520,32 @@ namespace System.Net
 
         private string UploadString(Uri address, string method, string data, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler onCompleted, bool isAsync) //todo: see if we should use UploadStringCompletedEventHandler instead
         {
+#if USEWPFWEBCLIENT
+            if (Interop.IsRunningInTheSimulator)
+            {
+                var wcFactory = INTERNAL_Simulator.WebClientFactory;
+                //todo: Encoding
+                if (isAsync)
+                {
+                    Action<object, dynamic> del = (s, e) =>
+                    {
+                        onCompleted(this, new INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs()
+                        {
+                            Result = e.Result,
+                            Cancelled = e.Cancelled,
+                            Error = e.Error,
+                            UserState = e.UserState
+                        });
+                    };
+                    wcFactory.UploadStringAsync(Headers._headers, del, address, method, data);
+                    return "";
+                }
+                else
+                {
+                    return wcFactory.UploadString(Headers._headers, address, method, data);
+                }
+            }
+#endif
             INTERNAL_WebRequestHelper_JSOnly webRequestHelper = new INTERNAL_WebRequestHelper_JSOnly();
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
@@ -675,10 +704,8 @@ namespace System.Net
             if (Interop.IsRunningInTheSimulator)
             {
                 var wcFactory = INTERNAL_Simulator.WebClientFactory;
-                dynamic wc = wcFactory.Create();
-                wc.Encoding = Encoding;
-                wc.Headers = Headers;
-                return wc.UploadStringTaskAsync(address, method, data);
+                //todo: Encoding
+                return wcFactory.UploadStringTaskAsync(Headers._headers ,address, method, data);
             }
 #endif
 

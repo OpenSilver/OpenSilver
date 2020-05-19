@@ -32,7 +32,7 @@ namespace System.Net
     [Serializable]
     public partial class WebHeaderCollection //: NameValueCollection, ISerializable //todo: inheritance
     {
-        Dictionary<string, string> _headers;
+        internal Dictionary<string, string> _headers;
         /// <summary>
         /// Initializes a new instance of the System.Net.WebHeaderCollection class.
         /// </summary>
