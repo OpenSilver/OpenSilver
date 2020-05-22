@@ -102,6 +102,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public DataGrid()
         {
+            CanBeInheritanceContext = false;
+            IsInheritanceContextSealed = true;
+
             Columns = new ObservableCollection<DataGridColumn>();
 
             _pagedView = new INTERNAL_PagedCollectionView(null);
@@ -1099,7 +1102,7 @@ namespace Windows.UI.Xaml.Controls
 
                     // we override the ItemsSource specified by the user so as to used a PagedView as the source of the data.
                     //todo: with the current implementation, bindings are lost, so the user cannot replace the ItemsSource via a binding.
-                    ItemsSource = _pagedView; // IMPORTANT: This causes re-entrance into this very same method, thus leading to PASS 2.
+                    SetCurrentValue(ItemsSourceProperty, _pagedView);
                 }
                 else
                 {

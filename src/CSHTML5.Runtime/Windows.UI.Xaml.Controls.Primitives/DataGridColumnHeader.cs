@@ -50,6 +50,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         public DataGridColumnHeader()
         {
             this.DefaultStyleKey = typeof(DataGridColumnHeader);
+            CanBeInheritanceContext = false;
+            IsInheritanceContextSealed = true;
         }
 
         /// <summary>

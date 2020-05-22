@@ -45,6 +45,12 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public partial class DataGridRow : DependencyObject
     {
+        public DataGridRow()
+        {
+            CanBeInheritanceContext = false;
+            IsInheritanceContextSealed = true;
+        }
+
         internal UIElement _headerUIElement;
         internal ObjectRepresentationInRow _representationInRow = new ObjectRepresentationInRow();
         internal DataGrid _datagrid;

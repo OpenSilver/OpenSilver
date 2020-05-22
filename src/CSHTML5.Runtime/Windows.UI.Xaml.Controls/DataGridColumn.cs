@@ -31,6 +31,12 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public abstract partial class DataGridColumn : DependencyObject
     {
+        protected DataGridColumn()
+        {
+            CanBeInheritanceContext = false;
+            IsInheritanceContextSealed = true;
+        }
+
         internal ColumnDefinition _gridColumn;
         private DataGridColumnHeader _header;
         internal DataGrid _parent;
