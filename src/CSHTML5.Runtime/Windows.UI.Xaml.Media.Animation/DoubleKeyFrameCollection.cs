@@ -59,6 +59,11 @@ namespace Windows.UI.Xaml.Media.Animation
             return this.RemoveDependencyObjectInternal(keyFrame);
         }
 
+        internal override DoubleKeyFrame GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
+        }
+
         internal override void SetItemOverride(int index, DoubleKeyFrame keyFrame)
         {
             this.SetItemDependencyObjectInternal(index, keyFrame);

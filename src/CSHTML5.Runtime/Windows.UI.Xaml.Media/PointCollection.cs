@@ -105,6 +105,11 @@ namespace Windows.UI.Xaml.Media
             this.NotifyCollectionChanged();
         }
 
+        internal override Point GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
+        }
+
         internal override void SetItemOverride(int index, Point point)
         {
             this.SetItemInternal(index, point);

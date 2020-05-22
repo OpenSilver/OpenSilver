@@ -11,6 +11,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 
@@ -94,6 +95,11 @@ namespace Windows.UI.Xaml
                 return true;
             }
             return false;
+        }
+
+        internal override ResourceDictionary GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
         }
 
         internal override void SetItemOverride(int index, ResourceDictionary value)

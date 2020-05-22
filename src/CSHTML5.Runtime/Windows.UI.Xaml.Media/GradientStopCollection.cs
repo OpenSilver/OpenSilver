@@ -99,6 +99,11 @@ namespace Windows.UI.Xaml.Media
             return false;
         }
 
+        internal override GradientStop GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
+        }
+
         internal override void SetItemOverride(int index, GradientStop gradientStop)
         {
             GradientStop oldItem = this.GetItemInternal(index);

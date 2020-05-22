@@ -123,6 +123,11 @@ namespace Windows.UI.Xaml.Controls
             return false;
         }
 
+        internal override RowDefinition GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
+        }
+
         internal override void SetItemOverride(int index, RowDefinition value)
         {
             this.CheckReentrancy();

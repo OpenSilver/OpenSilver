@@ -75,6 +75,11 @@ namespace Windows.UI.Xaml.Media
             return this.RemoveInternal(value);
         }
 
+        internal override double GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
+        }
+
         internal override void SetItemOverride(int index, double value)
         {
             this.SetItemInternal(index, value);

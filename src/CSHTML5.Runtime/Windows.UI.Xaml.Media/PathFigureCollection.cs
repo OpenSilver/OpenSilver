@@ -128,6 +128,11 @@ namespace Windows.UI.Xaml.Media
             this.NotifyCollectionChanged();
         }
 
+        internal override PathFigure GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
+        }
+
         internal override void SetItemOverride(int index, PathFigure figure)
         {
             PathFigure oldItem = this.GetItemInternal(index);

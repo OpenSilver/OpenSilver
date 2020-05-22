@@ -122,6 +122,11 @@ namespace Windows.UI.Xaml.Controls
             return false;
         }
 
+        internal override ColumnDefinition GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
+        }
+
         internal override void SetItemOverride(int index, ColumnDefinition value)
         {
             this.CheckReentrancy();

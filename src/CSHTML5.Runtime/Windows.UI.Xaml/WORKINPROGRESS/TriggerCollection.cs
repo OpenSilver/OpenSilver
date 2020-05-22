@@ -14,6 +14,7 @@
 
 
 using System;
+using System.Collections.Generic;
 
 #if MIGRATION
 namespace System.Windows
@@ -47,6 +48,11 @@ namespace Windows.UI.Xaml
         internal override bool RemoveOverride(TriggerBase value)
         {
             return this.RemoveDependencyObjectInternal(value);
+        }
+
+        internal override TriggerBase GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
         }
 
         internal override void SetItemOverride(int index, TriggerBase value)

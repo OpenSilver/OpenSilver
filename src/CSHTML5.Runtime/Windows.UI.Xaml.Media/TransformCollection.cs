@@ -57,6 +57,11 @@ namespace Windows.UI.Xaml.Media
             return this.RemoveDependencyObjectInternal(value);
         }
 
+        internal override Transform GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
+        }
+
         internal override void SetItemOverride(int index, Transform value)
         {
             this.SetItemDependencyObjectInternal(index, value);

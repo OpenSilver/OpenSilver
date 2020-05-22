@@ -14,6 +14,7 @@
 
 
 using System;
+using System.Collections.Generic;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -48,6 +49,11 @@ namespace Windows.UI.Xaml.Media.Animation
         internal override bool RemoveOverride(ColorKeyFrame keyFrame)
         {
             return this.RemoveDependencyObjectInternal(keyFrame);
+        }
+
+        internal override ColorKeyFrame GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
         }
 
         internal override void SetItemOverride(int index, ColorKeyFrame keyFrame)

@@ -135,6 +135,11 @@ namespace Windows.UI.Xaml.Media
             this.NotifyCollectionChanged();
         }
 
+        internal override PathSegment GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
+        }
+
         internal override void SetItemOverride(int index, PathSegment segment)
         {
             if (this._parentPath != null)

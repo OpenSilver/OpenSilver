@@ -16,12 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reflection;
 using System.Collections;
-using System.ComponentModel;
-using System.Collections.Specialized;
 
 
 #if MIGRATION
@@ -39,10 +34,11 @@ namespace Windows.UI.Xaml
         #region Data
         private readonly List<T> _collection;
 
-        public static readonly DependencyProperty CountProperty = DependencyProperty.Register("Count",
-                                                                                              typeof(int),
-                                                                                              typeof(PresentationFrameworkCollection<T>),
-                                                                                              new PropertyMetadata(0));
+        public static readonly DependencyProperty CountProperty = 
+            DependencyProperty.Register("Count",
+                                        typeof(int),
+                                        typeof(PresentationFrameworkCollection<T>),
+                                        new PropertyMetadata(0));
         #endregion
 
         #region Constructor
@@ -50,19 +46,19 @@ namespace Windows.UI.Xaml
         internal PresentationFrameworkCollection()
         {
             this._collection = new List<T>();
-            this.UpdateCountProperty();
+            this.UpdateCountProperty(this.CountInternal);
         }
 
         internal PresentationFrameworkCollection(int capacity)
         {
             this._collection = new List<T>(capacity);
-            this.UpdateCountProperty();
+            this.UpdateCountProperty(this.CountInternal);
         }
 
         internal PresentationFrameworkCollection(IEnumerable<T> source)
         {
             this._collection = new List<T>(source);
-            this.UpdateCountProperty();
+            this.UpdateCountProperty(this.CountInternal);
         }
 
         #endregion
@@ -76,7 +72,7 @@ namespace Windows.UI.Xaml
 
         public T this[int index]
         {
-            get { return this.GetItemInternal(index); }
+            get { return this.GetItemOverride(index); }
             set { this.SetItemOverride(index, value); }
         }
 
@@ -90,7 +86,10 @@ namespace Windows.UI.Xaml
         /// </returns>
         public bool IsFixedSize
         {
-            get { return false; }
+            get
+            {
+                return this.IsFixedSizeImpl;
+            }
         }
 
         /// <summary>
@@ -103,7 +102,10 @@ namespace Windows.UI.Xaml
         /// </returns>
         public bool IsReadOnly
         {
-            get { return false; }
+            get
+            {
+                return this.IsReadOnlyImpl;
+            }
         }
 
         /// <summary>
@@ -141,7 +143,7 @@ namespace Windows.UI.Xaml
         /// </returns>
         public IEnumerator<T> GetEnumerator()
         {
-            return this._collection.GetEnumerator();
+            return this.GetEnumeratorImpl();
         }
 
         /// <summary>
@@ -173,7 +175,7 @@ namespace Windows.UI.Xaml
         /// </returns>
         public bool Contains(T value)
         {
-            return this._collection.Contains(value);
+            return this.ContainsImpl(value);
         }
 
         /// <summary>
@@ -188,7 +190,7 @@ namespace Windows.UI.Xaml
         /// <param name="index">The zero-based index in array at which copying begins.</param>
         public void CopyTo(Array array, int index)
         {
-            ((ICollection)_collection).CopyTo(array, index);
+            this.CopyToImpl(array, index);
         }
 
         /// <summary>
@@ -203,7 +205,7 @@ namespace Windows.UI.Xaml
         /// <param name="index">The zero-based index in array at which copying begins.</param>
         public void CopyTo(T[] array, int index)
         {
-            this._collection.CopyTo(array, index);
+            this.CopyToImpl(array, index);
         }
 
         /// <summary>
@@ -211,12 +213,12 @@ namespace Windows.UI.Xaml
         /// </summary>
         /// <param name="value">The object to locate in the <see cref="PresentationFrameworkCollection{T}"/>.</param>
         /// <returns>The index of value if found in the list; otherwise, an exception.</returns>
-        /// <exception cref="System.ArgumentException">
+        /// <exception cref="ArgumentException">
         /// The object was not found in the list.
         /// </exception>
         public int IndexOf(T value)
         {
-            return this._collection.IndexOf(value);
+            return this.IndexOfImpl(value);
         }
 
         /// <summary>
@@ -305,7 +307,7 @@ namespace Windows.UI.Xaml
 
         #region Internal API
 
-        #region Abstract Methods
+        #region Abstract/Virtual Members
 
         internal abstract void AddOverride(T value);
 
@@ -319,6 +321,45 @@ namespace Windows.UI.Xaml
 
         internal abstract void SetItemOverride(int index, T value);
 
+        internal abstract T GetItemOverride(int index);
+
+        #endregion
+
+        #region Virtual Methods
+
+        internal virtual bool IsFixedSizeImpl
+        {
+            get { return false; }
+        }
+
+        internal virtual bool IsReadOnlyImpl
+        {
+            get { return false; }
+        }
+
+        internal virtual void CopyToImpl(Array array, int index)
+        {
+            for (int i = 0; i < this.CountInternal; ++i)
+            {
+                array.SetValue(this[i], index + i);
+            }
+        }
+
+        internal virtual bool ContainsImpl(T value)
+        {
+            return this._collection.Contains(value);
+        }
+
+        internal virtual int IndexOfImpl(T value)
+        {
+            return this._collection.IndexOf(value);
+        }
+
+        internal virtual IEnumerator<T> GetEnumeratorImpl()
+        {
+            return this._collection.GetEnumerator();
+        }
+
         #endregion
 
         #region Generic collection manipulation methods
@@ -330,7 +371,7 @@ namespace Windows.UI.Xaml
         internal void AddInternal(T value)
         {
             this._collection.Add(value);
-            this.UpdateCountProperty();
+            this.UpdateCountProperty(this.CountInternal);
         }
 
         /// <summary>
@@ -339,7 +380,7 @@ namespace Windows.UI.Xaml
         internal void ClearInternal()
         {
             this._collection.Clear();
-            this.UpdateCountProperty();
+            this.UpdateCountProperty(this.CountInternal);
         }
 
         /// <summary>
@@ -348,7 +389,7 @@ namespace Windows.UI.Xaml
         internal void InsertInternal(int index, T value)
         {
             this._collection.Insert(index, value);
-            this.UpdateCountProperty();
+            this.UpdateCountProperty(this.CountInternal);
         }
 
         /// <summary>
@@ -357,7 +398,7 @@ namespace Windows.UI.Xaml
         internal void RemoveAtInternal(int index)
         {
             this._collection.RemoveAt(index);
-            this.UpdateCountProperty();
+            this.UpdateCountProperty(this.CountInternal);
         }
 
         /// <summary>
@@ -367,7 +408,7 @@ namespace Windows.UI.Xaml
         {
             if (this._collection.Remove(value))
             {
-                this.UpdateCountProperty();
+                this.UpdateCountProperty(this.CountInternal);
                 return true;
             }
             return false;
@@ -419,7 +460,7 @@ namespace Windows.UI.Xaml
             DependencyObject valueDO = this.CastDO(value);
             this.ProvideSelfAsInheritanceContext(valueDO, null);
             this._collection.Add(value);
-            this.UpdateCountProperty();
+            this.UpdateCountProperty(this.CountInternal);
         }
 
         /// <summary>
@@ -433,7 +474,7 @@ namespace Windows.UI.Xaml
                 this.RemoveSelfAsInheritanceContext(valueDO, null);
             }
             this._collection.Clear();
-            this.UpdateCountProperty();
+            this.UpdateCountProperty(this.CountInternal);
         }
 
         /// <summary>
@@ -445,7 +486,7 @@ namespace Windows.UI.Xaml
             DependencyObject valueDO = this.CastDO(value);
             this.ProvideSelfAsInheritanceContext(valueDO, null);
             this._collection.Insert(index, value);
-            this.UpdateCountProperty();
+            this.UpdateCountProperty(this.CountInternal);
         }
 
         /// <summary>
@@ -457,7 +498,7 @@ namespace Windows.UI.Xaml
             DependencyObject removedDO = this.CastDO(this._collection[index]);
             this.RemoveSelfAsInheritanceContext(removedDO, null);
             this._collection.RemoveAt(index);
-            this.UpdateCountProperty();
+            this.UpdateCountProperty(this.CountInternal);
         }
 
         /// <summary>
@@ -472,6 +513,7 @@ namespace Windows.UI.Xaml
                 DependencyObject removedDO = this.CastDO(this._collection[index]);
                 this.RemoveSelfAsInheritanceContext(removedDO, null);
                 this._collection.RemoveAt(index);
+                this.UpdateCountProperty(this.CountInternal);
                 return true;
             }
             return false;
@@ -502,9 +544,9 @@ namespace Windows.UI.Xaml
             get { return this._collection.Count; }
         }
 
-        private void UpdateCountProperty()
+        internal void UpdateCountProperty(int value)
         {
-            this.SetValue(CountProperty, this.CountInternal);
+            this.SetValue(CountProperty, value);
         }
 
         #endregion

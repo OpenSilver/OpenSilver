@@ -408,6 +408,11 @@ namespace Windows.UI.Xaml
             return this.RemoveDependencyObjectInternal(value);
         }
 
+        internal override DependencyObject GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
+        }
+
         internal override void SetItemOverride(int index, DependencyObject value)
         {
             this.SetItemDependencyObjectInternal(index, value);

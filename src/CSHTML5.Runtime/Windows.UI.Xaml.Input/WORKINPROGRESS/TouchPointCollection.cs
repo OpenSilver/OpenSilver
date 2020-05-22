@@ -36,7 +36,12 @@ namespace Windows.UI.Xaml.Input
 
         internal override bool RemoveOverride(TouchPoint value)
         {
-            return this.RemoveOverride(value);
+            return this.RemoveInternal(value);
+        }
+
+        internal override TouchPoint GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
         }
 
         internal override void SetItemOverride(int index, TouchPoint value)

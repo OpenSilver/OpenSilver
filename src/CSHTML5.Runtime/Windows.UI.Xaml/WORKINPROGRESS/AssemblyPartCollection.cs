@@ -54,6 +54,11 @@ namespace Windows.UI.Xaml
             return this.RemoveDependencyObjectInternal(value);
         }
 
+        internal override AssemblyPart GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
+        }
+
         internal override void SetItemOverride(int index, AssemblyPart value)
         {
             this.SetItemDependencyObjectInternal(index, value);

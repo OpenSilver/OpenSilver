@@ -105,6 +105,11 @@ namespace Windows.UI.Xaml
             return this.RemoveInternal(value);
         }
 
+        internal override SetterBase GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
+        }
+
         internal override void SetItemOverride(int index, SetterBase value)
         {
             this.CheckSealed();
