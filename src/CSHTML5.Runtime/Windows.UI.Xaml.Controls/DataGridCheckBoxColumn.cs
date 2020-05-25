@@ -59,7 +59,7 @@ namespace Windows.UI.Xaml.Controls
                 checkBox.DataContext = childData;
             //}
             checkBox.IsEnabled = enable; //note: this is to avoid having the possibility to check/uncheck a checkbox when the datagrid/column is readonly
-            Binding b = this.INTERNAL_GetBinding(DataGridBoundColumn.BindingProperty); //we get the Binding in the Binding property set by the user.
+            Binding b = Binding as Binding;
 
             if (b != null)
             {

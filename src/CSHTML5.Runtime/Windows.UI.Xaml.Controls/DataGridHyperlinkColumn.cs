@@ -71,7 +71,7 @@ namespace Windows.UI.Xaml.Controls
             //we should probably simply make a TextBox
             TextBox textBox = new TextBox();
             textBox.DataContext = childData;
-            Binding b = this.INTERNAL_GetBinding(DataGridBoundColumn.BindingProperty); //we get the Binding in the Binding property set by the user.
+            Binding b = Binding as Binding;
             if (b != null)
             {
                 if (b.Mode == BindingMode.OneWay)
@@ -92,8 +92,8 @@ namespace Windows.UI.Xaml.Controls
         {
             HyperlinkButton hyperlink = new HyperlinkButton();
             hyperlink.DataContext = childData;
-            Binding contentBinding = this.INTERNAL_GetBinding(DataGridHyperlinkColumn.ContentBindingProperty); //we get the Binding in the ContentBinding property set by the user.
-            Binding b = this.INTERNAL_GetBinding(DataGridBoundColumn.BindingProperty); //we get the Binding in the Binding property set by the user.
+            Binding contentBinding = ContentBinding as Binding;
+            Binding b = Binding as Binding;
             if (b != null)
             {
                 if (b.Mode == BindingMode.OneWay)

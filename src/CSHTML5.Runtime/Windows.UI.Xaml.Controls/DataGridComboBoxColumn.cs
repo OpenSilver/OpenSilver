@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Controls
     {
         internal override FrameworkElement GenerateEditingElement(object childData)
         {
-            Binding b = this.INTERNAL_GetBinding(DataGridBoundColumn.BindingProperty); //we get the Binding in the Binding property set by the user.
+            Binding b = Binding as Binding;
             if (b.Mode == BindingMode.OneWay)
             {
                 if (!b.INTERNAL_WasModeSetByUserRatherThanDefaultValue())
@@ -92,7 +92,7 @@ namespace Windows.UI.Xaml.Controls
         {
             TextBlock textBlock = new TextBlock();
             //textBlock.DataContext = childData;
-            Binding b = this.INTERNAL_GetBinding(DataGridBoundColumn.BindingProperty); //we get the Binding in the Binding property set by the user.
+            Binding b = Binding as Binding;
             if (b != null)
             {
                 if (b.Mode == BindingMode.OneWay)

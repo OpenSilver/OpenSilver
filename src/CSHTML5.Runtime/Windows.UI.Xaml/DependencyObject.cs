@@ -464,16 +464,6 @@ namespace Windows.UI.Xaml
 
         #region Binding related elements
 
-        internal Binding INTERNAL_GetBinding(DependencyProperty dependencyProperty)
-        {
-            BindingExpression expr = BindingOperations.GetBindingExpression(this, dependencyProperty);
-            if (expr != null)
-            {
-                return expr.ParentBinding.Clone();
-            }
-            return null;
-        }
-
         internal void ApplyBindingExpression(DependencyProperty dp, BindingExpression expression)
         {
             INTERNAL_PropertyStorage storage;

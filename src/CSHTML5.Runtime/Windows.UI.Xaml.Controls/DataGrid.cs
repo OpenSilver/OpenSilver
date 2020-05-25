@@ -764,7 +764,7 @@ namespace Windows.UI.Xaml.Controls
                     //we set column.IsReadOnly = true if the user explicitely set its binding in OneWay mode:
                     if (column is DataGridBoundColumn)
                     {
-                        Binding b = column.INTERNAL_GetBinding(DataGridBoundColumn.BindingProperty);
+                        Binding b = ((DataGridBoundColumn)column).Binding as Binding;
                         if (b != null)
                         {
                             if (b.Mode == BindingMode.OneWay && b.INTERNAL_WasModeSetByUserRatherThanDefaultValue())
