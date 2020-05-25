@@ -370,7 +370,7 @@ namespace Windows.UI.Xaml.Controls
         {
             string nameAndContent = _buttonPanel.Children.Count.ToString() + 1;
 
-            Button newButton = new Button();
+            ToggleButton newButton = new ToggleButton();
             newButton.Style = NumericButtonStyle;
 
             newButton.Cursor = Cursors.Hand; // seems to not be by default
