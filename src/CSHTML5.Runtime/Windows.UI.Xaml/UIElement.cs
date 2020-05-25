@@ -602,7 +602,7 @@ namespace Windows.UI.Xaml
                 dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
                 if (element.INTERNAL_ArePointerEventsEnabled)
                 {
-                    style.pointerEvents = "auto"; //Note: MDN lies: pointer-events: "auto" is not the same as pointer-event not set.
+                    style.pointerEvents = "auto";
                 }
                 else
                 {

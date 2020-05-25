@@ -202,8 +202,7 @@ namespace Windows.UI.Xaml.Controls
             else if (SelectionMode == SelectionMode.Extended)
             {
 
-
-                int indexOfClickedItem = ConvertToListOfObjectsOrNull(_actualItemsSource).IndexOf(selectorItem.INTERNAL_CorrespondingItem); //todo-perfs: this is O(N).
+                int indexOfClickedItem = INTERNAL_ListsHelper.ConvertToListOfObjectsOrNull(Items).IndexOf(selectorItem.INTERNAL_CorrespondingItem); //todo-perfs: this is O(N).
 
                 //if Shift is pressed
                 if (isShift)
@@ -222,7 +221,11 @@ namespace Windows.UI.Xaml.Controls
                     int index = 0;
                     //clear before adding 
                     INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+#if WORKINPROGRESS
+                    foreach (object item in Items)
+#else
                     foreach (object item in _actualItemsSource)
+#endif
                     {
                         if (indexStart <= index && index <= indexEnd)
                         {
@@ -323,7 +326,7 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-        #endregion
+#endregion
 
 #if MIGRATION
         public override void OnApplyTemplate()

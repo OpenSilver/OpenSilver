@@ -12,6 +12,7 @@
 *  
 \*====================================================================================*/
 
+#if !WORKINPROGRESS
 
 using CSHTML5.Internal;
 using System;
@@ -70,3 +71,5 @@ namespace Windows.UI.Xaml.Controls
         }
     }
 }
+
+#endif

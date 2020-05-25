@@ -430,7 +430,11 @@ namespace Windows.UI.Xaml.Controls
             if (_useNativeComboBox)
             {
                 _placeWhereItemsPanelWillBeRendered = this;
+#if WORKINPROGRESS
+                UpdateChildrenInVisualTree(Items, Items, forceUpdateAllChildren: true);
+#else
                 UpdateChildrenInVisualTree(base._actualItemsSource, base._actualItemsSource, forceUpdateAllChildren: true);
+#endif
             }
         }
 
