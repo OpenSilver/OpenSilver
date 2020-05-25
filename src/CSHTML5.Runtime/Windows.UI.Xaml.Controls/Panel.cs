@@ -15,6 +15,7 @@
 
 using CSHTML5.Internal;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -67,40 +68,9 @@ namespace Windows.UI.Xaml.Controls
         }
         internal static bool INTERNAL_ApplicationWideEnableProgressiveRendering;
 
-        void Children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-#if PERFSTAT
-            var t0 = Performance.now();
-#endif
-
-            UIElementCollection oldItems = null;
-            UIElementCollection newItems = null;
-            var list = e.NewItems;
-            if (list != null)
-            {
-                newItems = new UIElementCollection();
-                foreach (UIElement uiElement in list)
-                {
-                    newItems.Add(uiElement);
-                }
-            }
-
-            list = e.OldItems;
-            if (list != null)
-            {
-                oldItems = new UIElementCollection();
-                foreach (UIElement uiElement in list)
-                {
-                    oldItems.Add(uiElement);
-                }
-            }
-
-#if PERFSTAT
-            Performance.Counter("Panel.Children_CollectionChanged without manage children", t0);
-#endif
-
-            //we put "this" below because the sender is directly the colection and we need to have an access to the control
-            this.ManageChildrenChanged_v2(e.Action, e.OldStartingIndex, oldItems, e.NewStartingIndex, newItems);
+            this.ManageChildrenChanged_v2(e.Action, e.OldStartingIndex, e.OldItems, e.NewStartingIndex, e.NewItems);
         }
 
         /// <summary>
@@ -152,7 +122,7 @@ namespace Windows.UI.Xaml.Controls
                     _children = new UIElementCollection();
 
                     if (this._isLoaded)
-                        _children.CollectionChanged += Children_CollectionChanged;
+                        _children.CollectionChanged += OnChildrenCollectionChanged;
                 }
 
                 return _children;
@@ -165,8 +135,8 @@ namespace Windows.UI.Xaml.Controls
             base.INTERNAL_OnAttachedToVisualTree();
             if (_children != null)
             {
-                _children.CollectionChanged -= Children_CollectionChanged;
-                _children.CollectionChanged += Children_CollectionChanged;
+                _children.CollectionChanged -= OnChildrenCollectionChanged;
+                _children.CollectionChanged += OnChildrenCollectionChanged;
             }
 
             this.ManageChildrenChanged(this._children, this._children);
@@ -175,31 +145,19 @@ namespace Windows.UI.Xaml.Controls
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
             if (_children != null)
-                _children.CollectionChanged -= Children_CollectionChanged;
+                _children.CollectionChanged -= OnChildrenCollectionChanged;
         }
 
-        internal virtual void ManageChildrenChanged(UIElementCollection oldChildren, UIElementCollection newChildren)
+        internal virtual void ManageChildrenChanged(IList oldChildren, IList newChildren)
         {
             if (oldChildren != null)
             {
                 // Detach old children only if they are not in the "newChildren" collection:
                 foreach (UIElement child in oldChildren) //note: there is no setter for Children so the user cannot change the order of the elements in one step --> we cannot have the same children in another order (which would keep the former order with the way it is handled now) --> no problem here
                 {
-#if PERFSTAT
-                    var t2 = Performance.now();
-#endif
                     if (newChildren == null || !newChildren.Contains(child))
                     {
-#if PERFSTAT
-                        Performance.Counter("Panel.ManageChildrenChanged 'Contains'", t2);
-#endif
                         INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, this);
-                    }
-                    else
-                    {
-#if PERFSTAT
-                        Performance.Counter("Panel.ManageChildrenChanged 'Contains'", t2);
-#endif
                     }
                 }
             }
@@ -225,7 +183,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        internal virtual void ManageChildrenChanged_v2(NotifyCollectionChangedAction action, int oldIndex, UIElementCollection oldChildren, int newIndex, UIElementCollection newChildren)
+        internal virtual void ManageChildrenChanged_v2(NotifyCollectionChangedAction action, int oldIndex, IList oldChildren, int newIndex, IList newChildren)
         {
             //if newIndex > oldIndex && oldIndex >= 0 consider newIndex as newIndex + oldChildren.Count to compensate the fact that newIndex is considering without the oldElements
             //For every item in oldChildren add to hashSet to remove it.
@@ -249,7 +207,11 @@ namespace Windows.UI.Xaml.Controls
                     compensateMovedItems = true;
                     newIndex += oldChildren.Count; //this is to compensate the fact that newIndex is the index after removing the oldChildren.
                 }
-                elementsToRemoveFromVisualTree = new HashSet<UIElement>(oldChildren);
+                elementsToRemoveFromVisualTree = new HashSet<UIElement>();
+                foreach (UIElement uiE in oldChildren)
+                {
+                    elementsToRemoveFromVisualTree.Add(uiE);
+                }
             }
             else
             {
@@ -289,7 +251,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private async void ProgressivelyAttachChildren(UIElementCollection newChildren)
+        private async void ProgressivelyAttachChildren(IList newChildren)
         {
             foreach (UIElement child in newChildren)
             {

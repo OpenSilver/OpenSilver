@@ -41,7 +41,14 @@ namespace Windows.UI.Xaml.Controls
         {
             _suppressCollectionChanged = true; // To avoid raising "CollectionChanged" twice.
             List<UIElement> oldItems = new List<UIElement>(this);
-            base.ClearItems();
+            try
+            {
+                base.ClearItems();
+            }
+            finally
+            {
+                _suppressCollectionChanged = false;
+            }
             base.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, oldItems));
         }
 
@@ -49,8 +56,6 @@ namespace Windows.UI.Xaml.Controls
         {
             if (!_suppressCollectionChanged)
                 base.OnCollectionChanged(e);
-
-            _suppressCollectionChanged = false;
         }
 
 #if WORKINPROGRESS

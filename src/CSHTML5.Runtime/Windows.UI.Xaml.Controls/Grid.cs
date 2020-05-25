@@ -21,6 +21,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
 #if BRIDGE
 using Bridge;
 #endif
@@ -765,37 +766,22 @@ namespace Windows.UI.Xaml.Controls
 #endif
         }
 
-        internal override void ManageChildrenChanged(UIElementCollection oldChildren, UIElementCollection newChildren)
+        internal override void ManageChildrenChanged(IList oldChildren, IList newChildren)
         {
             //todo: remove this method? I'm not sure that it's called anymore
             if (!Grid_InternalHelpers.isCSSGridSupported())
             {
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 {
-#if PERFSTAT
-                    var t1 = Performance.now();
-#endif
                     if (oldChildren != null)
                     {
                         // Detach old children only if they are not in the "newChildren" collection:
                         foreach (UIElement child in oldChildren) //note: there is no setter for Children so the user cannot change the order of the elements in one step --> we cannot have the same children in another order (which would keep the former order with the way it is handled now) --> no problem here
                         {
-#if PERFSTAT
-                            var t2 = Performance.now();
-#endif
                             if (newChildren == null || !newChildren.Contains(child))
                             {
-#if PERFSTAT
-                                Performance.Counter("Grid.ManageChildrenChanged 'Contains'", t2);
-#endif
                                 UpdateStructureWhenRemovingChild(child);
                                 INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, this);
-                            }
-                            else
-                            {
-#if PERFSTAT
-                                Performance.Counter("Grid.ManageChildrenChanged 'Contains'", t2);
-#endif
                             }
                         }
                     }

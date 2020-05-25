@@ -15,14 +15,11 @@
 
 using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if !MIGRATION
 using Windows.Foundation;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 #endif
 
 #if MIGRATION
@@ -238,7 +235,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        internal override void ManageChildrenChanged(UIElementCollection oldChildren, UIElementCollection newChildren)
+        internal override void ManageChildrenChanged(IList oldChildren, IList newChildren)
         {
             if (oldChildren != null)
             {
