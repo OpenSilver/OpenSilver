@@ -86,16 +86,7 @@ namespace Windows.UI.Xaml.Controls
 
         protected override SelectorItem INTERNAL_GenerateContainer(object item)
         {
-            ListBoxItem listBoxItem;
-
-            if (item is ListBoxItem) //if the item is already defined as a ListBoxItem (defined directly in the Xaml for example), we don't create a ListBoxItem to contain it.
-                listBoxItem = (ListBoxItem)item;
-            else
-                listBoxItem = new ListBoxItem();
-
-            listBoxItem.Click += listBoxItem_Click;
-
-            return listBoxItem;
+            return (SelectorItem)this.GetContainerFromItem(item);
         }
 
         protected override DependencyObject GetContainerFromItem(object item)
@@ -105,8 +96,17 @@ namespace Windows.UI.Xaml.Controls
             listBoxItem.INTERNAL_ParentSelectorControl = this;
             if(SelectedItems.Contains(item))
             {
-                //todo if possible: reuse the former items if they were already created rather than recreating them. It would actually be necessary to avoir errors like item is a string and there are two items with the same string, but only one of them is selected. Both will be considered (un)selected.
-                listBoxItem.IsSelected = true; //this can be needed when the SelectedItems collection was modified before the ListBox.Loaded event happened (which leads to an ItemsControl.UpdateItemsPanel, which then leads here).
+                // todo if possible: reuse the former items if they were already 
+                // created rather than recreating them. It would actually be 
+                // necessary to avoir errors like item is a string and there are 
+                // two items with the same string, but only one of them is 
+                // selected. Both will be considered (un)selected.
+
+                // this can be needed when the SelectedItems collection was 
+                // modified before the ListBox.Loaded event happened (which 
+                // leads to an ItemsControl.UpdateItemsPanel, which then leads 
+                // here).
+                listBoxItem.IsSelected = true; 
             }
             listBoxItem.Click += listBoxItem_Click;
             return listBoxItem;
@@ -275,7 +275,7 @@ namespace Windows.UI.Xaml.Controls
 
         protected override void UnselectAllItems()
         {
-            foreach (SelectorItem selectorItem in _itemContainerGenerator.INTERNAL_AllContainers)
+            foreach (SelectorItem selectorItem in ItemContainerGenerator.INTERNAL_AllContainers)
             {
                 selectorItem.IsSelected = false;
             }
@@ -285,7 +285,7 @@ namespace Windows.UI.Xaml.Controls
 
         protected override void SetItemVisualSelectionState(object item, bool newState)
         {
-            ListBoxItem listBoxItem = (ListBoxItem)_itemContainerGenerator.ContainerFromItem(item);
+            ListBoxItem listBoxItem = (ListBoxItem)ItemContainerGenerator.ContainerFromItem(item);
             if (listBoxItem != null)
             {
                 listBoxItem.IsSelected = newState;
@@ -320,7 +320,7 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                foreach (SelectorItem selectorItem in _itemContainerGenerator.INTERNAL_AllContainers)
+                foreach (SelectorItem selectorItem in ItemContainerGenerator.INTERNAL_AllContainers)
                 {
                     selectorItem.IsSelected = true;
                 }

@@ -327,7 +327,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
 
-#endregion
+        #endregion
 
 
 
@@ -342,7 +342,16 @@ namespace Windows.UI.Xaml.Controls
         //}
 
 #if WORKINPROGRESS
-        public bool IsItemsHost { get; private set; }
+        public static readonly DependencyProperty IsItemsHostProperty =
+            DependencyProperty.Register("IsItemsHost",
+                                        typeof(bool),
+                                        typeof(Panel),
+                                        new PropertyMetadata(false));
+        public bool IsItemsHost
+        {
+            get { return (bool)this.GetValue(IsItemsHostProperty); }
+            internal set { this.SetValue(IsItemsHostProperty, value); }
+        }
 #endif
     }
 }

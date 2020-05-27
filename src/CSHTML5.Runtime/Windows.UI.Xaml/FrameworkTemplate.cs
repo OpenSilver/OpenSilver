@@ -62,6 +62,28 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
+        /// Creates an instance of the Template.
+        /// </summary>
+        /// <param name="templateOwner">
+        /// Owner of the template.
+        /// Should be null if the template has no owner (for example,
+        /// DataTemplate)
+        /// </param>
+        /// <returns></returns>
+        internal FrameworkElement INTERNAL_InstantiateFrameworkTemplate(Control templateOwner)
+        {
+            if (_methodToInstantiateFrameworkTemplate != null)
+            {
+                TemplateInstance templateInstance = _methodToInstantiateFrameworkTemplate(templateOwner);
+                return templateInstance.TemplateContent;
+            }
+            else
+            {
+                throw new Exception("The FrameworkTemplate was not properly initialized.");
+            }
+        }
+
+        /// <summary>
         /// Creates an instance of the Template, attaches it to the Visual Tree, and calls "OnApplyTemplate". This method is intented to be called for ControlTemplates only (not DataTemplates).
         /// </summary>
         /// <param name="templateOwner">The owner of the template is the control to which the template is applied.</param>

@@ -685,7 +685,15 @@ if(nextSibling != undefined) {
 #if PERFSTAT
             var t0 = Performance.now();
 #endif
-            var list = dependencyObject.INTERNAL_PropertyStorageDictionary.ToList(); //we copy the Dictionary so that the foreach doesn't break when we modify a DependencyProperty inside the Changed of another one (which causes it to be added to the Dictionary).
+            // we copy the Dictionary so that the foreach doesn't break when 
+            // we modify a DependencyProperty inside the Changed of another 
+            // one (which causes it to be added to the Dictionary).
+            // we exclude properties where source is set to default because
+            // it means they have been set at some point, and unset afterward,
+            // so we should not call the PropertyChanged callback.
+            var list = dependencyObject.INTERNAL_PropertyStorageDictionary
+                .Where(s => s.Value.BaseValueSourceInternal > BaseValueSourceInternal.Default)
+                .ToList();
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Copy list of properties", t0);
 #endif
@@ -700,13 +708,7 @@ if(nextSibling != undefined) {
 #endif
 
                 PropertyMetadata propertyMetadata = property.GetTypeMetaData(dependencyObject.GetType());
-                //#if CSHTML5BLAZOR && DEBUG
-                //                    string prettyPrintProperty = property.Name + (property != null ? "(" + property.GetHashCode().ToString() + ")" : "");
-                //                    Console.WriteLine("OPENSILVER DEBUG: VisualTreeManager: RenderElementsAndRaiseChangedEventOnAllDependencyProperties:"
-                //                        + " dependencyObject:" + prettyPrintDependencyObject
-                //                        + " property:" + prettyPrintProperty
-                //                        + " MSG: " + (propertyMetadata != null ? "has" : "has not") + " a propertyMetadata");
-                //#endif
+
                 if (propertyMetadata != null)
                 {
                     INTERNAL_PropertyStorage storage = propertiesAndTheirStorage.Value;
@@ -714,7 +716,7 @@ if(nextSibling != undefined) {
                     bool valueWasRetrieved = false;
 
                     //--------------------
-                    // Call "Apply CSS", which uses "GetCSSEquivalent/s":
+                    // Call "Apply CSS", which uses "GetCSSEquivalent/s"
                     //--------------------
                     if (propertyMetadata.GetCSSEquivalent != null || propertyMetadata.GetCSSEquivalents != null)
                     {
@@ -728,7 +730,7 @@ if(nextSibling != undefined) {
                     }
 
                     //--------------------
-                    // Call "MethodToUpdateDom":
+                    // Call "MethodToUpdateDom"
                     //--------------------
                     if (propertyMetadata.MethodToUpdateDom != null)
                     {
@@ -743,16 +745,9 @@ if(nextSibling != undefined) {
                     }
 
                     //--------------------
-                    // Call PropertyChanged:
+                    // Call PropertyChanged
                     //--------------------
-                    //#if CSHTML5BLAZOR && DEBUG
-                    //                        string prettyPrintPropertyMetadata = propertyMetadata + (propertyMetadata != null ? propertyMetadata.GetHashCode().ToString() : "");
-                    //                        Console.WriteLine("OPENSILVER DEBUG: VisualTreeManager: RenderElementsAndRaiseChangedEventOnAllDependencyProperties:"
-                    //                            + " dependencyObject:" + prettyPrintDependencyObject
-                    //                            + " property:" + prettyPrintProperty
-                    //                            + " propertyMetadata:" + propertyMetadata
-                    //                            + " MSG: " + (propertyMetadata.PropertyChangedCallback != null ? "has" : "has not") + " a PropertyChangedCallback" );
-                    //#endif
+
                     if (propertyMetadata.PropertyChangedCallback != null
                         && propertyMetadata.CallPropertyChangedWhenLoadedIntoVisualTree != WhenToCallPropertyChangedEnum.Never)
                     {
@@ -762,18 +757,8 @@ if(nextSibling != undefined) {
                             valueWasRetrieved = true;
                         }
 
-                        //#if CSHTML5BLAZOR && DEBUG
-                        //                            Console.WriteLine("OPENSILVER DEBUG: VisualTreeManager: RenderElementsAndRaiseChangedEventOnAllDependencyProperties:" 
-                        //                                + " dependencyObject:" + prettyPrintDependencyObject 
-                        //                                + " property:" + prettyPrintProperty 
-                        //                                + " propertyMetadata:" + propertyMetadata
-                        //                                + " MSG: is raising PropertyChangedCallback)");
-                        //#endif
                         // Raise the "PropertyChanged" event:
                         propertyMetadata.PropertyChangedCallback(storage.Owner, new DependencyPropertyChangedEventArgs(value, value, property));
-
-                        // Remember that we raised the event, to avoid raising it again in the code below:
-                        //propertiesForWhichTheEventHasAlreadyBeenRaised.Add(property, property); //commented since the "code below" is commented
                     }
                 }
 

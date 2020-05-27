@@ -371,7 +371,6 @@ namespace Windows.UI.Xaml.Data
                 {
                     //Note: we make two calls because "replace" does not work in the DataGrid at the time of writing.
                     CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-                    CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _collectionInteface, 0));
 #if WORKINPROGRESS && !CSHTML5NETSTANDARD
                     this.OnPropertyChanged("Count");
 #endif

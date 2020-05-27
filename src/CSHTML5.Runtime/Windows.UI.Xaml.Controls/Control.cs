@@ -62,7 +62,7 @@ namespace Windows.UI.Xaml.Controls
         //      - RegisterName
         //END OF COMMENT
 
-        private UIElement _renderedControlTemplate = null;
+        internal UIElement _renderedControlTemplate = null;
         private bool _isDisabled = false;
 
         /// <summary>

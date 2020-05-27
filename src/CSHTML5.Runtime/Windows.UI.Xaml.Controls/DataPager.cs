@@ -150,21 +150,20 @@ namespace Windows.UI.Xaml.Controls
             "Source",
             typeof(INTERNAL_PagedCollectionView),
             typeof(DataPager),
-            new PropertyMetadata(OnSourceChanged)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            new PropertyMetadata(OnSourceChanged));
 
         private static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             DataPager datapager = (DataPager)d;
 
-            if (e.NewValue != null && e.NewValue != e.OldValue)
+            if (e.OldValue != null)
             {
-                if (e.OldValue != null)
-                {
-                    ((INTERNAL_PagedCollectionView)e.OldValue).CollectionChanged -= datapager.Source_CollectionChanged;
-                    ((INTERNAL_PagedCollectionView)e.OldValue).PageChanged -= datapager.Source_PageChanged;
-                }
+                ((INTERNAL_PagedCollectionView)e.OldValue).CollectionChanged -= datapager.Source_CollectionChanged;
+                ((INTERNAL_PagedCollectionView)e.OldValue).PageChanged -= datapager.Source_PageChanged;
+            }
 
+            if (e.NewValue != null)
+            {
                 datapager.Source.PageSize = datapager.PageSize;
 
                 datapager.NumberOfPages = datapager.CountNumberPage();
@@ -178,7 +177,9 @@ namespace Windows.UI.Xaml.Controls
                 datapager.GenerateControls();
             }
             else
+            {
                 datapager.NumberOfPages = 0;
+            }
         }
 
 #endregion

@@ -5,15 +5,19 @@
 
     <!--<Style x:Key="DefaultGridSplitterStyle" TargetType="local:GridSplitter">-->
     <Style TargetType="GridSplitter">
-        <Setter Property="IsTabStop" Value="False"></Setter>
-        <Setter Property="Background" Value="#FFF0F0F0"/>
+        <Setter Property="IsTabStop"
+                Value="False"></Setter>
+        <Setter Property="Background"
+                Value="#FFF0F0F0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="GridSplitter">
                     <Grid Background="{TemplateBinding Background}">
-                        <Thumb x:Name="PART_Thumb" Opacity="0" />
-                         <!--Note: the thumb control is here only in CSHTML5--> 
-                        <ContentPresenter Content="{TemplateBinding Element}" IsHitTestVisible="False" />
+                        <Thumb x:Name="PART_Thumb"
+                               Opacity="0" />
+                        <!--Note: the thumb control is here only in CSHTML5-->
+                        <ContentPresenter Content="{TemplateBinding Element}"
+                                          IsHitTestVisible="False" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

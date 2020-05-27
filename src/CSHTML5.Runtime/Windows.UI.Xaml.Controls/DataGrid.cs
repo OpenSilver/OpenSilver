@@ -593,11 +593,11 @@ namespace Windows.UI.Xaml.Controls
             }
             AttachGridToVisualTree();
             //UpdateChildrenInVisualTree(Items, Items);
-            if (_renderedItemsPanel == null && ItemsPanel != null)
+            if (RenderedItemsPanel == null && ItemsPanel != null)
             {
                 UpdateItemsPanel(ItemsPanel);
             }
-            else if (_renderedItemsPanel != null)
+            else if (RenderedItemsPanel != null)
             {
                 //we set the new Items (which will refresh the display)
                 if (_objectsToDisplay != null && _objectsToDisplay.Count > 0)
@@ -668,10 +668,53 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+#if WORKINPROGRESS
+        private static ItemsPanelTemplate _itemsPanelTemplate;
+        private static ItemsPanelTemplate ItemsPanelInternal
+        {
+            get
+            {
+                if (_itemsPanelTemplate == null)
+                {
+                    _itemsPanelTemplate = new ItemsPanelTemplate()
+                    {
+                        _methodToInstantiateFrameworkTemplate = (Control templateOwner) =>
+                        {
+                            return new TemplateInstance()
+                            {
+                                // Default items panel. 
+                                // Note: the parameter templateOwner is made necessary 
+                                // for the ControlTemplates but can be kept null for DataTemplates.
+                                TemplateContent = new StackPanel()
+                            };
+                        }
+                    };
+
+                    // Note: We seal the template in order to avoid letting the user modify the 
+                    // default template itself since it is the same instance that is used as 
+                    // the default value for all ItemsControls.
+                    // This would bring issues such as a user modifying the default template 
+                    // for one element then modifying it again for another one and both would 
+                    // have the last one's template.
+                    _itemsPanelTemplate.Seal();
+                }
+                return _itemsPanelTemplate;
+            }
+        }
+
+        protected override void UpdateItemsPanel(ItemsPanelTemplate newTemplate)
+        {
+            newTemplate = ItemsPanelInternal;
+            base.UpdateItemsPanel(newTemplate);
+        }
+
+
+#else
         protected override void UpdateItemsPanel(ItemsPanelTemplate newTemplate)
         {
             _renderedItemsPanel = new StackPanel();
         }
+#endif
 
         internal void AddElementToGrid(UIElement elementToAdd)
         {
@@ -807,7 +850,7 @@ namespace Windows.UI.Xaml.Controls
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    if (_renderedItemsPanel != null)
+                    if (RenderedItemsPanel != null)
                     {
                         //we check if we added in ItemsSource or in Items: If ItemsSource is empty or null, then we added through Items.Add(..).
 #if WORKINPROGRESS
@@ -862,7 +905,7 @@ namespace Windows.UI.Xaml.Controls
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    if (_renderedItemsPanel != null)
+                    if (RenderedItemsPanel != null)
                     {
                         //we generate the list of the children before the change:
                         List<object> oldChildren2 = INTERNAL_ListsHelper.ConvertToListOfObjectsOrNull(Items); //we use this to make a clone of the list in Items
@@ -903,10 +946,14 @@ namespace Windows.UI.Xaml.Controls
                     //todo
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    if (_renderedItemsPanel != null)
+                    if (RenderedItemsPanel != null)
                     {
                         //we generate a list with the elements that were in the DataGrid:
                         RemoveAllChildren();
+                        if (this.Items.Count > 0)
+                        {
+                            UpdateChildrenInVisualTree(Enumerable.Empty<object>(), this.Items, true);
+                        }
                     }
                     break;
                 default:
@@ -1063,7 +1110,7 @@ namespace Windows.UI.Xaml.Controls
                 INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(_objectsToDisplay)
 #else
                 _objectsToDisplay.Values
-# endif
+#endif
                 )
             {
                 foreach (UIElement element in child._representationInRow.ElementsInRow)
@@ -1421,7 +1468,7 @@ namespace Windows.UI.Xaml.Controls
 
         protected override void UpdateChildrenInVisualTree(IEnumerable oldChildrenEnumerable, IEnumerable newChildrenEnumerable, bool forceUpdateAllChildren = false) // "forceUpdateAllChildren" is used to remove all the children and add them back, for example when the ItemsPanel changes.
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _renderedItemsPanel != null)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && RenderedItemsPanel != null)
             {
                 INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_grid, this);
                 INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_pagerUI, this);

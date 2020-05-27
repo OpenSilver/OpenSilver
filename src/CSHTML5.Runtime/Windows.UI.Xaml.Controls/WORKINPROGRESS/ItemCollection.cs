@@ -23,7 +23,7 @@ namespace Windows.UI.Xaml.Controls
         private IEnumerable _itemsSource; // base collection
 
         private bool _isUsingListWrapper;
-        private IList _listWrapper;
+        private EnumerableWrapper _listWrapper;
 
         #endregion Data
 
@@ -290,6 +290,8 @@ namespace Windows.UI.Xaml.Controls
             this.InitializeSourceList(value);
 
             this.UpdateCountProperty(this.CountInternal);
+
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         internal void ClearItemsSource()
@@ -305,6 +307,8 @@ namespace Windows.UI.Xaml.Controls
                 this._isUsingListWrapper = false;
 
                 this.UpdateCountProperty(this.CountInternal);
+
+                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             }
         }
 
@@ -375,6 +379,7 @@ namespace Windows.UI.Xaml.Controls
                         this._listWrapper[e.OldStartingIndex] = e.NewItems[0];
                         break;
                     case NotifyCollectionChangedAction.Reset:
+                        this._listWrapper.Refresh();
                         break;
                 }
             }
@@ -428,15 +433,24 @@ namespace Windows.UI.Xaml.Controls
 
         private class EnumerableWrapper : List<object>
         {
-            private IEnumerable _sourceCollection; // unused
+            private IEnumerable _sourceCollection;
             private ItemCollection _owner; // unused
 
             public EnumerableWrapper(IEnumerable source, ItemCollection owner)
             {
+                Debug.Assert(source != null);
+                Debug.Assert(owner != null);
                 this._sourceCollection = source;
                 this._owner = owner;
 
-                IEnumerator enumerator = source.GetEnumerator();
+                this.Refresh();
+            }
+
+            public void Refresh()
+            {
+                this.Clear();
+
+                IEnumerator enumerator = this._sourceCollection.GetEnumerator();
                 while (enumerator.MoveNext())
                 {
                     this.Add(enumerator.Current);

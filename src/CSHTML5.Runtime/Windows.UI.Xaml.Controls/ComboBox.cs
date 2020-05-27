@@ -112,8 +112,10 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public ComboBox()
         {
+#if !WORKINPROGRESS
             // Prevent rendering the items as direct children to this ComboBox. Instead, we wait for the "OnApplyTemplate" method that will find where the correct place to render the items is. If there is no "OnApplyTemplate" because we are using the native combobox, the variable is set in "INTERNAL_OnAttachedToVisualTree".
             _placeWhereItemsPanelWillBeRendered = null;
+#endif
 
             UseSystemFocusVisuals = true;
 
@@ -234,16 +236,7 @@ namespace Windows.UI.Xaml.Controls
 
         protected override SelectorItem INTERNAL_GenerateContainer(object item)
         {
-            ComboBoxItem comboBoxItem;
-
-            if (item is ComboBoxItem) //if the item is already defined as a ComboBoxItem (defined directly in the Xaml for example), we don't create a ComboBoxItem to contain it.
-                comboBoxItem = (ComboBoxItem)item;
-            else
-                comboBoxItem = new ComboBoxItem();
-
-            comboBoxItem.Click += ComboBoxItem_Click;
-
-            return comboBoxItem;
+            return (SelectorItem)this.GetContainerFromItem(item);
         }
 
         protected override DependencyObject GetContainerFromItem(object item)
@@ -268,7 +261,7 @@ namespace Windows.UI.Xaml.Controls
                 _dropDownToggle.IsChecked = false;
         }
 
-        #endregion
+#endregion
 
 #if WORKINPROGRESS
         IList GetListOfSelectedItemsInCSharp()
@@ -298,7 +291,7 @@ namespace Windows.UI.Xaml.Controls
                     if (_nativeComboBoxDomElement != null)
                     {
                         var optionDomElement = INTERNAL_HtmlDomManager.AddOptionToNativeComboBox(_nativeComboBoxDomElement, value.ToString());
-                        _itemContainerGenerator.INTERNAL_RegisterContainer(optionDomElement, newItem);
+                        ItemContainerGenerator.INTERNAL_RegisterContainer(optionDomElement, newItem);
                     }
                 }
                 //todo: else --> ?
@@ -316,12 +309,12 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (_nativeComboBoxDomElement != null)
                 {
-                    var optionDomElement = _itemContainerGenerator.INTERNAL_ContainerFromItem(item);
+                    var optionDomElement = ItemContainerGenerator.INTERNAL_ContainerFromItem(item);
                     if (optionDomElement != null)
                     {
                         INTERNAL_HtmlDomManager.RemoveOptionFromNativeComboBox(optionDomElement, _nativeComboBoxDomElement);
 
-                        return _itemContainerGenerator.INTERNAL_TryUnregisterContainer(optionDomElement, item);
+                        return ItemContainerGenerator.INTERNAL_TryUnregisterContainer(optionDomElement, item);
                     }
                 }
                 return false;
@@ -389,6 +382,10 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnApplyTemplate()
 #endif
         {
+#if WORKINPROGRESS
+            base.OnApplyTemplate();
+#endif
+
             if(_popup != null)
                 _popup.ClosedDueToOutsideClick -= Popup_ClosedDueToOutsideClick; // Note: we do this here rather than at "OnDetached" because it may happen that the popup is closed after the ComboBox has been removed from the visual tree (in which case, when putting it back into the visual tree, we want the drop down to be in its initial closed state).
 
@@ -396,6 +393,7 @@ namespace Windows.UI.Xaml.Controls
             _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
             _contentPresenter = GetTemplateChild("ContentPresenter") as ContentPresenter;
 
+#if !WORKINPROGRESS
             var itemsPresenter = GetTemplateChild("ItemsHost") as ItemsPresenter;
             if (itemsPresenter != null)
             {
@@ -405,6 +403,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 _placeWhereItemsPanelWillBeRendered = this;
             }
+#endif
 
             if (_dropDownToggle != null)
             {
@@ -419,7 +418,9 @@ namespace Windows.UI.Xaml.Controls
                 _popup.ClosedDueToOutsideClick += Popup_ClosedDueToOutsideClick;
             }
 
+#if !WORKINPROGRESS
             base.OnApplyTemplate();
+#endif
 
             ApplySelectedIndex(SelectedIndex);
         }
@@ -429,7 +430,10 @@ namespace Windows.UI.Xaml.Controls
             // We update the ItemsPanel only if we use the native ComboBox. Otherwise, it will be done in the "OnApplyTemplate" method.
             if (_useNativeComboBox)
             {
+#if !WORKINPROGRESS
                 _placeWhereItemsPanelWillBeRendered = this;
+#endif
+
 #if WORKINPROGRESS
                 UpdateChildrenInVisualTree(Items, Items, forceUpdateAllChildren: true);
 #else
@@ -444,7 +448,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (_useNativeComboBox)
             {
-                _itemContainerGenerator.INTERNAL_Clear();
+                ItemContainerGenerator.INTERNAL_Clear();
             }
         }
 
