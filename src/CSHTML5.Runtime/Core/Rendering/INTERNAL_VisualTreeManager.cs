@@ -168,7 +168,40 @@ namespace CSHTML5.Internal
             element.INTERNAL_DeferredLoadingWhenControlBecomesVisible = null;
         }
 
-        public static void AttachVisualChildIfNotAlreadyAttached(UIElement child, UIElement parent)
+        public static void MoveVisualChildInSameParent(UIElement child, UIElement parent, int index)
+        {
+            if(parent.INTERNAL_VisualChildrenInformation.ContainsKey(child))
+            {
+                INTERNAL_VisualChildInformation visualChildInformation = parent.INTERNAL_VisualChildrenInformation[child];
+                var domElementToMove = visualChildInformation.INTERNAL_OptionalChildWrapper_OuterDomElement;
+                if (domElementToMove == null)
+                    domElementToMove = child.INTERNAL_OuterDomElement;
+
+                if(domElementToMove != null) //Not sure if this test is needed but at least we won't break anything if the element is not in the Visual tree
+                {
+                    object domElementWhereToPlaceChildStuff = (parent.GetDomElementWhereToPlaceChild(child) ?? parent.INTERNAL_InnerDomElement);
+                    //todo: see if there is a way to know the index of the domElement in its parent without looping through the list (where we find i in the js below).
+                    Interop.ExecuteJavaScript(@"
+var actualIndex = $1;
+var i = 0;
+while (i < actualIndex && $0.children[i]!=$2) { 
+    ++i;
+}
+if(i < actualIndex) {
+    ++actualIndex; //to compensate the fact that the item that will be moved was before the next sibling
+}
+var nextSibling = $0.children[$1];
+if(nextSibling != undefined) {
+    $0.insertBefore($2, nextSibling);
+} else {
+    $0.appendChild($2);
+}", domElementWhereToPlaceChildStuff, index, domElementToMove);
+                }
+            }
+        }
+        
+
+        public static void AttachVisualChildIfNotAlreadyAttached(UIElement child, UIElement parent, int index = -1)
         {
             // Modify the visual tree only if the parent element is itself in the visual tree:
             if (child != null && IsElementInVisualTree(parent))
@@ -189,7 +222,7 @@ namespace CSHTML5.Internal
                         Profiler.ConsoleTime(label);
                     }
 
-                    AttachVisualChild_Private(child, parent);
+                    AttachVisualChild_Private(child, parent, index);
 
                     if (EnablePerformanceLogging)
                     {
@@ -266,7 +299,7 @@ namespace CSHTML5.Internal
             return false; //result is false here only if 1) the direct parent didn't define an implicit Style, 2) the parent didn't inherit implicit Styles from its parents.
         }
 
-        static void AttachVisualChild_Private(UIElement child, UIElement parent)
+        static void AttachVisualChild_Private(UIElement child, UIElement parent, int index)
         {
             //
             // THIS IS WHAT THE FINAL STRUCTURE IN THE DOM TREE WILL LOOK LIKE:
@@ -383,7 +416,7 @@ namespace CSHTML5.Internal
 
             // A "wrapper for child" is sometimes needed between the child and the parent (for example in case of a grid). It is usually one or more DIVs that fit in-between the child and the parent, and that are used to position the child within the parent.
             object innerDivOfWrapperForChild;
-            object wrapperForChild = parent.CreateDomChildWrapper(domElementWhereToPlaceChildStuff, out innerDivOfWrapperForChild);
+            object wrapperForChild = parent.CreateDomChildWrapper(domElementWhereToPlaceChildStuff, out innerDivOfWrapperForChild, index);
             bool comparison1 = (wrapperForChild == null); // Note: we need due to a bug of JSIL where translation fails if we do not use this temp variable.
             bool comparison2 = (innerDivOfWrapperForChild == null); // Note: we need due to a bug of JSIL where translation fails if we do not use this temp variable.
             bool doesParentRequireToCreateAWrapperForEachChild = (!comparison1 && !comparison2); // Note: The result is "True" for complex structures such as tables, false otherwise (cf. documentation in "INTERNAL_VisualChildInformation" class).

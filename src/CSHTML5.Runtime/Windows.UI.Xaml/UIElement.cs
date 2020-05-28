@@ -182,8 +182,9 @@ namespace Windows.UI.Xaml
         /// </summary>
         /// <param name="parentRef"></param>
         /// <param name="domElementWhereToPlaceChild"></param>
+        /// <param name="index">The index for the position in which to add the child.</param>
         /// <returns></returns>
-        public virtual object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild)
+        public virtual object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index = -1)
         {
             // This method is optional (cf. documentation in "INTERNAL_VisualChildInformation" class). It should return null if not used.
             domElementWhereToPlaceChild = null;
@@ -1119,9 +1120,9 @@ namespace Windows.UI.Xaml
 
         }
 
-        internal void AddVisualChild(UIElement child)
+        internal void AddVisualChild(UIElement child, int index = -1)
         {
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this, index);
 
             if (object.ReferenceEquals(INTERNAL_VisualTreeOperation.Current.Root, this))
             {

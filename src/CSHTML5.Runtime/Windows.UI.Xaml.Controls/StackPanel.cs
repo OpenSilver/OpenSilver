@@ -156,7 +156,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild)
+        public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index)
         {
             if (Orientation == Orientation.Horizontal)
             {
@@ -195,7 +195,7 @@ namespace Windows.UI.Xaml.Controls
                 // ...
                 //</div>
 
-                var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+                var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this, index);
                 var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
                 divStyle.position = "relative";
                 divStyle.display = "table-cell";
@@ -216,7 +216,7 @@ namespace Windows.UI.Xaml.Controls
                 //wrapper for each child:
                 //<div style="width: inherit">... </div>
 
-                var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+                var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this, index);
                 var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
                 divStyle.position = "relative";
                 divStyle.width = "100%"; // Makes it possible to do horizontal alignment of the element that will be the child of this div.

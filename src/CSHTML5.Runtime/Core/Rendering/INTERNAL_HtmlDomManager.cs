@@ -776,7 +776,7 @@ temporaryParentElement.appendChild(newElement);
         }
 #endif
 
-        public static object CreateDomElementAndAppendIt(string domElementTag, object parentRef, UIElement associatedUIElement) //associatedUIElement is the UIElement of which the current dom element is a part.
+        public static object CreateDomElementAndAppendIt(string domElementTag, object parentRef, UIElement associatedUIElement, int index = -1) //associatedUIElement is the UIElement of which the current dom element is a part.
         {
 #if PERFSTAT
             var t0 = Performance.now();
@@ -789,19 +789,35 @@ temporaryParentElement.appendChild(newElement);
 function(){
     var newElement = document.createElement($0);
     newElement.associatedUIElement = $2;
-    $1.appendChild(newElement);
+    if({3} < 0 || {3} >= {1}.children.length)
+    {
+        $1.appendChild(newElement);
+    }
+    else
+    {
+        var nextSibling = $1.children[$3];
+        $1.insertBefore(newElement,nextSibling);
+    }
     return newElement;
 }()
-", domElementTag, parentRef, associatedUIElement);
+", domElementTag, parentRef, associatedUIElement, index);
 #else
                 var result = Script.Write<object>(@"
 (function(){
     var newElement = document.createElement({0});
     newElement.associatedUIElement = {2};
-    {1}.appendChild(newElement);
+    if({3} < 0 || {3} >= {1}.children.length)
+    {
+        {1}.appendChild(newElement);
+    }
+    else
+    {
+        var nextSibling = {1}.children[{3}];
+        {1}.insertBefore(newElement,nextSibling);
+    }
     return newElement;
 }());
-", domElementTag, parentRef, associatedUIElement);
+", domElementTag, parentRef, associatedUIElement, index);
 #endif
 
 #if PERFSTAT
@@ -814,7 +830,7 @@ function(){
 #if PERFSTAT
                 Performance.Counter("CreateDomElementAndAppendIt", t0);
 #endif
-                return CreateDomElementAndAppendIt_ForUseByTheSimulator(domElementTag, parentRef, associatedUIElement);
+                return CreateDomElementAndAppendIt_ForUseByTheSimulator(domElementTag, parentRef, associatedUIElement, index);
             }
         }
 
@@ -865,7 +881,7 @@ function(){
 #else
         [External]
 #endif
-        static object CreateDomElementAndAppendIt_ForUseByTheSimulator(string domElementTag, object parentRef, UIElement associatedUIElement)
+        static object CreateDomElementAndAppendIt_ForUseByTheSimulator(string domElementTag, object parentRef, UIElement associatedUIElement, int index)
         {
             //------------------
             // This is the WPF version of the DOM element creation, intented to be used only by the Simulator (not by
@@ -883,8 +899,16 @@ function(){
 var newElement = document.createElement(""{0}"");
 newElement.setAttribute(""id"", ""{1}"");
 var parentElement = document.getElementById(""{2}"");
-parentElement.appendChild(newElement);
-", domElementTag, uniqueIdentifier, parentUniqueIdentifier);
+if({3} < 0 || {3} >= parentElement.children.length)
+{{
+    parentElement.appendChild(newElement);
+}}
+else
+{{
+    var nextSibling = parentElement.children[{3}];
+    parentElement.insertBefore(newElement,nextSibling);
+}}
+", domElementTag, uniqueIdentifier, parentUniqueIdentifier, index);
                 ExecuteJavaScript(javaScriptToExecute);
                 INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
                 return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, (INTERNAL_HtmlDomElementReference)parentRef);
@@ -894,8 +918,16 @@ parentElement.appendChild(newElement);
                 Interop.ExecuteJavaScriptAsync(@"
 var newElement = document.createElement($0);
 newElement.setAttribute(""id"", $1);
-$2.appendChild(newElement);
-", domElementTag, uniqueIdentifier, parentRef);
+if($3 < 0 || $3 >= $2.children.length)
+{
+    $2.appendChild(newElement);
+}
+else
+{
+    var nextSibling = $2.children[$3];
+    $2.insertBefore(newElement,nextSibling);
+}
+", domElementTag, uniqueIdentifier, parentRef,index);
                 INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
                 return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, null); //todo: this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
             }

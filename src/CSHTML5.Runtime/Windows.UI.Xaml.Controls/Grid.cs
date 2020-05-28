@@ -867,7 +867,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
 
-        public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild)
+        public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index = -1)
         {
             bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
             if (isCSSGrid)

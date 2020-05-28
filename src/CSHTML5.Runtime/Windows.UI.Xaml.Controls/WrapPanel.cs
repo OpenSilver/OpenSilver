@@ -139,11 +139,11 @@ namespace Windows.UI.Xaml.Controls
             return div;
         }
 
-        public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild)
+        public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index = -1)
         {
             if (Orientation == Controls.Orientation.Horizontal)
             {
-                var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+                var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this, index);
                 var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
                 divStyle.display = "inline-block";
                 divStyle.lineHeight = "initial";

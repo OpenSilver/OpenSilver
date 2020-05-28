@@ -100,7 +100,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 
             //we put "this" below because the sender is directly the colection and we need to have an access to the control
-            this.ManageChildrenChanged(oldItems, newItems);
+            this.ManageChildrenChanged_v2(e.Action, e.OldStartingIndex, oldItems, e.NewStartingIndex, newItems);
         }
 
         /// <summary>
@@ -221,6 +221,70 @@ namespace Windows.UI.Xaml.Controls
 #endif
                     }
                 }
+            }
+        }
+
+        internal virtual void ManageChildrenChanged_v2(NotifyCollectionChangedAction action, int oldIndex, UIElementCollection oldChildren, int newIndex, UIElementCollection newChildren)
+        {
+            //if newIndex > oldIndex && oldIndex >= 0 consider newIndex as newIndex + oldChildren.Count to compensate the fact that newIndex is considering without the oldElements
+            //For every item in oldChildren add to hashSet to remove it.
+            //For every item in newChildren:
+            //  - if item in oldChildren remove from oldChildren's HashSet, and move it to newIndex + currentIndex in newChildren
+            //  - else create and add the new child at the index of newIndex
+            //  In both cases, increment currentIndex in NewChildren
+            //For every item left in the oldChildren's HashSet, remove it.
+
+            if (action == NotifyCollectionChangedAction.Move && newChildren == null)
+            {
+                //We need to do this because in the case of a move action, only the indexes and oldChildren are set and it doesn't fit with the logic of this method.
+                newChildren = oldChildren;
+            }
+            bool compensateMovedItems = false;
+            HashSet<UIElement> elementsToRemoveFromVisualTree = null;
+            if (oldChildren != null)
+            {
+                if (newIndex > oldIndex && oldIndex > -1)
+                {
+                    compensateMovedItems = true;
+                    newIndex += oldChildren.Count; //this is to compensate the fact that newIndex is the index after removing the oldChildren.
+                }
+                elementsToRemoveFromVisualTree = new HashSet<UIElement>(oldChildren);
+            }
+            else
+            {
+                elementsToRemoveFromVisualTree = new HashSet<UIElement>();
+            }
+            if (newChildren != null)
+            {
+                int indexInNewChildren = 0;
+                int itemsMoved = 0; //Note: this is used to compensate the fact that the items were moved from a previous index to a further one so there are still the same amount of elements before the element that was 
+                foreach (UIElement child in newChildren)
+                {
+                    if(elementsToRemoveFromVisualTree.Contains(child))
+                    {
+                        //we want to move the element instead of recreating it:
+                        elementsToRemoveFromVisualTree.Remove(child);
+                        INTERNAL_VisualTreeManager.MoveVisualChildInSameParent(child, this, newIndex + indexInNewChildren - itemsMoved);
+                        if(compensateMovedItems)
+                        {
+                            ++itemsMoved;
+                        }
+                    }
+                    else
+                    {
+#if REWORKLOADED
+                        this.AddVisualChild(child, newIndex + indexInNewChildren - itemsMoved);
+#else
+                        INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this, newIndex + indexInNewChildren - itemsMoved);
+#endif
+                    }
+                    ++indexInNewChildren;
+                }
+            }
+
+            foreach(UIElement child in elementsToRemoveFromVisualTree)
+            {
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, this);
             }
         }
 
