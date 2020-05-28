@@ -94,7 +94,7 @@ namespace Windows.UI.Xaml.Controls
 
         // members for paging
         INTERNAL_PagedCollectionView _pagedView;
-        DataPager _pagerUI = new DataPager();
+        DataPager _pagerUI;
         IEnumerable _oldOldValue; // When the user sets the value of ItemsSource, the DataGrid changes the ItemsSource again in order to replace it with a PagedCollectionView (which allows for sorting, filtering, grouping, etc.). 
 
         /// <summary>
@@ -109,9 +109,20 @@ namespace Windows.UI.Xaml.Controls
 
             _pagedView = new INTERNAL_PagedCollectionView(null);
             _pagedView.PageSize = 20;
+
+            // Initialize grid
+            _grid = new Grid();
+            _grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            _grid.INTERNAL_StringToSetVerticalGridLinesInCss = "thin solid black";
+            _grid.INTERNAL_StringToSetHorizontalGridLinesInCss = "thin solid black";
+            Grid.SetRow(_grid, 0);
+
+            // Initialize datapager
+            _pagerUI = new DataPager();
             _pagerUI.Source = _pagedView;
             _pagerUI.PageSize = 20;
             _pagerUI.DisplayMode = DataPager_DisplayMode.FirstLastPreviousNext;
+            Grid.SetRow(_pagerUI, 1);
         }
 
         // public DataPager DataPager { get { return _pagerUI; } }
@@ -585,12 +596,10 @@ namespace Windows.UI.Xaml.Controls
         /// <exclude/>
         internal protected override void INTERNAL_OnAttachedToVisualTree()
         {
-            if (_grid == null)
-            {
-                MakeUIStructure();
-                _grid.INTERNAL_StringToSetVerticalGridLinesInCss = "thin solid black";
-                _grid.INTERNAL_StringToSetHorizontalGridLinesInCss = "thin solid black";
-            }
+            base.INTERNAL_OnAttachedToVisualTree();
+
+            UpdateUIStructure();
+
             AttachGridToVisualTree();
             //UpdateChildrenInVisualTree(Items, Items);
             if (RenderedItemsPanel == null && ItemsPanel != null)
@@ -618,23 +627,6 @@ namespace Windows.UI.Xaml.Controls
             base.INTERNAL_OnDetachedFromVisualTree();
 
             _areItemsInVisualTree = false;
-        }
-
-
-        /// <summary>
-        /// Creates the structure: creates the grid that will contain the elements and sets its columns
-        /// </summary>
-        private void MakeUIStructure()
-        {
-            //Note: The Columns property must be filled before calling this method, otherwise, it's pointless
-            _grid = new Grid();
-            _grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-            if (AutoGenerateColumns)
-            {
-                GenerateColumns();
-            }
-            GenerateFakeColumnToTheEnd();
-            AddColumns(Columns);
         }
 
         private void UpdateUIStructure() //this method has to be called everytime a change in the columns appears because we cannot just add the new columns (the order has to be respected).
@@ -680,12 +672,22 @@ namespace Windows.UI.Xaml.Controls
                     {
                         _methodToInstantiateFrameworkTemplate = (Control templateOwner) =>
                         {
+                            Grid grid = new Grid();
+
+                            // Row for DataGrid content
+                            RowDefinition row1 = new RowDefinition();
+                            row1.Height = new GridLength(1d, GridUnitType.Star);
+                            
+                            // Row for DataPager
+                            RowDefinition row2 = new RowDefinition();
+                            row2.Height = new GridLength(1d, GridUnitType.Auto);
+
+                            grid.RowDefinitions.Add(row1);
+                            grid.RowDefinitions.Add(row2);
+
                             return new TemplateInstance()
                             {
-                                // Default items panel. 
-                                // Note: the parameter templateOwner is made necessary 
-                                // for the ControlTemplates but can be kept null for DataTemplates.
-                                TemplateContent = new StackPanel()
+                                TemplateContent = grid,
                             };
                         }
                     };
@@ -701,6 +703,7 @@ namespace Windows.UI.Xaml.Controls
                 return _itemsPanelTemplate;
             }
         }
+
 
         protected override void UpdateItemsPanel(ItemsPanelTemplate newTemplate)
         {
@@ -728,16 +731,13 @@ namespace Windows.UI.Xaml.Controls
 
         internal void RemoveAllHeaders()
         {
-            List<UIElement> ToRemove = new List<UIElement>();
-            foreach (UIElement element in _grid.Children)
+            for (int i = _grid.Children.Count - 1; i > -1; --i)
             {
-                if (element is DataGridColumnHeader)
-                    ToRemove.Add(element);
-            }
-
-            for (int i = 0; i < ToRemove.Count; i++)
-            {
-                _grid.Children.Remove(ToRemove[i]);
+                DataGridColumnHeader header = _grid.Children[i] as DataGridColumnHeader;
+                if (header != null)
+                {
+                    _grid.Children.RemoveAt(i);
+                }
             }
         }
 
@@ -745,8 +745,17 @@ namespace Windows.UI.Xaml.Controls
         {
             if (columnsToAdd != null)
             {
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_grid, this); //NOTE1: we remove the grid from the visual tree because each addition of a column or a row makes it recreate the whole dom for the grid, so might as well remove it completely from the visual tree, make the changes, then put it back.
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_pagerUI, this);
+                if (this.RenderedItemsPanel != null)
+                {
+                    // Remove _grid and _pagerUI from visual tree
+
+                    // NOTE1: we remove the grid from the visual tree because
+                    // each addition of a column or a row makes it recreate the 
+                    // whole dom for the grid, so might as well remove it 
+                    // completely from the visual tree, make the changes, then 
+                    // put it back.
+                    this.RenderedItemsPanel.Children.Clear();
+                }
 
                 //we add the column for the rows' headers:
                 ColumnDefinition columnDefinitionForHeader = new ColumnDefinition(); //todo: remove the first column when the SelectionMode is Single (do not forget every change it implies)
@@ -1218,14 +1227,7 @@ namespace Windows.UI.Xaml.Controls
                         }
                         if (newType != null)
                         {
-                            if (_grid != null)
-                            {
-                                UpdateUIStructure();
-                            }
-                            else
-                            {
-                                MakeUIStructure();
-                            }
+                            UpdateUIStructure();
                         }
                     }
                 }
@@ -1466,12 +1468,17 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        protected override void UpdateChildrenInVisualTree(IEnumerable oldChildrenEnumerable, IEnumerable newChildrenEnumerable, bool forceUpdateAllChildren = false) // "forceUpdateAllChildren" is used to remove all the children and add them back, for example when the ItemsPanel changes.
+        protected override void UpdateChildrenInVisualTree(
+            IEnumerable oldChildrenEnumerable, 
+            IEnumerable newChildrenEnumerable, 
+            bool forceUpdateAllChildren = false) // "forceUpdateAllChildren" is used to remove all the children and add them back, for example when the ItemsPanel changes.
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && RenderedItemsPanel != null)
             {
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_grid, this);
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_pagerUI, this);
+                // Remove _grid and _pagerUI from visual tree
+                this.RenderedItemsPanel.Children.Clear();
+                //INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_grid, this);
+                //INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_pagerUI, this);
                 //we should not arrive in here from the user's code since the user cannot set items.
 
                 List<object> oldChildren = INTERNAL_ListsHelper.ConvertToListOfObjectsOrNull(oldChildrenEnumerable);
@@ -1563,7 +1570,7 @@ namespace Windows.UI.Xaml.Controls
             if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(_grid))
             {
 #if REWORKLOADED
-                this.AddVisualChild(this._grid);
+                this.RenderedItemsPanel.AddVisualChild(this._grid);
 #else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_grid, this);
 #endif
@@ -1572,15 +1579,16 @@ namespace Windows.UI.Xaml.Controls
                     throw new Exception("The DataPager is already attached and cannot be attached twice.");
 
 #if REWORKLOADED
-                this.AddVisualChild(this._pagerUI);
+                this.RenderedItemsPanel.AddVisualChild(this._pagerUI);
 #else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_pagerUI, this);
 #endif
             }
 
             // Work around a vertical alignment issue due to the fact that we attach both the DataGrid and the DataPager (cf. ticket #1290):
-            if (this.VerticalAlignment != VerticalAlignment.Top)
-                this.VerticalAlignment = VerticalAlignment.Top;
+            //if (this.VerticalAlignment != VerticalAlignment.Top)
+            //    this.VerticalAlignment = VerticalAlignment.Top;
+            this.VerticalAlignment = VerticalAlignment.Top;
         }
 
         protected override void UnselectAllItems()

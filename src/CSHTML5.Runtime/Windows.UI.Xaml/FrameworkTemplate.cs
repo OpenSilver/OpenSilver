@@ -52,13 +52,7 @@ namespace Windows.UI.Xaml
         /// <returns>The instantiated template.</returns>
         internal FrameworkElement INTERNAL_InstantiateFrameworkTemplate()
         {
-            if (_methodToInstantiateFrameworkTemplate != null)
-            {
-                TemplateInstance templateInstance = _methodToInstantiateFrameworkTemplate(null); // We pass "null" in case of DataTemplate (unlike ControlTemplate), because there is no "templateOwner" for a DataTemplate.
-                return templateInstance.TemplateContent;
-            }
-            else
-                throw new Exception("The FrameworkTemplate was not properly initialized.");
+            return INTERNAL_InstantiateFrameworkTemplate(null);
         }
 
         /// <summary>
@@ -79,7 +73,7 @@ namespace Windows.UI.Xaml
             }
             else
             {
-                throw new Exception("The FrameworkTemplate was not properly initialized.");
+                return null;
             }
         }
 
@@ -95,9 +89,10 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException("templateOwner");
             }
 
+            templateOwner.INTERNAL_IsTemplated = true;
+
             if (_methodToInstantiateFrameworkTemplate != null)
             {
-                templateOwner.INTERNAL_IsTemplated = true;
 
                 // Instantiate the ControlTemplate:
                 TemplateInstance templateInstance = _methodToInstantiateFrameworkTemplate(templateOwner);
@@ -118,7 +113,6 @@ namespace Windows.UI.Xaml
             }
             else
             {
-                templateOwner.INTERNAL_IsTemplated = false;
                 return null;
             }
         }

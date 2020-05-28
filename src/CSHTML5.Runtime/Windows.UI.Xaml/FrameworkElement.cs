@@ -187,12 +187,7 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-        /// <summary>
-        /// Returns a list of the parents' resourceDictionaries that contain at least one implicit Style.
-        /// It excludes this FrameworkElement's own Resources so that we don't have to get the list from the parent.
-        /// </summary>
-        //internal List<ResourceDictionary> INTERNAL_InheritedImplicitStyles = null; //this is set in the INTERNAL_VisualTreeManager.AttachVisualChild_Private(UIElement child, UIElement parent) method
-
+        
         #endregion
 
         /// <summary>
@@ -318,11 +313,13 @@ namespace Windows.UI.Xaml
             set { SetValue(CursorProperty, value); }
         }
         public static readonly DependencyProperty CursorProperty =
-            DependencyProperty.Register("Cursor", typeof(Cursor), typeof(FrameworkElement), new PropertyMetadata()
-            {
-                MethodToUpdateDom = Cursor_MethodToUpdateDom,
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            });
+            DependencyProperty.Register("Cursor", 
+                                        typeof(Cursor), 
+                                        typeof(FrameworkElement), 
+                                        new PropertyMetadata((object)null)
+                                        {
+                                            MethodToUpdateDom = Cursor_MethodToUpdateDom,
+                                        });
 
         private static void Cursor_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -355,13 +352,14 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Identifies the IsEnabled dependency property.
         /// </summary>
-        public static readonly DependencyProperty IsEnabledProperty = DependencyProperty.Register("IsEnabled",
-                                                                                                  typeof(bool),
-                                                                                                  typeof(FrameworkElement),
-                                                                                                  new PropertyMetadata(true, IsEnabled_Changed, CoerceIsEnabledProperty)
-                                                                                                  {
-                                                                                                      MethodToUpdateDom = IsEnabled_MethodToUpdateDom,
-                                                                                                  });
+        public static readonly DependencyProperty IsEnabledProperty =
+            DependencyProperty.Register("IsEnabled",
+                                        typeof(bool),
+                                        typeof(FrameworkElement),
+                                        new PropertyMetadata(true, IsEnabled_Changed, CoerceIsEnabledProperty)
+                                        {
+                                            MethodToUpdateDom = IsEnabled_MethodToUpdateDom,
+                                        });
 
         private static void IsEnabled_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -479,17 +477,20 @@ namespace Windows.UI.Xaml
         /// Identifies the Name dependency property.
         /// </summary>
         public static readonly DependencyProperty NameProperty =
-            DependencyProperty.Register("Name", typeof(string), typeof(FrameworkElement), new PropertyMetadata(string.Empty)
-            {
-                MethodToUpdateDom = OnNameChanged_MethodToUpdateDom,
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            });
+            DependencyProperty.Register("Name", 
+                                        typeof(string), 
+                                        typeof(FrameworkElement), 
+                                        new PropertyMetadata(string.Empty)
+                                        {
+                                            MethodToUpdateDom = OnNameChanged_MethodToUpdateDom,
+                                        });
 
         private static void OnNameChanged_MethodToUpdateDom(DependencyObject d, object value)
         {
             var @this = (FrameworkElement)d;
             INTERNAL_HtmlDomManager.SetDomElementAttribute(@this.INTERNAL_OuterDomElement, "dataId", (value ?? string.Empty).ToString());
         }
+
         #endregion
 
         #region DataContext
@@ -529,10 +530,12 @@ namespace Windows.UI.Xaml
 
         /// <summary>Occurs when the data context for this element changes. </summary>
         public event DependencyPropertyChangedEventHandler DataContextChanged;
+
         #endregion
 
+        #region Work in progress
 #if WORKINPROGRESS
-        #region Triggers (not implemented)
+        #region Triggers
 
         public TriggerCollection Triggers
         {
@@ -542,10 +545,54 @@ namespace Windows.UI.Xaml
             }
         }
 
-        public static DependencyProperty TriggersProperty = DependencyProperty.Register("Triggers", typeof(TriggerCollection), typeof(FrameworkElement), new PropertyMetadata(new TriggerCollection())
-        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+        public static DependencyProperty TriggersProperty =
+            DependencyProperty.Register("Triggers",
+                                        typeof(TriggerCollection),
+                                        typeof(FrameworkElement),
+                                        new PropertyMetadata(new TriggerCollection()));
 
         #endregion
+
+        public event EventHandler LayoutUpdated;
+
+        public static readonly DependencyProperty FlowDirectionProperty =
+            DependencyProperty.Register("FlowDirection",
+                                        typeof(FlowDirection),
+                                        typeof(FrameworkElement),
+                                        new PropertyMetadata(FlowDirection.LeftToRight));
+
+        /// <summary>
+        /// Gets or sets the direction that text and other user interface 
+        /// elements flow within any parent element that controls their layout.
+        /// </summary>
+        /// <returns>
+        /// The direction that text and other UI elements flow within their 
+        /// parent element, as a value of the enumeration. The default value 
+        /// is <see cref="FlowDirection.LeftToRight" />.
+        /// </returns>
+        public FlowDirection FlowDirection
+        {
+            get
+            {
+                return (FlowDirection)this.GetValue(FrameworkElement.FlowDirectionProperty);
+            }
+            set
+            {
+                this.SetValue(FrameworkElement.FlowDirectionProperty, (Enum)value);
+            }
+        }
+
+        public static readonly DependencyProperty LanguageProperty =
+            DependencyProperty.Register("Language",
+                                        typeof(XmlLanguage),
+                                        typeof(FrameworkElement),
+                                        null);
+
+        public XmlLanguage Language
+        {
+            get { return (XmlLanguage)this.GetValue(LanguageProperty); }
+            set { this.SetValue(LanguageProperty, value); }
+        }
 
         //
         // Summary:
@@ -583,6 +630,7 @@ namespace Windows.UI.Xaml
             return new Size();
         }
 #endif
+        #endregion Work in progress
 
         #region Tag
 
@@ -595,12 +643,15 @@ namespace Windows.UI.Xaml
             get { return (object)GetValue(TagProperty); }
             set { SetValue(TagProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Tag dependency property.
         /// </summary>
         public static readonly DependencyProperty TagProperty =
-            DependencyProperty.Register("Tag", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Tag", 
+                                        typeof(object), 
+                                        typeof(FrameworkElement), 
+                                        new PropertyMetadata((object)null));
 
         #endregion
 
@@ -626,11 +677,15 @@ namespace Windows.UI.Xaml
             get { return _styleCache; }
             set { SetValue(StyleProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Style dependency property.
         /// </summary>
         public static readonly DependencyProperty StyleProperty =
-            DependencyProperty.Register("Style", typeof(Style), typeof(FrameworkElement), new PropertyMetadata(null, OnStyleChanged));
+            DependencyProperty.Register("Style", 
+                                        typeof(Style), 
+                                        typeof(FrameworkElement), 
+                                        new PropertyMetadata(null, OnStyleChanged));
 
         private static void OnStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -828,11 +883,14 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the System.Windows.FrameworkElement.DefaultStyleKey dependency
+        /// Identifies the <see cref="FrameworkElement.DefaultStyleKey"/> dependency
         /// property.
         /// </summary>
         public static readonly DependencyProperty DefaultStyleKeyProperty =
-            DependencyProperty.Register("DefaultStyleKey", typeof(object), typeof(FrameworkElement), new PropertyMetadata(null, OnThemeStyleKeyChanged));
+            DependencyProperty.Register("DefaultStyleKey", 
+                                        typeof(object), 
+                                        typeof(FrameworkElement), 
+                                        new PropertyMetadata(null, OnThemeStyleKeyChanged));
 
         private static void OnThemeStyleKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1004,9 +1062,9 @@ namespace Windows.UI.Xaml
             get { return _themeStyleCache; }
         }
 
-        #endregion
+        #endregion DefaultStyleKey
 
-        #endregion
+        #endregion Handling Styles
 
         #region Loaded/Unloaded events
 
@@ -1087,37 +1145,6 @@ namespace Windows.UI.Xaml
             }
         }
         #endregion
-
-
-#if WORKINPROGRESS
-
-        public event EventHandler LayoutUpdated;
-
-        public static readonly DependencyProperty FlowDirectionProperty = DependencyProperty.Register("FlowDirection", typeof(FlowDirection), typeof(FrameworkElement), new PropertyMetadata(FlowDirection.LeftToRight)
-        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-
-        /// <summary>Gets or sets the direction that text and other user interface elements flow within any parent element that controls their layout.</summary>
-        /// <returns>The direction that text and other UI elements flow within their parent element, as a value of the enumeration. The default value is <see cref="F:System.Windows.FlowDirection.LeftToRight" />.</returns>
-        public FlowDirection FlowDirection
-        {
-            get
-            {
-                return (FlowDirection)this.GetValue(FrameworkElement.FlowDirectionProperty);
-            }
-            set
-            {
-                this.SetValue(FrameworkElement.FlowDirectionProperty, (Enum)value);
-            }
-        }
-
-        public static readonly DependencyProperty LanguageProperty = DependencyProperty.Register("Language", typeof(XmlLanguage), typeof(FrameworkElement), null);
-
-        public XmlLanguage Language
-        {
-            get { return (XmlLanguage)this.GetValue(LanguageProperty); }
-            set { this.SetValue(LanguageProperty, value); }
-        }
-#endif
 
 #if REWORKLOADED
         internal override void INTERNAL_FinalizeAttachToParent()

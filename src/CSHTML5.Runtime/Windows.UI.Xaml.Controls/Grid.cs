@@ -660,6 +660,8 @@ namespace Windows.UI.Xaml.Controls
 
         internal protected override void INTERNAL_OnDetachedFromVisualTree()
         {
+            base.INTERNAL_OnDetachedFromVisualTree();
+
             _currentCellsStructure = null;
             _innerDiv = null;
             _currentDomTable = null;

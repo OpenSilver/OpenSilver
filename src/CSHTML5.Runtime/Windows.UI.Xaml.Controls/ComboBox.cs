@@ -427,6 +427,8 @@ namespace Windows.UI.Xaml.Controls
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
+            base.INTERNAL_OnAttachedToVisualTree();
+
             // We update the ItemsPanel only if we use the native ComboBox. Otherwise, it will be done in the "OnApplyTemplate" method.
             if (_useNativeComboBox)
             {

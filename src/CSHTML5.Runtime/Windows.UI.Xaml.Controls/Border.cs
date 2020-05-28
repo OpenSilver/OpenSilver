@@ -100,6 +100,8 @@ namespace Windows.UI.Xaml.Controls
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
+            base.INTERNAL_OnAttachedToVisualTree();
+
             if (this.BorderBrush == null)
             {
                 INTERNAL_PropertyStore.ApplyCssChanges(null, null, Border.BorderBrushProperty.GetMetadata(typeof(Border)), this);

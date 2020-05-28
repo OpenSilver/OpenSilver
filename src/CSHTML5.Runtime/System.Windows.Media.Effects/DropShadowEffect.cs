@@ -109,15 +109,14 @@ namespace System.Windows.Media.Effects
         /// property.
         /// </summary>
         public static readonly DependencyProperty BlurRadiusProperty =
-            DependencyProperty.Register("BlurRadius", typeof(double), typeof(DropShadowEffect), new PropertyMetadata(5d, ManageChange)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("BlurRadius", 
+                                        typeof(double), 
+                                        typeof(DropShadowEffect), 
+                                        new PropertyMetadata(5d, ManageChange));
+
         private static void ManageChange(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            DropShadowEffect shadow = (DropShadowEffect)d;
-            if (shadow._parentUIElement != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(shadow._parentUIElement))
-            {
-                shadow.RefreshEffect();
-            }
+            ((DropShadowEffect)d).RefreshEffect();
         }
 
         /// <summary>
@@ -133,8 +132,10 @@ namespace System.Windows.Media.Effects
         /// property.
         /// </summary>
         public static readonly DependencyProperty ColorProperty =
-            DependencyProperty.Register("Color", typeof(Color), typeof(DropShadowEffect), new PropertyMetadata(Colors.Black, ManageChange)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Color", 
+                                        typeof(Color), 
+                                        typeof(DropShadowEffect), 
+                                        new PropertyMetadata(Colors.Black, ManageChange));
 
         /// <summary>
         /// Gets or sets the direction of the drop shadow.
@@ -149,8 +150,10 @@ namespace System.Windows.Media.Effects
         /// property.
         /// </summary>
         public static readonly DependencyProperty DirectionProperty =
-            DependencyProperty.Register("Direction", typeof(double), typeof(DropShadowEffect), new PropertyMetadata(315d, ManageChange)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Direction", 
+                                        typeof(double), 
+                                        typeof(DropShadowEffect), 
+                                        new PropertyMetadata(315d, ManageChange));
 
         /// <summary>
         /// Gets or sets the opacity of the drop shadow.
@@ -165,8 +168,10 @@ namespace System.Windows.Media.Effects
         /// property.
         /// </summary>
         public static readonly DependencyProperty OpacityProperty =
-            DependencyProperty.Register("Opacity", typeof(double), typeof(DropShadowEffect), new PropertyMetadata(1d, ManageChange)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Opacity", 
+                                        typeof(double), 
+                                        typeof(DropShadowEffect), 
+                                        new PropertyMetadata(1d, ManageChange));
 
         //// Returns:
         ////     A System.Windows.Media.Effects.RenderingBias value that indicates whether
@@ -201,8 +206,10 @@ namespace System.Windows.Media.Effects
         /// dependency property.
         /// </summary>
         public static readonly DependencyProperty ShadowDepthProperty =
-            DependencyProperty.Register("ShadowDepth", typeof(double), typeof(DropShadowEffect), new PropertyMetadata(5d, ManageChange)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("ShadowDepth", 
+                                        typeof(double), 
+                                        typeof(DropShadowEffect), 
+                                        new PropertyMetadata(5d, ManageChange));
 
         ///// <summary>
         ///// Creates a modifiable clone of this System.Windows.Media.Effects.Effect object,

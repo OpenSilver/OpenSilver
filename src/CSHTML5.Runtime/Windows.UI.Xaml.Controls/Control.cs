@@ -62,7 +62,7 @@ namespace Windows.UI.Xaml.Controls
         //      - RegisterName
         //END OF COMMENT
 
-        internal UIElement _renderedControlTemplate = null;
+        internal FrameworkElement _renderedControlTemplate = null;
         private bool _isDisabled = false;
 
         /// <summary>
@@ -128,20 +128,12 @@ namespace Windows.UI.Xaml.Controls
                         Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
                     };
                 },
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            }
-            );
+            });
 
 #if REVAMPPOINTEREVENTS
-        internal virtual void OnBackgroundPropertyChanged(Brush background)
-        {
-            INTERNAL_UpdateCssPointerEvents(this);
-        }
-
         private static void Background_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            Control control = (Control)d;
-            control.OnBackgroundPropertyChanged(e.NewValue as Brush);
+            INTERNAL_UpdateCssPointerEvents((Control)d);
         }
 #endif
 
@@ -178,9 +170,7 @@ namespace Windows.UI.Xaml.Controls
                         Name = new List<string> { "borderColor" },
                     };
                 },
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            }
-            );
+            });
 
         //-----------------------
         // BORDERTHICKNESS
@@ -197,8 +187,13 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the BorderThickness dependency property.
         /// </summary>
         public static readonly DependencyProperty BorderThicknessProperty =
-            DependencyProperty.Register("BorderThickness", typeof(Thickness), typeof(Control), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = BorderThickness_MethodToUpdateDom,
-            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("BorderThickness", 
+                                        typeof(Thickness), 
+                                        typeof(Control), 
+                                        new PropertyMetadata(new Thickness())
+                                        {
+                                            MethodToUpdateDom = BorderThickness_MethodToUpdateDom,
+                                        });
 
         static void BorderThickness_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -249,9 +244,7 @@ namespace Windows.UI.Xaml.Controls
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
                     };
                 },
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            }
-            );
+            });
 
 
         /// <summary>
@@ -323,9 +316,7 @@ namespace Windows.UI.Xaml.Controls
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
                     };
                 },
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            }
-            );
+            });
 
 
         //-----------------------
@@ -379,9 +370,7 @@ namespace Windows.UI.Xaml.Controls
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
                     };
                 },
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            }
-            );
+            });
 
 
         //-----------------------
@@ -430,9 +419,7 @@ namespace Windows.UI.Xaml.Controls
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
                     };
                 },
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            }
-            );
+            });
 
         //-----------------------
         // TEXTDECORATION
@@ -451,14 +438,14 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the TextDecorations dependency property.
         /// </summary>
-        public static readonly DependencyProperty TextDecorationsProperty = DependencyProperty.Register("TextDecorations",
-                                                                                                        typeof(TextDecorationCollection),
-                                                                                                        typeof(Control),
-                                                                                                        new PropertyMetadata(System.Windows.TextDecorations.None)
-                                                                                                        {
-                                                                                                            GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations,
-                                                                                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                                                                                                        });
+        public static readonly DependencyProperty TextDecorationsProperty = 
+            DependencyProperty.Register("TextDecorations",
+                                        typeof(TextDecorationCollection),
+                                        typeof(Control),
+                                        new PropertyMetadata(System.Windows.TextDecorations.None)
+                                        {
+                                            GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations,
+                                        });
         internal static CSSEquivalent INTERNAL_GetCSSEquivalentForTextDecorations(DependencyObject instance)
         {
             return new CSSEquivalent()
@@ -500,12 +487,13 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the TextDecorations dependency property.
         /// </summary>
         public static readonly DependencyProperty TextDecorationsProperty =
-            DependencyProperty.Register("TextDecorations", typeof(TextDecorations?), typeof(Control), new PropertyMetadata(null)
-            {
-                GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations,
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            }
-            );
+            DependencyProperty.Register("TextDecorations", 
+                                        typeof(TextDecorations?), 
+                                        typeof(Control), 
+                                        new PropertyMetadata(null)
+                                        {
+                                            GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations,
+                                        });
 
         internal static CSSEquivalent INTERNAL_GetCSSEquivalentForTextDecorations(DependencyObject instance)
         {
@@ -571,8 +559,13 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Padding dependency property.
         /// </summary>
         public static readonly DependencyProperty PaddingProperty =
-            DependencyProperty.Register("Padding", typeof(Thickness), typeof(Control), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = Padding_MethodToUpdateDom,
-            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Padding", 
+                                        typeof(Thickness), 
+                                        typeof(Control), 
+                                        new PropertyMetadata(new Thickness()) 
+                                        { 
+                                            MethodToUpdateDom = Padding_MethodToUpdateDom,
+                                        });
         private static void Padding_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             var control = (Control)d;
@@ -619,8 +612,10 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the HorizontalContentAlignment dependency property.
         /// </summary>
         public static readonly DependencyProperty HorizontalContentAlignmentProperty =
-            DependencyProperty.Register("HorizontalContentAlignment", typeof(HorizontalAlignment), typeof(Control), new PropertyMetadata(HorizontalAlignment.Center)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("HorizontalContentAlignment", 
+                                        typeof(HorizontalAlignment), 
+                                        typeof(Control), 
+                                        new PropertyMetadata(HorizontalAlignment.Center));
 
 
         //-----------------------
@@ -640,8 +635,10 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the VerticalContentAlignment dependency property.
         /// </summary>
         public static readonly DependencyProperty VerticalContentAlignmentProperty =
-            DependencyProperty.Register("VerticalContentAlignment", typeof(VerticalAlignment), typeof(Control), new PropertyMetadata(VerticalAlignment.Center)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("VerticalContentAlignment", 
+                                        typeof(VerticalAlignment), 
+                                        typeof(Control), 
+                                        new PropertyMetadata(VerticalAlignment.Center));
 
 
         //-----------------------
@@ -659,11 +656,13 @@ namespace Windows.UI.Xaml.Controls
             set { SetValue(TabIndexProperty, value); }
         }
         public static readonly DependencyProperty TabIndexProperty =
-            DependencyProperty.Register("TabIndex", typeof(int), typeof(Control), new PropertyMetadata(int.MaxValue)
-            {
-                MethodToUpdateDom = TabIndexProperty_MethodToUpdateDom,
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            });
+            DependencyProperty.Register("TabIndex", 
+                                        typeof(int), 
+                                        typeof(Control), 
+                                        new PropertyMetadata(int.MaxValue)
+                                        {
+                                            MethodToUpdateDom = TabIndexProperty_MethodToUpdateDom,
+                                        });
 
         const int TABINDEX_BROWSER_MAX_VALUE = 32767;
 
@@ -740,17 +739,23 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Control.IsTabStop dependency property.
         /// </summary>
         public static readonly DependencyProperty IsTabStopProperty =
-            DependencyProperty.Register("IsTabStop", typeof(bool), typeof(Control), new PropertyMetadata(true)
-            {
-                //MethodToUpdateDom = TabIndexProperty_MethodToUpdateDom,
-                MethodToUpdateDom = TabStopProperty_MethodToUpdateDom,
-            });
+            DependencyProperty.Register("IsTabStop",    
+                                        typeof(bool), 
+                                        typeof(Control), 
+                                        new PropertyMetadata(true)
+                                        {
+                                            MethodToUpdateDom = TabStopProperty_MethodToUpdateDom,
+                                        });
 
         //-----------------------
         // TEMPLATE
         //-----------------------
 
-        internal bool INTERNAL_IsTemplated = false; //todo: use only this or HasTemplate (whith IsTemplated's efficiency, which means not reading the DependencyProperty and HasTemplate's accuracy, which means taking into consideration INTERNAL_DoNotApplyControlTemplate).
+        // todo: use only this or HasTemplate (whith IsTemplated's 
+        // efficiency, which means not reading the DependencyProperty 
+        // and HasTemplate's accuracy, which means taking into 
+        // consideration INTERNAL_DoNotApplyControlTemplate).
+        internal bool INTERNAL_IsTemplated = false; 
 
         /// <summary>
         /// Gets or sets a control template.
@@ -764,39 +769,78 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Template dependency property.
         /// </summary>
         public static readonly DependencyProperty TemplateProperty =
-            DependencyProperty.Register("Template", typeof(ControlTemplate), typeof(Control), new PropertyMetadata(null, Template_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Template", 
+                                        typeof(ControlTemplate), 
+                                        typeof(Control), 
+                                        new PropertyMetadata(null, OnTemplateChanged));
 
-        private static void Template_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Control control = (Control)d;
-            ControlTemplate controlTemplate = (ControlTemplate)e.NewValue;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(control))
+
+            control.INTERNAL_IsTemplated = e.NewValue != null;
+
+            // First detach previously attached template if any
+            if (control._renderedControlTemplate != null)
             {
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(control._renderedControlTemplate, control);
+                control._renderedControlTemplate = null;
+                control.ClearRegisteredNames();
+                control.INTERNAL_GetVisualStateGroups().Clear();
+            }
 
-                //detach the former control:
-                if (control._renderedControlTemplate != null)
-                {
-                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(control._renderedControlTemplate, control);
-                    control._renderedControlTemplate = null;
-                    control.ClearRegisteredNames();
-                    control.INTERNAL_GetVisualStateGroups().Clear();
-                }
+            control.ApplyTemplate();
+        }
 
-                //attach the new control:
-                //attacher controlTemplate.INTERNAL_InstantiateFrameworkTemplate();
-                FrameworkElement generatedControl;
-                if (controlTemplate != null && !control.INTERNAL_DoNotApplyControlTemplate)
+        public bool ApplyTemplate()
+        {
+            bool visualsCreated = false;
+            FrameworkElement visualChild = null;
+
+            if (this.INTERNAL_IsTemplated &&
+               !this.INTERNAL_DoNotApplyControlTemplate &&
+                INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                ControlTemplate template = this.Template;
+
+                // we only apply the template if no template has been
+                // rendered already for this control.
+                if (this._renderedControlTemplate == null)
                 {
-                    // Apply the control template:
-                    generatedControl = controlTemplate.INTERNAL_InstantiateAndAttachControlTemplate(templateOwner: control);
-                    control._renderedControlTemplate = generatedControl;
+                    visualChild = template.INTERNAL_InstantiateFrameworkTemplate(this);
+                    if (visualChild != null)
+                    {
+                        visualsCreated = true;
+                    }
                 }
                 else
                 {
-                    //todo: display the child the same way as in Content_Changed.
+                    visualChild = this._renderedControlTemplate;
                 }
             }
+
+#if REWORKLOADED
+            this.AddVisualChild(visualChild);
+#else
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(visualChild, this);
+#endif
+
+            if (visualsCreated)
+            {
+                // Raise the OnApplyTemplate method
+                this.OnApplyTemplate();
+
+                this._renderedControlTemplate = visualChild;
+            }
+
+            return visualsCreated;
+        }
+
+        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        {
+            base.INTERNAL_OnAttachedToVisualTree();
+
+            this.ApplyTemplate();
         }
 
         /// <summary>
@@ -818,7 +862,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
 
-        #region ---------- INameScope implementation ----------
+#region ---------- INameScope implementation ----------
         //note: copy from UserControl
         Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
 
@@ -866,20 +910,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
 
-        #endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endregion
 
         //-----------------------
         // OTHER
@@ -1165,8 +1196,10 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         }
 
         public static readonly DependencyProperty TabNavigationProperty = 
-            DependencyProperty.Register("TabNavigation", typeof(KeyboardNavigationMode), typeof(Control), new PropertyMetadata(KeyboardNavigationMode.Local)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("TabNavigation", 
+                                        typeof(KeyboardNavigationMode), 
+                                        typeof(Control), 
+                                        new PropertyMetadata(KeyboardNavigationMode.Local));
 
         public KeyboardNavigationMode TabNavigation
         {
@@ -1175,8 +1208,10 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         }
 
         public static readonly DependencyProperty FontStretchProperty = 
-            DependencyProperty.Register("FontStretch", typeof(FontStretch), typeof(Control), new PropertyMetadata(new FontStretch())
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("FontStretch", 
+                                        typeof(FontStretch), 
+                                        typeof(Control), 
+                                        new PropertyMetadata(new FontStretch()));
 
         /// <summary>
         ///     The stretch of the desired font.
@@ -1199,11 +1234,6 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         protected virtual void OnTextInput(TextCompositionEventArgs e)
         {
 
-        }
-
-        public bool ApplyTemplate()
-        {
-            return false;
         }
 
         protected virtual void OnDrop(DragEventArgs e)

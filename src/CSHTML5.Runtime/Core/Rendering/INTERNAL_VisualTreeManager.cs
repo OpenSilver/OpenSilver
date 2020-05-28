@@ -668,20 +668,19 @@ if(nextSibling != undefined) {
 
         static void RenderElementsAndRaiseChangedEventOnAllDependencyProperties(DependencyObject dependencyObject)
         {
+            //--------------------------------------------------------------
+            // RAISE "PROPERTYCHANGED" FOR ALL THE PROPERTIES THAT HAVE 
+            // A VALUE THAT HAS BEEN SET, INCLUDING ATTACHED PROPERTIES, 
+            // AND CALL THE "METHOD TO UPDATE DOM"
+            //--------------------------------------------------------------
 
-            //#if CSHTML5BLAZOR && DEBUG
-            //            string prettyPrintDependencyObject = dependencyObject + (dependencyObject != null ? "(" + dependencyObject.GetHashCode().ToString() +")" : "");
-            //            Console.WriteLine("OPENSILVER DEBUG: VisualTreeManager: RenderElementsAndRaiseChangedEventOnAllDependencyProperties: dependencyObject:" + prettyPrintDependencyObject);
-            //#endif
+            // This is used to force a redraw of all the properties that are 
+            // set on the object (including Attached Properties!). For 
+            // example, if a Border has a colored background, this is the 
+            // moment when that color will be applied. Properties that have 
+            // no value set by the user are not concerned (their default 
+            // state is rendered elsewhere).
 
-            // To prevent raising the property multiple times, we keep track of the properties for which we already raised the "PropertyChanged" event:
-            //Dictionary<DependencyProperty, DependencyProperty> propertiesForWhichTheEventHasAlreadyBeenRaised = new Dictionary<DependencyProperty, DependencyProperty>(); //todo: replace with HashSet<DependencyProperty> when available.
-
-            //------------------------------------------------------------------------------------------------------------------
-            // RAISE "PROPERTYCHANGED" FOR ALL THE PROPERTIES THAT HAVE A VALUE THAT HAS BEEN SET, INCLUDING ATTACHED PROPERTIES, AND CALL THE "METHOD TO UPDATE DOM":
-            //------------------------------------------------------------------------------------------------------------------
-
-            // This is used to force a redraw of all the properties that are set on the object (including Attached Properties!). For example, if a Border has a colored background, this is the moment when that color will be applied. Properties that have no value set by the user are not concerned (their default state is rendered elsewhere).
 #if PERFSTAT
             var t0 = Performance.now();
 #endif
@@ -715,9 +714,10 @@ if(nextSibling != undefined) {
                     object value = null;
                     bool valueWasRetrieved = false;
 
-                    //--------------------
+                    //--------------------------------------------------
                     // Call "Apply CSS", which uses "GetCSSEquivalent/s"
-                    //--------------------
+                    //--------------------------------------------------
+
                     if (propertyMetadata.GetCSSEquivalent != null || propertyMetadata.GetCSSEquivalents != null)
                     {
                         if (!valueWasRetrieved)
@@ -729,9 +729,9 @@ if(nextSibling != undefined) {
                         INTERNAL_PropertyStore.ApplyCssChanges(value, value, propertyMetadata, storage.Owner);
                     }
 
-                    //--------------------
+                    //--------------------------------------------------
                     // Call "MethodToUpdateDom"
-                    //--------------------
+                    //--------------------------------------------------
                     if (propertyMetadata.MethodToUpdateDom != null)
                     {
                         if (!valueWasRetrieved)
@@ -740,13 +740,13 @@ if(nextSibling != undefined) {
                             valueWasRetrieved = true;
                         }
 
-                        // Call the "Method to update DOM":
+                        // Call the "Method to update DOM"
                         propertyMetadata.MethodToUpdateDom(storage.Owner, value);
                     }
 
-                    //--------------------
+                    //--------------------------------------------------
                     // Call PropertyChanged
-                    //--------------------
+                    //--------------------------------------------------
 
                     if (propertyMetadata.PropertyChangedCallback != null
                         && propertyMetadata.CallPropertyChangedWhenLoadedIntoVisualTree != WhenToCallPropertyChangedEnum.Never)
@@ -757,7 +757,7 @@ if(nextSibling != undefined) {
                             valueWasRetrieved = true;
                         }
 
-                        // Raise the "PropertyChanged" event:
+                        // Raise the "PropertyChanged" event
                         propertyMetadata.PropertyChangedCallback(storage.Owner, new DependencyPropertyChangedEventArgs(value, value, property));
                     }
                 }
@@ -767,47 +767,6 @@ if(nextSibling != undefined) {
                 Performance.Counter("VisualTreeManager: RaisePropertyChanged for property '" + property.Name + "'", t1);
 #endif
             }
-            /*
-            //------------------------------------------------------------------------------------
-            // RAISE "PROPERTYCHANGED" FOR ALL THE OTHER PROPERTIES THAT REQUIRE IT
-            //------------------------------------------------------------------------------------
-
-            // When a dependency property is not set, we usually do not raise the "PropertyChanged" event, unless the property has its "CallPropertyChangedWhenLoadedIntoVisualTree" property set to "Always" in its TypeMetadata:
-            var type = dependencyObject.GetType();
-            // Iterate through all the inheritance parents of the type (we use a Stack to revert the order):
-            Stack<Type> typeAndItsInheritanceParents = new Stack<Type>();
-            while (type != null)
-            {
-                typeAndItsInheritanceParents.Push(type);
-                type = type.BaseType;
-            }
-            while (typeAndItsInheritanceParents.Count > 0)
-            {
-                type = typeAndItsInheritanceParents.Pop();
-                if (INTERNAL_TypeToDependencyPropertiesThatRequirePropertyChanged.TypeToDependencyPropertiesThatRequirePropertyChanged.ContainsKey(type))
-                {
-                    // Raise the "PropertyChanged" for all the DependencyProperties of the object that require it:
-                    foreach (DependencyProperty dependencyProperty in INTERNAL_TypeToDependencyPropertiesThatRequirePropertyChanged.TypeToDependencyPropertiesThatRequirePropertyChanged[type])
-                    {
-                        if (!propertiesForWhichTheEventHasAlreadyBeenRaised.ContainsKey(dependencyProperty)
-                            && dependencyProperty.TypeMetadata.PropertyChangedCallback != null)
-                        {
-                            // Get the value:
-                            object value;
-                            if (dependencyObject.INTERNAL_PropertyStorageDictionary.ContainsKey(dependencyProperty))
-                                value = dependencyObject.GetValue(dependencyProperty);
-                            else if (dependencyProperty.TypeMetadata != null)
-                                value = dependencyProperty.TypeMetadata.DefaultValue;
-                            else
-                                value = null;
-
-                            // Raise the "PropertyChanged":
-                            dependencyProperty.TypeMetadata.PropertyChangedCallback(dependencyObject, new DependencyPropertyChangedEventArgs(value, value, dependencyProperty));
-                        }
-                    }
-                }
-            }
-             */
         }
 
 #if !BRIDGE

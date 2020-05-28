@@ -86,7 +86,7 @@ namespace Windows.UI.Xaml.Controls
             if (this._templateCache != null)
             {
                 // Create an instance of the Panel
-                FrameworkElement visualTree = this._templateCache.INTERNAL_InstantiateFrameworkTemplate();
+                FrameworkElement visualTree = this._templateCache.INTERNAL_InstantiateFrameworkTemplate(null);
                 Panel panel = visualTree as Panel;
                 if (panel != null)
                 {
@@ -106,7 +106,7 @@ namespace Windows.UI.Xaml.Controls
                     throw new InvalidOperationException(string.Format("VisualTree of ItemsPanelTemplate must contain a Panel. '{0}' is not a Panel.", visualTree.GetType()));
                 }
 
-                // attach the newly generated panel.
+                // attach the panel.
 #if REWORKLOADED
                 this.AddVisualChild(panel);
 #else

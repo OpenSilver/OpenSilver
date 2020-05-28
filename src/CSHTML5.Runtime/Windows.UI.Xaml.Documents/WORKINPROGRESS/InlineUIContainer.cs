@@ -46,7 +46,12 @@ namespace Windows.UI.Xaml.Documents
                 if (this._isLoaded)
                 {
                     INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
+
+#if REWORKLOADED
+                    AddVisualChild(value);
+#else
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
+#endif
                 }
                 _child = value;
             }
@@ -54,7 +59,13 @@ namespace Windows.UI.Xaml.Documents
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
+            base.INTERNAL_OnAttachedToVisualTree();
+
+#if REWORKLOADED
+            AddVisualChild(_child);
+#else
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
+#endif
         }
     }
 }

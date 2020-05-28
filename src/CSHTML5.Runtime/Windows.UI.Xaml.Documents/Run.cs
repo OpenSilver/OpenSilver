@@ -81,6 +81,7 @@ namespace Windows.UI.Xaml.Documents
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
+
             INTERNAL_HtmlDomManager.SetContentString(this, (string)CoerceTextProperty(this, this.Text));
         }
     }

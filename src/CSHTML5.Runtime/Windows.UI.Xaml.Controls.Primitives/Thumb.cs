@@ -195,6 +195,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
+
             if (!CSHTML5.Interop.IsRunningInTheSimulator)
             {
                 // Prevent the selection of text while dragging from the thumb

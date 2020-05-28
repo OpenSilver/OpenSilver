@@ -98,7 +98,8 @@ namespace Windows.UI.Xaml.Controls
                 _grid = new Grid();
                 MakeUIStructure();
             }
-            ManageChildrenChanged(Children, Children);
+
+            base.INTERNAL_OnAttachedToVisualTree();
         }
 
         private void MakeUIStructure()

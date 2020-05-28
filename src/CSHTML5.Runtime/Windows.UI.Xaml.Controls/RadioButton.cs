@@ -137,7 +137,7 @@ var radioButtonDomElement = document.getElementById(""{1}"");
 
         #region new version of handling IsChecked
 
-        
+
         internal void ChangedEventReceived()
         {
             bool newIsChecked = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.checked", INTERNAL_OptionalSpecifyDomElementConcernedByFocus)); //Note: this should be sufficient since a RadioButton cannot be in an indeterminate state.
@@ -240,11 +240,13 @@ var radios = document.getElementsByName( $0 );
                                     $0.dispatchEvent(evt);", INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
         }
 
-#endregion
+        #endregion
 
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
+            base.INTERNAL_OnAttachedToVisualTree();
+            
             if (this.HasTemplate)
             {
                 //there is a template so we need to make specific changes to make it work with the other RadioButtons
@@ -252,10 +254,6 @@ var radios = document.getElementsByName( $0 );
                 INTERNAL_HtmlDomManager.SetDomElementAttribute(this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus, "checked", IsChecked, forceSimulatorExecuteImmediately: true);
                 INTERNAL_CheckBoxAndRadioButtonHelpers.SubscribeToBasicEventsForRadioButton(this, this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus, this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
                 UpdateDomBasedOnCheckedState(IsChecked);
-            }
-            else
-            {
-                base.INTERNAL_OnAttachedToVisualTree();
             }
 
             if (string.IsNullOrWhiteSpace(GroupName))

@@ -100,45 +100,52 @@ namespace Windows.UI.Xaml
             get { return (double)GetValue(HeightProperty); }
             set { SetValue(HeightProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Height dependency property.
         /// </summary>
         public static readonly DependencyProperty HeightProperty =
-            DependencyProperty.Register("Height", typeof(double), typeof(FrameworkElement), new PropertyMetadata(double.NaN)
-            {
-                GetCSSEquivalent = (instance) =>
-                {
-                    return new CSSEquivalent()
-                    {
-                        Value = (inst, value) =>
-                        {
-                            if (value is double)
-                            {
-                                return !double.IsNaN((double)value) ? value.ToString() + "px" : "auto";
-                            }
-                            throw new InvalidOperationException("Error when trying to set FrameworkElement.Height: expected double, got " + value.GetType().FullName);
-                        },
-                        CallbackMethod = Height_Changed,
-                        UIElement = (UIElement)instance,
-                        Name = new List<string> { "height" },
-                        ApplyAlsoWhenThereIsAControlTemplate = true
-                    };
-                },
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            });
+            DependencyProperty.Register("Height",
+                                        typeof(double),
+                                        typeof(FrameworkElement),
+                                        new PropertyMetadata(double.NaN)
+                                        {
+                                            GetCSSEquivalent = (instance) =>
+                                            {
+                                                return new CSSEquivalent()
+                                                {
+                                                    Value = (inst, value) =>
+                                                    {
+                                                        if (value is double)
+                                                        {
+                                                            return !double.IsNaN((double)value) ? value.ToString() + "px" : "auto";
+                                                        }
+                                                        throw new InvalidOperationException("Error when trying to set FrameworkElement.Height: expected double, got " + value.GetType().FullName);
+                                                    },
+                                                    CallbackMethod = Height_Changed,
+                                                    UIElement = (UIElement)instance,
+                                                    Name = new List<string> { "height" },
+                                                    ApplyAlsoWhenThereIsAControlTemplate = true
+                                                };
+                                            },
+                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                                        });
 
         private static void Height_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var frameworkElement = (FrameworkElement)d;
 
 #if !PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
-            // We need to update vertical alignment because of the "Stretch" case which depends on whether the Height is set. It also makes the code simpler. //todo-performance: call only the relevant code in "INTERNAL_ApplyVerticalAlignmentAndHeight" not the whole method?
+            // We need to update vertical alignment because of the "Stretch" 
+            // case which depends on whether the Height is set. It also makes 
+            // the code simpler. //todo-performance: call only the relevant 
+            // code in "INTERNAL_ApplyVerticalAlignmentAndHeight" not the 
+            // whole method?
             INTERNAL_ApplyVerticalAlignmentAndHeight(frameworkElement, frameworkElement.VerticalAlignment);
 #else
             RefreshHeight(frameworkElement);
 #endif
             frameworkElement.HandleSizeChanged();
-
         }
 
 #if PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
@@ -188,38 +195,47 @@ namespace Windows.UI.Xaml
             get { return (double)GetValue(WidthProperty); }
             set { SetValue(WidthProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Width dependency property.
         /// </summary>
         public static readonly DependencyProperty WidthProperty =
-            DependencyProperty.Register("Width", typeof(double), typeof(FrameworkElement), new PropertyMetadata(double.NaN, null)
-            {
-                GetCSSEquivalent = (instance) =>
-                {
-                    return new CSSEquivalent()
-                    {
-                        Value = (inst, value) =>
-                        {
-                            if (value is double)
-                            {
-                                return !double.IsNaN((double)value) ? value.ToString() + "px" : "auto";
-                            }
-                            throw new InvalidOperationException("Error when trying to set FrameworkElement.Width: expected double, got " + value.GetType().FullName);
-                        },
-                        CallbackMethod = Width_Changed,
-                        UIElement = (UIElement)instance,
-                        Name = new List<string> { "width" },
-                        ApplyAlsoWhenThereIsAControlTemplate = true
-                    };
-                },
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            });
+            DependencyProperty.Register("Width",
+                                        typeof(double),
+                                        typeof(FrameworkElement),
+                                        new PropertyMetadata(double.NaN)
+                                        {
+                                            GetCSSEquivalent = (instance) =>
+                                            {
+                                                return new CSSEquivalent()
+                                                {
+                                                    Value = (inst, value) =>
+                                                    {
+                                                        if (value is double)
+                                                        {
+                                                            return !double.IsNaN((double)value) ? value.ToString() + "px" : "auto";
+                                                        }
+                                                        throw new InvalidOperationException("Error when trying to set FrameworkElement.Width: expected double, got " + value.GetType().FullName);
+                                                    },
+                                                    CallbackMethod = Width_Changed,
+                                                    UIElement = (UIElement)instance,
+                                                    Name = new List<string> { "width" },
+                                                    ApplyAlsoWhenThereIsAControlTemplate = true
+                                                };
+                                            },
+                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                                        });
+
         internal static void Width_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var frameworkElement = (FrameworkElement)d;
 
 #if !PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
-            // We need to update horizontal alignment because of the "Stretch" case which depends on whether the Width is set. It also makes the code simpler. //todo-performance: call only the relevant code in "INTERNAL_ApplyHorizontalAlignmentAndWidth" not the whole method?
+            // We need to update horizontal alignment because of the "Stretch"
+            // case which depends on whether the Width is set. It also makes 
+            // the code simpler. //todo-performance: call only the relevant 
+            // code in "INTERNAL_ApplyHorizontalAlignmentAndWidth" not the 
+            //whole method?
             INTERNAL_ApplyHorizontalAlignmentAndWidth(frameworkElement, frameworkElement.HorizontalAlignment);
 #else
             RefreshWidth(frameworkElement);
@@ -275,17 +291,26 @@ namespace Windows.UI.Xaml
             get { return (HorizontalAlignment)GetValue(HorizontalAlignmentProperty); }
             set { SetValue(HorizontalAlignmentProperty, value); }
         }
+
         /// <summary>
         /// Identifies the HorizontalAlignment dependency property.
         /// </summary>
         public static readonly DependencyProperty HorizontalAlignmentProperty =
-            DependencyProperty.Register("HorizontalAlignment", typeof(HorizontalAlignment), typeof(FrameworkElement), new PropertyMetadata(HorizontalAlignment.Stretch, HorizontalAlignment_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("HorizontalAlignment",
+                                        typeof(HorizontalAlignment),
+                                        typeof(FrameworkElement),
+                                        new PropertyMetadata(HorizontalAlignment.Stretch, HorizontalAlignment_Changed)
+                                        {
+                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                                        });
+
         private static void HorizontalAlignment_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var frameworkElement = (FrameworkElement)d;
             HorizontalAlignment newHorizontalAlignment = (HorizontalAlignment)e.NewValue;
             INTERNAL_ApplyHorizontalAlignmentAndWidth(frameworkElement, newHorizontalAlignment);
         }
+
         internal static void INTERNAL_ApplyHorizontalAlignmentAndWidth(FrameworkElement frameworkElement, HorizontalAlignment newHorizontalAlignment)
         {
 #if PERFSTAT
@@ -656,17 +681,26 @@ if ($0.tagName.toLowerCase() != 'span')
             get { return (VerticalAlignment)GetValue(VerticalAlignmentProperty); }
             set { SetValue(VerticalAlignmentProperty, value); }
         }
+
         /// <summary>
         /// Identifies the VerticalAlignment dependency property.
         /// </summary>
         public static readonly DependencyProperty VerticalAlignmentProperty =
-            DependencyProperty.Register("VerticalAlignment", typeof(VerticalAlignment), typeof(FrameworkElement), new PropertyMetadata(VerticalAlignment.Stretch, VerticalAlignment_Changed) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("VerticalAlignment",
+                                        typeof(VerticalAlignment),
+                                        typeof(FrameworkElement),
+                                        new PropertyMetadata(VerticalAlignment.Stretch, VerticalAlignment_Changed)
+                                        {
+                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                                        });
+
         private static void VerticalAlignment_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var frameworkElement = (FrameworkElement)d;
             VerticalAlignment newVerticalAlignment = (VerticalAlignment)e.NewValue;
             INTERNAL_ApplyVerticalAlignmentAndHeight(frameworkElement, newVerticalAlignment);
         }
+
         internal static void INTERNAL_ApplyVerticalAlignmentAndHeight(FrameworkElement frameworkElement, VerticalAlignment newVerticalAlignment)
         {
 #if PERFSTAT
@@ -1058,15 +1092,18 @@ if ($0.tagName.toLowerCase() != 'span')
             get { return (Thickness)GetValue(MarginProperty); }
             set { SetValue(MarginProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Margin dependency property.
         /// </summary>
         public static readonly DependencyProperty MarginProperty =
-            DependencyProperty.Register("Margin", typeof(Thickness), typeof(FrameworkElement), new PropertyMetadata(new Thickness())
-            {
-                MethodToUpdateDom = Margin_MethodToUpdateDom,
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            });
+            DependencyProperty.Register("Margin",
+                                        typeof(Thickness),
+                                        typeof(FrameworkElement),
+                                        new PropertyMetadata(new Thickness())
+                                        {
+                                            MethodToUpdateDom = Margin_MethodToUpdateDom,
+                                        });
 
         internal static void Margin_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -1191,8 +1228,13 @@ if ($0.tagName.toLowerCase() != 'span')
         /// Identifies the MinHeight dependency property.
         /// </summary>
         public static readonly DependencyProperty MinHeightProperty =
-            DependencyProperty.Register("MinHeight", typeof(double), typeof(FrameworkElement), new PropertyMetadata(0d, MinHeight_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("MinHeight",
+                                        typeof(double),
+                                        typeof(FrameworkElement),
+                                        new PropertyMetadata(0d, MinHeight_Changed)
+                                        { 
+                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
+                                        });
 
         private static void MinHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1228,8 +1270,13 @@ if ($0.tagName.toLowerCase() != 'span')
         /// Identifies the MinWidth dependency property.
         /// </summary>
         public static readonly DependencyProperty MinWidthProperty =
-            DependencyProperty.Register("MinWidth", typeof(double), typeof(FrameworkElement), new PropertyMetadata(0d, MinWidth_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("MinWidth",
+                                        typeof(double),
+                                        typeof(FrameworkElement),
+                                        new PropertyMetadata(0d, MinWidth_Changed)
+                                        {
+                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                                        });
 
         private static void MinWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1262,8 +1309,13 @@ if ($0.tagName.toLowerCase() != 'span')
         /// Identifies the MaxHeight dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxHeightProperty =
-            DependencyProperty.Register("MaxHeight", typeof(double), typeof(FrameworkElement), new PropertyMetadata(double.PositiveInfinity, MaxHeight_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("MaxHeight",
+                                        typeof(double),
+                                        typeof(FrameworkElement),
+                                        new PropertyMetadata(double.PositiveInfinity, MaxHeight_Changed)
+                                        {
+                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                                        });
 
         private static void MaxHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1299,8 +1351,13 @@ if ($0.tagName.toLowerCase() != 'span')
         /// Identifies the MaxWidth dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxWidthProperty =
-            DependencyProperty.Register("MaxWidth", typeof(double), typeof(FrameworkElement), new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("MaxWidth",
+                                        typeof(double),
+                                        typeof(FrameworkElement),
+                                        new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed)
+                                        {
+                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                                        });
 
         private static void MaxWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1511,7 +1568,7 @@ if ($0.tagName.toLowerCase() != 'span')
                 }
             }
         }
-        
+
         #endregion
 
         #region ContextMenu
@@ -1533,8 +1590,13 @@ if ($0.tagName.toLowerCase() != 'span')
         /// Identifies the ContextMenu dependency property.
         /// </summary>
         public static readonly DependencyProperty ContextMenuProperty =
-            DependencyProperty.Register("ContextMenu", typeof(ContextMenu), typeof(FrameworkElement), new PropertyMetadata(null, ContextMenu_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("ContextMenu",
+                                        typeof(ContextMenu),
+                                        typeof(FrameworkElement),
+                                        new PropertyMetadata(null, ContextMenu_Changed)
+                                        {
+                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                                        });
 
         private static void ContextMenu_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

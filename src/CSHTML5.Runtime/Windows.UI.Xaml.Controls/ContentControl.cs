@@ -104,6 +104,7 @@ namespace Windows.UI.Xaml.Controls
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
+
             if (this.HasTemplate)
             {
                 return;

@@ -46,9 +46,9 @@ namespace Windows.UI.Xaml.Controls
     [ContentProperty("Items")]
     public partial class ItemsControl : Control
     {
-        internal FrameworkElement RenderedItemsPanel
+        internal Panel RenderedItemsPanel
         {
-            get { return this._renderedItemsPanel; }
+            get { return this._renderedItemsPanel as Panel; }
         }
 
         protected ItemContainerGenerator _itemContainerGenerator = new ItemContainerGenerator(); // Note: this maps an item (for example a string) to the element that is added to the visual tree (such a datatemplate) or to the native DOM element in case of native combo box for example.

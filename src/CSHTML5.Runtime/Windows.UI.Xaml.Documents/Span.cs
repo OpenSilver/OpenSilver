@@ -52,6 +52,8 @@ namespace Windows.UI.Xaml.Documents
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
+            base.INTERNAL_OnAttachedToVisualTree();
+
             foreach (Inline child in this.Inlines)
             {
 #if REWORKLOADED
