@@ -768,44 +768,102 @@ namespace Windows.UI.Xaml.Controls
 #endif
         }
 
-        internal override void ManageChildrenChanged(IList oldChildren, IList newChildren)
+        internal override void OnChildrenAdded(UIElement newChild, int index)
         {
-            //todo: remove this method? I'm not sure that it's called anymore
             if (!Grid_InternalHelpers.isCSSGridSupported())
             {
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 {
-                    if (oldChildren != null)
-                    {
-                        // Detach old children only if they are not in the "newChildren" collection:
-                        foreach (UIElement child in oldChildren) //note: there is no setter for Children so the user cannot change the order of the elements in one step --> we cannot have the same children in another order (which would keep the former order with the way it is handled now) --> no problem here
-                        {
-                            if (newChildren == null || !newChildren.Contains(child))
-                            {
-                                UpdateStructureWhenRemovingChild(child);
-                                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, this);
-                            }
-                        }
-                    }
-                    if (newChildren != null)
-                    {
-                        foreach (UIElement child in newChildren)
-                        {
-                            // Note: we do this for all items (regardless of whether they are in the oldChildren collection or not) to make it work when the item is first added to the Visual Tree (at that moment, all the properties are refreshed by calling their "Changed" method).
-                            UpdateStructureWhenAddingChild(child);
+                    this.UpdateStructureWhenAddingChild(newChild);
 #if REWORKLOADED
-                            this.AddVisualChild(child);
+                    this.AddVisualChild(newChild, index);
 #else
-                            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, this, index);
 #endif
-                        }
-                    }
                     this.LocallyManageChildrenChanged();
                 }
             }
             else
             {
-                base.ManageChildrenChanged(oldChildren, newChildren);
+                base.OnChildrenAdded(newChild, index);
+                this.LocallyManageChildrenChanged();
+            }
+        }
+
+        internal override void OnChildrenRemoved(UIElement oldChild, int index)
+        {
+            if (!Grid_InternalHelpers.isCSSGridSupported())
+            {
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+                {
+                    this.UpdateStructureWhenRemovingChild(oldChild);
+                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
+                    this.LocallyManageChildrenChanged();
+                }
+            }
+            else
+            {
+                base.OnChildrenRemoved(oldChild, index);
+                this.LocallyManageChildrenChanged();
+            }
+        }
+
+        internal override void OnChildrenReplaced(UIElement oldChild, UIElement newChild, int index)
+        {
+            if (oldChild == newChild)
+            {
+                return;
+            }
+
+            if (!Grid_InternalHelpers.isCSSGridSupported())
+            {
+                this.UpdateStructureWhenRemovingChild(oldChild);
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
+
+                this.UpdateStructureWhenAddingChild(newChild);
+#if REWORKLOADED
+                this.AddVisualChild(newChild, index);
+#else
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, this, index);
+#endif
+
+                this.LocallyManageChildrenChanged();
+            }
+            else
+            {
+                base.OnChildrenReplaced(oldChild, newChild, index);
+                this.LocallyManageChildrenChanged();
+            }
+        }
+
+        internal override void OnChildrenReset()
+        {
+            if (!Grid_InternalHelpers.isCSSGridSupported())
+            {
+                if (this.INTERNAL_VisualChildrenInformation != null)
+                {
+                    foreach (var childInfo in this.INTERNAL_VisualChildrenInformation.Select(kp => kp.Value).ToArray())
+                    {
+                        UpdateStructureWhenRemovingChild(childInfo.INTERNAL_UIElement);
+                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(childInfo.INTERNAL_UIElement, this);
+                    }
+                }
+
+                for (int i = 0; i < this.Children.Count; ++i)
+                {
+                    this.UpdateStructureWhenAddingChild(this.Children[i]);
+#if REWORKLOADED
+                    this.AddVisualChild(this.Children[i], i);
+#else
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.Children[i], this, i);
+#endif
+                }
+
+                this.LocallyManageChildrenChanged();
+            }
+            else
+            {
+                base.OnChildrenReset();
                 this.LocallyManageChildrenChanged();
             }
         }

@@ -30,32 +30,9 @@ namespace Windows.UI.Xaml.Controls
     /// <exclude/>
     public partial class UIElementCollection : ObservableCollection<UIElement>
     {
-        bool _suppressCollectionChanged;
-
-
-        public UIElementCollection() { }
-
-
-        // We override the "ClearItems" method so that the list of removed items is passed to the "CollectionChanged" event when some code calls ".Clear()".
-        protected override void ClearItems()
-        {
-            _suppressCollectionChanged = true; // To avoid raising "CollectionChanged" twice.
-            List<UIElement> oldItems = new List<UIElement>(this);
-            try
-            {
-                base.ClearItems();
-            }
-            finally
-            {
-                _suppressCollectionChanged = false;
-            }
-            base.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, oldItems));
-        }
-
-        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
-        {
-            if (!_suppressCollectionChanged)
-                base.OnCollectionChanged(e);
+        public UIElementCollection()
+        { 
+        
         }
 
 #if WORKINPROGRESS

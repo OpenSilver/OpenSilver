@@ -101,8 +101,6 @@ namespace Windows.UI.Xaml.Controls
                     //todo-perfs:
                     this.DefaultStyleKey = typeof(ComboBox);
                 }
-
-                base._workaroundForComboBox = _useNativeComboBox; //todo: avoid using this workaround.
             }
         }
 

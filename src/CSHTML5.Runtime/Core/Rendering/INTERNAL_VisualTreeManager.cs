@@ -161,16 +161,73 @@ namespace CSHTML5.Internal
             element.INTERNAL_DeferredLoadingWhenControlBecomesVisible = null;
         }
 
+        public static void MoveVisualChildInSameParent(UIElement child, UIElement parent, int newIndex, int oldIndex)
+        {
+            if (oldIndex < 0)
+            {
+                // setting oldIndex to -1 means we don't know the previous
+                // position of the child. We have to iterate through all the
+                // child to find it.
+                MoveVisualChildInSameParent(child, parent, newIndex);
+                return;
+            }
+
+            if (parent.INTERNAL_VisualChildrenInformation.ContainsKey(child))
+            {
+                INTERNAL_VisualChildInformation visualChildInformation = parent.INTERNAL_VisualChildrenInformation[child];
+                var domElementToMove = visualChildInformation.INTERNAL_OptionalChildWrapper_OuterDomElement ?? child.INTERNAL_OuterDomElement;
+
+                //Not sure if this test is needed but at least we won't 
+                // break anything if the element is not in the Visual tree
+                if (domElementToMove != null)
+                {
+                    object domElementWhereToPlaceChildStuff = (parent.GetDomElementWhereToPlaceChild(child) ?? parent.INTERNAL_InnerDomElement);
+
+                    object movedChild = CSHTML5.Interop.ExecuteJavaScript(
+                        "$0.children[$1]", 
+                        domElementWhereToPlaceChildStuff, 
+                        oldIndex);
+
+
+                    if (!Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0 == $1", movedChild, domElementToMove)))
+                    {
+                        throw new InvalidOperationException(string.Format("index '{0}' does match index of the element about to be moved.", oldIndex));
+                    }
+
+                    object nextSibling = CSHTML5.Interop.ExecuteJavaScript(
+                        "$0.children[$1]",
+                        domElementWhereToPlaceChildStuff,
+                        newIndex);
+
+                    if (nextSibling != null)
+                    {
+                        CSHTML5.Interop.ExecuteJavaScript(
+                            "$0.insertBefore($1, $2)",
+                            domElementWhereToPlaceChildStuff,
+                            domElementToMove,
+                            nextSibling);
+                    }
+                    else
+                    {
+                        CSHTML5.Interop.ExecuteJavaScript(
+                            "$0.appendChild($1)",
+                            domElementWhereToPlaceChildStuff,
+                            domElementToMove);
+                    }
+                }
+            }
+        }
+
         public static void MoveVisualChildInSameParent(UIElement child, UIElement parent, int index)
         {
-            if(parent.INTERNAL_VisualChildrenInformation.ContainsKey(child))
+            if (parent.INTERNAL_VisualChildrenInformation.ContainsKey(child))
             {
                 INTERNAL_VisualChildInformation visualChildInformation = parent.INTERNAL_VisualChildrenInformation[child];
                 var domElementToMove = visualChildInformation.INTERNAL_OptionalChildWrapper_OuterDomElement;
                 if (domElementToMove == null)
                     domElementToMove = child.INTERNAL_OuterDomElement;
 
-                if(domElementToMove != null) //Not sure if this test is needed but at least we won't break anything if the element is not in the Visual tree
+                if (domElementToMove != null) //Not sure if this test is needed but at least we won't break anything if the element is not in the Visual tree
                 {
                     object domElementWhereToPlaceChildStuff = (parent.GetDomElementWhereToPlaceChild(child) ?? parent.INTERNAL_InnerDomElement);
                     //todo: see if there is a way to know the index of the domElement in its parent without looping through the list (where we find i in the js below).
@@ -192,7 +249,7 @@ if(nextSibling != undefined) {
                 }
             }
         }
-        
+
 
         public static void AttachVisualChildIfNotAlreadyAttached(UIElement child, UIElement parent, int index = -1)
         {

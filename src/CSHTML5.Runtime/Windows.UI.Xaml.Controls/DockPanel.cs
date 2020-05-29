@@ -16,6 +16,7 @@
 using CSHTML5.Internal;
 using System;
 using System.Collections;
+using System.Diagnostics;
 using System.Linq;
 
 #if !MIGRATION
@@ -236,6 +237,54 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        internal override void OnChildrenAdded(UIElement newChild, int index)
+        {
+            this.MakeUIStructure();
+            this._grid.Children.Insert(index, newChild);
+        }
+
+        internal override void OnChildrenRemoved(UIElement oldChild, int index)
+        {
+            this._grid.Children.RemoveAt(index);
+        }
+
+        internal override void OnChildrenReplaced(UIElement oldChild, UIElement newChild, int index)
+        {
+            if (oldChild == newChild)
+            {
+                return;
+            }
+
+            Debug.Assert(oldChild == this._grid.Children[index]);
+
+            this.MakeUIStructure();
+            this._grid.Children[index] = newChild;
+        }
+
+        internal override void OnChildrenMoved(UIElement oldChild, int newIndex, int oldIndex)
+        {
+            if (newIndex == oldIndex)
+            {
+                return;
+            }
+
+            this.MakeUIStructure();
+            this._grid.Children.Move(oldIndex, newIndex);
+        }
+
+        internal override void OnChildrenReset()
+        {
+            this._grid.Children.Clear();
+
+            this.MakeUIStructure();
+
+            foreach (UIElement child in this.Children)
+            {
+                this._grid.Children.Add(child);
+            }
+        }
+
+#if false
         internal override void ManageChildrenChanged(IList oldChildren, IList newChildren)
         {
             if (oldChildren != null)
@@ -255,5 +304,6 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
+#endif
     }
 }
