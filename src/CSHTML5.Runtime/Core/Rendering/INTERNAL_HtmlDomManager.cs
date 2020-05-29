@@ -287,24 +287,25 @@ else
 }", domElement, content, removeTextWrapping);
 #else
                 Script.Write(@"
-if ('innerText' in {0})
+if ('innerText' in {0} && !window.IE_VERSION)
 {
     // --- CHROME & IE: ---
     {0}.innerText = {1};
     if ({2})
     {
         {0}.style.whiteSpace = 'nowrap';
-            }
+    }
 }
-            else
-            {
+else
+{
     // --- FIREFOX: ---
     // First, escape the string so that if it contains some HTML, it is made harmless:
     var tempDiv = document.createElement('div');
     tempDiv.appendChild(document.createTextNode({1}));
     var escapedText = tempDiv.innerHTML;
     // Then, replace all line breaks with '<br>' so that FireFox can render them properly:
-    var finalHtml = escapedText.replace(/\n/g,'<br>');
+    var finalHtml = escapedText.replace(/\r\n/g,'<br>');
+    finalHtml = finalHtml.replace(/\n/g,'<br>');
     // Finally, display the HTML:
     {0}.innerHTML = finalHtml;
     if ({2})
