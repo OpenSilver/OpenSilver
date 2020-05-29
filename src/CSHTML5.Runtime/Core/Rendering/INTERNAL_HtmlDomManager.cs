@@ -260,7 +260,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             {
 #if !BRIDGE
                 JSIL.Verbatim.Expression(@"
-if ('innerText' in $0)
+if ('innerText' in $0 && !window.IE_VERSION)
 {
     // --- CHROME & IE: ---
     $0.innerText = $1;
@@ -277,7 +277,8 @@ else
     tempDiv.appendChild(document.createTextNode($1));
     var escapedText = tempDiv.innerHTML;
     // Then, replace all line breaks with '<br>' so that FireFox can render them properly:
-    var finalHtml = escapedText.replace(/\n/g,'<br>');
+    var finalHtml = escapedText.replace(/\r\n/g,'<br>');
+    finalHtml = finalHtml.replace(/\n/g,'<br>');
     // Finally, display the HTML:
     $0.innerHTML = finalHtml;
     if ($2)

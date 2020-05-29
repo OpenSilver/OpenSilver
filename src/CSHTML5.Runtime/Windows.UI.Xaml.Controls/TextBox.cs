@@ -861,8 +861,11 @@ $0.addEventListener('paste', function(e) {
                     content = content.substr(0, content.length + lengthComparison);
                 }
             }
+              content = content.replace(/\r\n/g, '<br />');
               newDiv.innerHTML = content.replace(/\n/g, '<br />');
-              window.getSelection().getRangeAt(0).insertNode( newDiv );
+              var range = window.getSelection().getRangeAt(0);
+              range.deleteContents()
+              range.insertNode( newDiv );
               //window.getSelection().getRangeAt(0).insertNode( document.createTextNode(content) );
             }
           }
@@ -917,8 +920,11 @@ $0.addEventListener('paste', function(e) {
               if (isSingleLine){
                 content = content.replace(/\n/g, '').replace(/\r/g, '');
               }
+              content = content.replace(/\r\n/g, '<br />');
               newDiv.innerHTML = content.replace(/\n/g, '<br />');
-              window.getSelection().getRangeAt(0).insertNode( newDiv );
+              var range = window.getSelection().getRangeAt(0);
+              range.deleteContents()
+              range.insertNode( newDiv );
               //window.getSelection().getRangeAt(0).insertNode( document.createTextNode(content) );
             }
           }
