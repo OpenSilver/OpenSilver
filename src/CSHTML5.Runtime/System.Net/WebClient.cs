@@ -520,7 +520,32 @@ namespace System.Net
 
         private string UploadString(Uri address, string method, string data, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler onCompleted, bool isAsync) //todo: see if we should use UploadStringCompletedEventHandler instead
         {
-#if USEWPFWEBCLIENT
+#if OPENSILVER
+            if (Interop.IsRunningInTheSimulator_WorkAround)
+            {
+                var netStandardWebClient = new System.Net.WebClient();
+                if (isAsync)
+                {
+                    netStandardWebClient.UploadStringCompleted += (s, e) =>
+                    {
+                        onCompleted(this, new INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs()
+                        {
+                            Result = e.Result,
+                            Cancelled = e.Cancelled,
+                            Error = e.Error,
+                            UserState = e.UserState
+                        });
+                    };
+                    netStandardWebClient.UploadStringAsync(address, method, data);
+                    return "";
+                }
+                else
+                {
+                    return netStandardWebClient.UploadString(address, method, data);
+                }
+                
+            }
+#elif USEWPFWEBCLIENT
             if (Interop.IsRunningInTheSimulator)
             {
                 var wcFactory = INTERNAL_Simulator.WebClientFactory;
