@@ -57,11 +57,6 @@ namespace Windows.UI.Xaml.Controls
 
             //MinimumDelay is a property that set the time before opening the PopUp, so we listen to the Tick event
             _timer.Tick += _timer_Tick;
-
-#if !WORKINPROGRESS
-            // Prevent rendering the items as direct children to this control. Instead, we wait for the "OnApplyTemplate" method that will find where the correct place to render the items is.
-            _placeWhereItemsPanelWillBeRendered = null;
-#endif
         }
 
 
@@ -72,25 +67,11 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnApplyTemplate()
 #endif
         {
-#if WORKINPROGRESS
             base.OnApplyTemplate();
-#endif
 
             _popup = GetTemplateChild("Popup") as Popup;
             _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
             _textBox = GetTemplateChild("PART_TextBox") as TextBox;
-
-#if !WORKINPROGRESS
-            var itemsPresenter = GetTemplateChild("ItemsHost") as ItemsPresenter;
-            if (itemsPresenter != null)
-            {
-                _placeWhereItemsPanelWillBeRendered = itemsPresenter;
-            }
-            else
-            {
-                _placeWhereItemsPanelWillBeRendered = this;
-            }
-#endif
 
             if (_dropDownToggle != null)
             {
@@ -102,11 +83,6 @@ namespace Windows.UI.Xaml.Controls
             _textBox.MouseLeftButtonDown += TextBox_MouseLeftButtonDown;
 #else
             _textBox.PointerPressed += TextBox_PointerPressed;
-#endif
-
-#if !WORKINPROGRESS
-            // Update the ItemsPanel:
-            UpdateItemsPanel(ItemsPanel);
 #endif
         }
 

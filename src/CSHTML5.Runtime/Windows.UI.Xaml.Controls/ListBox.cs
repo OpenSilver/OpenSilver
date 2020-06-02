@@ -221,11 +221,7 @@ namespace Windows.UI.Xaml.Controls
                     int index = 0;
                     //clear before adding 
                     INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
-#if WORKINPROGRESS
                     foreach (object item in Items)
-#else
-                    foreach (object item in _actualItemsSource)
-#endif
                     {
                         if (indexStart <= index && index <= indexEnd)
                         {

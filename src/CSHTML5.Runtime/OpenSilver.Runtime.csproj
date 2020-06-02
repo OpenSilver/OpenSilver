@@ -1089,6 +1089,9 @@
 		<None Include="OpenSilver.Runtime.licenseheader" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Page Include="DefaultStyles\INTERNAL_DefaultItemsControlStyle.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	  <Page Include="DefaultStyles\INTERNAL_DefaultLabelStyle.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>

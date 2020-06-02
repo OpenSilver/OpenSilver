@@ -110,11 +110,6 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public ComboBox()
         {
-#if !WORKINPROGRESS
-            // Prevent rendering the items as direct children to this ComboBox. Instead, we wait for the "OnApplyTemplate" method that will find where the correct place to render the items is. If there is no "OnApplyTemplate" because we are using the native combobox, the variable is set in "INTERNAL_OnAttachedToVisualTree".
-            _placeWhereItemsPanelWillBeRendered = null;
-#endif
-
             UseSystemFocusVisuals = true;
 
             // Call the "setter" of the UseNativeComboBox property, so that it initializes the right state:
@@ -380,9 +375,7 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnApplyTemplate()
 #endif
         {
-#if WORKINPROGRESS
             base.OnApplyTemplate();
-#endif
 
             if(_popup != null)
                 _popup.ClosedDueToOutsideClick -= Popup_ClosedDueToOutsideClick; // Note: we do this here rather than at "OnDetached" because it may happen that the popup is closed after the ComboBox has been removed from the visual tree (in which case, when putting it back into the visual tree, we want the drop down to be in its initial closed state).
@@ -390,18 +383,6 @@ namespace Windows.UI.Xaml.Controls
             _popup = GetTemplateChild("Popup") as Popup;
             _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
             _contentPresenter = GetTemplateChild("ContentPresenter") as ContentPresenter;
-
-#if !WORKINPROGRESS
-            var itemsPresenter = GetTemplateChild("ItemsHost") as ItemsPresenter;
-            if (itemsPresenter != null)
-            {
-                _placeWhereItemsPanelWillBeRendered = itemsPresenter;
-            }
-            else
-            {
-                _placeWhereItemsPanelWillBeRendered = this;
-            }
-#endif
 
             if (_dropDownToggle != null)
             {
@@ -416,10 +397,6 @@ namespace Windows.UI.Xaml.Controls
                 _popup.ClosedDueToOutsideClick += Popup_ClosedDueToOutsideClick;
             }
 
-#if !WORKINPROGRESS
-            base.OnApplyTemplate();
-#endif
-
             ApplySelectedIndex(SelectedIndex);
         }
 
@@ -430,15 +407,7 @@ namespace Windows.UI.Xaml.Controls
             // We update the ItemsPanel only if we use the native ComboBox. Otherwise, it will be done in the "OnApplyTemplate" method.
             if (_useNativeComboBox)
             {
-#if !WORKINPROGRESS
-                _placeWhereItemsPanelWillBeRendered = this;
-#endif
-
-#if WORKINPROGRESS
                 UpdateChildrenInVisualTree(Items, Items, forceUpdateAllChildren: true);
-#else
-                UpdateChildrenInVisualTree(base._actualItemsSource, base._actualItemsSource, forceUpdateAllChildren: true);
-#endif
             }
         }
 

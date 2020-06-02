@@ -28,7 +28,6 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public partial class ItemsPresenter : FrameworkElement
     {
-#if WORKINPROGRESS
         private ItemsPanelTemplate _templateCache;
         private ItemsControl _owner;
         private Panel _itemsHost;
@@ -76,8 +75,10 @@ namespace Windows.UI.Xaml.Controls
         {
             if (this.ItemsHost != null)
             {
+#if WORKINPROGRESS
                 // Panel is no longer ItemsHost
                 this.ItemsHost.IsItemsHost = false;
+#endif
 
                 // Detach old panel
                 INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(this.ItemsHost, this);
@@ -98,8 +99,10 @@ namespace Windows.UI.Xaml.Controls
 
                     this._itemsHost = panel;
 
+#if WORKINPROGRESS
                     // set IsItemsHost flag
                     panel.IsItemsHost = true;
+#endif
                 }
                 else
                 {
@@ -147,6 +150,5 @@ namespace Windows.UI.Xaml.Controls
 #endif
             }
         }
-#endif
     }
 }
