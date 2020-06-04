@@ -529,6 +529,29 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+        {
+            base.PrepareContainerForItemOverride(element, item);
+
+            ComboBoxItem container = element as ComboBoxItem;
+            if (container != null)
+            {
+                container.INTERNAL_CorrespondingItem = item;
+                container.INTERNAL_ParentSelectorControl = this;
+                container.Click += ComboBoxItem_Click;
+            }
+        }
+
+        protected override DependencyObject GetContainerForItemOverride()
+        {
+            return new ComboBoxItem();
+        }
+
+        protected override bool IsItemItsOwnContainerOverride(object item)
+        {
+            return (item is ComboBoxItem);
+        }
+
         protected override SelectorItem INTERNAL_GenerateContainer(object item)
         {
             return (SelectorItem)this.GetContainerFromItem(item);

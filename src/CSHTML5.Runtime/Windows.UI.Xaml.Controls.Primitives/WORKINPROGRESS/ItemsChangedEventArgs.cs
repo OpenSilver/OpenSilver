@@ -23,47 +23,77 @@ namespace System.Windows.Controls.Primitives
 namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
-	//
-	// Summary:
-	//     Provides data for the System.Windows.Controls.ItemContainerGenerator.ItemsChanged
-	//     event.
+	/// <summary>
+	/// The ItemsChanged event is raised by an ItemContainerGenerator to inform
+	/// layouts that the items collection has changed.
+	/// </summary>
 	public partial class ItemsChangedEventArgs : EventArgs
 	{
-		//
-		// Summary:
-		//     Gets the action that occurred on the items collection.
-		//
-		// Returns:
-		//     Returns the action that occurred.
-		public NotifyCollectionChangedAction Action { get; }
-		//
-		// Summary:
-		//     Gets the number of items that were involved in the change.
-		//
-		// Returns:
-		//     Integer that represents the number of items involved in the change.
-		public int ItemCount { get; }
-		//
-		// Summary:
-		//     Gets the number of UI elements involved in the change.
-		//
-		// Returns:
-		//     Integer that represents the number of UI elements involved in the change.
-		public int ItemUICount { get; }
-		//
-		// Summary:
-		//     Gets the position in the collection before the change occurred.
-		//
-		// Returns:
-		//     Returns a System.Windows.Controls.Primitives.GeneratorPosition.
-		public GeneratorPosition OldPosition { get; }
-		//
-		// Summary:
-		//     Gets the position in the collection where the change occurred.
-		//
-		// Returns:
-		//     Returns a System.Windows.Controls.Primitives.GeneratorPosition.
-		public GeneratorPosition Position { get; }
-	}
+        //------------------------------------------------------
+        //
+        //  Constructors
+        //
+        //------------------------------------------------------
+
+        internal ItemsChangedEventArgs(NotifyCollectionChangedAction action,
+                                        GeneratorPosition position,
+                                        GeneratorPosition oldPosition,
+                                        int itemCount,
+                                        int itemUICount)
+        {
+            _action = action;
+            _position = position;
+            _oldPosition = oldPosition;
+            _itemCount = itemCount;
+            _itemUICount = itemUICount;
+        }
+
+        internal ItemsChangedEventArgs(NotifyCollectionChangedAction action,
+                                        GeneratorPosition position,
+                                        int itemCount,
+                                        int itemUICount) : this(action, position, new GeneratorPosition(-1, 0), itemCount, itemUICount)
+
+        {
+        }
+
+        //------------------------------------------------------
+        //
+        //  Public Properties
+        //
+        //------------------------------------------------------
+
+        /// <summary> What happened </summary>
+        public NotifyCollectionChangedAction Action { get { return _action; } }
+
+        /// <summary> Where it happened </summary>
+        public GeneratorPosition Position { get { return _position; } }
+
+        /// <summary> Where it happened </summary>
+        public GeneratorPosition OldPosition { get { return _oldPosition; } }
+
+        /// <summary> How many items were involved </summary>
+        public int ItemCount { get { return _itemCount; } }
+
+        /// <summary> How many UI elements were involved </summary>
+        public int ItemUICount { get { return _itemUICount; } }
+
+
+        //------------------------------------------------------
+        //
+        //  Private Fields
+        //
+        //------------------------------------------------------
+
+        NotifyCollectionChangedAction _action;
+        GeneratorPosition _position;
+        GeneratorPosition _oldPosition;
+        int _itemCount;
+        int _itemUICount;
+    }
+
+    /// <summary>
+    ///     The delegate to use for handlers that receive ItemsChangedEventArgs.
+    /// </summary>
+    public delegate void ItemsChangedEventHandler(object sender, ItemsChangedEventArgs e);
 }
 #endif

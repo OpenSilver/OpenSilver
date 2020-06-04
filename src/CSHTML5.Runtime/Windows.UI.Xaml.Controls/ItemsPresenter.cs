@@ -16,6 +16,7 @@
 using CSHTML5.Internal;
 using System;
 using System.Collections.Specialized;
+using System.Linq;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -68,10 +69,10 @@ namespace Windows.UI.Xaml.Controls
             // Update template cache
             ip._templateCache = (ItemsPanelTemplate)e.NewValue;
 
-            ip.OnPanelChanged();
+            ip.OnPanelChangedInternal();
         }
 
-        internal void OnPanelChanged()
+        internal void OnPanelChangedInternal()
         {
             if (this.ItemsHost != null)
             {
@@ -116,10 +117,10 @@ namespace Windows.UI.Xaml.Controls
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(panel, this);
 #endif
 
-                // Attach children to panel if any
-                if (this.Owner != null && this.Owner.Items.Count > 0)
+                // Attach children to panel
+                if (this.Owner != null)
                 {
-                    this.Owner.UpdateChildrenInVisualTree(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                    this.Owner.Refresh();
                 }
             }
             else
@@ -133,8 +134,19 @@ namespace Windows.UI.Xaml.Controls
         {
             this._owner = owner;
 
+            // create the panel, based either on ItemsControl.ItemsPanel
+            ItemsPanelTemplate template = (this._owner != null) ? this._owner.ItemsPanel : null;
+
             // Get Template from ItemsControl.ItemsPanel
-            this.Template = owner.ItemsPanel;
+            this.Template = template;
+        }
+
+        internal static ItemsPresenter FromPanel(Panel panel)
+        {
+            if (panel == null)
+                return null;
+
+            return panel.Parent as ItemsPresenter;
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()

@@ -23,11 +23,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
+
 #if MIGRATION
 using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Media;
-using System.Windows.Controls;
 #endif
 
 #if MIGRATION
@@ -95,7 +95,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #region Children Management
+#region Children Management
 
         internal virtual void OnChildrenReset()
         {
@@ -164,7 +164,7 @@ namespace Windows.UI.Xaml.Controls
             INTERNAL_VisualTreeManager.MoveVisualChildInSameParent(oldChild, this, newIndex, oldIndex);
         }
 
-        #endregion Children Management
+#endregion Children Management
 
         /// <summary>
         /// Gets or sets a Brush that is used to fill the panel.
@@ -320,7 +320,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
 
-#endregion
+        #endregion
 
 
 
@@ -334,17 +334,15 @@ namespace Windows.UI.Xaml.Controls
         //    }
         //}
 
-#if WORKINPROGRESS
         public static readonly DependencyProperty IsItemsHostProperty =
-            DependencyProperty.Register("IsItemsHost",
-                                        typeof(bool),
-                                        typeof(Panel),
-                                        new PropertyMetadata(false));
+    DependencyProperty.Register("IsItemsHost",
+                                typeof(bool),
+                                typeof(Panel),
+                                new PropertyMetadata(false));
         public bool IsItemsHost
         {
             get { return (bool)this.GetValue(IsItemsHostProperty); }
             internal set { this.SetValue(IsItemsHostProperty, value); }
         }
-#endif
     }
 }

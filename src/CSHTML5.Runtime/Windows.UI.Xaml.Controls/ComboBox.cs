@@ -18,6 +18,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -75,15 +76,19 @@ namespace Windows.UI.Xaml.Controls
     /// </example>
     public partial class ComboBox : Selector
     {
-        dynamic _nativeComboBoxDomElement;
         Popup _popup;
         ToggleButton _dropDownToggle;
         ContentPresenter _contentPresenter;
         UIElement _selectedContent;
+
+#if false
+        dynamic _nativeComboBoxDomElement;
         private bool _useNativeComboBox;
+#endif
 
         //todo: synchronize html/c# selected value/item/index
 
+#if false
         public bool UseNativeComboBox
         {
             get { return _useNativeComboBox; }
@@ -103,6 +108,14 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
+#else
+        [Obsolete]
+        public bool UseNativeComboBox
+        {
+            get { return false; }
+            set { }
+        }
+#endif
 
 
         /// <summary>
@@ -110,13 +123,15 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public ComboBox()
         {
+            this.DefaultStyleKey = typeof(ComboBox);
+#if false
             UseSystemFocusVisuals = true;
-
             // Call the "setter" of the UseNativeComboBox property, so that it initializes the right state:
             this.UseNativeComboBox = true; // Default value
+#endif
         }
 
-
+#if false
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             if (_useNativeComboBox)
@@ -152,8 +167,10 @@ namespace Windows.UI.Xaml.Controls
 #endif
             }
         }
+#endif
 
-#region Native ComboBox implementation
+#if false
+        #region Native ComboBox implementation
 
         void DomSelectionChanged(dynamic element)
         {
@@ -223,9 +240,33 @@ namespace Windows.UI.Xaml.Controls
                 return -1;
         }
 
-#endregion
+        #endregion
+#endif
 
-#region Non-Native ComboBox implementation
+        #region Non-Native ComboBox implementation
+
+        protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+        {
+            base.PrepareContainerForItemOverride(element, item);
+
+            ComboBoxItem container = element as ComboBoxItem;
+            if (container != null)
+            {
+                container.INTERNAL_CorrespondingItem = item;
+                container.INTERNAL_ParentSelectorControl = this;
+                container.Click += ComboBoxItem_Click;
+            }
+        }
+
+        protected override DependencyObject GetContainerForItemOverride()
+        {
+            return new ComboBoxItem();
+        }
+
+        protected override bool IsItemItsOwnContainerOverride(object item)
+        {
+            return (item is ComboBoxItem);
+        }
 
         protected override SelectorItem INTERNAL_GenerateContainer(object item)
         {
@@ -254,7 +295,7 @@ namespace Windows.UI.Xaml.Controls
                 _dropDownToggle.IsChecked = false;
         }
 
-#endregion
+        #endregion
 
 #if WORKINPROGRESS
         IList GetListOfSelectedItemsInCSharp()
@@ -267,6 +308,7 @@ namespace Windows.UI.Xaml.Controls
             return selectedItems;
         }
 
+#if false
         protected override void AddChildItemToVisualTree(object newItem)
         {
             if (_useNativeComboBox)
@@ -295,7 +337,9 @@ namespace Windows.UI.Xaml.Controls
                 base.AddChildItemToVisualTree(newItem);
             }
         }
+#endif
 
+#if false
         protected override bool TryRemoveChildItemFromVisualTree(object item)
         {
             if (_useNativeComboBox)
@@ -317,56 +361,61 @@ namespace Windows.UI.Xaml.Controls
                 return base.TryRemoveChildItemFromVisualTree(item);
             }
         }
+#endif
 
         protected override void ApplySelectedIndex(int index)
         {
             base.ApplySelectedIndex(index);
 
+#if false
             if (_useNativeComboBox)
             {
                 SetSelectedIndexInNativeHtmlDom(this.SelectedIndex);
             }
             else
             {
-                UIElement newSelectedContent;
+#endif
+            UIElement newSelectedContent;
 
-                if (index == -1)
-                {
-                    if (_contentPresenter != null)
-                        _contentPresenter.Content = null;
+            if (index == -1)
+            {
+                if (_contentPresenter != null)
+                    _contentPresenter.Content = null;
 
-                    newSelectedContent = null;
-                }
-                else if (this.Items != null && index < this.Items.Count)
-                {
-                    var item = this.Items[index];
-
-                    // If the item is a FrameworkElement, we detach it from its current parent (if any) so that we can later put it into the ContentPresenter:
-                    if (item is FrameworkElement)
-                    {
-                        // Detach it from the current parent:
-                        if (((FrameworkElement)item).INTERNAL_VisualParent is UIElement)
-                            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(((FrameworkElement)item), (UIElement)((FrameworkElement)item).INTERNAL_VisualParent);
-                    }
-                    else if (item != null)
-                    {
-                        // Otherwise, we create a FrameworkElement out of the item:
-                        item = GenerateFrameworkElementToRenderTheItem(item);
-                    }
-
-                    newSelectedContent = (FrameworkElement)item; // Note: this can be null.
-
-                    // We put the selected content into the ContentPresenter:
-                    if (_contentPresenter != null)
-                        _contentPresenter.Content = newSelectedContent; // Note: this can be null.
-                }
-                else
-                {
-                    throw new IndexOutOfRangeException();
-                }
-
-                _selectedContent = newSelectedContent;
+                newSelectedContent = null;
             }
+            else if (this.Items != null && index < this.Items.Count)
+            {
+                var item = this.Items[index];
+
+                // If the item is a FrameworkElement, we detach it from its current parent (if any) so that we can later put it into the ContentPresenter:
+                if (item is FrameworkElement)
+                {
+                    // Detach it from the current parent:
+                    if (((FrameworkElement)item).INTERNAL_VisualParent is UIElement)
+                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(((FrameworkElement)item), (UIElement)((FrameworkElement)item).INTERNAL_VisualParent);
+                }
+                else if (item != null)
+                {
+                    // Otherwise, we create a FrameworkElement out of the item:
+                    item = GenerateFrameworkElementToRenderTheItem(item);
+                }
+
+                newSelectedContent = (FrameworkElement)item; // Note: this can be null.
+
+                // We put the selected content into the ContentPresenter:
+                if (_contentPresenter != null)
+                    _contentPresenter.Content = newSelectedContent; // Note: this can be null.
+            }
+            else
+            {
+                throw new IndexOutOfRangeException();
+            }
+
+            _selectedContent = newSelectedContent;
+#if false
+            }
+#endif
         }
 
 #if MIGRATION
@@ -377,7 +426,7 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnApplyTemplate();
 
-            if(_popup != null)
+            if (_popup != null)
                 _popup.ClosedDueToOutsideClick -= Popup_ClosedDueToOutsideClick; // Note: we do this here rather than at "OnDetached" because it may happen that the popup is closed after the ComboBox has been removed from the visual tree (in which case, when putting it back into the visual tree, we want the drop down to be in its initial closed state).
 
             _popup = GetTemplateChild("Popup") as Popup;
@@ -400,6 +449,7 @@ namespace Windows.UI.Xaml.Controls
             ApplySelectedIndex(SelectedIndex);
         }
 
+#if false
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
@@ -420,6 +470,7 @@ namespace Windows.UI.Xaml.Controls
                 ItemContainerGenerator.INTERNAL_Clear();
             }
         }
+#endif
 
         void DropDownToggle_Checked(object sender, RoutedEventArgs e)
         {
@@ -478,6 +529,7 @@ namespace Windows.UI.Xaml.Controls
         public event RoutedEventHandler DropDownOpened;
 #endif
 
+#if false
         protected override void UpdateItemsPanel(ItemsPanelTemplate newTemplate)
         {
             if (_useNativeComboBox)
@@ -487,6 +539,7 @@ namespace Windows.UI.Xaml.Controls
             else
                 base.UpdateItemsPanel(newTemplate);
         }
+#endif
 
         /// <summary>
         /// Gets or sets a value that indicates whether the drop-down portion of the
@@ -507,89 +560,93 @@ namespace Windows.UI.Xaml.Controls
         private static void IsDropDownOpen_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var comboBox = (ComboBox)d;
+#if false
             if (!comboBox._useNativeComboBox)
             {
-                // IMPORTANT: we must NOT require that the element be in the visual tree because the DropDown may be closed even when the ComboBox is not in the visual tree (for example, after it has been removed from the visual tree)
-                if (e.NewValue is bool)
+#endif
+            // IMPORTANT: we must NOT require that the element be in the visual tree because the DropDown may be closed even when the ComboBox is not in the visual tree (for example, after it has been removed from the visual tree)
+            if (e.NewValue is bool)
+            {
+                bool isDropDownOpen = (bool)e.NewValue;
+
+                if (isDropDownOpen)
                 {
-                    bool isDropDownOpen = (bool)e.NewValue;
+                    //-----------------------------
+                    // Show the Popup
+                    //-----------------------------
 
-                    if (isDropDownOpen)
+                    // Empty the ContentPresenter so that, in case it is needed, the same item can be placed in the popup:
+                    if (comboBox._contentPresenter != null)
+                        comboBox._contentPresenter.Content = null;
+
+                    // Show the popup:
+                    if (comboBox._popup != null)
                     {
-                        //-----------------------------
-                        // Show the Popup
-                        //-----------------------------
+                        comboBox._popup.IsOpen = true;
 
-                        // Empty the ContentPresenter so that, in case it is needed, the same item can be placed in the popup:
-                        if (comboBox._contentPresenter != null)
-                            comboBox._contentPresenter.Content = null;
+                        // Make sure the Width of the popup is the same as the popup:
+                        double actualWidth = comboBox._popup.ActualWidth;
+                        if (!double.IsNaN(actualWidth) && comboBox._popup.Child is FrameworkElement)
+                            ((FrameworkElement)comboBox._popup.Child).Width = actualWidth;
 
-                        // Show the popup:
-                        if (comboBox._popup != null)
-                        {
-                            comboBox._popup.IsOpen = true;
+                        // Draw the list (it was not drawn before because it was not in the visual tree):
+                        comboBox.UpdateItemsPanel(comboBox.ItemsPanel);
+                    }
 
-                            // Make sure the Width of the popup is the same as the popup:
-                            double actualWidth = comboBox._popup.ActualWidth;
-                            if (!double.IsNaN(actualWidth) && comboBox._popup.Child is FrameworkElement)
-                                ((FrameworkElement)comboBox._popup.Child).Width = actualWidth;
+                    // Ensure that the toggle button is checked:
+                    if (comboBox._dropDownToggle != null
+                        && comboBox._dropDownToggle.IsChecked == false)
+                    {
+                        comboBox._dropDownToggle.IsChecked = true;
+                    }
 
-                            // Draw the list (it was not drawn before because it was not in the visual tree):
-                            comboBox.UpdateItemsPanel(comboBox.ItemsPanel);
-                        }
-
-                        // Ensure that the toggle button is checked:
-                        if (comboBox._dropDownToggle != null
-                            && comboBox._dropDownToggle.IsChecked == false)
-                        {
-                            comboBox._dropDownToggle.IsChecked = true;
-                        }
-
-                        // Raise the Opened event:
+                    // Raise the Opened event:
 #if MIGRATION
-                        comboBox.OnDropDownOpened(new EventArgs());
+                    comboBox.OnDropDownOpened(new EventArgs());
 #else
                         comboBox.OnDropDownOpened(new RoutedEventArgs());
 #endif
-                    }
-                    else
+                }
+                else
+                {
+                    //-----------------------------
+                    // Hide the Popup
+                    //-----------------------------
+
+                    // Close the popup:
+                    if (comboBox._popup != null)
+                        comboBox._popup.IsOpen = false;
+
+                    // Put the selected item back into the ContentPresenter if it was removed when the ToggleButton was checked:
+                    if (comboBox._contentPresenter != null && comboBox._contentPresenter.Content == null)
                     {
-                        //-----------------------------
-                        // Hide the Popup
-                        //-----------------------------
+                        comboBox._contentPresenter.Content = comboBox._selectedContent;
+                    }
 
-                        // Close the popup:
-                        if (comboBox._popup != null)
-                            comboBox._popup.IsOpen = false;
+                    // Workaround for the fact that IsHitTestVisible does not propagate properly //todo: fix the propagation (which comes from the ComboBox style), and remove this block of code. Current issue when removing this code: if we click multiple times on the ComboBox (selecting and deselecting items), at one point the item in the ContentPresenter does not inherit "transparency to click", meaning that it is no longer possible to click the underlying ToggleButton when clicking on the item.
+                    if (comboBox._contentPresenter != null)
+                    {
+                        comboBox._contentPresenter.IsHitTestVisible = true;
+                        comboBox._contentPresenter.IsHitTestVisible = false;
+                    }
 
-                        // Put the selected item back into the ContentPresenter if it was removed when the ToggleButton was checked:
-                        if (comboBox._contentPresenter != null && comboBox._contentPresenter.Content == null)
-                        {
-                            comboBox._contentPresenter.Content = comboBox._selectedContent;
-                        }
+                    // Ensure that the toggle button is unchecked:
+                    if (comboBox._dropDownToggle != null && comboBox._dropDownToggle.IsChecked == true)
+                    {
+                        comboBox._dropDownToggle.IsChecked = false;
+                    }
 
-                        // Workaround for the fact that IsHitTestVisible does not propagate properly //todo: fix the propagation (which comes from the ComboBox style), and remove this block of code. Current issue when removing this code: if we click multiple times on the ComboBox (selecting and deselecting items), at one point the item in the ContentPresenter does not inherit "transparency to click", meaning that it is no longer possible to click the underlying ToggleButton when clicking on the item.
-                        if (comboBox._contentPresenter != null)
-                        {
-                            comboBox._contentPresenter.IsHitTestVisible = true;
-                            comboBox._contentPresenter.IsHitTestVisible = false;
-                        }
-
-                        // Ensure that the toggle button is unchecked:
-                        if (comboBox._dropDownToggle != null && comboBox._dropDownToggle.IsChecked == true)
-                        {
-                            comboBox._dropDownToggle.IsChecked = false;
-                        }
-
-                        // Raise the Closed event:
+                    // Raise the Closed event:
 #if MIGRATION
-                        comboBox.OnDropDownClosed(new EventArgs());
+                    comboBox.OnDropDownClosed(new EventArgs());
 #else
                         comboBox.OnDropDownClosed(new RoutedEventArgs());
 #endif
-                    }
                 }
             }
+#if false
+        }
+#endif
         }
 
         /// <summary>

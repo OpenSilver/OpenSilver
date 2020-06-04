@@ -602,11 +602,11 @@ namespace Windows.UI.Xaml.Controls
 
             AttachGridToVisualTree();
             //UpdateChildrenInVisualTree(Items, Items);
-            if (RenderedItemsPanel == null && ItemsPanel != null)
+            if (ItemsHost == null && ItemsPanel != null)
             {
                 UpdateItemsPanel(ItemsPanel);
             }
-            else if (RenderedItemsPanel != null)
+            else if (ItemsHost != null)
             {
                 //we set the new Items (which will refresh the display)
                 if (_objectsToDisplay != null && _objectsToDisplay.Count > 0)
@@ -736,7 +736,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (columnsToAdd != null)
             {
-                if (this.RenderedItemsPanel != null)
+                if (this.ItemsHost != null)
                 {
                     // Remove _grid and _pagerUI from visual tree
 
@@ -745,7 +745,7 @@ namespace Windows.UI.Xaml.Controls
                     // whole dom for the grid, so might as well remove it 
                     // completely from the visual tree, make the changes, then 
                     // put it back.
-                    this.RenderedItemsPanel.Children.Clear();
+                    this.ItemsHost.Children.Clear();
                 }
 
                 //we add the column for the rows' headers:
@@ -850,7 +850,7 @@ namespace Windows.UI.Xaml.Controls
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    if (RenderedItemsPanel != null)
+                    if (ItemsHost != null)
                     {
                         //we check if we added in ItemsSource or in Items: If ItemsSource is empty or null, then we added through Items.Add(..).
                         bool isItemsSourceEmptyOrNull = (ItemsSource == null);
@@ -893,7 +893,7 @@ namespace Windows.UI.Xaml.Controls
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    if (RenderedItemsPanel != null)
+                    if (ItemsHost != null)
                     {
                         //we generate the list of the children before the change:
                         List<object> oldChildren2 = INTERNAL_ListsHelper.ConvertToListOfObjectsOrNull(Items); //we use this to make a clone of the list in Items
@@ -934,7 +934,7 @@ namespace Windows.UI.Xaml.Controls
                     //todo
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    if (RenderedItemsPanel != null)
+                    if (ItemsHost != null)
                     {
                         //we generate a list with the elements that were in the DataGrid:
                         RemoveAllChildren();
@@ -1435,10 +1435,10 @@ namespace Windows.UI.Xaml.Controls
             IEnumerable newChildrenEnumerable, 
             bool forceUpdateAllChildren = false) // "forceUpdateAllChildren" is used to remove all the children and add them back, for example when the ItemsPanel changes.
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && RenderedItemsPanel != null)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && ItemsHost != null)
             {
                 // Remove _grid and _pagerUI from visual tree
-                this.RenderedItemsPanel.Children.Clear();
+                this.ItemsHost.Children.Clear();
                 //INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_grid, this);
                 //INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_pagerUI, this);
                 //we should not arrive in here from the user's code since the user cannot set items.
@@ -1532,7 +1532,7 @@ namespace Windows.UI.Xaml.Controls
             if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(_grid))
             {
 #if REWORKLOADED
-                this.RenderedItemsPanel.AddVisualChild(this._grid);
+                this.ItemsHost.AddVisualChild(this._grid);
 #else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_grid, this);
 #endif
@@ -1541,7 +1541,7 @@ namespace Windows.UI.Xaml.Controls
                     throw new Exception("The DataPager is already attached and cannot be attached twice.");
 
 #if REWORKLOADED
-                this.RenderedItemsPanel.AddVisualChild(this._pagerUI);
+                this.ItemsHost.AddVisualChild(this._pagerUI);
 #else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_pagerUI, this);
 #endif

@@ -31,5 +31,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         protected MenuBase() { }
 
+        protected override bool IsItemItsOwnContainerOverride(object item)
+        {
+            return item is MenuItem;
+        }
+
+        protected override DependencyObject GetContainerForItemOverride()
+        {
+            return new MenuItem();
+        }
+
     }
 }

@@ -20,13 +20,17 @@ using System.Collections.Specialized;
 using System.Windows.Markup;
 using System.Diagnostics;
 using System.Linq;
+using CSHTML5.Internals.Controls;
+using System.Reflection;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -39,14 +43,14 @@ namespace Windows.UI.Xaml.Controls
     /// Represents a control that can be used to present a collection of items.
     /// </summary>
     [ContentProperty("Items")]
-    public partial class ItemsControl : Control
+    public partial class ItemsControl : Control, IGeneratorHost
     {
         #region Data
 
         // Note: this maps an item (for example a string) to the element
         // that is added to the visual tree (such a datatemplate) or to 
         // the native DOM element in case of native combo box for example.
-        private ItemContainerGenerator _itemContainerGenerator = new ItemContainerGenerator();
+        private ItemContainerGenerator _itemContainerGenerator;
 
         // ItemsPresenter retrieve from this control's Template
         // in which items will be rendered.
@@ -80,8 +84,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (this._items == null)
                 {
-                    this._items = new ItemCollection();
-                    this._items.CollectionChanged += this.OnItemCollectionChanged;
+                    this.CreateItemCollectionAndGenerator();
                 }
                 return this._items;
             }
@@ -94,8 +97,24 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
+                if (this._itemContainerGenerator == null)
+                {
+                    this.CreateItemCollectionAndGenerator();
+                }
                 return _itemContainerGenerator;
             }
+        }
+
+        private void CreateItemCollectionAndGenerator()
+        {
+            this._items = new ItemCollection();
+
+            // the generator must attach its collection change handler before
+            // the control itself, so that the generator is up-to-date by the
+            // time the control tries to use it
+            this._itemContainerGenerator = new ItemContainerGenerator();
+
+            this._items.CollectionChanged += this.OnItemCollectionChanged;
         }
 
         #endregion Public Properties
@@ -214,9 +233,9 @@ namespace Windows.UI.Xaml.Controls
         private static void OnItemTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ItemsControl itemsControl = (ItemsControl)d;
-            if (itemsControl.RenderedItemsPanel != null)
+            if (itemsControl.ItemsHost != null)
             {
-                itemsControl.UpdateChildrenInVisualTree(itemsControl.Items, itemsControl.Items, forceUpdateAllChildren: true);
+                itemsControl.Refresh();
             }
         }
 
@@ -242,7 +261,31 @@ namespace Windows.UI.Xaml.Controls
         private static void OnDisplayMemberPathChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ItemsControl itemsControl = (ItemsControl)d;
-            itemsControl.UpdateChildrenInVisualTree(itemsControl.Items, itemsControl.Items, true);
+            if (itemsControl.ItemsHost != null)
+            {
+                itemsControl.Refresh();
+            }
+        }
+
+        internal void Refresh()
+        {
+            IGeneratorHost host = (IGeneratorHost)this;
+
+            this.ItemsHost.Children.Clear();
+            this.ItemContainerGenerator.INTERNAL_Clear();
+            foreach (var item in this.Items)
+            {
+                DependencyObject container = host.GetContainerForItem(item, null);
+                if (container != item)
+                {
+                    container.SetValue(FrameworkElement.DataContextProperty, item);
+                }
+                host.PrepareItemContainer(container, item);
+
+                this.ItemContainerGenerator.INTERNAL_RegisterContainer(container, item);
+
+                this.ItemsHost.Children.Add((UIElement)container);
+            }
         }
 
         /// <summary>
@@ -266,10 +309,129 @@ namespace Windows.UI.Xaml.Controls
         private static void OnItemContainerStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ItemsControl itemsControl = (ItemsControl)d;
-            itemsControl.UpdateChildrenInVisualTree(itemsControl.Items, itemsControl.Items, true);
+            if (itemsControl.ItemsHost != null)
+            {
+                itemsControl.Refresh();
+            }
         }
 
         #endregion Dependency Properties
+
+        #region IGeneratorHost
+
+        /// <summary>
+        /// The view of the data
+        /// </summary>
+        IList IGeneratorHost.View
+        {
+            get { return Items; }
+        }
+
+        void IGeneratorHost.ClearContainerForItem(DependencyObject container, object item)
+        {
+            ClearContainerForItemOverride(container, item);
+        }
+
+        DependencyObject IGeneratorHost.GetContainerForItem(object item, DependencyObject recycledContainer)
+        {
+            // Note: for now we ignore the recycledContainer parameter.
+            // In WPF containers are not recycled so the parameter is
+            // only kept to preserve the Silverlight method's signature.
+
+            DependencyObject container;
+
+            // use the item directly, if possible
+            if (IsItemItsOwnContainerOverride(item))
+            {
+                if (this.Items.IsUsingItemsSource && this.ItemTemplate != null)
+                {
+                    throw new NotSupportedException("ItemsControl.Items must not be a UIElement type when an ItemTemplate is set.");
+                }
+                container = item as DependencyObject;
+            }
+            else
+                container = GetContainerForItemOverride();
+
+            // the container might have a parent from a previous
+            // generation.  If so, clean it up before using it again.
+            //
+            // Note: This assumes the container is about to be added to a new parent,
+            // according to the ItemsControl/Generator/Container pattern.
+            // If someone calls the generator and doesn't add the container to
+            // a visual parent, unexpected things might happen.
+
+            UIElement visual = container as UIElement;
+            if (visual != null)
+            {
+                UIElement parent = VisualTreeHelper.GetParent(visual) as UIElement;
+                if (parent != null)
+                {
+                    Debug.Assert(parent is FrameworkElement, "The Parent of the container should always be a FrameworkElement");
+                    Panel p = parent as Panel;
+                    if (p != null)
+                    {
+                        p.Children.Remove(visual);
+                    }
+                    //else
+                    //{
+                    //    ((FrameworkElement)parent).TemplateChild = null;
+                    //}
+                }
+            }
+
+            return container;
+        }
+
+        bool IGeneratorHost.IsHostForItemContainer(DependencyObject container)
+        {
+            // If ItemsControlFromItemContainer can determine who owns the element,
+            // use its decision.
+            ItemsControl ic = ItemsControlFromItemContainer(container);
+            if (ic != null)
+                return (ic == this);
+
+            // If the element is in my items view, and if it can be its own ItemContainer,
+            // it's mine.  Contains may be expensive, so we avoid calling it in cases
+            // where we already know the answer - namely when the element has a
+            // logical parent (ItemsControlFromItemContainer handles this case).  This
+            // leaves only those cases where the element belongs to my items
+            // without having a logical parent (e.g. via ItemsSource) and without
+            // having been generated yet. HasItem indicates if anything has been generated.
+
+            DependencyObject parent = VisualTreeHelper.GetParent(container);
+            //DependencyObject parent = LogicalTreeHelper.GetParent(container);
+
+            if (parent == null)
+            {
+                return IsItemItsOwnContainerOverride(container) &&
+                    HasItems && Items.Contains(container);
+            }
+
+            // Otherwise it's not mine
+            return false;
+        }
+
+        /// <summary>
+        /// Return true if the item is (or is eligible to be) its own ItemContainer
+        /// </summary>
+        bool IGeneratorHost.IsItemItsOwnContainer(object item)
+        {
+            return IsItemItsOwnContainer(item);
+        }
+
+        void IGeneratorHost.PrepareItemContainer(DependencyObject container, object item)
+        {
+            if (ShouldApplyItemContainerStyle(container, item))
+            {
+                // apply the ItemContainer style (if any)
+                ApplyItemContainerStyle(container, item);
+            }
+
+            // forward ItemTemplate, et al.
+            PrepareContainerForItemOverride(container, item);
+        }
+
+        #endregion IGeneratorHost
 
         #region Public Methods
 
@@ -326,7 +488,7 @@ namespace Windows.UI.Xaml.Controls
         /// correct type, otherwise it returns null if no container is to be 
         /// created, or it returns the new container otherwise.
         /// </returns>
-        [Obsolete("Use GetContainerFromItem(object item) instead.")]
+        [Obsolete]
         protected virtual SelectorItem INTERNAL_GenerateContainer(object item)
         {
             return (SelectorItem)this.GetContainerFromItem(item);
@@ -371,6 +533,49 @@ namespace Windows.UI.Xaml.Controls
         protected virtual void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
         }
+
+        //internal void ResetChildren()
+        //{
+        //    if (this.RenderedItemsPanel != null)
+        //    {
+        //        this.RenderedItemsPanel.Children.Clear();
+        //        this.ItemContainerGenerator.INTERNAL_Clear();
+        //    }
+        //    this.GenerateChildren();
+        //}
+
+        //internal void GenerateChildren()
+        //{
+        //    if (this.RenderedItemsPanel != null)
+        //    {
+        //        for (int i = 0; i < this.Items.Count; ++i)
+        //        {
+        //            object item = this._items[i];
+        //            DependencyObject container = this.GenerateContainerForItem(item);
+
+        //            UIElement child = container as UIElement;
+        //            if (child != null)
+        //            {
+        //                this.RenderedItemsPanel.Children.Add(child);
+        //            }
+        //        }
+        //    }
+        //}
+
+        //private DependencyObject GenerateContainerForItem(object item)
+        //{
+        //    IGeneratorHost host = (IGeneratorHost)this;
+        //    DependencyObject container = host.GetContainerForItem(item, null);
+        //    if (container != null)
+        //    {
+        //        container.SetValue(FrameworkElement.DataContextProperty, item);
+        //        host.PrepareItemContainer(container, item);
+
+        //        this.ItemContainerGenerator.INTERNAL_RegisterContainer(container, item);
+        //    }
+
+        //    return container;
+        //}
 
         // "forceUpdateAllChildren" is used to remove all the children
         // and add them back, for example when the ItemsPanel changes.
@@ -513,17 +718,17 @@ namespace Windows.UI.Xaml.Controls
                 {
                     // It means that no DataTemplate was applied,
                     // so we just remove the element.
-                    if (this.RenderedItemsPanel != null)
+                    if (this.ItemsHost != null)
                     {
-                        return this.RenderedItemsPanel.Children.Remove(itemAsUIElement);
+                        return this.ItemsHost.Children.Remove(itemAsUIElement);
                     }
                 }
             }
             else if (containerIfAny is FrameworkElement containerAsFE)
             {
-                if (this.RenderedItemsPanel != null)
+                if (this.ItemsHost != null)
                 {
-                    return this.RenderedItemsPanel.Children.Remove(containerAsFE);
+                    return this.ItemsHost.Children.Remove(containerAsFE);
                 }
                 return ItemContainerGenerator.INTERNAL_TryUnregisterContainer(containerIfAny, item);
             }
@@ -608,7 +813,7 @@ namespace Windows.UI.Xaml.Controls
 
             // If necessary, generate a container (such as "ListBoxItem",
             // "ComboBoxItem", etc.), and attach the item to the visual tree
-            if (RenderedItemsPanel != null)
+            if (ItemsHost != null)
             {
                 if (newContent != null) //otherwise, we are not in the Visual tree
                 {
@@ -628,7 +833,7 @@ namespace Windows.UI.Xaml.Controls
                         ItemContainerGenerator.INTERNAL_RegisterContainer(newContent, item);
 
                         // We directly attach the content to the visual tree
-                        this.RenderedItemsPanel.Children.Add(newContent);
+                        this.ItemsHost.Children.Add(newContent);
                     }
                     else
                     {
@@ -652,7 +857,7 @@ namespace Windows.UI.Xaml.Controls
                         ItemContainerGenerator.INTERNAL_RegisterContainer(containerIfAny, item);
 
                         // We attach the container to the visual tree
-                        this.RenderedItemsPanel.Children.Add(containerIfAny);
+                        this.ItemsHost.Children.Add(containerIfAny);
 
                         if (containerIfAny == newContent)
                         {
@@ -722,6 +927,7 @@ namespace Windows.UI.Xaml.Controls
             return result;
         }
 
+        [Obsolete]
         /// <summary>
         /// Create or identify the element used to display the given item.
         /// </summary>
@@ -775,7 +981,7 @@ namespace Windows.UI.Xaml.Controls
             get { return this._itemsPresenter; }
         }
 
-        internal Panel RenderedItemsPanel
+        internal Panel ItemsHost
         {
             get
             {
@@ -787,103 +993,128 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        internal bool HasItems
+        {
+            get { return this.Items.Count > 0; }
+        }
+
         #endregion Internal Properties
 
         #region Internal Methods
 
+        // A version of Object.Equals with paranoia for mismatched types, to avoid problems
+        // with classes that implement Object.Equals poorly, as in Dev11 439664, 746174, DDVSO 602650
+        internal static bool EqualsEx(object o1, object o2)
+        {
+            try
+            {
+                return Object.Equals(o1, o2);
+            }
+            catch (InvalidCastException)
+            {
+                // A common programming error: the type of o1 overrides Equals(object o2)
+                // but mistakenly assumes that o2 has the same type as o1:
+                //     MyType x = (MyType)o2;
+                // This throws InvalidCastException when o2 is a sentinel object,
+                // e.g. UnsetValue, DisconnectedItem, NewItemPlaceholder, etc.
+                // Rather than crash, just return false - the objects are clearly unequal.
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Determine whether the ItemContainerStyle/StyleSelector should apply to the container
+        /// </summary>
+        /// <returns>true if the ItemContainerStyle should apply to the item</returns>
+        internal virtual bool ShouldApplyItemContainerStyle(DependencyObject container, object item)
+        {
+            return true;
+        }
+
+        private void ApplyItemContainerStyle(DependencyObject container, object item)
+        {
+            FrameworkElement feContainer = container as FrameworkElement;
+
+            // Control's ItemContainerStyle has first stab
+            Style style = ItemContainerStyle;
+
+            // apply the style, if found
+            if (style != null)
+            {
+                // verify style is appropriate before applying it
+                if (!style.TargetType.IsInstanceOfType(container))
+                    throw new InvalidOperationException(string.Format("A style intended for type '{0}' cannot be applied to type '{1}'.", style.TargetType.Name, container.GetType().Name));
+
+                feContainer.Style = style;
+                //feContainer.IsStyleSetFromGenerator = true;
+            }
+        }
+
+        /// <summary>
+        /// Return true if the item is (or should be) its own item container
+        /// </summary>
+        internal bool IsItemItsOwnContainer(object item)
+        {
+            return IsItemItsOwnContainerOverride(item);
+        }
+
         internal void HandleItemsChanged(NotifyCollectionChangedEventArgs e)
         {
-            if (this.RenderedItemsPanel == null)
+            if (this.ItemsHost == null)
             {
                 return;
             }
 
-            switch (e.Action)
+            IGeneratorHost host = (IGeneratorHost)this;
+
+            if (e.Action == NotifyCollectionChangedAction.Reset)
             {
-                case NotifyCollectionChangedAction.Reset:
-                    this.RenderedItemsPanel.Children.Clear();
-                    this.ItemContainerGenerator.INTERNAL_Clear();
-                    foreach (var item in this.Items)
-                    {
-                        this.RenderedItemsPanel.Children.Add(this.CreateContainerFromItem(item));
-                    }
-                    break;
-
-                case NotifyCollectionChangedAction.Add:
-                    FrameworkElement newChild = this.CreateContainerFromItem(e.NewItems[0]);
-                    this.RenderedItemsPanel.Children.Insert(e.NewStartingIndex, newChild);
-                    break;
-
-                case NotifyCollectionChangedAction.Remove:
-                    this.ItemContainerGenerator.INTERNAL_TryUnregisterContainer(
-                        this.RenderedItemsPanel.Children[e.OldStartingIndex],
-                        e.OldItems[0]);
-                    this.RenderedItemsPanel.Children.RemoveAt(e.OldStartingIndex);
-                    break;
-
-                case NotifyCollectionChangedAction.Replace:
-                    FrameworkElement newItem = this.CreateContainerFromItem(e.NewItems[0]);
-                    this.ItemContainerGenerator.INTERNAL_TryUnregisterContainer(
-                        this.RenderedItemsPanel.Children[e.OldStartingIndex],
-                        e.OldItems[0]);
-                    this.RenderedItemsPanel.Children[e.OldStartingIndex] = newItem;
-                    break;
-
-                default:
-                    throw new InvalidOperationException(string.Format("Unexpected collection change action '{0}'.", e.Action));
+                this.Refresh();
             }
-        }
-
-        internal void UpdateChildrenInVisualTree(NotifyCollectionChangedEventArgs e)
-        {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            else if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                if (e.Action == NotifyCollectionChangedAction.Reset)
+                object item = e.NewItems[0];
+                DependencyObject container = host.GetContainerForItem(item, null);
+                if (container != item)
                 {
-                    if (this.RenderedItemsPanel != null)
-                    {
-                        this.RenderedItemsPanel.Children.Clear();
-                    }
-                    this.ItemContainerGenerator.INTERNAL_Clear();
-                    if (this.Items.Count > 0)
-                    {
-                        this.UpdateChildrenInVisualTree(Enumerable.Empty<object>(), this.Items, true);
-                    }
-                    return;
+                    container.SetValue(FrameworkElement.DataContextProperty, item);
                 }
+                host.PrepareItemContainer(container, item);
 
-                if (e.Action == NotifyCollectionChangedAction.Remove ||
-                    e.Action == NotifyCollectionChangedAction.Replace)
-                {
-                    Debug.Assert(e.OldItems.Count == 1);
-                    List<object> removedChildren = new List<object>(e.OldItems.Count);
-                    foreach (object item in e.OldItems)
-                    {
-                        bool removed = this.TryRemoveChildItemFromVisualTree(item);
-                        if (removed)
-                        {
-                            removedChildren.Add(item);
-                        }
-                    }
+                this.ItemContainerGenerator.INTERNAL_RegisterContainer(container, item);
 
-                    //-------------------------------------------------
-                    // Call the "OnChildItemRemoved" method for all the 
-                    // children that were in the old collection
-                    //-------------------------------------------------
-                    foreach (object removedItem in removedChildren)
-                    {
-                        this.OnChildItemRemoved(removedItem);
-                    }
-                }
-                if (e.Action == NotifyCollectionChangedAction.Add ||
-                    e.Action == NotifyCollectionChangedAction.Replace)
+                this.ItemsHost.Children.Insert(e.NewStartingIndex, (UIElement)container);
+
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                this.ItemContainerGenerator.INTERNAL_TryUnregisterContainer(
+                        this.ItemsHost.Children[e.OldStartingIndex],
+                        e.OldItems[0]);
+
+                this.ItemsHost.Children.RemoveAt(e.OldStartingIndex);
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Replace)
+            {
+                this.ItemContainerGenerator.INTERNAL_TryUnregisterContainer(
+                        this.ItemsHost.Children[e.OldStartingIndex],
+                        e.OldItems[0]);
+
+                object item = e.NewItems[0];
+                DependencyObject container = host.GetContainerForItem(item, null);
+                if (container != item)
                 {
-                    Debug.Assert(e.NewItems.Count == 1);
-                    foreach (object item in e.NewItems)
-                    {
-                        this.AddChildItemToVisualTree(item);
-                    }
+                    container.SetValue(FrameworkElement.DataContextProperty, item);
                 }
+                host.PrepareItemContainer(container, item);
+
+                this.ItemContainerGenerator.INTERNAL_RegisterContainer(container, item);
+
+                this.ItemsHost.Children[e.OldStartingIndex] = (UIElement)container;
+            }
+            else
+            {
+                throw new InvalidOperationException(string.Format("Unexpected collection change action '{0}'.", e.Action));
             }
         }
 
@@ -897,7 +1128,7 @@ namespace Windows.UI.Xaml.Controls
         #endregion Internal Methods
 
         #region Work in progress
-#if WORKINPROGRESS
+//#if WORKINPROGRESS
 
         /// <summary>
         /// Undoes the effects of the PrepareContainerForItemOverride method.
@@ -906,7 +1137,17 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="item">The item.</param>
         protected virtual void ClearContainerForItemOverride(DependencyObject element, object item)
         {
-            throw new NotImplementedException();
+            ContentControl cc;
+            ContentPresenter cp;
+
+            if ((cc = element as ContentControl) != null)
+            {
+                ClearContentControl(cc, item);
+            }
+            else if ((cp = element as ContentPresenter) != null)
+            {
+                ClearContentPresenter(cp, item);
+            }
         }
 
         /// <summary>
@@ -917,7 +1158,7 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         protected virtual DependencyObject GetContainerForItemOverride()
         {
-            throw new NotImplementedException();
+            return new ContentPresenter();
         }
 
         /// <summary>
@@ -933,7 +1174,7 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         protected virtual bool IsItemItsOwnContainerOverride(object item)
         {
-            throw new NotImplementedException();
+            return (item is UIElement);
         }
 
         /// <summary>
@@ -947,21 +1188,183 @@ namespace Windows.UI.Xaml.Controls
         /// </param>
         protected virtual void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
-            //throw new NotImplementedException();
-            //todo: implement this
-            //for now the implementation of this method is fully handled by derived classes.
+            ContentControl cc;
+            ContentPresenter cp;
+
+            if (this.ItemTemplate != null && !string.IsNullOrWhiteSpace(this.DisplayMemberPath))
+            {
+                throw new InvalidOperationException("Cannot set both DisplayMemberPath and ItemTemplate.");
+            }
+
+            DataTemplate template = this.ItemTemplate;
+            if (template == null)
+            {
+                template = GetDataTemplateForDisplayMemberPath(this.DisplayMemberPath);
+            }
+
+            if ((cc = element as ContentControl) != null)
+            {
+                PrepareContentControl(cc, item, template);
+            }
+            else if ((cp = element as ContentPresenter) != null)
+            {
+                PrepareContentPresenter(cp, item, template);
+            }
+        }
+
+        private static DataTemplate GetDataTemplateForDisplayMemberPath(string displayMemberPath)
+        {
+            DataTemplate template = new DataTemplate();
+
+            template._methodToInstantiateFrameworkTemplate = control =>
+            {
+                TemplateInstance templateInstance = new TemplateInstance();
+
+                TextBlock textBlock = new TextBlock();
+                textBlock.SetBinding(TextBlock.TextProperty, new Binding(displayMemberPath ?? string.Empty));
+
+                templateInstance.TemplateContent = textBlock;
+
+                return templateInstance;
+            };
+
+            return template;
+        }
+
+        private static void PrepareContentControl(ContentControl cc,
+                                                  object item,
+                                                  DataTemplate template)
+        {
+            if (item != cc)
+            {
+                cc.ContentTemplate = template;
+                cc.Content = item;
+            }
+        }
+
+        private static void PrepareContentPresenter(ContentPresenter cp,
+                                                    object item,
+                                                    DataTemplate template)
+        {
+            if (item != cp)
+            {
+                cp.ContentTemplate = template;
+                cp.Content = item;
+            }
+        }
+
+        private static void ClearContentControl(ContentControl cc,
+                                                object item)
+        {
+            if (cc != item)
+            {
+                cc.ClearValue(ContentControl.ContentProperty);
+            }
+        }
+
+        private static void ClearContentPresenter(ContentPresenter cp,
+                                                  object item)
+        {
+            if (cp != item)
+            {
+                cp.ClearValue(ContentPresenter.ContentProperty);
+            }
         }
 
         public static ItemsControl GetItemsOwner(DependencyObject element)
         {
-            return null;
+            ItemsControl container = null;
+            Panel panel = element as Panel;
+
+            if (panel != null && panel.IsItemsHost)
+            {
+                // see if element was generated for an ItemsPresenter
+                ItemsPresenter ip = ItemsPresenter.FromPanel(panel);
+
+                if (ip != null)
+                {
+                    // if so use the element whose style begat the ItemsPresenter
+                    container = ip.Owner;
+                }
+                //else
+                //{
+                //    // otherwise use element's templated parent
+                //    container = panel.TemplatedParent as ItemsControl;
+                //}
+            }
+
+            return container;
         }
 
         public static ItemsControl ItemsControlFromItemContainer(DependencyObject container)
         {
-            return null;
+            UIElement ui = container as UIElement;
+            if (ui == null)
+                return null;
+
+            // ui appeared in items collection
+            ItemsControl ic = ui.INTERNAL_VisualParent as ItemsControl;
+            if (ic != null)
+            {
+                // this is the right ItemsControl as long as the item
+                // is (or is eligible to be) its own container
+                IGeneratorHost host = ic as IGeneratorHost;
+                if (host.IsItemItsOwnContainer(ui))
+                    return ic;
+                else
+                    return null;
+            }
+
+            ui = VisualTreeHelper.GetParent(ui) as UIElement;
+
+            return ItemsControl.GetItemsOwner(ui);
         }
-#endif
+
+        //internal static DependencyObject GetItemsOwnerInternal(DependencyObject element)
+        //{
+        //    ItemsControl temp;
+        //    return GetItemsOwnerInternal(element, out temp);
+        //}
+
+        ///// <summary>
+        ///// Different from public GetItemsOwner
+        ///// Returns ip.TemplatedParent instead of ip.Owner
+        ///// More accurate when we want to distinguish if owner is a GroupItem or ItemsControl
+        ///// </summary>
+        ///// <param name="element"></param>
+        ///// <returns></returns>
+        //internal static DependencyObject GetItemsOwnerInternal(DependencyObject element, out ItemsControl itemsControl)
+        //{
+        //    DependencyObject container = null;
+        //    Panel panel = element as Panel;
+        //    itemsControl = null;
+
+        //    if (panel != null && panel.IsItemsHost)
+        //    {
+        //        // see if element was generated for an ItemsPresenter
+        //        ItemsPresenter ip = ItemsPresenter.FromPanel(panel);
+
+        //        if (ip != null)
+        //        {
+        //            // if so use the element whose style begat the ItemsPresenter
+        //            //container = ip.TemplatedParent;
+        //            FrameworkElement templateParent;
+        //            for (templateParent = ip.Parent as FrameworkElement; templateParent != null; templateParent = templateParent.Parent as FrameworkElement);
+        //            itemsControl = ip.Owner;
+        //        }
+        //        else
+        //        {
+        //            // otherwise use element's templated parent
+        //            //container = panel.TemplatedParent;
+        //            FrameworkElement templateParent;
+        //            for (templateParent = panel.Parent as FrameworkElement; templateParent != null; templateParent = templateParent.Parent as FrameworkElement);
+        //            itemsControl = container as ItemsControl;
+        //        }
+        //    }
+
+        //    return container;
+        //}
+//#endif
         #endregion
 
     }

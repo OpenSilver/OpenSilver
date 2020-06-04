@@ -85,6 +85,9 @@
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction.cs" />
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IItemContainerGenerator.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IRecyclingItemContainerGenerator.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\BusyIndicator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DescriptionViewer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Frame.cs" />
@@ -330,9 +333,7 @@
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlObject.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptObject.cs" />
     <Compile Include="Windows.UI.Core\WORKINPROGRESS\DispatcherOperation.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\GeneratorPosition.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\ItemsChangedEventArgs.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\ItemsChangedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Dock.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DockPanel.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Frame.cs" />

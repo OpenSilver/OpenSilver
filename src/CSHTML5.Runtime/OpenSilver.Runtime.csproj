@@ -103,6 +103,7 @@
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TableItemPatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TablePatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
@@ -263,7 +264,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ValidationSummaryItemType.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\VirtualizingPanel.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\VirtualizingStackPanel.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\GeneratorDirection.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IItemContainerGenerator.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IRecyclingItemContainerGenerator.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IScrollInfo.cs" />
@@ -538,9 +538,7 @@
 		<Compile Include="Windows.UI.Text\FontWeightConverter.cs" />
 		<Compile Include="Windows.UI.Text\FontWeights.cs" />
 		<Compile Include="Windows.UI.Text\TextDecorations.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\GeneratorPosition.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\ItemsChangedEventArgs.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\ItemsChangedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\ButtonBase.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\DataGridColumnHeader.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\DragCompletedEventArgs.cs" />

@@ -84,6 +84,43 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public ListBox() { }
 
+        protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+        {
+            base.PrepareContainerForItemOverride(element, item);
+
+            ListBoxItem container = element as ListBoxItem;
+            if (container != null)
+            {
+                container.INTERNAL_CorrespondingItem = item;
+                container.INTERNAL_ParentSelectorControl = this;
+                if (SelectedItems.Contains(item))
+                {
+                    // todo if possible: reuse the former items if they were already 
+                    // created rather than recreating them. It would actually be 
+                    // necessary to avoir errors like item is a string and there are 
+                    // two items with the same string, but only one of them is 
+                    // selected. Both will be considered (un)selected.
+
+                    // this can be needed when the SelectedItems collection was 
+                    // modified before the ListBox.Loaded event happened (which 
+                    // leads to an ItemsControl.UpdateItemsPanel, which then leads 
+                    // here).
+                    container.IsSelected = true;
+                }
+                container.Click += listBoxItem_Click;
+            }
+        }
+
+        protected override DependencyObject GetContainerForItemOverride()
+        {
+            return new ListBoxItem();
+        }
+
+        protected override bool IsItemItsOwnContainerOverride(object item)
+        {
+            return (item is ListBoxItem);
+        }
+
         protected override SelectorItem INTERNAL_GenerateContainer(object item)
         {
             return (SelectorItem)this.GetContainerFromItem(item);
