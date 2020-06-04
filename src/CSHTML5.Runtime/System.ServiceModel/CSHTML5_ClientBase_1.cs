@@ -966,7 +966,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 {
                     const string NS = "http://www.w3.org/2003/05/soap-envelope";
                     
-                    XElement envelopeElement = XDocument.Parse(responseAsString).Element(XName.Get("Envelope", NS));
+                    XElement envelopeElement = XDocument.Parse(responseAsString).Root;
                     XElement headerElement = envelopeElement.Element(XName.Get("Header", NS));
                     XElement bodyElement = envelopeElement.Element(XName.Get("Body", NS));
 
@@ -987,25 +987,10 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         if (detailElement != null)
                         {
                             XElement innerExceptionElement = detailElement.Elements().First();
-                            Type innerExceptionType = ResolveType(innerExceptionElement.Name.LocalName);
-                            Type faultExceptionType = typeof(FaultException<>).MakeGenericType(innerExceptionType);
-                        
-                            object innerException = Activator.CreateInstance(innerExceptionType);
 
-                            foreach (XElement element in innerExceptionElement.Elements())
-                            {
-                                PropertyInfo elementProperty = innerExceptionType.GetProperty(element.Name.LocalName);
+                            object innerException = ParseException(innerExceptionElement, innerExceptionElement.Name.LocalName);
                             
-                                XAttribute isNullAttribute = element.Attributes().FirstOrDefault(a => a.Name.LocalName == "nil");
-                                if (isNullAttribute != null && isNullAttribute.Value == "true")
-                                {
-                                    elementProperty.SetValue(innerException, null);
-                                }
-                                else
-                                {
-                                    elementProperty.SetValue(innerException, element.Value);
-                                }
-                            }
+                            Type faultExceptionType = typeof(FaultException<>).MakeGenericType(innerException.GetType());
 
                             faultException = (FaultException)Activator.CreateInstance(faultExceptionType, innerException, faultReason, faultCode, action);
                         }
@@ -1017,6 +1002,33 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         
                         raiseFaultException(faultException);
                         return null;
+                    }
+
+                    object ParseException(XElement exceptionElement, string exceptionTypeName)
+                    {
+                        Type exceptionType = ResolveType(exceptionTypeName);
+                        
+                        object exception = Activator.CreateInstance(exceptionType);
+                        
+                        foreach (XElement element in exceptionElement.Elements())
+                        {
+                            PropertyInfo property = exceptionType.GetProperty(element.Name.LocalName);
+                            
+                            XAttribute isNullAttribute = element.Attributes().FirstOrDefault(a => a.Name.LocalName == "nil");
+                            if (isNullAttribute != null && isNullAttribute.Value == "true")
+                            {
+                                property.SetValue(exception, null);
+                            }
+                            else
+                            {
+                                if (property.Name == "InnerException")
+                                    property.SetValue(exception, ParseException(element, "SoaUnknownException"));
+                                else
+                                    property.SetValue(exception, element.Value);
+                            }
+                        }
+
+                        return exception;
                     }
 
                     Type ResolveType(string name)
@@ -1033,7 +1045,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                             }
                         }
 
-                        return null;
+                        throw new InvalidOperationException($"Could not resolve type {name}");
                     }
                 }
                 else
