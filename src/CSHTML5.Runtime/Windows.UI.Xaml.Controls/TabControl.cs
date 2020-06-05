@@ -19,13 +19,17 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 #else
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Input;
 #endif
 
 #if MIGRATION
@@ -47,12 +51,14 @@ namespace Windows.UI.Xaml.Controls
         public TabControl()
         {
             SelectedIndex = -1;
+#if MIGRATION
+            KeyDown += delegate (object sender, KeyEventArgs e) { /*OnKeyDown(e);*/ };
+#else
+            KeyDown += delegate (object sender, KeyRoutedEventArgs e) { /*OnKeyDown(e);*/ };
+#endif
             SelectionChanged += delegate (object sender, SelectionChangedEventArgs e) { OnSelectionChanged(e); };
-            //IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
-            //DefaultStyleKey = typeof(TabControl);
-
-            // Set default style:
-            this.DefaultStyleKey = typeof(TabControl);
+            IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
+            DefaultStyleKey = typeof(TabControl);
         }
 
         /// <summary>
@@ -89,7 +95,7 @@ namespace Windows.UI.Xaml.Controls
                 TabItem tabItem = item as TabItem;
                 if (tabItem == null)
                 {
-                    throw new ArgumentException("string.Format(CultureInfo.InvariantCulture, System.Windows.Controls.Properties.Resources.TabControl_InvalidChild, item.GetType().ToString())");
+                    throw new ArgumentException(string.Format("Unable to cast object of type '{0}' to type '{1}'.", item.GetType().ToString(), typeof(TabItem)));
                 }
                 AddToTabPanel(tabItem);
             }
@@ -106,7 +112,7 @@ namespace Windows.UI.Xaml.Controls
             ChangeVisualState(false);
         }
 
-        #region SelectedItem
+#region SelectedItem
         /// <summary>
         /// Gets or sets the currently selected TabItem.
         /// </summary>
@@ -138,8 +144,7 @@ namespace Windows.UI.Xaml.Controls
                 "SelectedItem",
                 typeof(object),
                 typeof(TabControl),
-                new PropertyMetadata(null, OnSelectedItemChanged)
-                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+                new PropertyMetadata(null, OnSelectedItemChanged));
 
         /// <summary>
         /// SelectedItem property changed handler.
@@ -167,9 +172,9 @@ namespace Windows.UI.Xaml.Controls
                 tc.SelectItem(oldItem, tabItem);
             }
         }
-        #endregion SelectedItem
+#endregion SelectedItem
 
-        #region SelectedIndex
+#region SelectedIndex
         /// <summary>
         /// Gets or sets the index of the currently selected TabItem.
         /// </summary>
@@ -193,8 +198,7 @@ namespace Windows.UI.Xaml.Controls
                 "SelectedIndex",
                 typeof(int),
                 typeof(TabControl),
-                new PropertyMetadata(-1, OnSelectedIndexChanged)
-                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+                new PropertyMetadata(-1, OnSelectedIndexChanged));
 
         /// <summary>
         /// SelectedIndex property changed handler.
@@ -210,7 +214,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (newIndex < -1)
             {
-                throw new ArgumentException("string.Format(CultureInfo.InvariantCulture, System.Windows.Controls.Properties.Resources.TabControl_InvalidIndex, newIndex.ToString(CultureInfo.CurrentCulture))");
+                throw new ArgumentException(string.Format("'{0}' is not a valid value for property 'SelectedIndex'", newIndex.ToString()));
             }
 
             // Coercion Workaround
@@ -261,7 +265,7 @@ namespace Windows.UI.Xaml.Controls
                 TabItem tabItem = item as TabItem;
                 if (tabItem == null)
                 {
-                    throw new ArgumentException("string.Format(CultureInfo.InvariantCulture, System.Windows.Controls.Properties.Resources.TabControl_InvalidChild, item.GetType().ToString())");
+                    throw new ArgumentException(string.Format("Unable to cast object of type '{0}' to type '{1}'.", item.GetType().ToString(), typeof(TabItem)));
                 }
                 if (tabItem != newItem && tabItem.IsSelected)
                 {
@@ -279,16 +283,14 @@ namespace Windows.UI.Xaml.Controls
             if (handler != null)
             {
                 SelectionChangedEventArgs args = new SelectionChangedEventArgs(
-                    (oldItem == null ? new List<object> { } : new List<object> { oldItem }),
-                    (newItem == null ? new List<object> { } : new List<object> { newItem }));
-                //(oldItem == null ? new List<TabItem> { } : new List<TabItem> { oldItem }),
-                //(newItem == null ? new List<TabItem> { } : new List<TabItem> { newItem }));
+                     (oldItem == null ? new List<TabItem> { } : new List<TabItem> { oldItem }),
+                     (newItem == null ? new List<TabItem> { } : new List<TabItem> { newItem }));
                 handler(this, args);
             }
         }
-        #endregion SelectedIndex
+#endregion SelectedIndex
 
-        #region SelectedContent
+#region SelectedContent
         /// <summary>
         /// Gets the content of the currently selected TabItem.
         /// </summary>
@@ -312,8 +314,7 @@ namespace Windows.UI.Xaml.Controls
                 "SelectedContent",
                 typeof(object),
                 typeof(TabControl),
-                new PropertyMetadata(null, OnSelectedContentChanged)
-                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+                new PropertyMetadata(null, OnSelectedContentChanged));
 
         /// <summary>
         /// SelectedContent property changed handler.
@@ -326,7 +327,7 @@ namespace Windows.UI.Xaml.Controls
 
             tc.UpdateSelectedContent(e.NewValue);
         }
-        #endregion SelectedContent
+#endregion SelectedContent
 
         /// <summary>
         /// Called when the IsEnabled property changes.
@@ -358,7 +359,7 @@ namespace Windows.UI.Xaml.Controls
                     TabItem tabItem = item as TabItem;
                     if (tabItem == null)
                     {
-                        throw new ArgumentException("string.Format(CultureInfo.InvariantCulture, System.Windows.Controls.Properties.Resources.TabControl_InvalidChild, item.GetType().ToString())"); //todo: what is this?
+                        throw new ArgumentException(string.Format("Unable to cast object of type '{0}' to type '{1}'.", item.GetType().ToString(), typeof(TabItem)));
                     }
                     AddToTabPanel(tabItem);
                 }
@@ -400,131 +401,131 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        ///// <summary>
-        ///// Updates the current selection when Items has changed.
-        ///// </summary>
-        ///// <param name="e">Data used by the event.</param>
-        //protected void OnItemsChanged(NotifyCollectionChangedEventArgs e)
-        //{
-        //    switch (e.Action)
-        //    {
-        //        case NotifyCollectionChangedAction.Add:
-        //            int newSelectedIndex = -1;
-        //            foreach (object o in e.NewItems)
-        //            {
-        //                TabItem tabItem = o as TabItem;
-        //                if (tabItem == null)
-        //                {
-        //                    throw new ArgumentException("string.Format(CultureInfo.InvariantCulture, System.Windows.Controls.Properties.Resources.TabControl_InvalidChild, o.GetType().ToString())");
-        //                }
-        //                int index = Items.IndexOf(tabItem);
-        //                InsertIntoTabPanel(index, tabItem);
+        /// <summary>
+        /// Updates the current selection when Items has changed.
+        /// </summary>
+        /// <param name="e">Data used by the event.</param>
+        protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    int newSelectedIndex = -1;
+                    foreach (object o in e.NewItems)
+                    {
+                        TabItem tabItem = o as TabItem;
+                        if (tabItem == null)
+                        {
+                            throw new ArgumentException(string.Format("Unable to cast object of type '{0}' to type '{1}'.", o.GetType().ToString(), typeof(TabItem)));
+                        }
+                        int index = Items.IndexOf(tabItem);
+                        InsertIntoTabPanel(index, tabItem);
 
-        //                // If we are adding a selected item
-        //                if (tabItem.IsSelected)
-        //                {
-        //                    newSelectedIndex = index;
-        //                }
-        //                else if (SelectedItem != GetItemAtIndex(SelectedIndex))
-        //                {
-        //                    newSelectedIndex = Items.IndexOf(SelectedItem);
-        //                }
-        //                else if ((_desiredIndex < Items.Count) && (_desiredIndex >= 0))
-        //                {
-        //                    // Coercion Workaround
-        //                    newSelectedIndex = _desiredIndex;
-        //                }
+                        // If we are adding a selected item
+                        if (tabItem.IsSelected)
+                        {
+                            newSelectedIndex = index;
+                        }
+                        else if (SelectedItem != GetItemAtIndex(SelectedIndex))
+                        {
+                            newSelectedIndex = Items.IndexOf(SelectedItem);
+                        }
+                        else if ((_desiredIndex < Items.Count) && (_desiredIndex >= 0))
+                        {
+                            // Coercion Workaround
+                            newSelectedIndex = _desiredIndex;
+                        }
 
-        //                tabItem.UpdateVisualState();
-        //            }
+                        tabItem.UpdateVisualState();
+                    }
 
-        //            if (newSelectedIndex == -1)
-        //            {
-        //                // If we are adding many items through xaml, one could
-        //                // already be specified as selected. If so, we don't
-        //                // want to override the value.
-        //                foreach (object item in Items)
-        //                {
-        //                    TabItem tabItem = item as TabItem;
-        //                    if (tabItem == null)
-        //                    {
-        //                        throw new ArgumentException("string.Format(CultureInfo.InvariantCulture, System.Windows.Controls.Properties.Resources.TabControl_InvalidChild, item.GetType().ToString())");
-        //                    }
+                    if (newSelectedIndex == -1)
+                    {
+                        // If we are adding many items through xaml, one could
+                        // already be specified as selected. If so, we don't
+                        // want to override the value.
+                        foreach (object item in Items)
+                        {
+                            TabItem tabItem = item as TabItem;
+                            if (tabItem == null)
+                            {
+                                throw new ArgumentException(string.Format("Unable to cast object of type '{0}' to type '{1}'.", item.GetType().ToString(), typeof(TabItem)));
+                            }
 
-        //                    if (tabItem.IsSelected)
-        //                    {
-        //                        return;
-        //                    }
-        //                }
+                            if (tabItem.IsSelected)
+                            {
+                                return;
+                            }
+                        }
 
-        //                // To follow WPF behavior, we only select the item if
-        //                // the user has not explicitly set the IsSelected field
-        //                // to false, or if there are 2 or more items in the
-        //                // TabControl.
-        //                if (Items.Count > 1 || ((Items[0] as TabItem).ReadLocalValue(TabItem.IsSelectedProperty) as bool?) != false)
-        //                {
-        //                    newSelectedIndex = 0;
-        //                }
-        //            }
+                        // To follow WPF behavior, we only select the item if
+                        // the user has not explicitly set the IsSelected field
+                        // to false, or if there are 2 or more items in the
+                        // TabControl.
+                        if (Items.Count > 1 || ((Items[0] as TabItem).ReadLocalValue(TabItem.IsSelectedProperty) as bool?) != false)
+                        {
+                            newSelectedIndex = 0;
+                        }
+                    }
 
-        //            // When we add a new item into the selected position, 
-        //            // SelectedIndex does not change, so we need to update both
-        //            // the SelectedItem and the SelectedIndex.
-        //            SelectedItem = GetItemAtIndex(newSelectedIndex);
-        //            SelectedIndex = newSelectedIndex;
-        //            break;
+                    // When we add a new item into the selected position, 
+                    // SelectedIndex does not change, so we need to update both
+                    // the SelectedItem and the SelectedIndex.
+                    SelectedItem = GetItemAtIndex(newSelectedIndex);
+                    SelectedIndex = newSelectedIndex;
+                    break;
 
-        //        case NotifyCollectionChangedAction.Remove:
-        //            foreach (object o in e.OldItems)
-        //            {
-        //                TabItem tabItem = o as TabItem;
-        //                RemoveFromTabPanel(tabItem);
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (object o in e.OldItems)
+                    {
+                        TabItem tabItem = o as TabItem;
+                        RemoveFromTabPanel(tabItem);
 
-        //                // if there are no items, the selected index is set to
-        //                // -1
-        //                if (Items.Count == 0)
-        //                {
-        //                    SelectedIndex = -1;
-        //                }
-        //                else if (Items.Count <= SelectedIndex)
-        //                {
-        //                    SelectedIndex = Items.Count - 1;
-        //                }
-        //                else
-        //                {
-        //                    SelectedItem = GetItemAtIndex(SelectedIndex);
-        //                }
-        //            }
-        //            break;
+                        // if there are no items, the selected index is set to
+                        // -1
+                        if (Items.Count == 0)
+                        {
+                            SelectedIndex = -1;
+                        }
+                        else if (Items.Count <= SelectedIndex)
+                        {
+                            SelectedIndex = Items.Count - 1;
+                        }
+                        else
+                        {
+                            SelectedItem = GetItemAtIndex(SelectedIndex);
+                        }
+                    }
+                    break;
 
-        //        case NotifyCollectionChangedAction.Reset:
-        //            ClearTabPanel();
-        //            SelectedIndex = -1;
+                case NotifyCollectionChangedAction.Reset:
+                    ClearTabPanel();
+                    SelectedIndex = -1;
 
-        //            // For Setting the ItemsSource
-        //            foreach (object item in Items)
-        //            {
-        //                TabItem tabItem = item as TabItem;
-        //                if (tabItem == null)
-        //                {
-        //                    throw new ArgumentException("string.Format(CultureInfo.InvariantCulture, System.Windows.Controls.Properties.Resources.TabControl_InvalidChild, item.GetType().ToString())");
-        //                }
-        //                AddToTabPanel(tabItem);
-        //                if (tabItem.IsSelected)
-        //                {
-        //                    SelectedItem = tabItem;
-        //                }
-        //            }
-        //            if (SelectedIndex == -1 && Items.Count > 0)
-        //            {
-        //                SelectedIndex = 0;
-        //            }
-        //            break;
+                    // For Setting the ItemsSource
+                    foreach (object item in Items)
+                    {
+                        TabItem tabItem = item as TabItem;
+                        if (tabItem == null)
+                        {
+                            throw new ArgumentException(string.Format("Unable to cast object of type '{0}' to type '{1}'.", item.GetType().ToString(), typeof(TabItem)));
+                        }
+                        AddToTabPanel(tabItem);
+                        if (tabItem.IsSelected)
+                        {
+                            SelectedItem = tabItem;
+                        }
+                    }
+                    if (SelectedIndex == -1 && Items.Count > 0)
+                    {
+                        SelectedIndex = 0;
+                    }
+                    break;
 
-        //        case NotifyCollectionChangedAction.Replace:
-        //            break;
-        //    }
-        //}
+                case NotifyCollectionChangedAction.Replace:
+                    break;
+            }
+        }
 
         /// <summary>
         /// Occurs when the selected
@@ -540,6 +541,57 @@ namespace Windows.UI.Xaml.Controls
         /// </param>
         protected virtual void OnSelectionChanged(SelectionChangedEventArgs args)
         {
+        }
+
+        /// <summary>
+        /// This is the method that responds to the KeyDown event.
+        /// </summary>
+        /// <param name="e">Data used by the event.</param>
+#if MIGRATION
+        protected override void OnKeyDown(KeyEventArgs e)
+#else
+        protected override void OnKeyDown(KeyRoutedEventArgs e)
+#endif
+        {
+            base.OnKeyDown(e);
+            if (e.Handled)
+            {
+                return;
+            }
+            TabItem nextTabItem = null;
+
+            int direction = 0;
+            int startIndex = -1;
+            switch (e.Key)
+            {
+#if MIGRATION
+                case Key.Home:
+#else
+                case VirtualKey.Home:
+#endif
+                    direction = 1;
+                    startIndex = -1;
+                    break;
+#if MIGRATION
+                case Key.End:
+#else
+                case VirtualKey.End:
+#endif
+                    direction = -1;
+                    startIndex = Items.Count;
+                    break;
+                default:
+                    return;
+            }
+
+            nextTabItem = FindNextTabItem(startIndex, direction);
+
+            if (nextTabItem != null && nextTabItem != SelectedItem)
+            {
+                e.Handled = true;
+                SelectedItem = nextTabItem;
+                nextTabItem.Focus();
+            }
         }
 
         /// <summary>
@@ -626,44 +678,44 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        ///// <summary>
-        ///// Inherited code: Requires comment.
-        ///// </summary>
-        ///// <param name="index">Inherited code: Requires comment 1.</param>
-        ///// <param name="tabItem">Inherited code: Requires comment 2.</param>
-        //private void InsertIntoTabPanel(int index, TabItem tabItem)
-        //{
-        //    TabPanel panel = ElementTabPanelTop;
-        //    if (panel != null && !panel.Children.Contains(tabItem))
-        //    {
-        //        panel.Children.Insert(index, tabItem);
-        //    }
-        //}
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <param name="index">Inherited code: Requires comment 1.</param>
+        /// <param name="tabItem">Inherited code: Requires comment 2.</param>
+        private void InsertIntoTabPanel(int index, TabItem tabItem)
+        {
+            TabPanel panel = ElementTabPanelTop;
+            if (panel != null && !panel.Children.Contains(tabItem))
+            {
+                panel.Children.Insert(index, tabItem);
+            }
+        }
 
-        ///// <summary>
-        ///// Inherited code: Requires comment.
-        ///// </summary>
-        ///// <param name="tabItem">Inherited code: Requires comment 1.</param>
-        //private void RemoveFromTabPanel(TabItem tabItem)
-        //{
-        //    TabPanel panel = ElementTabPanelTop;
-        //    if (panel != null && panel.Children.Contains(tabItem))
-        //    {
-        //        panel.Children.Remove(tabItem);
-        //    }
-        //}
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <param name="tabItem">Inherited code: Requires comment 1.</param>
+        private void RemoveFromTabPanel(TabItem tabItem)
+        {
+            TabPanel panel = ElementTabPanelTop;
+            if (panel != null && panel.Children.Contains(tabItem))
+            {
+                panel.Children.Remove(tabItem);
+            }
+        }
 
-        ///// <summary>
-        ///// Inherited code: Requires comment.
-        ///// </summary>
-        //private void ClearTabPanel()
-        //{
-        //    TabPanel panel = ElementTabPanelTop;
-        //    if (panel != null)
-        //    {
-        //        panel.Children.Clear();
-        //    }
-        //}
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        private void ClearTabPanel()
+        {
+            TabPanel panel = ElementTabPanelTop;
+            if (panel != null)
+            {
+                panel.Children.Clear();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the TabStripPlacement Top template.
@@ -704,34 +756,5 @@ namespace Windows.UI.Xaml.Controls
         /// Inherited code: Requires comment.
         /// </summary>
         private bool _updateIndex = true;
-
-        protected override void OnChildItemRemoved(object item)
-        {
-            base.OnChildItemRemoved(item);
-
-            // Ensure that, when an item is removed from the list of items, we deselect it:
-            if (this.SelectedItem == item)
-            {
-                SetCurrentValue(SelectedIndexProperty, -1); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                SetCurrentValue(SelectedItemProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                SetCurrentValue(SelectedContentProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-
-                //todo: update binding of SelectedIndex, SelectedValue, and SelectedItem
-            }
-        }
-
-        protected override void UpdateItemsPanel(ItemsPanelTemplate newTemplate)
-        {
-            //this is to keep the implementation of UpdateItemsPanel from ItemsControl from interfering with this class' logic.
-        }
-
-        protected override void AddChildItemToVisualTree(object item)
-        {
-            //this is to keep the implementation of AddChildItemToVisualTree from ItemsControl from interfering with this class' logic.
-            if (item is TabItem)
-            {
-                AddToTabPanel((TabItem)item);
-            }
-        }
     }
 }

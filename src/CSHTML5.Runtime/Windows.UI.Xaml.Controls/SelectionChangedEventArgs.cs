@@ -36,28 +36,16 @@ namespace Windows.UI.Xaml.Controls
     public partial class SelectionChangedEventArgs : RoutedEventArgs
     {
         /// <summary>
-        /// Initializes a new instance of the SelectionChangedEventArgs class.
-        /// </summary>
-        public SelectionChangedEventArgs() : this(new List<object>(), new List<object>())
-        {
-
-        }
-        /// <summary>
         /// Initializes a new instance of the SelectionChangedEventArgs class with the specified removed and added items.
         /// </summary>
         /// <param name="removedItems">A list of the elements that have been removed from the list.</param>
         /// <param name="addedItems">A list of the elements that have been added to the list.</param>
-#if WORKINPROGRESS
         public SelectionChangedEventArgs(IList removedItems, IList addedItems)
-#else
-        public SelectionChangedEventArgs(IList<object> removedItems, IList<object> addedItems)
-#endif
         {
             _addedItems = addedItems;
             _removedItems = removedItems;
         }
 
-#if WORKINPROGRESS
         IList _addedItems;
         IList _removedItems;
 
@@ -74,23 +62,5 @@ namespace Windows.UI.Xaml.Controls
         /// Gets a list that contains the items that were unselected.
         /// </summary>
         public IList RemovedItems { get { return _removedItems; } }
-#else
-        IList<object> _addedItems;
-        IList<object> _removedItems;
-
-        // Returns:
-        //     The loosely typed collection of items that were selected in this event.
-        /// <summary>
-        /// Gets a list that contains the items that were selected.
-        /// </summary>
-        public IList<object> AddedItems { get { return _addedItems; } }
-
-        // Returns:
-        //     The loosely typed list of items that were unselected in this event.
-        /// <summary>
-        /// Gets a list that contains the items that were unselected.
-        /// </summary>
-        public IList<object> RemovedItems { get { return _removedItems; } }
-#endif
     }
 }
