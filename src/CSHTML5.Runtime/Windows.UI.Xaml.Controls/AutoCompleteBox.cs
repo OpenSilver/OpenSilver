@@ -17,6 +17,7 @@ using CSHTML5.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 #if MIGRATION
@@ -42,24 +43,79 @@ namespace Windows.UI.Xaml.Controls
         Popup _popup;
         ToggleButton _dropDownToggle;
         TextBox _textBox;
-        UIElement _selectedContent;
-        DispatcherTimer _timer = new DispatcherTimer();
-        IEnumerable _filteredItems;// _filteredItems are Items that fit the SearchText using the _itemFilter. 
-        string _searchText = "";
+        DispatcherTimer _timer; // timer used to manage the MinimumPopulateDelay property.
+
+        private AutoCompleteFilterMode _filterMode; // filter mode
+        private AutoCompleteFilterPredicate<object> _filter; // currently selected filter
+        private AutoCompleteFilterPredicate<object> _itemFilter; // filter used when mode is set to Custom.
+
+        private bool _updatingTextOnSelection;
 
         /// <summary>
         /// Initializes a new instance of the AutoCompleteBox class.
         /// </summary>
         public AutoCompleteBox()
         {
-            // Set default style: //todo-perfs: verify that this technique does not result in duplicate calls to the setters of the style in case the user then specifies a different style.
             this.DefaultStyleKey = typeof(AutoCompleteBox);
-
-            //MinimumDelay is a property that set the time before opening the PopUp, so we listen to the Tick event
-            _timer.Tick += _timer_Tick;
+            this.FilterMode = AutoCompleteFilterMode.StartsWith;
+            this._timer = new DispatcherTimer();
+            this._timer.Tick += (o, e) =>
+            {
+                this._timer.Stop();
+                this.UpdateItemsVisibilityOnTextChanged();
+            };
         }
 
+        private void OnTextBoxTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this._updatingTextOnSelection)
+            {
+                return;
+            }
 
+            if (this._textBox == null ||
+                this._textBox.Text.Length < this.MinimumPrefixLength)
+            {
+                this._timer.Stop();
+                this.SetCurrentValue(SelectedIndexProperty, -1);
+                this.IsDropDownOpen = false;
+
+                return;
+            }
+
+            if (this._timer.IsEnabled)
+            {
+                // if the timer has already started, we need
+                // to reset it.
+                this._timer.Stop();
+            }
+            this._timer.Start();
+        }
+
+        private void UpdateItemsVisibilityOnTextChanged()
+        {
+            if (this.ItemsHost != null)
+            {
+                for (int i = 0; i < this.ItemsHost.Children.Count; ++i)
+                {
+                    ComboBoxItem child = this.ItemsHost.Children[i] as ComboBoxItem;
+                    if (this._filter(this._textBox.Text, child.Content))
+                    {
+                        child.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        child.Visibility = Visibility.Collapsed;
+                        if (this.SelectedIndex == i)
+                        {
+                            this.SetCurrentValue(SelectedIndexProperty, -1);
+                        }
+                    }
+                }
+
+                this.IsDropDownOpen = true;
+            }
+        }
 
 #if MIGRATION
         public override void OnApplyTemplate()
@@ -79,11 +135,20 @@ namespace Windows.UI.Xaml.Controls
                 _dropDownToggle.Unchecked += DropDownToggle_Unchecked;
             }
 
+            if (_textBox != null)
+            {
+                _textBox.TextChanged += OnTextBoxTextChanged;
+            }
+
 #if MIGRATION
             _textBox.MouseLeftButtonDown += TextBox_MouseLeftButtonDown;
 #else
             _textBox.PointerPressed += TextBox_PointerPressed;
 #endif
+
+            this.UpdateToggleButton(this.IsArrowVisible);
+
+            this.ApplySelectedIndex(this.SelectedIndex);
         }
 
 
@@ -112,14 +177,15 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the IsDropDownOpen dependency property.
         /// </summary>
         public static readonly DependencyProperty IsDropDownOpenProperty =
-            DependencyProperty.Register("IsDropDownOpen", typeof(bool), typeof(AutoCompleteBox), new PropertyMetadata(false, IsDropDownOpen_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("IsDropDownOpen", 
+                                        typeof(bool), 
+                                        typeof(AutoCompleteBox), 
+                                        new PropertyMetadata(false, OnIsDropDownOpenChanged));
 
-        private static void IsDropDownOpen_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnIsDropDownOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var autoCompleteBox = (AutoCompleteBox)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(autoCompleteBox)
-                && e.NewValue is bool)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(autoCompleteBox))
             {
                 bool isDropDownOpen = (bool)e.NewValue;
 
@@ -138,18 +204,7 @@ namespace Windows.UI.Xaml.Controls
                         double actualWidth = autoCompleteBox._popup.ActualWidth;
                         if (!double.IsNaN(actualWidth) && autoCompleteBox._popup.Child is FrameworkElement)
                             ((FrameworkElement)autoCompleteBox._popup.Child).Width = actualWidth;
-
-                        // Draw the list (it was not drawn before because it was not in the visual tree):
-                        autoCompleteBox.UpdateItemsPanel(autoCompleteBox.ItemsPanel);
                     }
-
-                    // Close the popup if, after the call above to "UpdateItemsPanel" (which applies the filter), it appears that there are actually no elements in the popup:
-#if !(BRIDGE && MIGRATION)
-                    if (autoCompleteBox._filteredItems.Cast<object>().Count() == 0)
-                    {
-                        autoCompleteBox._popup.IsOpen = false;
-                    }
-#endif
 
                     // Reflect the state of the popup on the toggle button:
                     if (autoCompleteBox._dropDownToggle != null)
@@ -193,6 +248,20 @@ namespace Windows.UI.Xaml.Controls
                         autoCompleteBox._dropDownToggle.IsChecked = false;
                     }
 
+                    if (autoCompleteBox._textBox != null)
+                    {
+                        autoCompleteBox._updatingTextOnSelection = true;
+
+                        try
+                        {
+                            autoCompleteBox._textBox.Text = (autoCompleteBox.SelectedItem ?? string.Empty).ToString();
+                        }
+                        finally
+                        {
+                            autoCompleteBox._updatingTextOnSelection = false;
+                        }
+                    }
+
                     // Raise the Closed event:
 #if MIGRATION
                     autoCompleteBox.OnDropDownClosed(new EventArgs());
@@ -213,132 +282,38 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty IsArrowVisibleProperty =
-            DependencyProperty.Register("IsArrowVisible", typeof(bool), typeof(AutoCompleteBox), new PropertyMetadata(false, IsArrowVisible_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("IsArrowVisible", 
+                                        typeof(bool), 
+                                        typeof(AutoCompleteBox), 
+                                        new PropertyMetadata(false, OnIsArrowVisibleChanged));
 
-        private static void IsArrowVisible_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnIsArrowVisibleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            AutoCompleteBox autoCompleteBox = (AutoCompleteBox)d;
-            if (autoCompleteBox._textBox != null && autoCompleteBox._dropDownToggle != null)
+            ((AutoCompleteBox)d).UpdateToggleButton((bool)e.NewValue);
+        }
+
+        private void UpdateToggleButton(bool isVisible)
+        {
+            if (this._textBox != null && this._dropDownToggle != null)
             {
-                if ((bool)e.NewValue)
+                if (isVisible)
                 {
                     //-----------------------------
                     // Show the toggle button
                     //-----------------------------
-                    autoCompleteBox._textBox.Margin = new Thickness(0, 0, 30, 0);
-                    autoCompleteBox._dropDownToggle.Visibility = Visibility.Visible;
+                    this._textBox.Margin = new Thickness(0, 0, 30, 0);
+                    this._dropDownToggle.Visibility = Visibility.Visible;
                 }
                 else
                 {
                     //-----------------------------
                     // Hide the toggle button
                     //-----------------------------
-                    autoCompleteBox._textBox.Margin = new Thickness(0, 0, 0, 0);
-                    autoCompleteBox._dropDownToggle.Visibility = Visibility.Collapsed;
+                    this._textBox.Margin = new Thickness(0, 0, 0, 0);
+                    this._dropDownToggle.Visibility = Visibility.Collapsed;
                 }
             }
         }
-
-        /// <summary>
-        /// Specifies how text in the text box portion of the AutoCompleteBox
-        /// control is used to filter items specified by the AutoCompleteBox.ItemsSource
-        /// property for display in the drop-down.
-        /// </summary>
-#if WORKINPROGRESS
-	    public enum AutoCompleteFilterMode
-	    {
-		    //
-		    // Summary:
-		    //     Specifies that no filter is used. All items are returned.
-		    None = 0,
-		    //
-		    // Summary:
-		    //     Specifies a culture-sensitive, case-insensitive filter where the returned items
-		    //     start with the specified text. The filter uses the System.String.StartsWith(System.String,System.StringComparison)
-		    //     method, specifying System.StringComparer.CurrentCultureIgnoreCase as the string
-		    //     comparison criteria.
-		    StartsWith = 1,
-		    //
-		    // Summary:
-		    //     Specifies a culture-sensitive, case-sensitive filter where the returned items
-		    //     start with the specified text. The filter uses the System.String.StartsWith(System.String,System.StringComparison)
-		    //     method, specifying System.StringComparer.CurrentCulture as the string comparison
-		    //     criteria.
-		    StartsWithCaseSensitive = 2,
-		    //
-		    // Summary:
-		    //     Specifies an ordinal, case-insensitive filter where the returned items start
-		    //     with the specified text. The filter uses the System.String.StartsWith(System.String,System.StringComparison)
-		    //     method, specifying System.StringComparer.OrdinalIgnoreCase as the string comparison
-		    //     criteria.
-		    StartsWithOrdinal = 3,
-		    //
-		    // Summary:
-		    //     Specifies an ordinal, case-sensitive filter where the returned items start with
-		    //     the specified text. The filter uses the System.String.StartsWith(System.String,System.StringComparison)
-		    //     method, specifying System.StringComparer.Ordinal as the string comparison criteria.
-		    StartsWithOrdinalCaseSensitive = 4,
-		    //
-		    // Summary:
-		    //     Specifies a culture-sensitive, case-insensitive filter where the returned items
-		    //     contain the specified text.
-		    Contains = 5,
-		    //
-		    // Summary:
-		    //     Specifies a culture-sensitive, case-sensitive filter where the returned items
-		    //     contain the specified text.
-		    ContainsCaseSensitive = 6,
-		    //
-		    // Summary:
-		    //     Specifies an ordinal, case-insensitive filter where the returned items contain
-		    //     the specified text.
-		    ContainsOrdinal = 7,
-		    //
-		    // Summary:
-		    //     Specifies an ordinal, case-sensitive filter where the returned items contain
-		    //     the specified text.
-		    ContainsOrdinalCaseSensitive = 8,
-		    //
-		    // Summary:
-		    //     Specifies a culture-sensitive, case-insensitive filter where the returned items
-		    //     equal the specified text. The filter uses the System.String.Equals(System.String,System.StringComparison)
-		    //     method, specifying System.StringComparer.CurrentCultureIgnoreCase as the search
-		    //     comparison criteria.
-		    Equals = 9,
-		    //
-		    // Summary:
-		    //     Specifies a culture-sensitive, case-sensitive filter where the returned items
-		    //     equal the specified text. The filter uses the System.String.Equals(System.String,System.StringComparison)
-		    //     method, specifying System.StringComparer.CurrentCulture as the string comparison
-		    //     criteria.
-		    EqualsCaseSensitive = 10,
-		    //
-		    // Summary:
-		    //     Specifies an ordinal, case-insensitive filter where the returned items equal
-		    //     the specified text. The filter uses the System.String.Equals(System.String,System.StringComparison)
-		    //     method, specifying System.StringComparer.OrdinalIgnoreCase as the string comparison
-		    //     criteria.
-		    EqualsOrdinal = 11,
-		    //
-		    // Summary:
-		    //     Specifies an ordinal, case-sensitive filter where the returned items equal the
-		    //     specified text. The filter uses the System.String.Equals(System.String,System.StringComparison)
-		    //     method, specifying System.StringComparer.Ordinal as the string comparison criteria.
-		    EqualsOrdinalCaseSensitive = 12,
-		    //
-		    // Summary:
-		    //     Specifies that a custom filter is used. This mode is used when the System.Windows.Controls.AutoCompleteBox.TextFilter
-		    //     or System.Windows.Controls.AutoCompleteBox.ItemFilter properties are set.
-		    Custom = 13
-	    }
-#else
-        public enum AutoCompleteFilterMode
-        {
-            StartsWith,
-            Custom
-        }
-#endif
 
         /// <summary>
         /// Gets or sets the minimum delay, in milliseconds, after text is typed in the text box before the AutoCompleteBox control populates the list of possible matches in the drop-down.
@@ -350,10 +325,12 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty MinimumPopulateDelayProperty =
-            DependencyProperty.Register("MinimumPopulateDelay", typeof(int), typeof(AutoCompleteBox), new PropertyMetadata(0, MinimumPopulateDelay_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("MinimumPopulateDelay", 
+                                        typeof(int), 
+                                        typeof(AutoCompleteBox), 
+                                        new PropertyMetadata(0, OnMinimumPopulateDelayChanged));
 
-        private static void MinimumPopulateDelay_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnMinimumPopulateDelayChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             AutoCompleteBox autoCompleteBox = (AutoCompleteBox)d;
             autoCompleteBox._timer.Interval = new TimeSpan(0, 0, 0, 0, (int)e.NewValue);
@@ -369,8 +346,10 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty MinimumPrefixLengthProperty =
-            DependencyProperty.Register("MinimumPrefixLength", typeof(int), typeof(AutoCompleteBox), new PropertyMetadata(1)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("MinimumPrefixLength", 
+                                        typeof(int), 
+                                        typeof(AutoCompleteBox), 
+                                        new PropertyMetadata(1));
 
         /// <summary>
         /// Gets the text that is used to filter items in the ItemsSource item collection.
@@ -393,54 +372,16 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof(string), typeof(AutoCompleteBox), new PropertyMetadata(string.Empty, Text_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Text", 
+                                        typeof(string), 
+                                        typeof(AutoCompleteBox), 
+                                        new PropertyMetadata(string.Empty, OnTextChanged));
 
-        private static void Text_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             AutoCompleteBox autoCompleteBox = (AutoCompleteBox)d;
 
-            // Remember the "SearchText":
-            if (autoCompleteBox._textBox != null)
-                autoCompleteBox._searchText = autoCompleteBox._textBox.Text ?? "";
-            else
-                autoCompleteBox._searchText = "";
-
-            // Raise the "OnTextChanged" user event:
-            autoCompleteBox.OnTextChanged(new RoutedEventArgs());
-
-            // Open or close the popup:
-            if (autoCompleteBox.MinimumPrefixLength <= autoCompleteBox.Text.Length)
-            {
-                //----------------------------------
-                // ENOUGH LENGTH
-                //----------------------------------
-                if (autoCompleteBox.MinimumPopulateDelay != 0)
-                {
-                    //----------------------------------
-                    // TICK EVENT BECAUSE THERE IS A DELAY SET
-                    //----------------------------------
-                    autoCompleteBox._timer.Stop();
-                    autoCompleteBox._timer.Start();
-                }
-                else
-                {
-                    //----------------------------------
-                    // NO TICK EVENT BECAUSE DELAY IS 0
-                    //----------------------------------
-                    autoCompleteBox._timer.Stop();
-
-                    // We update the panel, with the new text by opening the popup:
-                    autoCompleteBox.IsDropDownOpen = true;
-                }
-            }
-            else
-            {
-                //----------------------------------
-                // NOT ENOUGH LENGTH
-                //----------------------------------
-                autoCompleteBox.IsDropDownOpen = false;
-            }
+            autoCompleteBox.OnTextChanged(new RoutedEventArgs());            
         }
 
         protected virtual void OnTextChanged(RoutedEventArgs e)
@@ -449,34 +390,6 @@ namespace Windows.UI.Xaml.Controls
                 TextChanged(this, e);
         }
 
-        private void _timer_Tick(object sender, object e)
-        {
-            //Stopping a timer that was already started
-            this._timer.Stop();
-
-            //We update the panel, with the new text by opening the popup:
-            IsDropDownOpen = true;
-        }
-
-        protected override void UpdateChildrenInVisualTree(IEnumerable oldChildrenEnumerable, IEnumerable newChildrenEnumerable, bool forceUpdateAllChildren = false)
-        {
-            // This function is called when we use UpdateItemsPanel(ItemsPanel);
-
-            if (_itemFilter != null)
-            {
-
-#if !(BRIDGE && MIGRATION)
-                newChildrenEnumerable = newChildrenEnumerable.Cast<object>().Where((obj) => (_itemFilter(_searchText, obj)));
-#endif
-
-                //Storing the filtered items for future use
-                _filteredItems = newChildrenEnumerable;
-            }
-            base.UpdateChildrenInVisualTree(oldChildrenEnumerable, newChildrenEnumerable, true);
-        }
-
-        private AutoCompleteFilterMode _filterMode = AutoCompleteFilterMode.StartsWith;
-        
         /// <summary>
         /// Gets or sets how the text in the text box is used to filter items specified
         /// by the AutoCompleteBox.ItemsSource property for display
@@ -487,15 +400,9 @@ namespace Windows.UI.Xaml.Controls
             get { return _filterMode; }
             set
             {
-                _filterMode = value;
-                if (value == AutoCompleteFilterMode.StartsWith)
-                {
-                    _itemFilter = StartsWith;
-                }
+                SelectFilter(value);
             }
         }
-
-        private AutoCompleteFilterPredicate<object> _itemFilter = StartsWith;
 
         /// <summary>
         /// The custom method that uses the user-entered text to filter the items specified by the ItemsSource property.
@@ -505,29 +412,250 @@ namespace Windows.UI.Xaml.Controls
             get { return _itemFilter; }
             set
             {
-                if (value != null)
+                if (_itemFilter != value)
                 {
                     _itemFilter = value;
-                    _filterMode = AutoCompleteFilterMode.Custom;
-                }
-                else
-                {
-                    // If value is null, we reset to the default behavior:
-                    _itemFilter = StartsWith;
-                    _filterMode = AutoCompleteFilterMode.StartsWith;
+                    if (value != null)
+                    {
+                        FilterMode = AutoCompleteFilterMode.Custom;
+                    }
+                    else
+                    {
+                        FilterMode = AutoCompleteFilterMode.None;
+                    }
                 }
             }
         }
 
-        static bool StartsWith(string search, object item)
+        #region Filters
+
+        private void SelectFilter(AutoCompleteFilterMode mode)
+        {
+            switch (mode)
+            {
+                case AutoCompleteFilterMode.None:
+                    this._filterMode = AutoCompleteFilterMode.None;
+                    this._filter = None;
+                    break;
+                case AutoCompleteFilterMode.StartsWith:
+                    this._filterMode = AutoCompleteFilterMode.StartsWith;
+                    this._filter = StartsWith;
+                    break;
+                case AutoCompleteFilterMode.StartsWithCaseSensitive:
+                    this._filterMode = AutoCompleteFilterMode.StartsWithCaseSensitive;
+                    this._filter = StartsWithCaseSensitive;
+                    break;
+                case AutoCompleteFilterMode.StartsWithOrdinal:
+                    this._filterMode = AutoCompleteFilterMode.StartsWithOrdinal;
+                    this._filter = StartsWithOrdinal;
+                    break;
+                case AutoCompleteFilterMode.StartsWithOrdinalCaseSensitive:
+                    this._filterMode = AutoCompleteFilterMode.StartsWithOrdinalCaseSensitive;
+                    this._filter = StartsWithOrdinalCaseSensitive;
+                    break;
+                case AutoCompleteFilterMode.Contains:
+                    this._filterMode = AutoCompleteFilterMode.Contains;
+                    this._filter = Contains;
+                    break;
+                case AutoCompleteFilterMode.ContainsCaseSensitive:
+                    this._filterMode = AutoCompleteFilterMode.ContainsCaseSensitive;
+                    this._filter = ContainsCaseSensitive;
+                    break;
+                case AutoCompleteFilterMode.ContainsOrdinal:
+                    this._filterMode = AutoCompleteFilterMode.ContainsOrdinal;
+                    this._filter = ContainsOrdinal;
+                    break;
+                case AutoCompleteFilterMode.ContainsOrdinalCaseSensitive:
+                    this._filterMode = AutoCompleteFilterMode.ContainsOrdinalCaseSensitive;
+                    this._filter = ContainsOrdinalCaseSensitive;
+                    break;
+                case AutoCompleteFilterMode.Equals:
+                    this._filterMode = AutoCompleteFilterMode.Equals;
+                    this._filter = Equals;
+                    break;
+                case AutoCompleteFilterMode.EqualsCaseSensitive:
+                    this._filterMode = AutoCompleteFilterMode.EqualsCaseSensitive;
+                    this._filter = EqualsCaseSensitive;
+                    break;
+                case AutoCompleteFilterMode.EqualsOrdinal:
+                    this._filterMode = AutoCompleteFilterMode.EqualsOrdinal;
+                    this._filter = EqualsOrdinal;
+                    break;
+                case AutoCompleteFilterMode.EqualsOrdinalCaseSensitive:
+                    this._filterMode = AutoCompleteFilterMode.EqualsOrdinalCaseSensitive;
+                    this._filter = EqualsOrdinalCaseSensitive;
+                    break;
+                case AutoCompleteFilterMode.Custom:
+                    this._filterMode = AutoCompleteFilterMode.Custom;
+                    this._filter = Custom;
+                    break;
+                default:
+                    throw new ArgumentException("Filters can't be combined.");
+            }
+        }
+
+        // filter for AutoCompleteFilterMode.None
+        private static bool None(string search, object item)
+        {
+            return true;
+        }
+
+        // filter for AutoCompleteFilterMode.StartsWith
+        private static bool StartsWith(string search, object item)
         {
             if (item != null && search != null)
-                return item.ToString().ToLower().StartsWith(search.ToLower());
+            {
+                return item.ToString().StartsWith(search, StringComparison.CurrentCultureIgnoreCase);
+            }
             else
             {
                 return false;
             }
         }
+
+        // filter for AutoCompleteFilterMode.StartsWithCaseSensitive
+        private static bool StartsWithCaseSensitive(string search, object item)
+        {
+            if (item != null && search != null)
+            {
+                return item.ToString().StartsWith(search, StringComparison.CurrentCulture);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // filter for AutoCompleteFilterMode.StartsWithOrdinal
+        private static bool StartsWithOrdinal(string search, object item)
+        {
+            if (item != null && search != null)
+            {
+                return item.ToString().StartsWith(search, StringComparison.OrdinalIgnoreCase);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // filter for AutoCompleteFilterMode.StartsWithOrdinalCaseSensitive
+        private static bool StartsWithOrdinalCaseSensitive(string search, object item)
+        {
+            if (item != null && search != null)
+            {
+                return item.ToString().StartsWith(search, StringComparison.Ordinal);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // filter for AutoCompleteFilterMode.Contains
+        private static bool Contains(string search, object item)
+        {
+            if (item != null && search != null)
+            {
+                return item.ToString().ToLower().Contains(search.ToLower());
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // filter for AutoCompleteFilterMode.ContainsCaseSensitive
+        private static bool ContainsCaseSensitive(string search, object item)
+        {
+            if (item != null && search != null)
+            {
+                return item.ToString().Contains(search);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // filter for AutoCompleteFilterMode.ContainsOrdinal
+        private static bool ContainsOrdinal(string search, object item)
+        {
+            return Contains(search, item);
+        }
+
+        // filter for AutoCompleteFilterMode.ContainsOrdinalCaseSensitive
+        private static bool ContainsOrdinalCaseSensitive(string search, object item)
+        {
+            return ContainsCaseSensitive(search, item);
+        }
+
+        // filter for AutoCompleteFilterMode.Equals
+        private static bool Equals(string search, object item)
+        {
+            if (item != null && search != null)
+            {
+                return item.ToString().Equals(search, StringComparison.CurrentCultureIgnoreCase);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // filter for AutoCompleteFilterMode.EqualsCaseSensitive
+        private static bool EqualsCaseSensitive(string search, object item)
+        {
+            if (item != null && search != null)
+            {
+                return item.ToString().Equals(search, StringComparison.CurrentCulture);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // filter for AutoCompleteFilterMode.EqualsOrdinal
+        private static bool EqualsOrdinal(string search, object item)
+        {
+            if (item != null && search != null)
+            {
+                return item.ToString().Equals(search, StringComparison.OrdinalIgnoreCase);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // filter for AutoCompleteFilterMode.EqualsOrdinalCaseSensitive
+        private static bool EqualsOrdinalCaseSensitive(string search, object item)
+        {
+            if (item != null && search != null)
+            {
+                return item.ToString().Equals(search, StringComparison.Ordinal);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // filter for AutoCompleteFilterMode.Custom
+        private bool Custom(string search, object item)
+        {
+            if (item != null && search != null)
+            {
+                return this._itemFilter(search, item);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        #endregion Filters
 
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
@@ -570,7 +698,6 @@ namespace Windows.UI.Xaml.Controls
         void ComboBoxItem_Click(object sender, RoutedEventArgs e)
         {
             var selectedContainer = (SelectorItem)sender;
-            _selectedContent = selectedContainer.Content as UIElement;
 
             // Select the item:
             this.SelectedItem = selectedContainer.INTERNAL_CorrespondingItem;
@@ -584,6 +711,10 @@ namespace Windows.UI.Xaml.Controls
         {
             base.ApplySelectedIndex(index);
 
+            if (this.ItemsHost == null)
+            {
+                return;
+            }
 
             UIElement newSelectedContent;
 
@@ -593,38 +724,15 @@ namespace Windows.UI.Xaml.Controls
                 // not en exception but we don't want to treat it as there is no item
                 newSelectedContent = null;
             }
-            else if (this.Items != null && index < this.Items.Count)
+            else if (index < this.ItemsHost.Children.Count)
             {
-                var item = this.Items[index];
-
-                // If the item is a FrameworkElement, we detach it from its current parent (if any) so that we can later put it into the ContentPresenter:
-                if (item is FrameworkElement fe)
-                {
-                    // Detach it from the current parent:
-                    if (fe.INTERNAL_VisualParent is UIElement uiE)
-                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(fe, uiE);
-                }
-                else if (item != null)
-                {
-                    // Otherwise, we create a FrameworkElement out of the item:
-                    item = GenerateFrameworkElementToRenderTheItem(item);
-                }
-
-                newSelectedContent = item as FrameworkElement; // Note: this can be null.
-
-                if (_textBox != null)
-                    if (newSelectedContent is TextBlock)
-                    {
-                        TextBlock textblock = (TextBlock)newSelectedContent;
-                        _textBox.Text = textblock.Text;
-                    }
+                ComboBoxItem container = this.ItemsHost.Children[index] as ComboBoxItem;
+                newSelectedContent = container;
             }
             else
             {
                 throw new IndexOutOfRangeException();
             }
-
-            _selectedContent = newSelectedContent;
         }
 
 
@@ -688,10 +796,12 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the MaxDropDownHeight dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxDropDownHeightProperty =
-            DependencyProperty.Register("MaxDropDownHeight", typeof(double), typeof(AutoCompleteBox), new PropertyMetadata(200d)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("MaxDropDownHeight", 
+                                        typeof(double), 
+                                        typeof(AutoCompleteBox), 
+                                        new PropertyMetadata(200d));
 
-#region event
+        #region event
 
         /// <summary>
         /// Occurs when the text in the text box portion of the AutoCompleteBox changes.
@@ -715,6 +825,92 @@ namespace Windows.UI.Xaml.Controls
 #else
         public event RoutedEventHandler DropDownOpened;
 #endif
-#endregion
+        #endregion
+    }
+
+    /// <summary>
+    /// Specifies how text in the text box portion of the AutoCompleteBox
+    /// control is used to filter items specified by the AutoCompleteBox.ItemsSource
+    /// property for display in the drop-down.
+    /// </summary>
+    public enum AutoCompleteFilterMode
+    {
+        /// <summary>
+        /// Specifies that no filter is used. All items are returned.
+        /// </summary>
+        None = 0,
+        /// <summary>
+        /// Specifies a culture-sensitive, case-insensitive filter where the returned items
+        /// start with the specified text. The filter uses the <see cref="String.StartsWith(string, StringComparison)"/>
+        /// method.
+        /// </summary>
+        StartsWith = 1,
+        /// <summary>
+        /// Specifies a culture-sensitive, case-sensitive filter where the returned items
+        /// start with the specified text. The filter uses the <see cref="String.StartsWith(string, StringComparison)"/>
+        /// method.
+        /// </summary>
+        StartsWithCaseSensitive = 2,
+        /// <summary>
+        /// Specifies an ordinal, case-insensitive filter where the returned items start
+        /// with the specified text. The filter uses the <see cref="String.StartsWith(string, StringComparison)"/>
+        /// method.
+        /// </summary>
+        StartsWithOrdinal = 3,
+        /// <summary>
+        /// Specifies an ordinal, case-sensitive filter where the returned items start with
+        /// the specified text. The filter uses the <see cref="String.StartsWith(string, StringComparison)"/>
+        /// method.
+        /// </summary>
+        StartsWithOrdinalCaseSensitive = 4,
+        /// <summary>
+        /// Specifies a culture-sensitive, case-insensitive filter where the returned items
+        /// contain the specified text.
+        /// </summary>
+        Contains = 5,
+        /// <summary>
+        /// Specifies a culture-sensitive, case-sensitive filter where the returned items
+        /// contain the specified text.
+        /// </summary>
+        ContainsCaseSensitive = 6,
+        /// <summary>
+        /// Specifies an ordinal, case-insensitive filter where the returned items contain
+        /// the specified text.
+        /// </summary>
+        ContainsOrdinal = 7,
+        /// <summary>
+        /// Specifies an ordinal, case-sensitive filter where the returned items contain
+        /// the specified text.
+        /// </summary>
+        ContainsOrdinalCaseSensitive = 8,
+        /// <summary>
+        /// Specifies a culture-sensitive, case-insensitive filter where the returned items
+        /// equal the specified text. The filter uses the <see cref="String.Equals(string, StringComparison)"/>
+        /// method.
+        /// </summary>
+        Equals = 9,
+        /// <summary>
+        /// Specifies a culture-sensitive, case-sensitive filter where the returned items
+        /// equal the specified text. The filter uses the <see cref="String.Equals(string, StringComparison)"/>
+        /// method.
+        /// </summary>
+        EqualsCaseSensitive = 10,
+        /// <summary>
+        /// Specifies an ordinal, case-insensitive filter where the returned items equal
+        /// the specified text. The filter uses the <see cref="String.Equals(string, StringComparison)"/>
+        /// method.
+        /// </summary>
+        EqualsOrdinal = 11,
+        /// <summary>
+        /// Specifies an ordinal, case-sensitive filter where the returned items equal the
+        /// specified text. The filter uses the <see cref="String.Equals(string, StringComparison)"/>
+        /// method.
+        /// </summary>
+        EqualsOrdinalCaseSensitive = 12,
+        /// <summary>
+        /// Specifies that a custom filter is used. This mode is used when the <see cref="AutoCompleteBox.TextFilter"/>
+        /// or <see cref="AutoCompleteBox.ItemFilter"/> properties are set.
+        /// </summary>
+        Custom = 13
     }
 }

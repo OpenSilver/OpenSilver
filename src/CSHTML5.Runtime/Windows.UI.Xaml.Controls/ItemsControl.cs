@@ -350,7 +350,9 @@ namespace Windows.UI.Xaml.Controls
                 container = item as DependencyObject;
             }
             else
+            {
                 container = GetContainerForItemOverride();
+            }
 
             // the container might have a parent from a previous
             // generation.  If so, clean it up before using it again.
@@ -466,34 +468,6 @@ namespace Windows.UI.Xaml.Controls
 
         #region Protected Methods
 
-        /// <summary>
-        /// Derived classes can call this methed in their constructor if they 
-        /// want to disable the default rendering of the ItemsControl. It can 
-        /// be useful for example to replace the rendering with a custom 
-        /// HTML-based one.
-        /// </summary>
-        [Obsolete("Disabling default rendering is not supported anymore.")]
-        protected void DisableDefaultRendering()
-        {
-        }
-
-        /// <summary>
-        /// Returns the item itself if the item is already a container of the 
-        /// correct type, otherwise it returns null if no container is to be 
-        /// created, or it returns the new container otherwise.
-        /// </summary>
-        /// <param name="item">The item to generate the container with.</param>
-        /// <returns>
-        /// Returns the item itself if the item is already a container of the 
-        /// correct type, otherwise it returns null if no container is to be 
-        /// created, or it returns the new container otherwise.
-        /// </returns>
-        [Obsolete]
-        protected virtual SelectorItem INTERNAL_GenerateContainer(object item)
-        {
-            return (SelectorItem)this.GetContainerFromItem(item);
-        }
-
         protected virtual void ManageCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             this.HandleItemsChanged(e);
@@ -517,13 +491,6 @@ namespace Windows.UI.Xaml.Controls
             //we do nothing here
         }
 
-        protected virtual void OnChildItemRemoved(object item)
-        {
-            // This is intented to be overridden by the controls that have 
-            // a "SelectedItem" to make sure that the item is de-selected 
-            // in case that the element is removed.
-        }
-
         /// <summary>
         ///  Called when the value of the <see cref="ItemsControl.Items"/> property changes.
         /// </summary>
@@ -532,411 +499,6 @@ namespace Windows.UI.Xaml.Controls
         /// </param>
         protected virtual void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
-        }
-
-        //internal void ResetChildren()
-        //{
-        //    if (this.RenderedItemsPanel != null)
-        //    {
-        //        this.RenderedItemsPanel.Children.Clear();
-        //        this.ItemContainerGenerator.INTERNAL_Clear();
-        //    }
-        //    this.GenerateChildren();
-        //}
-
-        //internal void GenerateChildren()
-        //{
-        //    if (this.RenderedItemsPanel != null)
-        //    {
-        //        for (int i = 0; i < this.Items.Count; ++i)
-        //        {
-        //            object item = this._items[i];
-        //            DependencyObject container = this.GenerateContainerForItem(item);
-
-        //            UIElement child = container as UIElement;
-        //            if (child != null)
-        //            {
-        //                this.RenderedItemsPanel.Children.Add(child);
-        //            }
-        //        }
-        //    }
-        //}
-
-        //private DependencyObject GenerateContainerForItem(object item)
-        //{
-        //    IGeneratorHost host = (IGeneratorHost)this;
-        //    DependencyObject container = host.GetContainerForItem(item, null);
-        //    if (container != null)
-        //    {
-        //        container.SetValue(FrameworkElement.DataContextProperty, item);
-        //        host.PrepareItemContainer(container, item);
-
-        //        this.ItemContainerGenerator.INTERNAL_RegisterContainer(container, item);
-        //    }
-
-        //    return container;
-        //}
-
-        // "forceUpdateAllChildren" is used to remove all the children
-        // and add them back, for example when the ItemsPanel changes.
-        protected virtual void UpdateChildrenInVisualTree(
-            IEnumerable oldChildrenEnumerable,
-            IEnumerable newChildrenEnumerable,
-            bool forceUpdateAllChildren = false)
-        {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                List<object> oldChildren = INTERNAL_ListsHelper.ConvertToListOfObjectsOrNull(oldChildrenEnumerable);
-                List<object> newChildren = INTERNAL_ListsHelper.ConvertToListOfObjectsOrNull(newChildrenEnumerable);
-
-                // if we want to update all the children (for example because 
-                // ItemsPanel or ItemTemplate changed), we need to remove the 
-                // old versions of the children
-                if (forceUpdateAllChildren)
-                {
-                    foreach (object oldChild in oldChildren)
-                    {
-                        TryRemoveChildItemFromVisualTree(oldChild);
-                    }
-                    foreach (object newChild in newChildren)
-                    {
-                        AddChildItemToVisualTree(newChild);
-                    }
-                }
-                else
-                {
-                    //--------------------------------------------------
-                    // The way that this algorithm works is the following:
-                    // We compare the elements of the new and old collections,
-                    // and we add/remove the elements that are missing or added.
-                    // To do so, we traverse the old and new collections at the
-                    // same time by having a "foreach" on the new collection, and
-                    // at the same time keeping a pointer to the current index in
-                    // the old collection.
-                    //--------------------------------------------------
-
-                    int currentIndexInOldChildren = 0;
-                    if (newChildren != null)
-                    {
-                        foreach (object newChild in newChildren)
-                        {
-                            if (oldChildren != null)
-                            {
-                                // we remove the old children that are not the current new
-                                // child until we find it
-                                while (currentIndexInOldChildren < oldChildren.Count && newChild != oldChildren[currentIndexInOldChildren])
-                                {
-                                    var oldChild = oldChildren[currentIndexInOldChildren];
-                                    TryRemoveChildItemFromVisualTree(oldChild);
-                                    ++currentIndexInOldChildren;
-                                }
-                            }
-                            // it means that newChild == oldChildren[currentIndexInOldChildren] 
-                            // since we got out of the while
-                            if (oldChildren != null && currentIndexInOldChildren < oldChildren.Count)
-                            {
-                                // we let the current oldChild since it is the new child
-                                ++currentIndexInOldChildren;
-                            }
-                            else
-                            {
-                                // we need to add the new child (all the old children have 
-                                // been removed)
-                                AddChildItemToVisualTree(newChild);
-                            }
-
-                        }
-                    }
-                    //we remove the remaining old children
-                    if (oldChildren != null)
-                    {
-                        while (currentIndexInOldChildren < oldChildren.Count)
-                        {
-                            var oldChild = oldChildren[currentIndexInOldChildren];
-                            TryRemoveChildItemFromVisualTree(oldChild);
-                            ++currentIndexInOldChildren;
-                        }
-                    }
-                }
-
-                //-------------------------------------------------
-                // Call the "OnChildItemRemoved" method for all the 
-                // children that were in the old collection and are 
-                // no longer in the new one:
-                //-------------------------------------------------
-
-                // For performance reasons, start by building a dictionary 
-                // that contains all the new children as well as a count 
-                // that says how may times each child is present (> 1 in 
-                // case of multiple identical children)
-
-                // Note: the "int" is the number of occurences in case the 
-                // same child is present twice.
-                Dictionary<object, int> newChildrenFastAccess = new Dictionary<object, int>();
-                if (newChildren != null)
-                {
-                    foreach (var newChild in newChildren)
-                    {
-                        if (newChildrenFastAccess.ContainsKey(newChild))
-                            newChildrenFastAccess[newChild] = newChildrenFastAccess[newChild] + 1;
-                        else
-                            newChildrenFastAccess.Add(newChild, 1);
-                    }
-                }
-                // Then, traverse the collection of old children to call
-                // "OnChildItemRemoved" for each of those that are no longer 
-                // in the "newChildren" collection:
-                if (oldChildren != null)
-                {
-                    foreach (var oldChild in oldChildren)
-                    {
-                        if (!newChildrenFastAccess.ContainsKey(oldChild))
-                        {
-                            OnChildItemRemoved(oldChild);
-                        }
-                        else
-                        {
-                            int newCount = newChildrenFastAccess[oldChild] - 1;
-                            newChildrenFastAccess[oldChild] = newCount;
-                            if (newCount == 0)
-                                newChildrenFastAccess.Remove(oldChild);
-                        }
-                    }
-                }
-            }
-        }
-
-        protected virtual bool TryRemoveChildItemFromVisualTree(object item)
-        {
-            //-----------------------------
-            // DETACH ITEM
-            //-----------------------------
-            var containerIfAny = ItemContainerGenerator.ContainerFromItem(item);
-            if (containerIfAny == null)
-            {
-                if (item is UIElement itemAsUIElement)
-                {
-                    // It means that no DataTemplate was applied,
-                    // so we just remove the element.
-                    if (this.ItemsHost != null)
-                    {
-                        return this.ItemsHost.Children.Remove(itemAsUIElement);
-                    }
-                }
-            }
-            else if (containerIfAny is FrameworkElement containerAsFE)
-            {
-                if (this.ItemsHost != null)
-                {
-                    return this.ItemsHost.Children.Remove(containerAsFE);
-                }
-                return ItemContainerGenerator.INTERNAL_TryUnregisterContainer(containerIfAny, item);
-            }
-            return false;
-        }
-
-        private FrameworkElement CreateContainerFromItem(object item)
-        {
-            FrameworkElement newContent = GenerateFrameworkElementToRenderTheItem(item);
-
-            ContentControl containerIfAny = GetContainerFromItem(item) as ContentControl;
-
-            if (containerIfAny == null)
-            {
-                //-------------------------------------------------------
-                // If we arrive here, it means that there is no container
-                // to be generated, such as in a standard ItemsControl.
-                //-------------------------------------------------------
-
-                // We remember the new content (it may be a DataTemplate 
-                // for example), so that we can later remove it by finding 
-                // it in the "_itemContainerGenerator" collection based on 
-                // the business object "item"
-                this.ItemContainerGenerator.INTERNAL_RegisterContainer(newContent, item);
-
-                return newContent;
-            }
-            else
-            {
-                //-------------------------------------------------------
-                // If we arrive here, it means that either the newContent 
-                // is already a container (of the correct type), or a new 
-                // container was generated.
-                //-------------------------------------------------------
-
-                containerIfAny.DataContext = item;
-
-                //if the user defined a style for the container, 
-                // we apply it
-                containerIfAny.Style = this.ItemContainerStyle;
-
-                if (containerIfAny == newContent)
-                {
-                    //---------------------------------------------------
-                    // If we arrive here, it means that the newContent is
-                    // already a container (of the correct type). For 
-                    // example, this happens if the user adds a 
-                    // ListBoxItem to a ListBox.
-                    //---------------------------------------------------
-
-                    // (Nothing to do)
-                }
-                else
-                {
-                    //---------------------------------------------------
-                    // If we arrive here, it means a container was 
-                    // generated. For example, when the user adds an 
-                    // object to a ListBox, a ListBoxItem container is 
-                    // generated.
-                    //---------------------------------------------------
-
-                    // We put the content into the container
-                    containerIfAny.Content = newContent;
-                }
-
-                // We register the container so that later we can
-                // find it back, given the "item"
-                this.ItemContainerGenerator.INTERNAL_RegisterContainer(containerIfAny, item);
-
-                return containerIfAny;
-            }
-        }
-
-        protected virtual void AddChildItemToVisualTree(object item)
-        {
-            //-------------------------------------------------------
-            // ATTACH NEW CONTENT
-            //-------------------------------------------------------
-
-            // Generate a FrameworkElement from the "item"
-            FrameworkElement newContent = GenerateFrameworkElementToRenderTheItem(item);
-
-            // If necessary, generate a container (such as "ListBoxItem",
-            // "ComboBoxItem", etc.), and attach the item to the visual tree
-            if (ItemsHost != null)
-            {
-                if (newContent != null) //otherwise, we are not in the Visual tree
-                {
-                    var containerIfAny = GetContainerFromItem(item) as ContentControl;
-
-                    if (containerIfAny == null)
-                    {
-                        //-------------------------------------------------------
-                        // If we arrive here, it means that there is no container
-                        // to be generated, such as in a standard ItemsControl.
-                        //-------------------------------------------------------
-
-                        // We remember the new content (it may be a DataTemplate 
-                        // for example), so that we can later remove it by finding 
-                        // it in the "_itemContainerGenerator" collection based on 
-                        // the business object "item"
-                        ItemContainerGenerator.INTERNAL_RegisterContainer(newContent, item);
-
-                        // We directly attach the content to the visual tree
-                        this.ItemsHost.Children.Add(newContent);
-                    }
-                    else
-                    {
-                        //-------------------------------------------------------
-                        // If we arrive here, it means that either the newContent 
-                        // is already a container (of the correct type), or a new 
-                        // container was generated.
-                        //-------------------------------------------------------
-
-                        containerIfAny.DataContext = item;
-
-                        //if the user defined a style for the container, 
-                        // we apply it
-                        if (ItemContainerStyle != null)
-                        {
-                            containerIfAny.Style = ItemContainerStyle;
-                        }
-
-                        // We register the container so that later we can
-                        // find it back, given the "item"
-                        ItemContainerGenerator.INTERNAL_RegisterContainer(containerIfAny, item);
-
-                        // We attach the container to the visual tree
-                        this.ItemsHost.Children.Add(containerIfAny);
-
-                        if (containerIfAny == newContent)
-                        {
-                            //---------------------------------------------------
-                            // If we arrive here, it means that the newContent is
-                            // already a container (of the correct type). For 
-                            // example, this happens if the user adds a 
-                            // ListBoxItem to a ListBox.
-                            //---------------------------------------------------
-
-                            // (Nothing to do)
-                        }
-                        else
-                        {
-                            //---------------------------------------------------
-                            // If we arrive here, it means a container was 
-                            // generated. For example, when the user adds an 
-                            // object to a ListBox, a ListBoxItem container is 
-                            // generated.
-                            //---------------------------------------------------
-
-                            // We put the content into the container
-                            containerIfAny.Content = newContent;
-                        }
-                    }
-                }
-            }
-        }
-
-        protected FrameworkElement GenerateFrameworkElementToRenderTheItem(object item)
-        {
-            //---------------------------------------------------
-            // if the item is a FrameworkElement, return itself
-            //---------------------------------------------------
-            FrameworkElement result = item as FrameworkElement;
-            if (result == null)
-            {
-                object displayElement = PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(item, this.DisplayMemberPath);
-                if (this.ItemTemplate != null)
-                {
-                    //---------------------------------------------------
-                    // An ItemTemplate was specified, so we instantiate 
-                    // it and return it
-                    //---------------------------------------------------
-
-                    // Apply the data template
-                    result = ItemTemplate.INTERNAL_InstantiateFrameworkTemplate();
-                    result.DataContext = displayElement;
-                }
-                else
-                {
-                    //---------------------------------------------------
-                    // Otherwise we simply call "ToString()" to display 
-                    // the item as a string inside a TextBlock
-                    //---------------------------------------------------
-
-                    ContentPresenter container = new ContentPresenter();
-                    Binding b = new Binding(this.DisplayMemberPath);
-                    container.SetBinding(ContentControl.ContentProperty, b);
-                    container.DataContext = item;
-                    result = container;
-                }
-            }
-#if WORKINPROGRESS
-            this.PrepareContainerForItemOverride(result, item);
-#endif
-            return result;
-        }
-
-        [Obsolete]
-        /// <summary>
-        /// Create or identify the element used to display the given item.
-        /// </summary>
-        /// <returns>
-        /// The element that is used to display the given item.
-        /// </returns>
-        protected virtual DependencyObject GetContainerFromItem(object item)
-        {
-            return null;
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
@@ -1126,9 +688,6 @@ namespace Windows.UI.Xaml.Controls
         }
 
         #endregion Internal Methods
-
-        #region Work in progress
-//#if WORKINPROGRESS
 
         /// <summary>
         /// Undoes the effects of the PrepareContainerForItemOverride method.
@@ -1320,52 +879,97 @@ namespace Windows.UI.Xaml.Controls
             return ItemsControl.GetItemsOwner(ui);
         }
 
-        //internal static DependencyObject GetItemsOwnerInternal(DependencyObject element)
-        //{
-        //    ItemsControl temp;
-        //    return GetItemsOwnerInternal(element, out temp);
-        //}
+        #region Obsolete
 
-        ///// <summary>
-        ///// Different from public GetItemsOwner
-        ///// Returns ip.TemplatedParent instead of ip.Owner
-        ///// More accurate when we want to distinguish if owner is a GroupItem or ItemsControl
-        ///// </summary>
-        ///// <param name="element"></param>
-        ///// <returns></returns>
-        //internal static DependencyObject GetItemsOwnerInternal(DependencyObject element, out ItemsControl itemsControl)
-        //{
-        //    DependencyObject container = null;
-        //    Panel panel = element as Panel;
-        //    itemsControl = null;
+        /// <summary>
+        /// Derived classes can call this methed in their constructor if they 
+        /// want to disable the default rendering of the ItemsControl. It can 
+        /// be useful for example to replace the rendering with a custom 
+        /// HTML-based one.
+        /// </summary>
+        [Obsolete("Disabling default rendering is not supported anymore.")]
+        protected void DisableDefaultRendering()
+        {
+        }
 
-        //    if (panel != null && panel.IsItemsHost)
-        //    {
-        //        // see if element was generated for an ItemsPresenter
-        //        ItemsPresenter ip = ItemsPresenter.FromPanel(panel);
+        /// <summary>
+        /// Returns the item itself if the item is already a container of the 
+        /// correct type, otherwise it returns null if no container is to be 
+        /// created, or it returns the new container otherwise.
+        /// </summary>
+        /// <param name="item">The item to generate the container with.</param>
+        /// <returns>
+        /// Returns the item itself if the item is already a container of the 
+        /// correct type, otherwise it returns null if no container is to be 
+        /// created, or it returns the new container otherwise.
+        /// </returns>
+        [Obsolete]
+        protected virtual SelectorItem INTERNAL_GenerateContainer(object item)
+        {
+            return (SelectorItem)this.GetContainerFromItem(item);
+        }
 
-        //        if (ip != null)
-        //        {
-        //            // if so use the element whose style begat the ItemsPresenter
-        //            //container = ip.TemplatedParent;
-        //            FrameworkElement templateParent;
-        //            for (templateParent = ip.Parent as FrameworkElement; templateParent != null; templateParent = templateParent.Parent as FrameworkElement);
-        //            itemsControl = ip.Owner;
-        //        }
-        //        else
-        //        {
-        //            // otherwise use element's templated parent
-        //            //container = panel.TemplatedParent;
-        //            FrameworkElement templateParent;
-        //            for (templateParent = panel.Parent as FrameworkElement; templateParent != null; templateParent = templateParent.Parent as FrameworkElement);
-        //            itemsControl = container as ItemsControl;
-        //        }
-        //    }
+        [Obsolete]
+        protected virtual void OnChildItemRemoved(object item)
+        {
+            // This is intented to be overridden by the controls that have 
+            // a "SelectedItem" to make sure that the item is de-selected 
+            // in case that the element is removed.
+        }
 
-        //    return container;
-        //}
-//#endif
-        #endregion
+        [Obsolete]
+        protected FrameworkElement GenerateFrameworkElementToRenderTheItem(object item)
+        {
+            //---------------------------------------------------
+            // if the item is a FrameworkElement, return itself
+            //---------------------------------------------------
+            FrameworkElement result = item as FrameworkElement;
+            if (result == null)
+            {
+                object displayElement = PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(item, this.DisplayMemberPath);
+                if (this.ItemTemplate != null)
+                {
+                    //---------------------------------------------------
+                    // An ItemTemplate was specified, so we instantiate 
+                    // it and return it
+                    //---------------------------------------------------
 
+                    // Apply the data template
+                    result = ItemTemplate.INTERNAL_InstantiateFrameworkTemplate();
+                    result.DataContext = displayElement;
+                }
+                else
+                {
+                    //---------------------------------------------------
+                    // Otherwise we simply call "ToString()" to display 
+                    // the item as a string inside a TextBlock
+                    //---------------------------------------------------
+
+                    ContentPresenter container = new ContentPresenter();
+                    Binding b = new Binding(this.DisplayMemberPath);
+                    container.SetBinding(ContentControl.ContentProperty, b);
+                    container.DataContext = item;
+                    result = container;
+                }
+            }
+#if WORKINPROGRESS
+            this.PrepareContainerForItemOverride(result, item);
+#endif
+            return result;
+        }
+
+        [Obsolete]
+        /// <summary>
+        /// Create or identify the element used to display the given item.
+        /// </summary>
+        /// <returns>
+        /// The element that is used to display the given item.
+        /// </returns>
+        protected virtual DependencyObject GetContainerFromItem(object item)
+        {
+            return null;
+        }
+
+        #endregion Obsolete
     }
 }

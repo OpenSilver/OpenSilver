@@ -28,6 +28,7 @@
                                 BorderThickness="{TemplateBinding BorderThickness}">
                             <Grid>
                                 <ToggleButton x:Name="DropDownToggle"
+                                              IsChecked="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
                                               HorizontalAlignment="Stretch"
                                               VerticalAlignment="Stretch"
                                               HorizontalContentAlignment="Right"
@@ -45,7 +46,8 @@
                                           Data="M 1,1.5 L 4.5,5 L 8,1.5" />
                                 </ToggleButton>
                                 <TextBox x:Name="PART_TextBox"
-                                         Text="{TemplateBinding Text,Mode=TwoWay}" />
+                                         TextWrapping="NoWrap"
+                                         Text="{TemplateBinding Text, Mode=TwoWay}" />
 
 
                             </Grid>

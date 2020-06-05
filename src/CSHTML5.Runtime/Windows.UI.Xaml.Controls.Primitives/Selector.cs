@@ -22,6 +22,7 @@ using Bridge;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 
 
@@ -51,7 +52,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         bool _selectionChangeIsOnItem = false;
         bool _selectionChangeIsOnValue = false;
 
+#if false
         protected bool ChangingSelectionInHtml { get; set; }
+#endif
         protected bool ChangingSelectionProgrammatically { get; set; }
 
 
@@ -105,70 +108,93 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
             //if (!AreObjectsEqual(e.OldValue, e.NewValue))
             //{
-                int newValue = Convert.ToInt32(e.NewValue);
-                if (newValue < Items.Count) //The new value is ignored if it is bigger or equal than the amount of elements in the list of Items.
+            int newValue = Convert.ToInt32(e.NewValue);
+            if (newValue < Items.Count) //The new value is ignored if it is bigger or equal than the amount of elements in the list of Items.
+            {
+                if (!_selectionChangeIsOnValue && !_selectionChangeIsOnItem) //we only want to change the other ones if the change comes from SelectedIndex (otherwise it's already done by the one that was originally changed (SelectedItem or SelectedValue)
                 {
-                    if (!_selectionChangeIsOnValue && !_selectionChangeIsOnItem) //we only want to change the other ones if the change comes from SelectedIndex (otherwise it's already done by the one that was originally changed (SelectedItem or SelectedValue)
+                    object oldItem = SelectedItem;
+                    _selectionChangeIsOnIndex = true;
+                    if (newValue == -1)
                     {
-                        object oldItem = SelectedItem;
-                        _selectionChangeIsOnIndex = true;
-                        if (newValue == -1)
-                        {
-                            SetCurrentValue(SelectedItemProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                            SetCurrentValue(SelectedValueProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                        SetCurrentValue(SelectedItemProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                        SetCurrentValue(SelectedValueProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
 
-                            //todo: update binding of SelectedIndex
+                        //todo: update binding of SelectedIndex
 
-                            //selector.SelectedItem = null;
-                            //selector.SelectedValue = null;
-                        }
-                        else
-                        {
-                            object item = Items[newValue]; //todo: make sure that the index always corresponds (I think it does but I didn't check)
-                            SetCurrentValue(SelectedItemProperty, item); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                            SetCurrentValue(SelectedValueProperty, PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(item, SelectedValuePath)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-
-                            //todo: update binding of SelectedIndex
-
-                            //selector.SelectedItem = item;
-                            //selector.SelectedValue = selector.AccessValueByApplyingPropertyPathIfAny(item, selector.SelectedValuePath);
-                        }
-                        _selectionChangeIsOnIndex = false;
-
-                        List<object> oldItems = new List<object>();
-                        oldItems.Add(oldItem);
-                        List<object> newItems = new List<object>();
-                        newItems.Add(SelectedItem);
-
-                        RefreshSelectedItem();
-
-                        if (!ChangingSelectionInHtml) //the SelectionChanged event is already fired from the javascript event.
-                        {
-                            OnSelectionChanged(new SelectionChangedEventArgs(oldItems, newItems));
-                        }
+                        //selector.SelectedItem = null;
+                        //selector.SelectedValue = null;
                     }
-                    if (!ChangingSelectionInHtml)
+                    else
                     {
-                        ChangingSelectionProgrammatically = true; //so that it doesn't end up in a loop
-                        ApplySelectedIndex(newValue);
-                        ChangingSelectionProgrammatically = false;
+                        object item = Items[newValue]; //todo: make sure that the index always corresponds (I think it does but I didn't check)
+                        SetCurrentValue(SelectedItemProperty, item); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                        SetCurrentValue(SelectedValueProperty, PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(item, SelectedValuePath)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+
+                        //todo: update binding of SelectedIndex
+
+                        //selector.SelectedItem = item;
+                        //selector.SelectedValue = selector.AccessValueByApplyingPropertyPathIfAny(item, selector.SelectedValuePath);
                     }
+                    _selectionChangeIsOnIndex = false;
+
+                    List<object> oldItems = new List<object>();
+                    oldItems.Add(oldItem);
+                    List<object> newItems = new List<object>();
+                    newItems.Add(SelectedItem);
+
+                    RefreshSelectedItem();
+
+#if false
+                    if (!ChangingSelectionInHtml) //the SelectionChanged event is already fired from the javascript event.
+                    {
+                        OnSelectionChanged(new SelectionChangedEventArgs(oldItems, newItems));
+                    }
+#else
+                    OnSelectionChanged(new SelectionChangedEventArgs(oldItems, newItems));
+#endif
                 }
+#if false
+                if (!ChangingSelectionInHtml)
+                {
+                    ChangingSelectionProgrammatically = true; //so that it doesn't end up in a loop
+                    ApplySelectedIndex(newValue);
+                    ChangingSelectionProgrammatically = false;
+                }
+#else
+                ChangingSelectionProgrammatically = true; //so that it doesn't end up in a loop
+                ApplySelectedIndex(newValue);
+                ChangingSelectionProgrammatically = false;
+#endif
+            }
             //}
         }
 
-        protected override void OnChildItemRemoved(object item)
+        protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
-            base.OnChildItemRemoved(item);
+            base.OnItemsChanged(e);
 
-            // Ensure that, when an item is removed from the list of items, we deselect it:
-            if (this.SelectedItem == item)
+            bool unselect = false;
+
+            if (e.Action == NotifyCollectionChangedAction.Reset)
             {
-                SetCurrentValue(SelectedIndexProperty, -1); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                SetCurrentValue(SelectedItemProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                SetCurrentValue(SelectedValueProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                unselect = true;
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove ||
+                     e.Action == NotifyCollectionChangedAction.Replace)
+            {
+                if (e.OldItems[0] == this.SelectedItem)
+                {
+                    unselect = true;
+                }
+            }
 
-                //todo: update binding of SelectedIndex, SelectedValue, and SelectedItem
+            if (unselect)
+            {
+                // we use SetCurrentValue to preserve bindings if any.
+                this.SetCurrentValue(SelectedIndexProperty, -1);
+                this.SetCurrentValue(SelectedItemProperty, null);
+                this.SetCurrentValue(SelectedValueProperty, null);
             }
         }
 
@@ -253,7 +279,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         private static void SelectedValue_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (!AreObjectsEqual(e.OldValue, e.NewValue)) 
+            if (!AreObjectsEqual(e.OldValue, e.NewValue))
             {
                 Selector selector = (Selector)d;
                 object newValue = (object)e.NewValue;
@@ -300,17 +326,17 @@ namespace Windows.UI.Xaml.Controls.Primitives
         //   For example, in Bridge, if we use 2 classes, even if they have the same value and everything, using the symbol "==" doesn't work.
         //   this is why in C# we use <class name>.Equals(<other classname>) in order to see if they're equal
         //   and that's the same with Bridge
-#if !BRIDGE 
+#if !BRIDGE
         [JSReplacement("$item1 == $item2")] //the c# version doesn't work in javascript for types like int 
 #endif
         private static bool AreObjectsEqual(object item1, object item2)
         {
             // we need to check if both items or null separatly because of a Bridge issue : item1.Equals(item2) throws an error if item1 is null which is normal) and/or item2 is null (error : "cannot get property "low" of null")
-            if(item1 == null)
+            if (item1 == null)
             {
                 return item2 == null;
             }
-            else if(item2 == null)
+            else if (item2 == null)
             {
                 return item1 == null;
             }
@@ -362,7 +388,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
 
-        #region selection changed event
+#region selection changed event
         //note about this event: we need to register to this event, pre-handle it and only then change the value in c# since the user will probably want the old value if he registers to it.
 
         /// <summary>
@@ -382,11 +408,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
-        #endregion
+#endregion
 
 
 
-        #region things to replace with selectors Controltemplates
+#region things to replace with selectors Controltemplates
 
         /// <summary>
         /// Gets or sets the bakground color of the selected Items.
@@ -428,7 +454,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             get { return RowBackground; }
             set { RowBackground = value; }
         }
-       
+
         /// <summary>
         /// Gets or sets the bakground color of the Items that are not selected.
         /// </summary>
@@ -460,7 +486,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             DependencyProperty.Register("UnselectedItemForeground", typeof(Brush), typeof(Selector), new PropertyMetadata(null)
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
-        #endregion
+#endregion
 
         //// Summary:
         ////     Gets a value that indicates whether the specified Selector has the focus.

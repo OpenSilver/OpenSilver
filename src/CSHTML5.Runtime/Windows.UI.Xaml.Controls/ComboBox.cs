@@ -14,6 +14,7 @@
 
 
 using CSHTML5.Internal;
+using CSHTML5.Internals.Controls;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 #if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
@@ -285,7 +287,7 @@ namespace Windows.UI.Xaml.Controls
         void ComboBoxItem_Click(object sender, RoutedEventArgs e)
         {
             var selectedContainer = (SelectorItem)sender;
-            _selectedContent = selectedContainer.Content as UIElement;
+            _selectedContent = sender as UIElement;
 
             // Select the item:
             this.SelectedItem = selectedContainer.INTERNAL_CorrespondingItem;
@@ -297,6 +299,7 @@ namespace Windows.UI.Xaml.Controls
 
         #endregion
 
+#if false
 #if WORKINPROGRESS
         IList GetListOfSelectedItemsInCSharp()
 #else
@@ -307,6 +310,7 @@ namespace Windows.UI.Xaml.Controls
             selectedItems.Add(SelectedItem);
             return selectedItems;
         }
+#endif
 
 #if false
         protected override void AddChildItemToVisualTree(object newItem)
@@ -375,37 +379,26 @@ namespace Windows.UI.Xaml.Controls
             else
             {
 #endif
+            if (this.ItemsHost == null)
+            {
+                return;
+            }
+
             UIElement newSelectedContent;
 
             if (index == -1)
             {
                 if (_contentPresenter != null)
+                {
                     _contentPresenter.Content = null;
+                }
 
                 newSelectedContent = null;
             }
-            else if (this.Items != null && index < this.Items.Count)
+            else if (index < this.ItemsHost.Children.Count)
             {
-                var item = this.Items[index];
-
-                // If the item is a FrameworkElement, we detach it from its current parent (if any) so that we can later put it into the ContentPresenter:
-                if (item is FrameworkElement)
-                {
-                    // Detach it from the current parent:
-                    if (((FrameworkElement)item).INTERNAL_VisualParent is UIElement)
-                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(((FrameworkElement)item), (UIElement)((FrameworkElement)item).INTERNAL_VisualParent);
-                }
-                else if (item != null)
-                {
-                    // Otherwise, we create a FrameworkElement out of the item:
-                    item = GenerateFrameworkElementToRenderTheItem(item);
-                }
-
-                newSelectedContent = (FrameworkElement)item; // Note: this can be null.
-
-                // We put the selected content into the ContentPresenter:
-                if (_contentPresenter != null)
-                    _contentPresenter.Content = newSelectedContent; // Note: this can be null.
+                ComboBoxItem container = this.ItemsHost.Children[index] as ComboBoxItem;
+                newSelectedContent = container;
             }
             else
             {
@@ -447,6 +440,12 @@ namespace Windows.UI.Xaml.Controls
             }
 
             ApplySelectedIndex(SelectedIndex);
+
+            // Put the selected item into the ContentPresenter if the popup is closed
+            if (this._contentPresenter != null)
+            {
+                this._contentPresenter.Content = this._selectedContent;
+            }
         }
 
 #if false
@@ -582,15 +581,14 @@ namespace Windows.UI.Xaml.Controls
                     // Show the popup:
                     if (comboBox._popup != null)
                     {
+                        // add removed 
+
                         comboBox._popup.IsOpen = true;
 
                         // Make sure the Width of the popup is the same as the popup:
                         double actualWidth = comboBox._popup.ActualWidth;
                         if (!double.IsNaN(actualWidth) && comboBox._popup.Child is FrameworkElement)
                             ((FrameworkElement)comboBox._popup.Child).Width = actualWidth;
-
-                        // Draw the list (it was not drawn before because it was not in the visual tree):
-                        comboBox.UpdateItemsPanel(comboBox.ItemsPanel);
                     }
 
                     // Ensure that the toggle button is checked:
@@ -604,7 +602,7 @@ namespace Windows.UI.Xaml.Controls
 #if MIGRATION
                     comboBox.OnDropDownOpened(new EventArgs());
 #else
-                        comboBox.OnDropDownOpened(new RoutedEventArgs());
+                    comboBox.OnDropDownOpened(new RoutedEventArgs());
 #endif
                 }
                 else
@@ -623,12 +621,12 @@ namespace Windows.UI.Xaml.Controls
                         comboBox._contentPresenter.Content = comboBox._selectedContent;
                     }
 
-                    // Workaround for the fact that IsHitTestVisible does not propagate properly //todo: fix the propagation (which comes from the ComboBox style), and remove this block of code. Current issue when removing this code: if we click multiple times on the ComboBox (selecting and deselecting items), at one point the item in the ContentPresenter does not inherit "transparency to click", meaning that it is no longer possible to click the underlying ToggleButton when clicking on the item.
-                    if (comboBox._contentPresenter != null)
-                    {
-                        comboBox._contentPresenter.IsHitTestVisible = true;
-                        comboBox._contentPresenter.IsHitTestVisible = false;
-                    }
+                    //// Workaround for the fact that IsHitTestVisible does not propagate properly //todo: fix the propagation (which comes from the ComboBox style), and remove this block of code. Current issue when removing this code: if we click multiple times on the ComboBox (selecting and deselecting items), at one point the item in the ContentPresenter does not inherit "transparency to click", meaning that it is no longer possible to click the underlying ToggleButton when clicking on the item.
+                    //if (comboBox._contentPresenter != null)
+                    //{
+                    //    comboBox._contentPresenter.IsHitTestVisible = true;
+                    //    comboBox._contentPresenter.IsHitTestVisible = false;
+                    //}
 
                     // Ensure that the toggle button is unchecked:
                     if (comboBox._dropDownToggle != null && comboBox._dropDownToggle.IsChecked == true)
@@ -640,7 +638,7 @@ namespace Windows.UI.Xaml.Controls
 #if MIGRATION
                     comboBox.OnDropDownClosed(new EventArgs());
 #else
-                        comboBox.OnDropDownClosed(new RoutedEventArgs());
+                    comboBox.OnDropDownClosed(new RoutedEventArgs());
 #endif
                 }
             }

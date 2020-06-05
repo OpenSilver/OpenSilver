@@ -1430,7 +1430,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        protected override void UpdateChildrenInVisualTree(
+        protected virtual void UpdateChildrenInVisualTree(
             IEnumerable oldChildrenEnumerable, 
             IEnumerable newChildrenEnumerable, 
             bool forceUpdateAllChildren = false) // "forceUpdateAllChildren" is used to remove all the children and add them back, for example when the ItemsPanel changes.
