@@ -152,6 +152,8 @@ namespace CSHTML5.Internal
                 }
             }
 
+            DependencyObject oldParent = element.INTERNAL_VisualParent;
+
             // Reset all visual-tree related information:
             element.INTERNAL_OuterDomElement = null;
             element.INTERNAL_InnerDomElement = null;
@@ -159,6 +161,11 @@ namespace CSHTML5.Internal
             element.INTERNAL_VisualChildrenInformation = null;
             element.INTERNAL_AdditionalOutsideDivForMargins = null;
             element.INTERNAL_DeferredLoadingWhenControlBecomesVisible = null;
+
+            if (oldParent != null)
+            {
+                UIElement.SynchronizeForceInheritProperties(element, oldParent);
+            }
         }
 
         public static void MoveVisualChildInSameParent(UIElement child, UIElement parent, int newIndex, int oldIndex)
@@ -562,6 +569,8 @@ if(nextSibling != undefined) {
                 INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement).position = "absolute"; //todo: test if this works properly
             }
 
+            UIElement.SynchronizeForceInheritProperties(child, parent);
+
 #if REVAMPPOINTEREVENTS
             UIElement.INTERNAL_UpdateCssPointerEvents(child);
 #else
@@ -600,9 +609,7 @@ if(nextSibling != undefined) {
 
 #if PERFSTAT
             var t6 = Performance.now();
-#endif
-
-            UIElement.SynchronizeForceInheritProperties(child, parent);
+#endif 
 
             // Get the Inherited properties and pass them to the direct children:
             foreach (DependencyProperty dependencyProperty in
