@@ -193,8 +193,7 @@ namespace Windows.UI.Xaml
 #else
                     _pointerPressedEventManager = new INTERNAL_EventManager<PointerEventHandler, PointerRoutedEventArgs>(() => this.INTERNAL_OuterDomElement, eventsNames, (jsEventArg) =>
                     {
-                        
-                        ProcessPointerEvent(jsEventArg, (Action<PointerRoutedEventArgs>)OnPointerPressed, (Action<PointerRoutedEventArgs>)OnPointerPressed_ForHandledEventsToo, preventTextSelectionWhenPointerIsCaptured: false, checkForDivsThatAbsorbEvents: true, refreshClickCount: true);
+                        ProcessPointerEvent(jsEventArg, (Action<PointerRoutedEventArgs>)OnPointerPressed, (Action<PointerRoutedEventArgs>)OnPointerPressed_ForHandledEventsToo, preventTextSelectionWhenPointerIsCaptured: true, checkForDivsThatAbsorbEvents: true, refreshClickCount: true);
                     });
 #endif
                 }
