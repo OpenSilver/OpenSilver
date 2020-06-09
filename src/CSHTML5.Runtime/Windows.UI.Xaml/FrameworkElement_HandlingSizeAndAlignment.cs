@@ -145,7 +145,6 @@ namespace Windows.UI.Xaml
 #else
             RefreshHeight(frameworkElement);
 #endif
-            frameworkElement.HandleSizeChanged();
         }
 
 #if PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
@@ -240,7 +239,6 @@ namespace Windows.UI.Xaml
 #else
             RefreshWidth(frameworkElement);
 #endif
-            frameworkElement.HandleSizeChanged();
         }
 
 #if PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
