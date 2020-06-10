@@ -339,12 +339,6 @@ if(nextSibling != undefined) {
             //     --- --- --- --- outerDomElement
             //
 
-
-
-#if PERFSTAT
-            Performance.Counter("VisualTreeManager: Apply implicit and default styles", t);
-#endif
-
             //--------------------------------------------------------
             // PREPARE THE PARENT:
             //--------------------------------------------------------

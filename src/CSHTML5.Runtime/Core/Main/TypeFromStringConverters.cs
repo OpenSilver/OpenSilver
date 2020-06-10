@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSHTML5;
+using CSHTML5.Internal;
 #if MIGRATION
 using System.Windows;
 #else
