@@ -1594,25 +1594,11 @@ namespace Windows.UI.Xaml
                 }
             }
 
-            // If the pointer is captured, prevent the text selection during a drag operation (cf https://stackoverflow.com/questions/5429827/how-can-i-prevent-text-element-selection-with-cursor-drag)
-            //if (preventTextSelectionWhenPointerIsCaptured && Pointer.INTERNAL_captured != null)
-            //{
-//#if !CSHTML5NETSTANDARD
-//                if (IsRunningInJavaScript())
-//#endif
-                    //CSHTML5.Interop.ExecuteJavaScript(@"
-                    //if ($0.preventDefault && $0.type === 'touchend')
-                    //    $0.preventDefault();
-                    //else
-                    //    window.getSelection().removeAllRanges()", jsEventArg);
-                    //#if !CSHTML5NETSTANDARD
-                    //                else
-                    //                {
-                    //The current version of the simulator browser requires to clear the selection manually //todo: Fix this when replacing the simulator browser with a newer version (at the time of writing current version was chrome 18)
-                    //CSHTML5.Interop.ExecuteJavaScript(@"window.getSelection().removeAllRanges()");
-                    //                }
-                    //#endif
-                    //}
+            //Prevent text selection when the pointer is captured:
+            if (preventTextSelectionWhenPointerIsCaptured && Pointer.INTERNAL_captured != null)
+            {
+                CSHTML5.Interop.ExecuteJavaScript(@"window.getSelection().removeAllRanges()");
+            }
         }
 
 
