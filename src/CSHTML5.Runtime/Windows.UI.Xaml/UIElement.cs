@@ -146,12 +146,12 @@ namespace Windows.UI.Xaml
         }
 
         public static readonly DependencyProperty ClipToBoundsProperty =
-            DependencyProperty.Register("ClipToBounds", 
-                                        typeof(bool), 
-                                        typeof(UIElement), 
-                                        new PropertyMetadata(false) 
-                                        { 
-                                            MethodToUpdateDom = ClipToBounds_MethodToUpdateDom, 
+            DependencyProperty.Register("ClipToBounds",
+                                        typeof(bool),
+                                        typeof(UIElement),
+                                        new PropertyMetadata(false)
+                                        {
+                                            MethodToUpdateDom = ClipToBounds_MethodToUpdateDom,
                                         });
 
         private static void ClipToBounds_MethodToUpdateDom(DependencyObject d, object newValue)
@@ -270,12 +270,12 @@ namespace Windows.UI.Xaml
         /// Identifies the RenderTransform dependency property.
         /// </summary>
         public static readonly DependencyProperty RenderTransformProperty =
-            DependencyProperty.Register("RenderTransform", 
-                                        typeof(Transform), 
-                                        typeof(UIElement), 
+            DependencyProperty.Register("RenderTransform",
+                                        typeof(Transform),
+                                        typeof(UIElement),
                                         new PropertyMetadata(null, RenderTransform_Changed)
-                                        { 
-                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
+                                        {
+                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                                         });
 
         static void RenderTransform_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -335,12 +335,12 @@ namespace Windows.UI.Xaml
         }
 
         public static readonly DependencyProperty RenderTransformOriginProperty =
-            DependencyProperty.Register("RenderTransformOrigin", 
-                                        typeof(Point), 
-                                        typeof(UIElement), 
+            DependencyProperty.Register("RenderTransformOrigin",
+                                        typeof(Point),
+                                        typeof(UIElement),
                                         new PropertyMetadata(new Point(0d, 0d), RenderTransformOrigin_Changed)
-                                        { 
-                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
+                                        {
+                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                                         });
 
         private static void RenderTransformOrigin_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -408,9 +408,9 @@ namespace Windows.UI.Xaml
         /// Identifies the UseLayoutRounding dependency property.
         /// </summary>
         public static readonly DependencyProperty UseLayoutRoundingProperty =
-            DependencyProperty.Register("UseLayoutRounding", 
-                                        typeof(bool), 
-                                        typeof(UIElement), 
+            DependencyProperty.Register("UseLayoutRounding",
+                                        typeof(bool),
+                                        typeof(UIElement),
                                         new PropertyMetadata(false));
 
         //-------------------------------------------------------------------
@@ -438,12 +438,12 @@ namespace Windows.UI.Xaml
         /// Identifies the Visibility dependency property.
         /// </summary>
         public static readonly DependencyProperty VisibilityProperty =
-            DependencyProperty.Register("Visibility", 
-                                        typeof(Visibility), 
-                                        typeof(UIElement), 
+            DependencyProperty.Register("Visibility",
+                                        typeof(Visibility),
+                                        typeof(UIElement),
                                         new PropertyMetadata(Visibility.Visible, Visibility_Changed)
-                                        { 
-                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
+                                        {
+                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                                         });
 
         string _previousValueOfDisplayCssProperty = "block";
@@ -558,9 +558,9 @@ namespace Windows.UI.Xaml
         /// Identifies the IsHitTestVisible property.
         /// </summary>
         public static readonly DependencyProperty IsHitTestVisibleProperty =
-            DependencyProperty.Register("IsHitTestVisible", 
-                                        typeof(bool), 
-                                        typeof(UIElement), 
+            DependencyProperty.Register("IsHitTestVisible",
+                                        typeof(bool),
+                                        typeof(UIElement),
                                         new PropertyMetadata(true, OnIsHitTestVisiblePropertyChanged, CoerceIsHitTestVisibleProperty)
                                         {
                                             MethodToUpdateDom = IsHitTestVisible_MethodToUpdateDom,
@@ -578,9 +578,9 @@ namespace Windows.UI.Xaml
 #if REVAMPPOINTEREVENTS
             INTERNAL_UpdateCssPointerEvents(element);
 #else
-             INTERNAL_UpdateCssPointerEventsPropertyBasedOnIsHitTestVisibleAndIsEnabled(element,
-                isHitTestVisible: (bool)newValue,
-                isEnabled: element is FrameworkElement ? ((FrameworkElement)element).IsEnabled : true);
+            INTERNAL_UpdateCssPointerEventsPropertyBasedOnIsHitTestVisibleAndIsEnabled(element,
+               isHitTestVisible: (bool)newValue,
+               isEnabled: element is FrameworkElement ? ((FrameworkElement)element).IsEnabled : true);
 #endif
 
         }
@@ -698,9 +698,9 @@ namespace Windows.UI.Xaml
         /// Identifies the AllowDrop dependency property.
         /// </summary>
         public static readonly DependencyProperty AllowDropProperty =
-            DependencyProperty.Register("AllowDrop", 
-                                        typeof(bool), 
-                                        typeof(UIElement), 
+            DependencyProperty.Register("AllowDrop",
+                                        typeof(bool),
+                                        typeof(UIElement),
                                         new PropertyMetadata(false));
 
         #endregion
@@ -1078,6 +1078,45 @@ namespace Windows.UI.Xaml
 #else
         public event PointerEventHandler PointerCaptureLost;
 #endif
+
+        #endregion
+
+        #region AllowScrollOnTouchMove
+
+        /// <summary>
+        /// Gets or sets whether pressing (touchscreen devices) on this UIElement then moving should allow scrolling or not. The default value is True.
+        /// </summary>
+        public bool AllowScrollOnTouchMove
+        {
+            get { return (bool)GetValue(AllowScrollOnTouchMoveProperty); }
+            set { SetValue(AllowScrollOnTouchMoveProperty, value); }
+        }
+        /// <summary>
+        /// Identifies the AllowScrollOnTouchMove dependency property.
+        /// </summary>
+        public static readonly DependencyProperty AllowScrollOnTouchMoveProperty =
+            DependencyProperty.Register("AllowScrollOnTouchMove", typeof(bool), typeof(UIElement), new PropertyMetadata(true, AllowScrollOnTouchMove_Changed)
+            {
+                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+            });
+
+        private static void AllowScrollOnTouchMove_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            UIElement element = (UIElement)d;
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
+            {
+                string value;
+                if ((bool)e.NewValue)
+                {
+                    value = "auto";
+                }
+                else
+                {
+                    value = "none";
+                }
+                Interop.ExecuteJavaScript("$0.style.touchAction = $1", element.INTERNAL_OuterDomElement, value);
+            }
+        }
 
         #endregion
 
