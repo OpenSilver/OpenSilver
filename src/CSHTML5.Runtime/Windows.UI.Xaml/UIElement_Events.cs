@@ -52,19 +52,13 @@ namespace Windows.UI.Xaml
     partial class UIElement
     {
 
-        private static bool? _doMouseEventsExist = null;
-        public static bool DoMouseEventsExist
+        static bool ignoreMouseEvents = false; // This boolean is useful because we want to ignore mouse events when touch events have happened so the same user inputs are not handled twice. (Note: when using touch events, the browsers fire the touch events at the moment of the action, then throw the mouse events once touchend is fired)
+        private static DispatcherTimer _ignoreMouseEventsTimer = null;
+        private void _ignoreMouseEventsTimer_Tick(object sender, object e)
         {
-            get
-            {
-                if(_doMouseEventsExist == null)
-                {
-                    _doMouseEventsExist = Convert.ToBoolean(Interop.ExecuteJavaScript("document.onmousedown !== undefined"));
-                }
-                return (bool)_doMouseEventsExist; //todo-perf: if cast performance is really bad, we could use a second variable to tell us if _doMouseEventsExist was set or not and keep it as a simple bool instead of a nullable.
-            }
+            ignoreMouseEvents = false;
+            _ignoreMouseEventsTimer.Stop();
         }
-
 
         #region Pointer moved event
 
@@ -86,16 +80,7 @@ namespace Windows.UI.Xaml
             {
                 if (_pointerMovedEventManager == null)
                 {
-                    string[] eventsNames;
-                    if (DoMouseEventsExist)
-                    {
-                        eventsNames = new string[] { "mousemove" };
-
-                    }
-                    else
-                    {
-                        eventsNames = new string[] { "mousemove", "touchmove" };
-                    }
+                    string[] eventsNames = new string[] { "mousemove", "touchmove" };
 #if MIGRATION
                     _pointerMovedEventManager = new INTERNAL_EventManager<MouseEventHandler, MouseEventArgs>(() => this.INTERNAL_OuterDomElement, eventsNames, (jsEventArg) =>
                         {
@@ -206,16 +191,7 @@ namespace Windows.UI.Xaml
             {
                 if (_pointerPressedEventManager == null)
                 {
-                    string[] eventsNames;
-                    if (DoMouseEventsExist)
-                    {
-                        eventsNames = new string[] { "mousedown" };
-
-                    }
-                    else
-                    {
-                        eventsNames = new string[] { "mousedown", "touchstart" };
-                    }
+                    string[] eventsNames = new string[] { "mousedown", "touchstart" };
 #if MIGRATION
                     _pointerPressedEventManager = new INTERNAL_EventManager<MouseButtonEventHandler, MouseButtonEventArgs>(() => this.INTERNAL_OuterDomElement, eventsNames, (jsEventArg) =>
                         {
@@ -326,16 +302,7 @@ namespace Windows.UI.Xaml
             {
                 if (_pointerReleasedEventManager == null)
                 {
-                    string[] eventsNames;
-                    if (DoMouseEventsExist)
-                    {
-                        eventsNames = new string[] { "mouseup" };
-
-                    }
-                    else
-                    {
-                        eventsNames = new string[] { "mouseup", "touchend" };
-                    }
+                    string[] eventsNames = new string[] { "mouseup", "touchend" };
 
 #if MIGRATION
                     _pointerReleasedEventManager = new INTERNAL_EventManager<MouseButtonEventHandler, MouseButtonEventArgs>(() => this.INTERNAL_OuterDomElement, eventsNames, (jsEventArg) =>
@@ -1556,53 +1523,67 @@ namespace Windows.UI.Xaml
             //in a button or any other control that reacts to clicks from also triggering the click from that control
             bool refreshClickCount = false)
         {
+            bool isMouseEvent = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.type.startsWith('mouse')", jsEventArg));
+            if (!(ignoreMouseEvents && isMouseEvent)) //Ignore mousedown, mousemove and mouseup if the touch equivalents have been handled.
+            {
 #if MIGRATION
             var eventArgs = new MouseButtonEventArgs()
 #else
-            var eventArgs = new PointerRoutedEventArgs()
+                var eventArgs = new PointerRoutedEventArgs()
 #endif
-            {
-                INTERNAL_OriginalJSEventArg = jsEventArg,
-                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
-            };
-
-            if (!eventArgs.Handled && checkForDivsThatAbsorbEvents)
-            {
-                eventArgs.Handled = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("document.checkForDivsThatAbsorbEvents($0)", jsEventArg));
-            }
-
-            if (refreshClickCount)
-            {
-                eventArgs.RefreshClickCount(this);
-            }
-
-            if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
-            {
-                // Fill the position of the pointer and the key modifiers:
-                eventArgs.FillEventArgs(this, jsEventArg);
-
-                // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
-                if (!eventArgs.Handled)
                 {
-                    onEvent(eventArgs);
-                }
-                onEvent_ForHandledEventsToo(eventArgs);
+                    INTERNAL_OriginalJSEventArg = jsEventArg,
+                    Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
+                };
 
-                if (eventArgs.Handled)
+                if (!eventArgs.Handled && checkForDivsThatAbsorbEvents)
                 {
-                    CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                    eventArgs.Handled = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("document.checkForDivsThatAbsorbEvents($0)", jsEventArg));
                 }
-            }
 
-            //Prevent text selection when the pointer is captured:
-            if (preventTextSelectionWhenPointerIsCaptured && Pointer.INTERNAL_captured != null)
-            {
-                CSHTML5.Interop.ExecuteJavaScript(@"window.getSelection().removeAllRanges()");
+                if (refreshClickCount)
+                {
+                    eventArgs.RefreshClickCount(this);
+                }
+
+                if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
+                {
+                    // Fill the position of the pointer and the key modifiers:
+                    eventArgs.FillEventArgs(this, jsEventArg);
+
+                    // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
+                    if (!eventArgs.Handled)
+                    {
+                        onEvent(eventArgs);
+                    }
+                    onEvent_ForHandledEventsToo(eventArgs);
+
+                    if (eventArgs.Handled)
+                    {
+                        CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                    }
+                }
+
+                //Prevent text selection when the pointer is captured:
+                if (preventTextSelectionWhenPointerIsCaptured && Pointer.INTERNAL_captured != null)
+                {
+                    CSHTML5.Interop.ExecuteJavaScript(@"window.getSelection().removeAllRanges()");
+                }
+                bool isTouchEndEvent = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.type == 'touchend'", jsEventArg));
+                if(isTouchEndEvent) //prepare to ignore the mouse events since they were already handled as touch events
+                {
+                    ignoreMouseEvents = true;
+                    if(_ignoreMouseEventsTimer == null)
+                    {
+                        _ignoreMouseEventsTimer = new DispatcherTimer() { Interval = new TimeSpan(0,0,0,0,100) }; //I arbitrarily picked 100ms because at 30ms with throttling x6, it didn't work every time (but sometimes did so it should be alright, also, I tested with 100ms and it worked everytime)
+                        _ignoreMouseEventsTimer.Tick += _ignoreMouseEventsTimer_Tick;
+                        
+                    }
+                    _ignoreMouseEventsTimer.Stop();
+                    _ignoreMouseEventsTimer.Start();
+                }
             }
         }
-
-
-
 
         public virtual void INTERNAL_AttachToDomEvents()
         {
