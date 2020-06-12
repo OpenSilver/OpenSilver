@@ -1112,9 +1112,9 @@ namespace Windows.UI.Xaml
                 }
                 else
                 {
-                    value = "none";
+                    value = "none"; // Note: "none" disables scrolling, pinching and other gestures. It is supposed to not have any effect on the "TouchStart", "TouchMove", and "TouchEnd" events.
                 }
-                Interop.ExecuteJavaScript("$0.style.touchAction = $1", element.INTERNAL_OuterDomElement, value);
+                CSHTML5.Interop.ExecuteJavaScript("$0.style.touchAction = $1", element.INTERNAL_OuterDomElement, value);
             }
         }
 

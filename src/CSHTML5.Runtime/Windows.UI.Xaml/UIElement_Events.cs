@@ -33,6 +33,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Threading;
 #else
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
