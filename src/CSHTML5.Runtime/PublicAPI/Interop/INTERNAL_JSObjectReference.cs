@@ -40,21 +40,21 @@ namespace CSHTML5.Types
         public bool IsArray { get; set; }
 
         private int _arrayIndex;
-        public int ArrayIndex
+        public int ArrayIndex // Note: this property applies only if "IsArray" is true.
         {
             get
             {
                 if (!IsArray)
-                    throw new InvalidOperationException("Cannot get index of non-array item");
+                    System.Diagnostics.Debug.WriteLine("INTERNAL_JSObjectReference error: cannot get index of non-array item");
                 return _arrayIndex;
             }
             set
             {
                 if (!IsArray)
-                    throw new InvalidOperationException("Cannot set index of non-array item");
+                    System.Diagnostics.Debug.WriteLine("INTERNAL_JSObjectReference error: cannot set index of non-array item");
                 _arrayIndex = value;
             }
-        } // Note: this property applies only if "IsArray" is true.
+        }
 
 #if BRIDGE
         [External] //we exclude this method
