@@ -121,7 +121,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// This enum is used by the ItemContainerGenerator to indicate its status.
     /// </summary>
-    public enum GeneratorStatus
+    internal enum GeneratorStatus
     {
         ///<summary>The generator has not tried to generate content</summary>
         NotStarted,

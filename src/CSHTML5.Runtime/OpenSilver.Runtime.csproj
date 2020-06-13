@@ -131,8 +131,12 @@
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\BeginStoryboard.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\CircleEase.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\CubicEase.cs" />
+		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\DiscretePointKeyFrame.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\EasingFunctionBase.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\ExponentialEase.cs" />
+		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\PointAnimationUsingKeyFrames.cs" />
+		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\PointKeyFrame.cs" />
+		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\PointKeyFrameCollection.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\QuadraticEase.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\QuarticEase.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\QuinticEase.cs" />
