@@ -293,6 +293,8 @@ namespace Windows.UI.Xaml
 
         internal void CheckTargetType(object element)
         {
+#if OPENSILVER // Note: we do not do this verification in CSHTML5 in order to remain compatible with old applications created with prior versions of CSHTML5 (eg. Client_FB).
+
             // In the most common case TargetType is Default
             // and we can avoid a call to IsAssignableFrom() who's performance is unknown.
             if (DefaultTargetType == TargetType)
@@ -305,6 +307,7 @@ namespace Windows.UI.Xaml
                                                     this.TargetType.Name,
                                                     elementType.Name));
             }
+#endif
         }
 
         /// <summary>
