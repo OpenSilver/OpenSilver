@@ -50,9 +50,8 @@ namespace System.Windows.Interactivity
         {
             if(_associatedObject != null)
             {
-#if !GD_WIP
-                throw new InvalidOperationException("The AttachableCollection is already attached to a different object.");
-#endif
+                //todo: check why uncommenting the following line causes an issue with the Userware KanBan demo (CSHTML5 2.0.0-alpha67-087).
+                //throw new InvalidOperationException("The AttachableCollection is already attached to a different object.");
             }
             _associatedObject = dependencyObject;
             foreach(T element in this)
