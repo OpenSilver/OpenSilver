@@ -12,17 +12,9 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 #if MIGRATION
-using System.Windows;
 using System.Windows.Data;
 #else
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 #endif
 
@@ -38,24 +30,26 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public abstract partial class DataGridBoundColumn : DataGridColumn
     {
-        /// <summary>
-        /// Gets or sets the binding that associates the column with a property in the
-        /// data source.
-        /// </summary>
+        private BindingBase _binding;
+
         public BindingBase Binding
         {
-            get { return (BindingBase)GetValue(BindingProperty); }
-            set { SetValue(BindingProperty, value); }
+            get
+            {
+                return this._binding;
+            }
+            set
+            {
+                if (this._binding != value)
+                {
+                    BindingBase oldBinding = this._binding;
+                    this._binding = value;
+                    this.OnBindingChanged(oldBinding, this._binding);
+                }
+            }
         }
-        /// <summary>
-        /// Identifies the System.Windows.Controls.DataGridBoundColumn.Binding dependency property.
-        /// </summary>
-        public static readonly DependencyProperty BindingProperty =
-            DependencyProperty.Register("Binding", typeof(BindingBase), typeof(DataGridBoundColumn), new PropertyMetadata(null, Binding_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
-
-        static void Binding_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private void OnBindingChanged(BindingBase oldBinding, BindingBase newBinding)
         {
             //todo: tell the DataGrid that the Binding has changed so it has to refresh the elements (only i it is already in the visual tree).
         }

@@ -15,17 +15,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using CSHTML5.Native.Html.Controls;
+
 #if MIGRATION
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 #else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 #endif
 
@@ -58,8 +52,8 @@ namespace Windows.UI.Xaml.Controls
             }
             Type enumType = value.GetType();
             var enumValues = Enum.GetValues(enumType);//  enumType.GetEnumValues();
-            ComboBox comboBox = new ComboBox();
-            comboBox.DataContext = childData;
+            NativeComboBox cb = new NativeComboBox();
+            cb.DataContext = childData;
             if (enumValues != null && enumValues.Length > 0)
             {
 #if BRIDGE
@@ -73,18 +67,18 @@ namespace Windows.UI.Xaml.Controls
                 {
                     enumValuesAsStrings.Add(Enum.GetName(valueType, val));
                 }
-                comboBox.ItemsSource = enumValuesAsStrings;
+                cb.ItemsSource = enumValuesAsStrings;
 
                 //Add a converter so that we go smoothly between the selected value in the ComboBox and the expected value in the source of the binding:
                 b.Converter = new MyConverter();
                 b.ConverterParameter = valueType;
 #else
-                comboBox.ItemsSource = enumValues;
+                cb.ItemsSource = enumValues;
 #endif
 
-                comboBox.SetBinding(ComboBox.SelectedItemProperty, b);
+                cb.SetBinding(NativeComboBox.SelectedItemProperty, b);
             }
-            return comboBox;
+            return cb;
         }
 
 
