@@ -422,6 +422,23 @@ return innerText;
             return "";
         }
 
+        public static object AddOptionToNativeComboBox(
+            object nativeComboBoxDomElement,
+            string elementToAdd,
+            int index)
+        {
+            var optionDomElement = CSHTML5.Interop.ExecuteJavaScriptAsync(@"
+(function(){
+    var option = document.createElement(""option"");
+    option.text = $1;
+    $0.add(option, $2);
+    return option;
+}())
+", nativeComboBoxDomElement, elementToAdd, index);
+
+            return optionDomElement;
+        }
+
         public static object AddOptionToNativeComboBox(object nativeComboBoxDomElement, string elementToAdd)
         {
             // Note: we add an "option" element to the DOM, instead of the string directly, because it works better.
@@ -486,6 +503,11 @@ element.remove({1});
         public static void RemoveOptionFromNativeComboBox(object optionToRemove, object nativeComboBoxDomElement)
         {
             CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.removeChild($1)", nativeComboBoxDomElement, optionToRemove);
+        }
+
+        public static void RemoveOptionFromNativeComboBox(object nativeComboBoxDomElement, int index)
+        {
+            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.remove($1)", nativeComboBoxDomElement, index);
         }
 
         //public static void AppendChild(dynamic parentDomElement, dynamic childDomElement)
