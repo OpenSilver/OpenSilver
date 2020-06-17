@@ -15,15 +15,12 @@
 
 #if !BRIDGE
 using JSIL.Meta;
-#else
-using Bridge;
 #endif
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 
 
 #if MIGRATION
@@ -38,136 +35,451 @@ namespace System.Windows.Controls.Primitives
 namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
-    //[MarshalingBehavior(MarshalingType.Agile)]
-    //[Threading(ThreadingModel.Both)]
-    //[Version(100794368)]
-    //[WebHostHidden]
     /// <summary>
     /// Represents a control that allows a user to select an item from a collection
     /// of items.
     /// </summary>
     public partial class Selector : ItemsControl
     {
-        bool _selectionChangeIsOnIndex = false;
-        bool _selectionChangeIsOnItem = false;
-        bool _selectionChangeIsOnValue = false;
+        #region Data
 
-#if false
-        protected bool ChangingSelectionInHtml { get; set; }
-#endif
-        protected bool ChangingSelectionProgrammatically { get; set; }
+        private bool _selectionChangeIsOnIndex = false;
+        private bool _selectionChangeIsOnItem = false;
+        private bool _selectionChangeIsOnValue = false;
 
+        private bool SkipCoerceSelectedItemCheck;
+        private SelectionInfo _selectionInfo;
 
-        protected override void OnItemsSourceChanged_BeforeVisualUpdate(IEnumerable oldValue, IEnumerable newValue)
+        #endregion Data
+
+        #region Constructor
+
+        public Selector()
         {
-            SelectedIndex = -1;
+
         }
 
-        //// Returns:
-        ////     True if the SelectedItem is always synchronized with the current item in
-        ////     the ItemCollection; false if the SelectedItem is never synchronized with
-        ////     the current item; null if the SelectedItem is synchronized with the current
-        ////     item only if the Selector uses an ICollectionView. The default value is null/indeterminate.
-        ////     If you are programming using C# or Visual Basic, the type of this property
-        ////     is projected as bool? (a nullable Boolean).
-        ///// <summary>
-        ///// Gets or sets a value that indicates whether a Selector should keep the SelectedItem
-        ///// synchronized with the current item in the Items property.
-        ///// </summary>
-        //public bool? IsSynchronizedWithCurrentItem
-        //{
-        //    get { return (bool?)GetValue(IsSynchronizedWithCurrentItemProperty); }
-        //    set { SetValue(IsSynchronizedWithCurrentItemProperty, value); }
-        //}
-        //public static readonly DependencyProperty IsSynchronizedWithCurrentItemProperty =
-        //    DependencyProperty.Register("IsSynchronizedWithCurrentItem", typeof(bool?), typeof(Selector), new PropertyMetadata(null));
+        #endregion Constructor
+
+        #region Public Events
+
+        /// <summary>
+        /// Occurs when the selection is changed.
+        /// </summary>
+        public event SelectionChangedEventHandler SelectionChanged;
+
+        #endregion Public Events
+
+        #region Dependency Properties
+
+        /// <summary>
+        /// Gets or sets the selected item.
+        /// </summary>
+        public object SelectedItem
+        {
+            get { return this.GetValue(Selector.SelectedItemProperty); }
+            set { this.SetValue(Selector.SelectedItemProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the SelectedItem dependency property.
+        /// </summary>
+        public static readonly DependencyProperty SelectedItemProperty =
+            DependencyProperty.Register(
+                "SelectedItem", 
+                typeof(object), 
+                typeof(Selector), 
+                new PropertyMetadata(null, Selector.OnSelectedItemChanged, Selector.CoerceSelectedItem));
+
+        private static void OnSelectedItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Selector s = (Selector)d;
+            object newValue = e.NewValue;
+
+            // we only want to change the other ones if the change comes from 
+            // SelectedItem (otherwise it's already done by the one that was 
+            // originally changed (SelectedIndex or SelectedValue)
+            if (!s._selectionChangeIsOnValue && !s._selectionChangeIsOnIndex)
+            {
+                s._selectionChangeIsOnItem = true;
+
+                try
+                {
+                    if (newValue == null)
+                    {
+                        // we use SetCurrentValue to preserve any potential bindings.
+                        s.SetCurrentValue(Selector.SelectedValueProperty, null);
+                        s.SetCurrentValue(Selector.SelectedIndexProperty, -1);
+                    }
+                    else
+                    {
+                        // we use SetCurrentValue to preserve any potential bindings.
+                        s.SetCurrentValue(Selector.SelectedValueProperty, PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(newValue, s.SelectedValuePath));
+                        s.SetCurrentValue(Selector.SelectedIndexProperty, s.Items.IndexOf(newValue));
+                    }
+                }
+                finally
+                {
+                    s._selectionChangeIsOnItem = false;
+                }
+            }
+
+            // Raise the selection changed event
+            List<object> removedItems = new List<object>();
+            removedItems.Add(e.OldValue);
+            List<object> addedItems = new List<object>();
+            addedItems.Add(e.NewValue);
+            SelectionChangedEventArgs args = new SelectionChangedEventArgs(removedItems, addedItems);
+
+            s.OnSelectionChanged(args);
+        }
+
+        private static object CoerceSelectedItem(DependencyObject d, object baseValue)
+        {
+            Selector s = (Selector)d;
+
+            if (baseValue == null || s.SkipCoerceSelectedItemCheck)
+            {
+                return baseValue;
+            }
+
+            int selectedIndex = s.SelectedIndex;
+
+            if ((selectedIndex > -1 && selectedIndex < s.Items.Count && s.Items[selectedIndex] == baseValue)
+                || s.Items.Contains(baseValue))
+            {
+                return baseValue;
+            }
+
+            return DependencyProperty.UnsetValue; // reset baseValue to old value.
+        }
 
         /// <summary>
         /// Gets or sets the index of the selected item.
         /// </summary>
         public int SelectedIndex
         {
-            get { return (int)GetValue(SelectedIndexProperty); }
-            set { SetValue(SelectedIndexProperty, value); }
+            get { return (int)this.GetValue(Selector.SelectedIndexProperty); }
+            set { this.SetValue(Selector.SelectedIndexProperty, value); }
         }
+
         /// <summary>
         /// Identifies the SelectedIndex dependency property.
         /// </summary>
         public static readonly DependencyProperty SelectedIndexProperty =
-            DependencyProperty.Register("SelectedindexProperty", typeof(int), typeof(Selector), new PropertyMetadata(-1, SelectedIndex_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-        private static void SelectedIndex_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            DependencyProperty.Register(
+                "SelectedIndex", 
+                typeof(int), 
+                typeof(Selector), 
+                new PropertyMetadata(-1, Selector.OnSelectedIndexChanged, Selector.CoerceSelectedIndex));
+        
+        private static void OnSelectedIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            Selector selector = (Selector)d;
-            selector.ManageSelectedIndex_Changed(e);
-        }
+            Selector s = (Selector)d;
 
-        protected virtual void ManageSelectedIndex_Changed(DependencyPropertyChangedEventArgs e)
-        {
-            // Note: in this method, we use "Convert.ToInt32()" intead of casting to "(int)" because otherwise the JS code is not compatible with IE 9 (or Windows Phone 8.0).
-
-            //if (!AreObjectsEqual(e.OldValue, e.NewValue))
-            //{
-            int newValue = Convert.ToInt32(e.NewValue);
-            if (newValue < Items.Count) //The new value is ignored if it is bigger or equal than the amount of elements in the list of Items.
+            // we only want to change the other ones if the change comes from 
+            // SelectedIndex (otherwise it's already done by the one that was 
+            // originally changed (SelectedItem or SelectedValue)
+            if (!s._selectionChangeIsOnValue && !s._selectionChangeIsOnItem)
             {
-                if (!_selectionChangeIsOnValue && !_selectionChangeIsOnItem) //we only want to change the other ones if the change comes from SelectedIndex (otherwise it's already done by the one that was originally changed (SelectedItem or SelectedValue)
+                int newValue = (int)e.NewValue;
+
+                s._selectionChangeIsOnIndex = true;
+
+                try
                 {
-                    object oldItem = SelectedItem;
-                    _selectionChangeIsOnIndex = true;
                     if (newValue == -1)
                     {
-                        SetCurrentValue(SelectedItemProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                        SetCurrentValue(SelectedValueProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                        // Note : we use SetCurrentValue to preserve any potential bindings.
+                        s.SetCurrentValue(Selector.SelectedValueProperty, null);
 
-                        //todo: update binding of SelectedIndex
+                        // Skip the call to Items.IndexOf()
+                        s.SkipCoerceSelectedItemCheck = true;
 
-                        //selector.SelectedItem = null;
-                        //selector.SelectedValue = null;
+                        try
+                        {
+                            // Note: always update the value of SelectedItem last when
+                            // synchronizing selection properties, so that all the properties
+                            // are up to date when the selection changed event is fired.
+                            s.SetCurrentValue(Selector.SelectedItemProperty, null);
+                        }
+                        finally
+                        {
+                            s.SkipCoerceSelectedItemCheck = false;
+                        }
                     }
                     else
                     {
-                        object item = Items[newValue]; //todo: make sure that the index always corresponds (I think it does but I didn't check)
-                        SetCurrentValue(SelectedItemProperty, item); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                        SetCurrentValue(SelectedValueProperty, PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(item, SelectedValuePath)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
+                        object item = s.Items[newValue];
 
-                        //todo: update binding of SelectedIndex
+                        // Note : we use SetCurrentValue to preserve any potential bindings.
+                        s.SetCurrentValue(Selector.SelectedValueProperty, PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(item, s.SelectedValuePath));
 
-                        //selector.SelectedItem = item;
-                        //selector.SelectedValue = selector.AccessValueByApplyingPropertyPathIfAny(item, selector.SelectedValuePath);
+                        // Skip the call to Items.IndexOf()
+                        s.SkipCoerceSelectedItemCheck = true;
+
+                        try
+                        {
+                            // Note: always update the value of SelectedItem last when
+                            // synchronizing selection properties, so that all the properties
+                            // are up to date when the selection changed event is fired.
+                            s.SetCurrentValue(Selector.SelectedItemProperty, item);
+                        }
+                        finally
+                        {
+                            s.SkipCoerceSelectedItemCheck = false;
+                        }
                     }
-                    _selectionChangeIsOnIndex = false;
-
-                    List<object> oldItems = new List<object>();
-                    oldItems.Add(oldItem);
-                    List<object> newItems = new List<object>();
-                    newItems.Add(SelectedItem);
-
-                    RefreshSelectedItem();
-
-#if false
-                    if (!ChangingSelectionInHtml) //the SelectionChanged event is already fired from the javascript event.
-                    {
-                        OnSelectionChanged(new SelectionChangedEventArgs(oldItems, newItems));
-                    }
-#else
-                    OnSelectionChanged(new SelectionChangedEventArgs(oldItems, newItems));
-#endif
                 }
-#if false
-                if (!ChangingSelectionInHtml)
+                finally
                 {
-                    ChangingSelectionProgrammatically = true; //so that it doesn't end up in a loop
-                    ApplySelectedIndex(newValue);
-                    ChangingSelectionProgrammatically = false;
+                    s._selectionChangeIsOnIndex = false;
                 }
-#else
-                ChangingSelectionProgrammatically = true; //so that it doesn't end up in a loop
-                ApplySelectedIndex(newValue);
-                ChangingSelectionProgrammatically = false;
-#endif
+
+                s.ApplySelectedIndex(newValue);
             }
-            //}
+
+            s.ManageSelectedIndex_Changed(e);
+        }
+
+        private static object CoerceSelectedIndex(DependencyObject d, object baseValue)
+        {
+            Selector s = (Selector)d;
+
+            int index = (int)baseValue;
+            if (index < 0)
+            {
+                return -1;
+            }
+            else if (index >= s.Items.Count)
+            {
+                return s.Items.Count - 1;
+            }
+            else
+            {
+                return index;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the value of the selected item, obtained by using the SelectedValuePath.
+        /// </summary>
+        public object SelectedValue
+        {
+            get { return this.GetValue(Selector.SelectedValueProperty); }
+            set { this.SetValue(Selector.SelectedValueProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the SelectedValue dependency property.
+        /// </summary>
+        public static readonly DependencyProperty SelectedValueProperty =
+            DependencyProperty.Register(
+                "SelectedValue", 
+                typeof(object), 
+                typeof(Selector), 
+                new PropertyMetadata(null, Selector.OnSelectedValueChanged, Selector.CoerceSelectedValue));
+
+        private static void OnSelectedValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Selector s = (Selector)d;
+
+            // we only want to change the other ones if the change comes from 
+            // SelectedItem (otherwise it's already done by the one that was 
+            // originally changed (SelectedIndex or SelectedValue)
+            if (!s._selectionChangeIsOnItem && !s._selectionChangeIsOnIndex)
+            {
+                s._selectionChangeIsOnValue = true;
+
+                try
+                {
+                    s.SetCurrentValue(Selector.SelectedIndexProperty, s._selectionInfo.Index);
+
+                    // Note: always update the value of SelectedItem last when
+                    // synchronizing selection properties, so that all the properties
+                    // are up to date when the selection changed event is fired.
+                    //cb.SetCurrentValue(NativeComboBox.SelectedItemProperty, item);
+                    s.SetCurrentValue(Selector.SelectedItemProperty, s._selectionInfo.Item);
+                }
+                finally
+                {
+                    s._selectionChangeIsOnValue = false;
+                    s._selectionInfo = null;
+                }
+            }
+        }
+
+        private static object CoerceSelectedValue(DependencyObject d, object baseValue)
+        {
+            Selector s = (Selector)d;
+
+            if (s._selectionChangeIsOnIndex || s._selectionChangeIsOnItem)
+            {
+                // If we're in the middle of a selection change (SelectedIndex
+                // or SelectedItem), accept the value.
+                return baseValue;
+            }
+            else
+            {
+                // Otherwise, this is a user-initiated change to SelectedValue.
+                // Find the corresponding item.
+                int index;
+                object item = s.FindItemWithValue(baseValue, out index);
+
+                // if the search fails, coerce the value to null.  Unless there
+                // are no items at all, in which case wait for the items to appear
+                // and search again.
+                if (item == DependencyProperty.UnsetValue && s.Items.Count > 0)
+                {
+                    baseValue = null;
+                }
+
+                // Store the new selected item so we don't have to look for it again
+                // in OnSelectedValueChanged.
+                s._selectionInfo = new SelectionInfo(item == DependencyProperty.UnsetValue ? null : item, index);
+            }
+
+            return baseValue;
+        }
+
+        /// <summary>
+        /// Gets or sets the property path that is used to get the SelectedValue property
+        /// of the SelectedItem property.
+        /// </summary>
+        public string SelectedValuePath
+        {
+            get { return (string)this.GetValue(Selector.SelectedValuePathProperty); }
+            set { this.SetValue(Selector.SelectedValuePathProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the SelectedValuePath dependency property.
+        /// </summary>
+        public static readonly DependencyProperty SelectedValuePathProperty =
+            DependencyProperty.Register(
+                "SelectedValuePath", 
+                typeof(string), 
+                typeof(Selector), 
+                new PropertyMetadata(string.Empty, Selector.OnSelectedValuePathChanged));
+
+        private static void OnSelectedValuePathChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Selector s = (Selector)d;
+
+            s._selectionChangeIsOnItem = true;
+            s._selectionChangeIsOnIndex = true;
+
+            try
+            {
+                object item = null;
+                if (s.SelectedItem != null)
+                {
+                    item = PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(s.SelectedItem, (string)e.NewValue);
+                }
+                s.SetCurrentValue(Selector.SelectedValueProperty, item);
+            }
+            finally
+            {
+                s._selectionChangeIsOnItem = false;
+                s._selectionChangeIsOnIndex = false;
+            }
+        }
+
+        #region things to replace with selectors Controltemplates
+
+        /// <summary>
+        /// Gets or sets the bakground color of the selected Items.
+        /// </summary>
+        public Brush SelectedItemBackground
+        {
+            get { return (Brush)this.GetValue(Selector.SelectedItemBackgroundProperty); }
+            set { this.SetValue(Selector.SelectedItemBackgroundProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the SelectedItemBackground dependency property
+        /// </summary>
+        public static readonly DependencyProperty SelectedItemBackgroundProperty =
+            DependencyProperty.Register(
+                "SelectedItemBackground", 
+                typeof(Brush), 
+                typeof(Selector), 
+                new PropertyMetadata(new SolidColorBrush(Colors.Blue)));
+
+        /// <summary>
+        /// Gets or sets the foreground color of the selected Items.
+        /// </summary>
+        public Brush SelectedItemForeground
+        {
+            get { return (Brush)this.GetValue(Selector.SelectedItemForegroundProperty); }
+            set { this.SetValue(Selector.SelectedItemForegroundProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the SelectedItemForeground dependency property
+        /// </summary>
+        public static readonly DependencyProperty SelectedItemForegroundProperty =
+            DependencyProperty.Register(
+                "SelectedItemForeground", 
+                typeof(Brush), 
+                typeof(Selector), 
+                new PropertyMetadata(new SolidColorBrush(Colors.White)));
+
+        /// <summary>
+        /// Gets or sets the bakground color of the Items that are not selected.
+        /// </summary>
+        public Brush RowBackground
+        {
+            get { return (Brush)this.GetValue(Selector.RowBackgroundProperty); }
+            set { this.SetValue(Selector.RowBackgroundProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the RowBackground dependency property
+        /// </summary>
+        public static readonly DependencyProperty RowBackgroundProperty =
+            DependencyProperty.Register(
+                "RowBackground", 
+                typeof(Brush), 
+                typeof(Selector), 
+                new PropertyMetadata(new SolidColorBrush(Colors.White)));
+
+
+        /// <summary>
+        /// Gets or sets the foreground color of the Items that are not selected.
+        /// </summary>
+        public Brush UnselectedItemForeground
+        {
+            get { return (Brush)this.GetValue(Selector.UnselectedItemForegroundProperty); }
+            set { this.SetValue(Selector.UnselectedItemForegroundProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the UnselectedItemForeground dependency property
+        /// </summary>
+        public static readonly DependencyProperty UnselectedItemForegroundProperty =
+            DependencyProperty.Register(
+                "UnselectedItemForeground", 
+                typeof(Brush), 
+                typeof(Selector), 
+                new PropertyMetadata((Brush)null));
+
+        #endregion things to replace with selectors Controltemplates
+
+        #endregion Dependency Properties        
+
+        #region Public/Protected Methods
+
+        /// <summary>
+        /// Raises the SelectionChanged event
+        /// </summary>
+        /// <param name="e">The arguments for the event.</param>
+        protected virtual void OnSelectionChanged(SelectionChangedEventArgs e)
+        {
+            if (this.SelectionChanged != null)
+            {
+                this.SelectionChanged(this, e);
+            }
         }
 
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
@@ -178,7 +490,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
-                unselect = true;
+                unselect = !this.Items.Contains(this.SelectedItem);
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove ||
                      e.Action == NotifyCollectionChangedAction.Replace)
@@ -191,312 +503,105 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
             if (unselect)
             {
-                // we use SetCurrentValue to preserve bindings if any.
-                this.SetCurrentValue(SelectedIndexProperty, -1);
-                this.SetCurrentValue(SelectedItemProperty, null);
-                this.SetCurrentValue(SelectedValueProperty, null);
+                // Update selection properties
+
+                // Note : we use SetCurrentValue to preserve bindings if any.
+                this.SetCurrentValue(Selector.SelectedIndexProperty, -1);
             }
+        }
+
+        protected override void OnItemsSourceChanged_BeforeVisualUpdate(IEnumerable oldValue, IEnumerable newValue)
+        {
+            this.SetCurrentValue(Selector.SelectedIndexProperty, -1);
         }
 
         protected virtual void ApplySelectedIndex(int index)
         {
-            // This is overridden for example by classes that implement selection through though native HTML controls, such as the native ComboBox.
+
         }
 
-        /// <summary>
-        /// Gets or sets the selected item.
-        /// </summary>
-        public object SelectedItem
+        protected virtual void ManageSelectedIndex_Changed(DependencyPropertyChangedEventArgs e)
         {
-            get { return (object)GetValue(SelectedItemProperty); }
-            set { SetValue(SelectedItemProperty, value); }
+
         }
-        /// <summary>
-        /// Identifies the SelectedItem dependency property.
-        /// </summary>
-        public static readonly DependencyProperty SelectedItemProperty =
-            DependencyProperty.Register("SelectedItem", typeof(object), typeof(Selector), new PropertyMetadata(null, SelectedItem_changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-        private static void SelectedItem_changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+
+        #endregion Public/Protected Methods
+
+        #region Private Methods
+
+        private object FindItemWithValue(object value, out int index)
         {
-            if (!AreObjectsEqual(e.OldValue, e.NewValue))
+            index = -1;
+
+            if (this.Items.Count == 0)
             {
-                Selector selector = (Selector)d;
-                object newValue = (object)e.NewValue;
-                if (!selector._selectionChangeIsOnValue && !selector._selectionChangeIsOnIndex) //we only want to change the other ones if the change comes from SelectedItem (otherwise it's already done by the one that was originally changed (SelectedIndex or SelectedValue)
+                return DependencyProperty.UnsetValue;
+            }
+
+            string selectedValuePath = this.SelectedValuePath;
+
+            // optimize for case where there is no SelectedValuePath
+            if (string.IsNullOrEmpty(selectedValuePath))
+            {
+                index = this.Items.IndexOf(value);
+                if (index >= 0)
                 {
-                    selector._selectionChangeIsOnItem = true;
-                    if (newValue == null)
-                    {
-                        selector.SetCurrentValue(SelectedIndexProperty, -1); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                        selector.SetCurrentValue(SelectedValueProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-
-                        //todo: update binding of SelectedIndex
-
-                        //selector.SelectedIndex = -1;
-                        //selector.SelectedValue = null;
-                    }
-                    else
-                    {
-                        selector.SetCurrentValue(SelectedIndexProperty, GetIndexOfElementInItems(selector, newValue)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                        selector.SetCurrentValue(SelectedValueProperty, PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(newValue, selector.SelectedValuePath)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-
-                        //todo: update binding of SelectedIndex
-
-                        //selector.SelectedIndex = GetIndexOfElementInItems(selector, newValue);
-                        //selector.SelectedValue = selector.AccessValueByApplyingPropertyPathIfAny(newValue, selector.SelectedValuePath);
-                    }
-                    selector._selectionChangeIsOnItem = false;
-
-                    List<object> oldItems = new List<object>();
-                    oldItems.Add(e.OldValue);
-                    List<object> newItems = new List<object>();
-                    newItems.Add(e.NewValue);
-
-                    selector.RefreshSelectedItem();
-
-                    selector.OnSelectionChanged(new SelectionChangedEventArgs(oldItems, newItems));
+                    return value;
+                }
+                else
+                {
+                    return DependencyProperty.UnsetValue;
                 }
             }
-        }
 
-        // Returns:
-        //     The value of the selected item, obtained by using the SelectedValuePath,
-        //     or null if no item is selected. The default value is null.
-        /// <summary>
-        /// Gets or sets the value of the selected item, obtained by using the SelectedValuePath.
-        /// </summary>
-        public object SelectedValue
-        {
-            get { return (object)GetValue(SelectedValueProperty); }
-            set { SetValue(SelectedValueProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the SelectedValue dependency property.
-        /// </summary>
-        public static readonly DependencyProperty SelectedValueProperty =
-            DependencyProperty.Register("SelectedValue", typeof(object), typeof(Selector), new PropertyMetadata(null, SelectedValue_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-        private static void SelectedValue_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (!AreObjectsEqual(e.OldValue, e.NewValue))
+            index = 0;
+            foreach (object item in this.Items)
             {
-                Selector selector = (Selector)d;
-                object newValue = (object)e.NewValue;
-                object oldItem = selector.SelectedItem;
-                if (!selector._selectionChangeIsOnItem && !selector._selectionChangeIsOnIndex) //we only want to change the other ones if the change comes from SelectedItem (otherwise it's already done by the one that was originally changed (SelectedIndex or SelectedValue)
+                object displayedItem = PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(item, selectedValuePath);
+                if (ItemsControl.EqualsEx(displayedItem, value))
                 {
-                    selector._selectionChangeIsOnValue = true;
-                    if (newValue == null)
-                    {
-                        selector.SetCurrentValue(SelectedIndexProperty, -1); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                        selector.SetCurrentValue(SelectedItemProperty, null); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-
-                        //todo: update binding of SelectedIndex
-
-                        //selector.SelectedIndex = -1;
-                        //selector.SelectedItem = null;
-                    }
-                    else
-                    {
-                        var selectedPropertyPath = selector.SelectedValuePath;
-                        object item = selector.Items.FirstOrDefault(element => Object.Equals(PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(element, selectedPropertyPath), newValue)); //todo: perf? //Note: there is no way we can know which value was intended in the case of multiple items with the same values.
-                        selector.SetCurrentValue(SelectedIndexProperty, GetIndexOfElementInItems(selector, item)); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                        selector.SetCurrentValue(SelectedItemProperty, item); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-
-                        //todo: update binding of SelectedIndex
-
-                        //selector.SelectedIndex = GetIndexOfElementInItems(selector, item);
-                        //selector.SelectedItem = item;
-                    }
-
-                    selector._selectionChangeIsOnValue = false;
-                    List<object> oldItems = new List<object>();
-                    oldItems.Add(oldItem);
-                    List<object> newItems = new List<object>();
-                    newItems.Add(selector.SelectedItem);
-                    selector.RefreshSelectedItem();
-                    selector.OnSelectionChanged(new SelectionChangedEventArgs(oldItems, newItems));
+                    return item;
                 }
+                ++index;
             }
+
+            index = -1;
+            return DependencyProperty.UnsetValue;
         }
 
-        // IMPORTANT
-        // In Bridge, item1 == item2 doesn't work, so we let Bridge convert the code below in order to work properly
-        //   For example, in Bridge, if we use 2 classes, even if they have the same value and everything, using the symbol "==" doesn't work.
-        //   this is why in C# we use <class name>.Equals(<other classname>) in order to see if they're equal
-        //   and that's the same with Bridge
-#if !BRIDGE
-        [JSReplacement("$item1 == $item2")] //the c# version doesn't work in javascript for types like int 
-#endif
-        private static bool AreObjectsEqual(object item1, object item2)
+        #endregion Private Methods
+
+        #region Private classes
+
+        private class SelectionInfo
         {
-            // we need to check if both items or null separatly because of a Bridge issue : item1.Equals(item2) throws an error if item1 is null which is normal) and/or item2 is null (error : "cannot get property "low" of null")
-            if (item1 == null)
+            public int Index;
+            public object Item;
+
+            public SelectionInfo(object item, int index)
             {
-                return item2 == null;
-            }
-            else if (item2 == null)
-            {
-                return item1 == null;
-            }
-            else
-            {
-                return item1.Equals(item2);
+                this.Item = item;
+                this.Index = index;
             }
         }
 
-        //todo: remove the following method when the bug with ObservableCollection.IndexOf (that makes it not work in the simulator) will be fixed
-        private static int GetIndexOfElementInItems(Selector selector, object element)
-        {
-            int i = 0;
-            foreach (object currentItem in selector.Items)
-            {
-                if (element.Equals(currentItem))
-                {
-                    break;
-                }
-                ++i;
-            }
-            if (i >= selector.Items.Count)
-            {
-                i = -1;
-            }
-            return i;
-        }
+        #endregion Private classes
 
-        /// <summary>
-        /// Gets or sets the property path that is used to get the SelectedValue property
-        /// of the SelectedItem property.
-        /// </summary>
-        public string SelectedValuePath
-        {
-            get { return (string)GetValue(SelectedValuePathProperty); }
-            set { SetValue(SelectedValuePathProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the SelectedValuePath dependency property.
-        /// </summary>
-        public static readonly DependencyProperty SelectedValuePathProperty =
-            DependencyProperty.Register("SelectedValuePath", typeof(string), typeof(Selector), new PropertyMetadata(string.Empty)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+        #region Obsolete
 
-
-        internal virtual void RefreshSelectedItem()
-        {
-            //I do not think there is anything to do here, the method will probably be overriden.
-        }
-
-
-#region selection changed event
-        //note about this event: we need to register to this event, pre-handle it and only then change the value in c# since the user will probably want the old value if he registers to it.
-
-        /// <summary>
-        /// Occurs when the selection is changed.
-        /// </summary>
-        public event SelectionChangedEventHandler SelectionChanged;
-
-        /// <summary>
-        /// Raises the TextChanged event
-        /// </summary>
-        /// <param name="eventArgs">The arguments for the event.</param>
-        protected virtual void OnSelectionChanged(SelectionChangedEventArgs eventArgs)
-        {
-            if (SelectionChanged != null)
-            {
-                SelectionChanged(this, eventArgs);
-            }
-        }
-
-#endregion
-
-
-
-#region things to replace with selectors Controltemplates
-
-        /// <summary>
-        /// Gets or sets the bakground color of the selected Items.
-        /// </summary>
-        public Brush SelectedItemBackground
-        {
-            get { return (Brush)GetValue(SelectedItemBackgroundProperty); }
-            set { SetValue(SelectedItemBackgroundProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the SelectedItemBackground dependency property
-        /// </summary>
-        public static readonly DependencyProperty SelectedItemBackgroundProperty =
-            DependencyProperty.Register("SelectedItemBackground", typeof(Brush), typeof(Selector), new PropertyMetadata(new SolidColorBrush(Colors.Blue))
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-
-        /// <summary>
-        /// Gets or sets the foreground color of the selected Items.
-        /// </summary>
-        public Brush SelectedItemForeground
-        {
-            get { return (Brush)GetValue(SelectedItemForegroundProperty); }
-            set { SetValue(SelectedItemForegroundProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the SelectedItemForeground dependency property
-        /// </summary>
-        public static readonly DependencyProperty SelectedItemForegroundProperty =
-            DependencyProperty.Register("SelectedItemForeground", typeof(Brush), typeof(Selector), new PropertyMetadata(new SolidColorBrush(Colors.White))
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-
-
-        [Obsolete("Use RowBackground instead.")]
         /// <summary>
         /// Gets or sets the bakground color of the Items that are not selected.
         /// </summary>
+        [Obsolete("Use RowBackground instead.")]
         public Brush UnselectedItemBackground
         {
-            get { return RowBackground; }
-            set { RowBackground = value; }
+            get { return this.RowBackground; }
+            set { this.RowBackground = value; }
         }
 
-        /// <summary>
-        /// Gets or sets the bakground color of the Items that are not selected.
-        /// </summary>
-        public Brush RowBackground
-        {
-            get { return (Brush)GetValue(RowBackgroundProperty); }
-            set { SetValue(RowBackgroundProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the RowBackground dependency property
-        /// </summary>
-        public static readonly DependencyProperty RowBackgroundProperty =
-            DependencyProperty.Register("RowBackground", typeof(Brush), typeof(Selector), new PropertyMetadata(new SolidColorBrush(Colors.White))
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+        [Obsolete("Unused.")]
+        protected bool ChangingSelectionProgrammatically { get; set; }
 
-
-        /// <summary>
-        /// Gets or sets the foreground color of the Items that are not selected.
-        /// </summary>
-        public Brush UnselectedItemForeground
-        {
-            get { return (Brush)GetValue(UnselectedItemForegroundProperty); }
-            set { SetValue(UnselectedItemForegroundProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the UnselectedItemForeground dependency property
-        /// </summary>
-        public static readonly DependencyProperty UnselectedItemForegroundProperty =
-            DependencyProperty.Register("UnselectedItemForeground", typeof(Brush), typeof(Selector), new PropertyMetadata(null)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-
-#endregion
-
-        //// Summary:
-        ////     Gets a value that indicates whether the specified Selector has the focus.
-        ////
-        //// Parameters:
-        ////   element:
-        ////     The Selector to evaluate.
-        ////
-        //// Returns:
-        ////     Ttrue to indicate that the Selector has the focus; otherwise, false.
-        //public static bool GetIsSelectionActive(DependencyObject element)
+        #endregion Obsolete
     }
 }

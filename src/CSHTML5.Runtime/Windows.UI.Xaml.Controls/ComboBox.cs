@@ -13,27 +13,12 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
-using CSHTML5.Internals.Controls;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Input;
-using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -83,42 +68,12 @@ namespace Windows.UI.Xaml.Controls
         ContentPresenter _contentPresenter;
         UIElement _selectedContent;
 
-#if false
-        dynamic _nativeComboBoxDomElement;
-        private bool _useNativeComboBox;
-#endif
-
-        //todo: synchronize html/c# selected value/item/index
-
-#if false
-        public bool UseNativeComboBox
-        {
-            get { return _useNativeComboBox; }
-            set
-            {
-                _useNativeComboBox = value;
-
-                // In case of native combo box, we do not want to have the ControlTemplate of the ComboBox applied:
-                base.INTERNAL_DoNotApplyControlTemplate = _useNativeComboBox;
-                base.INTERNAL_DoNotApplyStyle = _useNativeComboBox;
-
-                // Set the default Style: //todo: ensure that the user can set another style (what happens if the user style was set before this line? The test below "this.Style == null" may be enough)
-                if (!_useNativeComboBox && this.Style == null)
-                {
-                    //todo-perfs:
-                    this.DefaultStyleKey = typeof(ComboBox);
-                }
-            }
-        }
-#else
-        [Obsolete]
+        [Obsolete("ComboBox does not support Native ComboBox. Use 'CSHTML5.Native.Html.Controls.NativeComboBox' instead.")]
         public bool UseNativeComboBox
         {
             get { return false; }
             set { }
         }
-#endif
-
 
         /// <summary>
         /// Initializes a new instance of the ComboBox class.
@@ -126,126 +81,7 @@ namespace Windows.UI.Xaml.Controls
         public ComboBox()
         {
             this.DefaultStyleKey = typeof(ComboBox);
-#if false
-            UseSystemFocusVisuals = true;
-            // Call the "setter" of the UseNativeComboBox property, so that it initializes the right state:
-            this.UseNativeComboBox = true; // Default value
-#endif
         }
-
-#if false
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            if (_useNativeComboBox)
-            {
-                var select = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("select", parentRef, this);
-                domElementWhereToPlaceChildren = select;
-                _nativeComboBoxDomElement = select;
-
-                INTERNAL_EventsHelper.AttachToDomEvents("change", select, (Action<object>)(e =>
-                {
-                    DomSelectionChanged(select);
-                }));
-
-                INTERNAL_HtmlDomManager.SetDomElementStyleProperty(select, new List<string>() { "fontSize" }, "inherit");
-
-                // Add an empty element that will make it easier to have nothing selected when items are added to the ComboBox: // See: http://stackoverflow.com/questions/8605516/default-select-option-as-blank
-                var emptyOption = INTERNAL_HtmlDomManager.AddOptionToNativeComboBox(_nativeComboBoxDomElement, "");
-                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.disabled = true", emptyOption);
-                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.selected = true", emptyOption);
-                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.style.display = 'hidden'", emptyOption);
-
-                // Set the mark saying that the pointer events must be "absorbed" by the ComboBox:
-                INTERNAL_HtmlDomManager.SetDomElementProperty(select, "data-absorb-events", true);
-
-                return select;
-            }
-            else
-            {
-#if !BRIDGE
-                return base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
-#else
-                return CreateDomElement_WorkaroundBridgeInheritanceBug(parentRef, out domElementWhereToPlaceChildren);
-#endif
-            }
-        }
-#endif
-
-#if false
-        #region Native ComboBox implementation
-
-        void DomSelectionChanged(dynamic element)
-        {
-            if (_useNativeComboBox)
-            {
-                if (!ChangingSelectionProgrammatically)
-                {
-#if WORKINPROGRESS
-                    IList oldItems = GetListOfSelectedItemsInCSharp();
-                    IList newItems = GetListOfNewlySelectedItems_InCaseOfNativeComboBox(element);
-#else
-                    IList<object> oldItems = GetListOfSelectedItemsInCSharp();
-                    IList<object> newItems = GetListOfNewlySelectedItems_InCaseOfNativeComboBox(element);
-#endif
-                    //todo: remove the items present in both oldItems and newItems ?
-                    var eventArgs = new SelectionChangedEventArgs(oldItems, newItems)
-                    {
-                        OriginalSource = this,
-                    };
-                    ChangingSelectionInHtml = true;
-                    int selectedIndexInNativeHtmlDom = GetSelectedIndexInNativeHtmlDom();
-
-                    SetCurrentValue(SelectedIndexProperty, selectedIndexInNativeHtmlDom); //we call SetLocalvalue directly to avoid replacing the BindingExpression that could be here on Mode = TwoWay
-                    //SelectedIndex = GetSelectedIndex(element);
-                    ChangingSelectionInHtml = false;
-                    OnSelectionChanged(eventArgs);
-                }
-            }
-        }
-
-        IList<object> GetListOfNewlySelectedItems_InCaseOfNativeComboBox(dynamic e)
-        {
-            List<object> newlySelectedItems = new List<object>();
-            //newlySelectedItems.Add(_nativeComboBoxDomElement.selectedIndex);
-            int selectedIndexInNativeHtmlDom = GetSelectedIndexInNativeHtmlDom();
-            newlySelectedItems.Add(selectedIndexInNativeHtmlDom);
-            return newlySelectedItems;
-        }
-
-        public void SetSelectedIndexInNativeHtmlDom(int value)
-        {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _nativeComboBoxDomElement != null)
-            {
-                int selectedIndexInHtmlDom = value;
-
-                // Compensate for the fact that the ComboBox contains an empty element at the beginning (see note in the CreateDomElement method):
-                if (selectedIndexInHtmlDom >= 0)
-                    selectedIndexInHtmlDom += 1;
-
-                INTERNAL_HtmlDomManager.SetDomElementProperty(_nativeComboBoxDomElement, "selectedIndex", selectedIndexInHtmlDom, forceSimulatorExecuteImmediately: true);
-            }
-        }
-
-        public int GetSelectedIndexInNativeHtmlDom()
-        {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _nativeComboBoxDomElement != null)
-            {
-                int selectedIndexInHtmlDom = (int)INTERNAL_HtmlDomManager.GetDomElementAttribute(_nativeComboBoxDomElement, "selectedIndex");
-
-                // Compensate for the fact that the ComboBox contains an empty element at the beginning (see note in the CreateDomElement method):
-                if (selectedIndexInHtmlDom >= 0)
-                    selectedIndexInHtmlDom -= 1;
-
-                return selectedIndexInHtmlDom;
-            }
-            else
-                return -1;
-        }
-
-        #endregion
-#endif
-
-        #region Non-Native ComboBox implementation
 
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
@@ -297,88 +133,10 @@ namespace Windows.UI.Xaml.Controls
                 _dropDownToggle.IsChecked = false;
         }
 
-        #endregion
-
-#if false
-#if WORKINPROGRESS
-        IList GetListOfSelectedItemsInCSharp()
-#else
-        IList<object> GetListOfSelectedItemsInCSharp()
-#endif
-        {
-            List<object> selectedItems = new List<object>();
-            selectedItems.Add(SelectedItem);
-            return selectedItems;
-        }
-#endif
-
-#if false
-        protected override void AddChildItemToVisualTree(object newItem)
-        {
-            if (_useNativeComboBox)
-            {
-                object value = PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(newItem, DisplayMemberPath);
-
-                //if (value is UIElement)
-                //{
-                //    SwitchToNonNativeComboBox(); // If the value is a UI element, we should switch to a non-native combo box:
-                //}
-                //else
-                //{
-                if (value != null)
-                {
-                    if (_nativeComboBoxDomElement != null)
-                    {
-                        var optionDomElement = INTERNAL_HtmlDomManager.AddOptionToNativeComboBox(_nativeComboBoxDomElement, value.ToString());
-                        ItemContainerGenerator.INTERNAL_RegisterContainer(optionDomElement, newItem);
-                    }
-                }
-                //todo: else --> ?
-                //}
-            }
-            else
-            {
-                base.AddChildItemToVisualTree(newItem);
-            }
-        }
-#endif
-
-#if false
-        protected override bool TryRemoveChildItemFromVisualTree(object item)
-        {
-            if (_useNativeComboBox)
-            {
-                if (_nativeComboBoxDomElement != null)
-                {
-                    var optionDomElement = ItemContainerGenerator.INTERNAL_ContainerFromItem(item);
-                    if (optionDomElement != null)
-                    {
-                        INTERNAL_HtmlDomManager.RemoveOptionFromNativeComboBox(optionDomElement, _nativeComboBoxDomElement);
-
-                        return ItemContainerGenerator.INTERNAL_TryUnregisterContainer(optionDomElement, item);
-                    }
-                }
-                return false;
-            }
-            else
-            {
-                return base.TryRemoveChildItemFromVisualTree(item);
-            }
-        }
-#endif
-
         protected override void ApplySelectedIndex(int index)
         {
             base.ApplySelectedIndex(index);
 
-#if false
-            if (_useNativeComboBox)
-            {
-                SetSelectedIndexInNativeHtmlDom(this.SelectedIndex);
-            }
-            else
-            {
-#endif
             if (this.ItemsHost == null)
             {
                 return;
@@ -406,9 +164,15 @@ namespace Windows.UI.Xaml.Controls
             }
 
             _selectedContent = newSelectedContent;
-#if false
+
+            // Put the selected item into the ContentPresenter if the popup is closed
+            if (!this.IsDropDownOpen)
+            {
+                if (this._contentPresenter != null)
+                {
+                    this._contentPresenter.Content = this._selectedContent;
+                }
             }
-#endif
         }
 
 #if MIGRATION
@@ -447,29 +211,6 @@ namespace Windows.UI.Xaml.Controls
                 this._contentPresenter.Content = this._selectedContent;
             }
         }
-
-#if false
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            base.INTERNAL_OnAttachedToVisualTree();
-
-            // We update the ItemsPanel only if we use the native ComboBox. Otherwise, it will be done in the "OnApplyTemplate" method.
-            if (_useNativeComboBox)
-            {
-                UpdateChildrenInVisualTree(Items, Items, forceUpdateAllChildren: true);
-            }
-        }
-
-        protected internal override void INTERNAL_OnDetachedFromVisualTree()
-        {
-            base.INTERNAL_OnDetachedFromVisualTree();
-
-            if (_useNativeComboBox)
-            {
-                ItemContainerGenerator.INTERNAL_Clear();
-            }
-        }
-#endif
 
         void DropDownToggle_Checked(object sender, RoutedEventArgs e)
         {
@@ -528,18 +269,6 @@ namespace Windows.UI.Xaml.Controls
         public event RoutedEventHandler DropDownOpened;
 #endif
 
-#if false
-        protected override void UpdateItemsPanel(ItemsPanelTemplate newTemplate)
-        {
-            if (_useNativeComboBox)
-            {
-                //this is to keep the implementation of UpdateItemsPanel from ItemsControl from interfering with this class' logic.
-            }
-            else
-                base.UpdateItemsPanel(newTemplate);
-        }
-#endif
-
         /// <summary>
         /// Gets or sets a value that indicates whether the drop-down portion of the
         /// ComboBox is currently open.
@@ -559,10 +288,7 @@ namespace Windows.UI.Xaml.Controls
         private static void IsDropDownOpen_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var comboBox = (ComboBox)d;
-#if false
-            if (!comboBox._useNativeComboBox)
-            {
-#endif
+
             // IMPORTANT: we must NOT require that the element be in the visual tree because the DropDown may be closed even when the ComboBox is not in the visual tree (for example, after it has been removed from the visual tree)
             if (e.NewValue is bool)
             {
@@ -621,13 +347,6 @@ namespace Windows.UI.Xaml.Controls
                         comboBox._contentPresenter.Content = comboBox._selectedContent;
                     }
 
-                    //// Workaround for the fact that IsHitTestVisible does not propagate properly //todo: fix the propagation (which comes from the ComboBox style), and remove this block of code. Current issue when removing this code: if we click multiple times on the ComboBox (selecting and deselecting items), at one point the item in the ContentPresenter does not inherit "transparency to click", meaning that it is no longer possible to click the underlying ToggleButton when clicking on the item.
-                    //if (comboBox._contentPresenter != null)
-                    //{
-                    //    comboBox._contentPresenter.IsHitTestVisible = true;
-                    //    comboBox._contentPresenter.IsHitTestVisible = false;
-                    //}
-
                     // Ensure that the toggle button is unchecked:
                     if (comboBox._dropDownToggle != null && comboBox._dropDownToggle.IsChecked == true)
                     {
@@ -642,9 +361,6 @@ namespace Windows.UI.Xaml.Controls
 #endif
                 }
             }
-#if false
-        }
-#endif
         }
 
         /// <summary>
