@@ -1,0 +1,70 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+
+namespace DotNetForHtml5.Compiler
+{
+    internal static class ConvertingXamlToCSharp
+    {
+        public static string Convert(
+            string xaml,
+            string sourceFile,
+            string fileNameWithPathRelativeToProjectRoot,
+            string assemblyNameWithoutExtension,
+            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+            bool isFirstPass,
+            bool isSLMigration,
+            string outputRootPath,
+            string outputAppFilesPath,
+            string outputLibrariesPath,
+            string outputResourcesPath,
+            ILogger logger)
+        {
+            // Process the "HtmlPresenter" nodes in order to "escape" its content, because the content is HTML and it could be badly formatted and not be parsable using XDocument.Parse.
+            xaml = ProcessingHtmlPresenterNodes.Process(xaml);
+
+            // Parse the XML:
+            XDocument doc = XDocument.Parse(xaml, LoadOptions.SetLineInfo);
+
+            // Process the "TextBlock" and "Span" nodes in order to surround direct text content with "<Run>" tags:
+            ProcessingTextBlockNodes.Process(doc, reflectionOnSeparateAppDomain);
+
+            // Insert implicit nodes in XAML:
+            if (!isFirstPass) // Note: we skip this step during the 1st pass because some types are not known yet, so we cannot determine the default "ContentProperty".
+            {
+                InsertingImplicitNodesAndNoDirectTextContent.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain);
+
+                // Process the "ContentPresenter" nodes in order to transform "<ContentPresenter />" into "<ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />"
+                ProcessingContentPresenterNodes.Process(doc, reflectionOnSeparateAppDomain);
+
+                // Process the "ColorAnimation" nodes in order to transform "Storyboard.TargetProperty="XXX"" into "Storyboard.TargetProperty="XXX.Color"" if XXX doesn't end on ".Color" or ".Color)"
+                ProcessingColorAnimationNodes.Process(doc, reflectionOnSeparateAppDomain);
+
+                // Convert markup extensions into XDocument nodes:
+                InsertingMarkupNodesInXaml.InsertMarkupNodes(doc, reflectionOnSeparateAppDomain);
+
+                // Fix names of visual states (for instance "PointerOver" in UWP becomes "MouseOver" in Silverlight and WPF).
+                FixingVisualStatesName.Fix(doc, isSLMigration);
+            }
+
+            // Generate unique names for XAML elements:
+            GeneratingUniqueNames.AddUniqueNamesToAllElements(doc);
+
+            // Prepare the code that will be put in the "InitializeComponent" of the Application class, which means that it will be executed when the application is launched:
+            string codeToPutInTheInitializeComponentOfTheApplicationClass = string.Format(@"
+global::CSHTML5.Internal.StartupAssemblyInfo.OutputRootPath = @""{0}"";
+global::CSHTML5.Internal.StartupAssemblyInfo.OutputAppFilesPath = @""{1}"";
+global::CSHTML5.Internal.StartupAssemblyInfo.OutputLibrariesPath = @""{2}"";
+global::CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = @""{3}"";
+", outputRootPath, outputAppFilesPath, outputLibrariesPath, outputResourcesPath);
+
+            // Generate C# code from the tree:
+            return GeneratingCSharpCode.GenerateCSharpCode(doc, sourceFile, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain, isFirstPass, isSLMigration, codeToPutInTheInitializeComponentOfTheApplicationClass, logger);
+
+        }
+
+    }
+}

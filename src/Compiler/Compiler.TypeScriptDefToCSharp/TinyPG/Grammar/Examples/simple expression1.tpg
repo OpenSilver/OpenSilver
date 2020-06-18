@@ -1,0 +1,19 @@
+//@TinyPG - a Tiny Parser Generator v1.1
+//Copyright © Herre Kuijpers 2008-2010
+//Simple expression - example of an mathematical expression parser
+
+<% @TinyPG Language="vb" %>
+
+NUMBER 	-> @"[0-9]+";
+PLUSMINUS 	-> @"(\+|-)";
+MULTDIV 	-> @"\*|/";
+BROPEN 	->  @"\(";
+BRCLOSE 	->  @"\)";
+EOF         -> @"^$";
+
+[Skip] WHITESPACE  -> @"\s+";
+
+Start 		-> (AddExpr)? EOF;
+AddExpr 	-> MultExpr (PLUSMINUS MultExpr)*;
+MultExpr 	-> Atom (MULTDIV Atom)*;
+Atom 		-> NUMBER | BROPEN AddExpr BRCLOSE;

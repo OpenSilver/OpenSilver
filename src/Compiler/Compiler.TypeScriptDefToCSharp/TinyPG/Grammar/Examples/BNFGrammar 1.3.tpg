@@ -1,0 +1,92 @@
+// @TinyPG - a Tiny Parser Generator v1.3
+// Copyright © Herre Kuijpers 2008-2012
+// this grammar describes the BNF notation
+
+// Incorporated revisions by William A. McKee Aug. 14, 2008
+
+<% @TinyPG Namespace="TinyPG" %>
+
+// Terminals:
+BRACKETOPEN      	-> @"\(";
+BRACKETCLOSE     	-> @"\)";
+CODEBLOCK     	-> @"\{[^\}]*\}([^};][^}]*\}+)*;";
+COMMA			-> @",";
+SQUAREOPEN		-> @"\[";
+SQUARECLOSE		-> @"\]";
+ASSIGN            	-> @"=";
+PIPE             	-> @"\|";
+SEMICOLON        	-> @";";
+UNARYOPER         	-> @"(\*|\+|\?)";
+IDENTIFIER        	-> @"[a-zA-Z_][a-zA-Z0-9_]*";
+INTEGER	      	-> @"[0-9]+";
+DOUBLE	      		-> @"[0-9]*\.[0-9]+";
+HEX	      		-> @"(0x[0-9a-fA-F]{6})";
+ARROW             	-> @"->";
+DIRECTIVEOPEN		-> @"<%\s*@";
+DIRECTIVECLOSE	-> @"%>";
+EOF               	-> @"^$";
+STRING             	-> @"@?\""(\""\""|[^\""])*\""";
+
+[Skip]
+WHITESPACE        	-> @"\s+";
+
+[Skip]
+COMMENTLINE       	-> @"//[^\n]*\n?";
+
+[Skip]
+COMMENTBLOCK      	-> @"/\*[^*]*\*+(?:[^/*][^*]*\*+)*/";
+
+// Production lines LL(1):
+Start             	-> Directive* ExtProduction* EOF;
+Directive 		-> DIRECTIVEOPEN IDENTIFIER NameValue* DIRECTIVECLOSE;
+NameValue		-> IDENTIFIER ASSIGN STRING;
+ExtProduction     	-> Attribute* Production;
+Attribute	      	-> SQUAREOPEN IDENTIFIER ( BRACKETOPEN Params? BRACKETCLOSE )? SQUARECLOSE;
+Params			-> Param (COMMA Param)*;
+Param			-> INTEGER | DOUBLE | STRING | HEX;
+Production        	-> IDENTIFIER ARROW Rule (CODEBLOCK | SEMICOLON);
+Rule              	-> STRING | Subrule;
+Subrule           	-> ConcatRule (PIPE ConcatRule)* ;
+ConcatRule      	-> Symbol+;
+Symbol            	-> (IDENTIFIER | (BRACKETOPEN Subrule BRACKETCLOSE) ) UNARYOPER?; 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

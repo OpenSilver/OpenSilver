@@ -1,0 +1,91 @@
+﻿// a Tiny Grammar Highlighter v1.3
+// Copyright © Herre Kuijpers 2008-2012
+// this grammar is used to quickly scan for sections in the text to be highlighted
+// because real-time highlighting is required, the scan must be done in a few ms.
+// therefore the grammar must be lean and mean. This can be achieved by keeping the
+// parse structure as flat as possible.
+
+<% @TinyPG Namespace="TinyPG.Highlighter" Language="VB"  %>
+<% @TextHighlighter Generate="True" %>
+
+[Skip]			WHITESPACE		-> @"\s+";
+			EOF			-> @"^$";
+
+[Color(0, 128, 0)] 	GRAMMARCOMMENTLINE       	-> @"//[^\n]*\n?";
+// improved COMMENTBLOCK, will also match comment optionally with non-closing tags
+[Color(0, 128, 0)]	GRAMMARCOMMENTBLOCK 		-> @"/\*([^*]+|\*[^/])+(\*/)?";
+
+	
+[Color(255, 0, 0)]	DIRECTIVESTRING        -> @"@?\""(\""\""|[^\""])*(""|\n)";
+[Color(128, 0, 255)]	DIRECTIVEKEYWORD	-> @"^(@TinyPG|@Parser|@Scanner|@Grammar|@ParseTree|@TextHighlighter)";
+			DIRECTIVESYMBOL	-> @"^(@|(%[^>])|=|"")+?";
+			DIRECTIVENONKEYWORD	-> @"[^%@=""]+";
+[Color(128, 0, 128)]	DIRECTIVEOPEN		-> @"<%";
+[Color(128, 0, 128)]	DIRECTIVECLOSE	-> @"%>";
+
+
+			ATTRIBUTESYMBOL	-> @"[^\[\]]";
+[Color(43, 145, 202)] ATTRIBUTEKEYWORD	-> @"^(Skip|Color)";
+			ATTRIBUTENONKEYWORD	-> @"[^\(\)\]\n\s]+";
+
+			ATTRIBUTEOPEN		-> @"\[\s*";
+			ATTRIBUTECLOSE	-> @"\s*\]\s*";
+
+// set the correct precedence for keywords here
+[Color(0, 0, 255)] 	CS_KEYWORD		-> @"^(abstract|as|base|break|case|catch|checked|class|const|continue|decimal|default|delegate|double|do|else|enum|event|explicit|extern|false|finally|fixed|float|foreach|for|get|goto|if|implicit|interface|internal|int|in|is|lock|namespace|new|null|object|operator|out|override|params|partial|private|protected|public|readonly|ref|return|sealed|set|sizeof|stackalloc|static|struct|switch|throw|this|true|try|typeof|unchecked|unsafe|ushort|using|virtual|void|volatile|while)";
+[Color(255, 0, 0)] 	VB_KEYWORD		-> @"^(AddHandler|AddressOf|Alias|AndAlso|And|Ansi|Assembly|As|Auto|Boolean|ByRef|Byte|ByVal|Call|Case|Catch|CBool|CByte|CChar|CDate|CDec|CDbl|Char|CInt|Class|CLng|CObj|Const|CShort|CSng|CStr|CType|Date|Decimal|Declare|Default|Delegate|Dim|DirectCast|Double|Do|Each|ElseIf|Else|End|Enum|Erase|Error|Event|Exit|False|Finally|For|Friend|Function|GetType|Get|GoSub|GoTo|Handles|If|Implements|Imports|Inherits|Integer|Interface|In|Is|Let|Lib|Like|Long|Loop|Me|Mod|Module|MustInherit|MustOverride|MyBase|MyClass|Namespace|New|Next|Nothing|NotInheritable|NotOverridable|Not|Object|On|Optional|Option|OrElse|Or|Overloads|Overridable|Overrides|ParamArray|Preserve|Private|Property|Protected|Public|RaiseEvent|ReadOnly|ReDim|REM|RemoveHandler|Resume|Return|Select|Set|Shadows|Shared|Short|Single|Static|Step|Stop|String|Structure|Sub|SyncLock|Then|Throw|To|True|Try|TypeOf|Unicode|Until|Variant|When|While|With|WithEvents|WriteOnly|Xor|Source)";
+[Color(0, 0, 255)] 	DOTNET_KEYWORD	-> @"^(abstract|as|base|break|case|catch|checked|class|const|continue|decimal|default|delegate|double|do|else|enum|event|explicit|extern|false|finally|fixed|float|foreach|for|get|goto|if|implicit|interface|internal|int|in|is|lock|namespace|new|null|object|operator|out|override|params|partial|private|protected|public|readonly|ref|return|sealed|set|sizeof|stackalloc|static|struct|switch|throw|this|true|try|typeof|unchecked|unsafe|ushort|using|virtual|void|volatile|while)";
+[Color(43, 145, 202)] DOTNET_TYPES		-> @"^(Array|AttributeTargets|AttributeUsageAttribute|Attribute|BitConverter|Boolean|Buffer|Byte|Char|CharEnumerator|CLSCompliantAttribute|ConsoleColor|ConsoleKey|ConsoleKeyInfo|ConsoleModifiers|ConsoleSpecialKey|Console|ContextBoundObject|ContextStaticAttribute|Converter|Convert|DateTimeKind|DateTimeOffset|DateTime|DayOfWeek|DBNull|Decimal|Delegate|Double|Enum|Environment.SpecialFolder|EnvironmentVariableTarget|Environment|EventArgs|EventHandler|Exception|FlagsAttribute|GCCollectionMode|GC|Guid|ICloneable|IComparable|IConvertible|ICustomFormatter|IDisposable|IEquatable|IFormatProvider|IFormattable|IndexOutOfRangeException|InsufficientMemoryException|Int16|Int32|Int64|IntPtr|InvalidCastException|InvalidOperationException|InvalidProgramException|MarshalByRefObject|Math|MidpointRounding|NotFiniteNumberException|NotImplementedException|NotSupportedException|Nullable|NullReferenceException|ObjectDisposedException|Object|ObsoleteAttribute|OperatingSystem|OutOfMemoryException|OverflowException|ParamArrayAttribute|PlatformID|PlatformNotSupportedException|Predicate|Random|SByte|SerializableAttribute|Single|StackOverflowException|StringComparer|StringComparison|StringSplitOptions|String|SystemException|TimeSpan|TimeZone|TypeCode|TypedReference|TypeInitializationException|Type|UInt16|UInt32|UInt64|UIntPtr|UnauthorizedAccessException|UnhandledExceptionEventArgs|UnhandledExceptionEventHandler|ValueType|Void|WeakReference|Comparer|Dictionary|EqualityComparer|ICollection|IComparer|IDictionary|IEnumerable|IEnumerator|IEqualityComparer|IList|KeyNotFoundException|KeyValuePair|List|ASCIIEncoding|Decoder|DecoderExceptionFallback|DecoderExceptionFallbackBuffer|DecoderFallback|DecoderFallbackBuffer|DecoderFallbackException|DecoderReplacementFallback|DecoderReplacementFallbackBuffer|EncoderExceptionFallback|EncoderExceptionFallbackBuffer|EncoderFallback|EncoderFallbackBuffer|EncoderFallbackException|EncoderReplacementFallback|EncoderReplacementFallbackBuffer|Encoder|EncodingInfo|Encoding|NormalizationForm|StringBuilder|UnicodeEncoding|UTF32Encoding|UTF7Encoding|UTF8Encoding)";
+
+// define what c# codeblocks look like
+[Color(0, 128, 0)] 	CS_COMMENTLINE  	-> @"//[^\n]*\n?";
+[Color(0, 128, 0)]	CS_COMMENTBLOCK 	-> @"/\*([^*]+|\*[^/])+(\*/)?";
+			CS_SYMBOL		-> @"[^}]";
+			CS_NONKEYWORD		-> @"([^""\n\s/;.}\(\)\[\]]|/[^/*]|}[^;])+";
+[Color(163, 21, 21)]	CS_STRING     	-> @"@?[""]([""][""]|[^\""\n])*[""]?";
+
+
+// define what VB codeblocks look like
+[Color(0, 128, 0)] 	VB_COMMENTLINE  	-> @"'[^\n]*\n?";
+[Color(0, 128, 0)] 	VB_COMMENTBLOCK  	-> @"REM[^\n]*\n?";
+			VB_SYMBOL		-> @"[^}]";
+			VB_NONKEYWORD		-> @"([^""\n\s/;.}\(\)\[\]]|/[^/*]|}[^;])+";
+[Color(163, 21, 21)]	VB_STRING     	-> @"@?[""]([""][""]|[^\""\n])*[""]?";
+
+// assume c# codeblocks by default
+[Color(0, 128, 0)] 	DOTNET_COMMENTLINE  	-> @"//[^\n]*\n?";
+[Color(0, 128, 0)]	DOTNET_COMMENTBLOCK 	-> @"/\*([^*]+|\*[^/])+(\*/)?";
+			DOTNET_SYMBOL		-> @"[^}]";
+			DOTNET_NONKEYWORD	-> @"([^""\n\s/;.}\[\]\(\)]|/[^/*]|}[^;])+";
+[Color(163, 21, 21)]	DOTNET_STRING     	-> @"@?[""]([""][""]|[^\""\n])*[""]?";
+
+
+// define open/closing of codeblocks
+[Color(128, 0, 128)]	CODEBLOCKOPEN		-> @"\{";
+[Color(128, 0, 128)]	CODEBLOCKCLOSE	-> @"\};";
+
+
+[Color(0, 0, 255)] 	GRAMMARKEYWORD	-> @"(Start)";
+[Color(128, 0, 128)]	GRAMMARARROW		-> @"->";
+			GRAMMARSYMBOL		-> @"[^{}\[\]/<>]|[</]$";
+			GRAMMARNONKEYWORD	-> @"([^;""\[\n\s/<{\(\)]|/[^/*]|<[^%])+";
+// string will scan until closing quote or the end of line
+[Color(163, 21, 21)]	GRAMMARSTRING        -> @"@?[""]([""][""]|[^\""\n])*[""]?";
+
+Start 			->  (CommentBlock | AttributeBlock | GrammarBlock | CodeBlock | DirectiveBlock)* EOF;
+CommentBlock		-> (GRAMMARCOMMENTLINE | GRAMMARCOMMENTBLOCK)+;
+DirectiveBlock	-> DIRECTIVEOPEN (WHITESPACE | DIRECTIVEKEYWORD | DIRECTIVESYMBOL | DIRECTIVENONKEYWORD | DIRECTIVESTRING )* DIRECTIVECLOSE?;
+GrammarBlock		-> (GRAMMARSTRING | GRAMMARARROW | GRAMMARNONKEYWORD | GRAMMARKEYWORD | GRAMMARSYMBOL)+;
+AttributeBlock	-> ATTRIBUTEOPEN (ATTRIBUTEKEYWORD | ATTRIBUTENONKEYWORD | ATTRIBUTESYMBOL)* ATTRIBUTECLOSE?;
+CodeBlock		-> CODEBLOCKOPEN (DOTNET_COMMENTLINE | DOTNET_COMMENTBLOCK | DOTNET_TYPES | DOTNET_KEYWORD  | DOTNET_SYMBOL | DOTNET_STRING | DOTNET_NONKEYWORD)* CODEBLOCKCLOSE?;
+
+
+
+
+
+
+
+
+
+
+
