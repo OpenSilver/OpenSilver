@@ -486,27 +486,50 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             base.OnItemsChanged(e);
 
-            bool unselect = false;
+            int selectedIndex = this.SelectedIndex;
 
-            if (e.Action == NotifyCollectionChangedAction.Reset)
+            switch (e.Action)
             {
-                unselect = !this.Items.Contains(this.SelectedItem);
+                case NotifyCollectionChangedAction.Reset:
+                    if (!this.Items.Contains(this.SelectedItem))
+                    {
+                        selectedIndex = -1; // unselect.
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Add:
+                    if (e.NewStartingIndex <= this.SelectedIndex)
+                    {
+                        ++selectedIndex;
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    if (e.OldItems[0] == this.SelectedItem)
+                    {
+                        selectedIndex = -1; // unselect
+                    }
+                    else if (e.OldStartingIndex <= this.SelectedIndex)
+                    {
+                        --selectedIndex;
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    if (e.OldItems[0] == this.SelectedItem)
+                    {
+                        selectedIndex = -1;
+                    }
+                    break;
+
+                default:
+                    throw new NotSupportedException(string.Format("Unexpected collection change action '{0}'.", e.Action));
             }
-            else if (e.Action == NotifyCollectionChangedAction.Remove ||
-                     e.Action == NotifyCollectionChangedAction.Replace)
-            {
-                if (e.OldItems[0] == this.SelectedItem)
-                {
-                    unselect = true;
-                }
-            }
 
-            if (unselect)
+            if (selectedIndex != this.SelectedIndex)
             {
-                // Update selection properties
-
                 // Note : we use SetCurrentValue to preserve bindings if any.
-                this.SetCurrentValue(Selector.SelectedIndexProperty, -1);
+                this.SetCurrentValue(Selector.SelectedIndexProperty, selectedIndex);
             }
         }
 

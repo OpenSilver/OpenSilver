@@ -676,7 +676,7 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                throw new InvalidOperationException(string.Format("Unexpected collection change action '{0}'.", e.Action));
+                throw new NotSupportedException(string.Format("Unexpected collection change action '{0}'.", e.Action));
             }
         }
 
