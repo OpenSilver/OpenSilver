@@ -10,6 +10,8 @@
     <RootNamespace>DotNetForHtml5.Compiler.Common</RootNamespace>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
