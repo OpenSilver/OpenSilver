@@ -52,6 +52,22 @@
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
+    <Reference Include="Mono.Cecil, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+      <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+      <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+      <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+      <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="PresentationFramework">
       <Aliases>wpf</Aliases>
     </Reference>
@@ -81,17 +97,10 @@
     <Compile Include="4_CheckingForUnsupportedStuff\CheckingThatNoUnsupportedProjectIsBeingProcessed.cs" />
     <Compile Include="4_CheckingForUnsupportedStuff\UnsupportedMethodInfo.cs" />
     <Compile Include="4_CheckingForUnsupportedStuff\MemberReferenceAndCallerInformation.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\ConvertingResXFilesToJavaScript.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\DeadCodeAnalyzer\Annotations.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\DeadCodeAnalyzer\Configuration.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\DeadCodeAnalyzer\DeadCodeAnalyzer.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\DeadCodeAnalyzer\DeadCodeInfoProvider.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\DeadCodeAnalyzer\TypeMapStep.cs" />
     <Compile Include="4_CheckingForUnsupportedStuff\CheckingThatNoUnsupportedMethodIsCalled.cs" />
     <Compile Include="5_ConvertingExeOrDllToJavaScript\ActivationHelpers.cs" />
     <Compile Include="6_CreatingAndCopyingSupportHtmlAndJavaScriptFiles\WrappingOutputFiles_BridgeVersion.cs" />
     <Compile Include="6_CreatingAndCopyingSupportHtmlAndJavaScriptFiles\ExtractingAndCopyingResources.cs" />
-    <Compile Include="EntryPointForCompilationFromSimulator\CompilationFromSimulator.cs" />
     <Compile Include="EntryPoints\BeforeXamlPreprocessor.cs" />
     <Compile Include="EntryPoints\AfterXamlPreprocessor.cs" />
     <Compile Include="EntryPoints\EntryPointGenerator.cs" />
@@ -111,9 +120,7 @@
     <Compile Include="OtherHelpersAndHandlers\ActivationHelpers_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\FixingServiceReferences.cs" />
     <Compile Include="OtherHelpersAndHandlers\MergingTwoSerializationAssemblies.cs" />
-    <Compile Include="OtherHelpersAndHandlers\TranspilingOnlyAssembliesThatHaveChanged.cs" />
     <Compile Include="OtherHelpersAndHandlers\RegistryHelpers_SharedWithOtherProjects.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\RemovalOfUnsupportedTypesFromCorlib.cs" />
     <Compile Include="OtherHelpersAndHandlers\ExecutionTimeMeasuring.cs" />
     <Compile Include="OtherHelpersAndHandlers\TrialHelpers_SharedWithOtherProjects.cs" />
     <Compile Include="EntryPoints\AssemblyReferenceValidator.cs" />
@@ -135,14 +142,12 @@
     <Compile Include="OtherHelpersAndHandlers\XamlFilesWithoutCodeBehindHelper.cs" />
     <Compile Include="Tests\Program.cs" />
     <Compile Include="Tests\StandaloneCompilerTest.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\ConvertingExeOrDllToJavaScript.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GettingInformationAboutAXamlType.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingUniqueNames.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\PostOrderTreeTraversal.cs" />
     <Compile Include="Tests\CreatingTemporarySolution.cs" />
     <Compile Include="Loggers\LoggerThatUsesTaskOutput.cs" />
-    <Compile Include="EntryPoints\JavaScriptGenerator.cs" />
     <Compile Include="EntryPoints\Wrapper_JSILversion.cs" />
     <Compile Include="EntryPoints\XamlPreprocessor.cs" />
     <Compile Include="Loggers\LoggerThatUsesConsoleWriteLine.cs" />
@@ -161,6 +166,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

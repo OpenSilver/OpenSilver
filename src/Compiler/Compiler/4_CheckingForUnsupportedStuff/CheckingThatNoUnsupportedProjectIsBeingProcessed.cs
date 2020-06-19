@@ -1,7 +1,6 @@
 ﻿#if !BRIDGE && !CSHTML5BLAZOR
 extern alias DotNetForHtml5Core;
 #endif
-using JSIL.Proxy;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
