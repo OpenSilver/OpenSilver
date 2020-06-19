@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!--
+    This file is Copyright Userware. All rights are reserved.
+  -->
+  <!--
+    The code below is proprietary code. You are not allowed
+    to modify nor reuse any portion of the code without prior
+    written consent by Userware.
+    http://www.userware-solutions.com
+  -->
+
+  <!--============================================================
+  LOCATION OF COMPILER TASKS
+  ============================================================-->
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\CSHTML5.UwpCompatible.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AssemblyReferenceValidator" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\CSHTML5.UwpCompatible.Compiler.dll" TaskName="DotNetForHtml5.Compiler.EntryPointGenerator" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\CSHTML5.UwpCompatible.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AssemblyAttributesGenerator" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\CSHTML5.UwpCompatible.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ServiceReferenceFixer" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\CSHTML5.UwpCompatible.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesProcessor" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\CSHTML5.UwpCompatible.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResXProcessor" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\CSHTML5.UwpCompatible.Compiler.dll" TaskName="DotNetForHtml5.Compiler.BeforeXamlPreprocessor" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\CSHTML5.UwpCompatible.Compiler.dll" TaskName="DotNetForHtml5.Compiler.XamlPreprocessor" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\CSHTML5.UwpCompatible.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AfterXamlPreprocessor" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\CSHTML5.UwpCompatible.Compiler.dll" TaskName="DotNetForHtml5.Compiler.OutputPathsEraser" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\CSHTML5.UwpCompatible.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesExtractorAndCopier" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\CSHTML5.UwpCompatible.Compiler.dll" TaskName="DotNetForHtml5.Compiler.Wrapper_BridgeVersion" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\CSHTML5.UwpCompatible.Compiler.dll" TaskName="DotNetForHtml5.Compiler.TypeScriptDefToCSharp" />
+
+  <!--============================================================
+  PROPERTIES
+  ============================================================-->
+  <PropertyGroup Condition="'$(IsSLMigration)'==''">
+    <IsSLMigration>False</IsSLMigration>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(CoreAssemblyFiles)'==''">
+    <CoreAssemblyFiles>$(MSBuildThisFileDirectory)..\lib\net40\CSHTML5.dll</CoreAssemblyFiles>
+  </PropertyGroup>
+
+  <!--============================================================
+  IMPORT THE MAIN TARGET FILE
+  ============================================================-->
+  <Import Project="$(MSBuildThisFileDirectory)\CSHTML5.Common.targets" />
+
+
+</Project>
