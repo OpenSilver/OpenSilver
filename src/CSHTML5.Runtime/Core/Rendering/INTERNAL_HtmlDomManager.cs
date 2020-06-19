@@ -375,6 +375,7 @@ if (element)
 {{
 element.value = ""{1}"";
 element.style.visibility=""collapse"";
+setTimeout(function(){{ var element2 = document.getElementById(""{0}""); if (element2) {{ element2.style.visibility=""visible""; }} }}, 0);
 }}
             ", uniqueIdentifier, EscapeStringForUseInJavaScript(newText));
 
