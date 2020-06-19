@@ -6,7 +6,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
-namespace ProgessIndicatorNamespace
+namespace ProgressIndicatorNamespace
 {
     [TemplatePart(Name = ElementCanvas, Type = typeof(Canvas))]
     public class ProgressIndicator : RangeBase

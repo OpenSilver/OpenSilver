@@ -4,7 +4,7 @@
         xmlns:dotnetbrowser="clr-namespace:DotNetBrowser.WPF;assembly=DotNetBrowser"
         xmlns:mahapps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:xamlinspection="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection"
-        xmlns:progressindicatornamespace="clr-namespace:ProgessIndicatorNamespace"
+        xmlns:progressindicatornamespace="clr-namespace:ProgressIndicatorNamespace"
         xmlns:licensecheckernamespace="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking"
         Title="Simulator - C#/XAML for HTML5"
         SizeToContent="WidthAndHeight"
