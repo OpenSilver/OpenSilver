@@ -1,0 +1,407 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <!--<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>-->
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DotNetForHtml5.EmulatorWithoutJavascript</RootNamespace>
+    <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'BridgeDebug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\BridgeDebug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;BRIDGE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'BridgeSLMigration|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\BridgeSLMigration\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;BRIDGE;</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'OpenSilver.UwpCompatible|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <!--We have to set the TargetFrameworkVersion To be the same as the one of Compiler.Common-->
+    <!--<TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>-->
+    <OutputPath>bin\OpenSilver.UwpCompatible\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;OPENSILVER</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'OpenSilver|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <!--We have to set the TargetFrameworkVersion To be the same as the one of Compiler.Common-->
+    <!--<TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>-->
+    <OutputPath>bin\OpenSilver\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;OPENSILVER</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'OpenSilver.WorkInProgress|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <!--We have to set the TargetFrameworkVersion To be the same as the one of Compiler.Common-->
+    <!--<TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>-->
+    <OutputPath>bin\OpenSilver.WorkInProgress\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;OPENSILVER;OPENSILVER_WORKAROUND</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotNetBrowser, Version=1.14.0.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetBrowser.1.14\lib\DotNetBrowser.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetBrowser.Chromium, Version=1.14.0.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetBrowser.1.14\lib\DotNetBrowser.Chromium.dll</HintPath>
+    </Reference>
+    <Reference Include="JSIL.Meta">
+      <HintPath>..\JSIL\bin\JSIL.Meta.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.2.4.0\lib\net45\MahApps.Metro.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
+    <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.2.4.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework">
+      <Aliases>global</Aliases>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="..\DotNetForHtml5.Compiler\OtherHelpersAndHandlers\ActivationHelpers_SharedWithOtherProjects.cs">
+      <Link>ActivationHelpers_SharedWithOtherProjects.cs</Link>
+    </Compile>
+    <Compile Include="..\DotNetForHtml5.Compiler\OtherHelpersAndHandlers\Constants.cs">
+      <Link>Constants.cs</Link>
+    </Compile>
+    <Compile Include="..\DotNetForHtml5.Compiler\OtherHelpersAndHandlers\PathsHelper.cs">
+      <Link>SupportClasses\PathsHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\DotNetForHtml5.Compiler\OtherHelpersAndHandlers\RegistryHelpers_SharedWithOtherProjects.cs">
+      <Link>RegistryHelpers_SharedWithOtherProjects.cs</Link>
+    </Compile>
+    <Compile Include="..\DotNetForHtml5.Compiler\OtherHelpersAndHandlers\TrialHelpers_SharedWithOtherProjects.cs">
+      <Link>TrialHelpers_SharedWithOtherProjects.cs</Link>
+    </Compile>
+    <Compile Include="..\DotNetForHtml5.Compiler\OtherHelpersAndHandlers\ValidityHelpers_SharedWithOtherProjects.cs">
+      <Link>ValidityHelpers_SharedWithOtherProjects.cs</Link>
+    </Compile>
+    <Compile Include="..\DotNetForHtml5.Compiler\OtherHelpersAndHandlers\VersionInformation_SharedWithOtherProjects.cs">
+      <Link>VersionInformation_SharedWithOtherProjects.cs</Link>
+    </Compile>
+    <Compile Include="Compilation\CompilationState.cs" />
+    <Compile Include="DialogBoxes\MessageBoxScrollable.xaml.cs">
+      <DependentUpon>MessageBoxScrollable.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Interop\ClipboardHandler.cs" />
+    <Compile Include="Interop\SimulatorProxy.cs" />
+    <Compile Include="Interop\WebClientFactory.cs" />
+    <Compile Include="LicenseChecking\LicenseChecker.xaml.cs">
+      <DependentUpon>LicenseChecker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SupportClasses\CookieData.cs" />
+    <Compile Include="SupportClasses\CrossDomainCallsHelper.cs" />
+    <Compile Include="SupportClasses\Serializer.cs" />
+    <Compile Include="Service References\LicensingServiceReference\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Interop\InteropHelpers.cs" />
+    <Compile Include="DialogBoxes\InputBox.xaml.cs">
+      <DependentUpon>InputBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ProgressIndicator.cs" />
+    <Compile Include="StaticConstructorsCaller.cs" />
+    <Compile Include="SupportClasses\CookiesHelper.cs" />
+    <Compile Include="SupportClasses\ReflectionInUserAssembliesHelper.cs" />
+    <Compile Include="SupportClasses\ScreenCoordinatesHelper.cs" />
+    <Compile Include="Interop\WpfMediaElementFactory.cs" />
+    <Compile Include="SupportClasses\JavaScriptErrorsReportingHandler.cs" />
+    <Compile Include="Interop\JavaScriptExecutionHandler.cs" />
+    <Compile Include="SupportClasses\ResourceInterceptor.cs" />
+    <Compile Include="TrialHelpers_MoreMethods.cs" />
+    <Compile Include="XamlInspection\TreeViewDataTemplateSelector.cs" />
+    <Compile Include="XamlInspection\TreeNode.cs" />
+    <Compile Include="XamlInspection\XamlInspectionTreeView.xaml.cs">
+      <DependentUpon>XamlInspectionTreeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XamlInspection\XamlInspectorHelper.cs" />
+    <Compile Include="XamlInspection\XamlPropertiesPane.xaml.cs">
+      <DependentUpon>XamlPropertiesPane.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XamlInspection\XamlSinglePropertyEditor.xaml.cs">
+      <DependentUpon>XamlSinglePropertyEditor.xaml</DependentUpon>
+    </Compile>
+    <Page Include="DialogBoxes\MessageBoxScrollable.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DialogBoxes\InputBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="LicenseChecking\LicenseChecker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="XamlInspection\XamlInspectionTreeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="XamlInspection\XamlPropertiesPane.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="XamlInspection\XamlSinglePropertyEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Resource Include="ProgressIndicatorStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.ActivateKeyResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.ActivateKey_V2Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.ActivityLog.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.AdminCreateKeyResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.AdminCreateUserResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.AdminDeactivateKeyResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.AdminEditKeyResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.AdminEditUserResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.AdminGetActivityLogsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.AdminGetKeysResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.AdminGetListOfUsersResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.AdminGetTransactionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.AdminUpdatePasswordResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.ArrayOfString.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.ChangePasswordResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.CheckLicenseValidityResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.DeactivateKeyResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.GetCurrentUserInformationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.GetKeysResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.GetTransactionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.HandlePasswordForgottenResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.KeyActivationResult.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.KeyValidity.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.LicenseKey.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.LogInResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.LogOutResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.ModifyCurrentUserInformationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.Transaction.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference.User.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\LicensingServiceReference\LicensingService.wsdl" />
+    <None Include="Service References\LicensingServiceReference\LicensingService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\LicensingServiceReference\LicensingService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="teamdev.licenses" />
+    <Resource Include="Icon1.ico" />
+    <Content Include="..\JSIL\bin\JSIL.Proxies.4.0.dll">
+      <Link>JSIL.Proxies.4.0.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\JSIL\bin\JSIL.Proxies.Bcl.dll">
+      <Link>JSIL.Proxies.Bcl.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Service References\LicensingServiceReference\LicensingService.disco" />
+    <None Include="Service References\LicensingServiceReference\configuration91.svcinfo" />
+    <None Include="Service References\LicensingServiceReference\configuration.svcinfo" />
+    <None Include="Service References\LicensingServiceReference\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <Content Include="interop_debug_root.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="simulator_root.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\LicensingServiceReference\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DotNetForHtml5.Compiler.Common\DotNetForHtml5.Compiler.Common.csproj">
+      <Project>{4ecad5cd-91df-48f6-9e9f-ae0a6e7622a8}</Project>
+      <Name>DotNetForHtml5.Compiler.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
