@@ -315,6 +315,14 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
+        /// <see cref="Contains(object)"/>
+        /// </summary>
+        public bool ContainsKey(object key)
+        {
+            return this.Contains(key);
+        }
+
+        /// <summary>
         /// Copies the elements of the <see cref="ResourceDictionary"/> to an <see cref="Array"/>,
         /// starting at a particular <see cref="Array"/> index.
         /// </summary>
@@ -481,12 +489,7 @@ namespace Windows.UI.Xaml
         ICollection<object> IDictionary<object, object>.Values
         {
             get { throw new NotImplementedException("The method or operation is not implemented."); }
-        }
-
-        bool IDictionary<object, object>.ContainsKey(object key)
-        {
-            return this.Contains(key);
-        }
+        }        
 
         bool IDictionary<object, object>.Remove(object key)
         {
