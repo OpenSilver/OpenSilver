@@ -104,7 +104,10 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         //     content to load into the Silverlight plug-in.
         public Uri Source
         {
-            get { return null; }
+            get 
+            {
+                return new Uri(CSHTML5.Interop.ExecuteJavaScript("window.location.origin").ToString());
+            }
         }
 
         //// Summary:
