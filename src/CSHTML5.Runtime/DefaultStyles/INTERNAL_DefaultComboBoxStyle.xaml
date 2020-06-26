@@ -6,10 +6,23 @@
 
     <!--<Style x:Key="DefaultComboBoxStyle" TargetType="ComboBox">-->
     <Style TargetType="ComboBox">
-        <Setter Property="Background"
-                Value="White" />
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    <GradientStopCollection>
+                        <GradientStop Color="white" Offset="0"/>
+                        <GradientStop Color="White" Offset="0.3"/>
+                        <GradientStop Color="#FFD0D0D0" Offset="1"/>
+                    </GradientStopCollection>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Foreground"
                 Value="Black" />
+        <Setter Property="BorderBrush"
+                Value="DarkGray" />
+        <Setter Property="BorderThickness"
+                Value="1" />
         <Setter Property="Padding"
                 Value="6,2,30,2" />
         <Setter Property="Cursor"
@@ -19,27 +32,55 @@
                 <ControlTemplate TargetType="ComboBox">
                     <StackPanel>
                         <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup Name="CommonStates">
+                                <VisualState Name="Disabled">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush"
+                                                                       Storyboard.TargetName="OuterBorder">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="#FFD0D0D0" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Fill"
+                                                                       Storyboard.TargetName="arrow">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="#FFD0D0D0" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Stroke"
+                                                                       Storyboard.TargetName="arrow">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="#FFD0D0D0" />
+                                        </ObjectAnimationUsingKeyFrames>
+
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <Border x:Name="OuterBorder"
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}">
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5"
+                                    >
                             <Grid>
                                 <ToggleButton x:Name="DropDownToggle"
                                               HorizontalAlignment="Stretch"
                                               VerticalAlignment="Stretch"
                                               HorizontalContentAlignment="Right"
-                                              VerticalContentAlignment="Center">
+                                              VerticalContentAlignment="Center"
+                                              BorderThickness="0"
+                                              Background="Transparent"
+                                                  >
                                     <Path x:Name="arrow"
                                           Visibility="Visible"
                                           Stroke="Black"
-                                          Width="13"
-                                          Height="9"
-                                          StrokeThickness="3"
+                                          Fill="Black"
+                                          Width="5"
+                                          Height="3"
+                                          StrokeThickness="1"
                                           HorizontalAlignment="Center"
                                           VerticalAlignment="Center"
                                           Stretch="None"
-                                          Data="M 1.5,2.25 L 6.75,7.5 L 12,2.25" />
+                                          Data="M 0,0 L 2.5,3 L 5,0 z" />
                                 </ToggleButton>
                                 <ContentPresenter x:Name="ContentPresenter"
                                                   IsHitTestVisible="False"
@@ -47,7 +88,7 @@
 
                                 <!-- This empty TextBlock allows to ensure that the minimum vertical size of 
                                 the ComboBox corresponds to the value of the inherited FontSize property -->
-                                
+
                                 <TextBlock Text=" "
                                            Opacity="0"
                                            IsHitTestVisible="False"
@@ -58,8 +99,10 @@
                         <Popup x:Name="Popup"
                                IsOpen="False">
                             <Border Background="White"
-                                    BorderBrush="Black"
-                                    BorderThickness="1">
+                                    BorderBrush="Gray"
+                                    BorderThickness="1"
+                                    CornerRadius="3"
+                                    Padding="3">
                                 <ScrollViewer MaxHeight="{TemplateBinding MaxDropDownHeight}"
                                               VerticalScrollBarVisibility="Auto"
                                               HorizontalScrollBarVisibility="Disabled">
