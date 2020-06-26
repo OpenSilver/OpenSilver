@@ -396,13 +396,8 @@ namespace Windows.UI.Xaml.Media
 
             if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
             {
-
-                //in IE and FireFox, it uses an angle in the opposite direction of that of the other browsers and 0deg is up while in other browsers it is right (or something like that).
-                if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("(window.IE_VERSION || window.FIREFOX_VERSION)")))
-                {
+                // In the browsers, the angle goes in the opposite direction of that of the Simulator, and 0 degrees is not in the same position so we fix it:
                     angle = 360 - angle + 90;
-                }
-
             }
 
 
