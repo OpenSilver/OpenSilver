@@ -8,7 +8,9 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DotNetForHtml5.Compiler</RootNamespace>
-    <AssemblyName>CSharpXamlForHtml5.Compiler</AssemblyName>
+    <OutputPath>bin\CSHTML5\$(Configuration)\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -17,224 +19,28 @@
     <SccProvider>SAK</SccProvider>
 	<NoWarn>CS1591</NoWarn>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <AssemblyName>CSharpXamlForHtml5.Compiler</AssemblyName>
+    <DefineConstants>TRACE;DEBUG;BRIDGE</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SLMigration|AnyCPU'">
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <!-- ************************************* -->
-    <!-- We manually override the AssemblyName -->
-    <!-- ************************************* -->
     <AssemblyName>SLMigration.CSharpXamlForHtml5.Compiler</AssemblyName>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\SLMigration\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;SKIPUNSUPPORTEDSTUFF</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'BridgeDebug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\BridgeDebug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;BRIDGE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'BridgeSLMigration|AnyCPU'">
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <!-- ************************************* -->
-    <!-- We manually override the AssemblyName -->
-    <!-- ************************************* -->
-    <AssemblyName>SLMigration.CSharpXamlForHtml5.Compiler</AssemblyName>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\BridgeSLMigration\</OutputPath>
     <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;BRIDGE;</DefineConstants>
-    <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'OpenSilver|AnyCPU' ">
-    <!-- ************************************* -->
-    <!-- We manually override the AssemblyName -->
-    <!-- ************************************* -->
-    <AssemblyName>OpenSilver.CSharpXamlForHtml5.Compiler</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\OpenSilver\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;SILVERLIGHTCOMPATIBLEVERSION;MIGRATION</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <DocumentationFile>bin\OpenSilver\OpenSilver.CSharpXamlForHtml5.Compiler.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'OpenSilver.WorkInProgress|AnyCPU'">
-    <!-- ************************************* -->
-    <!-- We manually override the AssemblyName -->
-    <!-- ************************************* -->
-    <AssemblyName>OpenSilver.CSharpXamlForHtml5.Compiler</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\OpenSilver.WorkInProgress\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;SILVERLIGHTCOMPATIBLEVERSION</DefineConstants>
-    <DocumentationFile>bin\OpenSilver.WorkInProgress\OpenSilver.CSharpXamlForHtml5.Compiler.xml</DocumentationFile>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'OpenSilver.UwpCompatible|AnyCPU'">
-    <!-- ************************************* -->
-    <!-- We manually override the AssemblyName -->
-    <!-- ************************************* -->
-    <AssemblyName>OpenSilver.UwpCompatible.CSharpXamlForHtml5.Compiler</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\OpenSilver.UwpCompatible\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR</DefineConstants>
-    <DocumentationFile>bin\OpenSilver.UwpCompatible\OpenSilver.UwpCompatible.CSharpXamlForHtml5.Compiler.xml</DocumentationFile>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <!-- ******************* -->
-    <!-- DEBUG CONFIGURATION -->
-    <!-- ******************* -->
-    <Reference Include="CSharpXamlForHtml5" Condition=" '$(Configuration)' == 'Debug' ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DotNetForHtml5.Core\bin\Debug\CSharpXamlForHtml5.dll</HintPath>
-      <Aliases>DotNetForHtml5Core</Aliases>
-    </Reference>
-    <Reference Include="CSharpXamlForHtml5.System.dll" Condition=" '$(Configuration)' == 'Debug' ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DotNetForHtml5.Core\bin\Debug\CSharpXamlForHtml5.System.dll.dll</HintPath>
-      <Aliases>custom</Aliases>
-    </Reference>
-    <Reference Include="CSharpXamlForHtml5.System.Runtime.Serialization.dll" Condition=" '$(Configuration)' == 'Debug' ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DotNetForHtml5.Core\bin\Debug\CSharpXamlForHtml5.System.Runtime.Serialization.dll.dll</HintPath>
-      <Aliases>custom</Aliases>
-    </Reference>
-    <Reference Include="CSharpXamlForHtml5.System.Xaml.dll" Condition=" '$(Configuration)' == 'Debug' ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DotNetForHtml5.Core\bin\Debug\CSharpXamlForHtml5.System.Xaml.dll.dll</HintPath>
-      <Aliases>custom</Aliases>
-    </Reference>
-    <Reference Include="CSharpXamlForHtml5.System.Xml.dll" Condition=" '$(Configuration)' == 'Debug' ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DotNetForHtml5.Core\bin\Debug\CSharpXamlForHtml5.System.Xml.dll.dll</HintPath>
-      <Aliases>custom</Aliases>
-    </Reference>
-    <ProjectReference Include="..\DotNetForHtml5.Compiler.Common\DotNetForHtml5.Compiler.Common.csproj">
+    <ProjectReference Include="..\Compiler.Common\Compiler.Common.CSHTML5.csproj">
       <Project>{4ecad5cd-91df-48f6-9e9f-ae0a6e7622a8}</Project>
-      <Name>DotNetForHtml5.Compiler.Common</Name>
+      <Name>Compiler.Common.CSHTML5</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DotNetForHtml5.System.dll\DotNetForHtml5.System.dll.csproj" Condition=" '$(Configuration)' == 'Debug' ">
-      <Project>{e4615bfa-f591-4a1c-b104-6111d7fed7e2}</Project>
-      <Name>DotNetForHtml5.System.dll</Name>
-      <Aliases>custom</Aliases>
-    </ProjectReference>
-    <ProjectReference Include="..\DotNetForHtml5.System.Runtime.Serialization.dll\DotNetForHtml5.System.Runtime.Serialization.dll.csproj" Condition=" '$(Configuration)' == 'Debug' ">
-      <Project>{e6c5ccd3-da85-41db-90b3-a36ba194e987}</Project>
-      <Name>DotNetForHtml5.System.Runtime.Serialization.dll</Name>
-      <Aliases>custom</Aliases>
-    </ProjectReference>
-    <ProjectReference Include="..\DotNetForHtml5.System.Xaml.dll\DotNetForHtml5.System.Xaml.dll.csproj" Condition=" '$(Configuration)' == 'Debug' ">
-      <Project>{abff5588-d769-418f-8d6a-8acb7f3b988e}</Project>
-      <Name>DotNetForHtml5.System.Xaml.dll</Name>
-      <Aliases>custom</Aliases>
-    </ProjectReference>
-    <ProjectReference Include="..\DotNetForHtml5.System.Xml.dll\DotNetForHtml5.System.Xml.dll.csproj" Condition=" '$(Configuration)' == 'Debug' ">
-      <Project>{0e9a6c70-0e29-4138-b816-646f0973198a}</Project>
-      <Name>DotNetForHtml5.System.Xml.dll</Name>
-      <Aliases>custom</Aliases>
-    </ProjectReference>
-    <!-- ************************* -->
-    <!-- SLMIGRATION CONFIGURATION -->
-    <!-- ************************* -->
-    <Reference Include="CSharpXamlForHtml5" Condition=" '$(Configuration)' == 'SLMigration' ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DotNetForHtml5.Core\bin\SLMigration\SLMigration.CSharpXamlForHtml5.dll</HintPath>
-      <Aliases>DotNetForHtml5Core</Aliases>
-    </Reference>
-    <Reference Include="CSharpXamlForHtml5.System.dll" Condition=" '$(Configuration)' == 'SLMigration' ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DotNetForHtml5.Core\bin\SLMigration\SLMigration.CSharpXamlForHtml5.System.dll.dll</HintPath>
-      <Aliases>custom</Aliases>
-    </Reference>
-    <Reference Include="CSharpXamlForHtml5.System.Runtime.Serialization.dll" Condition=" '$(Configuration)' == 'SLMigration' ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DotNetForHtml5.Core\bin\SLMigration\SLMigration.CSharpXamlForHtml5.System.Runtime.Serialization.dll.dll</HintPath>
-      <Aliases>custom</Aliases>
-    </Reference>
-    <Reference Include="CSharpXamlForHtml5.System.Xaml.dll" Condition=" '$(Configuration)' == 'SLMigration' ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DotNetForHtml5.Core\bin\SLMigration\SLMigration.CSharpXamlForHtml5.System.Xaml.dll.dll</HintPath>
-      <Aliases>custom</Aliases>
-    </Reference>
-    <Reference Include="CSharpXamlForHtml5.System.Xml.dll" Condition=" '$(Configuration)' == 'SLMigration' ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DotNetForHtml5.Core\bin\SLMigration\SLMigration.CSharpXamlForHtml5.System.Xml.dll.dll</HintPath>
-      <Aliases>custom</Aliases>
-    </Reference>
-    <ProjectReference Include="..\DotNetForHtml5.System.dll\DotNetForHtml5.System.dll.csproj" Condition=" '$(Configuration)' == 'SLMigration' ">
-      <Project>{e4615bfa-f591-4a1c-b104-6111d7fed7e2}</Project>
-      <Name>DotNetForHtml5.System.dll</Name>
-      <Aliases>custom</Aliases>
-    </ProjectReference>
-    <ProjectReference Include="..\DotNetForHtml5.System.Runtime.Serialization.dll\DotNetForHtml5.System.Runtime.Serialization.dll.csproj" Condition=" '$(Configuration)' == 'SLMigration' ">
-      <Project>{e6c5ccd3-da85-41db-90b3-a36ba194e987}</Project>
-      <Name>DotNetForHtml5.System.Runtime.Serialization.dll</Name>
-      <Aliases>custom</Aliases>
-    </ProjectReference>
-    <ProjectReference Include="..\DotNetForHtml5.System.Xaml.dll\DotNetForHtml5.System.Xaml.dll.csproj" Condition=" '$(Configuration)' == 'SLMigration' ">
-      <Project>{abff5588-d769-418f-8d6a-8acb7f3b988e}</Project>
-      <Name>DotNetForHtml5.System.Xaml.dll</Name>
-      <Aliases>custom</Aliases>
-    </ProjectReference>
-    <ProjectReference Include="..\DotNetForHtml5.System.Xml.dll\DotNetForHtml5.System.Xml.dll.csproj" Condition=" '$(Configuration)' == 'SLMigration' ">
-      <Project>{0e9a6c70-0e29-4138-b816-646f0973198a}</Project>
-      <Name>DotNetForHtml5.System.Xml.dll</Name>
-      <Aliases>custom</Aliases>
-    </ProjectReference>
-    <!-- ************************* -->
-    <!-- BRIDGEDEBUG CONFIGURATION -->
-    <!-- ************************* -->
-    <!-- (empty) -->
-    <!-- ******************************* -->
-    <!-- BRIDGESLMIGRATION CONFIGURATION -->
-    <!-- ******************************* -->
-    <!-- (empty) -->
-    <!-- *****-->
-    <!-- COMMON -->
-    <!-- *****-->
-    <ProjectReference Include="..\DotNetForHtml5.Compiler.TypeScriptDefToCSharp\DotNetForHtml5.Compiler.TypeScriptDefToCSharp.csproj">
+    <ProjectReference Include="..\Compiler.TypeScriptDefToCSharp\Compiler.TypeScriptDefToCSharp.CSHTML5.csproj">
       <Project>{4d0ca743-4f06-40da-92d7-f31d8f395e2a}</Project>
-      <Name>DotNetForHtml5.Compiler.TypeScriptDefToCSharp</Name>
+      <Name>Compiler.TypeScriptDefToCSharp.CSHTML5</Name>
     </ProjectReference>
     <Reference Include="ICSharpCode.Decompiler">
       <HintPath>..\JSIL\bin\ICSharpCode.Decompiler.dll</HintPath>
@@ -300,17 +106,10 @@
     <Compile Include="4_CheckingForUnsupportedStuff\CheckingThatNoUnsupportedProjectIsBeingProcessed.cs" />
     <Compile Include="4_CheckingForUnsupportedStuff\UnsupportedMethodInfo.cs" />
     <Compile Include="4_CheckingForUnsupportedStuff\MemberReferenceAndCallerInformation.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\ConvertingResXFilesToJavaScript.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\DeadCodeAnalyzer\Annotations.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\DeadCodeAnalyzer\Configuration.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\DeadCodeAnalyzer\DeadCodeAnalyzer.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\DeadCodeAnalyzer\DeadCodeInfoProvider.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\DeadCodeAnalyzer\TypeMapStep.cs" />
     <Compile Include="4_CheckingForUnsupportedStuff\CheckingThatNoUnsupportedMethodIsCalled.cs" />
     <Compile Include="5_ConvertingExeOrDllToJavaScript\ActivationHelpers.cs" />
     <Compile Include="6_CreatingAndCopyingSupportHtmlAndJavaScriptFiles\WrappingOutputFiles_BridgeVersion.cs" />
     <Compile Include="6_CreatingAndCopyingSupportHtmlAndJavaScriptFiles\ExtractingAndCopyingResources.cs" />
-    <Compile Include="EntryPointForCompilationFromSimulator\CompilationFromSimulator.cs" />
     <Compile Include="EntryPoints\BeforeXamlPreprocessor.cs" />
     <Compile Include="EntryPoints\AfterXamlPreprocessor.cs" />
     <Compile Include="EntryPoints\EntryPointGenerator.cs" />
@@ -330,9 +129,7 @@
     <Compile Include="OtherHelpersAndHandlers\ActivationHelpers_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\FixingServiceReferences.cs" />
     <Compile Include="OtherHelpersAndHandlers\MergingTwoSerializationAssemblies.cs" />
-    <Compile Include="OtherHelpersAndHandlers\TranspilingOnlyAssembliesThatHaveChanged.cs" />
     <Compile Include="OtherHelpersAndHandlers\RegistryHelpers_SharedWithOtherProjects.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\RemovalOfUnsupportedTypesFromCorlib.cs" />
     <Compile Include="OtherHelpersAndHandlers\ExecutionTimeMeasuring.cs" />
     <Compile Include="OtherHelpersAndHandlers\TrialHelpers_SharedWithOtherProjects.cs" />
     <Compile Include="EntryPoints\AssemblyReferenceValidator.cs" />
@@ -354,14 +151,12 @@
     <Compile Include="OtherHelpersAndHandlers\XamlFilesWithoutCodeBehindHelper.cs" />
     <Compile Include="Tests\Program.cs" />
     <Compile Include="Tests\StandaloneCompilerTest.cs" />
-    <Compile Include="5_ConvertingExeOrDllToJavaScript\ConvertingExeOrDllToJavaScript.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GettingInformationAboutAXamlType.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingUniqueNames.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\PostOrderTreeTraversal.cs" />
     <Compile Include="Tests\CreatingTemporarySolution.cs" />
     <Compile Include="Loggers\LoggerThatUsesTaskOutput.cs" />
-    <Compile Include="EntryPoints\JavaScriptGenerator.cs" />
     <Compile Include="EntryPoints\Wrapper_JSILversion.cs" />
     <Compile Include="EntryPoints\XamlPreprocessor.cs" />
     <Compile Include="Loggers\LoggerThatUsesConsoleWriteLine.cs" />
@@ -380,6 +175,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Mono.Cecil" Version="0.9.5" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

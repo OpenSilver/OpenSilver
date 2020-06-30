@@ -12,7 +12,6 @@ using MahApps.Metro.Controls;
 using System.Windows.Controls;
 using System.Globalization;
 using DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection;
-using DotNetForHtml5.Compiler.Common;
 using Microsoft.Win32;
 using DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference;
 using DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking;
@@ -1358,25 +1357,21 @@ Click OK to continue.";
                     ToolbarAfterSuccessfulJavaScriptCompilation.Visibility = Visibility.Collapsed;
                     ToolbarDuringJavaScriptCompilation.Visibility = Visibility.Collapsed;
                     ToolbarWhenCompilationError.Visibility = Visibility.Collapsed;
-                    CompilationProgressBarIndicator.IsRunning = false;
                     break;
                 case CompilationState.Compiling:
                     ToolbarAfterSuccessfulJavaScriptCompilation.Visibility = Visibility.Collapsed;
                     ToolbarDuringJavaScriptCompilation.Visibility = Visibility.Visible;
                     ToolbarWhenCompilationError.Visibility = Visibility.Collapsed;
-                    CompilationProgressBarIndicator.IsRunning = true;
                     break;
                 case CompilationState.AlreadyCompiled:
                     ToolbarAfterSuccessfulJavaScriptCompilation.Visibility = Visibility.Visible;
                     ToolbarDuringJavaScriptCompilation.Visibility = Visibility.Collapsed;
                     ToolbarWhenCompilationError.Visibility = Visibility.Collapsed;
-                    CompilationProgressBarIndicator.IsRunning = false;
                     break;
                 case CompilationState.CompilationError:
                     ToolbarAfterSuccessfulJavaScriptCompilation.Visibility = Visibility.Collapsed;
                     ToolbarDuringJavaScriptCompilation.Visibility = Visibility.Collapsed;
                     ToolbarWhenCompilationError.Visibility = Visibility.Visible;
-                    CompilationProgressBarIndicator.IsRunning = false;
                     break;
                 default:
                     break;

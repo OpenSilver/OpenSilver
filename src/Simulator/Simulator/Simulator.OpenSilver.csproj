@@ -107,7 +107,6 @@
     <Compile Include="DialogBoxes\InputBox.xaml.cs">
       <DependentUpon>InputBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ProgressIndicator.cs" />
     <Compile Include="StaticConstructorsCaller.cs" />
     <Compile Include="SupportClasses\CookiesHelper.cs" />
     <Compile Include="SupportClasses\ReflectionInUserAssembliesHelper.cs" />
@@ -165,10 +164,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Resource Include="ProgressIndicatorStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

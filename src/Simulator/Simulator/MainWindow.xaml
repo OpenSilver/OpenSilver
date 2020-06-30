@@ -4,7 +4,6 @@
         xmlns:dotnetbrowser="clr-namespace:DotNetBrowser.WPF;assembly=DotNetBrowser"
         xmlns:mahapps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:xamlinspection="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection"
-        xmlns:progressindicatornamespace="clr-namespace:ProgressIndicatorNamespace"
         xmlns:licensecheckernamespace="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking"
         Title="Simulator - C#/XAML for HTML5"
         SizeToContent="WidthAndHeight"
@@ -33,7 +32,6 @@
                 <StackPanel Orientation="Vertical" Grid.Row="0" Grid.ColumnSpan="2">
                     <Border x:Name="ToolbarDuringJavaScriptCompilation" Background="#FF49BC1C">
                         <StackPanel Orientation="Horizontal" Margin="10,10,10,10">
-                            <progressindicatornamespace:ProgressIndicator x:Name="CompilationProgressBarIndicator" VerticalAlignment="Center"/>
                             <StackPanel Orientation="Vertical" Margin="10,0,10,0">
                                 <TextBlock Text="Generating HTML and JavaScript files..." Foreground="White" FontWeight="Bold"/>
                                 <TextBlock Text="Note: what you see below is an intermediate version that is useful for debugging. However, it is much slower than the final result." Foreground="White" Margin="0,5,0,0" TextWrapping="Wrap"/>
