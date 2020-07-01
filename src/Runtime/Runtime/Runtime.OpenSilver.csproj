@@ -366,6 +366,7 @@
 		<Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs.cs" />
 		<Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler.cs" />
 		<Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_SimulatorOnly.cs" />
+		<Compile Include="Properties\AssemblyInfo.cs" />
 		<Compile Include="PublicAPI\CompilerIsSLMigrationAttribute.cs" />
 		<Compile Include="PublicAPI\CompilerVersionFriendlyNameAttribute.cs" />
 		<Compile Include="PublicAPI\CompilerVersionNumberAttribute.cs" />
