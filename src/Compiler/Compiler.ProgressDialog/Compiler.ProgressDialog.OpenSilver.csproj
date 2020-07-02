@@ -26,11 +26,11 @@
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP|AnyCPU'">
-    <AssemblyName>OpenSilver.UwpCompatible.Compiler.ProgressDialog</AssemblyName>
+    <AssemblyName>OpenSilver.UWPCompatible.Compiler.ProgressDialog</AssemblyName>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU'">
-    <AssemblyName>OpenSilver.UwpCompatible.Compiler.ProgressDialog</AssemblyName>
+    <AssemblyName>OpenSilver.UWPCompatible.Compiler.ProgressDialog</AssemblyName>
   </PropertyGroup>
   
   <ItemGroup>

@@ -27,12 +27,12 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP|AnyCPU'">
-    <AssemblyName>OpenSilver.UwpCompatible.Simulator</AssemblyName>
+    <AssemblyName>OpenSilver.UWPCompatible.Simulator</AssemblyName>
     <DefineConstants>TRACE;DEBUG;OPENSILVER</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU'">
-    <AssemblyName>OpenSilver.UwpCompatible.Simulator</AssemblyName>
+    <AssemblyName>OpenSilver.UWPCompatible.Simulator</AssemblyName>
     <DefineConstants>TRACE;DEBUG;OPENSILVER;WORKINPROGRESS</DefineConstants>
   </PropertyGroup>
   

@@ -25,11 +25,11 @@
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP|AnyCPU'">
-    <AssemblyName>OpenSilver.UwpCompatible.Compiler.Common</AssemblyName>
+    <AssemblyName>OpenSilver.UWPCompatible.Compiler.Common</AssemblyName>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU'">
-    <AssemblyName>OpenSilver.UwpCompatible.Compiler.Common</AssemblyName>
+    <AssemblyName>OpenSilver.UWPCompatible.Compiler.Common</AssemblyName>
   </PropertyGroup>
   
   <ItemGroup>
