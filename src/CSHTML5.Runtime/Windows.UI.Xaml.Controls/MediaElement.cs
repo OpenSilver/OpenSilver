@@ -118,8 +118,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the IsAudioOnly dependency property.
         /// </summary>
         public static readonly DependencyProperty IsAudioOnlyProperty =
-            DependencyProperty.Register("IsAudioOnly", typeof(bool), typeof(MediaElement), new PropertyMetadata(false)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("IsAudioOnly", typeof(bool), typeof(MediaElement), new PropertyMetadata(false));
 
 
 

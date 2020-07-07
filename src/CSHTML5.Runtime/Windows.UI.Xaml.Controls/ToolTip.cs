@@ -268,8 +268,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the HorizontalOffset dependency property.
         /// </summary>
         public static readonly DependencyProperty HorizontalOffsetProperty =
-            DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(ToolTip), new PropertyMetadata(0d)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(ToolTip), new PropertyMetadata(0d));
 
 
         //-----------------------
@@ -288,8 +287,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the VerticalOffset dependency property.
         /// </summary>
         public static readonly DependencyProperty VerticalOffsetProperty =
-            DependencyProperty.Register("VerticalOffset", typeof(double), typeof(ToolTip), new PropertyMetadata(0d)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("VerticalOffset", typeof(double), typeof(ToolTip), new PropertyMetadata(0d));
 
     }
 }

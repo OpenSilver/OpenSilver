@@ -58,8 +58,7 @@ namespace Windows.UI.Xaml.Controls
         /// property.
         /// </summary>
         public static readonly DependencyProperty LastChildFillProperty =
-            DependencyProperty.Register("LastChildFill", typeof(bool), typeof(DockPanel), new PropertyMetadata(true)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("LastChildFill", typeof(bool), typeof(DockPanel), new PropertyMetadata(true));
 
         /// <summary>
         /// Gets the value of the DockPanel.Dock attached property
@@ -87,8 +86,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the DockPanel.Dock attached property.
         /// </summary>
         public static readonly DependencyProperty DockProperty =
-            DependencyProperty.RegisterAttached("Dock", typeof(Dock), typeof(DockPanel), new PropertyMetadata(Dock.Left)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet }); //this is the likely default value since Dock.Left is 0.
+            DependencyProperty.RegisterAttached("Dock", typeof(Dock), typeof(DockPanel), new PropertyMetadata(Dock.Left)); //this is the likely default value since Dock.Left is 0.
 
 
 

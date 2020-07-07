@@ -38,8 +38,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         static RepeatButton()
         {
             //DefaultStyleKeyProperty.OverrideMetadata(typeof(RepeatButton), new FrameworkPropertyMetadata(typeof(RepeatButton)));
-            ClickModeProperty.OverrideMetadata(typeof(RepeatButton), new PropertyMetadata(ClickMode.Press)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            ClickModeProperty.OverrideMetadata(typeof(RepeatButton), new PropertyMetadata(ClickMode.Press));
         }
 
         /// <summary>
@@ -74,8 +73,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             = DependencyProperty.Register("Delay",
             typeof(int),
             typeof(RepeatButton),
-            new PropertyMetadata(250)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            new PropertyMetadata(250));
 
         /// <summary>
         /// Gets or sets the time, in milliseconds, the RepeatButton
@@ -102,8 +100,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             = DependencyProperty.Register("Interval",
             typeof(int),
             typeof(RepeatButton),
-            new PropertyMetadata(250)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            new PropertyMetadata(250));
 
         /// <summary>
         /// Gets or sets the time, in milliseconds, between repetitions of the click

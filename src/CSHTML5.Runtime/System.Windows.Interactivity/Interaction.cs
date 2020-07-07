@@ -35,7 +35,7 @@ namespace System.Windows.Interactivity
         /// attached property.
         /// </summary>
         public static readonly DependencyProperty BehaviorsProperty =
-            DependencyProperty.RegisterAttached("Behaviors", typeof(BehaviorCollection), typeof(Interaction), new PropertyMetadata(null) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.RegisterAttached("Behaviors", typeof(BehaviorCollection), typeof(Interaction), new PropertyMetadata(null));
 
         /// <summary>
         /// Gets the System.Windows.Interactivity.BehaviorCollection associated with

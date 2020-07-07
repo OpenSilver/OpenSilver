@@ -124,8 +124,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the ToggleButton.IsThreeState dependency property.
         /// </summary>
         public static readonly DependencyProperty IsThreeStateProperty =
-            DependencyProperty.Register("IsThreeState", typeof(bool), typeof(ToggleButton), new PropertyMetadata(false)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("IsThreeState", typeof(bool), typeof(ToggleButton), new PropertyMetadata(false));
 
 #if MIGRATION
         internal override void OnKeyDownWhenFocused(object sender, KeyEventArgs e)

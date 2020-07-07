@@ -53,8 +53,7 @@ namespace Windows.UI.Xaml.Media
         }
 
         public static readonly DependencyProperty ChildrenProperty =
-            DependencyProperty.Register("Children", typeof(TransformCollection), typeof(TransformGroup), new PropertyMetadata(null)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Children", typeof(TransformCollection), typeof(TransformGroup), new PropertyMetadata(null));
 
         protected override Point INTERNAL_TransformPoint(Point point)
         {

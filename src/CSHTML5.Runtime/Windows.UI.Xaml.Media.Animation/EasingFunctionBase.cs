@@ -46,8 +46,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Identifies the EasingMode dependency property.
         /// </summary>
         public static readonly DependencyProperty EasingModeProperty =
-            DependencyProperty.Register("EasingMode", typeof(EasingMode), typeof(EasingFunctionBase), new PropertyMetadata(EasingMode.EaseOut)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("EasingMode", typeof(EasingMode), typeof(EasingFunctionBase), new PropertyMetadata(EasingMode.EaseOut));
 
         ///// <summary>
         ///// Transforms normalized time to control the pace of an animation.

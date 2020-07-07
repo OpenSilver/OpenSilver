@@ -78,8 +78,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the MaxLength dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxLengthProperty =
-            DependencyProperty.Register("MaxLength", typeof(int), typeof(PasswordBox), new PropertyMetadata(null) { MethodToUpdateDom = MaxLength_MethodToUpdateDom,
-            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("MaxLength", typeof(int), typeof(PasswordBox), new PropertyMetadata(null) { MethodToUpdateDom = MaxLength_MethodToUpdateDom});
 
         static void MaxLength_MethodToUpdateDom(DependencyObject d, object newValue)
         {

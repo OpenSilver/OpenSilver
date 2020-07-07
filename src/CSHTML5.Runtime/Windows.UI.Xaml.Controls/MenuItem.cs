@@ -49,8 +49,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.MenuItem.Icon dependency property.
         /// </summary>
         public static readonly DependencyProperty IconProperty =
-            DependencyProperty.Register("Icon", typeof(object), typeof(MenuItem), new PropertyMetadata(null)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Icon", typeof(object), typeof(MenuItem), new PropertyMetadata(null));
 
 
 

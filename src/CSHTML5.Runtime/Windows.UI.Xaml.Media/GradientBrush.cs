@@ -112,8 +112,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the MappingMode dependency property.
         /// </summary>
         public static readonly DependencyProperty MappingModeProperty =
-            DependencyProperty.Register("MappingMode", typeof(BrushMappingMode), typeof(GradientBrush), new PropertyMetadata(BrushMappingMode.RelativeToBoundingBox)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("MappingMode", typeof(BrushMappingMode), typeof(GradientBrush), new PropertyMetadata(BrushMappingMode.RelativeToBoundingBox));
 
 
 
@@ -132,8 +131,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the SpreadMethod dependency property.
         /// </summary>
         public static readonly DependencyProperty SpreadMethodProperty =
-            DependencyProperty.Register("SpreadMethod", typeof(GradientSpreadMethod), typeof(GradientBrush), new PropertyMetadata(GradientSpreadMethod.Pad)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("SpreadMethod", typeof(GradientSpreadMethod), typeof(GradientBrush), new PropertyMetadata(GradientSpreadMethod.Pad));
 
 
     }

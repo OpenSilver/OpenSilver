@@ -30,8 +30,7 @@ namespace Windows.UI.Xaml
     public sealed partial class EventTrigger : TriggerBase
     {
         private static readonly DependencyProperty ActionsProperty = 
-            DependencyProperty.Register("Actions", typeof(TriggerActionCollection), typeof(EventTrigger), new PropertyMetadata(new TriggerActionCollection())
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Actions", typeof(TriggerActionCollection), typeof(EventTrigger), new PropertyMetadata(new TriggerActionCollection()));
 
         private static readonly DependencyProperty RoutedEventProperty = 
             DependencyProperty.Register("RoutedEvent", typeof(RoutedEvent), typeof(EventTrigger), null);

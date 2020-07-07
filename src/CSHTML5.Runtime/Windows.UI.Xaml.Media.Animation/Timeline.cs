@@ -160,8 +160,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Identifies the Duration dependency property.
         /// </summary>
         public static readonly DependencyProperty DurationProperty =
-            DependencyProperty.Register("Duration", typeof(Duration), typeof(Timeline), new PropertyMetadata(Duration.Automatic)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Duration", typeof(Duration), typeof(Timeline), new PropertyMetadata(Duration.Automatic));
 
 
 
@@ -186,8 +185,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Identifies the RepeatBehavior dependency property.
         /// </summary>
         public static readonly DependencyProperty RepeatBehaviorProperty =
-            DependencyProperty.Register("RepeatBehavior", typeof(RepeatBehavior), typeof(Timeline), new PropertyMetadata(new RepeatBehavior(1))
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("RepeatBehavior", typeof(RepeatBehavior), typeof(Timeline), new PropertyMetadata(new RepeatBehavior(1)));
 
 
         // Returns:
@@ -210,8 +208,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Identifies the BeginTime dependency property.
         /// </summary>
         public static readonly DependencyProperty BeginTimeProperty =
-            DependencyProperty.Register("BeginTime", typeof(TimeSpan?), typeof(Timeline), new PropertyMetadata(new TimeSpan())
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("BeginTime", typeof(TimeSpan?), typeof(Timeline), new PropertyMetadata(new TimeSpan()));
 
 
 
@@ -620,8 +617,7 @@ namespace Windows.UI.Xaml.Media.Animation
         }
 #if WORKINPROGRESS
 
-        public static readonly DependencyProperty SpeedRatioProperty = DependencyProperty.Register("SpeedRatio", typeof(double), typeof(Timeline), new PropertyMetadata(1d)
-        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+        public static readonly DependencyProperty SpeedRatioProperty = DependencyProperty.Register("SpeedRatio", typeof(double), typeof(Timeline), new PropertyMetadata(1d));
 
         public double SpeedRatio
         {
