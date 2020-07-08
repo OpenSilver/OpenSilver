@@ -50,6 +50,7 @@ namespace CSHTML5.Internal
     {
         internal static bool EnablePerformanceLogging;
         internal static bool EnableOptimizationWhereCollapsedControlsAreNotLoaded;
+        internal static bool EnableOptimizationWhereCollapsedControlsAreLoadedLast;
 
         public static void DetachVisualChildIfNotNull(UIElement child, UIElement parent)
         {
@@ -368,20 +369,8 @@ if(nextSibling != undefined) {
             // CONTINUE WITH THE OTHER STEPS (AND DEFER SOME OF THEM WHEN THE ELEMENT IS COLLAPSED):
             //--------------------------------------------------------
 
-            Visibility childVisibility = child.Visibility;
-
             // Defer loading to when the control becomes visible if the option to not load collapsed controls is enabled:
-            if (!EnableOptimizationWhereCollapsedControlsAreNotLoaded || childVisibility != Visibility.Collapsed)
-            {
-                AttachVisualChild_Private_MainSteps(
-                    child,
-                    parent,
-                    doesParentRequireToCreateAWrapperForEachChild,
-                    innerDivOfWrapperForChild,
-                    domElementWhereToPlaceChildStuff,
-                    wrapperForChild);
-            }
-            else
+            if (EnableOptimizationWhereCollapsedControlsAreNotLoaded && child.Visibility == Visibility.Collapsed)
             {
                 child.INTERNAL_DeferredLoadingWhenControlBecomesVisible = () =>
                 {
@@ -394,9 +383,38 @@ if(nextSibling != undefined) {
                         wrapperForChild);
                 };
             }
-
-            if (childVisibility == Visibility.Collapsed)
-                UIElement.INTERNAL_ApplyVisibility(child, childVisibility);
+            else if (EnableOptimizationWhereCollapsedControlsAreLoadedLast && child.Visibility == Visibility.Collapsed)
+            {
+                child.INTERNAL_DeferredLoadingWhenControlBecomesVisible = () =>
+                {
+                    AttachVisualChild_Private_MainSteps(
+                        child,
+                        parent,
+                        doesParentRequireToCreateAWrapperForEachChild,
+                        innerDivOfWrapperForChild,
+                        domElementWhereToPlaceChildStuff,
+                        wrapperForChild);
+                };
+                INTERNAL_DispatcherHelpers.QueueAction(() =>
+                {
+                    Action deferredLoadingWhenControlBecomesVisible = child.INTERNAL_DeferredLoadingWhenControlBecomesVisible;
+                    if (deferredLoadingWhenControlBecomesVisible != null) // Note: it may have become "null" if the visibility was changed to "Visible" before the dispatched was called, in which case the element is loaded earlier (cf. "Visibility_Changed" handler)
+                    {
+                        child.INTERNAL_DeferredLoadingWhenControlBecomesVisible = null;
+                        deferredLoadingWhenControlBecomesVisible();
+                    }
+                });
+            }
+            else
+            {
+                AttachVisualChild_Private_MainSteps(
+                    child,
+                    parent,
+                    doesParentRequireToCreateAWrapperForEachChild,
+                    innerDivOfWrapperForChild,
+                    domElementWhereToPlaceChildStuff,
+                    wrapperForChild);
+            }
 
             // Defer rendering to when the control becomes visible:
             if (!child.IsVisible)
@@ -714,6 +732,14 @@ if(nextSibling != undefined) {
                 }
             }
 #endif
+
+            //--------------------------------------------------------
+            // APPLY THE VISIBILITY:
+            //--------------------------------------------------------
+
+            Visibility childVisibility = child.Visibility;
+            if (childVisibility == Visibility.Collapsed)
+                UIElement.INTERNAL_ApplyVisibility(child, childVisibility);
 
             //--------------------------------------------------------
             // RAISE THE "SIZECHANGED" EVENT:

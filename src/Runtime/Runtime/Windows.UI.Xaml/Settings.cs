@@ -69,6 +69,17 @@ namespace System
             }
         }
 
+        private bool _enableOptimizationWhereCollapsedControlsAreLoadedLast;
+        public bool EnableOptimizationWhereCollapsedControlsAreLoadedLast
+        {
+            get { return _enableOptimizationWhereCollapsedControlsAreLoadedLast; }
+            set
+            {
+                _enableOptimizationWhereCollapsedControlsAreLoadedLast = value;
+                INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreLoadedLast = value;
+            }
+        }
+
         private bool _enableProgressiveRendering;
         public bool EnableProgressiveRendering
         {
