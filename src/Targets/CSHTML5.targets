@@ -41,7 +41,7 @@
   <!--============================================================
   IMPORT THE MAIN TARGET FILE
   ============================================================-->
-  <Import Project="$(MSBuildThisFileDirectory)\CSHTML5.Common.Bridge.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)\CSHTML5.Common.targets" />
 
 
 </Project>
