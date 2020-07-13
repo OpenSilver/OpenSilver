@@ -8,7 +8,6 @@
     <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DotNetForHtml5.Compiler.ProgressDialog</RootNamespace>
-    <AssemblyName>CSharpXamlForHtml5.Compiler.ProgressDialog</AssemblyName>
     <OutputPath>bin\CSHTML5\$(Configuration)\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -22,12 +21,26 @@
     <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <AssemblyName>CSHTML5.Compiler.ProgressDialog</AssemblyName>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SLMigration|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' ">
+    <AssemblyName>CSHTML5.Compiler.ProgressDialog</AssemblyName>
+    <DefineConstants>DEBUG;TRACE;WORKINPROGRESS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">
+    <AssemblyName>CSHTML5.Migration.Compiler.ProgressDialog</AssemblyName>
     <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">
+    <AssemblyName>CSHTML5.Migration.Compiler.ProgressDialog</AssemblyName>
+    <DefineConstants>TRACE;WORKINPROGRESS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
