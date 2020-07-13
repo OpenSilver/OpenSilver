@@ -3,7 +3,7 @@
   <metadata>
     <id>$PackageId$</id>
     <version>$PackageVersion$</version>
-    <title>CSHTML5 v2.0 Alpha 65</title>
+    <title>CSHTML5 v2.0</title>
     <authors>Userware</authors>
     <owners />
     <projectUrl>http://www.cshtml5.com</projectUrl>
@@ -23,8 +23,8 @@
     <file src="../../src/Runtime/Bridge.TypesThatWillBeForwarded/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.Stubs.dll" target="lib/net40/CSHTML5.Stubs.dll" />
 
     <!-- CSHTML5 targets -->
-    <file src="../../src/Targets/CSHTML5.Bridge.targets" target="build/CSHTML5.targets" /> <!-- Note: the main targets file must have the same name as the package in order to be automatically imported into the end-user project. -->
-    <file src="../../src/Targets/CSHTML5.Common.Bridge.targets" target="build/CSHTML5.Common.targets" />
+    <file src="../../src/Targets/CSHTML5.targets" target="build/$PackageVersion$.targets" /> <!-- Note: the main targets file must have the same name as the package in order to be automatically imported into the end-user project. -->
+    <file src="../../src/Targets/CSHTML5.Common.targets" target="build/CSHTML5.Common.targets" />
 
     <!-- CSHTML5 compiler -->
     <file src="../../src/Compiler/Compiler/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.Compiler.dll" target="tools/CSharpXamlForHtml5.Compiler.dll" />
