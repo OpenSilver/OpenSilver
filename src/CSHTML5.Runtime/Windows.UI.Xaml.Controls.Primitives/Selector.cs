@@ -86,9 +86,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register(
-                "SelectedItem", 
-                typeof(object), 
-                typeof(Selector), 
+                "SelectedItem",
+                typeof(object),
+                typeof(Selector),
                 new PropertyMetadata(null, Selector.OnSelectedItemChanged, Selector.CoerceSelectedItem));
 
         private static void OnSelectedItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -168,22 +168,21 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public static readonly DependencyProperty SelectedIndexProperty =
             DependencyProperty.Register(
-                "SelectedIndex", 
-                typeof(int), 
-                typeof(Selector), 
+                "SelectedIndex",
+                typeof(int),
+                typeof(Selector),
                 new PropertyMetadata(-1, Selector.OnSelectedIndexChanged, Selector.CoerceSelectedIndex));
-        
+
         private static void OnSelectedIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Selector s = (Selector)d;
 
+            int newValue = (int)e.NewValue;
             // we only want to change the other ones if the change comes from 
             // SelectedIndex (otherwise it's already done by the one that was 
             // originally changed (SelectedItem or SelectedValue)
             if (!s._selectionChangeIsOnValue && !s._selectionChangeIsOnItem)
             {
-                int newValue = (int)e.NewValue;
-
                 s._selectionChangeIsOnIndex = true;
 
                 try
@@ -235,10 +234,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 {
                     s._selectionChangeIsOnIndex = false;
                 }
-
-                s.ApplySelectedIndex(newValue);
             }
-
+            s.ApplySelectedIndex(newValue);
             s.ManageSelectedIndex_Changed(e);
         }
 
@@ -275,9 +272,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public static readonly DependencyProperty SelectedValueProperty =
             DependencyProperty.Register(
-                "SelectedValue", 
-                typeof(object), 
-                typeof(Selector), 
+                "SelectedValue",
+                typeof(object),
+                typeof(Selector),
                 new PropertyMetadata(null, Selector.OnSelectedValueChanged, Selector.CoerceSelectedValue));
 
         private static void OnSelectedValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -357,9 +354,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public static readonly DependencyProperty SelectedValuePathProperty =
             DependencyProperty.Register(
-                "SelectedValuePath", 
-                typeof(string), 
-                typeof(Selector), 
+                "SelectedValuePath",
+                typeof(string),
+                typeof(Selector),
                 new PropertyMetadata(string.Empty, Selector.OnSelectedValuePathChanged));
 
         private static void OnSelectedValuePathChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -401,9 +398,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public static readonly DependencyProperty SelectedItemBackgroundProperty =
             DependencyProperty.Register(
-                "SelectedItemBackground", 
-                typeof(Brush), 
-                typeof(Selector), 
+                "SelectedItemBackground",
+                typeof(Brush),
+                typeof(Selector),
                 new PropertyMetadata(new SolidColorBrush(Colors.Blue)));
 
         /// <summary>
@@ -420,9 +417,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public static readonly DependencyProperty SelectedItemForegroundProperty =
             DependencyProperty.Register(
-                "SelectedItemForeground", 
-                typeof(Brush), 
-                typeof(Selector), 
+                "SelectedItemForeground",
+                typeof(Brush),
+                typeof(Selector),
                 new PropertyMetadata(new SolidColorBrush(Colors.White)));
 
         /// <summary>
@@ -439,9 +436,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public static readonly DependencyProperty RowBackgroundProperty =
             DependencyProperty.Register(
-                "RowBackground", 
-                typeof(Brush), 
-                typeof(Selector), 
+                "RowBackground",
+                typeof(Brush),
+                typeof(Selector),
                 new PropertyMetadata(new SolidColorBrush(Colors.White)));
 
 
@@ -459,9 +456,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public static readonly DependencyProperty UnselectedItemForegroundProperty =
             DependencyProperty.Register(
-                "UnselectedItemForeground", 
-                typeof(Brush), 
-                typeof(Selector), 
+                "UnselectedItemForeground",
+                typeof(Brush),
+                typeof(Selector),
                 new PropertyMetadata((Brush)null));
 
         #endregion things to replace with selectors Controltemplates
