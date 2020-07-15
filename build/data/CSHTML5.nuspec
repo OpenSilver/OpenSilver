@@ -17,39 +17,39 @@
   </metadata>
   <files>
     <!-- CSHTML5 runtime -->
-    <file src="../../src/Runtime/Runtime/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.dll" target="lib/net40/CSHTML5.dll" />
-    <file src="../../src/Runtime/Runtime/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.xml" target="lib/net40/CSHTML5.xml" />
-    <file src="../../src/Runtime/Runtime/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.pdb" target="lib/net40/CSHTML5.pdb" />
-    <file src="../../src/Runtime/Bridge.TypesThatWillBeForwarded/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.Stubs.dll" target="lib/net40/CSHTML5.Stubs.dll" />
+    <file src="../../src/Runtime/Runtime/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.dll" target="lib/net40/$AssembliesPrefix$.dll" />
+    <file src="../../src/Runtime/Runtime/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.xml" target="lib/net40/$AssembliesPrefix$.xml" />
+    <file src="../../src/Runtime/Runtime/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.pdb" target="lib/net40/$AssembliesPrefix$.pdb" />
+    <file src="../../src/Runtime/Bridge.TypesThatWillBeForwarded/bin/CSHTML5/$Configuration$/CSHTML5.Stubs.dll" target="lib/net40/CSHTML5.Stubs.dll" />
 
     <!-- CSHTML5 targets -->
     <file src="../../src/Targets/CSHTML5.targets" target="build/$PackageId$.targets" /> <!-- Note: the main targets file must have the same name as the package in order to be automatically imported into the end-user project. -->
     <file src="../../src/Targets/CSHTML5.Common.targets" target="build/CSHTML5.Common.targets" />
 
     <!-- CSHTML5 compiler -->
-    <file src="../../src/Compiler/Compiler/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.Compiler.dll" target="tools/CSharpXamlForHtml5.Compiler.dll" />
-    <file src="../../src/Compiler/Compiler.Common/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.Compiler.Common.dll" target="tools/CSharpXamlForHtml5.Compiler.Common.dll" />
-    <file src="../../src/Compiler/Compiler.ProgressDialog/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.Compiler.ProgressDialog.dll" target="tools/CSharpXamlForHtml5.Compiler.ProgressDialog.dll" />
-    <file src="../../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.Compiler.TypeScriptDefToCSharp.dll" target="tools/CSharpXamlForHtml5.Compiler.TypeScriptDefToCSharp.dll" />
+    <file src="../../src/Compiler/Compiler/bin/CSHTML5/$Configuration$/$CompilerPrefix$.Compiler.dll" target="tools/$CompilerPrefix$.Compiler.dll" />
+    <file src="../../src/Compiler/Compiler.Common/bin/CSHTML5/$Configuration$/CSharpXamlForHtml5.Compiler.Common.dll" target="tools/CSharpXamlForHtml5.Compiler.Common.dll" />
+    <file src="../../src/Compiler/Compiler.ProgressDialog/bin/CSHTML5/$Configuration$/CSharpXamlForHtml5.Compiler.ProgressDialog.dll" target="tools/CSharpXamlForHtml5.Compiler.ProgressDialog.dll" />
+    <file src="../../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/CSHTML5/$Configuration$/CSharpXamlForHtml5.Compiler.TypeScriptDefToCSharp.dll" target="tools/CSharpXamlForHtml5.Compiler.TypeScriptDefToCSharp.dll" />
 
-    <file src="../../src/Runtime/Bridge.TypeForwarding/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.Bridge.TypeForwarding.dll" target="tools/CSharpXamlForHtml5.Bridge.TypeForwarding.dll" />
-    <file src="../../src/Runtime/Bridge.TypesThatWillBeForwarded/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.Stubs.dll" target="tools/CSHTML5.Stubs.dll" />
-    <file src="../../src/Runtime/Runtime/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.dll" target="tools/CSHTML5.dll" />
+    <file src="../../src/Runtime/Bridge.TypeForwarding/bin/CSHTML5/$Configuration$/CSharpXamlForHtml5.Bridge.TypeForwarding.dll" target="tools/CSharpXamlForHtml5.Bridge.TypeForwarding.dll" />
+    <file src="../../src/Runtime/Bridge.TypesThatWillBeForwarded/bin/CSHTML5/$Configuration$/CSHTML5.Stubs.dll" target="tools/CSHTML5.Stubs.dll" />
+    <file src="../../src/Runtime/Runtime/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.dll" target="tools/$AssembliesPrefix$.dll" />
     <file src="../../ExtLibs/BridgeNET/Bridge.Core/lib/net40/Bridge.dll" target="tools/Bridge.dll" />
 
     <!-- CSHTML5 simulator -->
-    <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.Simulator.exe" target="tools/simulator/CSharpXamlForHtml5.Simulator.exe" />
+    <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/CSharpXamlForHtml5.Simulator.exe" target="tools/simulator/CSharpXamlForHtml5.Simulator.exe" />
     <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/DotNetBrowser.Chromium.dll" target="tools/simulator/DotNetBrowser.Chromium.dll" />
     <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/DotNetBrowser.dll" target="tools/simulator/DotNetBrowser.dll" />
     <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/MahApps.Metro.dll" target="tools/simulator/MahApps.Metro.dll" />
     <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/System.Windows.Interactivity.dll" target="tools/simulator/System.Windows.Interactivity.dll" />
     <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/simulator_root.html" target="tools/simulator/simulator_root.html" />
     <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/interop_debug_root.html" target="tools/simulator/interop_debug_root.html" />
-    <file src="../../src/Simulator/LocalServer/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.LocalServer.exe" target="tools/simulator/CSharpXamlForHtml5.LocalServer.exe" />
+    <file src="../../src/Simulator/LocalServer/bin/CSHTML5/$Configuration$/CSharpXamlForHtml5.LocalServer.exe" target="tools/simulator/CSharpXamlForHtml5.LocalServer.exe" />
     <file src="../../src/Simulator/LocalServer/bin/CSHTML5/$Configuration$/Microsoft.Web.Administration.dll" target="tools/simulator/Microsoft.Web.Administration.dll" />
     <file src="../../src/Simulator/LocalServer/bin/CSHTML5/$Configuration$/Install_IIS.bat" target="tools/simulator/Install_IIS.bat" />
-    <file src="../../src/Compiler/Compiler.Common/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.Compiler.Common.dll" target="tools/simulator/CSharpXamlForHtml5.Compiler.Common.dll" />
-    <file src="../../src/Runtime/Bridge.TypeForwarding/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.Bridge.TypeForwarding.dll" target="tools/simulator/CSharpXamlForHtml5.Bridge.TypeForwarding.dll" />
+    <file src="../../src/Compiler/Compiler.Common/bin/CSHTML5/$Configuration$/CSharpXamlForHtml5.Compiler.Common.dll" target="tools/simulator/CSharpXamlForHtml5.Compiler.Common.dll" />
+    <file src="../../src/Runtime/Bridge.TypeForwarding/bin/CSHTML5/$Configuration$/CSharpXamlForHtml5.Bridge.TypeForwarding.dll" target="tools/simulator/CSharpXamlForHtml5.Bridge.TypeForwarding.dll" />
 
     <!-- CSHTML5 JS and CSS files -->
     <file src="js_css/cshtml5.css" target="js_css/cshtml5.css" />
