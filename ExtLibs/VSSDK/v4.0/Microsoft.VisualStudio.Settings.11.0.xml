@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.Settings.11.0</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.VisualStudio.Settings.ExternalSettingsManager">
+      <summary>An implementation of the <see cref="T:Microsoft.VisualStudio.Settings.SettingsManager" /> class that allows applications to access settings from Visual Studio or an isolated shell, either of which is selected by its AppID. </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Settings.ExternalSettingsManager.CreateForApplication(System.String)">
+      <summary>Used to construct the SettingsManager for AppID-based Visual Studio applications.</summary>
+      <param name="applicationPath">The path of the executable Visual Studio application.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Settings.ExternalSettingsManager.CreateForApplication(System.String,System.Boolean)">
+      <summary>Used to construct the SettingsManager for AppID-based Visual Studio applications.</summary>
+      <param name="applicationPath">The path of the executable Visual Studio application.</param>
+      <param name="isLogged">Controls the logging of the package definition management operations at startup and shutdown.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Settings.ExternalSettingsManager.CreateForApplication(System.String,System.String)">
+      <summary>Used to construct the SettingsManager for AppID-based Visual Studio applications that use suffixed mode. In suffixed mode, any changes to the settings are isolated from the normal running mode.</summary>
+      <param name="applicationPath">The path of the executable Visual Studio application.</param>
+      <param name="rootSuffix">The name of the suffix.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Settings.ExternalSettingsManager.CreateForApplication(System.String,System.String,System.Boolean)">
+      <summary>Used to construct the SettingsManager for AppID-based Visual Studio applications that use suffixed mode. In suffixed mode, any changes to the settings are isolated from the normal running mode.</summary>
+      <param name="applicationPath">The path of the executable Visual Studio application.</param>
+      <param name="rootSuffix">The name of the suffix.</param>
+      <param name="isLogged">Controls the logging of the package definition management operations at startup and shutdown.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Settings.ExternalSettingsManager.CreateForIsolatedApplication(System.String,System.String,System.String)"></member>
+    <member name="M:Microsoft.VisualStudio.Settings.ExternalSettingsManager.CreateForIsolatedApplication(System.String,System.String,System.String,System.Boolean)"></member>
+    <member name="M:Microsoft.VisualStudio.Settings.ExternalSettingsManager.Dispose">
+      <summary>Releases the resources that are used by the current instance of the <see cref="T:Microsoft.VisualStudio.Settings.ExternalSettingsManager" /> class.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Settings.ExternalSettingsManager.GetApplicationDataFolder(Microsoft.VisualStudio.Settings.ApplicationDataFolder)">
+      <summary>Returns the folder that Visual Studio uses for storing various files such as cache files, backup files, and template files</summary>
+      <returns>The full path of the requested folder.</returns>
+      <param name="folder">The requested folder.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Settings.ExternalSettingsManager.GetCollectionScopes(System.String)">
+      <summary>Outputs the scopes that contain the given collection. </summary>
+      <returns>The enclosing scopes.</returns>
+      <param name="collectionPath">The path of the collection to be searched.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Settings.ExternalSettingsManager.GetCommonExtensionsSearchPaths">
+      <summary>Returns the list of folders that Visual Studio uses to install or look for machine-wide extensions.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Settings.ExternalSettingsManager.GetPropertyScopes(System.String,System.String)">
+      <summary>Outputs the scopes that contain the given property. </summary>
+      <returns>The enclosing scopes.</returns>
+      <param name="collectionPath">The path of the collection of the property.</param>
+      <param name="propertyName">The name of the property to be searched.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Settings.ExternalSettingsManager.GetReadOnlySettingsStore(Microsoft.VisualStudio.Settings.SettingsScope)">
+      <summary>Provides the <see cref="T:Microsoft.VisualStudio.Settings.SettingsStore" /> class for the requested scope which can be used for read-only operations.</summary>
+      <returns>A <see cref="T:Microsoft.VisualStudio.Settings.SettingsStore" /> instance that can be used to access the scope.</returns>
+      <param name="scope">The requested scope.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Settings.ExternalSettingsManager.GetWritableSettingsStore(Microsoft.VisualStudio.Settings.SettingsScope)">
+      <summary>Provides the <see cref="T:Microsoft.VisualStudio.Settings.WritableSettingsStore" /> class for the requested scope which can be used for reading operations and writing operations.</summary>
+      <returns>A <see cref="T:Microsoft.VisualStudio.Settings.WritableSettingsStore" /> instance that can be used to access the scope.</returns>
+      <param name="scope">The requested scope.</param>
+      <exception cref="T:System.ArgumentException">The given scope is not writable.</exception>
+    </member>
+  </members>
+</doc>

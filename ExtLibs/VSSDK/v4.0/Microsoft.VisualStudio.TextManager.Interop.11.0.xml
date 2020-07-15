@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.TextManager.Interop.11.0</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.IVsLanguageDebugInfo3">
+      <summary>Provides support for binding breakpoints in debugging for a language service.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsLanguageDebugInfo3.GetValidBreakpointLineVariance(Microsoft.VisualStudio.TextManager.Interop.IVsTextBuffer,System.Int32,System.Int32,System.Int32@)">
+      <summary>Gets the valid line variance for binding a breakpoint for a given source location.</summary>
+      <param name="pBuffer">[in] Code buffer containing the candidate breakpoint.</param>
+      <param name="iLine">[in] Line for the candidate breakpoint.</param>
+      <param name="iCol">[in] Column for the candidate breakpoint.</param>
+      <param name="piVariance">[out] Number of lines below <paramref name="iLine" /> within which to bind breakpoint. Value of -1 specifies the debugger default number of lines.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextManager3">
+      <summary>Provides additional methods for active text view information services of <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextManager" />.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextManager3.FindLanguageSIDForExtensionlessFilename(System.String,System.Guid@)">
+      <summary>Gets the CLSID of the language service for a filename without an extension.</summary>
+      <returns>Returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" /> if the method is successful; otherwise, returns an error code.</returns>
+      <param name="pszFileName">[in] The filename for which to find the language service.</param>
+      <param name="pguidLangSID">[out] The pointer to the language service.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextManager3.GetUserPreferences3(Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3[],Microsoft.VisualStudio.TextManager.Interop.FRAMEPREFERENCES2[],Microsoft.VisualStudio.TextManager.Interop.LANGPREFERENCES2[],Microsoft.VisualStudio.TextManager.Interop.FONTCOLORPREFERENCES2[])">
+      <summary>Returns the user preferences specified for the given font or language.</summary>
+      <returns>Returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" /> if the method is successful; otherwise, returns an error code.</returns>
+      <param name="pViewPrefs">[out] User preferences for the view settings.</param>
+      <param name="pFramePrefs">[out] User preferences for the frame settings.</param>
+      <param name="pLangPrefs">[in, out] User language settings preferences.</param>
+      <param name="pColorPrefs">[in, out] User color settings preferences.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextManager3.PrimeExpansionManager(System.Guid@)">
+      <summary>Asynchronously prepares the expansion manager to support the given language.</summary>
+      <returns>Returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" /> if the method is successful; otherwise, returns an error code.</returns>
+      <param name="guidLang">[in] The language to be supported.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextManager3.SetUserPreferences3(Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3[],Microsoft.VisualStudio.TextManager.Interop.FRAMEPREFERENCES2[],Microsoft.VisualStudio.TextManager.Interop.LANGPREFERENCES2[],Microsoft.VisualStudio.TextManager.Interop.FONTCOLORPREFERENCES2[])">
+      <summary>Sets the user preferences as specified.</summary>
+      <returns>Returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" /> if the method is successful; otherwise, returns an error code.</returns>
+      <param name="pViewPrefs">[in] User preferences for the view settings.</param>
+      <param name="pFramePrefs">[in] User preferences for the frame settings.</param>
+      <param name="pLangPrefs">[in] User language settings preferences.</param>
+      <param name="pColorPrefs">[in] User color settings preferences.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextManagerEvents3">
+      <summary>Informs the user about changes in the text manager.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextManagerEvents3.OnRegisterMarkerType(System.Int32)">
+      <summary>Fires when a new marker type is registered.</summary>
+      <returns>Returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" /> if the method is successful.</returns>
+      <param name="iMarkerType">[in] The new marker type.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextManagerEvents3.OnRegisterView(Microsoft.VisualStudio.TextManager.Interop.IVsTextView)">
+      <summary>Fires when a view is registered.</summary>
+      <returns>Returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" /> if the method is successful.</returns>
+      <param name="pView">[in] The registered view.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextManagerEvents3.OnReplaceAllInFilesBegin">
+      <summary>Fires when a “Replace All in Files” operation begins.</summary>
+      <returns>Returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" /> if the method is successful.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextManagerEvents3.OnReplaceAllInFilesEnd">
+      <summary>Fires when a “Replace All in Files” operation ends.</summary>
+      <returns>Returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" /> if the method is successful.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextManagerEvents3.OnUnregisterView(Microsoft.VisualStudio.TextManager.Interop.IVsTextView)">
+      <summary>Fires when a view is unregistered.</summary>
+      <returns>Returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" /> if the method is successful.</returns>
+      <param name="pView">[in] The unregistered view.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextManagerEvents3.OnUserPreferencesChanged3(Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3[],Microsoft.VisualStudio.TextManager.Interop.FRAMEPREFERENCES2[],Microsoft.VisualStudio.TextManager.Interop.LANGPREFERENCES2[],Microsoft.VisualStudio.TextManager.Interop.FONTCOLORPREFERENCES2[])">
+      <summary>Fires whenever the user’s global preferences change.</summary>
+      <returns>Returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" /> if the method is successful.</returns>
+      <param name="pViewPrefs">[in] The view settings preferences.</param>
+      <param name="pFramePrefs">[in] The frame settings preferences.</param>
+      <param name="pLangPrefs">[in] The language settings preferences.</param>
+      <param name="pColorPrefs">[in] The color settings preferences.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextView3">
+      <summary>Contains methods to manage the text view.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextView3.AddProjectionAwareCommandFilter(Microsoft.VisualStudio.OLE.Interop.IOleCommandTarget,Microsoft.VisualStudio.OLE.Interop.IOleCommandTarget@)">
+      <summary>Adds a command filter which will be called even when the view selection or caret does not map to the underlying buffer. </summary>
+      <returns>Returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" /> if the method is successful; otherwise, returns an error code.</returns>
+      <param name="pNewCmdTarg">[in] Pointer to the new command filter to add to the command filter chain.</param>
+      <param name="ppNextCmdTarg">[out] Pointer to a command filter used to handle commands not dealt with by the <paramref name="pNewCmdTarg" /> command filter.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextView3.DoesViewSupportRole(System.String,System.Int32@)">
+      <summary>Determines whether the view supports the specified role.</summary>
+      <returns>Returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" /> if the method is successful; otherwise, returns an error code.</returns>
+      <param name="pszRole">[in] The specified role.</param>
+      <param name="pbContainsRole">[out] Value is true if the specified role is supported; otherwise, false.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextView3.GetCanCaretAndSelectionMapToSurfaceBuffer(System.Int32@)">
+      <summary>Determines whether the view selection and caret can map to the underlying text buffer.</summary>
+      <returns>Returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" /> if the method is successful; otherwise, returns an error code.</returns>
+      <param name="pbCanMap">[out] Value is true if the selection and caret can map to the underlying text buffer; otherwise, false.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3">
+      <summary>Supplies settings for text views; copies and extends <see cref="T:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES2" />.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fActiveInModalState">
+      <summary>Determines whether view is active in a modal state.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fAutoDelimiterHighlight">
+      <summary>Determines whether automatic delimiter highlighting is allowed.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fClientDragDropFeedback">
+      <summary>Determines whether drag/drop feedback is enabled.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fDetectUTF8">
+      <summary>Determines whether the view should detect UTF-8 encoding.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fDragDropEditing">
+      <summary>Determines whether drag/drop editing is allowed.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fDragDropMove">
+      <summary>Determines whether drag/drop moves are allowed.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fGoToAnchorAfterEscape">
+      <summary>Determines whether the user is sent to an anchor after pressing the ESC key.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fHighlightCurrentLine">
+      <summary>Determines whether current line highlighting is enabled.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fOvertype">
+      <summary>Determines whether insert or overtype is enabled. This value is not persisted.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fReadOnly">
+      <summary>Determines whether the view is read-only.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fSelectionMargin">
+      <summary>Determines whether the selection margin is displayed.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fTrackChanges">
+      <summary>Determines whether track changes is enabled.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fUndoCaretMovements">
+      <summary>Determines whether caret movements and text selections are included in undo list.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fVisibleWhitespace">
+      <summary>Determines whether spaces and tabs are shown.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.fWidgetMargin">
+      <summary>Determines whether the widget margin is shown.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.lEditorEmulation">
+      <summary>Determines whether the view should be in the Visual Studio default mode or some editor emulation mode.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.VIEWPREFERENCES3.uCompletorSize">
+      <summary>Determines the size of the IntelliSense completor.</summary>
+    </member>
+  </members>
+</doc>

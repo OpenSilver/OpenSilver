@@ -1,0 +1,314 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.Windows.Simulator.Client</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.Windows.Simulator.Client.ICompletionRoutine">
+      <summary>Defines the completion routine for asynchronous Simulator operations.</summary>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.ICompletionRoutine.OnComplete(System.Exception)">
+      <summary>Called when the Simulator finishes an asynchronous operation.</summary>
+      <param name="error">The exception that describes any error that occurs when it processes the Simulator request or null if there was no error.<see cref="T:Microsoft.Windows.Simulator.Client.SimulatorException" /> describes any error encountered when processing the request.</param>
+    </member>
+    <member name="T:Microsoft.Windows.Simulator.Client.IProcessStartedCompletionRoutine">
+      <summary>Defines the completion routine when <see cref="M:Microsoft.Windows.Simulator.Client.ISimulator.ActivateApplicationAsync(System.String,Microsoft.Windows.Simulator.Client.IProcessStartedCompletionRoutine,System.String@)" /> or <see cref="M:Microsoft.Windows.Simulator.Client.SimulatorClient.StartProcessAsync(Microsoft.Windows.Simulator.Client.StartProcessInfo,Microsoft.Windows.Simulator.Client.IProcessStartedCompletionRoutine)" /> finishes.</summary>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.IProcessStartedCompletionRoutine.OnComplete(System.Int32,System.Exception)">
+      <summary>Called when <see cref="M:Microsoft.Windows.Simulator.Client.ISimulator.ActivateApplicationAsync(System.String,Microsoft.Windows.Simulator.Client.IProcessStartedCompletionRoutine,System.String@)" /> or <see cref="M:Microsoft.Windows.Simulator.Client.SimulatorClient.StartProcessAsync(Microsoft.Windows.Simulator.Client.StartProcessInfo,Microsoft.Windows.Simulator.Client.IProcessStartedCompletionRoutine)" /> finishes starting the requested process.</summary>
+      <param name="processId">The id of the process that was started or 0 if there was an error.</param>
+      <param name="error">The exception that describes any error that occurs when you start the Simulator or null if there was no error.<see cref="T:Microsoft.Windows.Simulator.Client.SimulatorException" /> describes any error encountered when processing the request.</param>
+    </member>
+    <member name="T:Microsoft.Windows.Simulator.Client.ISimulator">
+      <summary>Defines a Windows simulator for running, debugging, profiling, and testing AppContainer applications. There is at most one simulator per user session. Each instance of <see cref="T:Microsoft.Windows.Simulator.Client.ISimulator" /> will connect to the same running simulator.</summary>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.ISimulator.ActivateApplicationAsync(System.String,Microsoft.Windows.Simulator.Client.IProcessStartedCompletionRoutine,System.String@)">
+      <summary>Activates an AppContainer application in the Simulator.</summary>
+      <param name="appUserModelId">The AppUserModelId that describes the AppContainer application to start.</param>
+      <param name="completionRoutine">An implementation of the completion routine to be called when activation finishes.</param>
+      <param name="requestId">Returns the request id that can be used to call ActivateApplicationCancelAsync.</param>
+      <exception cref="T:Microsoft.Windows.Simulator.Client.SimulatorException">Thrown if there is any asynchronous operation already in progress. Or any other error case in the Simulator.</exception>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.ISimulator.ActivateApplicationCancelAsync(System.String)">
+      <summary>Tries to cancel activation of the given application. If successful, the completionRoutine in ActivateApplicationAsync returns with E_ABORT exception in error parameter.</summary>
+      <param name="requestId">RequestId that was returned by ActivateApplicationAsync.</param>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.ISimulator.AllowTakeForeground(System.Int32)">
+      <summary>Requests the Simulator UI application to allow the given processId to take foreground.</summary>
+      <param name="processId">Process Id that is requesting to take foreground.</param>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.ISimulator.BringSimulatorToForeground">
+      <summary>Brings the Simulator UI application to the foreground.</summary>
+    </member>
+    <member name="P:Microsoft.Windows.Simulator.Client.ISimulator.ErrorReportingSettings">
+      <summary>Gets the IErrorReportingSettings for the Simulator session. This is not cached by the Simulator. Caller is responsible for caching and releasing.</summary>
+      <returns>Returns <see cref="T:System.Object" />.</returns>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.ISimulator.GetCurrentForegroundWindow">
+      <summary>Gets current foreground window.</summary>
+      <returns>A cookie representation of window.</returns>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.ISimulator.GetRestrictedErrorInfo(System.String,System.String@,System.String@)">
+      <summary>Maps a restricted reference to the restricted description and any missing capability.</summary>
+      <param name="restrictedReference">Restricted Reference.</param>
+      <param name="restrictedDescription">Restricted Description obtained from Restricted Reference.</param>
+      <param name="capabilitySid">Represents any missing capability.</param>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.ISimulator.GetUIProcessId">
+      <summary>Returns the ProcessId of the Simulator UI application.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.Windows.Simulator.Client.ISimulator.IsStarted">
+      <summary>Gets a value indicating whether the simulator is running or not.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.ISimulator.SendRemoteAction(Microsoft.Windows.Simulator.Client.RemoteSessionActionType)">
+      <summary>Sends the specified <see cref="T:Microsoft.Windows.Simulator.Client.RemoteSessionActionType" /> to the Simulator session. Currently only RemoteActionType.StartScreen is supported.</summary>
+      <param name="remoteActionType">The type of remote action to send to the Simulator session.</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">Thrown if the value of <paramref name="remoteActionType" /> is not RemoteActionType.StartScreen.</exception>
+    </member>
+    <member name="P:Microsoft.Windows.Simulator.Client.ISimulator.SessionId">
+      <summary>Gets the id of the session hosted by the Simulator.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.ISimulator.SetCurrentForegroundWindow(System.Int32)">
+      <summary>Sets the current foreground window.</summary>
+      <param name="cookie">A cookie retrieved using GetCurrentForegroundWindow.</param>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.ISimulator.StartAsync(Microsoft.Windows.Simulator.Client.ICompletionRoutine,System.Boolean,System.Int32)">
+      <summary>Asynchronously starts and logs into the Simulator.</summary>
+      <param name="completionRoutine">An implementation of the completion routine to be called when the Start operation finishes.</param>
+      <param name="startAsMinimized">Indicate whether Simulator should be started as minimized.</param>
+      <param name="lcid">The locale to be passed into Simulator.</param>
+      <exception cref="T:Microsoft.Windows.Simulator.Client.SimulatorException">Thrown if there is any asynchronous operation already in progress. Or any other error case in the Simulator.</exception>
+      <exception cref="T:Microsoft.Windows.Simulator.Client.SimulatorCancelException">Thrown if the Start operation was canceled.</exception>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.ISimulator.StartAsyncCancel">
+      <summary>Cancels an ongoing <see cref="M:Microsoft.Windows.Simulator.Client.ISimulator.StartAsync(Microsoft.Windows.Simulator.Client.ICompletionRoutine,System.Boolean,System.Int32)" /> operation.</summary>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.ISimulator.StartProcessAsync(Microsoft.Windows.Simulator.Client.StartProcessInfo,Microsoft.Windows.Simulator.Client.IProcessStartedCompletionRoutine)">
+      <summary>Starts a process in the Simulator running as the logged in user. The process is always started directly from the executable file (not through the shell). If the process is a console application, it is run without a console window.</summary>
+      <param name="startInfo">The set of parameters that are used to start the process in the Simulator.</param>
+      <param name="completionRoutine">An implementation of the completion routine to be called when activation finishes.</param>
+      <exception cref="T:Microsoft.Windows.Simulator.Client.SimulatorException">Thrown if there is any asynchronous operation already in progress. Or any other error case in the Simulator.</exception>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.ISimulator.StopAsync(Microsoft.Windows.Simulator.Client.ICompletionRoutine)">
+      <summary>Asynchronously logs out, stops, and shuts down the Simulator.</summary>
+      <param name="completionRoutine">An implementation of the completion routine to be called when the Stop operation finishes.</param>
+      <exception cref="T:Microsoft.Windows.Simulator.Client.SimulatorException">Thrown if there is any asynchronous operation already in progress. Or any other error case in the Simulator.</exception>
+    </member>
+    <member name="T:Microsoft.Windows.Simulator.Client.ISimulatorException"></member>
+    <member name="P:Microsoft.Windows.Simulator.Client.ISimulatorException.COMHResult">
+      <summary>Returns the HResult in case if the exception wraps a COMException</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.Windows.Simulator.Client.ISimulatorException.ErrorCode">
+      <summary>Returns a custom error code (See SimulatorErrorCodes)</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="T:Microsoft.Windows.Simulator.Client.RemoteSessionActionType">
+      <summary>Specifies the types of remote actions for the Simulator session. The value of each RemoteActionType matches the values in IRemoteDesktopClientActions::RemoteActionType.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.RemoteSessionActionType.Charms">
+      <summary />
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.RemoteSessionActionType.Appbar">
+      <summary />
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.RemoteSessionActionType.Snap">
+      <summary />
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.RemoteSessionActionType.StartScreen">
+      <summary />
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.RemoteSessionActionType.AppSwitch">
+      <summary />
+    </member>
+    <member name="T:Microsoft.Windows.Simulator.Client.SimulatorCancelException">
+      <summary>This exception is reported in ICompletionRoutine when an async action has been canceled.</summary>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorCancelException.#ctor"></member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorCancelException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)"></member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorCancelException.#ctor(System.String)"></member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorCancelException.#ctor(System.String,System.Exception)"></member>
+    <member name="T:Microsoft.Windows.Simulator.Client.SimulatorClient">
+      <summary>SimulatorClient class that implements ISimulator interface. Note that most methods in this class are not re-entrant.</summary>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.#ctor"></member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.ActivateApplicationAsync(System.String,Microsoft.Windows.Simulator.Client.IProcessStartedCompletionRoutine,System.String@)">
+      <summary>Activates an immersive application in the Simulator.</summary>
+      <param name="appUserModelId">The AppUserModelId that describes the immersive application to start.</param>
+      <param name="completionRoutine">An implementation of the completion routine to be called when activation is completed.</param>
+      <param name="requestId">Returns the request id that can be used to call ActivateApplicationCancelAsync.</param>
+      <exception cref="T:Microsoft.Windows.Simulator.Client.SimulatorException">Thrown if there is any asynchronous operation already in progress. Or any other error case in the Simulator.</exception>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.ActivateApplicationCancelAsync(System.String)">
+      <summary>Tries to cancel activation of the given application. If successful, the completionRoutine in ActivateApplicationAsync returns with E_ABORT exception in error parameter.</summary>
+      <param name="requestId">RequestId that was returned by ActivateApplicationAsync.</param>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.AllowTakeForeground(System.Int32)">
+      <summary>Requests the Simulator UI application to allow the given processId to take foreground.</summary>
+      <param name="processId">Process Id that is requesting to take foreground.</param>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.BringSimulatorToForeground">
+      <summary>Brings the Simulator UI application to the foreground.</summary>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.Dispose"></member>
+    <member name="P:Microsoft.Windows.Simulator.Client.SimulatorClient.ErrorReportingSettings">
+      <summary>Gets the IErrorReportingSettings for the Simulator session. This is not cached by the Simulator. Caller is responsible for caching and releasing.</summary>
+      <returns>Returns <see cref="T:System.Object" />.</returns>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.GetCurrentForegroundWindow">
+      <summary>Gets current foreground window.</summary>
+      <returns>A cookie representation of window.</returns>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.GetRestrictedErrorInfo(System.String,System.String@,System.String@)">
+      <summary>Maps a restricted reference to the restricted description and any missing capability.</summary>
+      <param name="restrictedReference">Restricted Reference.</param>
+      <param name="restrictedDescription">Restricted Description obtained from Restricted Reference.</param>
+      <param name="capabilitySid">Represents any missing capability.</param>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.GetUIProcessId">
+      <summary>Returns the ProcessId of the Simulator UI application.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.Windows.Simulator.Client.SimulatorClient.IsStarted">
+      <summary>Gets a value indicating whether the simulator is running or not.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.SendRemoteAction(Microsoft.Windows.Simulator.Client.RemoteSessionActionType)">
+      <summary>Sends the specified <see cref="T:Microsoft.Windows.Simulator.Client.RemoteSessionActionType" /> to the Simulator session. Currently only RemoteActionType.StartScreen is supported.</summary>
+      <param name="remoteActionType">The type of remote action to send to the Simulator session.</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">Thrown if the value of <paramref name="remoteActionType" /> is not RemoteActionType.StartScreen.</exception>
+    </member>
+    <member name="P:Microsoft.Windows.Simulator.Client.SimulatorClient.SessionId">
+      <summary>Gets the id of the session hosted by the Simulator.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.SetCurrentForegroundWindow(System.Int32)">
+      <summary>Sets the current foreground window.</summary>
+      <param name="cookie">A cookie retrieved using GetCurrentForegroundWindow.</param>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.StartAsync(Microsoft.Windows.Simulator.Client.ICompletionRoutine,System.Boolean,System.Int32)">
+      <summary>Asynchronously starts and logs into the Simulator.</summary>
+      <param name="completionRoutine">An implementation of the completion routine to be called when the Start operation finishes.</param>
+      <param name="startAsMinimized">Indicate whether Simulator should be started as minimized.</param>
+      <param name="lcid">The locale to be passed into Simulator.</param>
+      <exception cref="T:Microsoft.Windows.Simulator.Client.SimulatorException">Thrown if there is any asynchronous operation already in progress. Or any other error case in the Simulator.</exception>
+      <exception cref="T:Microsoft.Windows.Simulator.Client.SimulatorCancelException">Thrown if the Start operation was canceled.</exception>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.StartAsyncCancel">
+      <summary>Cancels an ongoing <see cref="M:Microsoft.Windows.Simulator.Client.SimulatorClient.StartAsync(Microsoft.Windows.Simulator.Client.ICompletionRoutine,System.Boolean,System.Int32)" /> operation.</summary>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.StartProcessAsync(Microsoft.Windows.Simulator.Client.StartProcessInfo,Microsoft.Windows.Simulator.Client.IProcessStartedCompletionRoutine)">
+      <summary>Starts a process in the Simulator running as the logged in user. The process is always started directly from the executable file (not through the shell). If the process is a console application, it is run without a console window.</summary>
+      <param name="startInfo">The set of parameters that are used to start the process in the Simulator.</param>
+      <param name="completionRoutine">An implementation of the completion routine to be called when activation finishes.</param>
+      <exception cref="T:Microsoft.Windows.Simulator.Client.SimulatorException">Thrown if there is any asynchronous operation already in progress. Or any other error case in the Simulator.</exception>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorClient.StopAsync(Microsoft.Windows.Simulator.Client.ICompletionRoutine)">
+      <summary>Asynchronously logs out, stops, and shuts down the Simulator.</summary>
+      <param name="completionRoutine">An implementation of the completion routine to be called when the Stop operation finishes.</param>
+      <exception cref="T:Microsoft.Windows.Simulator.Client.SimulatorException">Thrown if there is any asynchronous operation already in progress. Or any other error case in the Simulator.</exception>
+    </member>
+    <member name="T:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes"></member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.AnotherUserRunningSimulator">
+      <summary>Another user on this computer is running Simulator, cannot start Simulator.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.AppContainerAppIdNull">
+      <summary>AppContainer Application Id is Null or Empty/Whitespace String</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.ApplicationNotFound">
+      <summary>Application not found</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.CanNotCallSimulatorWithoutStart">
+      <summary>You cannot call any operation on Simulator if it is not running</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.CanNotGetShellProcessId">
+      <summary>Can not get Simulator ProcessID, see inner exception for more information.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.ErrorReportingSettingsFailed">
+      <summary>Failed to obtain the ErrorReportingSettings object in remote RDP session</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.InstallationCorrupt">
+      <summary>Could not find InstallPath in registry, Simulator installation might be corrupted.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.PreviousOperationNotCompleted">
+      <summary>When Simulator is canceling previous operation or still running another operation, it cannot execute current operation</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.ProcessFileNameIsNull">
+      <summary>Process File Name is Null or Empty/Whitespace string</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.ProcessFileNotFound">
+      <summary>FileNotFound exception from remote server</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.SimulatorClosed">
+      <summary>Simulator closed or crashed.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.SimulatorRunningInDifferentSecurityContext">
+      <summary>An instance of Simulator is running under a difference security context.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.SimulatorTakingTooLong">
+      <summary>Simulator is taking too long to start</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.UnableToCreateSimulatorService">
+      <summary>Unable to create Simulator Service in remote RDP session</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.UnableToGetForegroundWindow">
+      <summary>Unable to obtain current foreground window.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.UnableToSendRemoteAction">
+      <summary>The Simulator is unable to send the requested action to the Simulator session.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.UnableToSetForegroundWindow">
+      <summary>Unable to set foreground window.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.UnableToTakeForeground">
+      <summary>Unable to take foreground while activating application.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.UnknownError">
+      <summary>Any other error not known.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.SimulatorErrorCodes.UnsupportedOS">
+      <summary>Trying to run Simulator on an unsupported operating system.</summary>
+    </member>
+    <member name="T:Microsoft.Windows.Simulator.Client.SimulatorException">
+      <summary>Represents errors that occur while you are using the simulator.</summary>
+    </member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorException.#ctor"></member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)"></member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorException.#ctor(System.String)"></member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorException.#ctor(System.String,System.Exception)"></member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorException.#ctor(System.String,System.Exception,System.Int32)"></member>
+    <member name="M:Microsoft.Windows.Simulator.Client.SimulatorException.#ctor(System.String,System.Int32)"></member>
+    <member name="P:Microsoft.Windows.Simulator.Client.SimulatorException.COMHResult">
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.Windows.Simulator.Client.SimulatorException.ErrorCode">
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="T:Microsoft.Windows.Simulator.Client.StartProcessInfo">
+      <summary>Specifies a set of values that are used to start a process in the Simulator.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.StartProcessInfo.Arguments">
+      <summary>Gets or sets the command line arguments to use when it starts the application.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.StartProcessInfo.EnvironmentVariables">
+      <summary>Gets or sets the environment variables to use when it starts the application. The environment variables are represented as a null-terminated block of null-terminated strings.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.StartProcessInfo.FileName">
+      <summary>Gets or sets the file name of the application to start.</summary>
+    </member>
+    <member name="F:Microsoft.Windows.Simulator.Client.StartProcessInfo.WorkingDirectory">
+      <summary>Gets or sets the working directory to use when it starts the application.</summary>
+    </member>
+    <member name="T:Microsoft.Windows.Simulator.Common.IShellService"></member>
+    <member name="M:Microsoft.Windows.Simulator.Common.IShellService.AllowTakeForeground(System.Int32)"></member>
+    <member name="M:Microsoft.Windows.Simulator.Common.IShellService.Client2Screen(System.Double,System.Double,System.Double@,System.Double@)"></member>
+    <member name="M:Microsoft.Windows.Simulator.Common.IShellService.Execute(System.String,System.String,System.String)"></member>
+    <member name="M:Microsoft.Windows.Simulator.Common.IShellService.GetOrientationDegrees(System.Int32@)"></member>
+    <member name="M:Microsoft.Windows.Simulator.Common.IShellService.GetProcessId(System.Int32@)"></member>
+    <member name="M:Microsoft.Windows.Simulator.Common.IShellService.SendRemoteAction(System.Int32)"></member>
+    <member name="M:Microsoft.Windows.Simulator.Common.IShellService.ShowSimulatorNormally"></member>
+  </members>
+</doc>

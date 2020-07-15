@@ -1,0 +1,409 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.TextTemplating.11.0</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.AssemblyCacheMonitor">
+      <summary>Monitors the state of the assembly cache.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.AssemblyCacheMonitor.#ctor">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TextTemplating.AssemblyCacheMonitor" /> class. </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.AssemblyCacheMonitor.GetStaleAssembliesCount(System.TimeSpan)">
+      <summary>Gets the number of assemblies in the cache that have not been used after a specific length of time. </summary>
+      <returns>The number of assemblies in the cache that have not been used for a specific length of time.</returns>
+      <param name="assemblyStaleTime">The length of time that determines whether the cache count includes a particular assembly. The count includes only those assemblies that have not been used for the specified length of time or longer.Note   The time between the last use of the cache and the present time is not counted.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor">
+      <summary>The abstract base class for a concrete directive processor.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.#ctor">
+      <summary>When overridden in a derived class, initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor" /> class. </summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.Errors">
+      <summary>Gets the errors that occurred when processing directives.</summary>
+      <returns>A <see cref="T:System.CodeDom.Compiler.CompilerErrorCollection" /> that contains the errors and warnings that occurred when processing directives.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.FinishProcessingRun">
+      <summary>When overridden in a derived class, finishes a round of directive processing.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.GetClassCodeForProcessingRun">
+      <summary>When overridden in a derived class, gets code to add to the generated transformation class. </summary>
+      <returns>A <see cref="T:System.String" /> that contains the code to add to the generated transformation class.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.GetImportsForProcessingRun">
+      <summary>When overridden in a derived class, gets namespaces to import into the generated transformation class.</summary>
+      <returns>An array of type <see cref="T:System.String" /> that contains the namespaces.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.GetPostInitializationCodeForProcessingRun">
+      <summary>When overridden in a derived class, gets code to add to the end of the initialize method of the generated transformation class. </summary>
+      <returns>A <see cref="T:System.String" /> that contains the code to add to the generated transformation class.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.GetPreInitializationCodeForProcessingRun">
+      <summary>When overridden in a derived class, gets code to add to the start of the initialize method of the generated transformation class. </summary>
+      <returns>A <see cref="T:System.String" /> that contains the code to add to the generated transformation class.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.GetReferencesForProcessingRun">
+      <summary>When overridden in a derived class, gets references to pass to the generated transformation class compiler. </summary>
+      <returns>An array of type <see cref="T:System.String" /> that contains the references.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.GetTemplateClassCustomAttributes">
+      <summary>Get any custom attributes to put on the template class.</summary>
+      <returns>A collection of custom attributes that can be null or empty.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.Initialize(Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost)">
+      <summary>When overridden in a derived class, initializes the processor instance.</summary>
+      <param name="host">The <see cref="T:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost" /> of the <see cref="T:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor" />. The <see cref="T:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor" /> can request information about the file system or the external environment from <paramref name="host" />.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.IsDirectiveSupported(System.String)">
+      <summary>When overridden in a derived class, determines whether the directive processor supports the specified directive. </summary>
+      <returns>true if the directive is supported by the processor; otherwise, false.</returns>
+      <param name="directiveName">The name of the directive.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.Microsoft#VisualStudio#TextTemplating#IDirectiveProcessor#Errors"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.Microsoft#VisualStudio#TextTemplating#IDirectiveProcessor#RequiresProcessingRunIsHostSpecific"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.Microsoft#VisualStudio#TextTemplating#IDirectiveProcessor#SetProcessingRunIsHostSpecific(System.Boolean)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.ProcessDirective(System.String,System.Collections.Generic.IDictionary{System.String,System.String})">
+      <summary>When overridden in a derived class, processes a single directive from a template file.</summary>
+      <param name="directiveName">The name of the directive to process.</param>
+      <param name="arguments">The arguments for the directive.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessor.StartProcessingRun(System.CodeDom.Compiler.CodeDomProvider,System.String,System.CodeDom.Compiler.CompilerErrorCollection)">
+      <summary>When overridden in a derived class, starts a round of directive processing.</summary>
+      <param name="languageProvider">The code generator used to create the generated transformation class.</param>
+      <param name="templateContents">The contents of the text template that is being processed.</param>
+      <param name="errors">A collection that the <see cref="directiveprocessor" /> can add errors and warnings to if necessary.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.DirectiveProcessorException">
+      <summary>The exception that is thrown by the text template transformation engine, if an error occurs while processing directives. </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessorException.#ctor">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TextTemplating.DirectiveProcessorException" /> class. </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessorException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TextTemplating.DirectiveProcessorException" /> class with serialized data, for use in remoting scenarios. </summary>
+      <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
+      <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
+      <exception cref="T:System.ArgumentNullException">The <paramref name="info" /> parameter is null. </exception>
+      <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is null or <see cref="P:System.Exception.HResult" /> is zero (0). </exception>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessorException.#ctor(System.String)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TextTemplating.DirectiveProcessorException" /> class with a specified error message. </summary>
+      <param name="message">A message that describes the error.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessorException.#ctor(System.String,System.Exception)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TextTemplating.DirectiveProcessorException" /> class with a specified error message and a reference to the inner exception that is the cause of this exception. </summary>
+      <param name="message">A message that describes the error.</param>
+      <param name="inner">The exception that is the cause of the current exception.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.EncodingHelper">
+      <summary>A utility class that gets the encoding of a file from its byte order mark.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.EncodingHelper.GetEncoding(System.String)">
+      <summary>Determines the encoding of the specified file from its byte order mark.</summary>
+      <returns>An <see cref="T:System.Text.Encoding" /> that contains the encoding information. The default is <see cref="P:System.Text.Encoding.Default" />, the current ANSI code page of the system.</returns>
+      <param name="filePath">The file to determine the encoding of.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="filePath" /> is null.</exception>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.Engine">
+      <summary>The text template transformation engine.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.Engine.#ctor">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TextTemplating.Engine" /> class. </summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.Engine.CacheAssembliesOptionString">
+      <summary>CacheAssemblies option string.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.Engine.PrepareTransformationRun(System.String,Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost,Microsoft.VisualStudio.TextTemplating.IDebugTransformationRunFactory)">
+      <summary>Prepares an IDebugTransformationRun object to run the template.</summary>
+      <param name="content">The content of the templated file.</param>
+      <param name="host">The hosting environment that uses this engine.</param>
+      <param name="runFactory">The hosting environment for the transformation run.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.Engine.PreprocessTemplate(System.String,Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost,System.String,System.String,System.String@,System.String[]@)">
+      <summary>Generates code from a template that, when it is compiled and run, will produce the template output.</summary>
+      <returns>A string that can be compiled.</returns>
+      <param name="content">The content of the template.</param>
+      <param name="host">A template host, which should implement ITextTemplatingEngineHost.</param>
+      <param name="className">The name of the class that you want the template code to have.</param>
+      <param name="classNamespace">The namespace in which you want the template code to be generated.</param>
+      <param name="language">The language of the generated code.</param>
+      <param name="references">Assemblies specified by the template or the host.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.Engine.ProcessTemplate(System.String,Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost)">
+      <summary>Transforms the contents of a text template file to produce the generated text output.</summary>
+      <returns>The generated text output of the text template file.</returns>
+      <param name="content">The contents of the text template file to be transformed.</param>
+      <param name="host">The <see cref="T:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost" /> that will host this engine.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="content" /> is null.-or-<paramref name="host" /> is null.</exception>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.Engine.TemplateFileParameterName"></member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.IRecognizeHostSpecific">
+      <summary>Directive Processors implement this method to obtain the state of the HostSpecific flag in a text template.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.IRecognizeHostSpecific.RequiresProcessingRunIsHostSpecific">
+      <summary>If true, the directive processor requires the run to be host specific.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IRecognizeHostSpecific.SetProcessingRunIsHostSpecific(System.Boolean)"></member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.ParameterDirectiveProcessor">
+      <summary>Directive processor to route simple serializable parameters from callers or the host to the template.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ParameterDirectiveProcessor.#ctor"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ParameterDirectiveProcessor.FinishProcessingRun">
+      <summary>Nothing to do as we complete our run.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ParameterDirectiveProcessor.GetClassCodeForProcessingRun">
+      <summary>Gets generated class code.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ParameterDirectiveProcessor.GetImportsForProcessingRun"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ParameterDirectiveProcessor.GetPostInitializationCodeForProcessingRun">
+      <summary>Get the code to contribute to the body of the initialize method of the generated template processing class as a consequence of the most recent run. This code will run after the base class' Initialize method</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ParameterDirectiveProcessor.GetPreInitializationCodeForProcessingRun"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ParameterDirectiveProcessor.GetReferencesForProcessingRun"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ParameterDirectiveProcessor.IsDirectiveSupported(System.String)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ParameterDirectiveProcessor.Microsoft#VisualStudio#TextTemplating#IRecognizeHostSpecific#SetProcessingRunIsHostSpecific(System.Boolean)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ParameterDirectiveProcessor.ProcessDirective(System.String,System.Collections.Generic.IDictionary{System.String,System.String})"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.ParameterDirectiveProcessor.RequiresProcessingRunIsHostSpecific">
+      <summary>This processor does not require a host-specific template.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ParameterDirectiveProcessor.StartProcessingRun(System.CodeDom.Compiler.CodeDomProvider,System.String,System.CodeDom.Compiler.CompilerErrorCollection)"></member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor">
+      <summary>The abstract base class for a directive processor that defines and implements a design pattern called requires/provides.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.#ctor">
+      <summary>When overridden in a derived class, initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor" /> class. </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.FinishProcessingRun">
+      <summary>Finishes a round of directive processing.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.FriendlyName">
+      <summary>When overridden in a derived class, gets the friendly name of the directive processor. </summary>
+      <returns>A <see cref="T:System.String" /> that contains the friendly name of the directive processor.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.GeneratePostInitializationCode(System.String,System.Text.StringBuilder,System.CodeDom.Compiler.CodeDomProvider,System.Collections.Generic.IDictionary{System.String,System.String},System.Collections.Generic.IDictionary{System.String,System.String})">
+      <summary>When overridden in a derived class, adds code to the initialization code for the generated transformation class. This code is added after the base class is initialized.</summary>
+      <param name="directiveName">The name of the directive.</param>
+      <param name="codeBuffer">The buffer that concatenates the code that all directive processors must run after the base class is initialized during a processing run. Any code that this directive processor must run for this directive after the base class is  initialized should be concatenated to this buffer.</param>
+      <param name="languageProvider">The code generator that creates the code to add to <paramref name="codeBuffer" />.</param>
+      <param name="requiresArguments">The standard parameters that the directive processor requires.</param>
+      <param name="providesArguments">The standard parameters that the directive processor provides.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.GeneratePreInitializationCode(System.String,System.Text.StringBuilder,System.CodeDom.Compiler.CodeDomProvider,System.Collections.Generic.IDictionary{System.String,System.String},System.Collections.Generic.IDictionary{System.String,System.String})">
+      <summary>When overridden in a derived class, adds code to the initialization code of the generated transformation class. This code is added before the base class is initialized.</summary>
+      <param name="directiveName">The name of the directive.</param>
+      <param name="codeBuffer">The buffer that concatenates the code that all directive processors must run before the base class is initialized during a processing run. Any code that this directive processor must run for this directive before the base class is initialized should be concatenated to this buffer.</param>
+      <param name="languageProvider">The code generator that creates the code to add to <paramref name="codebuffer" />.</param>
+      <param name="requiresArguments">The standard parameters that the directive processor requires.</param>
+      <param name="providesArguments">The standard parameters that the directive processor provides.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.GenerateTransformCode(System.String,System.Text.StringBuilder,System.CodeDom.Compiler.CodeDomProvider,System.Collections.Generic.IDictionary{System.String,System.String},System.Collections.Generic.IDictionary{System.String,System.String})">
+      <summary>When overridden in a derived class, adds code to the generated transformation class. </summary>
+      <param name="directiveName">The name of the directive.</param>
+      <param name="codeBuffer">The buffer that concatenates the code that this directive processor adds to the generated transformation class during a processing run.</param>
+      <param name="languageProvider">The code generator that creates the code to add to <paramref name="codeBuffer." /></param>
+      <param name="requiresArguments">The standard parameters that the directive processor requires.</param>
+      <param name="providesArguments">The standard parameters that the directive processor provides.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.GetClassCodeForProcessingRun">
+      <summary>Gets code to add to the generated transformation class.</summary>
+      <returns>A <see cref="T:System.String" /> that contains the code to add to the generated transformation class.</returns>
+      <exception cref="T:System.InvalidOperationException">A processing run has already started but not yet finished.</exception>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.GetImportsForProcessingRun">
+      <summary>Gets namespaces to import into the generated transformation class.</summary>
+      <returns>An array of type <see cref="T:System.String" /> that contains the namespaces.</returns>
+      <exception cref="T:System.InvalidOperationException">A processing run has already started but not yet finished.</exception>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.GetPostInitializationCodeForProcessingRun">
+      <summary>Gets code to initialize when the generated transformation class is initialized, as a consequence of the most recent processing run.</summary>
+      <returns>A <see cref="T:System.String" /> that contains the code to add to the generated transformation class.</returns>
+      <exception cref="T:System.InvalidOperationException">A processing run has already started but not yet finished.</exception>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.GetPreInitializationCodeForProcessingRun">
+      <summary>Gets code to initialize when the generated transformation class is initialized, as a consequence of the most recent processing run. </summary>
+      <returns>A <see cref="T:System.String" /> that contains the code to add to the generated transformation class.</returns>
+      <exception cref="T:System.InvalidOperationException">A processing run has already started but not yet finished.</exception>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.GetReferencesForProcessingRun">
+      <summary>Gets references to pass to the compiler of the generated transformation class.</summary>
+      <returns>An array of type <see cref="T:System.String" /> that contains the references.</returns>
+      <exception cref="T:System.InvalidOperationException">A processing run has already started but not yet finished.</exception>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.Host">
+      <summary>Gets the host that is associated with this directive processor. </summary>
+      <returns>An <see cref="T:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost" /> that is the host that is associated with this directive processor.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.Initialize(Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost)">
+      <summary>Initializes an instance of the directive processor.</summary>
+      <param name="host">The <see cref="T:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost" /> of the <see cref="T:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor" />. The <see cref="T:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor" /> can request information about the file system or the external environment from the <paramref name="host" />.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="host" /> is null.</exception>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.InitializeProvidesDictionary(System.String,System.Collections.Generic.IDictionary{System.String,System.String})">
+      <summary>When overridden in a derived class, specifies the provides parameters for each directive.</summary>
+      <param name="directiveName">The name of the directive.</param>
+      <param name="providesDictionary">An <see cref="T:System.Collections.IDictionary" /> that contains the standard parameters that this processor provides.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.InitializeRequiresDictionary(System.String,System.Collections.Generic.IDictionary{System.String,System.String})">
+      <summary>When overridden in a derived class, specifies the requires parameters for each directive.</summary>
+      <param name="directiveName">The name of the directive.</param>
+      <param name="requiresDictionary">An <see cref="T:System.Collections.IDictionary" /> that contains the standard parameters that this processor requires.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.PostProcessArguments(System.String,System.Collections.Generic.IDictionary{System.String,System.String},System.Collections.Generic.IDictionary{System.String,System.String})">
+      <summary>When overridden in a derived class, allows derived classes to make any modifications to the parameters that they provide and require.</summary>
+      <param name="directiveName">The name of the directive.</param>
+      <param name="requiresArguments">The standard parameters that the directive processor requires.</param>
+      <param name="providesArguments">The standard parameters that the directive processor provides.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.ProcessDirective(System.String,System.Collections.Generic.IDictionary{System.String,System.String})">
+      <summary>Processes a single directive from a text template file. </summary>
+      <param name="directiveName">The name of the directive to process.</param>
+      <param name="arguments">The arguments that the directive requires.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="directiveName" /> is null.-or-<paramref name="arguments" /> is null.</exception>
+      <exception cref="T:System.InvalidOperationException">A processing run has already started but not yet finished.</exception>
+      <exception cref="T:Microsoft.VisualStudio.TextTemplating.DirectiveProcessorException">The processor does not support the directive.-or-A <paramref name="requires" /> parameter cannot be resolved.</exception>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.ProvideUniqueId(System.String,System.Collections.Generic.IDictionary{System.String,System.String},System.Collections.Generic.IDictionary{System.String,System.String},System.Collections.Generic.IDictionary{System.String,System.String})">
+      <summary>Provides an ID that identifies a call to the directive processor.</summary>
+      <returns>A <see cref="T:System.String" /> that contains a unique ID for a call to the directive processor.</returns>
+      <param name="directiveName">The name of the directive.</param>
+      <param name="arguments">The arguments that were passed to the <see cref="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.ProcessDirective(System.String,System.Collections.Generic.IDictionary{System.String,System.String})" /> method that is calling this method.</param>
+      <param name="requiresArguments">The standard parameters that the directive processor requires.</param>
+      <param name="providesArguments">The standard parameters that the directive processor provides.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor.StartProcessingRun(System.CodeDom.Compiler.CodeDomProvider,System.String,System.CodeDom.Compiler.CompilerErrorCollection)">
+      <summary>Starts a directive processor.</summary>
+      <param name="languageProvider">The code generator that creates the generated transformation class.</param>
+      <param name="templateContents">The contents of the template that is being processed.</param>
+      <param name="errors">A collection to which the <see cref="T:Microsoft.VisualStudio.TextTemplating.RequiresProvidesDirectiveProcessor" /> can add errors and warnings if necessary.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="languageProvider" /> is null.</exception>
+      <exception cref="T:System.InvalidOperationException">A processing run has already started but not yet finished.</exception>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.ShadowCopyMonitor">
+      <summary>Monitors the state of shadow-copied assemblies for use by hosts.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ShadowCopyMonitor.#ctor"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.ShadowCopyMonitor.AreShadowCopiesObsolete">
+      <summary>Whether any of the shadow-copied assemblies obsolete with regard to their on-disk files.</summary>
+      <returns>Whether any assemblies are obsolete.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.TextTemplatingSession">
+      <summary>Trivial implementation of text transformation session interface</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTemplatingSession.#ctor"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTemplatingSession.#ctor(System.Guid)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTemplatingSession.Equals(Microsoft.VisualStudio.TextTemplating.ITextTemplatingSession)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTemplatingSession.Equals(System.Guid)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTemplatingSession.Equals(System.Object)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTemplatingSession.GetHashCode"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.TextTemplatingSession.Id">
+      <summary>The identity of the session</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTemplatingSession.System#Runtime#Serialization#ISerializable#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)"></member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.TextTransformation">
+      <summary>The abstract base class for all generated transformation classes. This class also provides utility methods and properties for use in text template code.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.#ctor">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TextTemplating.TextTransformation" /> class.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.ClearIndent">
+      <summary>Resets the <see cref="P:Microsoft.VisualStudio.TextTemplating.TextTransformation.CurrentIndent" /> to an empty string.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.TextTransformation.CurrentIndent">
+      <summary>Gets the current indent text, which is prefixed to each line of the generated text output.</summary>
+      <returns>A <see cref="T:System.String" /> that contains the text that is prefixed to each line of the generated text output.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.Dispose">
+      <summary>Releases all resources used by the <see cref="T:Microsoft.VisualStudio.TextTemplating.TextTransformation" />.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.Dispose(System.Boolean)">
+      <summary>Releases the unmanaged resources used by the <see cref="T:Microsoft.VisualStudio.TextTemplating.TextTransformation" /> and optionally releases the managed resources.</summary>
+      <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.Error(System.String)">
+      <summary>Creates a new error to store information about errors that occur during the text template transformation process.</summary>
+      <param name="message">A message that describes the error.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.TextTransformation.Errors">
+      <summary>Gets the error collection for the text template transformation process.</summary>
+      <returns>A <see cref="T:System.CodeDom.Compiler.CompilerErrorCollection" /> that contains the errors and warnings raised during the text template transformation process.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.Finalize">
+      <summary>Allows an <see cref="T:System.Object" /> to attempt to free resources and perform other cleanup operations before it is reclaimed by the garbage collector. Called by the garbage collector.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.TextTransformation.GenerationEnvironment">
+      <summary>Gets or sets the string that the text template transformation process is using to assemble the generated text output. </summary>
+      <returns>A <see cref="T:System.Text.StringBuilder" /> that contains the generated text transformation.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.Initialize">
+      <summary>Initializes the <see cref="T:Microsoft.VisualStudio.TextTemplating.TextTransformation" /> class.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.PopIndent">
+      <summary>Removes the most recently added text from <see cref="P:Microsoft.VisualStudio.TextTemplating.TextTransformation.CurrentIndent" />.</summary>
+      <returns>A <see cref="T:System.String" /> that contains the text most recently added to <see cref="P:Microsoft.VisualStudio.TextTemplating.TextTransformation.CurrentIndent" />. <see cref="P:Microsoft.VisualStudio.TextTemplating.TextTransformation.CurrentIndent" /> is commonly called without capturing the return value.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.PushIndent(System.String)">
+      <summary>Adds text to <see cref="P:Microsoft.VisualStudio.TextTemplating.TextTransformation.CurrentIndent" />, which is prefixed to each line of the generated text output.</summary>
+      <param name="indent">The text to add to <see cref="P:Microsoft.VisualStudio.TextTemplating.TextTransformation.CurrentIndent" />. If <see cref="P:Microsoft.VisualStudio.TextTemplating.TextTransformation.CurrentIndent" /> already contains text, <paramref name="indent" /> is appended to the existing text.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.TextTransformation.Session">
+      <summary>Gets or sets the current session. A session represents a series of transformations that are executed within the same user command. The session object can be used to transmit information into the code of a text template. </summary>
+      <returns>A dictionary that maps key strings to arbitrary objects.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.TransformText">
+      <summary>When overridden in a derived class, generates the text output of the transformation. </summary>
+      <returns>A string representing the generated text output of the text template transformation process.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.Warning(System.String)">
+      <summary>Creates a new warning to store information about errors that occur during the text template transformation process.</summary>
+      <param name="message">A message that describes the warning.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.Write(System.String)">
+      <summary>Appends a copy of the specified string to the generated text output.</summary>
+      <param name="textToAppend">The string to append.</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">Enlarging the value of the underlying <see cref="T:System.Text.StringBuilder" /> would exceed <see cref="P:System.Text.StringBuilder.MaxCapacity" />. </exception>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.Write(System.String,System.Object[])">
+      <summary>Appends a formatted string, which contains zero or more format specifications, to the generated text output. Each format specification is replaced by the string representation of a corresponding object argument.</summary>
+      <param name="format">A string that contains zero or more format specifications.</param>
+      <param name="args">An array of objects to format.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="format" /> is null.-or-<paramref name="args" /> is null.</exception>
+      <exception cref="T:System.FormatException">
+        <paramref name="format" /> is invalid. </exception>
+      <exception cref="T:System.ArgumentOutOfRangeException">Enlarging the value of the underlying <see cref="T:System.Text.StringBuilder" /> would exceed <see cref="P:System.Text.StringBuilder.MaxCapacity" />. </exception>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.WriteLine(System.String)">
+      <summary>Appends a copy of the specified string and the default line terminator to the generated text output.</summary>
+      <param name="textToAppend">The string to write.</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">Enlarging the value of the underlying <see cref="T:System.Text.StringBuilder" /> would exceed <see cref="P:System.Text.StringBuilder.MaxCapacity" />. </exception>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TextTransformation.WriteLine(System.String,System.Object[])">
+      <summary>Appends a formatted string, which contains zero or more format specifications, and the default line terminator, to the generated text output. Each format specification is replaced by the string representation of a corresponding object argument.</summary>
+      <param name="format">A string that contains zero or more format specifications.</param>
+      <param name="args">An array of objects to format.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="format" /> is null.-or-<paramref name="args" /> is null. </exception>
+      <exception cref="T:System.FormatException">
+        <paramref name="format" /> is invalid. </exception>
+      <exception cref="T:System.ArgumentOutOfRangeException">Enlarging the value of the underlying <see cref="T:System.Text.StringBuilder" /> would exceed <see cref="P:System.Text.StringBuilder.MaxCapacity" />. </exception>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.ToStringHelper">
+      <summary>A utility class that is used to produce a culture-specific representation of an <see cref="T:System.Object" /> as a <see cref="T:System.String" />.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.ToStringHelper.FormatProvider">
+      <summary>Gets or sets the culture-specific formatting information that is used when calling <see cref="M:Microsoft.VisualStudio.TextTemplating.ToStringHelper.ToStringWithCulture(System.Object)" />.</summary>
+      <returns>An <see cref="T:System.IFormatProvider" /> that contains the culture-specific formatting information. The default is <see cref="P:System.Globalization.CultureInfo.InvariantCulture" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ToStringHelper.ToStringWithCulture(System.Object)">
+      <summary>Returns a <see cref="T:System.String" /> that represents the specified <see cref="T:System.Object" />.</summary>
+      <returns>A <see cref="T:System.String" /> that represents the specified <see cref="T:System.Object" />.</returns>
+    </member>
+  </members>
+</doc>

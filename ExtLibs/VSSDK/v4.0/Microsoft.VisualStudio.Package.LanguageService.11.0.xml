@@ -1,0 +1,914 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.Package.LanguageService.11.0</name>
+  </assembly>
+  <members>
+    <member name="M:Microsoft.VisualStudio.Package.AuthoringSink.AddHiddenRegion(Microsoft.VisualStudio.TextManager.Interop.TextSpan,System.String)"></member>
+    <member name="T:Microsoft.VisualStudio.Package.Colorizer">
+      <summary>This class implements the <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsColorizer" /> interface and is used to support syntax highlighting in an editor.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Colorizer.#ctor(Microsoft.VisualStudio.Package.LanguageService,Microsoft.VisualStudio.TextManager.Interop.IVsTextLines,Microsoft.VisualStudio.Package.IScanner)">
+      <summary>Initializes the <see cref="T:Microsoft.VisualStudio.Package.Colorizer" /> class.</summary>
+      <param name="svc">[in] The language service.</param>
+      <param name="buffer">[in] The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextLines" /> object that serves as the buffer for the colorizer.</param>
+      <param name="scanner">[in] The <see cref="T:Microsoft.VisualStudio.Package.IScanner" /> object that handles all parsing operations associated with syntax highlighting.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Colorizer.CloseColorizer">
+      <summary>Called when the colorizer is disposed of.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Colorizer.ColorizeLine(System.Int32,System.Int32,System.IntPtr,System.Int32,System.UInt32[])">
+      <summary>Obtains color and font attribute information for each character in the specified line of text.</summary>
+      <returns>Returns the updated state value.</returns>
+      <param name="line">[in] The line number from which the line of text came from.</param>
+      <param name="length">[in] The number of characters in the given text.</param>
+      <param name="ptr">[in] An unmarshaled pointer to a line of text.</param>
+      <param name="state">[in] The current state as maintained by the parser.</param>
+      <param name="attrs">[in, out] An array that is filled in with indices into the <see cref="M:Microsoft.VisualStudio.Package.LanguageService.GetColorableItem(System.Int32,Microsoft.VisualStudio.TextManager.Interop.IVsColorableItem@)" /> list as maintained by the <see cref="T:Microsoft.VisualStudio.Package.LanguageService" /> class.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Colorizer.Dispose">
+      <summary>Disposes the object.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Colorizer.Finalize">
+      <summary>Called when the object is about to be destroyed.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Colorizer.GetColorInfo(System.String,System.Int32,System.Int32)">
+      <summary>Returns the parsing state at the end of the line without returning any colorization information.</summary>
+      <returns>Returns the parsing state at the end of the line.</returns>
+      <param name="line">[in] The text of the line.</param>
+      <param name="length">[in] The length of the line.</param>
+      <param name="state">[in] The initial parsing state of the line.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Colorizer.GetLineInfo(Microsoft.VisualStudio.TextManager.Interop.IVsTextLines,System.Int32,Microsoft.VisualStudio.TextManager.Interop.IVsTextColorState)">
+      <summary>Returns color information about the specified line.</summary>
+      <returns>If successful, returns an array of <see cref="T:Microsoft.VisualStudio.Package.TokenInfo" /> objects describing each token on the line; otherwise, returns a null value.</returns>
+      <param name="buffer">[in] An <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextLines" /> object containing the entire source file.</param>
+      <param name="line">[in] The index of the line for which to get color information.</param>
+      <param name="colorState">[in] An <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextColorState" /> object from which cached state information can be obtained for a line.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Colorizer.GetStartState(System.Int32@)">
+      <summary>Returns the initial parsing state.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="start">[out] Returns the initial parsing state.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Colorizer.GetStateAtEndOfLine(System.Int32,System.Int32,System.IntPtr,System.Int32)">
+      <summary>Returns the parsing state at the end of the specified line.</summary>
+      <returns>Returns the parsing state at the end of the line.</returns>
+      <param name="line">[in] The line number from where the text came from.</param>
+      <param name="length">[in] The length of the text to examine.</param>
+      <param name="ptr">[in] An unmarshaled pointer to the text. The example in <see cref="M:Microsoft.VisualStudio.Package.Colorizer.ColorizeLine(System.Int32,System.Int32,System.IntPtr,System.Int32,System.UInt32[])" /> shows how to marshal this pointer to a string.</param>
+      <param name="state">[in] The parsing state at the beginning of the line.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Colorizer.GetStateMaintenanceFlag(System.Int32@)">
+      <summary>Called to determine if the colorizer requires per line state management.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="flag">[out] Returns nonzero if the colorizer requires parsing state to be tracked per line; otherwise, returns zero.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Colorizer.Resume">
+      <summary>Called to resume use of the colorizer.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.Colorizer.Scanner">
+      <summary>Returns the scanner being used.</summary>
+      <returns>Returns an <see cref="T:Microsoft.VisualStudio.Package.IScanner" /> object.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Colorizer.Suspend">
+      <summary>Called to suspend use of the colorizer.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Package.CompletionSet">
+      <summary>Represents an IntelliSense completion list that is displayed in the current text view.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.#ctor(System.Windows.Forms.ImageList,Microsoft.VisualStudio.Package.Source)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.Package.CompletionSet" /> class.</summary>
+      <param name="imageList">[in] An <see cref="T:System.Windows.Forms.ImageList" /> object containing the images to be used in the completion list display. This cannot be null. It can however, be an empty list..</param>
+      <param name="source">[in] A <see cref="T:Microsoft.VisualStudio.Package.Source" /> object representing the source file to be affected by the completion list. This cannot be null.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.Close">
+      <summary>Closes the completion list display.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.CompareItems(System.String,System.String,System.Int32,System.Int32@)">
+      <summary>Compares two strings for the specified number of characters.</summary>
+      <returns>If the method is successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code (in which case the default comparison is used).</returns>
+      <param name="bstrSoFar">The first string to compare.</param>
+      <param name="bstrOther">The second string to compare.</param>
+      <param name="lCharactersToCompare">The number of characters to compare.</param>
+      <param name="plResult">[out] The result of the comparison.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.CompletionSet.Declarations">
+      <summary>Gets or sets the <see cref="T:Microsoft.VisualStudio.Package.Declarations" /> object this completion set uses.</summary>
+      <returns>
+        <see cref="T:Microsoft.VisualStudio.Package.Declarations" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.DecreaseFilterLevel(System.Int32)">
+      <summary>Changes the level of the internal filter list and updates it, showing common items.</summary>
+      <returns>If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />. If it fails, it returns an error code.</returns>
+      <param name="iSelectedItem">The index of the item that is currently selected.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.Dismiss">
+      <summary>Called when the completion list is no longer needed.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.Dispose">
+      <summary>Deallocates any resources just before the <see cref="T:Microsoft.VisualStudio.Package.CompletionSet" /> object is destroyed.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.GetBestMatch(System.String,System.Int32,System.Int32@,System.UInt32@)">
+      <summary>Determines which item in the list is the best match for the text typed so far by the user.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="textSoFar">[in] The text that has been typed by the user.</param>
+      <param name="length">[in] The length of the text typed by the user.</param>
+      <param name="index">[out] Returns the index of the item in the <see cref="T:Microsoft.VisualStudio.Package.Declarations" /> object that best matches the typed text.</param>
+      <param name="flags">[out] Returns a set of flags from the <see cref="T:Microsoft.VisualStudio.TextManager.Interop.UpdateCompletionFlags" /> enumeration.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.GetCompletionItemColor(System.Int32,System.UInt32@,System.UInt32@)">
+      <summary>Gets the foreground and background colors for a selected item. </summary>
+      <returns>If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" /> if there are colors set, S_FALSE if the defaults are used. If it fails, it returns an error code.</returns>
+      <param name="iIndex">The index of the item for which to get the colors.</param>
+      <param name="dwFGColor">[out] Returns the foreground color.</param>
+      <param name="dwBGColor">[out] Returns the background color.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.GetCount">
+      <summary>Gets the number of items that can be displayed in the completion list.</summary>
+      <returns>The number of items to be displayed.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.GetDescriptionText(System.Int32,System.String@)">
+      <summary>Gets a description for the specified item in the completion list.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error.</returns>
+      <param name="index">[in] The index of the item for which to get a description.</param>
+      <param name="description">[out] Returns the description, or null if there is no description.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.GetDisplayText(System.Int32,System.String@,System.Int32[])">
+      <summary>Gets the text and image index to display in the completion list for the specified item.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="index">[in] The index of the item for which to get the display text and image.</param>
+      <param name="text">[out] Returns the display text, or null if there is no display text.</param>
+      <param name="glyph">[in, out] Returns the index of the image to display, or -1 if no image is to be displayed. This parameter can be null, indicating the caller does not want the image index.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.GetFilterLevel(System.Int32@)">
+      <summary>Gets the current filter level.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />. If there is no filter, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_FALSE" />; otherwise, returns an error code.</returns>
+      <param name="iFilterLevel">[out] Returns the filter level.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.GetFlags">
+      <summary>Gets a set of flags specifying the behavior of the completion list.</summary>
+      <returns>A set of flags from the <see cref="T:Microsoft.VisualStudio.TextManager.Interop.UpdateCompletionFlags" /> enumeration; specifically, from the CSF_* group.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.GetImageList(System.IntPtr@)">
+      <summary>Returns the image list to use for the glyphs in the completion list.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="phImages">[out] Returns the handle to an image list.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.GetInitialExtent(System.Int32@,System.Int32@,System.Int32@)">
+      <summary>Gets the initial extent of the text to be completed.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="line">[out] Returns the line number the text is on.</param>
+      <param name="startIdx">[out] Returns the character offset of the first character of the text.</param>
+      <param name="endIdx">[out] Returns the character offset of the last character of the text.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.IncreaseFilterLevel(System.Int32)">
+      <summary>Show in the completion list the members of the specified type. </summary>
+      <returns>If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />. If it fails, it returns an error code.</returns>
+      <param name="iSelectedItem">The index of the selected item.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.Init(Microsoft.VisualStudio.TextManager.Interop.IVsTextView,Microsoft.VisualStudio.Package.Declarations,System.Boolean)">
+      <summary>Initializes the completion set object.</summary>
+      <param name="textView">[in] An <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextView" /> object representing the view that displays the source file.</param>
+      <param name="declarations">[in] A <see cref="T:Microsoft.VisualStudio.Package.Declarations" /> object that manages the list of declarations to show in the completion list.</param>
+      <param name="completeWord">[in] true if part of a word is to be completed, otherwise false (the user selected Complete Word from the IntelliSense menu with the caret not positioned immediately after any text. This displays all possible completions).</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.CompletionSet.IsCommitted">
+      <summary>Gets whether any text has been committed to the source file.</summary>
+      <returns>true if text has been committed to the source file, otherwise false.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.CompletionSet.IsDisplayed">
+      <summary>Gets whether the completion list is currently displayed.</summary>
+      <returns>Set to true if the completion list is displayed, otherwise false.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.OnAutoComplete">
+      <summary>Called after completion text has been committed to the source file.</summary>
+      <returns>A character to be inserted after the committed text, or 0 if no character is to be inserted.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.OnCommit(System.String,System.Int32,System.Int32,System.UInt16,System.String@)">
+      <summary>Gets the text to be inserted into the source file if the specified character is a commit character.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />. If the <paramref name="commitChar" /> parameter is not a commit character, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_FALSE" /> (do not commit the text to the source file); otherwise, returns an error code.</returns>
+      <param name="textSoFar">[in] A string containing the text that has been typed so far by the user.</param>
+      <param name="index">[in] The index of the item in the completion list that is currently selected.</param>
+      <param name="selected">[in] Nonzero if an item is selected in the completion list (the index of the selected item is in the <paramref name="index" /> parameter). If this parameter is zero, the <paramref name="index" /> parameter is to be ignored.</param>
+      <param name="commitChar">[in] The typed character that triggered the completion list.</param>
+      <param name="completeWord">[out] Returns the string to insert in the source.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.CompletionSet.OnCommitComplete">
+      <summary>Called after the text has been committed.</summary>
+      <returns>
+        <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />. </returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.CompletionSet.OnCommitText">
+      <summary>Gets the text that is to be committed to the source file.</summary>
+      <returns>The text if there is anything to commit, otherwise null.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Package.Completor">
+      <summary>Wraps and applies multiple changes to a text view as a single operation.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Completor.#ctor(Microsoft.VisualStudio.Package.LanguageService,Microsoft.VisualStudio.TextManager.Interop.IVsTextView,System.String)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.Package.Completor" /> class.</summary>
+      <param name="langsvc">[in] A <see cref="T:Microsoft.VisualStudio.Package.LanguageService" /> object.</param>
+      <param name="view">[in] An <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextView" /> representing the view currently being edited.</param>
+      <param name="description">[in] A string used to describe the pending edit operation.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Completor.Apply">
+      <summary>Applies all changes made through the <see cref="T:Microsoft.VisualStudio.Package.Completor" /> object.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.Completor.AtEndOfLine">
+      <summary>Determines if the internal caret position is at the end of the current line.</summary>
+      <returns>If the internal caret position is at the end of the line, returns true; otherwise, returns false.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Completor.Dispose">
+      <summary>Cleans up any allocations made just before the object is destroyed.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.Completor.IsExpansionActive">
+      <summary>Determines if a code snippet is being edited.</summary>
+      <returns>If a code snippet is being edited, returns true; otherwise, returns false.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Completor.RefreshLine">
+      <summary>Obtains the current line of text from the <see cref="T:Microsoft.VisualStudio.Package.Source" /> object.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Completor.TypeBackspace(System.Int32)">
+      <summary>Performs the specified number of backspaces on the line being edited and updates the internal caret position.</summary>
+      <param name="len">[in] The number of backspaces to perform.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Completor.TypeChar(System.Char)">
+      <summary>Inserts the specified character and updates the internal caret position.</summary>
+      <param name="ch">[in] The character to insert.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Completor.TypeChars(System.String)">
+      <summary>Inserts the specified string of characters and updates internal caret position.</summary>
+      <param name="s">[in] A string containing the characters to insert.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Completor.TypeDelete(System.Int32)">
+      <summary>Performs the specified number of delete operations on the line being edited.</summary>
+      <param name="len">[in] The number of delete operations to perform.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Completor.TypeLeft(System.Int32)">
+      <summary>Moves the internal caret position the specified number of positions to the left.</summary>
+      <param name="len">[in] The number of positions to move to the left.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Completor.TypeRight(System.Int32)">
+      <summary>Moves the internal caret position the specified number of positions to the right.</summary>
+      <param name="len">[in] The number of positions to move to the right.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Package.DefaultFieldValue">
+      <summary>Associates a default value with a field name as defined in a code snippet template for a language service.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DefaultFieldValue.#ctor(System.String,System.String)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.Package.DefaultFieldValue" /> class.</summary>
+      <param name="field">[in] A string containing the name of the field.</param>
+      <param name="value">[in] A string containing the value of the field.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.DefaultFieldValue.Field">
+      <summary>Returns the name of the field.</summary>
+      <returns>Returns the name that was passed to the <see cref="T:Microsoft.VisualStudio.Package.DefaultFieldValue" /> class constructor.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.DefaultFieldValue.Value">
+      <summary>Returns the value of the field.</summary>
+      <returns>Returns the value that was passed to the <see cref="T:Microsoft.VisualStudio.Package.DefaultFieldValue" /> class constructor.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Package.DocumentTask">
+      <summary>Represents an item for a language service in the Error List Options window.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DocumentTask.#ctor(System.IServiceProvider,Microsoft.VisualStudio.TextManager.Interop.IVsTextLines,Microsoft.VisualStudio.TextManager.Interop.MARKERTYPE,Microsoft.VisualStudio.TextManager.Interop.TextSpan,System.String)">
+      <summary>Initializes a new instance of <see cref="T:Microsoft.VisualStudio.Package.DocumentTask" /> for the specified text buffer, text span, and file name.</summary>
+      <param name="site">The <see cref="T:System.IServiceProvider" />.</param>
+      <param name="buffer">The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextLines" /> text buffer.</param>
+      <param name="markerType">The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.MARKERTYPE" /> of the marker.</param>
+      <param name="span">The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> of the buffer.</param>
+      <param name="fileName">The name of the file in which the text is found.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DocumentTask.Dispose">
+      <summary>Recovers resources just before the <see cref="T:Microsoft.VisualStudio.Package.DocumentTask" /> object is destroyed.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DocumentTask.Dispose(System.Boolean)">
+      <summary>Recovers resources just before the <see cref="T:Microsoft.VisualStudio.Package.DocumentTask" /> object is destroyed.</summary>
+      <param name="disposing">true if disposing the object just before destruction; otherwise, false.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DocumentTask.ExecMarkerCommand(Microsoft.VisualStudio.TextManager.Interop.IVsTextMarker,System.Int32)">
+      <summary>Executes a command on a specific marker in the text buffer.</summary>
+      <returns>When this method is implemented in derived classes, if it succeeds, it returns <see cref="F:Microsoft.VisualStudio.NativeMethods.S_OK" />. If it fails, it returns an error code.</returns>
+      <param name="marker">The marker on which to execute the command.</param>
+      <param name="item">The ID of the command to execute. The values should be taken from <see cref="T:Microsoft.VisualStudio.TextManager.Interop.MarkerCommandValues" />.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DocumentTask.Finalize">
+      <summary>Recovers resources just before the <see cref="T:Microsoft.VisualStudio.Package.DocumentTask" /> object is destroyed.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DocumentTask.GetMarkerCommandInfo(Microsoft.VisualStudio.TextManager.Interop.IVsTextMarker,System.Int32,System.String[],System.UInt32[])">
+      <summary>Queries the marker for the command information.</summary>
+      <returns>When this method is implemented by derived classes, if it succeeds, it returns <see cref="F:Microsoft.VisualStudio.NativeMethods.S_OK" />. If it fails, it returns an error code.</returns>
+      <param name="marker">The marker to query.</param>
+      <param name="item">The ID of the command to execute. The values should be taken from <see cref="T:Microsoft.VisualStudio.TextManager.Interop.MarkerCommandValues" />.</param>
+      <param name="text">The text of the marker command in the context menu.</param>
+      <param name="commandFlags">[out] the command flags.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DocumentTask.GetTipText(Microsoft.VisualStudio.TextManager.Interop.IVsTextMarker,System.String[])">
+      <summary>Gets the tip text for the text marker that is displayed when the mouse hovers over the marker. </summary>
+      <returns>The text of this task.</returns>
+      <param name="marker">The marker for which to get the text.</param>
+      <param name="tipText">The text to display.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.DocumentTask.IsMarkerValid">
+      <summary>Gets whether the marker has been set to invalid.</summary>
+      <returns>Set to true if the marker has not been set to invalid; otherwise, false.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DocumentTask.MarkerInvalidated">
+      <summary>Called when the text that is associated with a marker is deleted by a user action. </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DocumentTask.OnAfterMarkerChange(Microsoft.VisualStudio.TextManager.Interop.IVsTextMarker)">
+      <summary>Signals that the marker position has changed. </summary>
+      <returns>When this method is implemented by derived classes, if it succeeds, it returns <see cref="F:Microsoft.VisualStudio.NativeMethods.S_OK" />. If it fails, it returns an error code.</returns>
+      <param name="marker">The marker that has changed.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DocumentTask.OnAfterSpanReload">
+      <summary>Signals that the text under the marker has been altered but the marker has not been deleted. </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DocumentTask.OnBeforeBufferClose">
+      <summary>Sends notification that the text buffer is about to close. </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DocumentTask.OnBufferSave(System.String)">
+      <summary>Called when the buffer has been saved.</summary>
+      <param name="fileName">The name of the file that was saved.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DocumentTask.OnNavigate(System.EventArgs)">
+      <summary>Loads the document that is associated with the error and jumps to the location of the error.</summary>
+      <param name="e">[in] An <see cref="T:System.EventArgs" /> object (which in this case does not contain any information and is used only as a placeholder in a delegate object).</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.DocumentTask.OnRemoved(System.EventArgs)">
+      <summary>Called when this <see cref="T:Microsoft.VisualStudio.Package.DocumentTask" /> object is removed from the Error List Options window.</summary>
+      <param name="e">[in] An <see cref="T:System.EventArgs" /> object (which in this case does not contain any information and is used only as a placeholder in a delegate object).</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.DocumentTask.Site">
+      <summary>Gets the service provider.</summary>
+      <returns>The <see cref="T:System.IServiceProvider" /> object that was passed to the <see cref="T:Microsoft.VisualStudio.Package.DocumentTask" /> class constructor.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.DocumentTask.Span">
+      <summary>Gets the span where the error occurred.</summary>
+      <returns>A <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object from the <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextLineMarker" /> object that was passed to the <see cref="T:Microsoft.VisualStudio.Package.DocumentTask" /> class constructor, if it is non-null. Otherwise, the <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object that was passed to the <see cref="T:Microsoft.VisualStudio.Package.DocumentTask" /> class constructor.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.DocumentTask.TextLineMarker">
+      <summary>Returns the text line marker object that describes the location of the error.</summary>
+      <returns>The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextLineMarker" /> object that was passed to the <see cref="T:Microsoft.VisualStudio.Package.DocumentTask" /> class constructor.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Package.FilePathUtilities">
+      <summary>Static utilities for getting and setting file paths.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.FilePathUtilities.#ctor">
+      <summary>Initializes a new instance of <see cref="T:Microsoft.VisualStudio.Package.FilePathUtilities" />.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.FilePathUtilities.GetFileExtension(System.String)">
+      <summary>Gets the file extension from a given file path.</summary>
+      <returns>The extension (lower case, preceded by ".").</returns>
+      <param name="moniker">The file path.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.FilePathUtilities.GetFilePath(Microsoft.VisualStudio.TextManager.Interop.IVsTextLines)">
+      <summary>Gets the file path from an <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextLines" /> buffer.</summary>
+      <returns>The file path.</returns>
+      <param name="textLines">The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextLines" /> buffer.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.FilePathUtilities.GetFilePath(System.IntPtr)">
+      <summary>Get file path for an object that implements <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsUserData" />.</summary>
+      <returns>The file path.</returns>
+      <param name="unknown">A pointer to the IUnknown interface of the file path.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Package.Methods">
+      <summary>Represents a collection of method signatures obtained from a parsing operation in a language service.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Methods.#ctor">
+      <summary>When implemented in a derived class, initializes a new instance of the <see cref="T:Microsoft.VisualStudio.Package.Methods" /> class.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.Methods.CloseBracket">
+      <summary>Gets the character to use at the end of a method parameter list.</summary>
+      <returns>The character to use at the end of a parameter list.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.Methods.DefaultMethod">
+      <summary>Gets the index of the initial method signature to show.</summary>
+      <returns>The index of the first method signature to show the user when the IntelliSense method tip is displayed.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.Methods.Delimiter">
+      <summary>Gets the character that separates parameters in a method's parameter list.</summary>
+      <returns>The parameter list separator.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Methods.GetCount">
+      <summary>When implemented in a derived class, gets the number of overloaded method signatures represented in this collection.</summary>
+      <returns>The number of signatures in the collection.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Methods.GetDescription(System.Int32)">
+      <summary>When implemented in a derived class, gets the description of the specified method signature.</summary>
+      <returns>The description of the specified method signature, or null if the method signature does not exist.</returns>
+      <param name="index">[in] An index into the internal list to the desired method signature.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Methods.GetName(System.Int32)">
+      <summary>When implemented in a derived class, gets the name of the specified method signature.</summary>
+      <returns>The name of the specified method, or null.</returns>
+      <param name="index">[in] The index of the method whose name is to be returned.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Methods.GetParameterCount(System.Int32)">
+      <summary>When implemented in a derived class, gets the number of parameters on the specified method signature.</summary>
+      <returns>The number of parameters on the specified method signature, or -1.</returns>
+      <param name="index">[in] An index into the list of method signatures.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Methods.GetParameterInfo(System.Int32,System.Int32,System.String@,System.String@,System.String@)">
+      <summary>When implemented in a derived class, gets information about the specified parameter on the specified method signature.</summary>
+      <param name="index">[in] An index into the list of method signatures.</param>
+      <param name="parameter">[in] An index into the parameter list of the specified method signature.</param>
+      <param name="name">[out] Returns the name of the parameter.</param>
+      <param name="display">[out] Returns the parameter name and type formatted for display.</param>
+      <param name="description">[out] Returns a string containing a description of the parameter.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.Methods.GetType(System.Int32)">
+      <summary>When implemented in a derived class, gets the return type of the specified method signature.</summary>
+      <returns>The return type of the specified method signature, or null.</returns>
+      <param name="index">[in] An index into the list of method signatures.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.Methods.OpenBracket">
+      <summary>Gets the character to use at the start of a method's parameter list.</summary>
+      <returns>The character to use at the start of a parameter list.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.Methods.TypePostfix">
+      <summary>Gets the string to place after the return type of a method.</summary>
+      <returns>The string to use after a method's type.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.Methods.TypePrefix">
+      <summary>Gets the string to place before the return type of a method.</summary>
+      <returns>The string to place before a method's return type.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Package.Methods.TypePrefixed">
+      <summary>Gets whether a method's return type comes before or after the method signature.</summary>
+      <returns>true if the type precedes the method's signature, false if the type follows the method's signature.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Package.ParseReason">
+      <summary>Provides reasons for a parsing operation in a language service.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.ParseReason.None">
+      <summary>A placeholder value indicating that no parsing should be done.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.ParseReason.MemberSelect">
+      <summary>Parse the separator character before the current location to obtain a list of members for the class.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.ParseReason.HighlightBraces">
+      <summary>Parse to find the matching language pairs (such as "{" and "}" or "&lt;" and "&gt;") that enclose the given location so they and their contents can be highlighted.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.ParseReason.MemberSelectAndHighlightBraces">
+      <summary>Parse the character at the current location to complete a member selection and to highlight the matching pair to the parsed character (such as a ")" after a method name).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.ParseReason.MatchBraces">
+      <summary>Parse the language pair at the given location to finds its match.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.ParseReason.Check">
+      <summary>Parse the entire source file, checking for errors. This pass should also create lists of matching language pairs, triplets, members, and methods.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.ParseReason.CompleteWord">
+      <summary>Parse to get the partially completed word before the current position in order to show a list of possible completions (members, arguments, methods).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.ParseReason.DisplayMemberList">
+      <summary>Parse the separator and the possible name before it, to obtain a list of members to be shown in a member completion list.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.ParseReason.QuickInfo">
+      <summary>Parse the identifier or selection at the given location to obtain type information to be shown in an IntelliSense quick info tool tip.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.ParseReason.MethodTip">
+      <summary>Parse the method name before the current position to produce a list of all overloaded method signatures that match the method name.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.ParseReason.Autos">
+      <summary>Parse the code block at the given location to obtain any expressions that might be of interest in the Autos debugging window (an expression is the name of variable or parameter that can be evaluated to produce a value).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.ParseReason.CodeSpan">
+      <summary>Parse the section of code containing the specified location to find the extent of the statement. Used in validating breakpoints.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.ParseReason.Goto">
+      <summary>Parse the identifier or expression at the specified location to obtain a possible URI of a file where the identifier is defined, declared, or referenced.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Package.ParseResultHandler">
+      <summary>Used to define a delegate for a parsing operation completion handler in a language service.</summary>
+      <param name="request">[in] A <see cref="T:Microsoft.VisualStudio.Package.ParseRequest" /> object that describes what the parsing operation did.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Package.TextSpanHelper">
+      <summary>A utility class that provides methods for manipulating and comparing instances of the <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> class, and also for validating positions.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.Clear(Microsoft.VisualStudio.TextManager.Interop.TextSpan@)">
+      <summary>Sets the members of the specified span to an empty state.</summary>
+      <param name="span">[in] The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object to clear.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.ContainsExclusive(Microsoft.VisualStudio.TextManager.Interop.TextSpan,System.Int32,System.Int32)">
+      <summary>Determines whether the given position is contained in the given span, not including the start and end points.</summary>
+      <returns>Returns true if the given position is greater than the start of the span and less than the end of the span. Returns false if the position is exactly equal to the start or end of the span or the position is outside the span.</returns>
+      <param name="span">[in] The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object that is being tested against.</param>
+      <param name="line">[in] The line index of the position to test.</param>
+      <param name="col">[in] The column index of the position to test.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.ContainsInclusive(Microsoft.VisualStudio.TextManager.Interop.TextSpan,System.Int32,System.Int32)">
+      <summary>Determines whether the given position is in the span, including the start and end points.</summary>
+      <returns>Returns true if the given position is greater than or equal to the start of the span and less than or equal to the end of the span. Returns false if the given position is entirely outside the span.</returns>
+      <param name="span">[in] The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object that is being tested against.</param>
+      <param name="line">[in] The line index of the position to test.</param>
+      <param name="col">[in] The column index of the position to test.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.EndsAfterEndOf(Microsoft.VisualStudio.TextManager.Interop.TextSpan,Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Determines whether the first span ends after the end of the second span.</summary>
+      <returns>Returns true if the end of <paramref name="span1" /> is greater than the end of <paramref name="span2" />; otherwise, returns false.</returns>
+      <param name="span1">[in] The first <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+      <param name="span2">[in] The second <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.EndsAfterStartOf(Microsoft.VisualStudio.TextManager.Interop.TextSpan,Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Determines whether the first span ends after the start of the second span.</summary>
+      <returns>Returns true if the end of <paramref name="span1" /> is greater than the start of <paramref name="span2" />; otherwise, returns false.</returns>
+      <param name="span1">[in] The first <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+      <param name="span2">[in] The second <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.EndsBeforeEndOf(Microsoft.VisualStudio.TextManager.Interop.TextSpan,Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Determines whether the first span ends before the end of the second span.</summary>
+      <returns>Returns true if the end of <paramref name="span1" /> is less than or equal to the end of <paramref name="span2" />; otherwise, returns false.</returns>
+      <param name="span1">[in] The first <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+      <param name="span2">[in] The second <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.EndsBeforeStartOf(Microsoft.VisualStudio.TextManager.Interop.TextSpan,Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Determines whether the first span ends before the start of the second span.</summary>
+      <returns>Returns true if the end of <paramref name="span1" /> is less than or equal to the start of <paramref name="span2" />; otherwise, returns false.</returns>
+      <param name="span1">[in] The first <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+      <param name="span2">[in] The second <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.Intersects(Microsoft.VisualStudio.TextManager.Interop.TextSpan,Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Determines whether the first span intersects the second span.</summary>
+      <returns>Returns true if the start of <paramref name="span1" /> is less than the end of <paramref name="span2" /> and the end of <paramref name="span1" /> is greater than the start of <paramref name="span2" />; otherwise, returns false. Notice that the spans do not intersect if one span ends exactly where the other begins.</returns>
+      <param name="span1">[in] The first <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+      <param name="span2">[in] The second <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.IsAfterEndOf(Microsoft.VisualStudio.TextManager.Interop.TextSpan,System.Int32,System.Int32)">
+      <summary>Determines whether the given position occurs after the end of the given span.</summary>
+      <returns>Returns true if the given position is greater than the end of the given span; otherwise, returns false.</returns>
+      <param name="span">[in] The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object that is being tested against.</param>
+      <param name="line">[in] The line index of the position to test.</param>
+      <param name="col">[in] The column index of the position to test.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.IsBeforeStartOf(Microsoft.VisualStudio.TextManager.Interop.TextSpan,System.Int32,System.Int32)">
+      <summary>Determines whether the given position occurs before the start of the given span.</summary>
+      <returns>Returns true if the given position is less than the start of the given span; otherwise, returns false.</returns>
+      <param name="span">[in] The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object that is being tested against.</param>
+      <param name="line">[in] The line index of the position to test.</param>
+      <param name="col">[in] The column index of the position to test.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.IsEmbedded(Microsoft.VisualStudio.TextManager.Interop.TextSpan,Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Determines whether the first span is wholly contained in the second span.</summary>
+      <returns>Returns true if the two spans are different and the start of <paramref name="span1" /> is equal to or greater than the start of <paramref name="span2" /> and the end of <paramref name="span1" /> is less than or equal to the end of <paramref name="span2" />; otherwise, returns false.</returns>
+      <param name="span1">[in] The first <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+      <param name="span2">[in] The second <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.IsEmpty(Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Determines whether the given span is empty.</summary>
+      <returns>Returns true if the given span is empty; otherwise, returns false.</returns>
+      <param name="span">[in] The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object that is being tested.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.IsPositive(Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Determines whether the start of the given span occurs before the end of the span.</summary>
+      <returns>Returns true if the start of the span is less than or equal to the end of the span; otherwise, returns false.</returns>
+      <param name="span">[in] The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object that is being tested.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.IsSameSpan(Microsoft.VisualStudio.TextManager.Interop.TextSpan,Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Determines whether two spans are the same.</summary>
+      <returns>Returns true if the start of <paramref name="span1" /> equals the start of <paramref name="span2" /> and the end of <paramref name="span1" /> equals the end of <paramref name="span2" />; otherwise, returns false.</returns>
+      <param name="span1">[in] The first <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+      <param name="span2">[in] The second <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.MakePositive(Microsoft.VisualStudio.TextManager.Interop.TextSpan@)">
+      <summary>Makes the given span positive.</summary>
+      <param name="span">[in] The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object to be modified.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.Merge(Microsoft.VisualStudio.TextManager.Interop.TextSpan,Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Merges the two given spans to create a new span.</summary>
+      <returns>Returns a <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object that is the result of merging <paramref name="span1" /> and <paramref name="span2" />.</returns>
+      <param name="span1">[in] The first <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object to be merged.</param>
+      <param name="span2">[in] The second <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object to be merged.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.Normalize(Microsoft.VisualStudio.TextManager.Interop.TextSpan@,Microsoft.VisualStudio.TextManager.Interop.IVsTextLines)">
+      <summary>Pins the ends of the given span to the actual line lengths in the given text buffer.</summary>
+      <param name="span">[in] The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object to be modified. This object can be null.</param>
+      <param name="textLines">[in] An <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextLines" /> object to normalize against.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.StartsAfterEndOf(Microsoft.VisualStudio.TextManager.Interop.TextSpan,Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Determines whether the first span starts after the end of the second span.</summary>
+      <returns>Returns true if the start of <paramref name="span1" /> is greater than or equal to the end of <paramref name="span2" />; otherwise, returns false.</returns>
+      <param name="span1">[in] The first <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+      <param name="span2">[in] The second <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.StartsAfterStartOf(Microsoft.VisualStudio.TextManager.Interop.TextSpan,Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Determines whether the first span starts after the start of the second span.</summary>
+      <returns>Returns true if the start of <paramref name="span1" /> is greater than or equal to the start of <paramref name="span2" />; otherwise, returns false.</returns>
+      <param name="span1">[in] The first <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+      <param name="span2">[in] The second <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.StartsBeforeEndOf(Microsoft.VisualStudio.TextManager.Interop.TextSpan,Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Determines whether the first span starts before the end of the second span.</summary>
+      <returns>Returns true if the start of <paramref name="span1" /> is less than the end of <paramref name="span2" />; otherwise, returns false.</returns>
+      <param name="span1">[in] The first <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+      <param name="span2">[in] The second <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.StartsBeforeStartOf(Microsoft.VisualStudio.TextManager.Interop.TextSpan,Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Determines whether the first span starts before the start of the second span.</summary>
+      <returns>Returns true if the start of <paramref name="span1" /> is less than the start of <paramref name="span2" />; otherwise, returns false.</returns>
+      <param name="span1">[in] The first <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+      <param name="span2">[in] The second <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.ValidCoord(Microsoft.VisualStudio.Package.Source,System.Int32,System.Int32)">
+      <summary>Determines whether the given position is valid for the given source buffer.</summary>
+      <returns>Returns true if the given position lies within the given source buffer; otherwise, returns false.</returns>
+      <param name="src">[in] A <see cref="T:Microsoft.VisualStudio.Package.Source" /> object to validate against. This can be a null value. See Remarks.</param>
+      <param name="line">[in] The line index of the position to test.</param>
+      <param name="pos">[in] The column index of the position to test.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TextSpanHelper.ValidSpan(Microsoft.VisualStudio.Package.Source,Microsoft.VisualStudio.TextManager.Interop.TextSpan)">
+      <summary>Determines whether the given span lies within the given source buffer.</summary>
+      <returns>Returns true if the span lies entirely within the source buffer and is positive; otherwise, returns false.</returns>
+      <param name="src">[in] A <see cref="T:Microsoft.VisualStudio.Package.Source" /> object to validate against.</param>
+      <param name="span">[in] The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextSpan" /> object representing the span to test.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Package.TokenColor">
+      <summary>Provides initial values for color indices as reported by an <see cref="T:Microsoft.VisualStudio.Package.IScanner" /> scanner.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenColor.Text">
+      <summary>= 0. The default. This represents the color corresponding to the user's default text colors (the language service's <see cref="T:Microsoft.VisualStudio.Package.ColorableItem" /> list is ignored in this one case).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenColor.Keyword">
+      <summary>= 1. Represents the color for a language keyword (for example, "for", "if", or "else").</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenColor.Comment">
+      <summary>= 2. Represents the color for a comment.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenColor.Identifier">
+      <summary>= 3. Represents the color for an identifier or name (for example, a class, method, or variable name).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenColor.String">
+      <summary>= 4. Represents the color for a string, typically bounded by single or double quotes.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenColor.Number">
+      <summary>= 5. Represents the color for a number (a string of decimal or hexadecimal digits).</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Package.TokenType">
+      <summary>Specifies the different types of tokens that can be identified and returned from a language service scanner.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenType.Unknown">
+      <summary>The token is an unknown type. This is typically used for any token not recognized by the parser and should be considered an error in the code being parsed.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenType.Text">
+      <summary>General text; any text not identified as a specified token type.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenType.Keyword">
+      <summary>A language keyword, an identifier that is reserved by the language. For example, in C#, do, while, foreach, if, and else, are all keywords.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenType.Identifier">
+      <summary>An identifier or name. For example, the name of a variable, method, or class. In XML, this could be the name of a tag or attribute.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenType.String">
+      <summary>A string. Typically defined as zero or more characters bounded by double quotes.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenType.Literal">
+      <summary>A literal value (a character or number). For example, in C# or C++, this is a character bounded by single quotes, or a decimal or hexadecimal number.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenType.Operator">
+      <summary>A punctuation character that has a specific meaning in a language. For example, in C#, arithmetic operators +, -, *, and /. In C++, pointer dereference operator -&gt;, insertion operator &gt;&gt;, and extraction operation &lt;&lt;. In XML, assignment operator =.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenType.Delimiter">
+      <summary>A token that operates as a separator between two language elements. For example, in C#, the period "." between class name and member name. In XML, the angle brackets surrounding a tag, &lt; and &gt;.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenType.WhiteSpace">
+      <summary>A space, tab, or newline. Typically, a contiguous run of any whitespace is considered a single whitespace token. For example, the three spaces in "name   this" would be treated as one whitespace token.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenType.LineComment">
+      <summary>A line comment (comment is terminated at the end of the line). For example, in C# or C++, a comment is preceded by a //. In Visual Basic, this is a single tick '.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.TokenType.Comment">
+      <summary>A block comment. For example, in C# or C++, a comment is bounded by /* and */. In XML, the comment is bounded by &lt;!-- and --&gt;.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars">
+      <summary>Provides support for the combo boxes showing type and member information as offered by a language service.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars.#ctor(Microsoft.VisualStudio.Package.LanguageService)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars" /> class.</summary>
+      <param name="languageService">[in] A <see cref="T:Microsoft.VisualStudio.Package.LanguageService" /> object representing the language service that uses the combo boxes.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars.Done">
+      <summary>Cleans up any allocated resources just before the <see cref="T:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars" /> object is destroyed.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars.GetComboAttributes(System.Int32,System.UInt32@,System.UInt32@,System.IntPtr@)">
+      <summary>Returns information about the specified combo box.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="combo">[in] The ID of the combo box (0 for the types combo box, 1 for the members combo box).</param>
+      <param name="entries">[out] The number of entries to be shown on the combo box.</param>
+      <param name="entryType">[out] A combination of flags from the <see cref="T:Microsoft.VisualStudio.TextManager.Interop.DROPDOWNENTRYTYPE" /> enumeration describing the type of entries to appear on the combo box.</param>
+      <param name="iList">[out] An unmarshaled handle to an <see cref="T:Microsoft.CLRAdmin.IImageList" /> object used for glyphs.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars.GetComboTipText(System.Int32,System.String@)">
+      <summary>Returns text to be shown in a tool tip when the cursor is held over the combo box.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="combo">[in] The ID of the combo box to get the tool tip text for (0 for the types combo box, 1 for the members combo box).</param>
+      <param name="text">[out] The text to be shown in a tool tip.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars.GetEntryAttributes(System.Int32,System.Int32,System.UInt32@)">
+      <summary>Returns the font attributes for the specified entry on the specified combo box.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="combo">[in] The ID of the combo box (0 for the types combo box, 1 for the members combo box).</param>
+      <param name="entry">[in] The index of the entry for which to get the attributes.</param>
+      <param name="fontAttrs">[out] Returns the collection of flags from the <see cref="T:Microsoft.VisualStudio.TextManager.Interop.DROPDOWNFONTATTR" /> enumeration for the requested entry.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars.GetEntryImage(System.Int32,System.Int32,System.Int32@)">
+      <summary>Returns the glyph index for the specified entry on the specified combo box.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="combo">[in] The ID of the combo box (0 for the types combo box, 1 for the members combo box).</param>
+      <param name="entry">[in] The index of the entry for which to get the image index.</param>
+      <param name="imgIndex">[out] Returns the index in the image list to the glyph for the specified entry. Returns -1 if there is no glyph or the entry does not exist.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars.GetEntryText(System.Int32,System.Int32,System.String@)">
+      <summary>Returns the text to be displayed for the specified entry in the specified combo box.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="combo">[in] The ID of the combo box (0 for the types combo box, 1 for the members combo box).</param>
+      <param name="entry">[in] The index of the entry for which to get the text.</param>
+      <param name="text">[out] Returns a string containing the text to be displayed in the combo box for the specified entry. Returns null if the entry does not exist.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars.GetMember(System.Int32,System.Int32)">
+      <summary>Returns the specified entry for the specified combo box.</summary>
+      <returns>If successful, returns a <see cref="T:Microsoft.VisualStudio.Package.DropDownMember" /> object describing the request entry; otherwise, returns null.</returns>
+      <param name="combo">[in] The ID of the combo box (0 for the types combo box, 1 for the members combo box).</param>
+      <param name="entry">[in] The index of the entry to get.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars.OnComboGetFocus(System.Int32)">
+      <summary>Called when a combo box gets the focus.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="combo">[in] The ID of the combo box (0 for the types combo box, 1 for the members combo box).</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars.OnItemChosen(System.Int32,System.Int32)">
+      <summary>Called when an item is chosen from the specified combo box.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="combo">[in] The ID of the combo box (0 for the types combo box, 1 for the members combo box).</param>
+      <param name="entry">[in] The index of the entry that was chosen.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars.OnItemSelected(System.Int32,System.Int32)">
+      <summary>Called when an entry is highlighted in one of the combo boxes.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="combo">[in] The ID of the combo box (0 for the types combo box, 1 for the members combo box).</param>
+      <param name="index">[in] The index of the entry that was highlighted.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars.OnSynchronizeDropdowns(Microsoft.VisualStudio.Package.LanguageService,Microsoft.VisualStudio.TextManager.Interop.IVsTextView,System.Int32,System.Int32,System.Collections.ArrayList,System.Collections.ArrayList,System.Int32@,System.Int32@)">
+      <summary>Called to fill and synchronize all combo boxes.</summary>
+      <returns>If successful, returns true if the combo boxes have been changed; otherwise returns false.</returns>
+      <param name="languageService">[in] A <see cref="T:Microsoft.VisualStudio.Package.LanguageService" /> object representing the language service that uses the combo boxes.</param>
+      <param name="textView">[in] An <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextView" /> object representing the view the combo boxes are placed in and the view that shows the source file.</param>
+      <param name="line">[in] The line number the caret is currently on.</param>
+      <param name="col">[in] The character offset the caret is currently on.</param>
+      <param name="dropDownTypes">[in, out] An <see cref="T:System.Collections.ArrayList" /> of <see cref="T:Microsoft.VisualStudio.Package.DropDownMember" />s representing the types combo box.</param>
+      <param name="dropDownMembers">[in, out] An <see cref="T:System.Collections.ArrayList" /> of <see cref="T:Microsoft.VisualStudio.Package.DropDownMember" />s representing the members combo box.</param>
+      <param name="selectedType">[in, out] The index of the entry to be selected in the types combo box. This can also be set if the current selection is invalid.</param>
+      <param name="selectedMember">[in, out] The index of the entry to be selected in the members combo box. This can also be set if the current selection is invalid.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Package.TypeAndMemberDropdownBars.SetDropdownBar(Microsoft.VisualStudio.TextManager.Interop.IVsDropdownBar)">
+      <summary>Called to specify the <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsDropdownBar" /> object that controls the two combo boxes.</summary>
+      <returns>If successful, returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />; otherwise, returns an error code.</returns>
+      <param name="bar">[in] The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsDropdownBar" /> object that controls the two combo boxes.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Package.Variant.VariantType">
+      <summary>Specifies the type of a variant object as used by a managed package framework (MPF) language service class.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_EMPTY">
+      <summary>An empty variant.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_NULL">
+      <summary>A null value.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_I2">
+      <summary>A 2 byte (16-bit) signed integer.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_I4">
+      <summary>A 4 byte (32-bit) signed integer.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_R4">
+      <summary>A 4 byte real number, also known as a float.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_R8">
+      <summary>An 8 byte real number, also known as a double.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_CY">
+      <summary>A Currency value (fixed decimal point value stored in 64-bits).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_DATE">
+      <summary>A DATE object.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_BSTR">
+      <summary>A string.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_DISPATCH">
+      <summary>An object that implements the <see cref="F:System.Runtime.InteropServices.UnmanagedType.IDispatch" /> interface.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_ERROR">
+      <summary>An error code (typically returned from a Win32 function).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_BOOL">
+      <summary>A value representing true (-1) or false (0).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_VARIANT">
+      <summary>A reference to a variant object.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_UNKNOWN">
+      <summary>An object implementing the IUnknown interface.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_DECIMAL">
+      <summary>A decimal number stored as a string.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_I1">
+      <summary>A 1 byte (8-bit) signed integer.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_UI1">
+      <summary>A 1 byte (8-bit) unsigned integer.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_UI2">
+      <summary>A 2 byte (16-bit) unsigned integer.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_UI4">
+      <summary>A 4 byte (32-bit) unsigned integer.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_I8">
+      <summary>An 8 byte (64-bit) signed integer.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_UI8">
+      <summary>An 8 byte (64-bit) unsigned integer.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_INT">
+      <summary>A generic integer (typically a 32-bit value).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_UINT">
+      <summary>A generic unsigned integer (typically 32-bits).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_VOID">
+      <summary>A C-style void type.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_HRESULT">
+      <summary>An HRESULT or COM return value.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_PTR">
+      <summary>A generic pointer.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_SAFEARRAY">
+      <summary>An array that is guaranteed to be at least empty (that is, it is never a null value).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_CARRAY">
+      <summary>A C-style array (an array of pointers).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_USERDEFINED">
+      <summary>A user-defined blob.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_LPSTR">
+      <summary>A pointer to a null-terminated ANSI string.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_LPWSTR">
+      <summary>A pointer to a null-terminated wide character (Unicode) string.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_FILETIME">
+      <summary>A <see cref="T:System.Runtime.InteropServices.FILETIME" /> value.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_BLOB">
+      <summary>An arbitrary block of memory.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_STREAM">
+      <summary>A stream of bytes.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_STORAGE">
+      <summary>Name of the storage.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_STREAMED_OBJECT">
+      <summary>A stream that contains an object.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_STORED_OBJECT">
+      <summary>A storage object.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_BLOB_OBJECT">
+      <summary>An arbitrary block of memory representing an object.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_CF">
+      <summary>A value specifying a clipboard format.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_CLSID">
+      <summary>A GUID for a class (a CLSID).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_VECTOR">
+      <summary>An array with a leading count value.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_ARRAY">
+      <summary>An array of variants.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_BYREF">
+      <summary>A reference to an object.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_RESERVED">
+      <summary>Reserved for future use.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_ILLEGAL">
+      <summary>Represents an illegal variant type.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_ILLEGALMASKED">
+      <summary>A bit mask to isolate valid variant types.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Package.Variant.VariantType.VT_TYPEMASK">
+      <summary>A bit mask to isolate valid variant types.</summary>
+    </member>
+  </members>
+</doc>

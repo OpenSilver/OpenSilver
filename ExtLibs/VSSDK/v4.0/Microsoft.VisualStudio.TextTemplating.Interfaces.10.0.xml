@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.TextTemplating.Interfaces.10.0</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngine">
+      <summary>The interface for the text template transformation engine.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngine.PreprocessTemplate(System.String,Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost,System.String,System.String,System.String@,System.String[]@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngine.ProcessTemplate(System.String,Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost)">
+      <summary>Transforms the contents of a text template file to produce the generated text output.</summary>
+      <returns>The generated text output of the text template file.</returns>
+      <param name="content">The contents of the text template file to be transformed.</param>
+      <param name="host">The <see cref="T:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost" /> that will host this engine.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost">
+      <summary>The interface for the host that transforms text templates. This is available to directive processors and can also be accessed by text templates.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost.GetHostOption(System.String)">
+      <summary>Called by the Engine to ask for the value of a specified option. Return null if you do not know. </summary>
+      <returns>Null to select the default value for this option. Otherwise, an appropriate value for the option. </returns>
+      <param name="optionName">The name of an option. </param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost.LoadIncludeText(System.String,System.String@,System.String@)">
+      <summary>Acquires the text that corresponds to a request to include a partial text template file.</summary>
+      <returns>true to indicate that the host was able to acquire the text; otherwise, false.</returns>
+      <param name="requestFileName">The name of the partial text template file to acquire.</param>
+      <param name="content">A <see cref="T:System.String" /> that contains the acquired text or <see cref="F:System.String.Empty" /> if the file could not be found.</param>
+      <param name="location">A <see cref="T:System.String" /> that contains the location of the acquired text. If the host searches the registry for the location of include files or if the host searches multiple locations by default, the host can return the final path of the include file in this parameter. The host can set the <paramref name="location" /> to <see cref="F:System.String.Empty" /> if the file could not be found or if the host is not file-system based.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost.LogErrors(System.CodeDom.Compiler.CompilerErrorCollection)">
+      <summary>Receives a collection of errors and warnings from the transformation engine. </summary>
+      <param name="errors">The <see cref="T:System.CodeDom.Compiler.CompilerErrorCollection" />  being passed to the host from the engine.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost.ProvideTemplatingAppDomain(System.String)">
+      <summary>Provides an application domain to run the generated transformation class. </summary>
+      <returns>An <see cref="T:System.AppDomain" /> that compiles and executes the generated transformation class.</returns>
+      <param name="content">The contents of the text template file to be processed. </param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost.ResolveAssemblyReference(System.String)">
+      <summary>Allows a host to provide additional information about the location of an assembly.</summary>
+      <returns>A <see cref="T:System.String" /> that contains the specified assembly reference or the specified assembly reference with additional information.</returns>
+      <param name="assemblyReference">The assembly to resolve.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost.ResolveDirectiveProcessor(System.String)">
+      <summary>Returns the type of a directive processor, given its friendly name. </summary>
+      <returns>The <see cref="T:System.Type" /> of the directive processor.</returns>
+      <param name="processorName">The name of the directive processor to be resolved.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost.ResolveParameterValue(System.String,System.String,System.String)">
+      <summary>Resolves the value of a parameter for a directive processor if the parameter is not specified in the template text. </summary>
+      <returns>A <see cref="T:System.String" /> that represents the resolved parameter value.</returns>
+      <param name="directiveId">The ID of the directive call to which the parameter belongs. This ID disambiguates repeated calls to the same directive from the same text template.</param>
+      <param name="processorName">The name of the directive processor to which the directive belongs.</param>
+      <param name="parameterName">The name of the parameter to be resolved.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost.ResolvePath(System.String)">
+      <summary>Allows a host to provide a complete path, given a file name or relative path.</summary>
+      <returns>A <see cref="T:System.String" /> that contains an absolute path.</returns>
+      <param name="path">The path to complete.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost.SetFileExtension(System.String)">
+      <summary>Tells the host the file name extension that is expected for the generated text output. </summary>
+      <param name="extension">The file name extension for the generated text output.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost.SetOutputEncoding(System.Text.Encoding,System.Boolean)">
+      <summary>Tells the host the encoding that is expected for the generated text output. </summary>
+      <param name="encoding">The encoding for the generated text output.</param>
+      <param name="fromOutputDirective">true to indicate that the user specified the encoding in the encoding parameter of the output directive.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost.StandardAssemblyReferences">
+      <summary>Gets a list of assembly references. </summary>
+      <returns>An <see cref="T:System.Collections.IList" /> that contains assembly names.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost.StandardImports">
+      <summary>Gets a list of namespaces.</summary>
+      <returns>An <see cref="T:System.Collections.IList" /> that contains namespaces.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost.TemplateFile">
+      <summary>Gets the path and file name of the text template that is being processed.</summary>
+      <returns>A <see cref="T:System.String" /> that contains the path and file name of the text template that is being processed.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.ITextTemplatingSession">
+      <summary>Can be used to transmit information from a directive processor into a text template.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.ITextTemplatingSession.Id">
+      <summary>Identity of this session, used to compare session instances by value.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.ITextTemplatingSessionHost">
+      <summary>Implemented by a text templating host, enabling callers to obtain an object denoting the current session. A session represents series of executions of text templates. The session object can be used to pass information from the host into the code of the text template.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ITextTemplatingSessionHost.CreateSession">
+      <summary>Create a Session object that can be used to transmit information into a template. The new Session becomes the current Session.</summary>
+      <returns>A new Session</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.ITextTemplatingSessionHost.Session">
+      <summary>The current Session.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplating">
+      <summary>The principal interface of the text template transformation service in Visual Studio, STextTemplating.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplating.BeginErrorSession">
+      <summary>Sets up/resets the system that causes only unique errors to be logged. Also creates an implicit code generation session.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplating.EndErrorSession">
+      <summary>Finishes a session using the system that causes only unique errors to be logged.</summary>
+      <returns>True if errors were encountered during the session; false otherwise.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplating.PreprocessTemplate(System.String,System.String,Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplatingCallback,System.String,System.String,System.String[]@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplating.ProcessTemplate(System.String,System.String,Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplatingCallback,System.Object)"></member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplatingCallback">
+      <summary>Callback interface to be implemented by clients of the STextTemplating service that wish to process errors and information</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplatingCallback.ErrorCallback(System.Boolean,System.String,System.Int32,System.Int32)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplatingCallback.SetFileExtension(System.String)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplatingCallback.SetOutputEncoding(System.Text.Encoding,System.Boolean)"></member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplatingComponents">
+      <summary>Interface on the STextTemplating service to support advanced scenarios requiring manipulation of the components of the text templating service</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplatingComponents.Callback">
+      <summary>The error reporting and file extension callback that the host uses.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplatingComponents.Engine">
+      <summary>Get the singleton text templating engine</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplatingComponents.Hierarchy">
+      <summary>The hierarchy to use to help resolve project references.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplatingComponents.Host">
+      <summary>Get the singleton Vs Host</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplatingComponents.InputFile">
+      <summary>The input filename that the host uses to report errors</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.STextTemplating">
+      <summary>The text template transformation service in Visual Studio.</summary>
+    </member>
+  </members>
+</doc>

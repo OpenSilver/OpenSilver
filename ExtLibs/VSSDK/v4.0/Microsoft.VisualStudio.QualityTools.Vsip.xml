@@ -1,0 +1,680 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.QualityTools.Vsip</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.VisualStudio.TestTools.TestTypes.Generic.SGenericTestService"></member>
+    <member name="T:Microsoft.VisualStudio.TestTools.TestTypes.Unit.SUnitTestService"></member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.BaseTuip">
+      <summary>Provides a base class for a test user interface (UI) package that is used to interface between Visual Studio and a custom test type.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.BaseTuip.#ctor(System.IServiceProvider)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.BaseTuip" /> class by using the provided service provider that is specific to the desired test type.</summary>
+      <param name="isp">An <see cref="T:System.IServiceProvider" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.BaseTuip.CloseResultViewer(Microsoft.VisualStudio.TestTools.Common.TestResultMessage)">
+      <summary>When overridden in a derived class, closes the viewer for the provided custom result.</summary>
+      <param name="result">A <see cref="T:Microsoft.VisualStudio.TestTools.Common.TestResultMessage" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.BaseTuip.DeleteAllTestsFromList(System.Collections.IList,System.Type,System.String@)">
+      <summary>When overridden in a derived class, removes all tests from the provided list that match the provided filter <see cref="T:System.Type" />.</summary>
+      <returns>true if all tests were successfully deleted; otherwise, false.</returns>
+      <param name="items">A list of test items.</param>
+      <param name="testTypeFilter">The <see cref="T:System.Type" /> for the tests.</param>
+      <param name="message">The message to display after the tests have been deleted.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.BaseTuip.GetFirstUIBlob(Microsoft.VisualStudio.TestTools.Common.ITestElement)">
+      <summary>Returns the first <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.UIBlob" /> in the provided test element.</summary>
+      <returns>The first <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.UIBlob" /> in the provided test element.</returns>
+      <param name="test">An <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.BaseTuip.InvokeEditor(Microsoft.VisualStudio.TestTools.Vsip.UIBlob,Microsoft.VisualStudio.TestTools.Common.ITestElement)">
+      <summary>Launches the registered editor for the provided <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.UIBlob" />.</summary>
+      <param name="uiBlob">A <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.UIBlob" /> object.</param>
+      <param name="test">An <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.BaseTuip.InvokeResultViewer(Microsoft.VisualStudio.TestTools.Common.TestResultMessage)">
+      <summary>When overridden in a derived class, starts the viewer that is registered for the provided test result message. </summary>
+      <param name="result">A <see cref="T:Microsoft.VisualStudio.TestTools.Common.TestResultMessage" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.BaseTuip.IsTestPropertiesReadOnly(Microsoft.VisualStudio.TestTools.Common.ITestElement)">
+      <summary>Returns a value that indicates whether the properties in the provided test element are read-only.</summary>
+      <returns>true if the properties in the provided test element are read-only; otherwise, false.</returns>
+      <param name="test">An <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> object.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.BaseTuip.RunConfigurationEditor">
+      <summary>When overridden in a derived class, returns a custom editor for a custom test type.</summary>
+      <returns>A custom editor for a custom test type.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.BaseTuip.ServiceProvider">
+      <summary>Returns the service provider.</summary>
+      <returns>The service provider.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.BaseTuip.UpdateTestCustomProperty(Microsoft.VisualStudio.TestTools.Common.ITestElement,System.String)">
+      <summary>Updates the value of a custom property by using the provided test element.</summary>
+      <param name="test">An <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> object.</param>
+      <param name="property">The name of the property to update.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.BaseTuip.UpdateTestProperty(Microsoft.VisualStudio.TestTools.Common.ITestElement,System.ComponentModel.PropertyDescriptor)">
+      <summary>Sets the value of the specified property in the provided test element.</summary>
+      <param name="test">The <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> object to be updated.</param>
+      <param name="property">A <see cref="T:System.ComponentModel.PropertyDescriptor" /> object.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.CodingLanguages"></member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.CodingLanguages.VB">
+      <summary />
+    </member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.CodingLanguages.CSharp">
+      <summary />
+    </member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.CodingLanguages.VC">
+      <summary />
+    </member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.CodingLanguages.JSharp">
+      <summary />
+    </member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.CodingLanguages.Unknown">
+      <summary />
+    </member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.CodingLanguages.TestProjectSupported">
+      <summary />
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.CommandEventArgs">
+      <summary>Represents the event arguments when commands are invoked.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.CommandEventArgs.#ctor(System.Collections.IList)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.CommandEventArgs" /> class.</summary>
+      <param name="items">A list of test items.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.CommandEventArgs.Items">
+      <summary>Gets the list of test items for this command event.</summary>
+      <returns>The list of test items for this command event.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.CommandEventHandler">
+      <summary>Represents the delegate for the event handler for command events.</summary>
+      <returns>The event handler for command events.</returns>
+      <param name="sender">The object that initiated the event.</param>
+      <param name="e">A <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.CommandEventArgs" /> object.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.CommandResult">
+      <summary>Represents the result of executing a command that is returned by a command callback to indicate whether the command handler completed.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.CommandResult.#ctor(System.Boolean)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.CommandResult" /> class by using the provided indication of whether the command was completed.</summary>
+      <param name="completed">true if the command has completed; otherwise, false.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.CommandResult.#ctor(System.Boolean,System.String)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.CommandResult" /> class by using the provided message and indication of whether the command was completed.</summary>
+      <param name="completed">true if the command has completed; otherwise, false.</param>
+      <param name="message">If the command handler was unable to finish, contains the reason why.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.CommandResult.Completed">
+      <summary>Gets a value that indicates whether the command was successfully completed.</summary>
+      <returns>true if the command was completed; otherwise, false.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.CommandResult.Message">
+      <summary>Gets the message that contains the reason that the command was not successfully completed.</summary>
+      <returns>The reason that the command was not successfully completed.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.CommandStatus">
+      <summary>Represents the state of a command.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.CommandStatus.#ctor(System.Boolean,System.Boolean)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.CommandStatus" /> class by using the provided indications of whether the command is visible and whether it is enabled.</summary>
+      <param name="visible">true if the command is visible; otherwise, false.</param>
+      <param name="enabled">true if the command is enabled; otherwise, false.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.CommandStatus.Enabled">
+      <summary>Gets a value that indicates whether the associated command is enabled.</summary>
+      <returns>true if the command is enabled; otherwise, false.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.CommandStatus.Visible">
+      <summary>Gets a value that indicates whether the associated command is visible.</summary>
+      <returns>true if the command is enabled; otherwise, false.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.CommandTableIds">
+      <summary>Provides access by third-party applications that use the <see cref="N:EnvDTE" /> tools to the GUIDs for standard Visual Studio menus.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.CommandTableIds.CommandSetGuid">
+      <summary>Returns the read-only GUID for the Visual Studio command set.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.CommandTableIds.Commands">
+      <summary>Provides access by third-party applications that use the <see cref="N:EnvDTE" /> tools to the GUIDs to delete a test manager and to delete a test view in.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.CommandTableIds.Commands.TestManagerDelete">
+      <summary>Returns the GUID for the TestManagerDelete command in Visual Studio SDK.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.CommandTableIds.Commands.TestViewDelete">
+      <summary>Returns the GUID for the TestViewDelete command in Visual Studio SDK.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.CommandTableIds.ContextMenus">
+      <summary>Provides access by third-party extensions to the GUIDs for the Test Manager window, the Test Results window, and the Test View window in.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.CommandTableIds.ContextMenus.TestManager">
+      <summary>Returns the GUID for the Visual Studio SDK Test Manager window.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.CommandTableIds.ContextMenus.TestResults">
+      <summary>Returns the GUID for the Visual Studio SDK Test Results window.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.CommandTableIds.ContextMenus.TestView">
+      <summary>Returns the GUID for the Visual Studio SDK Test View window.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.CommonRunConfigurationDirtyEventArgs">
+      <summary>Represents the event arguments for the event handler when common run configuration data is modified outside the test type-specific run configuration editor.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.CommonRunConfigurationDirtyEventArgs.#ctor(Microsoft.VisualStudio.TestTools.Common.TestRunConfiguration)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.CommonRunConfigurationDirtyEventArgs" /> class. </summary>
+      <param name="runConfig">A <see cref="T:Microsoft.VisualStudio.TestTools.Common.TestRunConfiguration" /> object.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.CommonRunConfigurationDirtyEventArgs.RunConfiguration">
+      <summary>Gets the test run configuration.</summary>
+      <returns>The test run configuration.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.CommonRunConfigurationDirtyEventHandler">
+      <summary>Represents the method that will handle the event of a control. </summary>
+      <param name="sender">The object that initiated the event.</param>
+      <param name="dirtyEventArgs">A <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.CommonRunConfigurationDirtyEventArgs" /> object.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory">
+      <summary>Provides an abstract base class for other editor factories that support a single physical view.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory.#ctor">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory" /> class. </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory.Close">
+      <summary>Releases all cached interface pointers and cancels any event sinks.</summary>
+      <returns>
+        <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory.CreateEditor(System.String)">
+      <summary>When overridden in a derived class, creates and returns the editor panel for the specified data.</summary>
+      <returns>The editor panel.</returns>
+      <param name="monikerDocument">A system identifier or path that specifies the file or data row to edit.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory.CreateEditorInstance(System.UInt32,System.String,System.String,Microsoft.VisualStudio.Shell.Interop.IVsHierarchy,System.UInt32,System.IntPtr,System.IntPtr@,System.IntPtr@,System.String@,System.Guid@,System.Int32@)">
+      <summary>Used internally by the editor factory framework to initialize this <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory" /> object.</summary>
+      <returns>
+        <see cref="T:Microsoft.VisualStudio.VSConstants.S_OK" />.</returns>
+      <param name="createDocFlag">A uint value where zero equals false and 1 equals true.</param>
+      <param name="monikerDocument">A string that contains the identifier of the document in the project system. If the document is a file, it must be a file path, but it can be a reference to records in a database table. Cannot be null or empty.</param>
+      <param name="physicalView">A string that contains the name of the physical view.</param>
+      <param name="hierarchy">An <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy" /> value.</param>
+      <param name="itemId">A uint value that identifies this instance.</param>
+      <param name="existingDocData">An <see cref="T:System.IntPtr" /> value.</param>
+      <param name="docView">An <see cref="T:System.IntPtr" /> value.</param>
+      <param name="docData">An <see cref="T:System.IntPtr" /> value.</param>
+      <param name="editorCaption">(Output) The editor caption.</param>
+      <param name="guidCmdUI">(Output) The command GUID.</param>
+      <param name="canceled">(Output) An int value that indicates whether the operation was canceled by the user.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory.EditorCaption">
+      <summary>Gets the caption that is appended to the file name to create the display name for this editor.</summary>
+      <returns>The caption that is appended to the file name to create the display name for this editor.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory.GuidCmdUI">
+      <summary>Returns a GUID that indicates which menu and toolbars will be displayed when the editor window is active.</summary>
+      <returns>A GUID that indicates which menu and toolbars will be displayed when the editor window is active.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory.MapLogicalView(System.Guid@,System.String@)">
+      <summary>Maps a logical view to a physical view.</summary>
+      <returns>
+        <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />.</returns>
+      <param name="guidLogicalView">A GUID for the logical view.</param>
+      <param name="physicalView">(Output) A string that contains the physical view.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory.Microsoft#VisualStudio#Shell#Interop#IVsEditorFactory#Close">
+      <summary>Closes the editor and releases all resources.</summary>
+      <returns>
+        <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />
+      </returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory.Microsoft#VisualStudio#Shell#Interop#IVsEditorFactory#CreateEditorInstance(System.UInt32,System.String,System.String,Microsoft.VisualStudio.Shell.Interop.IVsHierarchy,System.UInt32,System.IntPtr,System.IntPtr@,System.IntPtr@,System.String@,System.Guid@,System.Int32@)">
+      <summary>Used internally by the editor factory framework to initialize this <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory" /> object. </summary>
+      <returns>
+        <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />.</returns>
+      <param name="createDocFlag">A uint value where zero equals false and 1 equals true.</param>
+      <param name="monikerDocument">A string that contains the identifier of the document in the project system. If the document is a file, it must be a file path, but it can be a reference to records in a database table. Cannot be null or empty.</param>
+      <param name="physicalView">A string that contains the name of the physical view.</param>
+      <param name="hierarchy">An <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy" /> value.</param>
+      <param name="itemId">A uint value that identifies this instance.</param>
+      <param name="existingDocData">An <see cref="T:System.IntPtr" /> value.</param>
+      <param name="docView">An <see cref="T:System.IntPtr" /> value.</param>
+      <param name="docData">An <see cref="T:System.IntPtr" /> value.</param>
+      <param name="editorCaption">(Output) The editor caption.</param>
+      <param name="guidCmdUI">(Output) The command GUID.</param>
+      <param name="canceled">(Output) An int value that indicates whether the operation was canceled by the user.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory.Microsoft#VisualStudio#Shell#Interop#IVsEditorFactory#MapLogicalView(System.Guid@,System.String@)">
+      <summary>Maps the specified logical view to the actual physical view.</summary>
+      <returns>
+        <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />.</returns>
+      <param name="guidLogicalView">A GUID that identifies the logical view.</param>
+      <param name="physicalView">(Output) A null string.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory.Microsoft#VisualStudio#Shell#Interop#IVsEditorFactory#SetSite(Microsoft.VisualStudio.OLE.Interop.IServiceProvider)">
+      <summary>Initializes an editor in the environment.</summary>
+      <returns>
+        <see cref="T:Microsoft.VisualStudio.VSConstants.S_OK" />.</returns>
+      <param name="serviceProvider">An <see cref="T:Microsoft.VisualStudio.OLE.Interop.IServiceProvider" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory.SetSite(Microsoft.VisualStudio.OLE.Interop.IServiceProvider)">
+      <summary>Initializes an editor in the environment.</summary>
+      <returns>
+        <see cref="T:Microsoft.VisualStudio.VSConstants.S_OK" />.</returns>
+      <param name="serviceProvider">An <see cref="T:Microsoft.VisualStudio.OLE.Interop.IServiceProvider" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory.ShouldOpenDocument(System.String)">
+      <summary>Determines whether the specified document is a test and therefore should be opened.</summary>
+      <returns>true if the file is a test file; otherwise, false.</returns>
+      <param name="path">The path and file name of a file.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.EditorFactory.VSServiceProvider">
+      <summary>Gets the service provider.</summary>
+      <returns>The service provider.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.ICommandProvider">
+      <summary>Represents an interface for custom test types to provide new commands to menus and toolbars in the testing framework.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ICommandProvider.GetCommandHandler(System.ComponentModel.Design.CommandID,System.ComponentModel.Design.CommandID)">
+      <summary>Returns the command event handler from the specified context menu that contains the specified command. </summary>
+      <returns>A command event handler, if found; otherwise, null.</returns>
+      <param name="contextMenuId">A <see cref="T:System.ComponentModel.Design.CommandID" /> object that identifies a context menu.</param>
+      <param name="commandId">A <see cref="T:System.ComponentModel.Design.CommandID" /> object that identifies the command to search for.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ICommandProvider.GetTypeSpecificCommands(System.ComponentModel.Design.CommandID)">
+      <summary>Returns a list of command IDs for the type-specific commands that support the associated custom test type that are in the specified context menu.</summary>
+      <returns>A list of command IDs.</returns>
+      <param name="contextMenuId">The <see cref="T:System.ComponentModel.Design.CommandID" /> for a context menu.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ICommandProvider.QueryStatus(System.ComponentModel.Design.CommandID,System.ComponentModel.Design.CommandID,System.Collections.IList)">
+      <summary>Returns the status of the context menu command by using the specified context menu, the specified command, and a list of items that were selected at the time the context menu was displayed.</summary>
+      <returns>A command status object.</returns>
+      <param name="contextMenuId">The <see cref="T:System.ComponentModel.Design.CommandID" /> for a context menu.</param>
+      <param name="commandId">The <see cref="T:System.ComponentModel.Design.CommandID" /> for a command.</param>
+      <param name="items">A list of items that were selected at the time the context menu was displayed.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.IHostApplicationConsumer"></member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.IHostApplicationConsumer.SetHostApplication(Microsoft.VisualStudio.TestTools.Vsip.TestToolsHostApplication)"></member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationCustomEditor">
+      <summary>Represents an interface that can be added to a user control and must be implemented by a custom test type to cause the control to appear in the Run Configuration Editor panel in Visual Studio. </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationCustomEditor.GetData"></member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationCustomEditor.SetData(Microsoft.VisualStudio.TestTools.Common.ITestTypeSpecificRunConfigurationData)">
+      <summary>Sets the data for a custom Run Configuration Editor for a specific test type.</summary>
+      <param name="data">A custom <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestTypeSpecificRunConfigurationData" /> object.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationCustomEditor.TestType">
+      <summary>Gets the custom <see cref="T:Microsoft.VisualStudio.TestTools.Common.TestType" /></summary>
+      <returns>The associated test type.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationCustomHostEditor">
+      <summary>Represents the required extensions to a user control for a custom editor in a host environment for editing test run configuration settings.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationCustomHostEditor.GetData">
+      <summary>Retrieves persisted host configuration data.</summary>
+      <returns>The host-specific data for this editor. </returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationCustomHostEditor.HostType">
+      <summary>Gets the name of the host.</summary>
+      <returns>The name of the host.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationCustomHostEditor.SetData(Microsoft.VisualStudio.TestTools.Common.IHostSpecificRunConfigurationData)">
+      <summary>Persists host-specific data for this editor.</summary>
+      <param name="data">A <see cref="T:Microsoft.VisualStudio.TestTools.Common.IHostSpecificRunConfigurationData" /> object that contains the data to be persisted. </param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationEditor">
+      <summary>Provides the base interface for a run configuration editor.</summary>
+    </member>
+    <member name="E:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationEditor.DataGetDirty">
+      <summary>The event that is raised by the editor when the data in the editor is changed by the user.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationEditor.Description">
+      <summary>Gets the description of this configuration editor.</summary>
+      <returns>The description of this configuration editor.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationEditor.HelpKeyword">
+      <summary>Gets the Help keyword for this configuration editor.</summary>
+      <returns>The Help keyword for this configuration editor.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationEditor.Initialize(System.IServiceProvider,Microsoft.VisualStudio.TestTools.Common.TestRun)">
+      <summary>Initializes this configuration editor by using objects from the testing framework.</summary>
+      <param name="serviceProvider">An <see cref="T:Microsoft.VisualStudio.OLE.Interop.IServiceProvider" /> object that is the interface with the testing framework.</param>
+      <param name="run">The <see cref="T:Microsoft.VisualStudio.TestTools.Common.TestRun" /> object to be configured.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationEditor.OnCommonDataDirty(System.Object,Microsoft.VisualStudio.TestTools.Vsip.CommonRunConfigurationDirtyEventArgs)">
+      <summary>Handles the event that occurs when common test run configuration data has been modified outside the editor.</summary>
+      <param name="sender">The object that initiated the event.</param>
+      <param name="dirtyEventArgs">A <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.CommonRunConfigurationDirtyEventArgs" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.IRunConfigurationEditor.VerifyData">
+      <summary>Verifies the data in the editor and prompts the user, if it is required.</summary>
+      <returns>true if the data has been verified; otherwise, false.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.ITestManagement">
+      <summary>Adds access to the Test Management Interface (TMI) to a derived class.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ITestManagement.SaveTestLists">
+      <summary>Saves any changes that were made by using the <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITmi" /> instance to disk.</summary>
+      <exception cref="T:Microsoft.VisualStudio.TestTools.Exceptions.SaveNotSupportedException">No solution or metadata file is open.</exception>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.ITestManagement.TmiInstance">
+      <summary>Gets an instance of the <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITmi" />, which provides access to the Test Management Interface (TMI).</summary>
+      <returns>A TMI instance.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.ITestTypeExtensionResultViewer"></member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ITestTypeExtensionResultViewer.Initialize(Microsoft.VisualStudio.TestTools.Common.TestResult)"></member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.ITuip">
+      <summary>Provides an interface for a test user interface (UI) package that is used to interface between Visual Studio and a custom test type.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ITuip.CloseResultViewer(Microsoft.VisualStudio.TestTools.Common.TestResultMessage)">
+      <summary>Closes the viewer for the provided custom result.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ITuip.InvokeEditor(Microsoft.VisualStudio.TestTools.Vsip.UIBlob,Microsoft.VisualStudio.TestTools.Common.ITestElement)">
+      <summary>Launches the editor that is registered for the provided <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.UIBlob" /> and test element.</summary>
+      <param name="uiBlob">A <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.UIBlob" /> object.</param>
+      <param name="test">An <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ITuip.InvokeResultViewer(Microsoft.VisualStudio.TestTools.Common.TestResultMessage)">
+      <summary>Launches the viewer that is registered for the provided test result message.</summary>
+      <param name="result">A <see cref="T:Microsoft.VisualStudio.TestTools.Common.TestResultMessage" /> object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ITuip.IsTestPropertiesReadOnly(Microsoft.VisualStudio.TestTools.Common.ITestElement)">
+      <summary>Returns a value that indicates whether the properties in the provided test element are read-only.</summary>
+      <returns>true if the properties in the provided test element are read-only; otherwise, false.</returns>
+      <param name="test">An <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> object.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.ITuip.RunConfigurationEditor">
+      <summary>Gets a custom editor for a custom test type.</summary>
+      <returns>A custom editor for a custom test type.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ITuip.UpdateTestCustomProperty(Microsoft.VisualStudio.TestTools.Common.ITestElement,System.String)">
+      <summary>Sets the value of the specified custom property in the provided test element.</summary>
+      <param name="test">The <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> object to be updated.</param>
+      <param name="propertyToChange">The name of the custom property to set.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ITuip.UpdateTestProperty(Microsoft.VisualStudio.TestTools.Common.ITestElement,System.ComponentModel.PropertyDescriptor)">
+      <summary>Sets the value of the specified property in the provided test element.</summary>
+      <param name="test">The <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> object to be updated.</param>
+      <param name="propertyToChange">A <see cref="T:System.ComponentModel.PropertyDescriptor" /> object.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.ITuipEditorTestPropertyChange">
+      <summary>Provides an interface that adds methods to change properties in a derived class.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ITuipEditorTestPropertyChange.ChangeCustomTestProperty(Microsoft.VisualStudio.TestTools.Common.ITestElement,System.String)">
+      <summary>Sets the value of a custom property in the provided test element.</summary>
+      <param name="testWithNewProperty">A custom <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> that contains the changed property.</param>
+      <param name="customProperty">The name of the changed custom property.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ITuipEditorTestPropertyChange.ChangeTestProperty(Microsoft.VisualStudio.TestTools.Common.ITestElement,System.ComponentModel.PropertyDescriptor)">
+      <summary>Sets the value of a property in the provided test element.</summary>
+      <param name="testWithNewProperty">An <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> that contains the changed property.</param>
+      <param name="propertyDescriptor">A <see cref="T:System.ComponentModel.PropertyDescriptor" /> object that indicates the changed property.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.ProvideServiceForTestTypeAttribute">
+      <summary>Represents the attribute that is to be applied to a package that implements the service for a test type which ensures that the service is properly registered.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ProvideServiceForTestTypeAttribute.#ctor(System.Type,System.Type)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.ProvideServiceForTestTypeAttribute" /> class by using the provided test type and service type. </summary>
+      <param name="testType">The <see cref="T:System.Type" /> of the custom <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> for which to provide services.</param>
+      <param name="serviceType">The <see cref="T:System.Type" /> of the <see cref="T:Microsoft.VisualStudio.OLE.Interop.IServiceProvider" /> to provide.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ProvideServiceForTestTypeAttribute.Register(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)">
+      <summary>Registers the custom host adapter with the testing framework.</summary>
+      <param name="context">The current registration context.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.ProvideServiceForTestTypeAttribute.ServiceType">
+      <summary>Gets the <see cref="T:System.Type" /> of the custom <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> for which to provide services.</summary>
+      <returns>The <see cref="T:System.Type" /> of the custom test for which to provide services.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.ProvideServiceForTestTypeAttribute.TestType">
+      <summary>Gets the <see cref="T:System.Type" /> of the <see cref="T:Microsoft.VisualStudio.OLE.Interop.IServiceProvider" /> to return.</summary>
+      <returns>The <see cref="T:System.Type" /> of the <see cref="T:Microsoft.VisualStudio.OLE.Interop.IServiceProvider" /> to use.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ProvideServiceForTestTypeAttribute.Unregister(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)">
+      <summary>Unregisters the custom host adapter with the testing framework.</summary>
+      <param name="context">The current registration context.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.ProvideTipAttribute">
+      <summary>Represents the attribute that is applied to the class that implements the <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITip" /> interface.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ProvideTipAttribute.#ctor(System.Type,System.Type)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.ProvideTipAttribute" /> class.</summary>
+      <param name="testType">The type of the <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" />.</param>
+      <param name="serviceType">The type of the <see cref="T:Microsoft.VisualStudio.OLE.Interop.IServiceProvider" /> for the <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITip" />.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ProvideTipAttribute.Register(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)">
+      <summary>No text required</summary>
+      <param name="context">The current registration context.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.ProvideTipAttribute.ServiceType">
+      <summary>Gets the type of the service to provide.</summary>
+      <returns>The type of the service to provide.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.ProvideTipAttribute.TestType">
+      <summary>Gets the type of the custom test element.</summary>
+      <returns>The type of the custom test element.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.ProvideTipAttribute.Unregister(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)">
+      <summary>No text required</summary>
+      <param name="context">The current registration context.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.RegisterHostAdapterAttribute">
+      <summary>Represents the attribute that is applied to a custom host adapter to register the adapter with the Visual Studio testing framework.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.RegisterHostAdapterAttribute.#ctor(System.String,System.Type,System.Type)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.RegisterHostAdapterAttribute" /> class by using the provided host adapter name, adapter type, and editor type.</summary>
+      <param name="hostAdapterName">The name of the host adapter.</param>
+      <param name="hostAdapterType">The <see cref="T:System.Type" /> for the host adapter.</param>
+      <param name="hostAdapterEditorType">The <see cref="T:System.Type" /> for the editor of the host adapter.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.RegisterHostAdapterAttribute.HostAdapterEditorType">
+      <summary>Gets the type of the editor for the custom host adapter.</summary>
+      <returns>The type of the custom editor for the custom host adapter.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.RegisterHostAdapterAttribute.HostAdapterName">
+      <summary>Gets the name of the custom host adapter.</summary>
+      <returns>The name of the custom host adapter.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.RegisterHostAdapterAttribute.HostAdapterType">
+      <summary>Gets the type of the custom host adapter.</summary>
+      <returns>The type of the custom host adapter.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.RegisterHostAdapterAttribute.Register(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)">
+      <summary>Registers the custom host adapter with the testing framework.</summary>
+      <param name="context">The current registration context.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.RegisterHostAdapterAttribute.Unregister(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)">
+      <summary>Unregisters the custom host adapter with the testing framework.</summary>
+      <param name="context">The current registration context.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeAttribute">
+      <summary>Represents the attribute that is applied to a custom <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> to register it with the Visual Studio testing user interface (UI).</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeAttribute.#ctor(System.Type,System.Type,System.Type,System.Int32,System.String[],System.Int32[],System.Int32,System.Int32)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeAttribute" /> class. </summary>
+      <param name="testType">The <see cref="T:System.Type" /> for the custom <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> to which this attribute is applied.</param>
+      <param name="tipType">The <see cref="T:System.Type" /> for the custom <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITip" /> for the test type.</param>
+      <param name="factoryType">The <see cref="T:System.Type" /> for the custom <see cref="T:Microsoft.VisualStudio.TestTools.UITesting.UITestControlFactory" /> for the test type.</param>
+      <param name="priority">A number that indicates the priority for the test class to which this attribute is applied.</param>
+      <param name="extensions">A string array of extensions that is used by the test class to which this attribute is applied.</param>
+      <param name="iconIds">An int array of the IDs for icons that is used by the test class to which this attribute is applied.</param>
+      <param name="testTypeNameId">The ID number for the test name.</param>
+      <param name="editorNameId">The ID number for the editor to use for the test class to which this attribute is applied.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeAttribute.EditorNameId">
+      <summary>Gets the ID for the editor name.</summary>
+      <returns>The ID for the editor name.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeAttribute.Extensions">
+      <summary>Gets a collection of extensions that is used by the test type to which this attribute is applied</summary>
+      <returns>A collection of extensions that is used by the test type to which this attribute is applied.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeAttribute.FactoryType">
+      <summary>Gets the type of <see cref="T:Microsoft.VisualStudio.TestTools.UITesting.UITestControlFactory" /> for the test type to which this attribute is applied.</summary>
+      <returns>The type of <see cref="T:Microsoft.VisualStudio.TestTools.UITesting.UITestControlFactory" /> for the test type to which this attribute is applied.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeAttribute.Priority">
+      <summary>Gets the numeric priority for the test element to which this attribute is applied.</summary>
+      <returns>The numeric priority for the test element to which this attribute is applied.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeAttribute.Register(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)"></member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeAttribute.TestType">
+      <summary>Gets the custom <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> type for the test element to which this attribute is applied.</summary>
+      <returns>The custom <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITestElement" /> type for the test element to which this attribute is applied.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeAttribute.TestTypeNameId">
+      <summary>Gets the numeric ID for the name of the type of the test to which this attribute is applied.</summary>
+      <returns>The numeric ID for the name of the type of the test to which this attribute is applied.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeAttribute.TipType">
+      <summary>Gets the custom <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITip" /> type for the test item provider (TIP) for the test to which this attribute is applied.</summary>
+      <returns>The custom type of TIP for the test to which this attribute is applied.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeAttribute.Unregister(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)"></member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeNoEditorAttribute">
+      <summary>Represents the attribute that is applied to the class that requires no editor.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeNoEditorAttribute.#ctor(System.Type,System.Type,System.String[],System.Int32[],System.Int32)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeNoEditorAttribute" /> class by using the provided parameter values.</summary>
+      <param name="testType">The <see cref="T:System.Type" /> for the custom test.</param>
+      <param name="tipType">The <see cref="T:System.Type" /> for the custom <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITip" />.</param>
+      <param name="extensions">A string array of file name extensions.</param>
+      <param name="iconIds">An int array of IDs for icons.</param>
+      <param name="testTypeNameId">An int that represents the ID for the test name.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeNoEditorAttribute.Extensions">
+      <summary>Gets a collection of file name extensions.</summary>
+      <returns>A collection of file name extensions.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeNoEditorAttribute.Register(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)">
+      <summary>No text required.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeNoEditorAttribute.TestType">
+      <summary>Gets the <see cref="T:System.Type" /> for test elements.</summary>
+      <returns>The <see cref="T:System.Type" /> for test elements.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeNoEditorAttribute.TestTypeNameId">
+      <summary>Gets the numeric ID for the name of the test type.</summary>
+      <returns>The numeric ID for the name of the test type.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeNoEditorAttribute.TipType">
+      <summary>Gets the type name for the custom implementation of <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITip" />.</summary>
+      <returns>The type name for the custom implementation of <see cref="T:Microsoft.VisualStudio.TestTools.Common.ITip" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.RegisterTestTypeNoEditorAttribute.Unregister(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)">
+      <summary>No text required.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.STestManagement">
+      <summary>Represents the invariant interface of a service so that the caller can cast it to different interfaces so that <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.ITuip" /> implementations can have access to the Test Management Interface (TMI) of Visual Studio.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.TestExecutionSettings"></member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.TestExecutionSettings.#ctor"></member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.TestExecutionSettings.#ctor(Microsoft.VisualStudio.TestTools.Vsip.TestExecutionSettings)"></member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.TestExecutionSettings.Clone">
+      <returns>Returns <see cref="T:System.Object" />.</returns>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.TestExecutionSettings.DefaultIsInplaceInstrumentationEnabled"></member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.TestExecutionSettings.IsCodeColoringEnabled">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.TestExecutionSettings.IsInPlaceInstrumentationEnabled">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.TestExecutionSettings.KeepHostProcessAlive">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.TestExecutionSettings.MaxTestRunsPerSolution">
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.TestExecutionSettings.PathToWebRoot">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.TestExecutionSettings.UnitTestResultNavigatePointOfFailure">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.TestProjectSettings"></member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.TestProjectSettings.#ctor"></member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.TestProjectSettings.#ctor(Microsoft.VisualStudio.TestTools.Vsip.TestProjectSettings)"></member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.TestProjectSettings.#ctor(System.IServiceProvider)"></member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.TestProjectSettings.Clone">
+      <returns>Returns <see cref="T:System.Object" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.TestProjectSettings.DefaultProjectLanguage">
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.CodingLanguages" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.TestProjectSettings.DefaultTestTemplateIds">
+      <returns>Returns <see cref="T:System.Collections.Generic.Dictionary`2" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.TestProjectSettings.FireChangedEvent"></member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.TestProjectSettings.IsBackgroundTestDiscoveryEnabled">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="E:Microsoft.VisualStudio.TestTools.Vsip.TestProjectSettings.ProjectSettingsChanged"></member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.TestProjectSettings.UseCodeUnderTestLanguage">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.TestToolsHostApplication"></member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.TestToolsHostApplication.Vstt">
+      <summary />
+    </member>
+    <member name="F:Microsoft.VisualStudio.TestTools.Vsip.TestToolsHostApplication.VsttLite">
+      <summary />
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.TestTypeExtensionUI"></member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.TestTypeExtensionUI.#ctor"></member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.TestTypeExtensionUI.CommandProvider">
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.TestTools.Vsip.ICommandProvider" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.TestTypeExtensionUI.Icon">
+      <returns>Returns <see cref="T:System.Drawing.Icon" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.TestTypeExtensionUI.ResultExtensionViewer">
+      <returns>Returns <see cref="T:System.Windows.Forms.UserControl" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.UIBlob">
+      <summary>Represents an item in the Visual Studio solution hierarchy. This class cannot be inherited.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.UIBlob.Equals(System.Object)">
+      <summary>Determines whether the provided object is equal to the current object.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.UIBlob.GetHashCode"></member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.UIBlob.ItemId">
+      <summary>Gets the numeric ID for a specific item.</summary>
+      <returns>The numeric ID for a specific item.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.UIBlob.VSHierarchy">
+      <summary>Gets the pointer to the item in the Visual Studio solution hierarchy.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TestTools.Vsip.WebTestSettings"></member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.WebTestSettings.#ctor"></member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.WebTestSettings.#ctor(Microsoft.VisualStudio.TestTools.Vsip.WebTestSettings)"></member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.WebTestSettings.AttemptDependentMatching">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.WebTestSettings.BinaryHttpBodyContentTypes">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.WebTestSettings.BinaryHttpBodyContentTypesAsArray">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TestTools.Vsip.WebTestSettings.Clone">
+      <returns>Returns <see cref="T:System.Object" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.WebTestSettings.DetectDynamicParameters">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.WebTestSettings.ExtractBindHiddenFields">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.WebTestSettings.RecordEmptyContentTypeAsBinaryBody">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.WebTestSettings.RecordFromMultipleBrowsers">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TestTools.Vsip.WebTestSettings.StartingURL">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+  </members>
+</doc>

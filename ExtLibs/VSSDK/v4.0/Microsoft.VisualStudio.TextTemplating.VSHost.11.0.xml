@@ -1,0 +1,260 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.TextTemplating.VSHost.11.0</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGenerator">
+      <summary>A managed wrapper for VS's concept of an IVsSingleFileGenerator which is a custom tool invoked during the build which can take any file as an input  and provide a compilable code file as output.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGenerator.#ctor"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGenerator.Dispose">
+      <summary>Releases all resources used by this instance.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGenerator.Dispose(System.Boolean)"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGenerator.FileNamespace">
+      <summary>namespace for the file.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGenerator.Finalize"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGenerator.Generate(System.String,System.String,System.String,System.IntPtr@,System.Int32@,Microsoft.VisualStudio.Shell.Interop.IVsGeneratorProgress)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGenerator.GenerateCode(System.String,System.String)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGenerator.GeneratorErrorCallback(System.Boolean,System.Int32,System.String,System.Int32,System.Int32)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGenerator.GetDefaultExtension">
+      <summary>gets the default extension for this generator</summary>
+      <returns>string with the default extension for this generator</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGenerator.InputFilePath">
+      <summary>file-path for the input file.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGenerator.Microsoft#VisualStudio#Shell#Interop#IVsSingleFileGenerator#DefaultExtension(System.String@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGenerator.Microsoft#VisualStudio#Shell#Interop#IVsSingleFileGenerator#Generate(System.String,System.String,System.String,System.IntPtr[],System.UInt32@,Microsoft.VisualStudio.Shell.Interop.IVsGeneratorProgress)"></member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGeneratorWithSite">
+      <summary>This class exists to be co-created in a preprocessor build step.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGeneratorWithSite.#ctor"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGeneratorWithSite.CreateExceptionMessage(System.Exception)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGeneratorWithSite.Dispose(System.Boolean)"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGeneratorWithSite.Dte">
+      <summary>Get the DTE object</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGeneratorWithSite.ErrorList">
+      <summary>Get the Vs ErrorList object</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGeneratorWithSite.GetService(System.Guid)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGeneratorWithSite.GetService(System.Type)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGeneratorWithSite.GetSite(System.Guid@,System.IntPtr@)"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGeneratorWithSite.GlobalServiceProvider">
+      <summary>Provides a wrapper on the global service provider for Visual Studio</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGeneratorWithSite.SetSite(System.Object)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGeneratorWithSite.SetWaitCursor">
+      <summary>Set the wait cursor until the end of this generation</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.BaseCodeGeneratorWithSite.SiteServiceProvider">
+      <summary>Get a wrapper on the containing project system's Service provider &lt;remarks&gt; This is a limited service provider that can only reliably provide VxDTE::SID_SVSProjectItem  SID_SVSWebReferenceDynamicProperties  IID_IVsHierarchy  SID_SVsApplicationSettings To get the global provider, call GetSite on IVSHierarchy or use the GlobalServiceProvider property &lt;/remarks&gt;</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.BaseTemplatedCodeGenerator">
+      <summary>Text Templating Code Generator</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseTemplatedCodeGenerator.#ctor"></member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.BaseTemplatedCodeGenerator.callback"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseTemplatedCodeGenerator.GenerateCode(System.String,System.String)">
+      <summary>Generate the final code from the input template and its parameters</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseTemplatedCodeGenerator.GetDefaultExtension">
+      <summary>Get the extension of the file that should be created</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.BaseTemplatedCodeGenerator.ProcessTemplate(System.String,System.String,Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplating,Microsoft.VisualStudio.Shell.Interop.IVsHierarchy)">
+      <summary>Do the actual template processing that forms the core of this generator</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.BaseTemplatedCodeGenerator.TextTemplating">
+      <summary>Get the TextTemplating service from Visual Studio</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.CommandIds">
+      <summary>CommandIDs for the Text Templating Orchestrator package.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.CommandIds.DebugT4Template"></member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.CommandIds.GenerateAllCode">
+      <summary>Command Ids for Visual Studio.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.CommandIds.GenerateAllCodeCompatibility"></member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.CommandIds.GuidOrchestratorMenus">
+      <summary>Keep in sync with PkgCmdId.ctc</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.CommandIds.GuidOrchestratorSolutionExplorerCmdSet"></member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.CompositionServices">
+      <summary>Class to standardize usage of MEF within T4.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.CompositionServices.InitializeServices(Microsoft.VisualStudio.OLE.Interop.IServiceProvider)"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.CompositionServices.ServiceContainer">
+      <summary>Service container to add local services within the AppDomain</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.CompositionServices.ServiceProvider">
+      <summary>Service provider to ask for local services within the AppDomain Query for SComponentModel to acquire MEF services.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.OrchestratorOptionsAutomation">
+      <summary>Provides storage for the settings that are displayed in the Text Templating page in the Tools Options dialog.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.OrchestratorOptionsAutomation.#ctor(System.IServiceProvider)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.OrchestratorOptionsAutomation.LoadSettingsFromStorage">
+      <summary>Load settings from registry.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.OrchestratorOptionsAutomation.LoadSettingsFromXml(Microsoft.VisualStudio.Shell.Interop.IVsSettingsReader)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.OrchestratorOptionsAutomation.ResetSettings">
+      <summary>Reset Settings</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.OrchestratorOptionsAutomation.SaveSettingsToStorage">
+      <summary>Save settings to registry.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.OrchestratorOptionsAutomation.SaveSettingsToXml(Microsoft.VisualStudio.Shell.Interop.IVsSettingsWriter)"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.OrchestratorOptionsAutomation.ShowWarningDialog">
+      <summary>If true, a security warning dialog is shown each time text transformation is run.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.OrchestratorOptionsPage">
+      <summary>The page in the Visual Studio Tools&gt;Options dialog in which users can set Text Templating options.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.OrchestratorOptionsPage.#ctor"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.OrchestratorOptionsPage.AutomationObject"></member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorAttribute">
+      <summary>Apply this attribute to the package class in a Visual Studio extension that provides a custom tool.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorAttribute.#ctor(System.Type,System.String,System.String,System.Boolean)"></member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorAttribute.AspNetProjectGuid">
+      <summary>Guid of the ASP.Net Project System package</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorAttribute.CSharpProjectGuid">
+      <summary>Guid of the C# Project System package</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorAttribute.Description">
+      <summary>A human readable description of this generator</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorAttribute.GeneratesDesignTimeSource">
+      <summary>If true, this code generator provides design-time source code</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorAttribute.Name">
+      <summary>The name of this generator. To apply this generator to a file in Solution Explorer, set its Custom Tool property to this name.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorAttribute.ProjectSystem">
+      <summary>The project system with which this code generator is registered.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorAttribute.Register(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorAttribute.RegisterCodeBase">
+      <summary>If true, the generator is registered using a codebase - that is, a specific assembly file location. If false, the assembly is in the GAC.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorAttribute.Type">
+      <summary>The type implementing the Code Generator</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorAttribute.Unregister(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)"></member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorAttribute.VisualBasicProjectGuid">
+      <summary>Guid of the Visual Basic Project System package</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorExtensionAttribute">
+      <summary>Attribute class to provide registration of a code generator against a specific file extension</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorExtensionAttribute.#ctor(System.String,System.String)"></member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorExtensionAttribute.AspNetProjectSystemGuid">
+      <summary>Actual project GUID (as opposed to package Guid) for ASP.Net</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorExtensionAttribute.CSharpProjectSystemGuid">
+      <summary>Actual project GUID (as opposed to package Guid) for CSharp</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorExtensionAttribute.Extension">
+      <summary>The extension to bind the named generator to</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorExtensionAttribute.Name">
+      <summary>The name of the generator to add an extension for</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorExtensionAttribute.ProjectSystem">
+      <summary>The project system that this code generator is registered with</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorExtensionAttribute.ProjectSystemPackage">
+      <summary>The package implementing the project system that this code generator is registered with</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorExtensionAttribute.Register(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorExtensionAttribute.Unregister(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)"></member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideCodeGeneratorExtensionAttribute.VisualBasicProjectSystemGuid">
+      <summary>Actual project GUID (as opposed to package Guid) for Visual Basic</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideDirectiveProcessorAttribute">
+      <summary>Attribute class to provide the registry entries for a T4.VSHost Directive Processor</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideDirectiveProcessorAttribute.#ctor(System.Type,System.String,System.String)"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideDirectiveProcessorAttribute.Description">
+      <summary>The human description of the directive processor</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideDirectiveProcessorAttribute.DirectiveProcessorsKeyName">
+      <summary>Name of the specific registry key for Directive processors</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideDirectiveProcessorAttribute.Name">
+      <summary>The Name of the directive processor</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideDirectiveProcessorAttribute.Register(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)"></member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideDirectiveProcessorAttribute.TextTemplatingKeyName">
+      <summary>Name of the root registry key for Text templating</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideDirectiveProcessorAttribute.Type">
+      <summary>The type implementing the directive processor</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideDirectiveProcessorAttribute.Unregister(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)"></member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideIncludeFolderAttribute">
+      <summary>Attribute class to provide the registry entries for a T4.VSHost include folder.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideIncludeFolderAttribute.#ctor(System.String,System.Int32,System.String)"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideIncludeFolderAttribute.Extension">
+      <summary>The extension of template files to apply this inclusion folder with.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideIncludeFolderAttribute.Folder">
+      <summary>The path of the inclusion folder being registered.  This path is relative to the component path of the assembly being registered.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideIncludeFolderAttribute.IncludeFoldersKeyName">
+      <summary>Name of the specific registry key for Directive processors</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideIncludeFolderAttribute.Index">
+      <summary>The zero-based index of the folder</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideIncludeFolderAttribute.Register(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)"></member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideIncludeFolderAttribute.TextTemplatingKeyName">
+      <summary>Name of the root registry key for Text templating</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.ProvideIncludeFolderAttribute.Unregister(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)"></member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.TemplatedCodeGenerator">
+      <summary>Parses a file template to produce its output. Only a single generator is needed for any style of template as the custom code is handled with directive providers.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.TemplatedCodeGenerator.#ctor"></member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.TemplatedPreprocessor">
+      <summary>Parses a file template to produce the code class needed to generate the output of the template. Only a single generator is needed for any style of template as the custom code is handled with directive providers.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.TemplatedPreprocessor.#ctor"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.TemplatedPreprocessor.ProcessTemplate(System.String,System.String,Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplating,Microsoft.VisualStudio.Shell.Interop.IVsHierarchy)"></member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.TextTemplatingCallback"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.TextTemplatingCallback.#ctor"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.TextTemplatingCallback.DeepCopy">
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.TextTemplating.VSHost.TextTemplatingCallback" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.TextTemplatingCallback.ErrorCallback(System.Boolean,System.String,System.Int32,System.Int32)"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.TextTemplatingCallback.Errors">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.TextTemplatingCallback.Extension">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.TextTemplatingCallback.Initialize"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.TextTemplatingCallback.OutputEncoding">
+      <returns>Returns <see cref="T:System.Text.Encoding" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.TextTemplatingCallback.SetFileExtension(System.String)"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.TextTemplatingCallback.SetOutputEncoding(System.Text.Encoding,System.Boolean)"></member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.TransformationRunFactory"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.TransformationRunFactory.#ctor"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.TransformationRunFactory.CreateTransformationRun(System.Type,System.String,System.ResolveEventHandler)">
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.TextTemplating.IDebugTransformationRun" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.TransformationRunFactory.InitializeLifetimeService">
+      <returns>Returns <see cref="T:System.Object" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.TransformationRunFactory.RegisterIpcChannel"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.TransformationRunFactory.RegisterIpcChannel(System.String)"></member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.TransformationRunFactory.TransformationRunFactoryPrefix"></member>
+    <member name="F:Microsoft.VisualStudio.TextTemplating.VSHost.TransformationRunFactory.TransformationRunFactorySuffix"></member>
+  </members>
+</doc>
