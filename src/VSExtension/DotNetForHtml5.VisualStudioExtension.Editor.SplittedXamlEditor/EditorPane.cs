@@ -19,7 +19,6 @@ using DotNetForHtml5.VisualStudioExtension.Editor.XamlDesigner;
 using System.Windows.Forms.Integration;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.ComponentModelHost;
 
 namespace DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor
 {
