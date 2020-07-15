@@ -31,4 +31,13 @@ echo %ESC%[95mPacking %ESC%[0mCSHTML5 %ESC%[95mNuGet package%ESC%[0m
 echo. 
 nuget.exe pack data\CSHTML5.nuspec -OutputDirectory "output/CSHTML5" -Properties "PackageId=CSHTML5;PackageVersion=2.0.0-alpha%PackageVersion%;Configuration=Debug;AssembliesPrefix=CSHTML5;CompilerPrefix=CSharpXamlForHtml5"
 
+echo. 
+echo %ESC%[95mBuilding %ESC%[0mVSIX %ESC%[0m
+echo. 
+msbuild ../src/VSExtension/VSExtension.CSHTML5.sln -p:Configuration=Release -restore -p:VisualStudioVersion=14.0
+echo. 
+echo %ESC%[95mCopying %ESC%[0mCSHTML5.vsix %ESC%[95mto output folder%ESC%[0m
+echo. 
+xcopy ..\src\VSExtension\CSHTML5.Vsix\bin\CSHTML5\Release\CSHTML5.vsix output\CSHTML5\ /Y
+
 pause

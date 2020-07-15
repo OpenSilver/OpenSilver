@@ -31,4 +31,13 @@ echo %ESC%[95mPacking %ESC%[0mOpenSilver.UWPCompatible %ESC%[95mNuGet package%ES
 echo. 
 nuget.exe pack data\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver.UWPCompatible;PackageVersion=1.0.0-alpha-%PackageVersion%;Configuration=UWP;AssembliesPrefix=OpenSilver.UWPCompatible"
 
+echo. 
+echo %ESC%[95mBuilding %ESC%[0mVSIX %ESC%[0m
+echo. 
+msbuild ../src/VSExtension/VSExtension.OpenSilver.sln -p:Configuration=Release -restore -p:VisualStudioVersion=14.0
+echo. 
+echo %ESC%[95mCopying %ESC%[0mOpenSilver.vsix %ESC%[95mto output folder%ESC%[0m
+echo. 
+xcopy ..\src\VSExtension\OpenSilver.VSIX\bin\OpenSilver\Release\OpenSilver.vsix output\OpenSilver\ /Y
+
 pause
