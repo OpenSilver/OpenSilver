@@ -57,7 +57,9 @@ namespace Windows.UI.Xaml.Shapes
         private bool _isListeningToAncestorsVisibilityChanged;
 
         private bool _redrawPending = false;
-        
+
+        private bool _redrawWhenBecomeVisible = true;
+
         #endregion
 
         #region Constructor
@@ -81,15 +83,24 @@ namespace Windows.UI.Xaml.Shapes
                 // Then, after this has been drawn, programmatically reduce the size of the border => the rectangle will not become smaller because 
                 // its inner html <canvas> has a fixed size and prevents its container from being smaller.
             }
+
+            IsVisibleChanged += (d,e) =>
+            {
+                bool newValue = (bool)e.NewValue;
+                if (newValue && _redrawWhenBecomeVisible)
+                {
+                    ScheduleRedraw();
+                }
+            };
         }
 
         #endregion
 
-        #region Dependency Properties
+            #region Dependency Properties
 
-        /// <summary>
-        /// Gets or sets the Brush that specifies how to paint the interior of the shape.
-        /// </summary>
+            /// <summary>
+            /// Gets or sets the Brush that specifies how to paint the interior of the shape.
+            /// </summary>
         public Brush Fill
         {
             get { return (Brush)GetValue(FillProperty); }
@@ -363,7 +374,7 @@ namespace Windows.UI.Xaml.Shapes
 
         internal protected virtual void Redraw()
         {
-
+            _redrawWhenBecomeVisible = false;
         }
 
         internal protected virtual void ManageStrokeChanged()
@@ -430,30 +441,10 @@ namespace Windows.UI.Xaml.Shapes
                         if (INTERNAL_VisibilityChangedNotifier.IsElementVisible(this))
                         {
                             Redraw();
-
-                            // Stop listening to the ancestors' Visibility_Changed, if it was listening:
-                            if (_isListeningToAncestorsVisibilityChanged)
-                                INTERNAL_VisibilityChangedNotifier.StopListeningToAncestorsVisibilityChanged(this);
-                            _isListeningToAncestorsVisibilityChanged = false;
                         }
                         else
                         {
-                            // We listen to the Visibility_Changed event of the ancestors so as try again if a parent becomes visible:
-                            if (!_isListeningToAncestorsVisibilityChanged)
-                            {
-                                _isListeningToAncestorsVisibilityChanged = true;
-                                INTERNAL_VisibilityChangedNotifier.StartListeningToAncestorsVisibilityChanged(this,
-                                () =>
-                                {
-                                        // Stop listening to the ancestors' Visibility_Changed:
-                                        if (_isListeningToAncestorsVisibilityChanged)
-                                        INTERNAL_VisibilityChangedNotifier.StopListeningToAncestorsVisibilityChanged(this);
-                                    _isListeningToAncestorsVisibilityChanged = false;
-
-                                        // Try again:
-                                        ScheduleRedraw();
-                                });
-                            }
+                            _redrawWhenBecomeVisible = true;
                         }
                     });
                 }
