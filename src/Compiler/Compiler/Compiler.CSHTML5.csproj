@@ -20,28 +20,28 @@
 	<NoWarn>CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <AssemblyName>CSHTML5.Compiler</AssemblyName>
+    <AssemblyName>CSharpXamlForHtml5.Compiler</AssemblyName>
     <DefineConstants>TRACE;DEBUG;BRIDGE</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU'">
-    <AssemblyName>CSHTML5.Compiler</AssemblyName>
+    <AssemblyName>CSharpXamlForHtml5.Compiler</AssemblyName>
     <DefineConstants>TRACE;DEBUG;BRIDGE;WORKINPROGRESS</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration|AnyCPU'">
-    <AssemblyName>CSHTML5.Migration.Compiler</AssemblyName>
+    <AssemblyName>SLMigration.CSharpXamlForHtml5.Compiler</AssemblyName>
     <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;BRIDGE;</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU'">
-    <AssemblyName>CSHTML5.Migration.Compiler</AssemblyName>
+    <AssemblyName>SLMigration.CSharpXamlForHtml5.Compiler</AssemblyName>
     <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;BRIDGE;WORKINPROGRESS</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>

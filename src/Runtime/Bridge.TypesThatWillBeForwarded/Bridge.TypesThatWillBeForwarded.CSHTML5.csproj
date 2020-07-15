@@ -40,13 +40,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">
-    <AssemblyName>CSHTML5.Migration.Stubs</AssemblyName>
+    <AssemblyName>CSHTML5.Stubs</AssemblyName>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">
-    <AssemblyName>CSHTML5.Migration.Stubs</AssemblyName>
+    <AssemblyName>CSHTML5.Stubs</AssemblyName>
     <DefineConstants>TRACE;WORKINPROGRESS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
