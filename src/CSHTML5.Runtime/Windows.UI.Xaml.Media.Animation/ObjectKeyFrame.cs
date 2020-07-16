@@ -49,8 +49,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Identifies the KeyTime dependency property.
         /// </summary>
         public static readonly DependencyProperty KeyTimeProperty =
-            DependencyProperty.Register("KeyTime", typeof(KeyTime), typeof(ObjectKeyFrame), new PropertyMetadata(new KeyTime(new TimeSpan()))
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });//, KeyTime_Changed));
+            DependencyProperty.Register("KeyTime", typeof(KeyTime), typeof(ObjectKeyFrame), new PropertyMetadata(new KeyTime(new TimeSpan())));//, KeyTime_Changed));
 
         //private static void KeyTime_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         //{
@@ -74,8 +73,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Identifies the Value dependency property.
         /// </summary>
         public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register("Value", typeof(object), typeof(ObjectKeyFrame), new PropertyMetadata(null)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });//, Value_Changed));
+            DependencyProperty.Register("Value", typeof(object), typeof(ObjectKeyFrame), new PropertyMetadata(null));//, Value_Changed));
 
         //private static void Value_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         //{

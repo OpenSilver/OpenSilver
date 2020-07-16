@@ -755,11 +755,15 @@ namespace Windows.UI.Xaml.Controls
                 throw new InvalidOperationException("Cannot set both DisplayMemberPath and ItemTemplate.");
             }
 
-            DataTemplate template = this.ItemTemplate;
-            if (template == null)
+            DataTemplate template = null;
+            if (!(item is UIElement))
             {
-                template = GetDataTemplateForDisplayMemberPath(this.DisplayMemberPath);
-            }
+                template = this.ItemTemplate;
+                if (template == null)
+                {
+                    template = GetDataTemplateForDisplayMemberPath(this.DisplayMemberPath);
+                }
+            }            
 
             if ((cc = element as ContentControl) != null)
             {

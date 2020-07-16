@@ -32,8 +32,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// </summary>
     public sealed partial class SplineDoubleKeyFrame : DoubleKeyFrame
     {
-        public static readonly DependencyProperty KeySplineProperty = DependencyProperty.Register("KeySpline", typeof(KeySpline), typeof(SplineDoubleKeyFrame), new PropertyMetadata(new KeySpline())
-        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+        public static readonly DependencyProperty KeySplineProperty = DependencyProperty.Register("KeySpline", typeof(KeySpline), typeof(SplineDoubleKeyFrame), new PropertyMetadata(new KeySpline()));
 
         public KeySpline KeySpline
         {

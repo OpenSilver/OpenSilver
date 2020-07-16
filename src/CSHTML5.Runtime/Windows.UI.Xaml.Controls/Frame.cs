@@ -82,8 +82,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.Frame.CanGoBack dependency property.
         /// </summary>
         public static readonly DependencyProperty CanGoBackProperty =
-            DependencyProperty.Register("CanGoBack", typeof(bool), typeof(Frame), new PropertyMetadata(false)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("CanGoBack", typeof(bool), typeof(Frame), new PropertyMetadata(false));
 
         void UpdateCanGoForward()
         {
@@ -105,8 +104,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.Frame.CanGoForward dependency property.
         /// </summary>
         public static readonly DependencyProperty CanGoForwardProperty =
-            DependencyProperty.Register("CanGoForward", typeof(bool), typeof(Frame), new PropertyMetadata(false)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("CanGoForward", typeof(bool), typeof(Frame), new PropertyMetadata(false));
 
         /// <summary>
         /// Gets or sets the uniform resource identifier (URI) of the current content
@@ -238,8 +236,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.Frame.UriMapper dependency property.
         /// </summary>
         public static readonly DependencyProperty UriMapperProperty =
-            DependencyProperty.Register("UriMapper", typeof(UriMapperBase), typeof(Frame), new PropertyMetadata(null)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("UriMapper", typeof(UriMapperBase), typeof(Frame), new PropertyMetadata(null));
 
         // Exceptions:
         //   System.InvalidOperationException:

@@ -282,8 +282,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Style dependency property.
         /// </summary>
         public static readonly DependencyProperty NumericButtonStyleProperty =
-            DependencyProperty.Register("NumericButtonStyle", typeof(Style), typeof(DataPager), new PropertyMetadata(null)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("NumericButtonStyle", typeof(Style), typeof(DataPager), new PropertyMetadata(null));
 
 #endregion
 

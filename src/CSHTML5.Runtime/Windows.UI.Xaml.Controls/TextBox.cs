@@ -267,8 +267,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
         /// Identifies the TextAlignment dependency property.
         /// </summary>
         public static readonly DependencyProperty TextAlignmentProperty =
-            DependencyProperty.Register("TextAlignment", typeof(TextAlignment), typeof(TextBox), new PropertyMetadata(TextAlignment.Left) { MethodToUpdateDom = TextAlignment_MethodToUpdateDom,
-            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("TextAlignment", typeof(TextAlignment), typeof(TextBox), new PropertyMetadata(TextAlignment.Left) { MethodToUpdateDom = TextAlignment_MethodToUpdateDom});
 
         static void TextAlignment_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -348,8 +347,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                         Name = new List<String> { "caretColor", "colorAlpha" },
                         ApplyAlsoWhenThereIsAControlTemplate = false,
                     };
-                },
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                }
             });
         #endregion
 
@@ -1270,8 +1268,7 @@ return globalIndexes;
             DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBox), new PropertyMetadata(
                 TextWrapping.Wrap) // Note: we have made "Wrap" the default value because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
             {
-                MethodToUpdateDom = TextWrapping_MethodToUpdateDom,
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                MethodToUpdateDom = TextWrapping_MethodToUpdateDom
             });
 
         static void TextWrapping_MethodToUpdateDom(DependencyObject d, object newValue)
@@ -1331,8 +1328,7 @@ return globalIndexes;
             DependencyProperty.Register("HorizontalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(TextBox), new PropertyMetadata(
                 ScrollBarVisibility.Hidden)
             {
-                MethodToUpdateDom = HorizontalScrollBarVisibility_MethodToUpdateDom,
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                MethodToUpdateDom = HorizontalScrollBarVisibility_MethodToUpdateDom
             });
 
         static void HorizontalScrollBarVisibility_MethodToUpdateDom(DependencyObject d, object newValue)
@@ -1383,8 +1379,7 @@ return globalIndexes;
             DependencyProperty.Register("VerticalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(TextBox), new PropertyMetadata(
                 ScrollBarVisibility.Hidden)
             {
-                MethodToUpdateDom = VerticalScrollBarVisibility_MethodToUpdateDom,
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                MethodToUpdateDom = VerticalScrollBarVisibility_MethodToUpdateDom
             });
 
         static void VerticalScrollBarVisibility_MethodToUpdateDom(DependencyObject d, object newValue)
@@ -1478,8 +1473,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
                                                                                                         typeof(TextBox),
                                                                                                         new PropertyMetadata(null) 
                                                                                                         { 
-                                                                                                            MethodToUpdateDom = TextDecorations_MethodToUpdateDom,
-                                                                                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                                                                                                            MethodToUpdateDom = TextDecorations_MethodToUpdateDom
                                                                                                         });
 
         static void TextDecorations_MethodToUpdateDom(DependencyObject d, object newValue)
@@ -1519,8 +1513,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
         /// Identifies the TextDecorations dependency property.
         /// </summary>
         public new static readonly DependencyProperty TextDecorationsProperty =
-            DependencyProperty.Register("TextDecorations", typeof(TextDecorations?), typeof(TextBox), new PropertyMetadata(null) { MethodToUpdateDom = TextDecorations_MethodToUpdateDom,
-            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("TextDecorations", typeof(TextDecorations?), typeof(TextBox), new PropertyMetadata(null) { MethodToUpdateDom = TextDecorations_MethodToUpdateDom});
 
         static void TextDecorations_MethodToUpdateDom(DependencyObject d, object newValue)
         {

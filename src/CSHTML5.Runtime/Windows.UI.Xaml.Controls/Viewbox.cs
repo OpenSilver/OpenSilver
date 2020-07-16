@@ -117,8 +117,7 @@ namespace Windows.UI.Xaml.Controls
                 "Stretch",
                 typeof(Stretch),
                 typeof(Viewbox),
-                new PropertyMetadata(Stretch.Uniform)
-                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+                new PropertyMetadata(Stretch.Uniform));
 
         /// <summary>
         /// Gets or sets the StretchDirection, which determines how scaling

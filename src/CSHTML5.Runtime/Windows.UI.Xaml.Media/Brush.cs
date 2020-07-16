@@ -59,8 +59,7 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the Opacity dependency property.
         /// </summary>
         public static readonly DependencyProperty OpacityProperty =
-            DependencyProperty.Register("Opacity", typeof(double), typeof(Brush), new PropertyMetadata(1d)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Opacity", typeof(double), typeof(Brush), new PropertyMetadata(1d));
 
         private HashSet2<KeyValuePair<DependencyObject, DependencyProperty>> _propertiesWhereUsed;
         public HashSet2<KeyValuePair<DependencyObject, DependencyProperty>> PropertiesWhereUsed

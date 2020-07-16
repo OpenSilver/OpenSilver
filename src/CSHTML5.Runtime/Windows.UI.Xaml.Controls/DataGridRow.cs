@@ -301,8 +301,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the DataContext dependency property.
         /// </summary>
         public static readonly DependencyProperty DataContextProperty =
-            DependencyProperty.Register("DataContext", typeof(object), typeof(DataGridRow), new PropertyMetadata() { Inherits = true,
-            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("DataContext", typeof(object), typeof(DataGridRow), new PropertyMetadata() { Inherits = true});
 
         #endregion
     }

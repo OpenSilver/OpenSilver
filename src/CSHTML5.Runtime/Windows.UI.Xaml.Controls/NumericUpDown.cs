@@ -247,8 +247,7 @@ namespace Windows.UI.Xaml.Controls
                 "DragSpeed",
                 typeof(double),
                 typeof(NumericUpDown),
-                new PropertyMetadata(double.NaN)
-                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+                new PropertyMetadata(double.NaN));
 
         /// <summary>
         /// Gets or sets the DragSpeed property. This dependency property 
@@ -568,8 +567,7 @@ namespace Windows.UI.Xaml.Controls
         /// The identifier for the Increment dependency property.
         /// </summary>
         public static readonly DependencyProperty IncrementProperty =
-            DependencyProperty.Register("Increment", typeof(double), typeof(NumericUpDown), new PropertyMetadata(1.0)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Increment", typeof(double), typeof(NumericUpDown), new PropertyMetadata(1.0));
 
         private void OnValueTextBoxGotFocus(object sender, RoutedEventArgs routedEventArgs)
         {

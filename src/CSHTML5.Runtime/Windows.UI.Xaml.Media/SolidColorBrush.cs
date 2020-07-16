@@ -97,8 +97,7 @@ namespace Windows.UI.Xaml.Media
                         {
                             throw new ArgumentException();
                         }
-                    },
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                    }
             }
             );
 

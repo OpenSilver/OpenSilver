@@ -127,8 +127,7 @@ namespace Windows.UI.Xaml.Controls
                                                                                                       typeof(TextBlock), 
                                                                                                       new PropertyMetadata(TextAlignment.Left) 
                                                                                                       { 
-                                                                                                          MethodToUpdateDom = TextAlignment_MethodToUpdateDom,
-                                                                                                          CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                                                                                                          MethodToUpdateDom = TextAlignment_MethodToUpdateDom
                                                                                                       });
 
         static void TextAlignment_MethodToUpdateDom(DependencyObject d, object newValue)
@@ -186,8 +185,7 @@ namespace Windows.UI.Xaml.Controls
                             },
                         Name = new List<string> { "whiteSpace" },
                     };
-                },
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                }
             }
             );
 

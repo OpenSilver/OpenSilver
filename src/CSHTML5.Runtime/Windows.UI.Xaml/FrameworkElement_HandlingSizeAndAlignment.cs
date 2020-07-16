@@ -127,8 +127,7 @@ namespace Windows.UI.Xaml
                                                     Name = new List<string> { "height" },
                                                     ApplyAlsoWhenThereIsAControlTemplate = true
                                                 };
-                                            },
-                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                                            }
                                         });
 
         private static void Height_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -221,8 +220,7 @@ namespace Windows.UI.Xaml
                                                     Name = new List<string> { "width" },
                                                     ApplyAlsoWhenThereIsAControlTemplate = true
                                                 };
-                                            },
-                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                                            }
                                         });
 
         internal static void Width_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)

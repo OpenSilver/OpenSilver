@@ -148,8 +148,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the AlternatingRowBackground dependency property
         /// </summary>
         public static readonly DependencyProperty AlternatingRowBackgroundProperty =
-            DependencyProperty.Register("AlternatingRowBackground", typeof(Brush), typeof(DataGrid), new PropertyMetadata(new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString("#f0f0e9")))
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("AlternatingRowBackground", typeof(Brush), typeof(DataGrid), new PropertyMetadata(new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString("#f0f0e9"))));
 
 
 
@@ -166,8 +165,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the VerticalCellPadding dependency property
         /// </summary>
         public static readonly DependencyProperty VerticalCellPaddingProperty =
-            DependencyProperty.Register("VerticalCellPadding", typeof(double), typeof(DataGrid), new PropertyMetadata(3d)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("VerticalCellPadding", typeof(double), typeof(DataGrid), new PropertyMetadata(3d));
 
         /// <summary>
         ///     Event that is fired just before a row is prepared.
@@ -208,8 +206,7 @@ namespace Windows.UI.Xaml.Controls
         /// property.
         /// </summary>
         public static readonly DependencyProperty AutoGenerateColumnsProperty =
-            DependencyProperty.Register("AutoGenerateColumns", typeof(bool), typeof(DataGrid), new PropertyMetadata(true)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("AutoGenerateColumns", typeof(bool), typeof(DataGrid), new PropertyMetadata(true));
 
         /// <summary>
         /// Gets or sets the style applied to all column headers in the System.Windows.Controls.DataGrid.
@@ -249,8 +246,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty ColumnHeaderHeightProperty =
-            DependencyProperty.Register("ColumnHeaderHeight", typeof(double), typeof(DataGrid), new PropertyMetadata(double.NaN)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("ColumnHeaderHeight", typeof(double), typeof(DataGrid), new PropertyMetadata(double.NaN));
 
         /// <summary>
         /// Gets or sets the style applied to all cells in the System.Windows.Controls.DataGrid.
@@ -385,8 +381,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty EnableTwoStepsEditModeProperty =
-            DependencyProperty.Register("EnableTwoStepsEditMode", typeof(bool), typeof(DataGrid), new PropertyMetadata(false)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("EnableTwoStepsEditMode", typeof(bool), typeof(DataGrid), new PropertyMetadata(false));
 
 
 

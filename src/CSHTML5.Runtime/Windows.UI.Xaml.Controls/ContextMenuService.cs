@@ -32,8 +32,7 @@ namespace Windows.UI.Xaml.Controls
                        "ContextMenu",
                         typeof(ContextMenu),
                         typeof(ContextMenuService),
-                        new PropertyMetadata(null)
-                        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+                        new PropertyMetadata(null));
 
         /// <summary>
         ///     Gets the value of the ContextMenu property on the specified object.

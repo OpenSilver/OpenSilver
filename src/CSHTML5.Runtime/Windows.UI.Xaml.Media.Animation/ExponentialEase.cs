@@ -50,8 +50,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Identifies the Exponent dependency property.
         /// </summary>
         public static readonly DependencyProperty ExponentProperty =
-            DependencyProperty.Register("Exponent", typeof(double), typeof(ExponentialEase), new PropertyMetadata(2d)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Exponent", typeof(double), typeof(ExponentialEase), new PropertyMetadata(2d));
 
 
 //        Velocity.Easings.myCustomEasing = function (p, opts, tweenDelta) {

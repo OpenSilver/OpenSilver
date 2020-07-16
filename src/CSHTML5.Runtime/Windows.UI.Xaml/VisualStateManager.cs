@@ -88,8 +88,7 @@ namespace Windows.UI.Xaml
         /// Identifies the VisualStateManager.VisualStateGroup XAML attached property
         /// </summary>
         public static readonly DependencyProperty VisualStateGroupsProperty =
-            DependencyProperty.RegisterAttached("VisualStateGroups", typeof(IList), typeof(UIElement), new PropertyMetadata(null)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.RegisterAttached("VisualStateGroups", typeof(IList), typeof(UIElement), new PropertyMetadata(null));
 
         //note: there is no set accessible to the user in WinRT
         /// <summary>

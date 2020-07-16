@@ -283,8 +283,7 @@ namespace Windows.UI.Xaml.Controls
                         Name = new List<string> { "fontStyle" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
                     };
-                },
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                }
             }
             );
 

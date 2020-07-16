@@ -100,8 +100,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the SelectedItems dependency property.
         /// </summary>
         public static readonly DependencyProperty SelectedItemsProperty =
-            DependencyProperty.Register("SelectedItems", typeof(IList), typeof(MultiSelector), new PropertyMetadata(null)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("SelectedItems", typeof(IList), typeof(MultiSelector), new PropertyMetadata(null));
 
 
 
