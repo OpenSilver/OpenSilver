@@ -72,41 +72,11 @@
       <Project>{4d0ca743-4f06-40da-92d7-f31d8f395e2a}</Project>
       <Name>Compiler.TypeScriptDefToCSharp.CSHTML5</Name>
     </ProjectReference>
-    <Reference Include="ICSharpCode.Decompiler">
-      <HintPath>..\JSIL\bin\ICSharpCode.Decompiler.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.NRefactory">
-      <HintPath>..\JSIL\bin\ICSharpCode.NRefactory.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.NRefactory.CSharp">
-      <HintPath>..\JSIL\bin\ICSharpCode.NRefactory.CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="JSIL">
-      <HintPath>..\JSIL\bin\JSIL.dll</HintPath>
-    </Reference>
-    <Reference Include="JSIL.Meta">
-      <HintPath>..\JSIL\bin\JSIL.Meta.dll</HintPath>
-    </Reference>
-    <Reference Include="JSIL.Proxies.4.0">
-      <HintPath>..\JSIL\bin\JSIL.Proxies.4.0.dll</HintPath>
-    </Reference>
-    <Reference Include="JSIL.Proxies.Bcl">
-      <HintPath>..\JSIL\bin\JSIL.Proxies.Bcl.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Engine" />
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
-    <Reference Include="Mono.Cecil">
-      <HintPath>..\JSIL\bin\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Mdb">
-      <HintPath>..\JSIL\bin\Mono.Cecil.Mdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Pdb">
-      <HintPath>..\JSIL\bin\Mono.Cecil.Pdb.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationFramework">
       <Aliases>wpf</Aliases>
     </Reference>
