@@ -121,6 +121,5 @@
     <!-- ("Bridge.Core" package) NET40 -->
     <file src="../../ExtLibs/BridgeNET/Bridge.Core/lib/net40/Bridge.dll" target="lib/net40/Bridge.dll" />
     <file src="../../ExtLibs/BridgeNET/Bridge.Core/lib/net40/Bridge.xml" target="lib/net40/Bridge.xml" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Core/lib/net40/pdb/Bridge.pdb" target="lib/net40/pdb/Bridge.pdb" />
   </files>
 </package>
