@@ -41,3 +41,5 @@ echo.
 xcopy ..\src\VSExtension\CSHTML5.Vsix\bin\CSHTML5\Release\CSHTML5.vsix output\CSHTML5\ /Y
 
 pause
+
+explorer "output\CSHTML5"

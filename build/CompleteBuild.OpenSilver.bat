@@ -41,3 +41,5 @@ echo.
 xcopy ..\src\VSExtension\OpenSilver.VSIX\bin\OpenSilver\Release\OpenSilver.vsix output\OpenSilver\ /Y
 
 pause
+
+explorer "output\OpenSilver"
