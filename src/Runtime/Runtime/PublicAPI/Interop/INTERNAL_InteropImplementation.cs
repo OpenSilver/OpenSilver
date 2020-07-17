@@ -19,11 +19,6 @@ using Bridge;
 using JSIL.Meta;
 #endif
 
-#if !BUILDINGDOCUMENTATION
-using DotNetBrowser;
-#endif
-
-
 using CSHTML5.Types;
 using CSHTML5.Internal;
 using System;
@@ -85,9 +80,9 @@ namespace CSHTML5
                 if (Interop.IsRunningInTheSimulator_WorkAround)
                 {
 #endif
-                // Adding a property to the JavaScript "window" object:
-                JSObject jsWindow = (JSObject)INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("window");
-                jsWindow.SetProperty("onCallBack", new OnCallBack(CallbacksDictionary));
+                    // Adding a property to the JavaScript "window" object:
+                    dynamic jsWindow = INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("window");
+                    jsWindow.SetProperty("onCallBack", new OnCallBack(CallbacksDictionary));
 #if CSHTML5BLAZOR
                 }
                 else
@@ -155,9 +150,10 @@ namespace CSHTML5
 #endif
 
                     // Change the JS code to point to that callback:
+#if BRIDGE
                     javascript = javascript.Replace("$" + i.ToString(), string.Format(
                     @"(function() {{
-                        var argsArray = Array.prototype.slice.call(arguments);
+                        var argsArray = Array.prototype.slice.call(arguments);                        
                         var idWhereCallbackArgsAreStored = ""callback_args_"" + document.callbackCounterForSimulator++;
                         document.jsSimulatorObjectReferences[idWhereCallbackArgsAreStored] = argsArray;
                         setTimeout(
@@ -167,6 +163,20 @@ namespace CSHTML5
                             }}
                             , 1);
                       }})", callbackId));
+#else //OpenSilver
+                    javascript = javascript.Replace("$" + i.ToString(), string.Format(
+                                        @"(function() {{
+                        var argsArray = arguments;                        
+                        var idWhereCallbackArgsAreStored = ""callback_args_"" + document.callbackCounterForSimulator++;
+                        document.jsSimulatorObjectReferences[idWhereCallbackArgsAreStored] = argsArray;
+                        setTimeout(
+                            function() 
+                            {{
+                               window.onCallBack.OnCallbackFromJavaScript({0}, idWhereCallbackArgsAreStored, argsArray);
+                            }}
+                            , 1);
+                      }})", callbackId));
+#endif
 
                     // Note: generating the random number in JS rather than C# is important in order to be able to put this code inside a JavaScript "for" statement (cf. deserialization code of the JsonConvert extension, and also ZenDesk ticket #974) so that the "closure" system of JavaScript ensures that the number is the same before and inside the "setTimeout" call, but different for each iteration of the "for" statement in which this piece of code is put.
                     // Note: we store the arguments in the jsSimulatorObjectReferences that is inside the JS context, so that the user can access them from the callback.
@@ -199,7 +209,7 @@ namespace CSHTML5
             }
 
 #if CSHTML5NETSTANDARD
-                    //Console.WriteLine("Added ID: " + callbackId.ToString());
+            //Console.WriteLine("Added ID: " + callbackId.ToString());
 #endif
 
             // Change the JS code to call ShowErrorMessage in case of error:
@@ -315,50 +325,50 @@ result;
             {
 #endif
 #if !BUILDINGDOCUMENTATION
-            var res = (JSValue)obj;
-            int resInt;
+                dynamic res = obj;
+                int resInt;
 
-            if (res.IsString())
-                return res.AsString().Value;
-            else if (res.IsBool())
-                return res.AsBoolean().Value;
-            else if (res.IsNumber())
-                return res.AsNumber().Value;
-            else if (int.TryParse(res.ToString(), out resInt))
-                return resInt;
-            else if (res.IsNull())
-                return null;
-            else
-                return res;
+                if (res.IsString())
+                    return res.AsString().Value;
+                else if (res.IsBool())
+                    return res.AsBoolean().Value;
+                else if (res.IsNumber())
+                    return res.AsNumber().Value;
+                else if (int.TryParse(res.ToString(), out resInt))
+                    return resInt;
+                else if (res.IsNull())
+                    return null;
+                else
+                    return res;
 
-            //JSValue jsValue = (JSValue)obj;
-            //if (jsValu)
-            //{
-            //    return (string)jsValue;
-            //}
-            //else if (jsValue.IsBoolean)
-            //{
-            //    return (bool)jsValue;
-            //}
-            //else if (jsValue.IsDouble || jsValue.IsNumber)
-            //{
-            //    return (double)jsValue;
-            //}
-            //else if (jsValue.IsInteger)
-            //{
-            //    return (int)jsValue;
-            //}
-            //else if (jsValue.IsNaN || jsValue.IsNull || jsValue.IsUndefined)
-            //{
-            //    return null;
-            //}
-            //else
-            //    return jsValue; // Objects cannot be passed between C# and JavaScript, so we return the JSValue just for the sake of returning something, but we also keep a reference to the JS object via the "document.jsSimulatorObjectReferences" dictionary for later use (see comments above).
+                //JSValue jsValue = (JSValue)obj;
+                //if (jsValu)
+                //{
+                //    return (string)jsValue;
+                //}
+                //else if (jsValue.IsBoolean)
+                //{
+                //    return (bool)jsValue;
+                //}
+                //else if (jsValue.IsDouble || jsValue.IsNumber)
+                //{
+                //    return (double)jsValue;
+                //}
+                //else if (jsValue.IsInteger)
+                //{
+                //    return (int)jsValue;
+                //}
+                //else if (jsValue.IsNaN || jsValue.IsNull || jsValue.IsUndefined)
+                //{
+                //    return null;
+                //}
+                //else
+                //    return jsValue; // Objects cannot be passed between C# and JavaScript, so we return the JSValue just for the sake of returning something, but we also keep a reference to the JS object via the "document.jsSimulatorObjectReferences" dictionary for later use (see comments above).
 #else
             return obj;
 #endif
 #if CSHTML5BLAZOR
-        }
+            }
 #endif
         }
 

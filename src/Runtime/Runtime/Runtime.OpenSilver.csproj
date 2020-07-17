@@ -12,7 +12,6 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
 		<NoWarn>1591</NoWarn>
-		<DebugType>full</DebugType>
 		<DebugSymbols>true</DebugSymbols>
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
 		<EnableDefaultItems>false</EnableDefaultItems> <!-- This emluates the behavior of NET Framework, which excludes every files by default -->
@@ -41,17 +40,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="DotNetBrowser" Version="1.14.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Blazor" Version="$(BlazorVersion)" />
-		<PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="$(BlazorVersion)" PrivateAssets="all" />
-		<PackageReference Include="Microsoft.AspNetCore.Blazor.HttpClient" Version="$(BlazorVersion)" />
-		<PackageReference Include="Microsoft.AspNetCore.Blazor.DevServer" Version="$(BlazorVersion)" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+		<PackageReference Include="Microsoft.JSInterop" Version="3.1.3" />
 		<PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
 		<PackageReference Include="System.ServiceModel.Primitives" Version="4.6.0" />
-		<PackageReference Include="System.Text.Json" Version="4.7.0" />
 	</ItemGroup>
 	<ItemGroup>
+		<Compile Include="APP_SUPPORT\JavaScriptExecutionHandler.cs" />
 		<Compile Include="Core\Main\CopyOnWriteList.cs" />
 		<Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
@@ -309,7 +304,6 @@
 		<Compile Include="System.Windows.Threading\WORKINPROGRESS\DispatcherSynchronizationContext.cs" />
 		<Compile Include="APP_SUPPORT\ClientSideResourceManager.cs" />
 		<Compile Include="APP_SUPPORT\Cshtml5Initializer.cs" />
-		<Compile Include="APP_SUPPORT\JavaScriptExecutionHandler.cs" />
 		<Compile Include="APP_SUPPORT\StaticConstructorsCaller.cs" />
 		<Compile Include="Core\Events\HtmlEventProxy.cs" />
 		<Compile Include="Core\Events\INTERNAL_EventManager_2.cs" />

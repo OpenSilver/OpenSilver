@@ -27,17 +27,15 @@ using Windows.UI.Xaml;
 
 #if BRIDGE
 using Bridge;
+using DotNetBrowser;
 #else
 using JSIL.Meta;
-#endif
-
-#if !BUILDINGDOCUMENTATION
-using DotNetBrowser;
 #endif
 
 #if CSHTML5NETSTANDARD
 using System.Reflection;
 using System.Linq;
+using Microsoft.JSInterop;
 #endif
 #if !BUILDINGDOCUMENTATION
 namespace CSHTML5.Internal
@@ -48,7 +46,7 @@ namespace CSHTML5.Internal
     [JSIgnore]
 #endif
 
-#if CSHTML5NETSTANDARD
+#if CSHTML5NETSTANDARD && DEBUG
     // used to debug Browser Version
     // todo: remove when fixed
     public static class MethodInfoExtension
@@ -125,7 +123,7 @@ namespace CSHTML5.Internal
             _dictionary = dictionary;
         }
 
-#region CallBack methods
+        #region CallBack methods
 
 #if !CSHTML5NETSTANDARD
         public void UpdateDictionary(Dictionary<int, Delegate> newDictionary)
@@ -312,10 +310,12 @@ namespace CSHTML5.Internal
             return result;
         }
 
-        static public void OnCallbackFromJavaScript(
+        // Note: JSInvokable attribute allow use to call this method from JS
+        [JSInvokable]
+        public static void OnCallbackFromJavaScript(
             int callbackId,
             string idWhereCallbackArgsAreStored,
-            JSArray callbackArgsObject
+            object callbackArgsObject
             )
         {
             Action action = () =>
@@ -324,22 +324,6 @@ namespace CSHTML5.Internal
                 // Get the C# callback from its ID:
                 //----------------------------------
                 Delegate callback = _dictionary[callbackId];
-                //#if CSHTML5NETSTANDARD
-                //                try
-                //                {
-                //                    Console.WriteLine(
-                //                        "CallbackID: " + callbackId.ToString() + "\n" +
-                //                        "Callback Method Name: " + callback.Method.Name + "\n" +
-                //                        "Callback Method Body: " + callback.Method.GetMethodBody().ToString() + "\n" +
-                //                        "Callback Target: " + callback.Target.ToString() + "\n" +
-                //                        "idWhereCallbackArgsAreStored: " + idWhereCallbackArgsAreStored.ToString() + "\n" +
-                //                        "Dictionary.Count: " + _dictionary.Count.ToString());
-                //                }
-                //                catch (Exception e)
-                //                {
-
-                //                }
-                //#endif
 
                 Type callbackType = callback.GetType();
                 Type[] callbackGenericArgs = null;
@@ -451,11 +435,11 @@ namespace CSHTML5.Internal
             }
         }
 
-        static private object[] MakeArgumentsForCallback(
+        private static object[] MakeArgumentsForCallback(
             int count,
             int callbackId,
             string idWhereCallbackArgsAreStored,
-            JSArray callbackArgs,
+            object callbackArgs,
             Type[] callbackGenericArgs
             )
         {
@@ -488,38 +472,37 @@ namespace CSHTML5.Internal
             return result;
         }
 
-        static private object DelegateDynamicInvoke(Delegate d, params object[] args)
+        private static object DelegateDynamicInvoke(Delegate d, params object[] args)
         {
             object obj = null;
             string methodSingature = "Unknown Method";
             try
             {
-#if DEBUG
-                try
-                {
-                    methodSingature = d.Method.MethodSignature();
-                   // Console.WriteLine("DEBUG: OnCallBack: DelegateDynamicnvoke: " + methodSingature);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("DEBUG: OnCallBack: DelegateDynamicnvoke: ?????????");
-                    // we failed to display signature of the method
-                }
-#endif
+//#if DEBUG
+//                try
+//                {
+//                    methodSingature = d.Method.MethodSignature();
+//                    Console.WriteLine("DEBUG: OnCallBack: DelegateDynamicnvoke: " + methodSingature);
+//                }
+//                catch
+//                {
+//                    Console.WriteLine("DEBUG: OnCallBack: DelegateDynamicnvoke: ?????????");
+//                    // we failed to display signature of the method
+//                }
+//#endif
                 if (args != null)
                     obj = d.DynamicInvoke(args);
             }
             catch (Exception e)
             {
-#if DEBUG
-                Console.Error.WriteLine("DEBUG: OnCallBack: DelegateDynamicnvoke: failed to invoke: " + methodSingature + ": " + e);
-#endif
-                //throw;
+//#if DEBUG
+//                Console.Error.WriteLine("DEBUG: OnCallBack: DelegateDynamicnvoke: failed to invoke: " + methodSingature + ": " + e);
+//#endif
+                throw;
             }
             return obj;
         }
 #else
-
         public void OnCallbackFromJavaScript(
             int callbackId,
             string idWhereCallbackArgsAreStored,
@@ -532,22 +515,6 @@ namespace CSHTML5.Internal
                 // Get the C# callback from its ID:
                 //----------------------------------
                 Delegate callback = _dictionary[callbackId];
-//#if CSHTML5NETSTANDARD
-//                try
-//                {
-//                    Console.WriteLine(
-//                        "CallbackID: " + callbackId.ToString() + "\n" +
-//                        "Callback Method Name: " + callback.Method.Name + "\n" +
-//                        "Callback Method Body: " + callback.Method.GetMethodBody().ToString() + "\n" +
-//                        "Callback Target: " + callback.Target.ToString() + "\n" +
-//                        "idWhereCallbackArgsAreStored: " + idWhereCallbackArgsAreStored.ToString() + "\n" +
-//                        "Dictionary.Count: " + _dictionary.Count.ToString());
-//                }
-//                catch (Exception e)
-//                {
-
-//                }
-//#endif
 
                 Type callbackType = callback.GetType();
                 Type[] callbackGenericArgs = null;

@@ -61,7 +61,11 @@
   "Unhandled Exception: Mono.Linker.LoadException: Error while processing references of 'EmptyOpenSilverApp.Browser, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' - Mono.Linker.LoadException: Error while processing references of 'EmptyOpenSilverApp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' - Mono.Linker.LoadException: Error while processing references of 'OpenSilver, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' - Mono.Cecil.AssemblyResolutionException: Failed to resolve assembly: 'DotNetBrowser.Chromium, Version=1.14.0.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e' - Mono.Cecil.AssemblyResolutionException: Failed to resolve assembly: 'DotNetBrowser.Chromium, Version=1.14.0.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e'"
   ============================================================-->
   <PropertyGroup>
-    <BlazorLinkOnBuild>false</BlazorLinkOnBuild>
+    <BlazorWebAssemblyEnableLinking>false</BlazorWebAssemblyEnableLinking>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <!--============================================================
@@ -362,7 +366,7 @@
     <!-- _ResolveAssemblyReferenceResolvedFiles is the MSBuild variable containing the collection of all resolved references/projectReferences -->
     <!-- if we can't use this variable anymore we need to use the "@(Reference)" (assembly references) and "@(ProjectReference)" (project references) variables and manually resolve the references -->
     <BeforeXamlPreprocessor
-      Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True'"
+      Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
       IsSecondPass="$(IsSecondPass)"
       Flags="$(Flags)"
       TypeForwardingAssemblyPath="$(MSBuildThisFileDirectory)..\tools\CSharpXamlForHtml5.Bridge.TypeForwarding.dll"
@@ -377,7 +381,7 @@
       Process files which have been added as link to project.
       ============================================================-->
     <XamlPreprocessor
-    Condition="'$(SkipXamlPreprocessor)'!='true' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True'"
+    Condition="'$(SkipXamlPreprocessor)'!='true' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
     SourceFile="%(Content.FullPath)"
     OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.Link).g.cs"
     FileNameWithPathRelativeToProjectRoot="%(Content.Link)"
@@ -400,7 +404,7 @@
       Process files which have been added directly to the project.
       ============================================================-->
     <XamlPreprocessor
-    Condition="'$(SkipXamlPreprocessor)'!='true' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True'"
+    Condition="'$(SkipXamlPreprocessor)'!='true' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
     SourceFile="%(Content.FullPath)"
     OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.RelativeDir)%(Content.Filename)%(Content.Extension).g.cs"
     FileNameWithPathRelativeToProjectRoot="%(Content.RelativeDir)%(Content.Filename)%(Content.Extension)"
@@ -420,7 +424,7 @@
     NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
     />
     <AfterXamlPreprocessor
-      Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True'"
+      Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
       IsSecondPass="$(IsSecondPass)"
       Flags="$(Flags)"
       />
@@ -505,7 +509,7 @@
       ResourceExtractorAndCopier (only during Pass 2)
       ============================================================-->
     <ResourcesExtractorAndCopier
-      Condition="'$(CSharpXamlForHtml5OutputType)'!='Library' And '$(IsSecondPass)'=='True' And '$(SkipResourcesExtractorAndCopier)'!='true'"
+      Condition="'$(CSharpXamlForHtml5OutputType)'!='Library' And '$(IsSecondPass)'=='True' And '$(SkipResourcesExtractorAndCopier)'!='true' And '$(NoXamlPreprocessor)'!='True'"
       SourceAssembly="$(OutputAssemblyDirectory)\$(AssemblyName).dll"
       OutputRootPath="$(Cshtml5OutputRootPath)"
       OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
@@ -626,7 +630,7 @@
     <!-- _ResolveAssemblyReferenceResolvedFiles is the MSBuild variable containing the collection of all resolved assemblies references/project references -->
     <!-- if we can't use this variable anymore we need to use the "@(Reference)" (assembly references) and "@(ProjectReference)" (project references) variables and manually resolve the references -->
     <BeforeXamlPreprocessor
-      Condition="'$(IsSecondPass)'!='True' And '$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True'"
+      Condition="'$(IsSecondPass)'!='True' And '$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
       IsSecondPass="false"
       Flags="$(Flags)"
       TypeForwardingAssemblyPath="$(MSBuildThisFileDirectory)..\tools\CSharpXamlForHtml5.Bridge.TypeForwarding.dll"
@@ -639,7 +643,7 @@
       Process files which have been added as link to project.
       ============================================================-->
     <XamlPreprocessor
-    Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsSecondPass)'!='True' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True'"
+    Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsSecondPass)'!='True' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
     SourceFile="%(Content.FullPath)"
     OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.Link).g.cs"
     FileNameWithPathRelativeToProjectRoot="%(Content.Link)"
@@ -662,7 +666,7 @@
       Process files which have been added directly to the project.
       ============================================================-->
     <XamlPreprocessor
-    Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsSecondPass)'!='True' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True'"
+    Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsSecondPass)'!='True' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
     SourceFile="%(Content.FullPath)"
     OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.RelativeDir)%(Content.Filename)%(Content.Extension).g.cs"
     FileNameWithPathRelativeToProjectRoot="%(Content.RelativeDir)%(Content.Filename)%(Content.Extension)"
@@ -683,7 +687,7 @@
     />
 
     <AfterXamlPreprocessor
-      Condition="'$(IsSecondPass)'!='True' And '$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True'"
+      Condition="'$(IsSecondPass)'!='True' And '$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
       IsSecondPass="false"
       Flags="$(Flags)"
       />

@@ -7,8 +7,8 @@ using System.Windows.Media;
 using System.Windows.Threading;
 #else
 using Windows.Foundation;
+using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
-using Microsoft.AspNetCore.Components;
 #endif
 
 #if MIGRATION
@@ -51,7 +51,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
 		//
 		// Returns:
 		//     The element being processed at the time of an unhandled exception.
+#if MIGRATION
 		public static UIElement GetLayoutExceptionElement(Dispatcher dispatcher)
+#else
+		public static UIElement GetLayoutExceptionElement(CoreDispatcher dispatcher)
+#endif
 		{
 			return default(UIElement);
 		}

@@ -51,28 +51,11 @@ document.getElementsByTagName('head')[0].appendChild(velocityScript);
 
 window.onCallBack = {}
 window.onCallBack.OnCallbackFromJavaScript = function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject) {
-    //console.log("on callback");
-    var namespace = "CSHTML5.Internal";
-    var type = "OnCallBack";
-    var method = window.onCallbackFromJavaScript;
-    if (!method) {
-        try {
-            var assemblyName = "OpenSilver";
-            method = Blazor.platform.findMethod(assemblyName, namespace, type, "OnCallbackFromJavaScript");
-            window.onCallbackFromJavaScript = method;
-        } catch (e) {
-            var assemblyName = "OpenSilver.UWPCompatible";
-            method = Blazor.platform.findMethod(assemblyName, namespace, type, "OnCallbackFromJavaScript");
-            window.onCallbackFromJavaScript = method;
-        }
-    }
-    //console.log("method found. callbackIdStr: " + callbackId + ". idWhereCallbackArgsAreStored:" + idWhereCallbackArgsAreStored);
-    //console.log("ON CALLBACK FROM JS");
-    Blazor.platform.callMethod(method, null, [
-        Blazor.platform.toDotNetString(callbackId + ""),
-        Blazor.platform.toDotNetString(idWhereCallbackArgsAreStored),
-        Blazor.platform.toDotNetString(""),
-    ]);
+	try {
+		DotNet.invokeMethod("OpenSilver", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, "");
+	} catch (e)	{
+		DotNet.invokeMethod("OpenSilver.UwpCompatible", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, "");
+	}	
 };
 
 window.callJS = function (javaScriptToExecute) {

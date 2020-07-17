@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 
 #if !MIGRATION
-using Microsoft.AspNetCore.Components;
+using Windows.UI.Core;
 #endif
 
 namespace System.Windows.Threading
@@ -17,7 +17,11 @@ namespace System.Windows.Threading
 
         }
 
+#if MIGRATION
         public DispatcherSynchronizationContext(Dispatcher dispatcher)
+#else
+        public DispatcherSynchronizationContext(CoreDispatcher dispatcher)
+#endif
         {
 
         }

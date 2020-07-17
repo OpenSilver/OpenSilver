@@ -15,12 +15,9 @@
 
 #if BRIDGE
 using Bridge;
+using DotNetBrowser;
 #else
 using JSIL.Meta;
-#endif
-
-#if !BUILDINGDOCUMENTATION// We don't have the references to the "DotNetBrowser" web browser control when building the documentation.
-using DotNetBrowser;
 #endif
 
 using System;
@@ -68,9 +65,9 @@ namespace CSHTML5.Types
             
             if (IsArray)
             {
-                if (Value is JSArray jsarray)
+                if (Value.GetType().FullName == "DotNetBrowser.JSArray")
                 {
-                    result = jsarray[ArrayIndex];
+                    result = ((dynamic)Value)[ArrayIndex];
                 }
                 else if (Value is object[] array)
                 {
@@ -86,17 +83,17 @@ namespace CSHTML5.Types
                 result = Value;
             }
 
-            if (result is JSNumber jsNumber)
+            if (result.GetType().FullName == "DotNetBrowser.JSNumber")
             {
-                return jsNumber.GetNumber();
+                return ((dynamic)result).GetNumber();
             }
-            else if (result is JSBoolean jsBoolean)
+            else if (result.GetType().FullName == "DotNetBrowser.JSBoolean")
             {
-                return jsBoolean.GetBool();
+                return ((dynamic)result).GetBool();
             }
-            else if (result is JSString jsString)
+            else if (result.GetType().FullName == "DotNetBrowser.JSString")
             {
-                return jsString.GetString();
+                return ((dynamic)result).GetString();
             }
             else
             {
