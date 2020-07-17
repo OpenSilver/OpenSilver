@@ -13,7 +13,9 @@
 \*====================================================================================*/
 
 
+using DotNetForHtml5.Core;
 using System;
+using System.Threading.Tasks;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
@@ -330,6 +332,8 @@ namespace Windows.UI.Xaml.Controls
 #else
                     comboBox.OnDropDownOpened(new RoutedEventArgs());
 #endif
+
+                    comboBox.EnsurePopupIsWithinBoundaries();
                 }
                 else
                 {
@@ -361,6 +365,12 @@ namespace Windows.UI.Xaml.Controls
 #endif
                 }
             }
+        }
+
+        private async void EnsurePopupIsWithinBoundaries()
+        {
+            await Task.Delay(TimeSpan.FromSeconds(0.5));
+            INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(_popup);
         }
 
         /// <summary>
