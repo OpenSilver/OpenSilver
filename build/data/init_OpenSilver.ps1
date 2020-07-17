@@ -25,7 +25,7 @@ foreach ($project in $dte.Solution.Projects)
 			foreach ($projectConfiguration in $projectConfigurations)
 			{
 				$newStartAction = 1
-				[String]$newStartProgram = $toolsPath + "\simulator\OpenSilver.Simulator.exe"
+				[String]$newStartProgram = $toolsPath + "\simulator\CSharpXamlForHtml5.Simulator.exe"
 				Write-Host "Changing project start action to " $newStartAction
 				Write-Host "Changing project start program to " $newStartProgram              
 				$projectConfiguration.Properties.Item("StartAction").Value = $newStartAction

@@ -17,22 +17,22 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-    <AssemblyName>OpenSilver.Simulator</AssemblyName>
+    <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
     <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;OPENSILVER</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU'">
-    <AssemblyName>OpenSilver.Simulator</AssemblyName>
+    <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
     <DefineConstants>TRACE;DEBUGSILVERLIGHTCOMPATIBLEVERSION;OPENSILVER;WORKINPROGRESS</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP|AnyCPU'">
-    <AssemblyName>OpenSilver.UWPCompatible.Simulator</AssemblyName>
+    <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
     <DefineConstants>TRACE;DEBUG;OPENSILVER</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU'">
-    <AssemblyName>OpenSilver.UWPCompatible.Simulator</AssemblyName>
+    <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
     <DefineConstants>TRACE;DEBUG;OPENSILVER;WORKINPROGRESS</DefineConstants>
   </PropertyGroup>
   
