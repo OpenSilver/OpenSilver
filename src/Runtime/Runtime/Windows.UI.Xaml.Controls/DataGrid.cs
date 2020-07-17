@@ -1243,6 +1243,10 @@ namespace Windows.UI.Xaml.Controls
                     editableVersionOfCell.LostFocus += CurrentEditionElement_LostFocus;
 
                     _grid.Children.Add(editableVersionOfCell);
+                    if (column is DataGridTextColumn)
+                    {
+                        editableVersionOfCellContainer.Foreground = new SolidColorBrush(Colors.Black);
+                    }
                 }
                 else
                 {
