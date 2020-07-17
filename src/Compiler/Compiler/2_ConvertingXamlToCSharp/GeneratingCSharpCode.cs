@@ -601,9 +601,13 @@ namespace DotNetForHtml5.Compiler
 
                                         string name = attributeValue;
                                         // Add the code to register the name, etc.
-                                        if (isElementInRootNamescope && // We skip this section if the element is inside a DataTemplate or a ControlTemplate for example.
-                                            !(element.Parent != null && element.Parent.Name == DefaultXamlNamespace + "ResourceDictionary") && // skip resource dictionaries
-                                            !(element.Parent != null && element.Parent.Name.LocalName.EndsWith(".Resources"))) // skip resource dictionaries
+                                        if (isElementInRootNamescope &&
+                                            (isFirstPass ||
+                                            !reflectionOnSeparateAppDomain.IsAssignableFrom(
+                                                namespaceSystemWindows,
+                                                "ResourceDictionary",
+                                                elementThatIsRootOfTheCurrentNamescope.Name.NamespaceName,
+                                                elementThatIsRootOfTheCurrentNamescope.Name.LocalName)))
                                         {
                                             string fieldModifier = (isSLMigration ? "internal" : "protected");
                                             XAttribute attr = element.Attribute(xNamespace + "FieldModifier");
@@ -1344,6 +1348,16 @@ var {4} = {2}.GetValue({1});
                     }
                 }
             }
+        }
+
+        private static bool ShouldGenerateFieldForXNameAttribute(XElement element)
+        {
+            if (element.Document.Root.Name.NamespaceName == DefaultXamlNamespace
+                && element.Document.Root.Name.LocalName == "ResourceDictionary")
+            {
+                return false;
+            }
+            return true;
         }
 
         static bool IsAttributeTheXNameAttribute(XAttribute attribute)

@@ -268,6 +268,11 @@ namespace DotNetForHtml5.Compiler
             return _marshalledObject.TryGenerateCodeForInstantiatingAttributeValue(xamlValue, out generatedCSharpCode, valueNamespaceName, valueLocalTypeName, valueAssemblyNameIfAny);
         }
 
+        public bool IsAssignableFrom(string namespaceName, string typeName, string fromNamespaceName, string fromTypeName)
+        {
+            return _marshalledObject.IsAssignableFrom(namespaceName, typeName, fromNamespaceName, fromTypeName);
+        }
+
         public class MarshalledObject : MarshalByRefObject, IMarshalledObject
         {
             const string ASSEMBLY_NOT_IN_LIST_OF_LOADED_ASSEMBLIES = "The specified assembly is not in the list of loaded assemblies.";
@@ -1789,6 +1794,14 @@ namespace DotNetForHtml5.Compiler
                     }
                 }
                 return false;
+            }
+
+            public bool IsAssignableFrom(string namespaceName, string typeName, string fromNamespaceName, string fromTypeName)
+            {
+                Type type = this.FindType(namespaceName, typeName);
+                Type fromType = this.FindType(fromNamespaceName, fromTypeName);
+
+                return type.IsAssignableFrom(fromType);
             }
         }
 
