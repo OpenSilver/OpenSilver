@@ -1168,7 +1168,15 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
                     //exclude the parts that are <Enveloppe><Body>... since they are useless and would keep the deserialization from working properly:
                     //they should always be the two outermost elements:
-                    xElement = xElement.Elements().FirstOrDefault() ?? xElement; //move inside of the <Enveloppe> tag
+                    
+                    if (soapVersion == "1.2")
+                    {
+                        xElement = xElement.Element(XName.Get("Body", "http://www.w3.org/2003/05/soap-envelope"));
+                    }
+                    else
+                    {
+                        xElement = xElement.Elements().FirstOrDefault() ?? xElement; //move inside of the <Enveloppe> tag
+                    }
 
                     //we check if the type is defined in the next XElement because it changes the XElement we want to use in that case.
                     // The reason is that the response uses one less XElement in the case where we use XmlSerializer and the method has the return Type object.
