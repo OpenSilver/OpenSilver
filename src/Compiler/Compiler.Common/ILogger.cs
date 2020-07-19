@@ -10,7 +10,7 @@ namespace DotNetForHtml5.Compiler
     public interface ILogger
     {
         void WriteError(string message, string file = "", int lineNumber = 0, int columnNumber = 0);
-        void WriteMessage(string message, MessageImportance messageImportance = MessageImportance.High);
+        void WriteMessage(string message, MessageImportance messageImportance = MessageImportance.Normal);
         void WriteWarning(string message, string file = "", int lineNumber = 0, int columnNumber = 0);
         bool HasErrors { get; }
 #if REQUIRE_ACTIVATION_FOR_USING_CERTAIN_METHODS
