@@ -122,16 +122,24 @@
     </PropertyGroup>
     <Message
       Condition="'$(IsSecondPass)'!='True'"
-      Text="Visual Studio version: $(VisualStudioVersion)"
+      Text="OpenSilver Compiler"
       Importance="high"/>
     <Message
       Condition="'$(IsSecondPass)'!='True'"
-      Text="CSHTML5 Pass 1"
+      Text="     To enable detailed logging, set the 'MSBuild project build output verbosity' to 'Normal' or higher. The option is located in the Visual Studio IDE under Tools -> Options -> Projects and solutions -> Build and Run."
       Importance="high"/>
+    <Message
+      Condition="'$(IsSecondPass)'!='True'"
+      Text="Visual Studio version: $(VisualStudioVersion)"
+      Importance="normal"/>
+    <Message
+      Condition="'$(IsSecondPass)'!='True'"
+      Text="CSHTML5 Pass 1"
+      Importance="normal"/>
     <Message
       Condition="'$(IsSecondPass)'=='True'"
       Text="CSHTML5 Pass 2"
-      Importance="high"/>
+      Importance="normal"/>
 
     <!--============================================================
       If compiling CSHTML5 itself, remove some references:
@@ -210,7 +218,7 @@
     <Message
       Text="Starting AssemblyAttributesGenerator"
       Condition="'$(SkipAssemblyAttributesGenerator)'!='true'"
-      Importance="high"/>
+      Importance="normal"/>
     <AssemblyAttributesGenerator
       Condition="'$(SkipAssemblyAttributesGenerator)'!='true'"
       IsSLMigration="$(IsSLMigration)"
@@ -268,7 +276,7 @@
     <Message
       Condition="'%(Resource.Extension)'=='.resx' And '$(IsSecondPass)'=='True'"
       Text="Starting processing .resx files"
-      Importance="high"/>
+      Importance="normal"/>
     <ResXProcessor
       Condition="'%(Resource.Extension)'=='.resx' And '$(IsSecondPass)'=='True'"
       SourceFile="%(Resource.FullPath)"
@@ -291,7 +299,7 @@
     </ItemGroup>
     <Message
       Text="Starting processing TypeScript Definition files: @(TypeScriptDefFiles)"
-      Importance="high"/>
+      Importance="normal"/>
     <TypeScriptDefToCSharp
       InputFiles="@(TypeScriptDefFiles)"
       OutputDirectory="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)">
@@ -299,7 +307,7 @@
     </TypeScriptDefToCSharp>
     <Message
       Text="TypeScriptDefToCSharp output: $(ListOfGeneratedFiles)"
-      Importance="high"/>
+      Importance="normal"/>
     <ItemGroup>
       <Compile
         Include="$(GeneratedFiles)"/>
@@ -314,7 +322,7 @@
   <Target Name="CSharpXamlForHtml5BeforeCompile_NotDesignTime">
     <Message
           Text="CSHTML5 Before compile. IsSecondPass=$(IsSecondPass)"
-          Importance="high"/>
+          Importance="normal"/>
 
     <!--============================================================
       AssemblyReferenceValidator (only during Pass 1)
@@ -428,7 +436,7 @@
   <Target Name="CSharpXamlForHtml5BeforePostBuild" BeforeTargets="PostBuildEvent">
     <Message
           Text="CSHTML5 Before post build. IsSecondPass=$(IsSecondPass)"
-          Importance="high"/>
+          Importance="normal"/>
     <ItemGroup>
       <OutputAssembly Include="$(OutputAssemblyDirectory)\$(AssemblyName).dll" />
     </ItemGroup>
@@ -466,11 +474,11 @@
     
     <!--<Message  Condition="'$(IsBrowserProject)' == 'true' And '$(IsSecondPass)'=='True'"
                 Text="Copying resources from &quot;$(MSBuildThisFileDirectory)&quot; to &quot;$(BaseIntermediateOutputPath)..\wwwroot\libs\&quot;"
-                Importance="high"/>-->
+                Importance="normal"/>-->
     
     <Message  Condition="'$(IsBrowserProject)' == 'true' And '$(IsSecondPass)'=='True'"
                 Text="Copying OpenSilver's required js/css libraries."
-                Importance="high"/>
+                Importance="normal"/>
 
     <Copy Condition="'$(IsBrowserProject)' == 'true' And '$(IsSecondPass)'=='True'"
         SourceFiles="@(MySourceFiles)"
@@ -536,7 +544,7 @@
   <Target Name="DesignTimeCompilation">
     <Message
       Text="CSHTML5 Design-Time Compilation started"
-      Importance="high"/>
+      Importance="normal"/>
 
     <!--============================================================
       Change the Build Action of XAML and TypeScript files from ["Page", "CodeAnalysisDictionary", "ApplicationDefinition"] to "Content" in case the developer has not already done so.
@@ -566,7 +574,7 @@
     </ItemGroup>
     <Message
       Text="Starting processing TypeScript Definition files: @(TypeScriptDefFiles)"
-      Importance="high"/>
+      Importance="normal"/>
     <TypeScriptDefToCSharp
       InputFiles="@(TypeScriptDefFiles)"
       OutputDirectory="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)"
@@ -575,7 +583,7 @@
     </TypeScriptDefToCSharp>
     <Message
       Text="TypeScriptDefToCSharp output: $(ListOfGeneratedFiles)"
-      Importance="high"/>
+      Importance="normal"/>
     <ItemGroup>
       <Compile
         Include="$(GeneratedFiles)"/>
@@ -685,7 +693,7 @@
     </ItemGroup>
     <Message
       Text="CSHTML5 Design-Time Compilation ended"
-      Importance="high"/>
+      Importance="normal"/>
   </Target>
 
 </Project>
