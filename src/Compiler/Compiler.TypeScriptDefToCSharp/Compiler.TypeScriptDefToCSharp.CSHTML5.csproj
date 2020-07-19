@@ -119,11 +119,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Compiler.Common\Compiler.Common.CSHTML5.csproj">
       <Project>{4ecad5cd-91df-48f6-9e9f-ae0a6e7622a8}</Project>
-      <Name>DotNetForHtml5.Compiler.Common</Name>
+      <Name>Compiler.Common.CSHTML5</Name>
     </ProjectReference>
     <ProjectReference Include="..\Compiler.ProgressDialog\Compiler.ProgressDialog.CSHTML5.csproj">
       <Project>{4ddceebe-b5ca-4a29-87b0-29ff42ab7a0d}</Project>
-      <Name>DotNetForHtml5.Compiler.ProgressDialog</Name>
+      <Name>Compiler.ProgressDialog.CSHTML5</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

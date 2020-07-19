@@ -15,23 +15,18 @@
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
     <AssemblyName>OpenSilver.Compiler.TypeScriptDefToCSharp</AssemblyName>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU'">
     <AssemblyName>OpenSilver.Compiler.TypeScriptDefToCSharp</AssemblyName>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP|AnyCPU'">
     <AssemblyName>OpenSilver.UWPCompatible.Compiler.TypeScriptDefToCSharp</AssemblyName>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU'">
     <AssemblyName>OpenSilver.UWPCompatible.Compiler.TypeScriptDefToCSharp</AssemblyName>
   </PropertyGroup>
-  
   <ItemGroup>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="PresentationCore" />
@@ -107,11 +102,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Compiler.Common\Compiler.Common.OpenSilver.csproj">
       <Project>{4ecad5cd-91df-48f6-9e9f-ae0a6e7622a8}</Project>
-      <Name>Compiler.Common</Name>
+      <Name>Compiler.Common.OpenSilver</Name>
     </ProjectReference>
     <ProjectReference Include="..\Compiler.ProgressDialog\Compiler.ProgressDialog.OpenSilver.csproj">
       <Project>{4ddceebe-b5ca-4a29-87b0-29ff42ab7a0d}</Project>
-      <Name>Compiler.ProgressDialog</Name>
+      <Name>Compiler.ProgressDialog.OpenSilver</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

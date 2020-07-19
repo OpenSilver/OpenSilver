@@ -15,35 +15,30 @@
     <NoWarn>CS1591</NoWarn>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;SILVERLIGHTCOMPATIBLEVERSION;MIGRATION</DefineConstants>
     <AssemblyName>OpenSilver.Compiler</AssemblyName>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;SILVERLIGHTCOMPATIBLEVERSION;MIGRATION;WORKINPROGRESS</DefineConstants>
     <AssemblyName>OpenSilver.Compiler</AssemblyName>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR</DefineConstants>
     <AssemblyName>OpenSilver.UWPCompatible.Compiler</AssemblyName>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;WORKINPROGRESS</DefineConstants>
     <AssemblyName>OpenSilver.UWPCompatible.Compiler</AssemblyName>
   </PropertyGroup>
-  
   <ItemGroup>
     <ProjectReference Include="..\Compiler.Common\Compiler.Common.OpenSilver.csproj">
       <Project>{4ecad5cd-91df-48f6-9e9f-ae0a6e7622a8}</Project>
-      <Name>DotNetForHtml5.Compiler.Common</Name>
+      <Name>Compiler.Common.OpenSilver</Name>
     </ProjectReference>
     <ProjectReference Include="..\Compiler.TypeScriptDefToCSharp\Compiler.TypeScriptDefToCSharp.OpenSilver.csproj">
       <Project>{4d0ca743-4f06-40da-92d7-f31d8f395e2a}</Project>
-      <Name>DotNetForHtml5.Compiler.TypeScriptDefToCSharp</Name>
+      <Name>Compiler.TypeScriptDefToCSharp.OpenSilver</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
