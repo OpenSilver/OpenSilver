@@ -115,7 +115,13 @@ namespace System.Runtime.Serialization
             }
             else if (resultType.IsEnum)
             {
-                var enumValue = Enum.Parse(resultType, str, true);
+                // To support serialized flag enums (such as "Read Write"), we convert spaces to commas, so that Enum.Parse is able to properly parse them:
+                string[] splitted = str.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                string reformattedEnumValue = string.Join(", ", splitted);
+
+                // Parse the enum value:
+                var enumValue = Enum.Parse(resultType, reformattedEnumValue, true);
+
                 return enumValue;
             }
 
