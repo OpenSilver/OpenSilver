@@ -53,6 +53,15 @@ namespace System.Xml.Linq
             return this == other;// (this._localName == other.LocalName && this.NamespaceName == other.NamespaceName);
         }
 
+        /// <summary>
+        /// Gets a hash code for this System.Xml.Linq.XName.
+        /// </summary>
+        /// <returns>An System.Int32 that contains the hash code for the System.Xml.Linq.XName.</returns>
+        public override int GetHashCode()
+        {
+            return this.Namespace.GetHashCode() ^ this.LocalName.GetHashCode();
+        }
+
         string _localName;
         /// <summary>
         /// Gets the local (unqualified) part of the name.
@@ -176,36 +185,44 @@ namespace System.Xml.Linq
             return !(left != right);
         }
 
+        /// <summary>
+        /// Gets an <see cref="XName"/> object from a local name and a namespace.
+        /// </summary>
+        /// <param name="localName">A local (unqualified) name.</param>
+        /// <param name="namespaceName">An XML namespace.</param>
+        /// <returns>
+        /// An <see cref="XName"/> object created from the specified local name and
+        /// namespace.
+        /// </returns>
+        public static XName Get(string localName, string namespaceName)
+        {
+            return XNamespace.Get(namespaceName).GetName(localName);
+        }
 
 
-
-
-
-
-
-        ///// <summary>
-        ///// Gets an System.Xml.Linq.XName object from an expanded name.
-        ///// </summary>
-        ///// <param name="expandedName">A System.String that contains an expanded XML name in the format {namespace}localname.</param>
-        ///// <returns>An System.Xml.Linq.XName object constructed from the expanded name.</returns>
-        //public static XName Get(string expandedName);
-
-        ///// <summary>
-        ///// Gets an System.Xml.Linq.XName object from a local name and a namespace.
-        ///// </summary>
-        ///// <param name="localName">A local (unqualified) name.</param>
-        ///// <param name="namespaceName">An XML namespace.</param>
-        ///// <returns>
-        ///// An System.Xml.Linq.XName object created from the specified local name and
-        ///// namespace.
-        ///// </returns>
-        //public static XName Get(string localName, string namespaceName);
-
-        ///// <summary>
-        ///// Gets a hash code for this System.Xml.Linq.XName.
-        ///// </summary>
-        ///// <returns>An System.Int32 that contains the hash code for the System.Xml.Linq.XName.</returns>
-        //public override int GetHashCode();
+        /// <summary>
+        /// Gets an <see cref="XName"/> object from an expanded name.
+        /// </summary>
+        /// <param name="expandedName">A <see cref="String"/> that contains an expanded XML name in the format {namespace}localname.</param>
+        /// <returns>An <see cref="XName"/> object constructed from the expanded name.</returns>
+        public static XName Get(string expandedName)
+        {
+            if (expandedName == null)
+                throw new ArgumentNullException("expandedName");
+            if (expandedName.Length == 0)
+                throw new ArgumentException(string.Format("'{0}' is an invalid expanded name.", expandedName));
+            if (expandedName[0] == '{')
+            {
+                int i = expandedName.LastIndexOf('}');
+                if (i <= 1 || i == expandedName.Length - 1)
+                    throw new ArgumentException(string.Format("'{0}' is an invalid expanded name.", expandedName));
+                return XNamespace.Get(expandedName, 1, i - 1).GetName(expandedName, i + 1, expandedName.Length - i - 1);
+            }
+            else
+            {
+                return XNamespace.None.GetName(expandedName);
+            }
+        }
     }
 }
 #endif

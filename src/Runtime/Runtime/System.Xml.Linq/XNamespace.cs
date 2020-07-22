@@ -22,6 +22,8 @@ namespace System.Xml.Linq
     /// </summary>
     public sealed partial class XNamespace
     {
+        private static XNamespace _none;
+
         /// <summary>
         /// Combines an System.Xml.Linq.XNamespace object with a local name to create
         /// an System.Xml.Linq.XName.
@@ -58,6 +60,23 @@ namespace System.Xml.Linq
                 return XNamespace.Get(xmlnsPrefixNamespace);
             }
         }
+
+        /// <summary>
+        /// Gets the <see cref="XNamespace"/> object that corresponds to no namespace.
+        /// </summary>
+        public static XNamespace None
+        {
+            get
+            {
+                if (_none == null)
+                {
+                    _none = new XNamespace();
+                    _none.NamespaceName = string.Empty;
+                }
+                return _none;
+            }
+        }
+
 
         /// <summary>
         /// Converts a string containing a Uniform Resource Identifier (URI) to an System.Xml.Linq.XNamespace.
@@ -98,6 +117,11 @@ namespace System.Xml.Linq
             return xNamespace;
         }
 
+        internal static XNamespace Get(string namespaceName, int index, int count)
+        {
+            return XNamespace.Get(namespaceName.Substring(index, count));
+        }
+
         /// <summary>
         /// Returns an System.Xml.Linq.XName object created from this System.Xml.Linq.XNamespace
         /// and the specified local name.
@@ -113,6 +137,11 @@ namespace System.Xml.Linq
             xName.LocalName = localName;
             xName.Namespace = this;
             return xName;
+        }
+
+        internal XName GetName(string localName, int index, int count)
+        {
+            return this.GetName(localName.Substring(index, count));
         }
 
         /// <summary>
@@ -161,30 +190,33 @@ namespace System.Xml.Linq
             return !(left != right);
         }
 
+        /// <summary>
+        /// Gets a hash code for this <see cref="XNamespace"/>.
+        /// </summary>
+        /// <returns>An <see cref="Int32"/> that contains the hash code for the <see cref="XNamespace"/>.</returns>
+        public override int GetHashCode()
+        {
+            return (this.NamespaceName ?? string.Empty).GetHashCode();
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="XNamespace"/> is equal to the
+        /// current <see cref="XNamespace"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="XNamespace"/> to compare to the current <see cref="XNamespace"/>.</param>
+        /// <returns>
+        /// A <see cref="Boolean"/> that indicates whether the specified <see cref="XNamespace"/>
+        /// is equal to the current <see cref="XNamespace"/>.
+        /// </returns>
+        public override bool Equals(object obj)
+        {
+            return this == obj as XNamespace;
+        }
+
         #region not implemented
 
 
-        ///// <summary>
-        ///// Determines whether the specified System.Xml.Linq.XNamespace is equal to the
-        ///// current System.Xml.Linq.XNamespace.
-        ///// </summary>
-        ///// <param name="obj">The System.Xml.Linq.XNamespace to compare to the current System.Xml.Linq.XNamespace.</param>
-        ///// <returns>
-        ///// A System.Boolean that indicates whether the specified System.Xml.Linq.XNamespace
-        ///// is equal to the current System.Xml.Linq.XNamespace.
-        ///// </returns>
-        //public override bool Equals(object obj);
 
-        ///// <summary>
-        ///// Gets a hash code for this System.Xml.Linq.XNamespace.
-        ///// </summary>
-        ///// <returns>An System.Int32 that contains the hash code for the System.Xml.Linq.XNamespace.</returns>
-        //public override int GetHashCode();
-
-        ///// <summary>
-        ///// Gets the System.Xml.Linq.XNamespace object that corresponds to no namespace.
-        ///// </summary>
-        //public static XNamespace None { get; }
 
         ///// <summary>
         ///// Gets the System.Xml.Linq.XNamespace object that corresponds to the XML URI
