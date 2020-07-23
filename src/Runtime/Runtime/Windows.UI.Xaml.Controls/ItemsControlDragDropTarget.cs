@@ -143,7 +143,7 @@ namespace Windows.UI.Xaml.Controls
 
         internal override int INTERNAL_GetNumberOfElementsBetweenItemsRootAndDragDropTarget()
         {
-            return 3;
+            return 4; //Note: we originally returned 3 but it stopped working at some point. (Is it because there was an ItemsPanelTemplate ? Although that template was there when it originally worked).
         }
 
 
