@@ -474,16 +474,33 @@ namespace Windows.UI.Xaml
 
         internal void ResetInheritedProperties()
         {
-            foreach (DependencyProperty property in INTERNAL_AllInheritedProperties.Keys)
+            DependencyProperty[] inheritedProperties = INTERNAL_AllInheritedProperties.Keys.ToArray(); //Copy of the keys to allow removing items from the Dictionary furing the foreach.
+            foreach (DependencyProperty property in inheritedProperties)
             {
+                bool removeProperty = true; //We use this bool to tell whether the property should be removed from the Dictionaries or not. We do not want to remove it if there is a value other than the Default and the Inherited that is set.
                 INTERNAL_PropertyStorage storage;
                 if (INTERNAL_PropertyStorageDictionary.TryGetValue(property, out storage))
                 {
                     INTERNAL_PropertyStore.ResetInheritedValue(storage);
-                    INTERNAL_PropertyStorageDictionary.Remove(property);
+                    object newEffectiveValue; //unused
+                    BaseValueSourceInternal kind;
+                    INTERNAL_PropertyStore.ComputeEffectiveValue(storage, out newEffectiveValue, out kind);
+                    if(kind > BaseValueSourceInternal.Inherited)
+                    {
+                        removeProperty = false; //If there is a value that is neither the default or the inherited value, we do not want to remove the whole storage.
+                    }
+                    else
+                    {
+                        //Only the InheritedValue was set so we can remove the storage:
+                        INTERNAL_PropertyStorageDictionary.Remove(property);
+                    }
+                }
+                if(removeProperty)
+                {
+                    //Only the InheritedValue was set so we can remove the storage:
+                    INTERNAL_AllInheritedProperties.Remove(property);
                 }
             }
-            INTERNAL_AllInheritedProperties.Clear();
         }
 
         /// <summary>
