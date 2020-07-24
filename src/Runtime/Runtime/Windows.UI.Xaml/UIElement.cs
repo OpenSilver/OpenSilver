@@ -22,6 +22,7 @@ using CSHTML5;
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -1185,8 +1186,8 @@ namespace Windows.UI.Xaml
                 int sepIndex = concatenated.IndexOf('|');
                 string offsetLeftAsString = concatenated.Substring(0, sepIndex);
                 string offsetTopAsString = concatenated.Substring(sepIndex + 1);
-                offsetLeft = Convert.ToDouble(offsetLeftAsString);
-                offsetTop = Convert.ToDouble(offsetTopAsString);
+                offsetLeft = Convert.ToDouble(offsetLeftAsString, CultureInfo.InvariantCulture);
+                offsetTop = Convert.ToDouble(offsetTopAsString, CultureInfo.InvariantCulture);
             }
             //#endif
 
