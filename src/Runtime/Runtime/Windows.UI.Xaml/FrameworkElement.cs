@@ -1166,7 +1166,8 @@ namespace Windows.UI.Xaml
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
             base.INTERNAL_OnDetachedFromVisualTree();
-            if (HasImplicitStyleFromResources && !Resources.Contains(GetType()))
+            if (HasImplicitStyleFromResources && 
+                (!HasResources || !Resources.Contains(GetType())))
             {
                 HasStyleInvalidated = false;
                 UpdateStyleProperty();
@@ -1180,7 +1181,8 @@ namespace Windows.UI.Xaml
             // Fetch the implicit style
             // If this element's ResourceDictionary contains the
             // implicit style, it has already been retrieved.
-            if (!HasImplicitStyleFromResources || !Resources.Contains(GetType()))
+            if (!HasImplicitStyleFromResources || 
+                (!HasResources || !Resources.Contains(GetType())))
             {
                 HasStyleInvalidated = false;
                 UpdateStyleProperty();

@@ -121,9 +121,6 @@ namespace CSHTML5.Internal
                 element.INTERNAL_isPointerInside = false;
             }
 
-            //we reset the inherited properties since the element is no longer attached to its parent:
-            element.ResetInheritedProperties();
-
             // Call the "OnDetached" of the element. This is particularly useful for elements to clear any references they have to DOM elements. For example, the Grid will use it to set its _tableDiv to null.
             element.INTERNAL_OnDetachedFromVisualTree();
 
@@ -161,6 +158,9 @@ namespace CSHTML5.Internal
             element.INTERNAL_VisualChildrenInformation = null;
             element.INTERNAL_AdditionalOutsideDivForMargins = null;
             element.INTERNAL_DeferredLoadingWhenControlBecomesVisible = null;
+
+            // We reset the inherited properties since the element is no longer attached to its parent
+            element.ResetInheritedProperties();
 
             if (oldParent != null)
             {

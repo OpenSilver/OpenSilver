@@ -92,8 +92,8 @@ namespace CSHTML5.Internal
                 global::System.Diagnostics.Debug.Assert(typeMetadata != null && typeMetadata.Inherits,
                                                         string.Format("{0} is not an inherited property.", dependencyProperty.Name));
 
-                    // Create the storage:
-                    storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty, typeMetadata);
+                // Create the storage:
+                storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty, typeMetadata);
 
                 //-----------------------
                 // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
@@ -261,7 +261,7 @@ namespace CSHTML5.Internal
 
         #region Private Methods
 
-        internal static void ComputeEffectiveValue(INTERNAL_PropertyStorage storage,
+        private static void ComputeEffectiveValue(INTERNAL_PropertyStorage storage,
                                                   out object effectiveValue,
                                                   out BaseValueSourceInternal kind)
         {
@@ -652,21 +652,8 @@ namespace CSHTML5.Internal
                                  BaseValueSourceInternal.Inherited,
                                  false, // coerceWithCurrentValue
                                  false, // coerceValue
-                                 false, // clearValue
+                                 newValue == DependencyProperty.UnsetValue, // clearValue
                                  recursively); // propagateChanges
-        }
-
-        internal static void ResetInheritedValue(INTERNAL_PropertyStorage storage)
-        {
-            storage.InheritedValue = DependencyProperty.UnsetValue;
-
-            //UpdateEffectiveValue(storage,
-            //                     DependencyProperty.UnsetValue,
-            //                     BaseValueSourceInternal.Inherited,
-            //                     false, // coerceWithCurrentValue
-            //                     false, // coerceValue
-            //                     true, // clearValue
-            //                     false); // propagateChanges
         }
 
         internal static void SetLocalStyleValue(INTERNAL_PropertyStorage storage, object newValue)
