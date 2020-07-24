@@ -442,7 +442,11 @@ ends with "".Browser"" in your solution.";
 
 
             // Load the page:
+#if OPENSILVER
             MainWebBrowser.Browser.LoadHTML(new LoadHTMLParams(simulatorRootHtml, "UTF-8", "http://cshtml5-simulator/" + ARBITRARY_FILE_NAME_WHEN_RUNNING_FROM_SIMULATOR + urlFragment)); // Note: we set the URL so that the simulator browser can find the JS files.
+#else
+            MainWebBrowser.Browser.LoadHTML(new LoadHTMLParams(simulatorRootHtml, "UTF-8", baseURL + "/" + ARBITRARY_FILE_NAME_WHEN_RUNNING_FROM_SIMULATOR + urlFragment)); // Note: we set the URL so that the simulator browser can find the JS files.
+#endif
         }
 
         void OnLoaded()
