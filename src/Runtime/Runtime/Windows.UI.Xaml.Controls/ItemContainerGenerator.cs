@@ -36,6 +36,7 @@ namespace Windows.UI.Xaml.Controls
     public partial class ItemContainerGenerator
     {
         Dictionary<object, List<object>> _itemsToContainers = new Dictionary<object, List<object>>(); // Note: this maps each item (for example a string or a business object) to the corresponding element that is added to the visual tree (such a datatemplate) or to the native DOM element in case of native combo box for example. The reason why each single element can be associated to multiple objects is because of Strings and other value types: for example, if two identical strings are added to the ItemsControl, they will be the same key of the dictionary.
+        private Dictionary<object, object> _containerToItem = new Dictionary<object, object>(); // This is the reverse of the line above. Used to resolve items from their containers.
         List<object> _containers = new List<object>(); //this list is kept to get the index from the container (with minimum work to keep it updated, it might not be the most efficient method perf-wise).
 
         /// <summary>
@@ -108,6 +109,8 @@ namespace Windows.UI.Xaml.Controls
 
                         if (containersAssociatedToTheItem.Count == 0)
                             _itemsToContainers.Remove(correspondingItem);
+                        
+                        _containerToItem.Remove(container);
 
                         return true;
                     }
@@ -149,6 +152,7 @@ namespace Windows.UI.Xaml.Controls
         public void INTERNAL_Clear()
         {
             _itemsToContainers.Clear();
+            _containerToItem.Clear();
             _containers.Clear();
         }
 
@@ -171,6 +175,7 @@ namespace Windows.UI.Xaml.Controls
                 _itemsToContainers.Add(correspondingItem, containersAssociatedToTheItem);
             }
             containersAssociatedToTheItem.Add(container);
+            _containerToItem.Add(container, correspondingItem);
             _containers.Add(container);
         }
 
@@ -248,7 +253,12 @@ namespace Windows.UI.Xaml.Controls
         //     container is null.
         public object ItemFromContainer(DependencyObject container)
         {
-            return 0;
+            if (container != null && _containerToItem.ContainsKey(container))
+            {
+                return _containerToItem[container];
+            }
+
+            return null;
         }
 #endif
     }
