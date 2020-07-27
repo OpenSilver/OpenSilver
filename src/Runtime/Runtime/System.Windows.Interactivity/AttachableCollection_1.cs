@@ -50,7 +50,6 @@ namespace System.Windows.Interactivity
         {
             if(_associatedObject != null)
             {
-                //todo: check why uncommenting the following line causes an issue with the Userware KanBan demo (CSHTML5 2.0.0-alpha67-087).
                 throw new InvalidOperationException("The AttachableCollection is already attached to a different object.");
             }
             _associatedObject = dependencyObject;

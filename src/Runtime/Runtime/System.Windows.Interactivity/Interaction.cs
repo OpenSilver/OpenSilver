@@ -103,7 +103,6 @@ namespace System.Windows.Interactivity
             }
             if (triggerCollection2.AssociatedObject != null)
             {
-                //todo: check why uncommenting the following line causes an issue with the Userware KanBan demo (CSHTML5 2.0.0-alpha67-087).
                 throw new InvalidOperationException("Cannot Host TriggerCollection Multiple Times");
             }
             FrameworkElement fElement = obj as FrameworkElement;
