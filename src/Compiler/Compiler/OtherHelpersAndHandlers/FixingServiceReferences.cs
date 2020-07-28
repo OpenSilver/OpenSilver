@@ -378,7 +378,7 @@ namespace DotNetForHtml5.Compiler
                 {
                     methodType = MethodType.AsyncWithReturnType;
                 }
-                else if (returnType == "Task")
+                else if (returnType == "Task" || returnType == "System.Threading.Tasks.Task") //Note: I don't know if we can meet something like "Threading.Tasks.Task" or other variant, I don't expect we can.
                 {
                     methodType = MethodType.AsyncWithoutReturnType;
                 }
