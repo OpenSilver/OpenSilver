@@ -471,7 +471,20 @@ namespace Windows.UI.Xaml.Data
             {
                 if (this.Target is FrameworkElement targetFE)
                 {
+                    DependencyObject contextElement = targetFE;
+
+#if WORKINPROGRESS
+                    // special cases:
+                    // 1. if target property is DataContext, use the target's parent.
+                    //      This enables <X DataContext="{Binding...}"/>
+                    if (this.TargetProperty == FrameworkElement.DataContextProperty)
+                    {
+                        contextElement = targetFE.Parent;
+                    }
+                    this._bindingSource = contextElement;
+#else
                     this._bindingSource = targetFE;
+#endif
                 }
                 else
                 {
