@@ -479,6 +479,8 @@ namespace Windows.UI.Xaml.Data
                     //      This enables <X DataContext="{Binding...}"/>
                     if (this.TargetProperty == FrameworkElement.DataContextProperty)
                     {
+                        if (targetFE.Parent == null)
+                            throw new InvalidOperationException("Cannot use DataContext Binding on the root element.");
                         contextElement = targetFE.Parent;
                     }
                     this._bindingSource = contextElement;
