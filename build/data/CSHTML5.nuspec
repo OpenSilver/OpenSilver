@@ -23,7 +23,7 @@
     <file src="../../src/Runtime/Bridge.TypesThatWillBeForwarded/bin/CSHTML5/$Configuration$/CSHTML5.Stubs.dll" target="lib/net40/CSHTML5.Stubs.dll" />
 
     <!-- CSHTML5 targets -->
-    <file src="../../src/Targets/CSHTML5.targets" target="build/$PackageId$.targets" /> <!-- Note: the main targets file must have the same name as the package in order to be automatically imported into the end-user project. -->
+    <file src="../../src/Targets/$Target$.targets" target="build/$PackageId$.targets" /> <!-- Note: the main targets file must have the same name as the package in order to be automatically imported into the end-user project. -->
     <file src="../../src/Targets/CSHTML5.Common.targets" target="build/CSHTML5.Common.targets" />
 
     <!-- CSHTML5 compiler -->

@@ -37,11 +37,11 @@
   <PropertyGroup Condition="'$(CoreAssemblyFiles)'==''">
     <CoreAssemblyFiles>$(MSBuildThisFileDirectory)..\lib\net40\CSHTML5.Migration.dll</CoreAssemblyFiles>
   </PropertyGroup>
-  
+
   <!--============================================================
   IMPORT THE MAIN TARGET FILE
   ============================================================-->
-  <Import Project="$(MSBuildThisFileDirectory)\CSHTML5.Common.Bridge.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)\CSHTML5.Common.targets" />
 
-  
+
 </Project>
