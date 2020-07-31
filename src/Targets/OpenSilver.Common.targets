@@ -59,6 +59,14 @@
   </PropertyGroup>
 
   <!--============================================================
+  Tell the SplittedXamlEditor to use our xaml designer
+  (see file EditorFactory.cs in DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor) 
+  ============================================================-->
+  <PropertyGroup>
+    <IsOpenSilver>true</IsOpenSilver>
+  </PropertyGroup>
+  
+  <!--============================================================
   Set the default values for some properties (for example, if the output paths have not been specified, we set the default ones):
   ============================================================-->
   <PropertyGroup Condition="'$(IsSecondPass)'==''">

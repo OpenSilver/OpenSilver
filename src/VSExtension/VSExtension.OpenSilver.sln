@@ -1,6 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSilver.VSIX", "OpenSilver.VSIX\OpenSilver.VSIX.csproj", "{87A492A1-DF7F-411C-ABF8-33E0FA0F3522}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor", "DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor\DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor.csproj", "{756A216F-62A2-4277-8F48-D1CE0D5565AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetForHtml5.VisualStudioExtension.ShellIntegration", "DotNetForHtml5.VisualStudioExtension.ShellIntegration\DotNetForHtml5.VisualStudioExtension.ShellIntegration.csproj", "{F97EBEAB-6CFF-4243-A6F2-C7C368CB6870}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetForHtml5.VisualStudioExtension.Editor.XamlDesigner", "DotNetForHtml5.VisualStudioExtension.Editor.XamlDesigner\DotNetForHtml5.VisualStudioExtension.Editor.XamlDesigner.csproj", "{239BBB6C-1322-411A-8D60-B86AD62AC466}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +21,43 @@ Global
 		{87A492A1-DF7F-411C-ABF8-33E0FA0F3522}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87A492A1-DF7F-411C-ABF8-33E0FA0F3522}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87A492A1-DF7F-411C-ABF8-33E0FA0F3522}.Release|Any CPU.Build.0 = Release|Any CPU
+		{756A216F-62A2-4277-8F48-D1CE0D5565AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{756A216F-62A2-4277-8F48-D1CE0D5565AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{756A216F-62A2-4277-8F48-D1CE0D5565AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{756A216F-62A2-4277-8F48-D1CE0D5565AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F97EBEAB-6CFF-4243-A6F2-C7C368CB6870}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F97EBEAB-6CFF-4243-A6F2-C7C368CB6870}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F97EBEAB-6CFF-4243-A6F2-C7C368CB6870}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F97EBEAB-6CFF-4243-A6F2-C7C368CB6870}.Release|Any CPU.Build.0 = Release|Any CPU
+		{239BBB6C-1322-411A-8D60-B86AD62AC466}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{239BBB6C-1322-411A-8D60-B86AD62AC466}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{239BBB6C-1322-411A-8D60-B86AD62AC466}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{239BBB6C-1322-411A-8D60-B86AD62AC466}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9679BFF5-3425-47DF-870F-DC3F4BA5E30D}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://userware.visualstudio.com/
+		SccProjectUniqueName0 = DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor\\DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor.csproj
+		SccProjectName0 = DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor
+		SccAuxPath0 = https://userware.visualstudio.com
+		SccLocalPath0 = DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor
+		SccProvider0 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccProjectUniqueName1 = DotNetForHtml5.VisualStudioExtension.ShellIntegration\\DotNetForHtml5.VisualStudioExtension.ShellIntegration.csproj
+		SccProjectName1 = DotNetForHtml5.VisualStudioExtension.ShellIntegration
+		SccAuxPath1 = https://userware.visualstudio.com
+		SccLocalPath1 = DotNetForHtml5.VisualStudioExtension.ShellIntegration
+		SccProvider1 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccProjectUniqueName2 = DotNetForHtml5.VisualStudioExtension.Editor.XamlDesigner\\DotNetForHtml5.VisualStudioExtension.Editor.XamlDesigner.csproj
+		SccProjectName2 = DotNetForHtml5.VisualStudioExtension.Editor.XamlDesigner
+		SccAuxPath2 = https://userware.visualstudio.com
+		SccLocalPath2 = DotNetForHtml5.VisualStudioExtension.Editor.XamlDesigner
+		SccProvider2 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 	EndGlobalSection
 EndGlobal

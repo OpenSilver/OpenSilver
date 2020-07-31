@@ -184,6 +184,12 @@ namespace DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor
                 buildPropertyStorage.GetPropertyValue("IsCSharpXamlForHtml5", "Debug", (uint)_PersistStorageType.PST_PROJECT_FILE, out value);
                 if (value != null && value.Trim().ToLower() == "true")
                     isCSharpXamlForHtml5 = true;
+                else
+                {
+                    buildPropertyStorage.GetPropertyValue("IsOpenSilver", "Debug", (uint)_PersistStorageType.PST_PROJECT_FILE, out value);
+                    if (value != null && value.Trim().ToLower() == "true")
+                        isCSharpXamlForHtml5 = true;
+                }
             }
 
             return isCSharpXamlForHtml5;

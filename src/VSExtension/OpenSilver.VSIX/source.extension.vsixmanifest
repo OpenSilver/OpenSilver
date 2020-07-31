@@ -25,6 +25,8 @@
     <Prerequisite Id="Microsoft.VisualStudio.Component.ManagedDesktop.Prerequisites" Version="[16.0,)" DisplayName=".NET desktop development tools"/>
   </Prerequisites>
   <Assets>
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="DotNetForHtml5.VisualStudioExtension.ShellIntegration" Path="|DotNetForHtml5.VisualStudioExtension.ShellIntegration;PkgdefProjectOutputGroup|" d:VsixSubPath="ShellIntegration" />
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor" Path="|DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor;PkgdefProjectOutputGroup|" d:VsixSubPath="SplittedXamlEditor" />
     <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="File" Path="ProjectTemplates" d:TargetPath="ProjectTemplates\CSharp\OpenSilver\Empty OpenSilver Application.zip" />
     <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="File" Path="ProjectTemplates" d:TargetPath="ProjectTemplates\CSharp\OpenSilver\Empty OpenSilver UWP Application.zip" />
     <!--<Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="File" Path="ProjectTemplates" d:TargetPath="ProjectTemplates\CSharp\OpenSilver\Empty OpenSilver WIP Application.zip" />-->
