@@ -78,11 +78,14 @@
     <Compile Include="TypesRequiredByTheSimulator\SetMemberBinder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Bridge, Version=17.7.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.2.0.0-alpha28-043\lib\net40\Bridge.dll</HintPath>
+    <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
     </Reference>
     <Reference Include="CSHTML5, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.2.0.0-alpha28-043\lib\net40\CSHTML5.dll</HintPath>
+      <HintPath>..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\CSHTML5.dll</HintPath>
+    </Reference>
+    <Reference Include="CSHTML5.Stubs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\CSHTML5.Stubs.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -90,12 +93,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\packages\CSHTML5.2.0.0-alpha28-043\build\CSHTML5.targets" Condition="Exists('..\..\packages\CSHTML5.2.0.0-alpha28-043\build\CSHTML5.targets')" />
+  <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition="Exists('..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\CSHTML5.2.0.0-alpha28-043\build\CSHTML5.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\CSHTML5.2.0.0-alpha28-043\build\CSHTML5.targets'))" />
+    <Error Condition="!Exists('..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

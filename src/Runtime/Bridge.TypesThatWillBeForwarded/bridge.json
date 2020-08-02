@@ -72,5 +72,9 @@
   // Default is "None".
   "logging": {
     "level": "None"
-  }
+  },
+
+  // Avoid compilation collisions.
+  // https://github.com/bridgedotnet/Bridge/issues/4021
+  "ignoreDuplicateTypes": true
 }
