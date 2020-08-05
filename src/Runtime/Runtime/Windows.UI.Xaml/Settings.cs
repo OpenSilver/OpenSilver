@@ -47,15 +47,10 @@ namespace System
         public bool EnableBindingErrorsThrowing { get; set; }
 
 
-        private bool _enablePerformanceLogging;
         public bool EnablePerformanceLogging
         {
-            get { return _enablePerformanceLogging; }
-            set
-            {
-                _enablePerformanceLogging = value;
-                INTERNAL_VisualTreeManager.EnablePerformanceLogging = value;
-            }
+            get { return INTERNAL_VisualTreeManager.EnablePerformanceLogging; }
+            set { INTERNAL_VisualTreeManager.EnablePerformanceLogging = value; }
         }
 
         /// <summary>
@@ -63,15 +58,10 @@ namespace System
         /// Those property are applied later, when the control becomes visible.
         /// Enabling this option results in improved performance.
         /// </summary>
-        private bool _enableOptimizationWhereCollapsedControlsAreNotRendered = true;
         public bool EnableOptimizationWhereCollapsedControlsAreNotRendered
         {
-            get { return _enableOptimizationWhereCollapsedControlsAreNotRendered; }
-            set
-            {
-                _enableOptimizationWhereCollapsedControlsAreNotRendered = value;
-                INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreNotRendered = value;
-            }
+            get { return INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreNotRendered; }
+            set { INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreNotRendered = value; }
         }
 
         /// <summary>
@@ -79,15 +69,10 @@ namespace System
         /// The DOM elements are created later, when the control becomes visible.
         /// Enabling this option results in significantly improved performance if there are many hidden elements.
         /// </summary>
-        private bool _enableOptimizationWhereCollapsedControlsAreNotLoaded;
         public bool EnableOptimizationWhereCollapsedControlsAreNotLoaded
         {
-            get { return _enableOptimizationWhereCollapsedControlsAreNotLoaded; }
-            set
-            {
-                _enableOptimizationWhereCollapsedControlsAreNotLoaded = value;
-                INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreNotLoaded = value;
-            }
+            get { return INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreNotLoaded; }
+            set { INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreNotLoaded = value; }
         }
 
         /// <summary>
@@ -95,27 +80,16 @@ namespace System
         /// The goal is to give the time to the browser engine to draw the visible ones, in order to improve the perceived performance.
         /// The DOM elements are created immediately after the browser engine has finished drawing (when the UI thread is available).
         /// </summary>
-        private bool _enableOptimizationWhereCollapsedControlsAreLoadedLast;
         public bool EnableOptimizationWhereCollapsedControlsAreLoadedLast
         {
-            get { return _enableOptimizationWhereCollapsedControlsAreLoadedLast; }
-            set
-            {
-                _enableOptimizationWhereCollapsedControlsAreLoadedLast = value;
-                INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreLoadedLast = value;
-            }
+            get { return INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreLoadedLast; }
+            set { INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreLoadedLast = value; }
         }
 
-        private bool _enableProgressiveRendering;
         public bool EnableProgressiveRendering
         {
-            get { return _enableProgressiveRendering; }
-            set
-            {
-                _enableProgressiveRendering = value;
-                Panel.INTERNAL_ApplicationWideEnableProgressiveRendering = value;
-
-            }
+            get { return Panel.INTERNAL_ApplicationWideEnableProgressiveRendering; }
+            set { Panel.INTERNAL_ApplicationWideEnableProgressiveRendering = value; }
         }
 
         public bool EnableInvalidPropertyMetadataDefaultValueExceptions { get; set; }

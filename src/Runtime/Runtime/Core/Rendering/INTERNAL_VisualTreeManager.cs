@@ -50,8 +50,8 @@ namespace CSHTML5.Internal
     {
         internal static bool EnablePerformanceLogging;
         internal static bool EnableOptimizationWhereCollapsedControlsAreNotRendered = true;
-        internal static bool EnableOptimizationWhereCollapsedControlsAreNotLoaded;
-        internal static bool EnableOptimizationWhereCollapsedControlsAreLoadedLast;
+        internal static bool EnableOptimizationWhereCollapsedControlsAreNotLoaded = false;
+        internal static bool EnableOptimizationWhereCollapsedControlsAreLoadedLast = false;
 
         public static void DetachVisualChildIfNotNull(UIElement child, UIElement parent)
         {
