@@ -416,53 +416,6 @@ if(nextSibling != undefined) {
                     domElementWhereToPlaceChildStuff,
                     wrapperForChild);
             }
-
-            // Defer rendering when the control is not visible to when becomes visible (note: when this option is enabled, we do not apply the CSS properties of the UI elements that are not visible. Those property are applied later, when the control becomes visible. This option results in improved performance.)
-            bool enableDeferredRenderingOfCollapsedControls = 
-                EnableOptimizationWhereCollapsedControlsAreNotRendered
-                || EnableOptimizationWhereCollapsedControlsAreLoadedLast
-                || EnableOptimizationWhereCollapsedControlsAreNotLoaded;
-
-            if (enableDeferredRenderingOfCollapsedControls && !child.IsVisible)
-            {
-                child.INTERNAL_DeferredRenderingWhenControlBecomesVisible = () =>
-                {
-                    AttachVisualChild_Private_RenderElements_OnlyWhenControlIsVisible(
-                        child,
-                        parent,
-                        doesParentRequireToCreateAWrapperForEachChild,
-                        innerDivOfWrapperForChild,
-                        domElementWhereToPlaceChildStuff,
-                        wrapperForChild);
-                };
-            }
-            else
-            {
-                AttachVisualChild_Private_RenderElements_OnlyWhenControlIsVisible(
-                    child,
-                    parent,
-                    doesParentRequireToCreateAWrapperForEachChild,
-                    innerDivOfWrapperForChild,
-                    domElementWhereToPlaceChildStuff,
-                    wrapperForChild);
-            }
-        }
-
-        static void AttachVisualChild_Private_RenderElements_OnlyWhenControlIsVisible(
-            UIElement child,
-            UIElement parent,
-            bool doesParentRequireToCreateAWrapperForEachChild,
-            object innerDivOfWrapperForChild,
-            object domElementWhereToPlaceChildStuff,
-            object wrapperForChild
-            )
-        {
-            //--------------------------------------------------------
-            //RENDER THE ELEMENTS BY RAISING PROPERTYCHANGED EVENT ON ALL THE DEPENDENCY PROPERTIES THAT ARE SET:
-            //--------------------------------------------------------
-
-            RenderElementsAndRaiseChangedEventOnAllDependencyProperties(child);
-            //element.INTERNAL_Render();
         }
 
         static void AttachVisualChild_Private_MainSteps(UIElement child,
@@ -704,6 +657,28 @@ if(nextSibling != undefined) {
 
             // Raise the "OnAttached" event:
             child.INTERNAL_OnAttachedToVisualTree(); // IMPORTANT: Must be done BEFORE "RaiseChangedEventOnAllDependencyProperties" (for example, the ItemsControl uses this to initialize its visual)
+
+            //--------------------------------------------------------
+            // RENDER THE ELEMENTS BY APPLYING THE CSS PROPERTIES:
+            //--------------------------------------------------------
+
+            // Defer rendering when the control is not visible to when becomes visible (note: when this option is enabled, we do not apply the CSS properties of the UI elements that are not visible. Those property are applied later, when the control becomes visible. This option results in improved performance.)
+            bool enableDeferredRenderingOfCollapsedControls =
+                EnableOptimizationWhereCollapsedControlsAreNotRendered
+                || EnableOptimizationWhereCollapsedControlsAreLoadedLast
+                || EnableOptimizationWhereCollapsedControlsAreNotLoaded;
+
+            if (enableDeferredRenderingOfCollapsedControls && !child.IsVisible)
+            {
+                child.INTERNAL_DeferredRenderingWhenControlBecomesVisible = () =>
+                {
+                    RenderElementsAndRaiseChangedEventOnAllDependencyProperties(child);
+                };
+            }
+            else
+            {
+                RenderElementsAndRaiseChangedEventOnAllDependencyProperties(child);
+            }
 
             //--------------------------------------------------------
             // HANDLE BINDING:
