@@ -58,6 +58,17 @@ namespace System
             }
         }
 
+        private bool _enableOptimizationWhereCollapsedControlsAreNotRendered = true;
+        public bool EnableOptimizationWhereCollapsedControlsAreNotRendered
+        {
+            get { return _enableOptimizationWhereCollapsedControlsAreNotRendered; }
+            set
+            {
+                _enableOptimizationWhereCollapsedControlsAreNotRendered = value;
+                INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreNotRendered = value;
+            }
+        }
+
         private bool _enableOptimizationWhereCollapsedControlsAreNotLoaded;
         public bool EnableOptimizationWhereCollapsedControlsAreNotLoaded
         {

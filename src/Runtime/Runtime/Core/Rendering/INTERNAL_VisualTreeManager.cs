@@ -49,6 +49,7 @@ namespace CSHTML5.Internal
     public static class INTERNAL_VisualTreeManager
     {
         internal static bool EnablePerformanceLogging;
+        internal static bool EnableOptimizationWhereCollapsedControlsAreNotRendered = true;
         internal static bool EnableOptimizationWhereCollapsedControlsAreNotLoaded;
         internal static bool EnableOptimizationWhereCollapsedControlsAreLoadedLast;
 
@@ -416,8 +417,13 @@ if(nextSibling != undefined) {
                     wrapperForChild);
             }
 
-            // Defer rendering to when the control becomes visible:
-            if (!child.IsVisible)
+            // Defer rendering when the control is not visible to when becomes visible (note: when this option is enabled, we do not apply the CSS properties of the UI elements that are not visible. Those property are applied later, when the control becomes visible. This option results in improved performance.)
+            bool enableDeferredRenderingOfCollapsedControls = 
+                EnableOptimizationWhereCollapsedControlsAreNotRendered
+                || EnableOptimizationWhereCollapsedControlsAreLoadedLast
+                || EnableOptimizationWhereCollapsedControlsAreNotLoaded;
+
+            if (enableDeferredRenderingOfCollapsedControls && !child.IsVisible)
             {
                 child.INTERNAL_DeferredRenderingWhenControlBecomesVisible = () =>
                 {
