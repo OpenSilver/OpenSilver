@@ -58,6 +58,11 @@ namespace System
             }
         }
 
+        /// <summary>
+        /// When True, do not apply the CSS properties of the UI elements that are not visible.
+        /// Those property are applied later, when the control becomes visible.
+        /// Enabling this option results in improved performance.
+        /// </summary>
         private bool _enableOptimizationWhereCollapsedControlsAreNotRendered = true;
         public bool EnableOptimizationWhereCollapsedControlsAreNotRendered
         {
@@ -69,6 +74,11 @@ namespace System
             }
         }
 
+        /// <summary>
+        /// When True, do not create the DOM elements for the UI elements that are not visible.
+        /// The DOM elements are created later, when the control becomes visible.
+        /// Enabling this option results in significantly improved performance if there are many hidden elements.
+        /// </summary>
         private bool _enableOptimizationWhereCollapsedControlsAreNotLoaded;
         public bool EnableOptimizationWhereCollapsedControlsAreNotLoaded
         {
@@ -80,6 +90,11 @@ namespace System
             }
         }
 
+        /// <summary>
+        /// Wait a few moments before creating the DOM elements for the UI elements that are not visible.
+        /// The goal is to give the time to the browser engine to draw the visible ones, in order to improve the perceived performance.
+        /// The DOM elements are created immediately after the browser engine has finished drawing (when the UI thread is available).
+        /// </summary>
         private bool _enableOptimizationWhereCollapsedControlsAreLoadedLast;
         public bool EnableOptimizationWhereCollapsedControlsAreLoadedLast
         {
