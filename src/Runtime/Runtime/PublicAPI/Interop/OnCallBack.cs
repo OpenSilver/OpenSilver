@@ -498,7 +498,7 @@ namespace CSHTML5.Internal
                 try
                 {
                     methodSingature = d.Method.MethodSignature();
-                    Console.WriteLine("DEBUG: OnCallBack: DelegateDynamicnvoke: " + methodSingature);
+                   // Console.WriteLine("DEBUG: OnCallBack: DelegateDynamicnvoke: " + methodSingature);
                 }
                 catch (Exception e)
                 {
