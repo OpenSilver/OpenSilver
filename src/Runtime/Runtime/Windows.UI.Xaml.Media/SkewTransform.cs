@@ -114,21 +114,27 @@ namespace Windows.UI.Xaml.Media
         private void ApplyCSSChanges(SkewTransform skewTransform, double angleX, double angleY)
         {
             CSSEquivalent angleXcssEquivalent = AngleXProperty.GetTypeMetaData(typeof(SkewTransform)).GetCSSEquivalent(skewTransform);
-            object domElementX = angleXcssEquivalent.DomElement;
-            if (angleX != _appliedCssAngleX || (_domElementToWhichTheCssAngleXWasApplied != null && domElementX != _domElementToWhichTheCssAngleXWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
+            if (angleXcssEquivalent != null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(angleXcssEquivalent.DomElement, angleXcssEquivalent.Name, angleXcssEquivalent.Value(skewTransform, angleX));
-                _appliedCssAngleX = angleX;
-                _domElementToWhichTheCssAngleXWasApplied = domElementX;
+                object domElementX = angleXcssEquivalent.DomElement;
+                if (angleX != _appliedCssAngleX || (_domElementToWhichTheCssAngleXWasApplied != null && domElementX != _domElementToWhichTheCssAngleXWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
+                {
+                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(angleXcssEquivalent.DomElement, angleXcssEquivalent.Name, angleXcssEquivalent.Value(skewTransform, angleX));
+                    _appliedCssAngleX = angleX;
+                    _domElementToWhichTheCssAngleXWasApplied = domElementX;
+                }
             }
 
             CSSEquivalent angleYcssEquivalent = AngleYProperty.GetTypeMetaData(typeof(SkewTransform)).GetCSSEquivalent(skewTransform);
-            object domElementY = angleYcssEquivalent.DomElement;
-            if (angleY != _appliedCssAngleY || (_domElementToWhichTheCssAngleYWasApplied != null && domElementY != _domElementToWhichTheCssAngleYWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
+            if (angleYcssEquivalent != null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(angleYcssEquivalent.DomElement, angleYcssEquivalent.Name, angleYcssEquivalent.Value(skewTransform, angleY));
-                _appliedCssAngleY = angleY;
-                _domElementToWhichTheCssAngleYWasApplied = domElementY;
+                object domElementY = angleYcssEquivalent.DomElement;
+                if (angleY != _appliedCssAngleY || (_domElementToWhichTheCssAngleYWasApplied != null && domElementY != _domElementToWhichTheCssAngleYWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
+                {
+                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(angleYcssEquivalent.DomElement, angleYcssEquivalent.Name, angleYcssEquivalent.Value(skewTransform, angleY));
+                    _appliedCssAngleY = angleY;
+                    _domElementToWhichTheCssAngleYWasApplied = domElementY;
+                }
             }
         }
 

@@ -100,20 +100,23 @@ namespace Windows.UI.Xaml.Media
                         if (propertyMetadata.GetCSSEquivalent != null) // If the parent has a CSSEquivalent, we use it, otherwise we use the parent PropertyChanged method.
                         {
                             var parentPropertyCSSEquivalent = propertyMetadata.GetCSSEquivalent(uiElement);
-                            CSSEquivalent newCSSEquivalent = new CSSEquivalent()
+                            if (parentPropertyCSSEquivalent != null)
                             {
-                                Name = parentPropertyCSSEquivalent.Name,
-                                ApplyAlsoWhenThereIsAControlTemplate = parentPropertyCSSEquivalent.ApplyAlsoWhenThereIsAControlTemplate,
+                                CSSEquivalent newCSSEquivalent = new CSSEquivalent()
+                                {
+                                    Name = parentPropertyCSSEquivalent.Name,
+                                    ApplyAlsoWhenThereIsAControlTemplate = parentPropertyCSSEquivalent.ApplyAlsoWhenThereIsAControlTemplate,
 
-                                Value = parentPropertyToValueToHtmlConverter(parentPropertyCSSEquivalent),
-                                DomElement = parentPropertyCSSEquivalent.DomElement,
-                                UIElement = uiElement
-                            };
-                            if (newCSSEquivalent.DomElement == null)
-                            {
-                                newCSSEquivalent.DomElement = uiElement.INTERNAL_OuterDomElement;
+                                    Value = parentPropertyToValueToHtmlConverter(parentPropertyCSSEquivalent),
+                                    DomElement = parentPropertyCSSEquivalent.DomElement,
+                                    UIElement = uiElement
+                                };
+                                if (newCSSEquivalent.DomElement == null)
+                                {
+                                    newCSSEquivalent.DomElement = uiElement.INTERNAL_OuterDomElement;
+                                }
+                                result.Add(newCSSEquivalent);
                             }
-                            result.Add(newCSSEquivalent);
                         }
                         else
                         {

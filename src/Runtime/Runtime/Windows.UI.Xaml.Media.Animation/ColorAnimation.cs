@@ -359,20 +359,23 @@ namespace Windows.UI.Xaml.Media.Animation
                     if (propertyMetadata.GetCSSEquivalent != null)
                     {
                         CSSEquivalent cssEquivalent = propertyMetadata.GetCSSEquivalent(_propertyContainer);
-                        UIElement uiElement = cssEquivalent.UIElement ?? (_propertyContainer as UIElement); // If no UIElement is specified, we assume that the property is intended to be applied to the instance on which the PropertyChanged has occurred.
-
-                        bool hasTemplate = (uiElement is Control) && ((Control)uiElement).HasTemplate;
-
-                        if (!hasTemplate || cssEquivalent.ApplyAlsoWhenThereIsAControlTemplate)
+                        if (cssEquivalent != null)
                         {
-                            if (cssEquivalent.DomElement == null && uiElement != null)
+                            UIElement uiElement = cssEquivalent.UIElement ?? (_propertyContainer as UIElement); // If no UIElement is specified, we assume that the property is intended to be applied to the instance on which the PropertyChanged has occurred.
+
+                            bool hasTemplate = (uiElement is Control) && ((Control)uiElement).HasTemplate;
+
+                            if (!hasTemplate || cssEquivalent.ApplyAlsoWhenThereIsAControlTemplate)
                             {
-                                cssEquivalent.DomElement = uiElement.INTERNAL_OuterDomElement; // Default value
-                            }
-                            if (cssEquivalent.DomElement != null)
-                            {
-                                cssEquivalentExists = true;
-                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", cssEquivalent.DomElement, specificGroupName);
+                                if (cssEquivalent.DomElement == null && uiElement != null)
+                                {
+                                    cssEquivalent.DomElement = uiElement.INTERNAL_OuterDomElement; // Default value
+                                }
+                                if (cssEquivalent.DomElement != null)
+                                {
+                                    cssEquivalentExists = true;
+                                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", cssEquivalent.DomElement, specificGroupName);
+                                }
                             }
                         }
                     }

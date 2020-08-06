@@ -113,21 +113,27 @@ namespace Windows.UI.Xaml.Media
         private void ApplyCSSChanges(ScaleTransform scaleTransform, double scaleX, double scaleY)
         {
             CSSEquivalent scaleXcssEquivalent = ScaleXProperty.GetTypeMetaData(typeof(ScaleTransform)).GetCSSEquivalent(scaleTransform);
-            object domElementX = scaleXcssEquivalent.DomElement;
-            if (scaleX != _appliedCssScaleX || (_domElementToWhichTheCssScaleXWasApplied != null && domElementX != _domElementToWhichTheCssScaleXWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
+            if (scaleXcssEquivalent != null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleXcssEquivalent.DomElement, scaleXcssEquivalent.Name, scaleXcssEquivalent.Value(scaleTransform, scaleX));
-                _appliedCssScaleX = scaleX;
-                _domElementToWhichTheCssScaleXWasApplied = domElementX;
+                object domElementX = scaleXcssEquivalent.DomElement;
+                if (scaleX != _appliedCssScaleX || (_domElementToWhichTheCssScaleXWasApplied != null && domElementX != _domElementToWhichTheCssScaleXWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
+                {
+                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleXcssEquivalent.DomElement, scaleXcssEquivalent.Name, scaleXcssEquivalent.Value(scaleTransform, scaleX));
+                    _appliedCssScaleX = scaleX;
+                    _domElementToWhichTheCssScaleXWasApplied = domElementX;
+                }
             }
 
             CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetTypeMetaData(typeof(ScaleTransform)).GetCSSEquivalent(scaleTransform);
-            object domElementY = scaleYcssEquivalent.DomElement;
-            if (scaleY != _appliedCssScaleY || (_domElementToWhichTheCssScaleYWasApplied != null && domElementY != _domElementToWhichTheCssScaleYWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
+            if (scaleYcssEquivalent != null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleYcssEquivalent.DomElement, scaleYcssEquivalent.Name, scaleYcssEquivalent.Value(scaleTransform, scaleY));
-                _appliedCssScaleY = scaleY;
-                _domElementToWhichTheCssScaleYWasApplied = domElementY;
+                object domElementY = scaleYcssEquivalent.DomElement;
+                if (scaleY != _appliedCssScaleY || (_domElementToWhichTheCssScaleYWasApplied != null && domElementY != _domElementToWhichTheCssScaleYWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
+                {
+                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleYcssEquivalent.DomElement, scaleYcssEquivalent.Name, scaleYcssEquivalent.Value(scaleTransform, scaleY));
+                    _appliedCssScaleY = scaleY;
+                    _domElementToWhichTheCssScaleYWasApplied = domElementY;
+                }
             }
         }
 
