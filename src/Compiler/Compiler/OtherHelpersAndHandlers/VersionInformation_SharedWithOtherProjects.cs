@@ -14,9 +14,9 @@ namespace DotNetForHtml5
             // This date is used by the "ActivationApp" project to check if the end-user has the right to activate this app (because they usually get 1 year of free updates only).
 
 #if BRIDGE
-            return new DateTime(2020, 05, 25); // Year, Month, Day
+            return new DateTime(2020, 08, 05); // Year, Month, Day
 #elif CSHTML5BLAZOR
-            return new DateTime(2020, 05, 15); // Year, Month, Day
+            return new DateTime(2020, 08, 05); // Year, Month, Day
 #else
             return new DateTime(2019, 10, 17); // Year, Month, Day
 #endif
@@ -28,9 +28,9 @@ namespace DotNetForHtml5
             // This version is used by the Compiler to inject the compiler version attributes into the user code.
 
 #if BRIDGE
-            return new Version("2.0.0.65085"); // Note: here, we use the "string" constructor of the Version class so that we can copy/paste the string to/from the Setup project, which leads to a more reliable distribution process (ie. fewer chances of mismatch or typos).
+            return new Version("2.0.0.70090"); // Note: here, we use the "string" constructor of the Version class so that we can copy/paste the string to/from the Setup project, which leads to a more reliable distribution process (ie. fewer chances of mismatch or typos).
 #elif CSHTML5BLAZOR
-            return new Version("1.0.0.005"); // Note: here, we use the "string" constructor of the Version class so that we can copy/paste the string to/from the Setup project, which leads to a more reliable distribution process (ie. fewer chances of mismatch or typos).
+            return new Version("1.0.0.006"); // Note: here, we use the "string" constructor of the Version class so that we can copy/paste the string to/from the Setup project, which leads to a more reliable distribution process (ie. fewer chances of mismatch or typos).
 #else
             return new Version("1.2.137.191017"); // Note: here, we use the "string" constructor of the Version class so that we can copy/paste the string to/from the Setup project, which leads to a more reliable distribution process (ie. fewer chances of mismatch or typos).
 #endif
@@ -42,9 +42,9 @@ namespace DotNetForHtml5
             // This version is used by the Compiler to inject the compiler version attributes into the user code.
 
 #if BRIDGE
-            return "Version 2.0 Preview 0.7 (2.0.0-alpha65-085) (2020.05.25)";
+            return "Version 2.0 Preview 0.7 (2.0.0-alpha70-090) (2020.08.05)";
 #elif CSHTML5BLAZOR
-            return "Version 1.0.0-alpha-005 (2020.05.15)";
+            return "Version 1.0.0-alpha-006 (2020.08.05)";
 #else
             return "Version 1.2.4 R1";
 #endif
