@@ -1,39 +1,74 @@
-This repository contains the source code of both OpenSilver (which compiles to WebAssembly) and CSHTML5 (which compiles to JavaScript). More information about those two products can be found at: www.opensilver.net and www.cshtml5.com
+This repository contains the source code of the 2 following products, which share most of their code:
+- OpenSilver (www.opensilver.net) &rarr; It compiles C#/XAML/.NET to WebAssembly/HTML/CSS (Free, Open Source, MIT Licensed)
+- CSHTML5 (www.cshtml5.com) &rarr; It compiles C#/XAML/.NET to JavaScript/HTML/CSS (Dual Licensed)
 
-# Instructions for OpenSilver:
 
-TL;DR: Run "restore-packages-opensilver.bat" and then open the solution named "OpenSilver.sln" to compile the OpenSilver runtime.
 
-### How to build the source code?
+# How to download the software and get started?
+
+Simply download the .VSIX file (the extension for Microsoft Visual Studio) which installs the Project Templates:
+- The ones for OpenSilver can be downloaded from: https://opensilver.net/download.aspx (Free, Open Source, MIT Licensed)
+- The ones for CSHTML5 can be downloaded from: http://cshtml5.com/download.aspx (Dual Licensed)
+
+Then, launch Visual Studio, click "Create a new project", and choose one of the installed templates.
+
+In the newly-created project, you may then want to update the NuGet package to reference the very latest version, in order to be sure that you have the same version as the one in the "master" branch of this repository (note: in the NuGet Package Manager, be sure to check the option "include pre-releases", otherwise you may not see the latest package version).
+
+
+
+# How to build the source code in this repository?
+
+
+### 1. If you want to build only the Runtime (for faster compilation times):
+
+The "Runtime" corresponds to the assembly that is referenced by your application project. It is the assembly that contains most of the interesting code of this repository. In particular, it contains the code for the UI engine, the XAML controls, the framework classes, and more.
+
+To compile the Runtime source code, follow these steps:
+
 1. Clone this repository locally or download it as a ZIP archive and extract it on your machine
-2. Execute the file "restore-packages-opensilver.bat" (by double-clicking on it in Windows Explorer)
-3. Open the solution file "OpenSilver.sln" (located in the "src" folder) with Visual Studio 2019 or newer
-4. Build either the "SL" configuration or the "UWP" configuration, depending on whether you want to use the "OpenSilver" NuGet package (recommended) or the "OpenSilver.UWPCompatible" package. This will generate the assembly "OpenSilver.dll" in the "bin/OpenSilver/SL/" folder, or the assembly "OpenSilver.UWPCompatible.dll" in the "bin/OpenSilver/UWP/" folder.
 
-### How to test the changes that I make to the source code?
-1. Create a new Visual Studio project of type OpenSilver. To do so, you can install the latest VSIX available at https://opensilver.net/download.aspx , which will add new project templates to the"New Project" dialog of Visual Studio 2019.
-2. Build the OpenSilver source code (cf. previous question)
-3. Copy the 3 files "OpenSilver.dll", "OpenSilver.pdb", and "OpenSilver.xml" from the "bin/OpenSilver/SL/" folder of the OpenSilver source code (ie. the source code in this repository) into the folder "C:\Users\YOUR_USERNAME\.nuget\packages\opensilver\PACKAGE_VERSION\lib\netstandard2.0" (please replace "YOUR_USERNAME" and "PACKAGE_VERSION" in the path), overwriting the existing files
-4. Build and run the project that you created at step 1
+2. Execute the .BAT file "restore-packages-opensilver.bat" or "restore-packages-cshtml5.bat" (depending on whether you are using OpenSilver or CSHTML5)
 
+3. Launch Visual Studio 2019 or newer
 
+4. Open the solution file "OpenSilver.sln" or "CSHTML5.sln" (depending on whether you are using OpenSilver or CSHTML5)
+5. Choose the appropriate "Solution Configuration depending on your needs:
+- For OpenSilver, you may choose the "SL" configuration for Silverlight-like dialect, or the "UWP" configuration for UWP-like dialect. Note: there is also a "SL.WorkInProgress" configuration that contains work-in-progress features. It is useful during migrations from Silverlight to quickly arrive to a point where the migrated project compiles.
+- For CSHTML5, you may choose the "Debug" configuration for UWP-like dialect, and the "Migration" configuration for Silverlight-like dialect.
+6. Build the project named "Runtime"
 
-# Instructions for CSHTML5:
+7. If you wish to test the Runtime, start by creating a test project using the Project Templates (as described in the section "How to download the software and get started?" above). Then, update the NuGet package to reference the latest version. Lastly, copy/paste the assemblies that you just compiled from the "bin" folder of the "Runtime" project into the "lib" folder of the installed NuGet package (the one that is used by your test project). For example:
+- If you are compiling the Runtime of OpenSilver, simply copy/paste "OpenSilver.dll" from the "bin/SL" folder into the folder:
+C:\Users\%USERNAME%\.nuget\packages\opensilver\1.X.Y\lib\netstandard2.0
+- If you are compiling the Runtime of CSHTML5, simply copy/paste "CSHTML5.dll" from the "bin/Debug" folder into the the folder "packages\CSHTML5.2.X.Y\lib\net40" located inside the solution of your test project.
+Then, rebuild your test project and launch it.
 
-TL;DR: Run "restore-packages-cshtml5.bat" and then open the solution named "CSHTML5.sln" to compile the CSHTML5 runtime.
+### 2. If you want to build the whole NuGet package (including the Runtime, the Compiler, the Simulator, etc.):
 
-### How to build the source code?
 1. Clone this repository locally or download it as a ZIP archive and extract it on your machine
-2. Execute the file "restore-packages-cshtml5.bat" (by double-clicking on it in Windows Explorer)
-3. Open the solution file "CSHTML5.sln" (located in the "src" folder) with Visual Studio 2017 or newer
-4. Build either the "Debug" configuration or the "Migration" configuration, depending on whether you want to use the "CSHTML5" NuGet package (recommended for creating new apps) or the "CSHTML5.Migration" package (recommended for migrating existing Silverlight or WPF applications). This will generate the assembly "CSHTML5.dll" in the "bin/Debug/" folder, or the assembly "CSHTML5.Migration.dll" in the "bin/Migration/" folder.
+2. Execute the .BAT file "restore-packages-opensilver.bat" or "restore-packages-cshtml5.bat" (depending on whether you are using OpenSilver or CSHTML5)
+3. Launch the "Developer Command Prompt for VS 2019" (or newer) from your Start Menu
+4. Navigate with the command prompt to the folder "build" that is located inside the cloned repository
+5. Launch the .BAT file "CompleteBuild.OpenSilver.bat" or "CompleteBuild.CSHTML5.bat" (depending on whether you are using OpenSilver or CSHTML5)
+6. When asked, enter a version number (if you are unsure about which version number to enter, look at the latest version number on NuGet.org, and increment by 1, or just enter any number)
 
-Note: many low-level types are located in the Bridge.NET repository, which is located [here](https://github.com/cshtml5/Bridge).
+Wait for the compilation to finish. The generated NuGet packages are created inside the "build\output\XXXXX" directory.
 
-### How to test the changes that I make to the source code?
-1. Create a new Visual Studio project of type CSHTML5 version 2.x. To do so, you can install the VSIX available at http://forums.cshtml5.com/viewforum.php?f=6 (look for the latest version 2.x), which will add new project templates to the Visual Studio "New Project" dialog.
-2. Build the CSHTML5 source code (cf. previous question)
-3. Copy the 3 files "CSHTML5.dll", "CSHTML5.pdb", and "CSHTML5.xml" from the "bin/Debug/" folder of the CSHTML5 source code (ie. the source code in this repository) into the folder "packages/CSHTML5(...)/lib/net40/" of the project that you created at step 1, overwriting the existing files
-4. Build and run the project that you created at step 1
+To test the NuGet package, simply reference it from your test project. If you are unfamiliar with custom package sources in Visual Studio, please read  [this page](https://docs.microsoft.com/en-us/nuget/consume-packages/install-use-packages-visual-studio#package-sources).
+
+# What if I get a compilation error with the code in this repository?
+
+If you get a compilation error, it may be that a Visual Studio workload needs to be installed. To find out, please open the solution "OpenSilver.sln" or "CSHTML5.sln" and attempt to compile it with the Visual Studio IDE (2019 or newer).
+
+If the error is about the generation of the .VSIX file, just ignore the error, because the .VSIX file is not needed for testing the NuGet package.
+
+If you are compiling using the Command Prompt, please double-check that you are using the "Developer Command Prompt", not the simple one, and that the current directory is set to the "build" directory of this repository, because the paths in the .BAT files are relative to the current directory.
+
+If you still encounter any issues, please contact:
+- the OpenSilver team at: https://opensilver.net/contact.aspx
+- the CSHTML5 team at: http://cshtml5.com/contact.aspx
+
+
+
 
 
