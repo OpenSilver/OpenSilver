@@ -59,14 +59,20 @@ namespace TypeScriptDefToCSharp.Model
                     instanceName = "this.UnderlyingJSInstance";
                 }
 
-                res.AppendLine("public " + staticState + type + " " + Tool.ClearKeyWord(this.Name));
+                string typeNullableIfBool = type;
+                if (type == "bool")
+                {
+                    typeNullableIfBool = "bool?";
+                }
+
+                res.AppendLine("public " + staticState + typeNullableIfBool + " " + Tool.ClearKeyWord(this.Name));
                 res.AppendLine("{");
 
                 // Getter
                 res.AppendLine("get");
                 res.AppendLine("{");
                 res.AppendLine("var jsObj = Interop.ExecuteJavaScript(\"" + prefix + this.Name + "\", " + instanceName + ");");
-                res.AppendLine("if (jsObj == JSObject.Undefined.UnderlyingJSInstance)");
+                res.AppendLine("if (CSHTML5.Interop.IsUndefined(jsObj))");
                 res.AppendLine("    return " + this.GetterDefaultValue(type) + ";");
                 res.AppendLine("else");
                 res.AppendLine("    return " + this.Type.New("jsObj") + ";");
@@ -91,10 +97,10 @@ namespace TypeScriptDefToCSharp.Model
             switch (type)
             {
                 case "double":
-                    res.Append("0");
+                    res.Append("double.NaN");
                     break;
                 case "bool":
-                    res.Append("false");
+                    res.Append("null");
                     break;
                 default:
                     res.Append("null");
@@ -106,7 +112,7 @@ namespace TypeScriptDefToCSharp.Model
         private string SetterValue(string type)
         {
             var res = new StringBuilder();
-            switch(type)
+            switch (type)
             {
                 case "double":
                 case "string":
