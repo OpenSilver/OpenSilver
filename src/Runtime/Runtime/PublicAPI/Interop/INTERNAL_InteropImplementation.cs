@@ -376,28 +376,65 @@ result;
             }
         }
 
+        static Dictionary<string, List<Tuple<Action, Action>>> _pendingJSFile = new Dictionary<string, List<Tuple<Action, Action>>>(); //This Dictionary is here to:
+                                                                                                                                       //       - know when we are already attempting to load the file so we do not try to load it a second time
+                                                                                                                                       //       - call the correct callback (success or failure) for everything that tried to load said file (so access to the callback) once we receive the event saying that the loading was successful/failed.
+        static HashSet<string> _loadedFiles = new HashSet<string>(); //To know which files have already been successfully loaded so can we simply call the OnSuccess callback.
+
         internal static void LoadJavaScriptFile(string url, string callerAssemblyName, Action callbackOnSuccess, Action callbackOnFailure = null)
         {
             string html5Path = INTERNAL_UriHelper.ConvertToHtml5Path(url);
-
-            CSHTML5.Interop.ExecuteJavaScript(
-@"// Add the script tag to the head
+            if (_loadedFiles.Contains(html5Path)) //Note: using html5Path so we consider different ways of writing the same path as one and only path.
+            {
+                callbackOnSuccess();
+            }
+            else if (_pendingJSFile.ContainsKey(html5Path))
+            {
+                _pendingJSFile[html5Path].Add(new Tuple<Action, Action>(callbackOnSuccess, callbackOnFailure));
+            }
+            else
+            {
+                _pendingJSFile.Add(html5Path, new List<Tuple<Action, Action>> { new Tuple<Action, Action>(callbackOnSuccess, callbackOnFailure) });
+                CSHTML5.Interop.ExecuteJavaScript(
+    @"// Add the script tag to the head
+var filePath = $0;
 var head = document.getElementsByTagName('head')[0];
 var script = document.createElement('script');
 script.type = 'text/javascript';
-script.src = $0;
-
+script.src = filePath;
 // Then bind the event to the callback function
 // There are several events for cross browser compatibility.
 if(script.onreadystatechange != undefined) {
 script.onreadystatechange = $1;
 } else {
-script.onload = $1;
-script.onerror = $2;
+script.onload = function () { $1(filePath) };
+script.onerror = function () { $2(filePath) };
 }
 
 // Fire the loading
-head.appendChild(script);", html5Path, callbackOnSuccess, callbackOnFailure);
+head.appendChild(script);", html5Path, (Action<object>)LoadJavaScriptFileSuccess, (Action<object>)LoadJavaScriptFileFailure);
+            }
+        }
+
+        private static void LoadJavaScriptFileSuccess(object jsArgument)
+        {
+            string loadedFileName = jsArgument.ToString();
+            foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
+            {
+                actions.Item1();
+            }
+            _loadedFiles.Add(loadedFileName);
+            _pendingJSFile.Remove(loadedFileName);
+        }
+
+        private static void LoadJavaScriptFileFailure(object jsArgument)
+        {
+            string loadedFileName = jsArgument.ToString();
+            foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
+            {
+                actions.Item2();
+            }
+            _pendingJSFile.Remove(loadedFileName);
         }
 
         internal static void LoadJavaScriptFiles(List<string> urls, string callerAssemblyName, Action onCompleted, Action onError = null)

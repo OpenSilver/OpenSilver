@@ -124,7 +124,7 @@ namespace CSHTML5
             return t.Task;
         }
 
-        static HashSet2<string> _jsScriptFileKeys = new HashSet2<string>();
+        static HashSet2<string> _jsScriptFileKeys = new HashSet2<string>(); //todo: This is probably redundant with the _pendingJSFile and _loadedFiles in INTERNAL_InteropImplementation so remove this?
         public static Task<object> LoadJavaScriptFile(ResourceFile resourceFile)
         {
             if (!_jsScriptFileKeys.Contains(resourceFile.Key))
