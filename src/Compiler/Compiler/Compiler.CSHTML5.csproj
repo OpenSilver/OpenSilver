@@ -17,7 +17,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-	<NoWarn>CS1591</NoWarn>
+    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <AssemblyName>CSharpXamlForHtml5.Compiler</AssemblyName>
@@ -177,6 +177,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Compiler.licenseheader" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -84,6 +84,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scanner.cs" />
+    <None Include="Compiler.TypeScriptDefToCSharp.licenseheader" />
     <None Include="TinyPG\Compiler\Templates\C#\Parser.cs" />
     <None Include="TinyPG\Compiler\Templates\C#\ParseTree.cs" />
     <None Include="TinyPG\Compiler\Templates\C#\Scanner.cs" />

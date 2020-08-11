@@ -75,6 +75,7 @@
     <Compile Include="XMLExporter.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Compiler.TypeScriptDefToCSharp.licenseheader" />
     <None Include="TinyPG\Compiler\Manwgpj.exe" />
     <None Include="TinyPG\Compiler\Templates\C#\Parser.cs" />
     <None Include="TinyPG\Compiler\Templates\C#\ParseTree.cs" />
