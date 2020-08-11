@@ -1084,9 +1084,6 @@
 		</Content>
 	</ItemGroup>
 	<ItemGroup>
-		<None Include="OpenSilver.Runtime.licenseheader" />
-	</ItemGroup>
-	<ItemGroup>
 	  <Page Include="DefaultStyles\INTERNAL_DefaultItemsControlStyle.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
@@ -1099,6 +1096,9 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="System.ComponentModel.Composition.Primitives\WORKINPROGRESS\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="Runtime.licenseheader" />
 	</ItemGroup>
 
 	<!-- See ths comment on the first <Import> -->

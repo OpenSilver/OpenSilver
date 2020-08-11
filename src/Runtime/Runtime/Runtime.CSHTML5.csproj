@@ -877,7 +877,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="bridge.json" />
-    <None Include="Runtime.CSHTML5.licenseheader" />
+    <None Include="Runtime.licenseheader" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
