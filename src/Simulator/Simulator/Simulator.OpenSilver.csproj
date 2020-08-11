@@ -15,27 +15,22 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
     <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
     <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;OPENSILVER</DefineConstants>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU'">
     <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
     <DefineConstants>TRACE;DEBUGSILVERLIGHTCOMPATIBLEVERSION;OPENSILVER;WORKINPROGRESS</DefineConstants>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP|AnyCPU'">
     <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
     <DefineConstants>TRACE;DEBUG;OPENSILVER</DefineConstants>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU'">
     <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
     <DefineConstants>TRACE;DEBUG;OPENSILVER;WORKINPROGRESS</DefineConstants>
   </PropertyGroup>
-  
   <ItemGroup>
     <Reference Include="DotNetBrowser, Version=1.14.0.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e">
       <HintPath>..\..\packages\DotNetBrowser.1.14\lib\DotNetBrowser.dll</HintPath>
@@ -303,6 +298,7 @@
     <None Include="Service References\LicensingServiceReference\LicensingService1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Simulator.licenseheader" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

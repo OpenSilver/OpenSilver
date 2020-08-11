@@ -318,6 +318,7 @@
     <None Include="Service References\LicensingServiceReference\LicensingService1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Simulator.licenseheader" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
