@@ -15,10 +15,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 #if CSHTML5NETSTANDARD || BRIDGE
 using CSHTML5;
 #endif
@@ -69,6 +72,19 @@ namespace System
         /// <returns>The result of the request as a string.</returns>
         public string MakeRequest(Uri address, string Method, object sender, Dictionary<string, string> headers, string body, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler callbackMethod, bool isAsync, CredentialsMode mode = CredentialsMode.Disabled)
         {
+            if (Application.Current.Host.Settings.EnableWebRequestsLogging)
+            {
+                string headersCode = headers != null && headers.Count > 0 ? "new global::System.Collections.Generic.Dictionary<string, string> { " + string.Join(", ", headers.Select(keyValuePair => "{ " + EscapeStringAndSurroundWithQuotes(keyValuePair.Key) + ", " + EscapeStringAndSurroundWithQuotes(keyValuePair.Value) + " }")) + " }" : "null";
+
+                Debug.WriteLine(string.Format("CSHTML5.Internal.WebRequestsHelper.MakeRequest({0}, {1}, {2}, {3}, {4});",
+                    EscapeStringAndSurroundWithQuotes(address.ToString()),
+                    EscapeStringAndSurroundWithQuotes(Method),
+                    EscapeStringAndSurroundWithQuotes(body),
+                    headersCode,
+                    "false"
+                    ));
+            }
+
             bool askForUnsafeRequest = false; // This is true if we are doing the initial request to determine whether the credentials are supported or not.
 
             _xmlHttpRequest = GetWebRequest();
@@ -168,6 +184,11 @@ namespace System
 
             //get the response:
             return result;
+        }
+
+        private static string EscapeStringAndSurroundWithQuotes(string str)
+        {
+            return "@\"" + str.Replace("\"", "\"\"") + "\"";
         }
 
         // special version of sendRequest, it handles some errors and modifies the credentials mode if needed

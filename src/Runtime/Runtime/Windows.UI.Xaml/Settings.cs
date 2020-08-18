@@ -46,6 +46,8 @@ namespace System
 
         public bool EnableBindingErrorsThrowing { get; set; }
 
+        public bool EnableWebRequestsLogging { get; set; }
+
 
         public bool EnablePerformanceLogging
         {
