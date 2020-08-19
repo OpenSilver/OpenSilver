@@ -6,9 +6,11 @@ This repository contains the source code of the 2 following products, which shar
 
 # How to download the software and get started?
 
-Simply download the .VSIX file (the extension for Microsoft Visual Studio) which installs the Project Templates:
-- The ones for OpenSilver can be downloaded from: https://opensilver.net/download.aspx (Free, Open Source, MIT Licensed)
-- The ones for CSHTML5 can be downloaded from: http://cshtml5.com/download.aspx (Dual Licensed)
+Read the "[Getting Started](http://doc.opensilver.net/documentation/general/getting-started-tour.html)" page of the OpenSilver [documentation](http://doc.opensilver.net/) for a step-by-step tutorial.
+
+Basically, you should download the .VSIX file (the extension for Microsoft Visual Studio) which installs the Project Templates:
+- The .VSIX for OpenSilver can be downloaded from: https://opensilver.net/download.aspx (Free, Open Source, MIT Licensed)
+- The .VSIX for CSHTML5 can be downloaded from: http://cshtml5.com/download.aspx (Dual Licensed)
 
 Then, launch Visual Studio, click "Create a new project", and choose one of the installed templates.
 
