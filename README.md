@@ -59,6 +59,17 @@ Wait for the compilation to finish. The generated NuGet packages are created ins
 
 To test the NuGet package, simply reference it from your test project. If you are unfamiliar with custom package sources in Visual Studio, please read  [this page](https://docs.microsoft.com/en-us/nuget/consume-packages/install-use-packages-visual-studio#package-sources).
 
+### 3. If you want to build the VSIX installer (note: this is rarely needed - the steps above are usually enough)
+
+Building the VSIX is only useful if you wish to test your changes to the Project Templates, the Item Templates, or the XAML editor. For all the other scenarios, building the Runtime or the NuGet package is sufficient to test your changes.
+
+1. Install Visual Studio 2015. During the installation, make sure that the "Visual Studio Extensibility Tools" optional components are installed too
+2. With Visual Studio 2015, open the solution "VSExtension.OpenSilver.sln" or "VSExtension.CSHTML5.sln" depending on whether you want to build the VSIX of OpenSilver or CSHTML5
+3. Rebuild the solution
+4. The VSIX will be generated in a subfolder of the "bin" folder of the .VSIX project
+
+Note: If you are building the VSIX for CSHTML5, you may initially get a compilation error saying that some .nupckg files are missing. This is because the .nupckg files of CSHTML5 have not been uploaded to GitHub due to their large size. You need to manually download them and copy them into the folder that has the error. You can download those files from https://www.nuget.org/packages/cshtml5 and https://www.nuget.org/packages/cshtml5.migration
+
 # What if I get a compilation error with the code in this repository?
 
 If you get a compilation error, it may be that a Visual Studio workload needs to be installed. To find out, please open the solution "OpenSilver.sln" or "CSHTML5.sln" and attempt to compile it with the Visual Studio IDE (2019 or newer).
