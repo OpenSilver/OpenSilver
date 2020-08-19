@@ -518,7 +518,16 @@ namespace Windows.UI.Xaml.Data
                         this._bindingSource = Target;
                         break;
                     case RelativeSourceMode.TemplatedParent:
-                        this._bindingSource = ParentBinding.TemplateOwner.TemplateOwner;
+                        if (ParentBinding.TemplateOwner != null)
+                        {
+                            this._bindingSource = ParentBinding.TemplateOwner.TemplateOwner;
+                        }
+                        else
+                        {
+                            //todo: find out why we enter here in Client_TUI.
+                            Debug.WriteLine("ERROR: ParentBinding.TemplateOwner is null.");
+                            this._bindingSource = null;
+                        }
                         break;
                     case RelativeSourceMode.FindAncestor:
                         this._bindingSource = FindAncestor(Target, relativeSource);
