@@ -61,7 +61,7 @@ window.onCallBack.OnCallbackFromJavaScript = function (callbackId, idWhereCallba
             method = Blazor.platform.findMethod(assemblyName, namespace, type, "OnCallbackFromJavaScript");
             window.onCallbackFromJavaScript = method;
         } catch (e) {
-            var assemblyName = "OpenSilver.UwpCompatible";
+            var assemblyName = "OpenSilver.UWPCompatible";
             method = Blazor.platform.findMethod(assemblyName, namespace, type, "OnCallbackFromJavaScript");
             window.onCallbackFromJavaScript = method;
         }

@@ -157,12 +157,12 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             {
                 coreAssembly =
                     (from a in AppDomain.CurrentDomain.GetAssemblies()
-                     where (a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY
-                     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE
-                     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION
-                     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE
-                     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR
-                     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR)
+                     where (string.Equals(a.GetName().Name, Constants.NAME_OF_CORE_ASSEMBLY, StringComparison.CurrentCultureIgnoreCase)
+                     || string.Equals(a.GetName().Name, Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE, StringComparison.CurrentCultureIgnoreCase)
+                     || string.Equals(a.GetName().Name, Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION, StringComparison.CurrentCultureIgnoreCase)
+                     || string.Equals(a.GetName().Name, Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE, StringComparison.CurrentCultureIgnoreCase)
+                     || string.Equals(a.GetName().Name, Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR, StringComparison.CurrentCultureIgnoreCase)
+                     || string.Equals(a.GetName().Name, Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR, StringComparison.CurrentCultureIgnoreCase))
                      select a).FirstOrDefault();
                 if (coreAssembly != null)
                 {
