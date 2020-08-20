@@ -24,6 +24,7 @@ using System.Windows;
 using System.Windows.Controls;
 #if CSHTML5NETSTANDARD || BRIDGE
 using CSHTML5;
+using Windows.UI.Xaml;
 #endif
 #if BRIDGE
 using Bridge;
