@@ -68,7 +68,9 @@ Building the VSIX is only useful if you wish to test your changes to the Project
 3. Rebuild the solution
 4. The VSIX will be generated in a subfolder of the "bin" folder of the .VSIX project
 
-Note: If you are building the VSIX for CSHTML5, you may initially get a compilation error saying that some .nupckg files are missing. This is because the .nupckg files of CSHTML5 have not been uploaded to GitHub due to their large size. You need to manually download them and copy them into the folder that has the error. You can download those files from https://www.nuget.org/packages/cshtml5 and https://www.nuget.org/packages/cshtml5.migration
+Notes for building the VSIX:
+- Note for OpenSilver: while all the projects do build fine with VS 2015, the "OpenSilver.VSIX" project can only be opened and built with VS 2019 (or newer). When building it with VS 2019 (or newer), you can unload the other projects to avoid compilation errors due to the version of VS.
+- Note for CSHTML5: when building CSHTML5.VSIX, you may initially get a compilation error saying that some .nupckg files are missing. This is because the .nupckg files of CSHTML5 have not been uploaded to GitHub due to their large size. You need to manually download them and copy them into the folder that has the error. You can download those files from https://www.nuget.org/packages/cshtml5 and https://www.nuget.org/packages/cshtml5.migration
 
 # What if I get a compilation error with the code in this repository?
 
