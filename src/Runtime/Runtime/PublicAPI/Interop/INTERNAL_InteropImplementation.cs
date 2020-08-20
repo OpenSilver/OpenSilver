@@ -251,6 +251,12 @@ result;
 #endif
         }
 
+        internal static void ResetLoadedFilesDictionaries()
+        {
+            _pendingJSFile.Clear();
+            _loadedFiles.Clear();
+        }
+
         static List<string> UnmodifiedJavascriptCalls = new List<string>();
         static int IndexOfNextUnmodifiedJSCallInList = 0;
         static void ShowErrorMessage(string errorMessage, int indexOfCallInList)

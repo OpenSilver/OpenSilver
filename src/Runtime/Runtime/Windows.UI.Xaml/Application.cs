@@ -69,6 +69,9 @@ namespace Windows.UI.Xaml
 
         public Application()
         {
+            // In case of a redirection from Microsoft AAD, when running in the Simulator, we re-instantiate the application. We need to reload the JavaScript files because they are no longer in the HTML DOM due to the AAD redirection:
+            INTERNAL_InteropImplementation.ResetLoadedFilesDictionaries();
+
 #if CSHTML5BLAZOR
             // we change the resource manager for every resource registered
             ClientSideResourceRegister.Startup();
