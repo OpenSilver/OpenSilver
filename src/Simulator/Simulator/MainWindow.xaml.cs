@@ -932,9 +932,10 @@ Click OK to continue.";
             // We will need to wait for the page to finish loading before executing the app:
             MainWebBrowser.DocumentLoadedInMainFrameEvent += (s1, e1) =>
                     {
-                        Dispatcher.BeginInvoke((Action)(() =>
+                        Dispatcher.BeginInvoke((Action)(async () =>
                         {
                             InteropHelpers.RaiseReloadedEvent(_coreAssembly); // to reset some static fields
+                            await Task.Delay(3000); //Note: this is to ensure all the js and css files of simulator_root.html have been loaded (client_fb).
                             StartApplication();
                         }));
                     };
