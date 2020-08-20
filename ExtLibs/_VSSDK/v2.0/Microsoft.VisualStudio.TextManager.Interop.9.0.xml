@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.TextManager.Interop.9.0</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.AfterCompletorCommit"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.BeforeCompletorCommit"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.Exec(System.Guid@,System.UInt32,System.UInt32,System.IntPtr,System.IntPtr)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.GetContextBuffer(Microsoft.VisualStudio.TextManager.Interop.IVsTextLines@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.GetContextCaretPos(System.Int32@,System.Int32@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.GetContextFocalPoint(Microsoft.VisualStudio.TextManager.Interop.TextSpan[],System.Int32@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.GetContextLocation(System.Int32,System.Int32,System.Int32,Microsoft.VisualStudio.OLE.Interop.RECT[],System.Int32@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.GetContextSelection(Microsoft.VisualStudio.TextManager.Interop.TextSpan[])"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.GetHostFlags(System.UInt32@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.GetHostWindow(System.IntPtr@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.GetServiceProvider(Microsoft.VisualStudio.OLE.Interop.IServiceProvider@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.GetSmartTagRect(Microsoft.VisualStudio.OLE.Interop.RECT[])"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.GetSubjectCaretPos(System.Int32@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.GetSubjectSelection(System.Int32@,System.Int32@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.GetSubjectText(System.String@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.HighlightMatchingBrace(System.UInt32,System.UInt32,Microsoft.VisualStudio.TextManager.Interop.TextSpan[])"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.QueryStatus(System.Guid@,System.UInt32,Microsoft.VisualStudio.OLE.Interop.OLECMD[],System.IntPtr)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.ReplaceSubjectTextSpan(System.Int32,System.Int32,System.String)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.SetContextCaretPos(System.Int32,System.Int32)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.SetContextSelection(System.Int32,System.Int32,System.Int32,System.Int32)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.SetSubjectCaretPos(System.Int32)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.SetSubjectSelection(System.Int32,System.Int32)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.UpdateCompletionStatus(Microsoft.VisualStudio.TextManager.Interop.IVsCompletionSet,System.UInt32)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.UpdateSmartTagWindow(Microsoft.VisualStudio.TextManager.Interop.IVsSmartTagTipWindow,System.UInt32)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsIntellisenseHost_Corrected.UpdateTipWindow(Microsoft.VisualStudio.TextManager.Interop.IVsTipWindow,System.UInt32)"></member>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.IVsLanguageDebugInfoRemap">
+      <summary>Allows a language service to remap a pending breakpoint from one location to another.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsLanguageDebugInfoRemap.RemapBreakpoint(System.Object,System.Object@)">
+      <summary>Remaps a breakpoint.</summary>
+      <returns>If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />. If it fails, it returns an error code.</returns>
+      <param name="pUserBreakpointRequest">[in] The breakpoint to be remapped.</param>
+      <param name="ppMappedBreakpointRequest">[out] The remapped breakpoint.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.AfterCompletorCommit"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.BeforeCompletorCommit"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.Exec(System.Guid@,System.UInt32,System.UInt32,System.IntPtr,System.IntPtr)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.GetContextBuffer(Microsoft.VisualStudio.TextManager.Interop.IVsTextLines@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.GetContextCaretPos(System.Int32@,System.Int32@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.GetContextFocalPoint(Microsoft.VisualStudio.TextManager.Interop.TextSpan[],System.Int32@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.GetContextLocation(System.Int32,System.Int32,System.Int32,Microsoft.VisualStudio.OLE.Interop.RECT[],System.Int32@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.GetContextSelection(Microsoft.VisualStudio.TextManager.Interop.TextSpan[])"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.GetHostFlags(System.UInt32@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.GetHostWindow(System.IntPtr@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.GetServiceProvider(Microsoft.VisualStudio.OLE.Interop.IServiceProvider@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.GetSmartTagRect(Microsoft.VisualStudio.OLE.Interop.RECT[])"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.GetSubjectCaretPos(System.Int32@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.GetSubjectSelection(System.Int32@,System.Int32@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.GetSubjectText(System.String@)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.HighlightMatchingBrace(System.UInt32,System.UInt32,Microsoft.VisualStudio.TextManager.Interop.TextSpan[])"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.QueryStatus(System.Guid@,System.UInt32,Microsoft.VisualStudio.OLE.Interop.OLECMD[],System.IntPtr)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.ReplaceSubjectTextSpan(System.Int32,System.Int32,System.String)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.SetContextCaretPos(System.Int32,System.Int32)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.SetContextSelection(System.Int32,System.Int32,System.Int32,System.Int32)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.SetSubjectCaretPos(System.Int32)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.SetSubjectFromPrimaryBuffer(Microsoft.VisualStudio.TextManager.Interop.TextSpan[])"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.SetSubjectSelection(System.Int32,System.Int32)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.UpdateCompletionStatus(Microsoft.VisualStudio.TextManager.Interop.IVsCompletionSet,System.UInt32)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.UpdateSmartTagWindow(Microsoft.VisualStudio.TextManager.Interop.IVsSmartTagTipWindow,System.UInt32)"></member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextViewIntellisenseHost_Corrected.UpdateTipWindow(Microsoft.VisualStudio.TextManager.Interop.IVsTipWindow,System.UInt32)"></member>
+  </members>
+</doc>

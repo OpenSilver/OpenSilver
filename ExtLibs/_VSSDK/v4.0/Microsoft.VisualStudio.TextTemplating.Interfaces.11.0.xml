@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.TextTemplating.Interfaces.11.0</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.DirectiveProcessorAttribute"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.DirectiveProcessorAttribute.#ctor(System.String)">
+      <summary>Declares the decorated type to be a T4 directive processor</summary>
+      <param name="processorName">The public name of the processor.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.DirectiveProcessorAttribute.ProcessorName">
+      <summary>The public name of the processor.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.IDebugTextTemplatingEngine"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDebugTextTemplatingEngine.PrepareTransformationRun(System.String,Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost,Microsoft.VisualStudio.TextTemplating.IDebugTransformationRunFactory)">
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.TextTemplating.IDebugTransformationRun" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.IDebugTransformationRun"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.IDebugTransformationRun.Errors">
+      <returns>Returns <see cref="T:System.CodeDom.Compiler.CompilerErrorCollection" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDebugTransformationRun.PerformTransformation">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.IDebugTransformationRunFactory"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDebugTransformationRunFactory.CreateTransformationRun(System.Type,System.String,System.ResolveEventHandler)">
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.TextTemplating.IDebugTransformationRun" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor">
+      <summary>Interface for a directive processor.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor.Errors">
+      <summary>Error collection for DirectiveProcessor to add errors/warnings to.</summary>
+      <returns>Returns <see cref="T:System.CodeDom.Compiler.CompilerErrorCollection" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor.FinishProcessingRun">
+      <summary>Finishes a round of directive processing.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor.GetClassCodeForProcessingRun">
+      <summary>Gets the code to contribute to the generated template processing class because of the most recent run.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor.GetImportsForProcessingRun">
+      <summary>Gets any namespaces to import because of the most recent run.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor.GetPostInitializationCodeForProcessingRun">
+      <summary>Gets the code to contribute to the body of the initialize method of the generated template processing class because of the most recent run. This code will run after the base class' Initialize method.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor.GetPreInitializationCodeForProcessingRun">
+      <summary>Gets the code to contribute to the body of the initialize method of the generated template processing class because of the most recent run. This code will run before the base class' Initialize method.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor.GetReferencesForProcessingRun">
+      <summary>Gets any references to pass to the compiler because of the most recent run.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor.GetTemplateClassCustomAttributes">
+      <summary>Gets any custom attributes to include on the template class.</summary>
+      <returns>A collection of custom attributes that can be null or empty.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor.Initialize(Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost)">
+      <summary>Initializes the processor instance.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor.IsDirectiveSupported(System.String)">
+      <summary>Does this DirectiveProcessor support the given directive.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor.ProcessDirective(System.String,System.Collections.Generic.IDictionary{System.String,System.String})">
+      <summary>Processes a directive from a template file.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor.RequiresProcessingRunIsHostSpecific">
+      <summary>Allow a directive processor to specify that it needs the run to be host-specific.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor.SetProcessingRunIsHostSpecific(System.Boolean)">
+      <summary>Informs the directive processor whether the run is host-specific.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessor.StartProcessingRun(System.CodeDom.Compiler.CodeDomProvider,System.String,System.CodeDom.Compiler.CompilerErrorCollection)">
+      <summary>Starts a round of directive processing.</summary>
+      <param name="templateContents">The contents of the template being processed.</param>
+      <param name="errors">The collection to report processing errors in.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessorMetadata">
+      <summary>Metadata provided by DirectiveProcessors. Hosts that want to import DPs via MEF can consume this standard metadata.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessorMetadata.ProcessorName">
+      <summary>Public name of the processor. Used to resolve the processor for a simple host.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.IDirectiveProcessorMetadata.SupportedDirectives">
+      <summary>Set of directives supported by the processor. Used by more complex hosts to support anonymous directive processors</summary>
+      <returns>Returns <see cref="T:System.Collections.Generic.IEnumerable`1" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.ITextTemplatingOrchestrator"></member>
+    <member name="E:Microsoft.VisualStudio.TextTemplating.ITextTemplatingOrchestrator.TransformedAllTemplates">
+      <summary>Event fired when transform for all templates has completed.</summary>
+    </member>
+    <member name="E:Microsoft.VisualStudio.TextTemplating.ITextTemplatingOrchestrator.TransformingAllTemplates">
+      <summary>Event fired when transform for all templates is about to start</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.ServiceProviderExtensions">
+      <summary>Class that contains extensions to IServiceProvider relevant to T4 templates.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.ServiceProviderExtensions.GetCOMService(System.IServiceProvider,System.Type)">
+      <summary>Attempts to return a service from a remote provider enabled for COM interfacing.</summary>
+      <returns>The associated service enabled for COM interfacing if it is possible; otherwise whatever the service provider provides. May return null.</returns>
+      <param name="provider">The remote service provider.</param>
+      <param name="type">The type of service being requested.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.SupportedDirectiveAttribute"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.SupportedDirectiveAttribute.#ctor(System.String)">
+      <summary>Declares that the decorated T4 directive processor supports the given directive.</summary>
+      <param name="supportedDirective">A directive the processor supports.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.SupportedDirectiveAttribute.SupportedDirectives">
+      <summary>Contribution to the set of directives supported by the processor. This extra property is required by MEF to build a collection of this name.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.TransformedAllTemplatesEventArgs"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TransformedAllTemplatesEventArgs.#ctor"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.TransformedAllTemplatesEventArgs.AnyErrors">
+      <summary>Whether there were any errors during the run ///.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.TransformingAllTemplatesEventArgs"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.TransformingAllTemplatesEventArgs.#ctor"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.TransformingAllTemplatesEventArgs.Cancel">
+      <summary>Allow subscriber to cancel the operation</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.DebugTemplateEventArgs"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.DebugTemplateEventArgs.#ctor"></member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.DebugTemplateEventArgs.Succeeded">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TextTemplating.VSHost.DebugTemplateEventArgs.TemplateOutput">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextTemplating.VSHost.IDebugTextTemplating"></member>
+    <member name="E:Microsoft.VisualStudio.TextTemplating.VSHost.IDebugTextTemplating.DebugCompleted"></member>
+    <member name="M:Microsoft.VisualStudio.TextTemplating.VSHost.IDebugTextTemplating.DebugTemplateAsync(System.String,System.String,Microsoft.VisualStudio.TextTemplating.VSHost.ITextTemplatingCallback,System.Object)"></member>
+  </members>
+</doc>
