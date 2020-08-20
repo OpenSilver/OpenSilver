@@ -22,9 +22,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+#if !MIGRATION
+using Windows.UI.Xaml;
+#endif
 #if CSHTML5NETSTANDARD || BRIDGE
 using CSHTML5;
-using Windows.UI.Xaml;
 #endif
 #if BRIDGE
 using Bridge;
