@@ -130,6 +130,10 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
+    <ProjectReference Include="..\DotNetForHtml5.VisualStudioExtension.Editor.XamlDesigner\DotNetForHtml5.VisualStudioExtension.Editor.XamlDesigner.csproj">
+      <Project>{239bbb6c-1322-411a-8d60-b86ad62ac466}</Project>
+      <Name>DotNetForHtml5.VisualStudioExtension.Editor.XamlDesigner</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DotNetForHtml5.VisualStudioExtension.ShellIntegration\DotNetForHtml5.VisualStudioExtension.ShellIntegration.csproj">
       <Project>{f97ebeab-6cff-4243-a6f2-c7c368cb6870}</Project>
       <Name>DotNetForHtml5.VisualStudioExtension.ShellIntegration</Name>
