@@ -177,9 +177,6 @@
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\ModuleBuilder.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\PropertyBuilder.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\TypeBuilder.cs" />
-		<Compile Include="System.ServiceModel\WORKINPROGRESS\FaultException`1.cs" />
-		<Compile Include="System.ServiceModel\WORKINPROGRESS\FaultReasonText.cs" />
-		<Compile Include="System.ServiceModel\WORKINPROGRESS\IExtensionCollection.cs" />
 		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\CommunicationObject.cs" />
 		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\IInputSession.cs" />
 		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\IOutputSession.cs" />
@@ -429,7 +426,6 @@
 		<Compile Include="System.Net\CredentialsMode.cs" />
 		<Compile Include="System.Net\WebClientWithCredentials.cs" />
 		<Compile Include="System.Runtime.Serialization\CollectionDataContract2Attribute.cs" />
-		<Compile Include="System.Runtime.Serialization\DataContract2Attribute.cs" />
 		<Compile Include="System.Runtime.Serialization\DataContractSerializer.cs" />
 		<Compile Include="System.Runtime.Serialization\DataContractSerializer_Deserialization.cs" />
 		<Compile Include="System.Runtime.Serialization\DataContractSerializer_Helpers.cs" />
@@ -447,7 +443,6 @@
 		<Compile Include="System.ServiceModel\CSHTML5_ClientBase_1.cs" />
 		<Compile Include="System.ServiceModel\INTERNAL_AsyncResult.cs" />
 		<Compile Include="System.ServiceModel\INTERNAL_WebMethodsCaller.cs" />
-		<Compile Include="System.ServiceModel\ServiceContract2Attribute.cs" />
 		<Compile Include="System.Windows.Browser\HtmlDocument.cs" />
 		<Compile Include="System.Windows.Browser\HtmlPage.cs" />
 		<Compile Include="System.Windows.Browser\HtmlWindow.cs" />
@@ -1097,6 +1092,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="System.ComponentModel.Composition.Primitives\WORKINPROGRESS\" />
+	  <Folder Include="System.ServiceModel\WORKINPROGRESS\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Include="Runtime.licenseheader" />

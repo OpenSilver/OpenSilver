@@ -131,7 +131,6 @@
     <Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly.cs" />
     <Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs.cs" />
     <Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler.cs" />
-    <Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_SimulatorOnly.cs" />
     <Compile Include="ToBeReviewed\FileNotFoundException.cs" />
     <Compile Include="ToBeReviewed\IFormatter.cs" />
     <Compile Include="ToBeReviewed\INTERNAL_BridgeWorkarounds.cs" />
@@ -263,7 +262,6 @@
     <Compile Include="System.Net\WebRequest.cs" />
     <Compile Include="System.Net\WebResponse.cs" />
     <Compile Include="System.Runtime.Serialization\CollectionDataContract2Attribute.cs" />
-    <Compile Include="System.Runtime.Serialization\DataContract2Attribute.cs" />
     <Compile Include="System.Runtime.Serialization\DataContractSerializer.cs" />
     <Compile Include="System.Runtime.Serialization\DataContractSerializer_Deserialization.cs" />
     <Compile Include="System.Runtime.Serialization\DataContractSerializer_Helpers.cs" />
@@ -308,7 +306,6 @@
     <Compile Include="System.ServiceModel\OperationContractAttribute.cs" />
     <Compile Include="System.ServiceModel\OperationFormatStyle.cs" />
     <Compile Include="System.ServiceModel\OperationFormatUse.cs" />
-    <Compile Include="System.ServiceModel\ServiceContract2Attribute.cs" />
     <Compile Include="System.ServiceModel\ServiceContractAttribute.cs" />
     <Compile Include="System.ServiceModel\ServiceKnownTypeAttribute.cs" />
     <Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\ChannelFactory.cs" />

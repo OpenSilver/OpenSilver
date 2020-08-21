@@ -412,6 +412,7 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(MidpointRounding))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(MinLengthAttribute))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(MissingManifestResourceException))] // Generation Added
+[assembly: TypeForwardedToAttribute(typeof(MissingMethodException))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(MissingSatelliteAssemblyException))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(Module))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(Monitor))]

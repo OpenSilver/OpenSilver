@@ -65,7 +65,13 @@ namespace DotNetForHtml5.Compiler
                     bool wasAnythingFixed;
 
                     // Process the code:
-                    sourceCode = FixingServiceReferences.Fix(sourceCode, item.GetMetadata("ClientBaseToken"), item.GetMetadata("ClientBaseInterfaceName"), item.GetMetadata("EndpointCode"), item.GetMetadata("SoapVersion"), out wasAnythingFixed);
+                    sourceCode = FixingServiceReferences.Fix(
+                        sourceCode, 
+                        item.GetMetadata("ClientBaseToken"), 
+                        item.GetMetadata("ClientBaseInterfaceName"), 
+                        item.GetMetadata("EndpointCode"), 
+                        item.GetMetadata("SoapVersion"), 
+                        out wasAnythingFixed);
 
                     // Create output directory:
                     Directory.CreateDirectory(Path.GetDirectoryName(outputFile));

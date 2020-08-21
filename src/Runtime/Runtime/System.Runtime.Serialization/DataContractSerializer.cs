@@ -22,11 +22,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-// TODOBRIDGE: usefull using?
-#if !BRIDGE
-using JSIL.Meta;
-#else
+#if BRIDGE
 using Bridge;
+#else
+using JSIL.Meta;
 #endif
 
 namespace System.Runtime.Serialization

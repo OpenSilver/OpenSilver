@@ -949,21 +949,6 @@ namespace System.Runtime.Serialization
                         //Note: line below commented because we need to find DataContract2Attribute since DataContractAttribute does not have the values set in JSIL
                         //break; //break here because DataContract takes precedence over Serializable.
                     }
-                    else if (attribute is DataContract2Attribute) //todo: remove "DataContract2Attribute" and keep only "DataContractAttribute" when JSIL will support setting attribute properties such as Name and Namespace.
-                    {
-                        serializationType = SerializationType.DataContract;
-
-                        DataContract2Attribute attributeAsDataContractAttribute = (DataContract2Attribute)attribute;
-                        if (!string.IsNullOrWhiteSpace(attributeAsDataContractAttribute.Namespace))
-                        {
-                            namespaceName = attributeAsDataContractAttribute.Namespace;
-                        }
-                        if (!string.IsNullOrWhiteSpace(attributeAsDataContractAttribute.Name))
-                        {
-                            name = attributeAsDataContractAttribute.Name;
-                        }
-                        break; //break here because DataContract takes precedence over Serializable.
-                    }
                     else if (attribute is CollectionDataContractAttribute)
                     {
                         serializationType = SerializationType.DataContract;

@@ -13,21 +13,19 @@
 \*====================================================================================*/
 
 
+using CSHTML5;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+
+#if MIGRATION
 using System.Windows;
-using System.Windows.Controls;
-#if !MIGRATION
+#else
 using Windows.UI.Xaml;
 #endif
-#if CSHTML5NETSTANDARD || BRIDGE
-using CSHTML5;
-#endif
+
 #if BRIDGE
 using Bridge;
 #endif
@@ -65,6 +63,7 @@ namespace System
         /// </summary>
         /// <param name="address">the uri that identifies the Internet resource.</param>
         /// <param name="Method">The method to be called after making the request.</param>
+        /// <param name="sender"></param>
         /// <param name="headers">
         /// A dictionary containing the headers to put in the method.
         /// The pairs key/values in the dictionary correspond to the pairs key/value in the headers.
@@ -72,8 +71,17 @@ namespace System
         /// <param name="body">The body of the request.</param>
         /// <param name="callbackMethod">The method to be called after the request has been made.</param>
         /// <param name="isAsync">A boolean that determines whether the request must be made synchronously or asynchronously.</param>
+        /// <param name="mode"></param>
         /// <returns>The result of the request as a string.</returns>
-        public string MakeRequest(Uri address, string Method, object sender, Dictionary<string, string> headers, string body, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler callbackMethod, bool isAsync, CredentialsMode mode = CredentialsMode.Disabled)
+        public string MakeRequest(
+            Uri address, 
+            string Method, 
+            object sender, 
+            Dictionary<string, string> headers, 
+            string body, 
+            INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler callbackMethod, 
+            bool isAsync, 
+            CredentialsMode mode = CredentialsMode.Disabled)
         {
             if (Application.Current.Host.Settings.EnableWebRequestsLogging)
             {
@@ -274,10 +282,25 @@ namespace System
         private static string ResendLastUnsafeRequest()
         {
             // we need to recreate a webRequestHelper, beacause we can't modify settings after the request was send
-            return new INTERNAL_WebRequestHelper_JSOnly().MakeRequest(_requester._address, _requester._Method, _sender, _requester._headers, _requester._body, _requester._callback, _requester._isAsync, CredentialsMode.Disabled);
+            return new INTERNAL_WebRequestHelper_JSOnly().MakeRequest(
+                _requester._address, 
+                _requester._Method, 
+                _sender, 
+                _requester._headers, 
+                _requester._body, 
+                _requester._callback, 
+                _requester._isAsync, 
+                CredentialsMode.Disabled);
         }
 
-        private void SaveParameters(Uri address, string Method, object sender, Dictionary<string, string> headers, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler callback, string body, bool isAsync)
+        private void SaveParameters(
+            Uri address, 
+            string Method, 
+            object sender, 
+            Dictionary<string, string> headers, 
+            INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler callback, 
+            string body, 
+            bool isAsync)
         {
             _address = address;
             _Method = Method;
@@ -459,7 +482,6 @@ namespace System
 
 #if !BRIDGE
         [JSIL.Meta.JSReplacement("$xmlHttpRequest.readyState")]
-
 #else
         [Template("{xmlHttpRequest}.readyState")]
 #endif
@@ -474,7 +496,6 @@ namespace System
 
 #if !BRIDGE
         [JSIL.Meta.JSReplacement("$xmlHttpRequest.status")]
-
 #else
         [Template("{xmlHttpRequest}.status")]
 #endif
@@ -490,7 +511,6 @@ namespace System
 
 #if !BRIDGE
         [JSIL.Meta.JSReplacement("$xmlHttpRequest.statusText")]
-
 #else
         [Template("{xmlHttpRequest}.statusText")]
 #endif
@@ -505,7 +525,6 @@ namespace System
 
 #if !BRIDGE
         [JSIL.Meta.JSReplacement("$xmlHttpRequest.responseText")]
-
 #else
         [Template("{xmlHttpRequest}.responseText")]
 #endif
