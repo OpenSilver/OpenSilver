@@ -21,6 +21,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using CSHTML5.Internal;
 
 #if BRIDGE
 using Bridge;
@@ -102,6 +103,10 @@ namespace System.Runtime.Serialization
             if (knownTypes != null)
             { 
                 ((List<Type>)_knownTypes).AddRange(knownTypes);
+            }
+            if (KnownTypesHelper._additionalKnownTypes != null)
+            {
+                ((List<Type>)_knownTypes).AddRange(KnownTypesHelper._additionalKnownTypes); //todo: add only the items that are not already in the destination collection?
             }
         }
 
