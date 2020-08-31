@@ -42,14 +42,14 @@
     <!--<file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/DotNetBrowser.dll" target="lib/netstandard2.0/DotNetBrowser.dll"/>-->
 
     <!-- OpenSilver JS and CSS files -->
-    <file src="js_css/opensilver.js" target="js_css/opensilver.js" />
-    <file src="js_css/cshtml5.css" target="js_css/cshtml5.css" />
-    <file src="js_css/cshtml5.js" target="js_css/cshtml5.js" />
-    <file src="js_css/fastclick.js" target="js_css/fastclick.js" />
-    <file src="js_css/flatpickr.css" target="js_css/flatpickr.css" />
-    <file src="js_css/flatpickr.js" target="js_css/flatpickr.js" />
-    <file src="js_css/velocity.js" target="js_css/velocity.js" />
-    <file src="js_css/ResizeSensor.js" target="js_css/ResizeSensor.js" />
+    <file src="../../src/Runtime/Scripts/opensilver.js" target="js_css/opensilver.js" />
+    <file src="../../src/Runtime/Scripts/cshtml5.css" target="js_css/cshtml5.css" />
+    <file src="../../src/Runtime/Scripts/cshtml5.js" target="js_css/cshtml5.js" />
+    <file src="../../src/Runtime/Scripts/fastclick.js" target="js_css/fastclick.js" />
+    <file src="../../src/Runtime/Scripts/flatpickr.css" target="js_css/flatpickr.css" />
+    <file src="../../src/Runtime/Scripts/flatpickr.js" target="js_css/flatpickr.js" />
+    <file src="../../src/Runtime/Scripts/velocity.js" target="js_css/velocity.js" />
+    <file src="../../src/Runtime/Scripts/ResizeSensor.js" target="js_css/ResizeSensor.js" />
 
     <!-- OpenSilver simulator -->
     <file src="../../src/Simulator/Simulator/bin/OpenSilver/$Configuration$/CSharpXamlForHtml5.Simulator.exe" target="tools/simulator/CSharpXamlForHtml5.Simulator.exe" />
