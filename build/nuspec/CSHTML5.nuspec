@@ -35,7 +35,7 @@
     <file src="../../src/Runtime/Bridge.TypeForwarding/bin/CSHTML5/$Configuration$/CSharpXamlForHtml5.Bridge.TypeForwarding.dll" target="tools/CSharpXamlForHtml5.Bridge.TypeForwarding.dll" />
     <file src="../../src/Runtime/Bridge.TypesThatWillBeForwarded/bin/CSHTML5/$Configuration$/CSHTML5.Stubs.dll" target="tools/CSHTML5.Stubs.dll" />
     <file src="../../src/Runtime/Runtime/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.dll" target="tools/$AssembliesPrefix$.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Core/lib/net40/Bridge.dll" target="tools/Bridge.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Core/lib/net40/Bridge.dll" target="tools/Bridge.dll" />
 
     <!-- CSHTML5 simulator -->
     <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/CSharpXamlForHtml5.Simulator.exe" target="tools/simulator/CSharpXamlForHtml5.Simulator.exe" />
@@ -64,62 +64,62 @@
     <file src="install.ps1" target="tools/install.ps1" />
     
     <!-- ("Bridge" package) content -->
-    <file src="../../ExtLibs/BridgeNET/Bridge/content/bridge.json" target="content/bridge.json" />
+    <file src="../../libs/BridgeNET/Bridge/content/bridge.json" target="content/bridge.json" />
 
     <!-- ("Bridge.Min" package) build -->
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/build/Bridge.Min.targets" target="build/Bridge.Min.targets" />
+    <file src="../../libs/BridgeNET/Bridge.Min/build/Bridge.Min.targets" target="build/Bridge.Min.targets" />
 
     <!-- ("Bridge.Min" package) tools -->
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/Bridge.Builder.v17.dll" target="tools/Bridge.Builder.v17.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/Bridge.Contract.dll" target="tools/Bridge.Contract.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/Bridge.Translator.dll" target="tools/Bridge.Translator.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/bridge.exe" target="tools/bridge.exe" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/AjaxMin.dll" target="tools/AjaxMin.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/ICSharpCode.NRefactory.Cecil.dll" target="tools/ICSharpCode.NRefactory.Cecil.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/ICSharpCode.NRefactory.CSharp.dll" target="tools/ICSharpCode.NRefactory.CSharp.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/ICSharpCode.NRefactory.dll" target="tools/ICSharpCode.NRefactory.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/Microsoft.CodeAnalysis.CSharp.dll" target="tools/Microsoft.CodeAnalysis.CSharp.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/Microsoft.CodeAnalysis.dll" target="tools/Microsoft.CodeAnalysis.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/Mono.Cecil.Mdb.dll" target="tools/Mono.Cecil.Mdb.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/Mono.Cecil.Pdb.dll" target="tools/Mono.Cecil.Pdb.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/Mono.Cecil.Rocks.dll" target="tools/Mono.Cecil.Rocks.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/Newtonsoft.Json.dll" target="tools/Newtonsoft.Json.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/Object.Net.Utilities.dll" target="tools/Object.Net.Utilities.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.AppContext.dll" target="tools/System.AppContext.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Collections.Immutable.dll" target="tools/System.Collections.Immutable.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Composition.AttributedModel.dll" target="tools/System.Composition.AttributedModel.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Composition.Convention.dll" target="tools/System.Composition.Convention.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Composition.Hosting.dll" target="tools/System.Composition.Hosting.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Composition.Runtime.dll" target="tools/System.Composition.Runtime.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Composition.TypedParts.dll" target="tools/System.Composition.TypedParts.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Console.dll" target="tools/System.Console.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Diagnostics.FileVersionInfo.dll" target="tools/System.Diagnostics.FileVersionInfo.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Diagnostics.StackTrace.dll" target="tools/System.Diagnostics.StackTrace.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.IO.Compression.dll" target="tools/System.IO.Compression.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.IO.FileSystem.dll" target="tools/System.IO.FileSystem.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.IO.FileSystem.Primitives.dll" target="tools/System.IO.FileSystem.Primitives.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Reflection.Metadata.dll" target="tools/System.Reflection.Metadata.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Security.Cryptography.Algorithms.dll" target="tools/System.Security.Cryptography.Algorithms.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Security.Cryptography.Encoding.dll" target="tools/System.Security.Cryptography.Encoding.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Security.Cryptography.Primitives.dll" target="tools/System.Security.Cryptography.Primitives.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Security.Cryptography.X509Certificates.dll" target="tools/System.Security.Cryptography.X509Certificates.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Text.Encoding.CodePages.dll" target="tools/System.Text.Encoding.CodePages.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Threading.Thread.dll" target="tools/System.Threading.Thread.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.ValueTuple.dll" target="tools/System.ValueTuple.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Xml.ReaderWriter.dll" target="tools/System.Xml.ReaderWriter.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Xml.XmlDocument.dll" target="tools/System.Xml.XmlDocument.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Xml.XPath.dll" target="tools/System.Xml.XPath.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Xml.XPath.XDocument.dll" target="tools/System.Xml.XPath.XDocument.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/TopologicalSorting.dll" target="tools/TopologicalSorting.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/Microsoft.Build.dll" target="tools/Microsoft.Build.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/Microsoft.Build.Framework.dll" target="tools/Microsoft.Build.Framework.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/Microsoft.Build.Utilities.Core.dll" target="tools/Microsoft.Build.Utilities.Core.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Threading.Tasks.Dataflow.dll" target="tools/System.Threading.Tasks.Dataflow.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Min/tools/System.Runtime.InteropServices.RuntimeInformation.dll" target="tools/System.Runtime.InteropServices.RuntimeInformation.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/Bridge.Builder.v17.dll" target="tools/Bridge.Builder.v17.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/Bridge.Contract.dll" target="tools/Bridge.Contract.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/Bridge.Translator.dll" target="tools/Bridge.Translator.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/bridge.exe" target="tools/bridge.exe" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/AjaxMin.dll" target="tools/AjaxMin.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/ICSharpCode.NRefactory.Cecil.dll" target="tools/ICSharpCode.NRefactory.Cecil.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/ICSharpCode.NRefactory.CSharp.dll" target="tools/ICSharpCode.NRefactory.CSharp.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/ICSharpCode.NRefactory.dll" target="tools/ICSharpCode.NRefactory.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/Microsoft.CodeAnalysis.CSharp.dll" target="tools/Microsoft.CodeAnalysis.CSharp.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/Microsoft.CodeAnalysis.dll" target="tools/Microsoft.CodeAnalysis.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/Mono.Cecil.Mdb.dll" target="tools/Mono.Cecil.Mdb.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/Mono.Cecil.Pdb.dll" target="tools/Mono.Cecil.Pdb.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/Mono.Cecil.Rocks.dll" target="tools/Mono.Cecil.Rocks.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/Newtonsoft.Json.dll" target="tools/Newtonsoft.Json.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/Object.Net.Utilities.dll" target="tools/Object.Net.Utilities.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.AppContext.dll" target="tools/System.AppContext.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Collections.Immutable.dll" target="tools/System.Collections.Immutable.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Composition.AttributedModel.dll" target="tools/System.Composition.AttributedModel.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Composition.Convention.dll" target="tools/System.Composition.Convention.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Composition.Hosting.dll" target="tools/System.Composition.Hosting.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Composition.Runtime.dll" target="tools/System.Composition.Runtime.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Composition.TypedParts.dll" target="tools/System.Composition.TypedParts.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Console.dll" target="tools/System.Console.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Diagnostics.FileVersionInfo.dll" target="tools/System.Diagnostics.FileVersionInfo.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Diagnostics.StackTrace.dll" target="tools/System.Diagnostics.StackTrace.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.IO.Compression.dll" target="tools/System.IO.Compression.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.IO.FileSystem.dll" target="tools/System.IO.FileSystem.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.IO.FileSystem.Primitives.dll" target="tools/System.IO.FileSystem.Primitives.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Reflection.Metadata.dll" target="tools/System.Reflection.Metadata.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Security.Cryptography.Algorithms.dll" target="tools/System.Security.Cryptography.Algorithms.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Security.Cryptography.Encoding.dll" target="tools/System.Security.Cryptography.Encoding.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Security.Cryptography.Primitives.dll" target="tools/System.Security.Cryptography.Primitives.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Security.Cryptography.X509Certificates.dll" target="tools/System.Security.Cryptography.X509Certificates.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Text.Encoding.CodePages.dll" target="tools/System.Text.Encoding.CodePages.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Threading.Thread.dll" target="tools/System.Threading.Thread.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.ValueTuple.dll" target="tools/System.ValueTuple.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Xml.ReaderWriter.dll" target="tools/System.Xml.ReaderWriter.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Xml.XmlDocument.dll" target="tools/System.Xml.XmlDocument.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Xml.XPath.dll" target="tools/System.Xml.XPath.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Xml.XPath.XDocument.dll" target="tools/System.Xml.XPath.XDocument.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/TopologicalSorting.dll" target="tools/TopologicalSorting.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/Microsoft.Build.dll" target="tools/Microsoft.Build.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/Microsoft.Build.Framework.dll" target="tools/Microsoft.Build.Framework.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/Microsoft.Build.Utilities.Core.dll" target="tools/Microsoft.Build.Utilities.Core.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Threading.Tasks.Dataflow.dll" target="tools/System.Threading.Tasks.Dataflow.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Min/tools/System.Runtime.InteropServices.RuntimeInformation.dll" target="tools/System.Runtime.InteropServices.RuntimeInformation.dll" />
 
     <!-- ("Bridge.Core" package) NET40 -->
-    <file src="../../ExtLibs/BridgeNET/Bridge.Core/lib/net40/Bridge.dll" target="lib/net40/Bridge.dll" />
-    <file src="../../ExtLibs/BridgeNET/Bridge.Core/lib/net40/Bridge.xml" target="lib/net40/Bridge.xml" />
+    <file src="../../libs/BridgeNET/Bridge.Core/lib/net40/Bridge.dll" target="lib/net40/Bridge.dll" />
+    <file src="../../libs/BridgeNET/Bridge.Core/lib/net40/Bridge.xml" target="lib/net40/Bridge.xml" />
   </files>
 </package>
