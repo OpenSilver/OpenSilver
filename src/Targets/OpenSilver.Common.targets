@@ -152,11 +152,11 @@
       Importance="normal"/>
     <Message
       Condition="'$(IsSecondPass)'!='True'"
-      Text="CSHTML5 Pass 1"
+      Text="OpenSilver Pass 1"
       Importance="normal"/>
     <Message
       Condition="'$(IsSecondPass)'=='True'"
-      Text="CSHTML5 Pass 2"
+      Text="OpenSilver Pass 2"
       Importance="normal"/>
 
     <!--============================================================
@@ -352,7 +352,7 @@
   ============================================================-->
   <Target Name="CSharpXamlForHtml5BeforeCompile_NotDesignTime">
     <Message
-          Text="CSHTML5 Before compile. IsSecondPass=$(IsSecondPass)"
+          Text="OpenSilver Before compile. IsSecondPass=$(IsSecondPass)"
           Importance="normal"/>
 
     <!--============================================================
@@ -466,7 +466,7 @@
   ============================================================-->
   <Target Name="CSharpXamlForHtml5BeforePostBuild" BeforeTargets="PostBuildEvent">
     <Message
-          Text="CSHTML5 Before post build. IsSecondPass=$(IsSecondPass)"
+          Text="OpenSilver Before post build. IsSecondPass=$(IsSecondPass)"
           Importance="normal"/>
     <ItemGroup>
       <OutputAssembly Include="$(OutputAssemblyDirectory)\$(AssemblyName).dll" />
@@ -574,7 +574,7 @@
 
   <Target Name="DesignTimeCompilation">
     <Message
-      Text="CSHTML5 Design-Time Compilation started"
+      Text="OpenSilver Design-Time Compilation started"
       Importance="normal"/>
 
     <!--============================================================
@@ -723,7 +723,7 @@
       <Compile Include="@(ProcessedFiles2)" />
     </ItemGroup>
     <Message
-      Text="CSHTML5 Design-Time Compilation ended"
+      Text="OpenSilver Design-Time Compilation ended"
       Importance="normal"/>
   </Target>
 
