@@ -23,7 +23,7 @@
   <!--<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition=" '$(CoreCompileDependsOn)' == '' " />-->
   <!-- Note: The condition on the "CoreCompileDependsOn" property defined in "Microsoft.CSharp.targets" is here to avoid a warning if the target was already imported. We could have used any other property defined in "Microsoft.CSharp.targets". -->
 
-
+  
   <!--============================================================
   Add the tasks "CSharpXamlForHtml5BeforeCompile" and "CSharpXamlForHtml5BeforeBuild" to the build process:
   ============================================================-->
@@ -158,6 +158,19 @@
       Condition="'$(IsSecondPass)'=='True'"
       Text="CSHTML5 Pass 2"
       Importance="normal"/>
+
+    <!--============================================================
+    Display an error if this version has breaking changes that require manual update of the project files:
+    ============================================================-->
+    <PropertyGroup>
+      <IsCompilingTheBrowserProject Condition="'$(RazorCompileOnPublish)'!=''">True</IsCompilingTheBrowserProject>
+    </PropertyGroup>
+    <Exec
+      Condition="'$(IsCompilingTheBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
+      Command="explorer.exe https://opensilver.net/permalinks/update/alpha7.aspx" Timeout="2000" ContinueOnError="True"></Exec>
+    <Error
+      Condition="'$(IsCompilingTheBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
+      Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha7.aspx"/>
 
     <!--============================================================
       If compiling CSHTML5 itself, remove some references:
