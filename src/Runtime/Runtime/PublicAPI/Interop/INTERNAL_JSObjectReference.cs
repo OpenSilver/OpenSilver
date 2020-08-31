@@ -83,7 +83,11 @@ namespace CSHTML5.Types
                 result = Value;
             }
 
-            if (result.GetType().FullName == "DotNetBrowser.JSNumber")
+            if (result == null)
+            {
+                return null;
+            }
+            else if (result.GetType().FullName == "DotNetBrowser.JSNumber")
             {
                 return ((dynamic)result).GetNumber();
             }
