@@ -54,7 +54,7 @@ window.onCallBack.OnCallbackFromJavaScript = function (callbackId, idWhereCallba
 	try {
 		DotNet.invokeMethod("OpenSilver", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, "");
 	} catch (e)	{
-		DotNet.invokeMethod("OpenSilver.UwpCompatible", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, "");
+		DotNet.invokeMethod("OpenSilver.UWPCompatible", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, "");
 	}	
 };
 
