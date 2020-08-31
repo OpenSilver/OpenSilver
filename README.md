@@ -63,10 +63,11 @@ To test the NuGet package, simply reference it from your test project. If you ar
 
 Building the VSIX is only useful if you wish to test your changes to the Project Templates, the Item Templates, or the XAML editor. For all the other scenarios, building the Runtime or the NuGet package is sufficient to test your changes.
 
-1. Install Visual Studio 2015. During the installation, make sure that the "Visual Studio Extensibility Tools" optional components are installed too
-2. With Visual Studio 2015, open the solution "VSExtension.OpenSilver.sln" or "VSExtension.CSHTML5.sln" depending on whether you want to build the VSIX of OpenSilver or CSHTML5
-3. Rebuild the solution
-4. The VSIX will be generated in a subfolder of the "bin" folder of the .VSIX project
+1. If needed, change the version number in "source.extension.vsixmanifest" (located in the project "OpenSilver.VSIX" or "CSHTML5.VSIX", depending on whether you want to build the VSIX of OpenSilver or CSHTML5)
+2. Install Visual Studio 2015. During the installation, make sure that the "Visual Studio Extensibility Tools" optional components are installed too
+3. With Visual Studio 2015, open the solution "VSExtension.OpenSilver.sln" or "VSExtension.CSHTML5.sln" depending on whether you want to build the VSIX of OpenSilver or CSHTML5
+4. Rebuild the solution
+5. The VSIX will be generated in a subfolder of the "bin" folder of the .VSIX project
 
 Notes for building the VSIX:
 - Note for OpenSilver: while all the projects do build fine with VS 2015, the "OpenSilver.VSIX" project can only be opened and built with VS 2019 (or newer). When building it with VS 2019 (or newer), you can unload the other projects to avoid compilation errors due to the version of VS.
