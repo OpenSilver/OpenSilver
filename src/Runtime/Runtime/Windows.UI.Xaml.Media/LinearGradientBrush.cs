@@ -394,10 +394,14 @@ namespace Windows.UI.Xaml.Media
             double angle = alpha * 180 / Math.PI;
 
 
-            if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
+#if CSHTML5BLAZOR
+            if (!CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
+#else
+            if (!CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
             {
                 // In the browsers, the angle goes in the opposite direction of that of the Simulator, and 0 degrees is not in the same position so we fix it:
-                    angle = 360 - angle + 90;
+                angle = 360 - angle + 90;
             }
 
 
