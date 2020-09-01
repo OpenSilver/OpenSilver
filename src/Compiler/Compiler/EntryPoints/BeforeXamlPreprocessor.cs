@@ -113,7 +113,7 @@ namespace DotNetForHtml5.Compiler
                     // we load the source assembly early in case we are processing the CSHTML5.
                     if (isSecondPass && isProcessingCSHTML5Itself)
                     {
-                        reflectionOnSeparateAppDomain.LoadAssembly(sourceAssemblyForPass2, loadReferencedAssembliesToo: true, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: false, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode);
+                        reflectionOnSeparateAppDomain.LoadAssembly(sourceAssemblyForPass2, loadReferencedAssembliesToo: true, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: false, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies: false);
                     }
 #if CSHTML5BLAZOR
                     // work-around: reference path string is not correctly setted so we set it manually
@@ -126,7 +126,7 @@ namespace DotNetForHtml5.Compiler
 
                     foreach (string referencedAssembly in AssembliesLoadHelper.EnsureCoreAssemblyIsFirstInList(referencePaths)) // Note: we ensure that the Core assembly is loaded first so that types such as "XmlnsDefinitionAttribute" are known when loading the other assemblies.
                     {
-                        reflectionOnSeparateAppDomain.LoadAssembly(referencedAssembly, loadReferencedAssembliesToo: false, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: false, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode);
+                        reflectionOnSeparateAppDomain.LoadAssembly(referencedAssembly, loadReferencedAssembliesToo: false, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: false, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies: false);
                     }
 
                     // Load "mscorlib.dll" too (this is useful for resolving Mscorlib types in XAML, such as <system:String x:Key="TestString" xmlns:system="clr-namespace:System;assembly=mscorlib">Test</system:String>)
@@ -135,7 +135,7 @@ namespace DotNetForHtml5.Compiler
                     // Load for reflection the source assembly itself and the referenced assemblies if second path:
                     if (isSecondPass && !isProcessingCSHTML5Itself)
                     {
-                        reflectionOnSeparateAppDomain.LoadAssembly(sourceAssemblyForPass2, loadReferencedAssembliesToo: true, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: false, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode);
+                        reflectionOnSeparateAppDomain.LoadAssembly(sourceAssemblyForPass2, loadReferencedAssembliesToo: true, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: false, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies: false);
                     }
 
                     bool isSuccess = true;

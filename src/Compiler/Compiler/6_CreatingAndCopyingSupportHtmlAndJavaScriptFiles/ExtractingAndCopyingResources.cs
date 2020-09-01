@@ -27,7 +27,13 @@ namespace DotNetForHtml5.Compiler
         {
             resXFilesCopied = new List<string>();
             List<string> assemblySimpleNames;
-            reflectionOnSeparateAppDomain.LoadAssemblyAndAllReferencedAssembliesRecursively(assemblyPath, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: false, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode, assemblySimpleNames: out assemblySimpleNames);
+            reflectionOnSeparateAppDomain.LoadAssemblyAndAllReferencedAssembliesRecursively(
+                assemblyPath,
+                isBridgeBasedVersion: isBridgeBasedVersion,
+                isCoreAssembly: false,
+                nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode,
+                skipReadingAttributesFromAssemblies: true,
+                assemblySimpleNames: out assemblySimpleNames);
 
             foreach (string assemblySimpleName in assemblySimpleNames)
             {

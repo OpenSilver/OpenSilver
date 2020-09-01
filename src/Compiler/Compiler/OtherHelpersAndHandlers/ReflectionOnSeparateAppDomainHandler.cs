@@ -90,14 +90,14 @@ namespace DotNetForHtml5.Compiler
             GC.Collect();
         }
 
-        public string LoadAssembly(string assemblyPath, bool loadReferencedAssembliesToo, bool isBridgeBasedVersion, bool isCoreAssembly, string nameOfAssembliesThatDoNotContainUserCode)
+        public string LoadAssembly(string assemblyPath, bool loadReferencedAssembliesToo, bool isBridgeBasedVersion, bool isCoreAssembly, string nameOfAssembliesThatDoNotContainUserCode, bool skipReadingAttributesFromAssemblies)
         {
-            return _marshalledObject.LoadAssembly(assemblyPath, loadReferencedAssembliesToo, isBridgeBasedVersion, isCoreAssembly, nameOfAssembliesThatDoNotContainUserCode);
+            return _marshalledObject.LoadAssembly(assemblyPath, loadReferencedAssembliesToo, isBridgeBasedVersion, isCoreAssembly, nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies: skipReadingAttributesFromAssemblies);
         }
 
-        public void LoadAssemblyAndAllReferencedAssembliesRecursively(string assemblyPath, bool isBridgeBasedVersion, bool isCoreAssembly, string nameOfAssembliesThatDoNotContainUserCode, out List<string> assemblySimpleNames)
+        public void LoadAssemblyAndAllReferencedAssembliesRecursively(string assemblyPath, bool isBridgeBasedVersion, bool isCoreAssembly, string nameOfAssembliesThatDoNotContainUserCode, bool skipReadingAttributesFromAssemblies, out List<string> assemblySimpleNames)
         {
-            _marshalledObject.LoadAssemblyAndAllReferencedAssembliesRecursively(assemblyPath, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: isCoreAssembly, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode, assemblySimpleNames: out assemblySimpleNames);
+            _marshalledObject.LoadAssemblyAndAllReferencedAssembliesRecursively(assemblyPath, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: isCoreAssembly, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies: skipReadingAttributesFromAssemblies, assemblySimpleNames: out assemblySimpleNames);
         }
 
         public void LoadAssemblyMscorlib(bool isBridgeBasedVersion, bool isCoreAssembly, string nameOfAssembliesThatDoNotContainUserCode)
@@ -328,15 +328,15 @@ namespace DotNetForHtml5.Compiler
             }
 
             /// <returns>The assembly simple name</returns>
-            public string LoadAssembly(string assemblyPath, bool loadReferencedAssembliesToo, bool isBridgeBasedVersion, bool isCoreAssembly, string nameOfAssembliesThatDoNotContainUserCode)
+            public string LoadAssembly(string assemblyPath, bool loadReferencedAssembliesToo, bool isBridgeBasedVersion, bool isCoreAssembly, string nameOfAssembliesThatDoNotContainUserCode, bool skipReadingAttributesFromAssemblies)
             {
                 // Load the specified assembly and process it if not already done:
-                Assembly assembly = LoadAndProcessAssemblyFromPath(assemblyPath, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: isCoreAssembly);
+                Assembly assembly = LoadAndProcessAssemblyFromPath(assemblyPath, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: isCoreAssembly, skipReadingAttributesFromAssemblies: skipReadingAttributesFromAssemblies);
 
                 // Also load the referenced assemblies too if instructed to do so:
                 if (loadReferencedAssembliesToo)
                 {
-                    LoadAndProcessReferencedAssemblies(assembly, Path.GetDirectoryName(assemblyPath), isBridgeBasedVersion, nameOfAssembliesThatDoNotContainUserCode);
+                    LoadAndProcessReferencedAssemblies(assembly, Path.GetDirectoryName(assemblyPath), isBridgeBasedVersion, nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies);
                 }
 
                 string assemblySimpleName = assembly.GetName().Name;
@@ -344,12 +344,12 @@ namespace DotNetForHtml5.Compiler
                 return assemblySimpleName;
             }
 
-            public void LoadAssemblyAndAllReferencedAssembliesRecursively(string assemblyPath, bool isBridgeBasedVersion, bool isCoreAssembly, string nameOfAssembliesThatDoNotContainUserCode, out List<string> assemblySimpleNames)
+            public void LoadAssemblyAndAllReferencedAssembliesRecursively(string assemblyPath, bool isBridgeBasedVersion, bool isCoreAssembly, string nameOfAssembliesThatDoNotContainUserCode, bool skipReadingAttributesFromAssemblies, out List<string> assemblySimpleNames)
             {
                 HashSet<string> simpleNameOfAssembliesProcessedDuringRecursion = new HashSet<string>();
 
                 // Load the specified assembly in memory and process it if not already done:
-                Assembly assembly = LoadAndProcessAssemblyFromPath(assemblyPath, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: isCoreAssembly);
+                Assembly assembly = LoadAndProcessAssemblyFromPath(assemblyPath, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: isCoreAssembly, skipReadingAttributesFromAssemblies: skipReadingAttributesFromAssemblies);
                 simpleNameOfAssembliesProcessedDuringRecursion.Add(assembly.GetName().Name);
 
                 // Start the recursion:
@@ -364,10 +364,10 @@ namespace DotNetForHtml5.Compiler
                                 simpleNameOfAssembliesProcessedDuringRecursion.Add(referencedAssemblySimpleName);
 
                                 // Recursion:
-                                LoadAndProcessReferencedAssemblies(referencedAssembly, referencedAssemblyFolder, isBridgeBasedVersion, nameOfAssembliesThatDoNotContainUserCode, whatElseToDoWithTheReferencedAssembly);
+                                LoadAndProcessReferencedAssemblies(referencedAssembly, referencedAssemblyFolder, isBridgeBasedVersion, nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies, whatElseToDoWithTheReferencedAssembly);
                             }
                         };
-                LoadAndProcessReferencedAssemblies(assembly, Path.GetDirectoryName(assemblyPath), isBridgeBasedVersion, nameOfAssembliesThatDoNotContainUserCode, whatElseToDoWithTheReferencedAssembly);
+                LoadAndProcessReferencedAssemblies(assembly, Path.GetDirectoryName(assemblyPath), isBridgeBasedVersion, nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies, whatElseToDoWithTheReferencedAssembly);
 
                 assemblySimpleNames = new List<string>(simpleNameOfAssembliesProcessedDuringRecursion);
             }
@@ -384,7 +384,7 @@ namespace DotNetForHtml5.Compiler
                 }
             }
 
-            void LoadAndProcessReferencedAssemblies(Assembly assembly, string originalAssemblyFolder, bool isBridgeBasedVersion, string nameOfAssembliesThatDoNotContainUserCode, ReferencedAssemblyLoadedDelegate whatElseToDoWithTheReferencedAssembly = null)
+            void LoadAndProcessReferencedAssemblies(Assembly assembly, string originalAssemblyFolder, bool isBridgeBasedVersion, string nameOfAssembliesThatDoNotContainUserCode, bool skipReadingAttributesFromAssemblies, ReferencedAssemblyLoadedDelegate whatElseToDoWithTheReferencedAssembly = null)
             {
                 // Skip the assembly if it is not a user assembly:
                 HashSet<string> assembliesToSkipLowercase;
@@ -488,7 +488,10 @@ namespace DotNetForHtml5.Compiler
 #endif
                             if (referencedAssembly != null)
                             {
-                                ProcessLoadedAssembly(referencedAssembly, isBridgeBasedVersion);
+                                if (!skipReadingAttributesFromAssemblies)
+                                {
+                                    ReadXmlnsDefinitionAttributes(referencedAssembly, isBridgeBasedVersion);
+                                }
                             }
                         }
 
@@ -510,7 +513,7 @@ namespace DotNetForHtml5.Compiler
                 }
             }
 
-            Assembly LoadAndProcessAssemblyFromPath(string assemblyPath, bool isBridgeBasedVersion, bool isCoreAssembly)
+            Assembly LoadAndProcessAssemblyFromPath(string assemblyPath, bool isBridgeBasedVersion, bool isCoreAssembly, bool skipReadingAttributesFromAssemblies)
             {
                 Assembly assembly;
                 if (!_loadedAssemblyPathToAssembly.ContainsKey(assemblyPath))
@@ -557,7 +560,10 @@ namespace DotNetForHtml5.Compiler
 
                     _loadedAssemblyPathToAssembly[assemblyPath] = assembly;
                     _loadedAssemblySimpleNameToAssembly[assembly.GetName().Name] = assembly; // Note: this line is here in order to be done before "ProcessLoadedAssembly" (though such order may not be necessarily required)
-                    ProcessLoadedAssembly(assembly, isBridgeBasedVersion);
+                    if (!skipReadingAttributesFromAssemblies)
+                    {
+                        ReadXmlnsDefinitionAttributes(assembly, isBridgeBasedVersion);
+                    }
                 }
                 else
                 {
@@ -568,7 +574,7 @@ namespace DotNetForHtml5.Compiler
                 return assembly;
             }
 
-            void ProcessLoadedAssembly(Assembly assembly, bool isBridgeBasedVersion)
+            void ReadXmlnsDefinitionAttributes(Assembly assembly, bool isBridgeBasedVersion)
             {
                 string assemblySimpleName = assembly.GetName().Name;
 

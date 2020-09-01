@@ -522,7 +522,7 @@
       ResourceExtractorAndCopier (only during Pass 2)
       ============================================================-->
     <ResourcesExtractorAndCopier
-      Condition="'$(CSharpXamlForHtml5OutputType)'!='Library' And '$(IsSecondPass)'=='True' And '$(SkipResourcesExtractorAndCopier)'!='true' And '$(NoXamlPreprocessor)'!='True'"
+      Condition="'$(CSharpXamlForHtml5OutputType)'!='Library' And '$(IsSecondPass)'=='True' And '$(SkipResourcesExtractorAndCopier)'!='true'"
       SourceAssembly="$(OutputAssemblyDirectory)\$(AssemblyName).dll"
       OutputRootPath="$(Cshtml5OutputRootPath)"
       OutputResourcesPath="$(Cshtml5OutputResourcesPath)"

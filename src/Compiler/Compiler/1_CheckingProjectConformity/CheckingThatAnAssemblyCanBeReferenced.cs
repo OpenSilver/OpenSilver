@@ -194,7 +194,7 @@ namespace DotNetForHtml5.Compiler
                     }
 #endif
 
-                    string assemblySimpleName = reflectionOnSeparateAppDomain.LoadAssembly(referenceHintPath, loadReferencedAssembliesToo: false, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: false, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode);
+                    string assemblySimpleName = reflectionOnSeparateAppDomain.LoadAssembly(referenceHintPath, loadReferencedAssembliesToo: false, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: false, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies: false);
 
 
                     //-----------------------------------------------------------------------------

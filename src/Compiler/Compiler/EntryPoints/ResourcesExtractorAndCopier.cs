@@ -101,7 +101,7 @@ namespace DotNetForHtml5.Compiler
                         string[] coreAssemblyFilesArray = coreAssemblyFiles.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
                         foreach (string coreAssemblyFile in coreAssemblyFilesArray)
                         {
-                            reflectionOnSeparateAppDomain.LoadAssembly(coreAssemblyFile, loadReferencedAssembliesToo: false, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: true, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode);
+                            reflectionOnSeparateAppDomain.LoadAssembly(coreAssemblyFile, loadReferencedAssembliesToo: false, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: true, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies: true);
                         }
 #endif
 
