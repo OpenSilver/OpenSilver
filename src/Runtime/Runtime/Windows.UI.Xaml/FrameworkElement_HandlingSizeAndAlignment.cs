@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Media;
 
 #if MIGRATION
 using System.Windows;
@@ -1544,7 +1545,7 @@ if ($0.tagName.toLowerCase() != 'span')
                 }
                 if (this._sizeChangedEventHandlers.Count == 0 && this.INTERNAL_OuterDomElement != null)
                 {
-                    CSHTML5.Interop.ExecuteJavaScript(@"$0 = new ResizeSensor($1, $2)", this._resizeSensor, this.INTERNAL_OuterDomElement, (Action)this.HandleSizeChanged);
+                    this._resizeSensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action)this.HandleSizeChanged);
                 }
                 this._sizeChangedEventHandlers.Add(value);
             }
