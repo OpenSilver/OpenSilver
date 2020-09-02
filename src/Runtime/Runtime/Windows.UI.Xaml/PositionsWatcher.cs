@@ -45,21 +45,24 @@ namespace Windows.UI.Xaml
 
         void _timer_Tick(object sender, object e)
         {
-            foreach (ControlToWatch controlToWatch in _controlsToWatch)
+            ControlToWatch[] snapshot = _controlsToWatch.ToArray();
+            foreach (ControlToWatch controlToWatch in snapshot)
             {
                 //get the element's new Position:
                 Point elementCurrentPosition = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(controlToWatch.ControltoWatch);
                 Size elementCurrentSize;
-                if (controlToWatch.ControltoWatch is FrameworkElement)
+                FrameworkElement control = controlToWatch.ControltoWatch as FrameworkElement;
+                if (control != null)
                 {
-                    elementCurrentSize = ((FrameworkElement)controlToWatch.ControltoWatch).INTERNAL_GetActualWidthAndHeight();
+                    elementCurrentSize = control.INTERNAL_GetActualWidthAndHeight();
                 }
                 else
                 {
                     elementCurrentSize = new Size();
                 }
 
-                if (elementCurrentPosition != controlToWatch.PreviousPosition || !INTERNAL_SizeComparisonHelpers.AreSizesEqual(elementCurrentSize, controlToWatch.PreviousSize))
+                if (elementCurrentPosition != controlToWatch.PreviousPosition ||
+                    !INTERNAL_SizeComparisonHelpers.AreSizesEqual(elementCurrentSize, controlToWatch.PreviousSize))
                 {
                     controlToWatch.OnPositionOrSizeChanged(elementCurrentPosition, elementCurrentSize);
                     controlToWatch.PreviousPosition = elementCurrentPosition;
@@ -73,9 +76,10 @@ namespace Windows.UI.Xaml
             ControlToWatch returnvalue = new ControlToWatch(elementToWatch, callback);
 
             Size elementCurrentSize;
-            if (elementToWatch is FrameworkElement)
+            FrameworkElement control = elementToWatch as FrameworkElement;
+            if (control != null)
             {
-                elementCurrentSize = ((FrameworkElement)elementToWatch).INTERNAL_GetActualWidthAndHeight();
+                elementCurrentSize = control.INTERNAL_GetActualWidthAndHeight();
             }
             else
             {
