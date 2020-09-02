@@ -38,6 +38,7 @@ using System.Runtime.Serialization;
 using System.Xml.Linq;
 using System.Xml;
 using CSHTML5.Internal;
+using static System.ServiceModel.INTERNAL_WebMethodsCaller;
 
 #if MIGRATION
 using System.Windows;
@@ -576,6 +577,53 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     soapVersion);
             }
 
+            internal Task<T> CallWebMethodAsyncBeginEnd<T>(
+                string webMethodName,
+                Type interfaceType,
+                Type methodReturnType,
+                IDictionary<string, object> originalRequestObject,
+                string soapVersion)
+            {
+                TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
+
+                AsyncCallback callback = new AsyncCallback(delegate (IAsyncResult asyncResponseResult)
+                {
+                    try
+                    {
+                        T result = EndCallWebMethod<T>(
+                            webMethodName,
+                            interfaceType,
+                            ((WebMethodAsyncResult)asyncResponseResult).XmlReturnedFromTheServer,
+                            soapVersion);
+                        tcs.SetResult(result);
+                    }
+                    catch (Exception ex)
+                    {
+                        tcs.TrySetException(ex);
+                    }
+                });
+                object asyncState = null;
+
+                WebMethodAsyncResult webMethodAsyncResult = new WebMethodAsyncResult(callback, asyncState); 
+
+                BeginCallWebMethod(
+                    webMethodName,
+                    interfaceType,
+                    methodReturnType,
+                    originalRequestObject,
+                    (xmlReturnedFromTheServer) =>
+                    {
+                        // After server call has finished (not deserialized yet)
+                        webMethodAsyncResult.XmlReturnedFromTheServer = xmlReturnedFromTheServer;
+
+                        // This causes a call to "EndCallWebMethod" which will deserialize the response.
+                        webMethodAsyncResult.Completed();
+                    },
+                    soapVersion);
+
+                return tcs.Task;
+            }
+
             /// <summary>
             /// Asynchronously calls a WebMethod.
             /// </summary>
@@ -610,7 +658,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     out headers,
                     out request);
 
-                var taskCompletionSource = new TaskCompletionSource<T>(); //todo: here we need to change object to the return type
+                var tcs = new TaskCompletionSource<T>(); //todo: here we need to change object to the return type
 
                 string response = _webRequestHelper_JSVersion.MakeRequest(
                     new Uri(_addressOfService),
@@ -621,7 +669,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     (sender, args2) =>
                     {
                         ReadAndPrepareResponseGeneric_JSVersion(
-                            taskCompletionSource,
+                            tcs,
                             args2,
                             interfaceType,
                             methodReturnType,
@@ -631,7 +679,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     true,
                     Application.Current.Host.Settings.DefaultSoapCredentialsMode);
 
-                return taskCompletionSource.Task;
+                return tcs.Task;
             }
 
             /// <summary>

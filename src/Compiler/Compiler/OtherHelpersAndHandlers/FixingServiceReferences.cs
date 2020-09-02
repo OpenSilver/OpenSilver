@@ -486,25 +486,65 @@ namespace DotNetForHtml5.Compiler
             return wasAnythingFixed;
         }
 
+        /// <summary>
+        /// Try to find the web method name by trying to extract a substring.
+        /// </summary>
+        /// <param name="method"></param>
+        /// <param name="prefixTokens"></param>
+        /// <param name="suffixTokens"></param>
+        /// <returns></returns>
+        private static string GetMethodNameUnsafe(string method, string[] prefixTokens, string[] suffixTokens)
+        {
+            foreach (string token in prefixTokens)
+            {
+                if (method.StartsWith(token))
+                {
+                    return method.Substring(token.Length);
+                }
+            }
+
+            foreach (string token in suffixTokens)
+            {
+                if (method.EndsWith(token))
+                {
+                    return method.Substring(0, method.Length - token.Length);
+                }
+            }
+
+            return method;
+        }
+
         private static string GetMethodName(string method, MethodType methodType)
         {
             switch (methodType)
             {
                 case MethodType.AsyncBegin:
-                    Debug.Assert(method.StartsWith("Begin"), 
-                                 string.Format("'{0}' does not start with \"Begin\" !", method));
+                    if (!method.StartsWith("Begin"))
+                    {
+                        return GetMethodNameUnsafe(method, 
+                                                   new string[1] { "End" }, 
+                                                   new string[1] { "Async" });
+                    }
                     return method.Substring(5); // skips "Begin"
 
                 case MethodType.AsyncEndWithoutReturnType:
                 case MethodType.AsyncEndWithReturnType:
-                    Debug.Assert(method.StartsWith("End"), 
-                                 string.Format("'{0}' does not start with \"End\" !", method));
+                    if (!method.StartsWith("End"))
+                    {
+                        return GetMethodNameUnsafe(method,
+                                                   new string[1] { "Begin" },
+                                                   new string[1] { "Async" });
+                    }
                     return method.Substring(3); // skips "End"
                 
                 case MethodType.AsyncWithoutReturnType:
                 case MethodType.AsyncWithReturnType:
-                    Debug.Assert(method.EndsWith("Async"),  
-                                 string.Format("'{0}' does not end with \"Async\" !", method));
+                    if (!method.EndsWith("Async"))
+                    {
+                        return GetMethodNameUnsafe(method, 
+                                                   new string[2] { "Begin", "End" }, 
+                                                   new string[0]);
+                    }
                     return method.Substring(0, method.Length - 5); // skips "Async"
 
                 case MethodType.NotAsyncWithoutReturnType:
