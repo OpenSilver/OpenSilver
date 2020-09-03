@@ -1,4 +1,4 @@
-﻿
+
 
 /*===================================================================================
 * 
@@ -437,16 +437,16 @@ namespace DotNetForHtml5.Compiler
                                 try
                                 {
                                     referencedAssembly = Assembly.LoadFrom(candidateAssemblyPath);
-                                    if (!_onlyReflectionLoaded.ContainsKey(assembly))
-                                        _onlyReflectionLoaded.Add(assembly, false);
+                                    if (!_onlyReflectionLoaded.ContainsKey(referencedAssembly))
+                                        _onlyReflectionLoaded.Add(referencedAssembly, false);
                                 }
                                 // it may fails because somes .dll of .NET Standard are more like interfaces
                                 // so we load them only for reflection 
                                 catch (Exception)
                                 {
                                     referencedAssembly = Assembly.ReflectionOnlyLoadFrom(candidateAssemblyPath);
-                                    if (!_onlyReflectionLoaded.ContainsKey(assembly))
-                                        _onlyReflectionLoaded.Add(assembly, true);
+                                    if (!_onlyReflectionLoaded.ContainsKey(referencedAssembly))
+                                        _onlyReflectionLoaded.Add(referencedAssembly, true);
                                 }
 #else
                                 referencedAssembly = Assembly.LoadFrom(candidateAssemblyPath);
@@ -460,8 +460,8 @@ namespace DotNetForHtml5.Compiler
                                 try
                                 {
                                     referencedAssembly = Assembly.Load(referencedAssemblyName);
-                                    if (!_onlyReflectionLoaded.ContainsKey(assembly))
-                                        _onlyReflectionLoaded.Add(assembly, false);
+                                    if (!_onlyReflectionLoaded.ContainsKey(referencedAssembly))
+                                        _onlyReflectionLoaded.Add(referencedAssembly, false);
                                 }
                                 // it may fails because somes .dll of .NET Standard are more like interfaces
                                 // so we load them only for reflection 
@@ -470,8 +470,8 @@ namespace DotNetForHtml5.Compiler
                                     try
                                     {
                                         referencedAssembly = Assembly.ReflectionOnlyLoad(referencedAssemblyName.Name);
-                                        if (!_onlyReflectionLoaded.ContainsKey(assembly))
-                                            _onlyReflectionLoaded.Add(assembly, true);
+                                        if (!_onlyReflectionLoaded.ContainsKey(referencedAssembly))
+                                            _onlyReflectionLoaded.Add(referencedAssembly, true);
                                     }
                                     catch (Exception)
                                     {
