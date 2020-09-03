@@ -16,7 +16,7 @@
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
 		<EnableDefaultItems>false</EnableDefaultItems> <!-- This emluates the behavior of NET Framework, which excludes every files by default -->
 		<BlazorVersion>3.1.0-preview1.19508.20</BlazorVersion>
-		<OpenSilverVersion>1.0.0-alpha-005</OpenSilverVersion>
+		<OpenSilverVersion>1.0.0-alpha-006</OpenSilverVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
