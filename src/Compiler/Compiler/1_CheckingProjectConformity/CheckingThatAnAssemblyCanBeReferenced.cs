@@ -190,7 +190,7 @@ namespace DotNetForHtml5.Compiler
                     referencesPathsHasSet.RemoveWhere(s => !s.ToLower().EndsWith(".dll") || s.Contains("DotNetBrowser") || s.ToLower().EndsWith(@"\bridge.dll"));
                     foreach (string referencedAssembly in AssembliesLoadHelper.EnsureCoreAssemblyIsFirstInList(referencesPathsHasSet)) // Note: we ensure that the Core assembly is loaded first so that types such as "XmlnsDefinitionAttribute" are known when loading the other assemblies.
                     {
-                        reflectionOnSeparateAppDomain.LoadAssembly(referencedAssembly, loadReferencedAssembliesToo: false, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: false, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode);
+                        reflectionOnSeparateAppDomain.LoadAssembly(referencedAssembly, loadReferencedAssembliesToo: false, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: false, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies: false);
                     }
 #endif
 
