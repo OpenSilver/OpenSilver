@@ -199,7 +199,7 @@ namespace System
 
         private static string EscapeStringAndSurroundWithQuotes(string str)
         {
-            return "@\"" + str.Replace("\"", "\"\"") + "\"";
+            return "@\"" + (str ?? string.Empty).Replace("\"", "\"\"") + "\"";
         }
 
         // special version of sendRequest, it handles some errors and modifies the credentials mode if needed
