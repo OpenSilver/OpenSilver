@@ -434,7 +434,7 @@ head.appendChild(script);", html5Path, (Action<object>)LoadJavaScriptFileSuccess
 
         private static void LoadJavaScriptFileSuccess(object jsArgument)
         {
-            string loadedFileName = jsArgument.ToString();
+            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument)); //using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item1();
@@ -445,7 +445,7 @@ head.appendChild(script);", html5Path, (Action<object>)LoadJavaScriptFileSuccess
 
         private static void LoadJavaScriptFileFailure(object jsArgument)
         {
-            string loadedFileName = jsArgument.ToString();
+            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument)); //using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item2();
