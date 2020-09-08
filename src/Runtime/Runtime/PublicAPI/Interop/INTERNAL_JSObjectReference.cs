@@ -65,7 +65,7 @@ namespace CSHTML5.Types
             
             if (IsArray)
             {
-                if (Value.GetType().FullName == "DotNetBrowser.JSArray")
+                if (Value != null && Value.GetType().FullName == "DotNetBrowser.JSArray")
                 {
                     result = ((dynamic)Value)[ArrayIndex];
                 }
@@ -75,7 +75,7 @@ namespace CSHTML5.Types
                 }
                 else
                 {
-                    throw new InvalidOperationException("Value is marked as array but is neither an object[] nor a JSArray");
+                    throw new InvalidOperationException("Value is marked as array but is neither an object[] nor a JSArray. ReferenceId: " + (this.ReferenceId ?? "n/a").ToString());
                 }
             }
             else

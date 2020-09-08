@@ -202,25 +202,20 @@ namespace CSHTML5
             }
 
             UnmodifiedJavascriptCalls.Add(unmodifiedJavascript);
-            // Add the callback to the document:
-            if (!CallbacksDictionary.ContainsKey(0))
-            {
-                CallbacksDictionary.Add(0, (Action<string, int>)ShowErrorMessage);
-            }
 
 #if CSHTML5NETSTANDARD
             //Console.WriteLine("Added ID: " + callbackId.ToString());
 #endif
-
+            
             // Change the JS code to call ShowErrorMessage in case of error:
             string errorCallBack = string.Format(
             @"var idWhereErrorCallbackArgsAreStored = ""callback_args_"" + document.callbackCounterForSimulator++;
-                document.jsSimulatorObjectReferences[idWhereErrorCallbackArgsAreStored] = {0};
                 var argsArr = [];
                 argsArr[0] = error.message;
                 argsArr[1] = {0};
-window.onCallBack.OnCallbackFromJavaScript(0, idWhereErrorCallbackArgsAreStored, argsArr);", IndexOfNextUnmodifiedJSCallInList
-            );
+                document.jsSimulatorObjectReferences[idWhereErrorCallbackArgsAreStored] = argsArr;
+                window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);"
+                , IndexOfNextUnmodifiedJSCallInList);
             ++IndexOfNextUnmodifiedJSCallInList;
 
             // Surround the javascript code with some code that will store the result into the "document.jsSimulatorObjectReferences" for later use in subsequent calls to this method:
@@ -269,7 +264,8 @@ result;
 
         static List<string> UnmodifiedJavascriptCalls = new List<string>();
         static int IndexOfNextUnmodifiedJSCallInList = 0;
-        static void ShowErrorMessage(string errorMessage, int indexOfCallInList)
+
+        internal static void ShowErrorMessage(string errorMessage, int indexOfCallInList)
         {
             string str = UnmodifiedJavascriptCalls.ElementAt(indexOfCallInList);
             string message = string.Format(@"Error in the following javascript code:

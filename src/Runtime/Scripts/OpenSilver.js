@@ -68,6 +68,13 @@ window.onCallBack.OnCallbackFromJavaScript = function (callbackId, idWhereCallba
 		DotNet.invokeMethod("OpenSilver.UWPCompatible", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, "");
 	}	
 };
+window.onCallBack.OnCallbackFromJavaScriptError = function (idWhereCallbackArgsAreStored) {
+    try {
+        DotNet.invokeMethod("OpenSilver", "OnCallbackFromJavaScriptError", idWhereCallbackArgsAreStored);
+    } catch (e) {
+        DotNet.invokeMethod("OpenSilver.UWPCompatible", "OnCallbackFromJavaScriptError", idWhereCallbackArgsAreStored);
+    }
+};
 
 window.callJS = function (javaScriptToExecute) {
     //console.log(javaScriptToExecute);

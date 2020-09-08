@@ -54,7 +54,7 @@ namespace CSHTML5.Internal
         public static string MethodSignature(this MethodInfo mi)
         {
             String[] param = mi.GetParameters()
-                          .Select(p => 
+                          .Select(p =>
                           {
                               string paramType;
                               try
@@ -132,11 +132,37 @@ namespace CSHTML5.Internal
         }
 #endif
 
+#if CSHTML5NETSTANDARD
+        [JSInvokable] // Note: JSInvokable attribute allow use to call this method from JS
+#endif
+        public static void OnCallbackFromJavaScriptError(string idWhereCallbackArgsAreStored)
+        {
+            Action action = () =>
+            {
+                string errorMessage = Convert.ToString(Interop.ExecuteJavaScript("document.jsSimulatorObjectReferences[$0][0]", idWhereCallbackArgsAreStored));
+                int indexOfNextUnmodifiedJSCallInList = Convert.ToInt32(Interop.ExecuteJavaScript("document.jsSimulatorObjectReferences[$0][1]", idWhereCallbackArgsAreStored));
+                INTERNAL_InteropImplementation.ShowErrorMessage(errorMessage, indexOfNextUnmodifiedJSCallInList);
+            };
+
+#if CSHTML5NETSTANDARD
+            if (Interop.IsRunningInTheSimulator_WorkAround)
+#else
+            if (Interop.IsRunningInTheSimulator)
+#endif
+            {
+                // Go back to the UI thread because DotNetBrowser calls the callback from the socket background thread:
+                INTERNAL_Simulator.WebControlDispatcherBeginInvoke(action);
+            }
+            else
+            {
+                action();
+            }
+        }
+
         //---------------------------------------------------------------------------------------
         // This code follows the architecture drawn by DotNetBrowser (cf https://dotnetbrowser.support.teamdev.com/support/solutions/articles/9000109868-calling-javascript-from-net)
         // For an example of implementation, go to INTERNAL_InteropImplementation.cs & ExecuteJavaScript_SimulatorImplementation method, in the first "if".
         //---------------------------------------------------------------------------------------
-
 
 #if CSHTML5NETSTANDARD
 
@@ -478,26 +504,26 @@ namespace CSHTML5.Internal
             string methodSingature = "Unknown Method";
             try
             {
-//#if DEBUG
-//                try
-//                {
-//                    methodSingature = d.Method.MethodSignature();
-//                    Console.WriteLine("DEBUG: OnCallBack: DelegateDynamicnvoke: " + methodSingature);
-//                }
-//                catch
-//                {
-//                    Console.WriteLine("DEBUG: OnCallBack: DelegateDynamicnvoke: ?????????");
-//                    // we failed to display signature of the method
-//                }
-//#endif
+                //#if DEBUG
+                //                try
+                //                {
+                //                    methodSingature = d.Method.MethodSignature();
+                //                    Console.WriteLine("DEBUG: OnCallBack: DelegateDynamicnvoke: " + methodSingature);
+                //                }
+                //                catch
+                //                {
+                //                    Console.WriteLine("DEBUG: OnCallBack: DelegateDynamicnvoke: ?????????");
+                //                    // we failed to display signature of the method
+                //                }
+                //#endif
                 if (args != null)
                     obj = d.DynamicInvoke(args);
             }
             catch (Exception e)
             {
-//#if DEBUG
-//                Console.Error.WriteLine("DEBUG: OnCallBack: DelegateDynamicnvoke: failed to invoke: " + methodSingature + ": " + e);
-//#endif
+                //#if DEBUG
+                //                Console.Error.WriteLine("DEBUG: OnCallBack: DelegateDynamicnvoke: failed to invoke: " + methodSingature + ": " + e);
+                //#endif
                 throw;
             }
             return obj;

@@ -1272,21 +1272,7 @@ parentElement.appendChild(child);
 
         public static bool IsNullOrUndefined(object jsObject)
         {
-            if (Interop.IsRunningInTheSimulator)
-            {
-                if (jsObject == null)
-                    return true;
-#if !CSHTML5NETSTANDARD
-                if (!(jsObject is JSValue))
-                    return false;
-                JSValue value = ((JSValue)jsObject);
-                return value.IsNull() || value.IsUndefined();
-#else
-            return false;
-#endif
-            }
-            else
-                return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
+            return Interop.IsNull(jsObject) || Interop.IsUndefined(jsObject);
         }
 
         static HashSet2<Type> NumericTypes;
