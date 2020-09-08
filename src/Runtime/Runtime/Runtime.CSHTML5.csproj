@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
+    <Compile Include="PublicAPI\Internal\KnownTypesHelper.cs" />
     <Compile Include="PublicAPI\Native.Html.Controls\NativeComboBox.cs" />
     <Compile Include="System.Collections.ObjectModel\WORKINPROGRESS\ReadOnlyObservableCollection_1.cs" />
     <Compile Include="System.ComponentModel\IPagedCollectionView.cs" />
