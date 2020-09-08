@@ -1036,6 +1036,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 FaultException fe = null;
                 const string ns = "http://schemas.xmlsoap.org/soap/envelope/";
 
+                VerifyThatResponseIsNotNullOrEmpty(response);
                 XElement faultElement = XDocument.Parse(response).Root
                                                  .Element(XName.Get("Body", ns))
                                                  .Element(XName.Get("Fault", ns));
@@ -1159,6 +1160,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 {
                     const string NS = "http://www.w3.org/2003/05/soap-envelope";
 
+                    VerifyThatResponseIsNotNullOrEmpty(responseAsString);
                     XElement envelopeElement = XDocument.Parse(responseAsString).Root;
                     XElement headerElement = envelopeElement.Element(XName.Get("Header", NS));
                     XElement bodyElement = envelopeElement.Element(XName.Get("Body", NS));
@@ -1293,6 +1295,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     // to allow passing it as Generic type argument when calling CallWebMethod.
                     if (requestResponseType == typeof(object))
                     {
+                        VerifyThatResponseIsNotNullOrEmpty(responseAsString);
                         XDocument doc = XDocument.Parse(responseAsString);
                         XElement currentElement = doc.Root; //Current element is Envelope
                         currentElement = (XElement)currentElement.FirstNode; //Current element is now Body
@@ -1325,6 +1328,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 #else
                     DataContractSerializer deSerializer = new DataContractSerializer(typeToDeserialize, knownTypes);
 #endif
+                    VerifyThatResponseIsNotNullOrEmpty(responseAsString);
                     XDocument xDoc = XDocument.Parse(responseAsString);
                     responseAsString = RemoveUnparsableStrings(responseAsString);
                     XElement xElement = xDoc.Root;
@@ -1454,6 +1458,15 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     str = str.Replace(unparsableString, "");
                 }
                 return str;
+            }
+
+            static void VerifyThatResponseIsNotNullOrEmpty(string responseAsString)
+            {
+                // Check that the response is not empty:
+                if (string.IsNullOrEmpty(responseAsString))
+                {
+                    throw new CommunicationException("The remote server returned an error. To debug, look at the browser Console output, or use a tool such as Fiddler.");
+                }
             }
 
         }
