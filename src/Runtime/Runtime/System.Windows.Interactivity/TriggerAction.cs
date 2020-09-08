@@ -32,7 +32,7 @@ namespace System.Windows.Interactivity
     /// <remarks>
     /// This is an infrastructure class. Action authors should derive from TriggerAction&lt;T&gt; instead of this class.
     /// </remarks>
-    public abstract partial class TriggerAction : FrameworkElement, IAttachedObject //DependencyObject, IAttachedObject //InteractivityBase
+    public abstract partial class TriggerAction : DependencyObject, IAttachedObject //InteractivityBase
     {
         //Note on this file: see commit 58c52131 of October 30th, 2019 for comments on the modifications from the original source.
         //Based on the code that can be found at https://github.com/jlaanstra/Windows.UI.Interactivity/tree/master/Windows.UI.Interactivity.

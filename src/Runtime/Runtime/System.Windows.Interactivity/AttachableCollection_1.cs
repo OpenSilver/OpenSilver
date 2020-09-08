@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,43 +30,101 @@ namespace System.Windows.Interactivity
     /// and provides change notifications to its contents when that AssociatedObject
     /// changes.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public abstract partial class AttachableCollection<T> : List<T>, IAttachedObject where T:DependencyObject, IAttachedObject // : DependencyObjectCollection<T>, IAttachedObject where T : DependencyObject, System.Windows.Interactivity.IAttachedObject
+    public abstract partial class AttachableCollection<T> : DependencyObjectCollection<T>, IAttachedObject where T : DependencyObject, IAttachedObject
     {
-        DependencyObject _associatedObject = null;
+        private DependencyObject _associatedObject;
+        private List<T> _unorderedCopy;
+
+        internal AttachableCollection()
+        {
+            this._unorderedCopy = new List<T>();
+            this.CollectionChanged += new NotifyCollectionChangedEventHandler(this.OnCollectionChanged);
+        }
+
+        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Remove ||
+                e.Action == NotifyCollectionChangedAction.Replace)
+            {
+                foreach (T item in e.OldItems)
+                {
+                    this._unorderedCopy.Remove(item);
+                    item.Detach();
+                }
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Add ||
+                e.Action == NotifyCollectionChangedAction.Replace)
+            {
+                foreach (T item in e.NewItems)
+                {
+                    this._unorderedCopy.Add(item);
+                    if (this._associatedObject != null)
+                    {
+                        item.Attach(this._associatedObject);
+                    }
+                }
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                foreach (T item in this._unorderedCopy)
+                {
+                    item.Detach();
+                }
+                this._unorderedCopy.Clear();
+                foreach (T item in this)
+                {
+                    this._unorderedCopy.Add(item);
+                    if (this._associatedObject != null)
+                    {
+                        item.Attach(this._associatedObject);
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// The object on which the collection is hosted.
         /// </summary>
-        public DependencyObject AssociatedObject { get { return _associatedObject; } } //todo: was protected but it has to be public because it comes from an interface si I don't really understand.
+        public DependencyObject AssociatedObject
+        {
+            get { return _associatedObject; }
+        }
 
-       
-        // Exceptions:
-        //   System.InvalidOperationException:
-        //     The IAttachedObject is already attached to a different object.
+        DependencyObject IAttachedObject.AssociatedObject
+        {
+            get { return this.AssociatedObject; }
+        }
+
         /// <summary>
         /// Attaches to the specified object.
         /// </summary>
         /// <param name="dependencyObject">The object to attach to.</param>
+        /// <exception cref="InvalidOperationException">
+        /// The IAttachedObject is already attached to a different object.
+        /// </exception>
         public void Attach(DependencyObject dependencyObject)
         {
-            if(_associatedObject != null)
+            if (_associatedObject != null)
             {
                 throw new InvalidOperationException("The AttachableCollection is already attached to a different object.");
             }
             _associatedObject = dependencyObject;
-            foreach(T element in this)
+            foreach (T element in this)
             {
                 element.Attach(dependencyObject);
             }
             OnAttached();
         }
+
         /// <summary>
         /// Detaches this instance from its associated object.
         /// </summary>
         public void Detach()
         {
             OnDetaching();
-            foreach(T element in this)
+            foreach (T element in this)
             {
                 element.Detach();
             }
@@ -82,41 +141,5 @@ namespace System.Windows.Interactivity
         /// before it has actually occurred.
         /// </summary>
         protected abstract void OnDetaching();
-
-        public void Add(T item)
-        {
-            base.Add(item);
-            if(_associatedObject != null)
-            {
-                item.Attach(_associatedObject);
-            }
-        }
-
-        public bool Remove(T item)
-        {
-            if(base.Remove(item))
-            {
-                item.Detach();
-                return true;
-            }
-            return false;
-        }
-
-        public void RemoveAt(int index)
-        {
-            T item = this.ElementAt(index);
-            base.RemoveAt(index);
-            item.Detach();
-        }
-
-        
-        public void Insert(int index, T item)
-        {
-            base.Insert(index, item);
-            if (_associatedObject != null)
-            {
-                item.Attach(_associatedObject);
-            }
-        }
     }
 }

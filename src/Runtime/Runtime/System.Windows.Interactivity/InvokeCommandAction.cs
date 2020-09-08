@@ -32,12 +32,11 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
     /// </summary>
     public sealed partial class InvokeCommandAction : TriggerAction //DependencyObject, IAttachedObject //TriggerAction<FrameworkElement>
     {
-        //todo: make this class still inherit the DataContext from its "parent". It is not automatically set because the InvokeCommandAction is not added in the Visual tree.
         //Example of a currently working code:
         //<Button x:Name="TestButton" Content="a" Width="100" Height="30">
         //    <i:Interaction.Triggers>
         //        <i:EventTrigger EventName="Click" >
-        //            < i:InvokeCommandAction DataContext="{Binding ElementName=TestButton, Path=DataContext}" Command="{Binding Path=SomeCommand, Mode=OneWay}"/>
+        //            < i:InvokeCommandAction Command="{Binding Path=SomeCommand, Mode=OneWay}"/>
         //        </i:EventTrigger>
         //    </i:Interaction.Triggers>
         //</Button>
