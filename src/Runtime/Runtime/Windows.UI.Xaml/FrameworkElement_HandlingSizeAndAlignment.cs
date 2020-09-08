@@ -1469,7 +1469,7 @@ if ($0.tagName.toLowerCase() != 'span')
                     {
                         // Hack to improve the Simulator performance by making only one interop call rather than two:
                         string concatenated = CSHTML5.Interop.ExecuteJavaScript("$0['offsetWidth'].toFixed(3) + '|' + $0['offsetHeight'].toFixed(3)", this.INTERNAL_OuterDomElement).ToString();
-                        int sepIndex = concatenated.IndexOf('|');
+                        int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
                         if (sepIndex > -1)
                         {
                             string actualWidthAsString = concatenated.Substring(0, sepIndex);
