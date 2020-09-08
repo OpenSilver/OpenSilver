@@ -1198,7 +1198,7 @@ public void setAnimation{0} ({3}.DependencyObject finalTargetInstance, object va
 public void setLocal{0} ({3}.DependencyObject finalTargetInstance, object value)
 {{
   {1}
-  (finalTargetInstance).SetLocalValue({2}, value);
+  (finalTargetInstance).SetCurrentValue({2}, value);
 }}", accessorsUniqueNamePart, lastPropertyPreparation, lastPropertyFullPath, namespaceSystemWindows));
             resultingMethods.Add(string.Format(@"
 public global::System.Object get{0} ({3}.DependencyObject finalTargetInstance)
