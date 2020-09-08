@@ -110,7 +110,10 @@ namespace CSHTML5.Types
         {
             var actualValue = GetActualValue();
 #if CSHTML5NETSTANDARD
-           return actualValue == null;
+            if (Interop.IsRunningInTheSimulator_WorkAround)
+                return (actualValue == null || actualValue.GetType().FullName == "DotNetBrowser.JSUndefined");
+            else
+                return (actualValue == null);
 #else
             if (actualValue ==  null || !(actualValue is JSValue))
                 return false;
