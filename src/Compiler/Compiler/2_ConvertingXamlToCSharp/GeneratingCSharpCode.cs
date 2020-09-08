@@ -815,7 +815,9 @@ namespace DotNetForHtml5.Compiler
                                                 {
                                                     if (namescopeRootToNameToUniqueNameDictionary[elementThatIsRootOfTheCurrentNamescope].TryGetValue(targetNameAttributeAtTheAnimationLevel.Value, out targetElementUniqueName))
                                                     {
+#if LOG_TARGET_ELEMENTS_NOT_FOUND
                                                         logger.WriteWarning(string.Format("Could not find an element with name \"{0}\".", targetNameAttributeAtTheAnimationLevel.Value));
+#endif
                                                     }
                                                 }
                                                 else
@@ -826,7 +828,9 @@ namespace DotNetForHtml5.Compiler
                                                     {
                                                         if (!namescopeRootToNameToUniqueNameDictionary[elementThatIsRootOfTheCurrentNamescope].TryGetValue(targetNameAttributeAtTheStoryboardLevel.Value, out targetElementUniqueName))
                                                         {
+#if LOG_TARGET_ELEMENTS_NOT_FOUND
                                                             logger.WriteWarning(string.Format("Could not find an element with name \"{0}\".", targetNameAttributeAtTheStoryboardLevel.Value));
+#endif
                                                         }
                                                     }
                                                 }
@@ -923,7 +927,7 @@ namespace DotNetForHtml5.Compiler
                         var resultingForTheElementAndAllItsChildren = stringBuilder.ToString();
                         codeStack.Push(resultingForTheElementAndAllItsChildren);
                     }
-                    #endregion
+#endregion
                 }
                 catch (wpf::System.Windows.Markup.XamlParseException xamlParseException)
                 {
