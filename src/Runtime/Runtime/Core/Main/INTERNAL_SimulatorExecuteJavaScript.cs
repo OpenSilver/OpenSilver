@@ -31,6 +31,7 @@ namespace CSHTML5.Internal
 {
     internal static class INTERNAL_SimulatorExecuteJavaScript
     {
+        internal static bool EnableInteropLogging;
         static List<string> _pendingAsyncJavaScriptToExecute = new List<string>();
         static bool _disableAsyncJavaScriptExecution = false;
         static bool _isDispatcherPending = false;
@@ -230,6 +231,11 @@ namespace CSHTML5.Internal
             try
             {
 #if CSHTML5BLAZOR
+                if (EnableInteropLogging)
+                {
+                    global::System.Diagnostics.Debug.WriteLine(javaScriptToExecute);
+                }
+
                 // OpenSilver Version has two distincts JavaScriptExecutionHandler:
                 // - DynamicJavaScriptExecutionHandler is a dynamic typed JavaScriptExecutionHandler setted by the Emulator  
                 // - JavaScriptExecutionHandler        is a static typed JavaScriptExecutionHandler used in the browser version

@@ -49,6 +49,13 @@ namespace System
         public bool EnableWebRequestsLogging { get; set; }
 
 
+
+        public bool EnableInteropLogging
+        {
+            get { return INTERNAL_SimulatorExecuteJavaScript.EnableInteropLogging; }
+            set { INTERNAL_SimulatorExecuteJavaScript.EnableInteropLogging = value; }
+        }
+
         public bool EnablePerformanceLogging
         {
             get { return INTERNAL_VisualTreeManager.EnablePerformanceLogging; }
