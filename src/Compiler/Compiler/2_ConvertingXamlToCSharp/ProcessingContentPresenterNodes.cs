@@ -52,8 +52,13 @@ namespace DotNetForHtml5.Compiler
                 && currentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "ContentPresenter")
             {
                 if (currentElement.Attribute("Content") == null)
-                    currentElement.Add(new XAttribute("Content", "{TemplateBinding Content}"));
-                if (currentElement.Attribute("ContentTemplate") == null)
+                {
+                    if (!DoesContentPresenterContainDirectContent(currentElement))
+                    {
+                        currentElement.Add(new XAttribute("Content", "{TemplateBinding Content}"));
+                    }
+                }
+                if (currentElement.Attribute("ContentTemplate") == null) //todo: also check if there is a <ContentPresenter.ContentTemplate> child node.
                     currentElement.Add(new XAttribute("ContentTemplate", "{TemplateBinding ContentTemplate}"));
             }
 
@@ -62,6 +67,19 @@ namespace DotNetForHtml5.Compiler
             {
                 TraverseNextElement(childElements, isInsideControlTemplate, reflectionOnSeparateAppDomain);
             }
+        }
+
+        static bool DoesContentPresenterContainDirectContent(XElement contentPresenter)
+        {
+            // Check if there is direct content (note: we already added implicit nodes in a previous step):
+            foreach (var child in contentPresenter.Elements())
+            {
+                if (child.Name == GeneratingCSharpCode.DefaultXamlNamespace + "ContentPresenter.Content")
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
