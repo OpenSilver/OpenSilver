@@ -98,7 +98,10 @@ namespace CSHTML5.Internal
                 // This significantly improves performance.
                 //--------------------------------------------------------
 
-                _pendingAsyncJavaScriptToExecute.Add(javaScriptToExecute);
+                lock (_pendingAsyncJavaScriptToExecute)
+                {
+                    _pendingAsyncJavaScriptToExecute.Add(javaScriptToExecute);
+                }
 
 #if !CSHTML5NETSTANDARD
                 if (!_isDispatcherPending)
@@ -202,11 +205,12 @@ namespace CSHTML5.Internal
 #if OPTIMIZATION_LOG
             Console.WriteLine("[OPTIMIZATION] Done resetting _isDispatcherPending: " + _isDispatcherPending.ToString());
 #endif
-            string aggregatedPendingJavaScriptCode = string.Join("\r\n", _pendingAsyncJavaScriptToExecute);
-
-            _pendingAsyncJavaScriptToExecute.Clear();
-
-            return aggregatedPendingJavaScriptCode;
+            lock (_pendingAsyncJavaScriptToExecute)
+            {
+                string aggregatedPendingJavaScriptCode = string.Join("\r\n", _pendingAsyncJavaScriptToExecute.ToList());
+                _pendingAsyncJavaScriptToExecute.Clear();
+                return aggregatedPendingJavaScriptCode;
+            }
         }
 
 #if !BRIDGE
