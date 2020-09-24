@@ -49,7 +49,7 @@ namespace CSHTML5.Internal
     public static class INTERNAL_VisualTreeManager
     {
         internal static bool EnablePerformanceLogging;
-        internal static bool EnableOptimizationWhereCollapsedControlsAreNotRendered = false;
+        internal static bool EnableOptimizationWhereCollapsedControlsAreNotRendered = true;
         internal static bool EnableOptimizationWhereCollapsedControlsAreNotLoaded = false;
         internal static bool EnableOptimizationWhereCollapsedControlsAreLoadedLast = false;
 
