@@ -18,6 +18,8 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTabControlStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTabItemStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultThumbStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTileViewItemStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTileViewStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTimePickerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultToggleButtonStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultToolTipStyle.xaml" />

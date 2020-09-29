@@ -102,6 +102,8 @@
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TablePatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\TileView.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\TileViewItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
@@ -1073,6 +1075,14 @@
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultTileViewStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultTileViewItemStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Content>
 	</ItemGroup>
 	<ItemGroup>
 	  <Page Include="DefaultStyles\INTERNAL_DefaultItemsControlStyle.xaml">
@@ -1082,6 +1092,12 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
 	  <Page Include="DefaultStyles\INTERNAL_DefaultRepeatButtonStyle.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Include="DefaultStyles\INTERNAL_DefaultTileViewItemStyle.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Include="DefaultStyles\INTERNAL_DefaultTileViewStyle.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
 	</ItemGroup>
