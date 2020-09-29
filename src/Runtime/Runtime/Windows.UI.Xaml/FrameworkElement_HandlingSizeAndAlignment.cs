@@ -1379,7 +1379,7 @@ if ($0.tagName.toLowerCase() != 'span')
 
         /// <summary>
         /// Gets the rendered width of a FrameworkElement. The FrameworkElement must be in the visual tree,
-        /// otherwise this property will return double.NaN.
+        /// otherwise this property will return 0.
         /// </summary>
         public double ActualWidth
         {
@@ -1401,20 +1401,20 @@ if ($0.tagName.toLowerCase() != 'span')
                         }
                         catch
                         {
-                            return double.NaN;
+                            return 0d;
                         }
 #if !CSHTML5NETSTANDARD
                     }
 #endif
                 }
                 else
-                    return double.NaN;
+                    return 0d;
             }
         }
 
         /// <summary>
         /// Gets the rendered height of a FrameworkElement. The FrameworkElement must be in the visual tree,
-        /// otherwise this property will return double.NaN.
+        /// otherwise this property will return 0.
         /// </summary>
         public double ActualHeight
         {
@@ -1436,14 +1436,14 @@ if ($0.tagName.toLowerCase() != 'span')
                         }
                         catch
                         {
-                            return double.NaN;
+                            return 0d;
                         }
 #if !CSHTML5NETSTANDARD
                     }
 #endif
                 }
                 else
-                    return double.NaN;
+                    return 0d;
             }
         }
 
@@ -1480,19 +1480,19 @@ if ($0.tagName.toLowerCase() != 'span')
                         }
                         else
                         {
-                            return new Size(double.NaN, double.NaN);
+                            return new Size(0d, 0d);
                         }
                     }
                     catch
                     {
-                        return new Size(double.NaN, double.NaN);
+                        return new Size(0d, 0d);
                     }
 #if !CSHTML5NETSTANDARD
                 }
 #endif
             }
             else
-                return new Size(double.NaN, double.NaN);
+                return new Size(0d, 0d);
         }
 
         #endregion

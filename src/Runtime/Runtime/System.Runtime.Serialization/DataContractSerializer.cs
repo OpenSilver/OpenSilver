@@ -23,6 +23,12 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using CSHTML5.Internal;
 
+#if NETSTANDARD
+using System.IO;
+using System.Xml.Serialization;
+using System.Xml;
+#endif
+
 #if BRIDGE
 using Bridge;
 #else
@@ -31,18 +37,170 @@ using JSIL.Meta;
 
 namespace System.Runtime.Serialization
 {
-
+#if NETSTANDARD
     /// <summary>
     /// Serializes and deserializes an instance of a type into an XML stream or document
     /// using a supplied data contract. This class cannot be inherited.
     /// </summary>
+    public class DataContractSerializer_CSHTML5Ver
+    {
+        private readonly Type _type;
+        private bool _useXmlSerializerFormat;
+        private List<Type> _knownTypes;
+        private XmlSerializer _xmlSerializer;
+        private DataContractSerializer _dataContractSerializer;
 
-#if CSHTML5NETSTANDARD
-    // already defined in .NET Standard we need another name for the class
-    public partial class DataContractSerializer_CSHTML5Ver
+        /// <summary>
+        /// Initializes a new instance of the System.Runtime.Serialization.DataContractSerializer
+        /// class to serialize or deserialize an object of the specified type.
+        /// </summary>
+        /// <param name="type">The type of the instances that are serialized or deserialized.</param>
+        /// <param name="useXmlSerializerFormat"></param>
+        public DataContractSerializer_CSHTML5Ver(Type type, bool useXmlSerializerFormat = false)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException("type");
+            }
+            this._type = type;
+
+            if (this._useXmlSerializerFormat = useXmlSerializerFormat)
+            {
+                this._xmlSerializer = new XmlSerializer(type);
+            }
+            else
+            {
+                this._dataContractSerializer = new DataContractSerializer(type);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the System.Runtime.Serialization.DataContractSerializer
+        /// class to serialize or deserialize an object of the specified type, and a
+        /// collection of known types that may be present in the object graph.
+        /// </summary>
+        /// <param name="type">The type of the instances that are serialized or deserialized.</param>
+        /// <param name="knownTypes">
+        /// An System.Collections.Generic.IEnumerable`1 of System.Type that contains
+        /// the types that may be present in the object graph.
+        /// </param>
+        /// <param name="useXmlSerializerFormat"></param>
+        public DataContractSerializer_CSHTML5Ver(Type type, IEnumerable<Type> knownTypes, bool useXmlSerializerFormat = false)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException("type");
+            }
+            this._type = type;
+
+            if (knownTypes != null)
+            {
+                this._knownTypes = new List<Type>(knownTypes);
+            }
+            if (KnownTypesHelper._additionalKnownTypes != null)
+            {
+                if (this._knownTypes == null)
+                {
+                    this._knownTypes = new List<Type>(KnownTypesHelper._additionalKnownTypes);
+                }
+                else
+                {
+                    this._knownTypes.AddRange(KnownTypesHelper._additionalKnownTypes);
+                }
+
+            }
+            if (this._useXmlSerializerFormat = useXmlSerializerFormat)
+            {
+                this._xmlSerializer = new XmlSerializer(type);
+            }
+            else
+            {
+                this._dataContractSerializer = new DataContractSerializer(type, this._knownTypes);
+            }
+        }
+
+        /// <summary>
+        /// Gets a collection of types that may be present in the object graph serialized
+        /// using this instance of the System.Runtime.Serialization.DataContractSerializer.
+        /// </summary>
+        public IReadOnlyList<Type> KnownTypes
+        {
+            get { return this._knownTypes; }
+        }
+
+        public string SerializeToString(object obj, bool indentXml = false, bool omitXmlDeclaration = false)
+        {
+            return (omitXmlDeclaration ? "" : (@"<?xml version=""1.0"" encoding=""UTF-8""?>" + Environment.NewLine)) +
+                this.SerializeToXDocument(obj).ToString(indentXml ? SaveOptions.None : SaveOptions.DisableFormatting);
+        }
+
+        public XDocument SerializeToXDocument(object obj)
+        {
+            XDocument doc = null;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                this.SerializePrivate(ms, obj);
+                using (StreamReader sr = new StreamReader(ms))
+                {
+                    ms.Seek(0, SeekOrigin.Begin);
+                    string xml = sr.ReadToEnd();
+                    doc = XDocument.Parse(xml);
+                }
+            }
+            return doc;
+        }
+
+        public object DeserializeFromString(string xml)
+        {
+            object o = null;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (StreamWriter sw = new StreamWriter(ms))
+                {
+                    sw.Write(xml);
+                    sw.Flush();
+                    ms.Seek(0, SeekOrigin.Begin);
+                    o = this.DeserializePrivate(ms);
+                }
+            }
+            return o;
+        }
+
+        public object DeserializeFromXElement(XElement xElement)
+        {
+            return this.DeserializeFromString(xElement.ToString(SaveOptions.DisableFormatting));
+        }
+
+        private void SerializePrivate(Stream s, object o)
+        {
+            if (this._useXmlSerializerFormat)
+            {
+                this._xmlSerializer.Serialize(s, o);
+            }
+            else
+            {
+                this._dataContractSerializer.WriteObject(s, o);
+            }
+        }
+
+        private object DeserializePrivate(Stream s)
+        {
+            if (this._useXmlSerializerFormat)
+            {
+                return this._xmlSerializer.Deserialize(XmlReader.Create(s));
+            }
+            else
+            {
+                return this._dataContractSerializer.ReadObject(XmlReader.Create(s), false);
+            }
+        }
+    }
 #else
+    /// <summary>
+    /// Serializes and deserializes an instance of a type into an XML stream or document
+    /// using a supplied data contract. This class cannot be inherited.
+    /// </summary>
     public partial class DataContractSerializer
-#endif
     {
         Type _type;
         bool _useXmlSerializerFormat;
@@ -65,12 +223,7 @@ namespace System.Runtime.Serialization
         /// </summary>
         /// <param name="type">The type of the instances that are serialized or deserialized.</param>
         /// <param name="useXmlSerializerFormat"></param>
-
-#if CSHTML5NETSTANDARD        
-        public DataContractSerializer_CSHTML5Ver(Type type, bool useXmlSerializerFormat = false)
-#else
         public DataContractSerializer(Type type, bool useXmlSerializerFormat = false)
-#endif
         {
             DataContractSerializer_ValueTypesHandler.EnsureInitialized();
 
@@ -89,11 +242,7 @@ namespace System.Runtime.Serialization
         /// the types that may be present in the object graph.
         /// </param>
         /// <param name="useXmlSerializerFormat"></param>
-#if CSHTML5NETSTANDARD
-        public DataContractSerializer_CSHTML5Ver(Type type, IEnumerable<Type> knownTypes, bool useXmlSerializerFormat = false)
-#else
         public DataContractSerializer(Type type, IEnumerable<Type> knownTypes, bool useXmlSerializerFormat = false)
-#endif
         {
             DataContractSerializer_ValueTypesHandler.EnsureInitialized();
 
@@ -133,11 +282,7 @@ namespace System.Runtime.Serialization
             // Add the root:
             List<XObject> xnodesForRoot = DataContractSerializer_Serialization.SerializeToXObjects(obj, _type, _knownTypes, _useXmlSerializerFormat, isRoot: true, isContainedInsideEnumerable: false, parentTypeInformation: typeInformation, nodeDefaultNamespaceIfAny: null);
             xdoc.Add(xnodesForRoot.First());
-#if CSHTML5NETSTANDARD
-            string xml = xdoc.ToString(indentXml ? SaveOptions.None : SaveOptions.DisableFormatting);
-#else
             string xml = xdoc.ToString(indentXml);
-#endif
             // Add the header:
             if (!omitXmlDeclaration)
             {
@@ -191,4 +336,5 @@ namespace System.Runtime.Serialization
             return result;
         }
     }
+#endif
 }
