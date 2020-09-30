@@ -43,6 +43,7 @@ namespace Windows.UI.Xaml.Controls
 
         internal void Maximize()
         {
+            VisualStateManager.GoToState(this, "Maximized", false);
             if (OnMaximize != null)
             {
                 OnMaximize(this, null);
@@ -50,6 +51,7 @@ namespace Windows.UI.Xaml.Controls
         }
         internal void Minimize()
         {
+            VisualStateManager.GoToState(this, "Minimized", false);
             if (OnMinimize != null)
             {
                 OnMinimize(this, null);

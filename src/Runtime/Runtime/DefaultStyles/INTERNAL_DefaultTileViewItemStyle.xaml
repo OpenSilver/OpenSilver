@@ -36,7 +36,9 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <ContentPresenter Content="{TemplateBinding Header}"/>
-                                        <Button x:Name="PART_MaximizeButton" Content="M" Grid.Column="1" Margin="5"/>
+                                        <Button x:Name="PART_MaximizeButton" Grid.Column="1" Margin="5" Background="Transparent">
+                                            <Border Background="Transparent" BorderBrush="Black" BorderThickness="1,1,1,2" Width="10" Height="10"/>
+                                        </Button>
                                     </Grid>
                                 </Border>
                                 <ContentPresenter Grid.Row="1"/>
