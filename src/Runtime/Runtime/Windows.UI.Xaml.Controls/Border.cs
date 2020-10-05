@@ -107,13 +107,34 @@ namespace Windows.UI.Xaml.Controls
                 INTERNAL_PropertyStore.ApplyCssChanges(null, null, Border.BorderBrushProperty.GetMetadata(typeof(Border)), this);
             }
 
+            if (!this.INTERNAL_EnableProgressiveLoading)
+            {
+#if REWORKLOADED
+                this.AddVisualChild(this._child);
+#else
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
+#endif
+            }
+            else
+            {
+                ProgressivelyAttachChild();
+            }
+        }
+
+        private async void ProgressivelyAttachChild()
+        {
+            await Task.Delay(1);
+            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                //this can happen if the Panel is detached during the delay.
+                return;
+            }
 #if REWORKLOADED
             this.AddVisualChild(this._child);
 #else
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
 #endif
         }
-
 
         /// <summary>
         /// Gets or sets the Brush that fills the background of the border.

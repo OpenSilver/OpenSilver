@@ -54,13 +54,6 @@ namespace Windows.UI.Xaml.Controls
 
         UIElementCollection _children;
 
-        [Obsolete("Replaced by 'EnableProgressiveRendering'")]
-        public bool INTERNAL_EnableProgressiveLoading
-        {
-            get { return this.EnableProgressiveRendering; }
-            set { this.EnableProgressiveRendering = value; }
-        }
-
         private bool _enableProgressiveRendering;
         public bool EnableProgressiveRendering
         {
@@ -107,7 +100,7 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
 
-            if (this.EnableProgressiveRendering)
+            if (this._enableProgressiveRendering || this.INTERNAL_EnableProgressiveLoading)
             {
                 this.ProgressivelyAttachChildren(this.Children);
             }

@@ -91,6 +91,7 @@ namespace Windows.UI.Xaml
         internal int INTERNAL_lastClickDate; //this is used in the PointerPressed event to fill the ClickCount Property.
         public string XamlSourcePath; //this is used by the Simulator to tell where this control is defined. It is non-null only on root elements, that is, elements which class has "InitializeComponent" method. This member is public because it needs to be accessible via reflection.
         internal bool _isLoaded;
+        internal bool INTERNAL_EnableProgressiveLoading;
         internal Action INTERNAL_DeferredRenderingWhenControlBecomesVisible;
         internal Action INTERNAL_DeferredLoadingWhenControlBecomesVisible;
 
