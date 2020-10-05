@@ -396,8 +396,9 @@ if(nextSibling != undefined) {
                         domElementWhereToPlaceChildStuff,
                         wrapperForChild);
                 };
-                INTERNAL_DispatcherHelpers.QueueAction(() =>
+                INTERNAL_DispatcherHelpers.QueueAction(async () =>
                 {
+                    await Task.Delay(100); // This ensures that the hidden controls are really loaded after everything else (including the shapes and other visible elements which rendering is also deferred via a "Dispatcher.BeginInvoke" call).
                     Action deferredLoadingWhenControlBecomesVisible = child.INTERNAL_DeferredLoadingWhenControlBecomesVisible;
                     if (deferredLoadingWhenControlBecomesVisible != null) // Note: it may have become "null" if the visibility was changed to "Visible" before the dispatched was called, in which case the element is loaded earlier (cf. "Visibility_Changed" handler)
                     {
