@@ -151,7 +151,7 @@ namespace Windows.UI.Xaml.Controls
 
         // Using a DependencyProperty as the backing store for MinimizedColumnWidth.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MinimizedColumnWidthProperty =
-            DependencyProperty.Register("MinimizedColumnWidth", typeof(GridLength), typeof(TileView), new PropertyMetadata(GridLength.Auto, MinimizedColumnWidth_Changed));
+            DependencyProperty.Register("MinimizedColumnWidth", typeof(GridLength), typeof(TileView), new PropertyMetadata(new GridLength(1, GridUnitType.Star), MinimizedColumnWidth_Changed));
 
         private static void MinimizedColumnWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
