@@ -7,8 +7,15 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate>
-                        <Grid x:Name="PART_ItemsDisplayGrid"/>
+                        <ItemsPresenter x:Name="PART_ItemsDisplayGrid"/>
                     </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <Grid x:Name="PART_ItemsDisplayGrid"/>
+                    </ItemsPanelTemplate>
                 </Setter.Value>
             </Setter>
         </Style.Setters>

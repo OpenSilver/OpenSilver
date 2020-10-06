@@ -1,8 +1,10 @@
-﻿using System;
+﻿using CSHTML5.Internal;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Text;
+using System.Windows.Controls.Primitives;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -11,14 +13,14 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    [ContentProperty("Items")]
-    public class TileView : Control
+    //[ContentProperty("Items")]
+    public class TileView : MultiSelector
     {
         //Notes: We consider that the minimized items go on the right side of the grid, this should change at some point
         //       We put the first item as Maximized, we need to deal with TileViewItem.IsMaximized as an improvement.
         //       I'd say we should have VisualStates for Minimized and Maximized for the TileViewItems and this control tells them to GoToState
         //       Should we do like ItemsControl and have an ItemsSource to allows adding a whole bunch of items programmatically ?
-        ObservableCollection<TileViewItem> _items;
+        //ObservableCollection<TileViewItem> _items;
         TileViewItem _maximizedTile = null;
         Grid _contentGrid = null; //Note: this is intended to be solely used to display the Items, nothing else that mighrt have been added by the user in the template.
 
@@ -27,25 +29,8 @@ namespace Windows.UI.Xaml.Controls
             this.DefaultStyleKey = typeof(TileView);
         }
 
-        public ObservableCollection<TileViewItem> Items
-        {
-            get
-            {
-                if (this._items == null)
-                {
-                    this._items = new ObservableCollection<TileViewItem>();
-                    this._items.CollectionChanged += items_CollectionChanged;
-                }
-                return this._items;
-            }
-        }
 
-        private void items_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            //todo: make the corresponding changes. I guess we don't care what the changes are as long as we're not in the Visual tree.
-        }
-
-        private void AddItemsToVisualTree(ObservableCollection<TileViewItem> oldItems, ObservableCollection<TileViewItem> newItems)
+        private void AddItemsToVisualTree(ItemCollection oldItems, ItemCollection newItems)
         {
             //Note: this method initializes the grid that will contain the children and adds them (the children being the elements in newItems)
             //todo: rename/clean up/change this method so it reflects what it actually does.
@@ -82,21 +67,27 @@ namespace Windows.UI.Xaml.Controls
                         int n = 0;
                         foreach (var item in newItems)
                         {
-                            if (!isFirst)
+                            var itemAsTileViewItem = item as TileViewItem;
+                            if (itemAsTileViewItem != null)
                             {
-                                Grid.SetColumn(item, 1);
-                                Grid.SetRow(item, n);
-                                ++n;
+                                if (!isFirst)
+                                {
+                                    Grid.SetColumn(itemAsTileViewItem, 1);
+                                    Grid.SetRow(itemAsTileViewItem, n);
+                                    ++n;
+                                }
+                                else
+                                {
+                                    Grid.SetRowSpan(itemAsTileViewItem, int.MaxValue); //Note: this might not be good enough when we add an additional item since if I remember correctly, we change the value put in the html due to the fact that the css grid automatically adds rows when an Item.row is bigger (which we don't want) so we probably also do it for RowSpan. 
+                                    itemAsTileViewItem.Maximize();
+                                    _maximizedTile = itemAsTileViewItem;
+                                }
+                                Console.WriteLine("Before not adding item...");
+                                //_contentGrid.Children.Add(itemAsTileViewItem); //Note: the items have already been added (?)
+                                Console.WriteLine("After not adding item...");
+                                itemAsTileViewItem._TileViewParent = this;
+                                isFirst = false;
                             }
-                            else
-                            {
-                                Grid.SetRowSpan(item, int.MaxValue); //Note: this might not be good enough when we add an additional item since if I remember correctly, we change the value put in the html due to the fact that the css grid automatically adds rows when an Item.row is bigger (which we don't want) so we probably also do it for RowSpan. 
-                                item.Maximize();
-                                _maximizedTile = item;
-                            }
-                            _contentGrid.Children.Add(item);
-                            item._TileViewParent = this;
-                            isFirst = false;
                         }
 
                         int rowsToAdd = oldItems != null ? newItems.Count - oldItems.Count : newItems.Count;
@@ -156,8 +147,22 @@ namespace Windows.UI.Xaml.Controls
 #endif
         {
             base.OnApplyTemplate();
-            _contentGrid = GetTemplateChild("PART_ItemsDisplayGrid") as Grid;
+            _contentGrid = ItemsHost as Grid; //GetTemplateChild("PART_ItemsDisplayGrid") as Grid;
+            if(_contentGrid == null)
+            {
+                _contentGrid = INTERNAL_VisualTreeManager.GetChildOfType<Grid>(ItemsHost);
+            }
             AddItemsToVisualTree(null, Items);
+        }
+
+        protected override void UnselectAllItems()
+        {
+            //todo
+        }
+
+        protected override void SetItemVisualSelectionState(object item, bool newState)
+        {
+            //todo
         }
     }
 }
