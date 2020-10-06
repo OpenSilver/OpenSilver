@@ -133,31 +133,16 @@ namespace Windows.UI.Xaml.Media
                                                         double yOffsetToApplyAfterMultiplication, 
                                                         Size shapeActualSize)
         {
-            string strokeAsString = string.Empty;
+            dynamic ctx = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
-            // todo: make sure we want the same behaviour when it is null and when it is a SolidColorBrush (basically, check if null means default value)
-            if (path.Stroke == null || path.Stroke is SolidColorBrush) 
-            {
-                // if stroke is null, we want to set it as an empty string, otherwise, it is a SolidColorBrush and we want to get its color.
-                if (path.Stroke != null) 
-                {
-                    strokeAsString = ((SolidColorBrush)path.Stroke).INTERNAL_ToHtmlString();
-                }
-            }
-            else
-            {
-                throw new NotSupportedException("The specified brush is not supported.");
-            }
-            dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
-            double actualWidth = RadiusX * 2; //it's a radius and we want the whole width (basically a "diameter")
-            double actualHeight = RadiusY * 2; //it's a radius and we want the whole height
-
-            INTERNAL_ShapesDrawHelpers.PrepareEllipse(canvasDomElement, 
-                                                      actualWidth, 
-                                                      actualHeight, 
-                                                      Center.X + xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication, 
-                                                      Center.Y + yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication);
-            context.strokeStyle = strokeAsString;
+            ctx.ellipse(
+                Center.X + xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication,
+                Center.Y + yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication,
+                RadiusX,
+                RadiusY,
+                0,
+                0,
+                2 * Math.PI);
         }
     }
 }

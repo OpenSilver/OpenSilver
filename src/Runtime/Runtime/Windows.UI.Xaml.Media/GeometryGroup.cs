@@ -34,14 +34,54 @@ namespace Windows.UI.Xaml.Media
     [ContentProperty("Children")]
     public sealed partial class GeometryGroup : Geometry
     {
-        internal protected override void DefineInCanvas(Path path, object canvasDomElement, double horizontalMultiplicator, double verticalMultiplicator, double xOffsetToApplyBeforeMultiplication, double yOffsetToApplyBeforeMultiplication, double xOffsetToApplyAfterMultiplication, double yOffsetToApplyAfterMultiplication, Size shapeActualSize)
+        internal protected override void DefineInCanvas(
+            Path path, 
+            object canvasDomElement, 
+            double horizontalMultiplicator, 
+            double verticalMultiplicator, 
+            double xOffsetToApplyBeforeMultiplication, 
+            double yOffsetToApplyBeforeMultiplication, 
+            double xOffsetToApplyAfterMultiplication, 
+            double yOffsetToApplyAfterMultiplication, 
+            Size shapeActualSize)
         {
-            throw new NotImplementedException();
+            GeometryCollection children = (GeometryCollection)GetValue(ChildrenProperty);
+            if (children != null)
+            {
+                foreach (Geometry child in children)
+                {
+                    child.DefineInCanvas(
+                        path, 
+                        canvasDomElement, 
+                        horizontalMultiplicator, 
+                        verticalMultiplicator, 
+                        xOffsetToApplyBeforeMultiplication, 
+                        yOffsetToApplyBeforeMultiplication, 
+                        xOffsetToApplyAfterMultiplication, 
+                        yOffsetToApplyAfterMultiplication, 
+                        shapeActualSize);
+                }
+            }
         }
 
-        internal protected override void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
+        internal protected override void GetMinMaxXY(
+            ref double minX, 
+            ref double maxX, 
+            ref double minY, 
+            ref double maxY)
         {
-            throw new NotImplementedException();
+            GeometryCollection children = (GeometryCollection)GetValue(ChildrenProperty);
+            if (children != null)
+            {
+                foreach (Geometry child in children)
+                {
+                    child.GetMinMaxXY(
+                        ref minX, 
+                        ref maxX, 
+                        ref minY, 
+                        ref maxY);
+                }
+            }
         }
 
         /// <summary>
@@ -51,7 +91,13 @@ namespace Windows.UI.Xaml.Media
         {
             get
             {
-                return (GeometryCollection)GetValue(ChildrenProperty);
+                GeometryCollection value = (GeometryCollection)GetValue(ChildrenProperty);
+                if (value == null)
+                {
+                    value = new GeometryCollection();
+                    SetValue(ChildrenProperty, value);
+                }
+                return value;
             }
             set
             {
@@ -59,7 +105,12 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        public static readonly DependencyProperty ChildrenProperty = DependencyProperty.Register("Children", typeof(GeometryCollection), typeof(GeometryGroup), null);
+        public static readonly DependencyProperty ChildrenProperty = 
+            DependencyProperty.Register(
+                "Children", 
+                typeof(GeometryCollection), 
+                typeof(GeometryGroup), 
+                null);
 
         /// <summary>
         ///     FillRule - FillRule.  Default value is FillRule.EvenOdd.
@@ -76,7 +127,12 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        public static readonly DependencyProperty FillRuleProperty = DependencyProperty.Register("FillRule", typeof(FillRule), typeof(GeometryGroup), null);
+        public static readonly DependencyProperty FillRuleProperty = 
+            DependencyProperty.Register(
+                "FillRule", 
+                typeof(FillRule), 
+                typeof(GeometryGroup), 
+                null);
     }
 #endif
 }

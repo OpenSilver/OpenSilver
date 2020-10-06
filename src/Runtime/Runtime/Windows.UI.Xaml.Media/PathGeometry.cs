@@ -195,7 +195,7 @@ namespace Windows.UI.Xaml.Media
                                           horizontalMultiplicator, 
                                           verticalMultiplicator, 
                                           canvasDomElement, 
-                                          this.ParentPath.StrokeThickness, 
+                                          this.ParentPath != null ? this.ParentPath.StrokeThickness : 0, // Note : this paramater is unused 
                                           shapeActualSize);
                 }
             }

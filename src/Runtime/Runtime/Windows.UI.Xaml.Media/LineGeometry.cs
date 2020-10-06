@@ -140,13 +140,10 @@ namespace Windows.UI.Xaml.Media
                                                         double yOffsetToApplyAfterMultiplication, 
                                                         Size shapeActualSize)
         {
-            string strokeAsString = string.Empty;
+            dynamic ctx = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
-            INTERNAL_ShapesDrawHelpers.PrepareLine(path._canvasDomElement, StartPoint, EndPoint);
-
-            dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
-            context.strokeStyle = strokeAsString; //set the shape's lines color
-            context.lineWidth = path.StrokeThickness + "px";
+            ctx.moveTo(StartPoint.X, StartPoint.Y);
+            ctx.lineTo(EndPoint.X, EndPoint.Y);
         }
     }
 }
