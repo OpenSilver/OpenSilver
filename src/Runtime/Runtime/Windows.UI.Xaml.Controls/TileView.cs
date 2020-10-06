@@ -6,6 +6,9 @@ using System.Collections.Specialized;
 using System.Text;
 using System.Windows.Controls.Primitives;
 using System.Windows.Markup;
+#if !MIGRATION
+using Windows.UI.Xaml.Controls.Primitives;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -29,7 +32,6 @@ namespace Windows.UI.Xaml.Controls
             this.DefaultStyleKey = typeof(TileView);
         }
 
-
         private void AddItemsToVisualTree(ItemCollection oldItems, ItemCollection newItems)
         {
             //Note: this method initializes the grid that will contain the children and adds them (the children being the elements in newItems)
@@ -41,7 +43,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     _contentGrid.ColumnDefinitions.Clear();
                     _contentGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-                    _contentGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+                    _contentGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = MinimizedColumnWidth });
                 }
                 if (_contentGrid.RowDefinitions == null || _contentGrid.RowDefinitions.Count != 0)
                 {
@@ -110,7 +112,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-
         internal void MaximizeTile(TileViewItem tileToMaximize)
         {
             //we check if the tile asking to be maximized is not the one already maximized:
@@ -139,6 +140,29 @@ namespace Windows.UI.Xaml.Controls
                 _maximizedTile = tileToMaximize;
             }
         }
+
+
+
+        public GridLength MinimizedColumnWidth
+        {
+            get { return (GridLength)GetValue(MinimizedColumnWidthProperty); }
+            set { SetValue(MinimizedColumnWidthProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for MinimizedColumnWidth.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty MinimizedColumnWidthProperty =
+            DependencyProperty.Register("MinimizedColumnWidth", typeof(GridLength), typeof(TileView), new PropertyMetadata(GridLength.Auto, MinimizedColumnWidth_Changed));
+
+        private static void MinimizedColumnWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TileView tileView = d as TileView;
+            if (tileView._contentGrid != null && tileView._contentGrid.ColumnDefinitions != null && tileView._contentGrid.ColumnDefinitions.Count == 2)
+            {
+                tileView._contentGrid.ColumnDefinitions[1].Width = (GridLength)e.NewValue;
+            }
+        }
+
+
 
 #if MIGRATION
         public override void OnApplyTemplate()
