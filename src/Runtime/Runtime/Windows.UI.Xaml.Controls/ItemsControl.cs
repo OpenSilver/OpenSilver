@@ -343,10 +343,9 @@ namespace Windows.UI.Xaml.Controls
             // use the item directly, if possible
             if (IsItemItsOwnContainerOverride(item))
             {
-                if (this.Items.IsUsingItemsSource && this.ItemTemplate != null)
-                {
-                    throw new NotSupportedException("ItemsControl.Items must not be a UIElement type when an ItemTemplate is set.");
-                }
+                //note: There was once an exception thrown here if (this.Items.IsUsingItemsSource && this.ItemTemplate != null) was true, stating that "ItemsControl.Items must not be a UIElement type when an ItemTemplate is set."
+                //      I checked in a WPF Project and it seems the ItemTemplate is simply ignored for items that are UIElements so I removed that exception.
+                //todo: see if the exception of the note above should be there in certain cases (it was added in Commit 8eff80c0).
                 container = item as DependencyObject;
             }
             else
