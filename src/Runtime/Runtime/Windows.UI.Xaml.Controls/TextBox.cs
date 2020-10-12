@@ -399,9 +399,21 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             }
             else //if the TextBox is templated, we don't want contentEditable div to have a border:
             {
-                outerDivStyle.borderWidth = "0px";
-                outerDivStyle.width = "100%";
-                outerDivStyle.height = "100%";
+                //Note: commentary below is about ticket #1942 fix:
+                //todo: make the following more consistent with potentiel change (as in "if the element that receives the solid border in the !isTemplated above is no longer the child node of INTERNAL_AdditionalOutsideDivForMargins, this follows)
+                //Note: 2020/10/08 - outerDivStyle is different here than when we enter the "if".
+                //      The "if" version ends up being the child node of INTERNAL_AdditionalOutsideDivForMargins, (this should always be the case since it is the "no template" version of it so it should not change.)
+                //      here it is the first div inside the ContentPresenter defined in the Template.
+                //      This is why I replaced the following commented lines with the ones after:
+                //outerDivStyle.borderWidth = "0px";
+                //outerDivStyle.width = "100%";
+                //outerDivStyle.height = "100%";
+                dynamic additionalDivForMargins = INTERNAL_AdditionalOutsideDivForMargins;
+                dynamic divPreviouslyModified = additionalDivForMargins.firstChild;
+                dynamic stylePreviouslyModified = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(divPreviouslyModified);
+                stylePreviouslyModified.borderWidth = "0px";
+                stylePreviouslyModified.width = "100%";
+                stylePreviouslyModified.height = "100%";
             }
             outerDivStyle.backgroundColor = backgroundColor;
             object middleDiv;
