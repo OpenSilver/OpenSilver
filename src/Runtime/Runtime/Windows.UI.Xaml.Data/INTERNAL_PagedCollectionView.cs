@@ -55,7 +55,7 @@ namespace Windows.UI.Xaml.Data
 #endif
     {
         // the child views
-        List<CollectionViewGroupInternal> _views = new List<CollectionViewGroupInternal>();
+        List<INTERNAL_CollectionViewGroupInternal> _views = new List<INTERNAL_CollectionViewGroupInternal>();
 
         // the list of pages
         List<ICollection<object>> _pages = new List<ICollection<object>>();
@@ -89,7 +89,7 @@ namespace Windows.UI.Xaml.Data
 #region Internal and Private Methods
 
         // add a new child view in the paged collection (not necessarily a leaf)
-        internal void AddView(CollectionViewGroupInternal view)
+        internal void AddView(INTERNAL_CollectionViewGroupInternal view)
         {
             _views.Add(view);
         }
@@ -138,11 +138,11 @@ namespace Windows.UI.Xaml.Data
         }
 
         // get all the views that are considered as leaf
-        internal List<CollectionViewGroupInternal> GetLeaves()
+        internal List<INTERNAL_CollectionViewGroupInternal> GetLeaves()
         {
-            List<CollectionViewGroupInternal> leaves = new List<CollectionViewGroupInternal>();
+            List<INTERNAL_CollectionViewGroupInternal> leaves = new List<INTERNAL_CollectionViewGroupInternal>();
 
-            foreach (CollectionViewGroupInternal view in _views)
+            foreach (INTERNAL_CollectionViewGroupInternal view in _views)
             {
                 if (view.IsLeaf)
                     leaves.Add(view);
@@ -175,13 +175,13 @@ namespace Windows.UI.Xaml.Data
         }
 
         // Return the view without any data processing, that is a copy of the original source
-        CollectionViewGroupInternal GetDefaultView()
+        INTERNAL_CollectionViewGroupInternal GetDefaultView()
         {
             return _views.Count == 0 ? null : _views[_views.Count - 1];
         }
 
         // return the view just after the filter pass (the filter pass is always the first operation to be processed)
-        CollectionViewGroupInternal GetFilterView()
+        INTERNAL_CollectionViewGroupInternal GetFilterView()
         {
             if ((_filter.FilterUsingAnEvent != null || _filter.FilterUsingAPredicate != null) && _operations.HasFilteringBeenDone() && _views.Count >= 2)
             {
@@ -224,7 +224,7 @@ namespace Windows.UI.Xaml.Data
         // check if the index is inside the allowed range, and if not, modify it
         void ConstrainIndexToRemainInsideAllowedRange()
         {
-            List<CollectionViewGroupInternal> leaves = GetLeaves();
+            List<INTERNAL_CollectionViewGroupInternal> leaves = GetLeaves();
             if (leaves.Count == 0)
                 _index = -1; // mean return original source
 
@@ -246,7 +246,7 @@ namespace Windows.UI.Xaml.Data
                 newCollection.Add(obj);
             }
 
-            CollectionViewGroupInternal treeRoot = new CollectionViewGroupInternal(newCollection.ToList<object>(), null, _operations);
+            INTERNAL_CollectionViewGroupInternal treeRoot = new INTERNAL_CollectionViewGroupInternal(newCollection.ToList<object>(), null, _operations);
 
             _views.Add(treeRoot); // we make sure that the treeRoot is the last element to be added to the _views collection because the call to the CollectionViewGroupInternal contructor creates a tree via recursion, which by itself adds the branches in _views.
 
@@ -485,7 +485,7 @@ namespace Windows.UI.Xaml.Data
         //Returns a value that indicates if a specified item has passed the filter
         public bool PassesFilter(object item)
         {
-            CollectionViewGroupInternal filterView = GetFilterView();
+            INTERNAL_CollectionViewGroupInternal filterView = GetFilterView();
             if (filterView != null)
             {
                 return filterView.Items.Contains(item);
@@ -500,7 +500,7 @@ namespace Windows.UI.Xaml.Data
             {
                 Collection<IEnumerable> Leaves = new Collection<IEnumerable>();
 
-                foreach (CollectionViewGroupInternal group in GetLeaves())
+                foreach (INTERNAL_CollectionViewGroupInternal group in GetLeaves())
                 {
                     Leaves.Add(group.Items);
                 }

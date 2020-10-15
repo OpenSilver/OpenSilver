@@ -34,10 +34,10 @@ namespace Windows.UI.Xaml.Data
     /// The class that creates a tree results based on the operations requested by a PagedCollectionView.
     /// This is the class that can filter, sort and group (not paged, because pages are handled PagedCollectionView).
     /// </summary>
-    internal partial class CollectionViewGroupInternal //: INotifyPropertyChanged
+    internal partial class INTERNAL_CollectionViewGroupInternal //: INotifyPropertyChanged
     {
         // Parent has lower priority on sort and other operations
-        CollectionViewGroupInternal _parentView;
+        INTERNAL_CollectionViewGroupInternal _parentView;
 
         // Allow to get the operations that must be done on the data
         INTERNAL_Operations _operations;
@@ -52,7 +52,7 @@ namespace Windows.UI.Xaml.Data
         public ICollection<object> Items { get; private set; }
 
         // Take the result of the parent and generate the result for the next operation
-        internal CollectionViewGroupInternal(ICollection<object> source, CollectionViewGroupInternal parent, INTERNAL_Operations operations, int level = 0)
+        internal INTERNAL_CollectionViewGroupInternal(ICollection<object> source, INTERNAL_CollectionViewGroupInternal parent, INTERNAL_Operations operations, int level = 0)
         {
             Items = source;
             _level = level;
@@ -123,7 +123,7 @@ namespace Windows.UI.Xaml.Data
             }
 
             // Pass the result of the filtering to a child CollectionViewGroup in order to apply other operations (such as sort) if any:
-            CollectionViewGroupInternal newView = new CollectionViewGroupInternal(childItems, this, _operations);
+            INTERNAL_CollectionViewGroupInternal newView = new INTERNAL_CollectionViewGroupInternal(childItems, this, _operations);
             _operations.Requester.AddView(newView); // create child branch
         }
 
@@ -147,7 +147,7 @@ namespace Windows.UI.Xaml.Data
             }
 
             // Pass the result of the filtering to a child CollectionViewGroup in order to apply other operations (such as sort) if any:
-            CollectionViewGroupInternal newView = new CollectionViewGroupInternal(childItems, this, _operations);
+            INTERNAL_CollectionViewGroupInternal newView = new INTERNAL_CollectionViewGroupInternal(childItems, this, _operations);
             _operations.Requester.AddView(newView); // create child branch
         }
 
@@ -248,12 +248,12 @@ namespace Windows.UI.Xaml.Data
                 operation.Direction = directionBackup;
 
                 // Pass the result of the sort to a child CollectionViewGroup in order to apply other operations (such as sort) if any:
-                CollectionViewGroupInternal newView = new CollectionViewGroupInternal(childItems, this, _operations);
+                INTERNAL_CollectionViewGroupInternal newView = new INTERNAL_CollectionViewGroupInternal(childItems, this, _operations);
                 _operations.Requester.AddView(newView); // create child branch after sorting operation
             }
             else
             {
-                CollectionViewGroupInternal newView = new CollectionViewGroupInternal(Items, this, _operations);
+                INTERNAL_CollectionViewGroupInternal newView = new INTERNAL_CollectionViewGroupInternal(Items, this, _operations);
                 _operations.Requester.AddView(newView); // create child branch without sorting
             }
         }
@@ -323,7 +323,7 @@ namespace Windows.UI.Xaml.Data
 
             foreach(Collection<object> child in childGroups)
             {
-                CollectionViewGroupInternal newView = new CollectionViewGroupInternal(child, this, _operations, _level + 1);
+                INTERNAL_CollectionViewGroupInternal newView = new INTERNAL_CollectionViewGroupInternal(child, this, _operations, _level + 1);
                 _operations.Requester.AddView(newView); // create child branch (level matter in grouping views)
             }
         }

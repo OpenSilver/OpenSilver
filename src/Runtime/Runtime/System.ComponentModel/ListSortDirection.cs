@@ -1,17 +1,17 @@
 ﻿namespace System.ComponentModel
 {
-    //
-    // Summary:
-    //     Specifies the direction of a sort operation.
+    /// <devdoc>
+    ///    <para>Specifies the direction of a sort.</para>
+    /// </devdoc>
     public enum ListSortDirection
     {
-        //
-        // Summary:
-        //     Sorts in ascending order.
-        Ascending = 0,
-        //
-        // Summary:
-        //     Sorts in descending order.
-        Descending = 1
+        /// <devdoc>
+        ///    <para>Sort in ascending order.</para>
+        /// </devdoc>
+        Ascending,
+        /// <devdoc>
+        ///    <para>Sort in descending order.</para>
+        /// </devdoc>
+        Descending
     }
 }

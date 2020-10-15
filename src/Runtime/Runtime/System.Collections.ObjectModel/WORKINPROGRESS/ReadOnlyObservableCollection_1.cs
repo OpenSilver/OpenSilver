@@ -1,86 +1,134 @@
-﻿#if WORKINPROGRESS
-
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace System.Collections.ObjectModel
 {
-
     public class ReadOnlyObservableCollection<T> : ReadOnlyCollection<T>, INotifyCollectionChanged, INotifyPropertyChanged
     {
+        #region Constructors
+
+        //------------------------------------------------------
         //
-        // Summary:
-        //     Initializes a new instance of the System.Collections.ObjectModel.ReadOnlyObservableCollection`1
-        //     class that serves as a wrapper for the specified System.Collections.ObjectModel.ObservableCollection`1.
+        //  Constructors
         //
-        // Parameters:
-        //   list:
-        //     The collection to wrap.
+        //------------------------------------------------------
+
+        /// <summary>
+        /// Initializes a new instance of ReadOnlyObservableCollection that
+        /// wraps the given ObservableCollection.
+        /// </summary>
         public ReadOnlyObservableCollection(ObservableCollection<T> list) : base(list)
         {
-
+            ((INotifyCollectionChanged)Items).CollectionChanged += new NotifyCollectionChangedEventHandler(HandleCollectionChanged);
+            ((INotifyPropertyChanged)Items).PropertyChanged += new PropertyChangedEventHandler(HandlePropertyChanged);
         }
 
-        //
-        // Summary:
-        //     Occurs when an item is added or removed.
-        protected event NotifyCollectionChangedEventHandler CollectionChanged;
-        //
-        // Summary:
-        //     Occurs when a property value changes.
-        protected event PropertyChangedEventHandler PropertyChanged;
+        #endregion Constructors
 
+        #region Interfaces
+
+        //------------------------------------------------------
+        //
+        //  Interfaces
+        //
+        //------------------------------------------------------
+
+        #region INotifyCollectionChanged
+
+        /// <summary>
+        /// CollectionChanged event (per <see cref="INotifyCollectionChanged" />).
+        /// </summary>
         event NotifyCollectionChangedEventHandler INotifyCollectionChanged.CollectionChanged
         {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
+            add { CollectionChanged += value; }
+            remove { CollectionChanged -= value; }
         }
 
-        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
-        {
-            add
-            {
-                throw new NotImplementedException();
-            }
+        /// <summary>
+        /// Occurs when the collection changes, either by adding or removing an item.
+        /// </summary>
+        /// <remarks>
+        /// see <seealso cref="INotifyCollectionChanged"/>
+        /// </remarks>
+        protected virtual event NotifyCollectionChangedEventHandler CollectionChanged;
 
-            remove
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        //
-        // Summary:
-        //     Raises the System.Collections.ObjectModel.ReadOnlyObservableCollection`1.CollectionChanged
-        //     event.
-        //
-        // Parameters:
-        //   args:
-        //     The event data.
+        /// <summary>
+        /// raise CollectionChanged event to any listeners
+        /// </summary>
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
-
+            if (CollectionChanged != null)
+            {
+                CollectionChanged(this, args);
+            }
         }
-        //
-        // Summary:
-        //     Raises the System.Collections.ObjectModel.ReadOnlyObservableCollection`1.PropertyChanged
-        //     event.
-        //
-        // Parameters:
-        //   args:
-        //     The event data.
+
+        #endregion INotifyCollectionChanged
+
+        #region INotifyPropertyChanged
+
+        /// <summary>
+        /// PropertyChanged event (per <see cref="INotifyPropertyChanged" />).
+        /// </summary>
+        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
+        {
+            add { PropertyChanged += value; }
+            remove { PropertyChanged -= value; }
+        }
+
+        /// <summary>
+        /// Occurs when a property changes.
+        /// </summary>
+        /// <remarks>
+        /// see <seealso cref="INotifyPropertyChanged"/>
+        /// </remarks>
+        protected virtual event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// raise PropertyChanged event to any listeners
+        /// </summary>
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs args)
         {
-
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, args);
+            }
         }
+
+        #endregion INotifyPropertyChanged
+
+        #endregion Interfaces
+
+        #region Private Methods
+
+        //------------------------------------------------------
+        //
+        //  Private Methods
+        //
+        //------------------------------------------------------
+
+        // forward CollectionChanged events from the base list to our listeners
+        void HandleCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnCollectionChanged(e);
+        }
+
+        // forward PropertyChanged events from the base list to our listeners
+        void HandlePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(e);
+        }
+
+        #endregion Private Methods
+
+        #region Private Fields
+
+        //------------------------------------------------------
+        //
+        //  Private Fields
+        //
+        //------------------------------------------------------
+
+        #endregion Private Fields
     }
 }
-
-#endif

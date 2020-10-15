@@ -52,24 +52,29 @@
   <ItemGroup>
     <Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
+    <Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
+    <Compile Include="PagedCollectionView\CollectionViewGroupRoot.cs" />
+    <Compile Include="PagedCollectionView\IPagedCollectionView.cs" />
+    <Compile Include="PagedCollectionView\PageChangingEventArgs.cs" />
+    <Compile Include="PagedCollectionView\PagedCollectionView.cs" />
+    <Compile Include="PagedCollectionView\PagedCollectionViewResources.Designer.cs">
+      <DependentUpon>PagedCollectionViewResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="PagedCollectionView\TypeHelper.cs" />
     <Compile Include="PublicAPI\Internal\KnownTypesHelper.cs" />
     <Compile Include="PublicAPI\Internal\WebRequestsHelper.cs" />
     <Compile Include="PublicAPI\Native.Html.Controls\NativeComboBox.cs" />
     <Compile Include="PublicAPI\Performance\Performance.cs" />
     <Compile Include="System.Collections.ObjectModel\WORKINPROGRESS\ReadOnlyObservableCollection_1.cs" />
-    <Compile Include="System.ComponentModel\IPagedCollectionView.cs" />
+    <Compile Include="System.ComponentModel\CurrentChangingEventArgs.cs" />
+    <Compile Include="System.ComponentModel\GroupDescription.cs" />
+    <Compile Include="System.ComponentModel\ICollectionView.cs" />
+    <Compile Include="System.ComponentModel\IEditableCollectionView.cs" />
     <Compile Include="System.ComponentModel\ISupportInitialize.cs" />
     <Compile Include="System.ComponentModel\ListSortDirection.cs" />
-    <Compile Include="System.ComponentModel\PageChangingEventArgs.cs" />
     <Compile Include="System.ComponentModel\ReadOnlyAttribute.cs" />
-    <Compile Include="System.ComponentModel\WORKINPROGRESS\CurrentChangingEventArgs.cs" />
-    <Compile Include="System.ComponentModel\WORKINPROGRESS\CurrentChangingEventHandler.cs" />
-    <Compile Include="System.ComponentModel\WORKINPROGRESS\GroupDescription.cs" />
-    <Compile Include="System.ComponentModel\WORKINPROGRESS\ICollectionView.cs" />
-    <Compile Include="System.ComponentModel\WORKINPROGRESS\IEditableCollectionView.cs" />
-    <Compile Include="System.ComponentModel\WORKINPROGRESS\NewItemPlaceholderPosition.cs" />
-    <Compile Include="System.ComponentModel\WORKINPROGRESS\SortDescription.cs" />
-    <Compile Include="System.ComponentModel\WORKINPROGRESS\SortDescriptionCollection.cs" />
+    <Compile Include="System.ComponentModel\SortDescription.cs" />
+    <Compile Include="System.ComponentModel\SortDescriptionCollection.cs" />
     <Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageSettings.cs" />
     <Compile Include="System.Net\SecurityProtocolType.cs" />
     <Compile Include="System.Net\ServicePointManager.cs" />
@@ -100,12 +105,12 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Page.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\CollectionViewGroup.cs" />
     <Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Toolkit\ItemsControlExtensions.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\Binding.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\CollectionViewSource.cs" />
-    <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\PagedCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\EasingFunctionBase.cs" />
@@ -590,7 +595,7 @@
     <Compile Include="Windows.UI.Xaml.Data\BindingExpression.cs" />
     <Compile Include="Windows.UI.Xaml.Data\BindingMode.cs" />
     <Compile Include="Windows.UI.Xaml.Data\BindingOperations.cs" />
-    <Compile Include="Windows.UI.Xaml.Data\CollectionViewGroupInternal.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\INTERNAL_CollectionViewGroupInternal.cs" />
     <Compile Include="Windows.UI.Xaml.Data\FilterEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IDependencyPropertyChangedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IIsAttachedMonitor.cs" />
@@ -1032,6 +1037,12 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="System.ComponentModel\WORKINPROGRESS\" />
   </ItemGroup>
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' " />
