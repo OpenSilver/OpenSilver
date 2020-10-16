@@ -18,21 +18,15 @@ using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Data;
 #else
-using Windows.Foundation;
-using Windows.UI;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Data;
 #endif
 
 #if MIGRATION
@@ -40,141 +34,177 @@ namespace System.Windows.Controls
 #else
 namespace Windows.UI.Xaml.Controls
 #endif
-{     
-/// <summary>
-/// Provides methods and attached properties that support data validation.
-/// </summary>
+{
+    /// <summary>
+    /// Provides methods and attached properties that support data validation and govern
+    /// the visual state of the control.
+    /// </summary>
     public static class Validation
-    {   
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     If element is null.
+    {
         /// <summary>
-        /// Gets the value of the System.Windows.Controls.Validation.Errors attached
+        /// Identifies the <see cref="Validation"/> Errors attached property.
+        /// </summary>
+        public static readonly DependencyProperty ErrorsProperty =
+            DependencyProperty.RegisterAttached(
+                "Errors",
+                typeof(ReadOnlyObservableCollection<ValidationError>),
+                typeof(Validation),
+                new PropertyMetadata(ValidationErrorCollection.Empty));
+
+        /// <summary>
+        /// Gets the value of the <see cref="Validation"/> Errors attached
         /// property of the specified element.
         /// </summary>
         /// <param name="element">
-        /// The System.Windows.UIElement or System.Windows.ContentElement object to read
-        /// the value from.
+        /// The <see cref="UIElement"/> object to read the value from.
         /// </param>
         /// <returns>
-        /// A System.Collections.ObjectModel.ReadOnlyObservableCollection`1 of System.Windows.Controls.ValidationError
-        /// objects.
+        /// A <see cref="ReadOnlyObservableCollection{ValidationError}"/>.
         /// </returns>
-        public static ObservableCollection<ValidationError> GetErrors(DependencyObject element) //Note: it returned a ReadOnlyObservableCollection but the point seems limited so we will go back to it only if necessary.
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static ReadOnlyObservableCollection<ValidationError> GetErrors(DependencyObject element)
         {
-            ObservableCollection<ValidationError> returnValue =  (ObservableCollection<ValidationError>)element.GetValue(ErrorsProperty);
-            if (returnValue == null)
+            if (element == null)
             {
-                returnValue = new ObservableCollection<ValidationError>();
-                element.SetValue(ErrorsProperty, returnValue);
+                throw new ArgumentNullException("element");
             }
-            return returnValue;
+            return (ReadOnlyObservableCollection<ValidationError>)element.GetValue(ErrorsProperty);
         }
 
         /// <summary>
-        /// Identifies the System.Windows.Controls.Validation.Errors attached property.
+        ///     holds the internally modifiable collection of validation errors.
         /// </summary>
-        public static readonly DependencyProperty ErrorsProperty =
-            DependencyProperty.RegisterAttached("Errors", typeof(ObservableCollection<ValidationError>), typeof(Validation), new PropertyMetadata(null));
+        internal static readonly DependencyProperty ValidationErrorsInternalProperty =
+                DependencyProperty.RegisterAttached("ErrorsInternal",
+                        typeof(ValidationErrorCollection), typeof(Validation),
+                        new PropertyMetadata(
+                                (ValidationErrorCollection)null,
+                                new PropertyChangedCallback(OnErrorsInternalChanged)));
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     If element is null.
-        /// <summary>
-        /// Gets the value of the System.Windows.Controls.Validation.HasError attached
-        /// property of the specified element.
-        /// </summary>
-        /// <param name="obj">
-        /// The System.Windows.UIElement or System.Windows.ContentElement object to read
-        /// the value from.
-        /// </param>
-        /// <returns>
-        /// The value of the System.Windows.Controls.Validation.HasError attached property
-        /// of the specified element.
-        /// </returns>
-        public static bool GetHasError(DependencyObject obj)
+        // Update HasErrors and Invalidate the public ValidationErrors property whose GetOverride will return
+        // the updated value of ValidationErrorsInternal, nicely wrapped into a ReadOnlyCollection<T>
+        private static void OnErrorsInternalChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            return (bool)obj.GetValue(HasErrorProperty);
+            ValidationErrorCollection newErrors = e.NewValue as ValidationErrorCollection;
+
+            if (newErrors != null)
+            {
+                d.SetValue(ErrorsProperty, new ReadOnlyObservableCollection<ValidationError>(newErrors));
+            }
+            else
+            {
+                d.ClearValue(ErrorsProperty);
+            }
         }
 
-        private static void SetHasError(DependencyObject obj, object value)
+        internal static ValidationErrorCollection GetErrorsInternal(DependencyObject target)
         {
-            obj.SetValue(HasErrorProperty, value);
+            return (ValidationErrorCollection)target.GetValue(Validation.ValidationErrorsInternalProperty);
         }
 
         /// <summary>
-        /// Identifies the System.Windows.Controls.Validation.HasError attached property.
+        /// Identifies the <see cref="Validation"/> HasError attached property.
         /// </summary>
         public static readonly DependencyProperty HasErrorProperty =
-            DependencyProperty.RegisterAttached("HasError", typeof(bool), typeof(Validation), new PropertyMetadata(false));
+            DependencyProperty.RegisterAttached(
+                "HasError",
+                typeof(bool),
+                typeof(Validation),
+                new PropertyMetadata(false));
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     If bindingExpression is null.
         /// <summary>
-        /// Removes all System.Windows.Controls.ValidationError objects from the specified
-        /// System.Windows.Data.BindingExpressionBase object.
+        /// Gets the value of the <see cref="Validation"/> HasError attached
+        /// property of the specified element.
+        /// </summary>
+        /// <param name="element">
+        /// The <see cref="UIElement"/> object to read the value from.
+        /// </param>
+        /// <returns>
+        /// The value of the <see cref="Validation"/> HasError attached property
+        /// of the specified element.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static bool GetHasError(DependencyObject element)
+        {
+            if (element == null)
+            {
+                throw new ArgumentNullException("element");
+            }
+            return (bool)element.GetValue(HasErrorProperty);
+        }
+
+        /// <summary>
+        /// Clears the ValidationError that was set through a call
+        /// to MarkInvalid or a previously failed validation of that BindingExpression.
         /// </summary>
         /// <param name="bindingExpression">The object to turn valid.</param>
-        public static void ClearInvalid(BindingExpression bindingExpression) //Note: bindingExpression was of type BindingExpressionBase but we merged the BindingExpressionBase and the BindingExpression types.
+        /// <exception cref="ArgumentNullException">
+        /// bindingExpression is null.
+        /// </exception>
+        public static void ClearInvalid(BindingExpression bindingExpression)
         {
             if (bindingExpression == null)
             {
                 throw new ArgumentNullException("bindingExpression");
             }
-            if(bindingExpression.Target is UIElement)
+
+            UIElement target = bindingExpression.Target as UIElement;
+            if (target != null)
             {
-                UIElement targetAsUIElement = (UIElement)bindingExpression.Target;
-                if (targetAsUIElement.INTERNAL_ValidationErrorsDictionary != null && targetAsUIElement.INTERNAL_ValidationErrorsDictionary.ContainsKey(bindingExpression))
+                if (target.INTERNAL_ValidationErrorsDictionary != null &&
+                    target.INTERNAL_ValidationErrorsDictionary.ContainsKey(bindingExpression))
                 {
-                    ValidationError error = targetAsUIElement.INTERNAL_ValidationErrorsDictionary[bindingExpression];
+                    ValidationError error = target.INTERNAL_ValidationErrorsDictionary[bindingExpression];
                     //remove the error from the Errors attached property
-                    ObservableCollection<ValidationError> errors = GetErrors(targetAsUIElement);
+                    ValidationErrorCollection errors = GetErrorsInternal(target);
                     errors.Remove(error);
-                    targetAsUIElement.INTERNAL_ValidationErrorsDictionary.Remove(bindingExpression);
+                    target.INTERNAL_ValidationErrorsDictionary.Remove(bindingExpression);
 
                     if (errors.Count == 0)
                     {
                         //We removed the last error on the Target:
-                        SetHasError(targetAsUIElement, false);
+                        target.SetValue(Validation.HasErrorProperty, false);
                     }
 
                     //Raise the event saying that we removed a ValidationError
                     if (bindingExpression.ParentBinding.NotifyOnValidationError)
                     {
-                        DependencyObject element = targetAsUIElement;
-                        while (element is FrameworkElement)
+                        for (FrameworkElement elt = target as FrameworkElement; elt != null; elt = elt.Parent as FrameworkElement)
                         {
-                            ((FrameworkElement)element).INTERNAL_RaiseBindingValidationErrorEvent(new ValidationErrorEventArgs()
-                            {
-                                Action = ValidationErrorEventAction.Removed,
-                                Error = error,
-                                OriginalSource = targetAsUIElement
-                            });
-
-                            element = ((FrameworkElement)element).Parent;
+                            elt.INTERNAL_RaiseBindingValidationErrorEvent(
+                                new ValidationErrorEventArgs()
+                                {
+                                    Action = ValidationErrorEventAction.Removed,
+                                    Error = error,
+                                    OriginalSource = target
+                                });
                         }
                     }
 
-                    RefreshPopup(targetAsUIElement, errors);
+                    RefreshPopup(target, errors);
                 }
             }
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     If bindingExpression is null.
-        //
-        //   System.ArgumentNullException:
-        //     If validationError is null.
         /// <summary>
-        /// Marks the specified System.Windows.Data.BindingExpression object as invalid
-        /// with the specified System.Windows.Controls.ValidationError object.
+        /// Mark this BindingExpression as invalid.  If the BindingExpression has been
+        /// explicitly marked invalid in this way, then it will remain
+        /// invalid until ClearInvalid is called or another transfer to the source validates successfully.
         /// </summary>
-        /// <param name="bindingExpression">The System.Windows.Data.BindingExpression object to mark as invalid.</param>
-        /// <param name="validationError">The System.Windows.Controls.ValidationError object to use.</param>
-        public static void MarkInvalid(BindingExpression bindingExpression, ValidationError validationError) //Note: bindingExpression was of type BindingExpressionBase but we merged the BindingExpressionBase and the BindingExpression types.
+        /// <param name="bindingExpression">
+        /// The <see cref="BindingExpression"/> object to mark as invalid.
+        /// </param>
+        /// <param name="validationError">
+        /// The <see cref="ValidationError"/> object to use.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// bindingExpression is null or validationError is null.
+        /// </exception>
+        public static void MarkInvalid(BindingExpression bindingExpression, ValidationError validationError)
         {
             if (bindingExpression == null)
             {
@@ -184,52 +214,61 @@ namespace Windows.UI.Xaml.Controls
             {
                 throw new ArgumentNullException("validationError");
             }
-            DependencyObject target = bindingExpression.Target;
-            if (target is UIElement)
+
+            UIElement target = bindingExpression.Target as UIElement;
+            if (target != null)
             {
-                UIElement targetAsUIElement = (UIElement)target;
+                // We remove any previous error because I don't see how we could have 
+                // multiple ones on a single Binding + it wouldn't fit in the Dictionary 
+                // as it is.
+                ClearInvalid(bindingExpression);
 
-                ClearInvalid(bindingExpression); //We remove any previous error because I don't see how we could have multiple ones on a single Binding + it wouldn't fit in the Dictionary as it is.
-
-                ObservableCollection<ValidationError> errors = Validation.GetErrors(targetAsUIElement);
-                bool setHasError = errors.Count == 0;
-
-                if (targetAsUIElement.INTERNAL_ValidationErrorsDictionary == null)
+                if (target.INTERNAL_ValidationErrorsDictionary == null)
                 {
-                    targetAsUIElement.INTERNAL_ValidationErrorsDictionary = new Dictionary<BindingExpression, ValidationError>();
+                    target.INTERNAL_ValidationErrorsDictionary = new Dictionary<BindingExpression, ValidationError>();
                 }
-                //Remember the ValidationError and the BindingExpression it came from:
-                targetAsUIElement.INTERNAL_ValidationErrorsDictionary.Add(bindingExpression, validationError);
-                //add the error to the Errors attached property:
-                errors.Add(validationError);
+                // Remember the ValidationError and the BindingExpression it came from
+                target.INTERNAL_ValidationErrorsDictionary.Add(bindingExpression, validationError);
 
+                bool wasValid;
+                ValidationErrorCollection validationErrors = GetErrorsInternal(target);
 
-                if (setHasError)
+                if (validationErrors == null)
                 {
-                    SetHasError(targetAsUIElement, true);
+                    wasValid = true;
+                    validationErrors = new ValidationErrorCollection();
+                    validationErrors.Add(validationError);
+                    target.SetValue(Validation.ValidationErrorsInternalProperty, validationErrors);
+                }
+                else
+                {
+                    wasValid = validationErrors.Count == 0;
+                    validationErrors.Add(validationError);
+                }
+
+                if (wasValid)
+                {
+                    target.SetValue(Validation.HasErrorProperty, true);
                 }
 
                 //Raise the event saying that we added a ValidationError
                 if (bindingExpression.ParentBinding.NotifyOnValidationError)
                 {
-                    DependencyObject element = target;
-                    while (element is FrameworkElement)
+                    for (FrameworkElement elt = target as FrameworkElement; elt != null; elt = elt.Parent as FrameworkElement)
                     {
-                        ((FrameworkElement)element).INTERNAL_RaiseBindingValidationErrorEvent(
+                        elt.INTERNAL_RaiseBindingValidationErrorEvent(
                             new ValidationErrorEventArgs()
                             {
                                 Action = ValidationErrorEventAction.Added,
                                 Error = validationError,
-                                OriginalSource = targetAsUIElement
+                                OriginalSource = target
                             });
-                        element = ((FrameworkElement)element).Parent;
                     }
                 }
-                
 
-                RefreshPopup(targetAsUIElement, errors);
+                RefreshPopup(target, validationErrors);
             }
-            
+
         }
 
         private static void RefreshPopup(UIElement target, ObservableCollection<ValidationError> errors)
@@ -257,13 +296,13 @@ namespace Windows.UI.Xaml.Controls
                         {
                             Background = new SolidColorBrush(Color.FromArgb(255, 219, 2, 12)),
                             CornerRadius = new CornerRadius(2),
-                            Margin = new Thickness(5,0,0,0),
+                            Margin = new Thickness(5, 0, 0, 0),
                         };
                         TextBlock textBlock = new TextBlock()
                         {
                             Foreground = new SolidColorBrush(Colors.White),
                             FontSize = 11.0,
-                            Margin = new Thickness(5,3,5,3),
+                            Margin = new Thickness(5, 3, 5, 3),
                             TextWrapping = TextWrapping.Wrap,
                             MaxWidth = 250,
                         };
@@ -303,12 +342,13 @@ namespace Windows.UI.Xaml.Controls
 
         }
 
-        static void Popup_PopupMoved(object sender, EventArgs e)
+        private static void Popup_PopupMoved(object sender, EventArgs e)
         {
             Popup popup = (Popup)sender;
             PopupRoot popupRoot = popup.PopupRoot;
 
-            // Hide the popup if the parent element is not visible (for example, if the user scrolls and the TextBox becomes hidden under another control, cf. ZenDesk #628):
+            // Hide the popup if the parent element is not visible (for example, if the 
+            // user scrolls and the TextBox becomes hidden under another control, cf. ZenDesk #628):
             if (popup.PlacementTarget is FrameworkElement && popupRoot != null)
             {
                 bool isParentVisible = INTERNAL_PopupsManager.IsPopupParentVisibleOnScreen(popup);
@@ -467,8 +507,24 @@ namespace Windows.UI.Xaml.Controls
         ///// </param>
         //public static void SetValidationAdornerSite(DependencyObject element, DependencyObject value);
 
-        
+
 
         #endregion
+    }
+
+    /// <summary>
+    ///      ValidationErrorCollection contains the list of ValidationErrors from
+    ///      the various Bindings on an Element.  ValidationErrorCollection
+    ///      be set through the Validation.ErrorsProperty.
+    /// </summary>
+    internal class ValidationErrorCollection : ObservableCollection<ValidationError>
+    {
+
+        /// <summary>
+        /// Empty collection that serves as a default value for
+        /// Validation.ErrorsProperty.
+        /// </summary>
+        public static readonly ReadOnlyObservableCollection<ValidationError> Empty =
+                new ReadOnlyObservableCollection<ValidationError>(new ValidationErrorCollection());
     }
 }
