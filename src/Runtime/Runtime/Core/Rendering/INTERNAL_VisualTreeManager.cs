@@ -895,15 +895,9 @@ if(nextSibling != undefined) {
             if (parent == null || parent.INTERNAL_VisualChildrenInformation == null)
                 return null;
 
-            foreach (INTERNAL_VisualChildInformation visualChildInformation in
-#if BRIDGE
-                INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(parent.INTERNAL_VisualChildrenInformation)
-#else
-                parent.INTERNAL_VisualChildrenInformation.Values
-#endif
-                )
+            foreach (var childInfo in parent.INTERNAL_VisualChildrenInformation.Select(x => x.Value))
             {
-                var child = visualChildInformation.INTERNAL_UIElement;
+                var child = childInfo.INTERNAL_UIElement;
                 var result = (child as T) ?? GetChildOfType<T>(child);
                 if (result != null)
                     return result;

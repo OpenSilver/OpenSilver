@@ -961,13 +961,13 @@ namespace Windows.UI.Xaml.Controls
             return result;
         }
 
-        [Obsolete]
         /// <summary>
         /// Create or identify the element used to display the given item.
         /// </summary>
         /// <returns>
         /// The element that is used to display the given item.
         /// </returns>
+        [Obsolete]
         protected virtual DependencyObject GetContainerFromItem(object item)
         {
             return null;
