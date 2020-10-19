@@ -1,20 +1,19 @@
-﻿<ResourceDictionary
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style TargetType="TileView">
         <Style.Setters>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate>
-                        <ItemsPresenter x:Name="PART_ItemsDisplayGrid"/>
+                        <ItemsPresenter x:Name="ItemsHost" />
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
             <Setter Property="ItemsPanel">
                 <Setter.Value>
                     <ItemsPanelTemplate>
-                        <Grid x:Name="PART_ItemsDisplayGrid"/>
+                        <TileViewPanel />
                     </ItemsPanelTemplate>
                 </Setter.Value>
             </Setter>

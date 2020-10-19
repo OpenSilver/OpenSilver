@@ -1,12 +1,12 @@
 ﻿using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Text;
+using System.Diagnostics;
+
+#if MIGRATION
+using System.Windows.Data;
 using System.Windows.Controls.Primitives;
-using System.Windows.Markup;
-#if !MIGRATION
+#else
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Controls.Primitives;
 #endif
 
@@ -16,132 +16,77 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    //[ContentProperty("Items")]
-    public class TileView : MultiSelector
+    public class TileView : Selector
     {
-        //Notes: We consider that the minimized items go on the right side of the grid, this should change at some point
-        //       We put the first item as Maximized, we need to deal with TileViewItem.IsMaximized as an improvement.
-        //       I'd say we should have VisualStates for Minimized and Maximized for the TileViewItems and this control tells them to GoToState
-        //       Should we do like ItemsControl and have an ItemsSource to allows adding a whole bunch of items programmatically ?
-        //ObservableCollection<TileViewItem> _items;
-        TileViewItem _maximizedTile = null;
-        Grid _contentGrid = null; //Note: this is intended to be solely used to display the Items, nothing else that mighrt have been added by the user in the template.
+        // Notes: We consider that the minimized items go on the right side of the grid, this should change at some point
+        //        We put the first item as Maximized, we need to deal with TileViewItem.IsMaximized as an improvement.
+        //        I'd say we should have VisualStates for Minimized and Maximized for the TileViewItems and this control tells them to GoToState
+        //        Should we do like ItemsControl and have an ItemsSource to allows adding a whole bunch of items programmatically ?
+        private TileViewItem _maximizedTile = null;
 
         public TileView()
         {
             this.DefaultStyleKey = typeof(TileView);
         }
 
-        private void AddItemsToVisualTree(ItemCollection oldItems, ItemCollection newItems)
+        protected override DependencyObject GetContainerForItemOverride()
         {
-            //Note: this method initializes the grid that will contain the children and adds them (the children being the elements in newItems)
-            //todo: rename/clean up/change this method so it reflects what it actually does.
-            if (_contentGrid != null)
-            {
-                //clear the grid's rows and columns (just in case... if the user wants to add rows and columns, they need to add another grid around this one)
-                if (_contentGrid.ColumnDefinitions == null || _contentGrid.ColumnDefinitions.Count != 2)
-                {
-                    _contentGrid.ColumnDefinitions.Clear();
-                    _contentGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-                    _contentGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = MinimizedColumnWidth });
-                }
-                if (_contentGrid.RowDefinitions == null || _contentGrid.RowDefinitions.Count != 0)
-                {
-                    _contentGrid.RowDefinitions.Clear();
-                }
-                if (oldItems != newItems)
-                {
-                    if (oldItems != null) // Note: this part is currently useless since we only call this method in OnApplyTemplate
-                    {
-                        //remove the former elements if they were in the tree:
-                        if (_contentGrid != null)
-                        {
-                            foreach (TileViewItem oldItem in oldItems)
-                            {
-                                _contentGrid.Children.Remove(oldItem);
-                            }
-                        }
-                    }
-                    if (newItems != null)
-                    {
-                        //todo: deal with an eventual item.IsMaximized or something like that.
-                        bool isFirst = true;
-                        int n = 0;
-                        foreach (var item in newItems)
-                        {
-                            var itemAsTileViewItem = item as TileViewItem;
-                            if (itemAsTileViewItem != null)
-                            {
-                                if (!isFirst)
-                                {
-                                    Grid.SetColumn(itemAsTileViewItem, 1);
-                                    Grid.SetRow(itemAsTileViewItem, n);
-                                    ++n;
-                                }
-                                else
-                                {
-                                    Grid.SetRowSpan(itemAsTileViewItem, int.MaxValue); //Note: this might not be good enough when we add an additional item since if I remember correctly, we change the value put in the html due to the fact that the css grid automatically adds rows when an Item.row is bigger (which we don't want) so we probably also do it for RowSpan. 
-                                    itemAsTileViewItem.Maximize();
-                                    _maximizedTile = itemAsTileViewItem;
-                                }
-                                Console.WriteLine("Before not adding item...");
-                                //_contentGrid.Children.Add(itemAsTileViewItem); //Note: the items have already been added (?)
-                                Console.WriteLine("After not adding item...");
-                                itemAsTileViewItem._TileViewParent = this;
-                                isFirst = false;
-                            }
-                        }
+            return new TileViewItem();
+        }
 
-                        int rowsToAdd = oldItems != null ? newItems.Count - oldItems.Count : newItems.Count;
-                        if (rowsToAdd > 0)
-                        {
-                            for (int i = 0; i < rowsToAdd; ++i)
-                            {
-                                _contentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
-                            }
-                        }
-                        else
-                        {
-                            for (int i = 0; i > rowsToAdd; --i)
-                            {
-                                _contentGrid.RowDefinitions.RemoveAt(_contentGrid.RowDefinitions.Count);
-                            }
-                        }
-                    }
-                }
+        protected override bool IsItemItsOwnContainerOverride(object item)
+        {
+            return item is TileViewItem;
+        }
+
+        protected override void ClearContainerForItemOverride(DependencyObject element, object item)
+        {
+            base.ClearContainerForItemOverride(element, item);
+
+            TileViewItem tile = element as TileViewItem;
+            if (tile != null)
+            {
+                tile._tileViewParent = null;
+                tile.ClearValue(Grid.RowProperty);
+                tile.ClearValue(Grid.ColumnProperty);
+                tile.ClearValue(Grid.RowSpanProperty);
+            }
+        }
+
+        protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+        {
+            base.PrepareContainerForItemOverride(element, item);
+            
+            TileViewItem container = element as TileViewItem;
+            if (container != null)
+            {
+                container._tileViewParent = this;
             }
         }
 
         internal void MaximizeTile(TileViewItem tileToMaximize)
         {
             //we check if the tile asking to be maximized is not the one already maximized:
-            if (tileToMaximize != _maximizedTile)
+            if (tileToMaximize != this._maximizedTile)
             {
-                //we switch the Grid.Row and Column between those tiles and tell them that they are maximized/minimized:
-                if (_maximizedTile != null)
+                // we switch the Grid.Row and Column between those tiles and tell
+                // them that they are maximized/minimized
+                if (this._maximizedTile != null)
                 {
-                    int maximizedTileRow = Grid.GetRow(_maximizedTile);
-                    int maximizedTileColumn = Grid.GetColumn(_maximizedTile);
-                    Grid.SetRow(_maximizedTile, Grid.GetRow(tileToMaximize));
-                    Grid.SetColumn(_maximizedTile, Grid.GetColumn(tileToMaximize));
-                    Grid.SetRowSpan(tileToMaximize, Grid.GetRowSpan(_maximizedTile));
-                    Grid.SetRow(tileToMaximize, maximizedTileRow);
-                    Grid.SetColumn(tileToMaximize, maximizedTileColumn);
-                    Grid.SetRowSpan(_maximizedTile, 1);
+                    Grid.SetRow(this._maximizedTile, Grid.GetRow(tileToMaximize));
+                    Grid.SetColumn(this._maximizedTile, Grid.GetColumn(tileToMaximize));
+                    Grid.SetRowSpan(this._maximizedTile, 1);
+                    this._maximizedTile.Minimize();
                 }
-                else
-                {
-                    Grid.SetRow(tileToMaximize, 0);
-                    Grid.SetColumn(tileToMaximize, 0);
-                    Grid.SetRowSpan(tileToMaximize, int.MaxValue);
-                }
-                _maximizedTile.Minimize();
+
+                Grid.SetRow(tileToMaximize, 0);
+                Grid.SetColumn(tileToMaximize, 0);
+                Grid.SetRowSpan(tileToMaximize, int.MaxValue);
+                
                 tileToMaximize.Maximize();
-                _maximizedTile = tileToMaximize;
+                this._maximizedTile = tileToMaximize;
             }
         }
-
-
 
         public GridLength MinimizedColumnWidth
         {
@@ -149,44 +94,175 @@ namespace Windows.UI.Xaml.Controls
             set { SetValue(MinimizedColumnWidthProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for MinimizedColumnWidth.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MinimizedColumnWidthProperty =
-            DependencyProperty.Register("MinimizedColumnWidth", typeof(GridLength), typeof(TileView), new PropertyMetadata(new GridLength(1, GridUnitType.Star), MinimizedColumnWidth_Changed));
+            DependencyProperty.Register(
+                "MinimizedColumnWidth", 
+                typeof(GridLength), 
+                typeof(TileView), 
+                new PropertyMetadata(new GridLength(1, GridUnitType.Star)));
 
-        private static void MinimizedColumnWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        internal TileViewItem MaximizedTile
         {
-            TileView tileView = d as TileView;
-            if (tileView._contentGrid != null && tileView._contentGrid.ColumnDefinitions != null && tileView._contentGrid.ColumnDefinitions.Count == 2)
-            {
-                tileView._contentGrid.ColumnDefinitions[1].Width = (GridLength)e.NewValue;
-            }
+            get { return this._maximizedTile; }
         }
+    }
 
+    /// <summary>
+    /// This panel is meant to be used to display a <see cref="TileView"/> children.
+    /// </summary>
+    public class TileViewPanel : Panel
+    {
+        private TileView _owner;
+        private Grid _contentGrid;
 
+        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        {
+            // we need the TileView to be set before calling OnChildrenReset,
+            // which is done in the base implementation.
+            this._owner = ItemsControl.GetItemsOwner(this) as TileView;
 
-#if MIGRATION
-        public override void OnApplyTemplate()
+            if (this._contentGrid == null)
+            {
+                var grid = new Grid();
+                var column1 = new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) };
+                var column2 = new ColumnDefinition();
+                grid.ColumnDefinitions.Add(column1);
+                grid.ColumnDefinitions.Add(column2);
+                this._contentGrid = grid;
+
+            }
+
+            BindingOperations.SetBinding(
+                this._contentGrid.ColumnDefinitions[1], 
+                ColumnDefinition.WidthProperty, 
+                new Binding("MinimizedColumnWidth") { Source = this._owner });
+
+            base.INTERNAL_OnAttachedToVisualTree();
+
+#if REWORKLOADED
+            this.AddVisualChild(this._contentGrid, 0);
 #else
-        protected override void OnApplyTemplate() 
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this._contentGrid, this, 0);
 #endif
+        }
+
+        protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
-            base.OnApplyTemplate();
-            _contentGrid = ItemsHost as Grid; //GetTemplateChild("PART_ItemsDisplayGrid") as Grid;
-            if(_contentGrid == null)
+            base.INTERNAL_OnDetachedFromVisualTree();
+
+            this._owner = null;
+            this._contentGrid = null;
+        }
+
+        internal override void OnChildrenAdded(UIElement newChild, int index)
+        {
+            if (this._contentGrid != null)
             {
-                _contentGrid = INTERNAL_VisualTreeManager.GetChildOfType<Grid>(ItemsHost);
+                this._contentGrid.Children.Insert(index, newChild);
+                this.ArrangeInternal();
             }
-            AddItemsToVisualTree(null, Items);
         }
 
-        protected override void UnselectAllItems()
+        internal override void OnChildrenRemoved(UIElement oldChild, int index)
         {
-            //todo
+            if (this._contentGrid != null)
+            {
+                Debug.Assert(this._contentGrid.Children[index] == oldChild);
+                this._contentGrid.Children.RemoveAt(index);
+                this.ArrangeInternal();
+            }
         }
 
-        protected override void SetItemVisualSelectionState(object item, bool newState)
+        internal override void OnChildrenReplaced(UIElement oldChild, UIElement newChild, int index)
         {
-            //todo
+            if (this._contentGrid != null)
+            {
+                Debug.Assert(this._contentGrid.Children[index] == oldChild);
+                this._contentGrid.Children[index] = newChild;
+                this.ArrangeInternal();
+            }
+        }
+
+        internal override void OnChildrenMoved(UIElement oldChild, int newIndex, int oldIndex)
+        {
+            if (this._contentGrid != null)
+            {
+                Debug.Assert(this._contentGrid.Children[oldIndex] == oldChild);
+                this._contentGrid.Children.Move(oldIndex, newIndex);
+                this.ArrangeInternal();
+            }
+        }
+
+        internal override void OnChildrenReset()
+        {
+            if (this._contentGrid != null)
+            {
+                this._contentGrid.Children.Clear();
+                foreach (var child in this.Children)
+                {
+                    this._contentGrid.Children.Add(child);
+                }
+                this.ArrangeInternal();
+            }
+        }
+
+        private void ArrangeInternal()
+        {
+            int count = this.Children.Count;
+
+            this._contentGrid.RowDefinitions.Clear();
+
+            if (count == 0)
+            {
+                return;
+            }
+            
+            int rowsCount = Math.Max(1, count - 1);
+            for (int i = 0; i < rowsCount; ++i)
+            {
+                this._contentGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
+            }
+
+            // First get the index of the maximized tile.
+            int maximizedTileIndex = 0;
+            for (int i = 0; i < count; ++i)
+            {
+                if ((TileViewItem)this.Children[i] == this._owner.MaximizedTile)
+                {
+                    maximizedTileIndex = i;
+                    break;
+                }
+            }
+
+            TileViewItem child;
+            for (int i = 0; i < count; ++i)
+            {
+                child = (TileViewItem)this.Children[i];
+
+                if (i == maximizedTileIndex)
+                {
+                    Grid.SetRow(child, 0);
+                    Grid.SetRowSpan(child, int.MaxValue);
+                    Grid.SetColumn(child, 0);
+                }
+                else if (i == 0)
+                {
+                    Grid.SetRow(child, maximizedTileIndex);
+                    Grid.SetRowSpan(child, 1);
+                    Grid.SetColumn(child, 1);
+                }
+                else
+                {
+                    Grid.SetRow(child, i - 1);
+                    Grid.SetRowSpan(child, 1);
+                    Grid.SetColumn(child, 1);
+                }
+            }
+
+            if (this._owner.MaximizedTile == null)
+            {
+                this._owner.MaximizeTile((TileViewItem)this.Children[maximizedTileIndex]);
+            }
         }
     }
 }
