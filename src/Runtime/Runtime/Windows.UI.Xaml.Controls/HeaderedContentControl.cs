@@ -1,27 +1,9 @@
-﻿
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
-
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-#endif
+using System.Diagnostics.CodeAnalysis;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -39,9 +21,10 @@ namespace Windows.UI.Xaml.Controls
     /// lack of support and consistency with other Silverlight controls.
     /// </remarks>
     /// <QualityBand>Stable</QualityBand>
+    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Headered", Justification = "Consistency with WPF")]
     public partial class HeaderedContentControl : ContentControl
     {
-        #region public object Header
+#region public object Header
         /// <summary>
         /// Gets or sets the content for the header of the control.
         /// </summary>
@@ -57,12 +40,12 @@ namespace Windows.UI.Xaml.Controls
 
         /// <summary>
         /// Identifies the
-        /// <see cref="P:System.Windows.Controls.HeaderedContentControl.Header" />
+        /// <see cref="HeaderedContentControl.Header" />
         /// dependency property.
         /// </summary>
         /// <value>
         /// The identifier for the
-        /// <see cref="P:System.Windows.Controls.HeaderedContentControl.Header" />
+        /// <see cref="HeaderedContentControl.Header" />
         /// dependency property.
         /// </value>
         public static readonly DependencyProperty HeaderProperty =
@@ -70,8 +53,7 @@ namespace Windows.UI.Xaml.Controls
                         "Header",
                         typeof(object),
                         typeof(HeaderedContentControl),
-                        new PropertyMetadata(null, OnHeaderPropertyChanged)
-                        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+                        new PropertyMetadata(OnHeaderPropertyChanged));
 
         /// <summary>
         /// HeaderProperty property changed handler.
@@ -83,9 +65,9 @@ namespace Windows.UI.Xaml.Controls
             HeaderedContentControl ctrl = (HeaderedContentControl)d;
             ctrl.OnHeaderChanged(e.OldValue, e.NewValue);
         }
-        #endregion public object Header
+#endregion public object Header
 
-        #region public DataTemplate HeaderTemplate
+#region public DataTemplate HeaderTemplate
         /// <summary>
         /// Gets or sets the template that is used to display the content of the
         /// control's header.
@@ -102,12 +84,12 @@ namespace Windows.UI.Xaml.Controls
 
         /// <summary>
         /// Identifies the
-        /// <see cref="P:System.Windows.Controls.HeaderedContentControl.HeaderTemplate" />
+        /// <see cref="HeaderedContentControl.HeaderTemplate" />
         /// dependency property.
         /// </summary>
         /// <value>
         /// The identifier for the
-        /// <see cref="P:System.Windows.Controls.HeaderedContentControl.HeaderTemplate" />
+        /// <see cref="HeaderedContentControl.HeaderTemplate" />
         /// dependency property.
         /// </value>
         public static readonly DependencyProperty HeaderTemplateProperty =
@@ -115,8 +97,7 @@ namespace Windows.UI.Xaml.Controls
                         "HeaderTemplate",
                         typeof(DataTemplate),
                         typeof(HeaderedContentControl),
-                        new PropertyMetadata(null, OnHeaderTemplatePropertyChanged)
-                        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+                        new PropertyMetadata(OnHeaderTemplatePropertyChanged));
 
         /// <summary>
         /// HeaderTemplateProperty property changed handler.
@@ -128,50 +109,40 @@ namespace Windows.UI.Xaml.Controls
             HeaderedContentControl ctrl = (HeaderedContentControl)d;
             ctrl.OnHeaderTemplateChanged((DataTemplate)e.OldValue, (DataTemplate)e.NewValue);
         }
-        #endregion public DataTemplate HeaderTemplate
+#endregion public DataTemplate HeaderTemplate
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:System.Windows.Controls.HeaderedContentControl" />
-        /// class.
+        /// Initializes a new instance of the <see cref="HeaderedContentControl" /> class.
         /// </summary>
         public HeaderedContentControl()
         {
-            //DefaultStyleKey = typeof(HeaderedContentControl);
+            DefaultStyleKey = typeof(HeaderedContentControl);
         }
 
         /// <summary>
-        /// Called when the value of the
-        /// <see cref="P:System.Windows.Controls.HeaderedContentControl.Header" />
+        /// Called when the value of the <see cref="HeaderedContentControl.Header" />
         /// property changes.
         /// </summary>
         /// <param name="oldHeader">
-        /// The old value of the
-        /// <see cref="P:System.Windows.Controls.HeaderedContentControl.Header" />
-        /// property.
+        /// The old value of the <see cref="HeaderedContentControl.Header" /> property.
         /// </param>
         /// <param name="newHeader">
-        /// The new value of the
-        /// <see cref="P:System.Windows.Controls.HeaderedContentControl.Header" />
-        /// property.
+        /// The new value of the <see cref="HeaderedContentControl.Header" /> property.
         /// </param>
         protected virtual void OnHeaderChanged(object oldHeader, object newHeader)
         {
         }
 
         /// <summary>
-        /// Called when the value of the
-        /// <see cref="P:System.Windows.Controls.HeaderedContentControl.HeaderTemplate" />
+        /// Called when the value of the <see cref="HeaderedContentControl.HeaderTemplate" />
         /// property changes.
         /// </summary>
         /// <param name="oldHeaderTemplate">
-        /// The old value of the
-        /// <see cref="P:System.Windows.Controls.HeaderedContentControl.HeaderTemplate" />
+        /// The old value of the <see cref="HeaderedContentControl.HeaderTemplate" />
         /// property.
         /// </param>
         /// <param name="newHeaderTemplate">
-        /// The new value of the
-        /// <see cref="P:System.Windows.Controls.HeaderedContentControl.HeaderTemplate" />
+        /// The new value of the <see cref="HeaderedContentControl.HeaderTemplate" />
         /// property.
         /// </param>
         protected virtual void OnHeaderTemplateChanged(DataTemplate oldHeaderTemplate, DataTemplate newHeaderTemplate)

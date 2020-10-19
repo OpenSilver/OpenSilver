@@ -1105,6 +1105,9 @@
     <Content Include="DefaultStyles\INTERNAL_DefaultTileViewStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultHeaderedContentControlStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
 	</ItemGroup>
 	<ItemGroup>
 	  <EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />
@@ -1116,7 +1119,7 @@
 	<ItemGroup>
 	  <None Include="Runtime.licenseheader" />
 	</ItemGroup>
-
+  
 	<!-- See ths comment on the first <Import> -->
 	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 

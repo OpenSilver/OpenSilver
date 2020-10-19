@@ -26,5 +26,6 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultViewboxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultRepeatButtonStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultItemsControlStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultHeaderedContentControlStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
