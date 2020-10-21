@@ -857,7 +857,6 @@
     <Compile Include="Windows.UI.Xaml\ICanConvertToCSSValues.cs" />
     <Compile Include="Windows.UI.Xaml\ICloneOnAnimation.cs" />
     <Compile Include="Windows.UI.Xaml\IHasAccessToPropertiesWhereItIsUsed.cs" />
-    <Compile Include="Windows.UI.Xaml\INTERNAL_VisualStateGroupCollection.cs" />
     <Compile Include="Windows.UI.Xaml\MessageBox.cs" />
     <Compile Include="Windows.UI.Xaml\MessageBoxButton.cs" />
     <Compile Include="Windows.UI.Xaml\MessageBoxResult.cs" />
@@ -903,7 +902,6 @@
     <Compile Include="Windows.UI.Xaml\Visibility.cs" />
     <Compile Include="Windows.UI.Xaml\VisualState.cs" />
     <Compile Include="Windows.UI.Xaml\VisualStateChangedEventArgs.cs" />
-    <Compile Include="Windows.UI.Xaml\VisualStateChangedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml\VisualStateGroup.cs" />
     <Compile Include="Windows.UI.Xaml\VisualStateManager.cs" />
     <Compile Include="Windows.UI.Xaml\WhenToCallPropertyChangedEnum.cs" />

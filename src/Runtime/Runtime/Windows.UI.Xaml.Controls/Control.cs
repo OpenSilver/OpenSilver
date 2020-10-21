@@ -17,7 +17,9 @@ using CSHTML5.Internal;
 using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -58,12 +60,30 @@ namespace Windows.UI.Xaml.Controls
         //      - RegisterName
         //END OF COMMENT
 
-        internal FrameworkElement _renderedControlTemplate = null;
+        // Note: this should be protected and the Control class should be abstract.
+        /// <summary>
+        /// Represents the base class for UI elements that use a <see cref="ControlTemplate"/>
+        /// to define their appearance.
+        /// </summary>
+        public Control()
+        {
+            // Initialize the _templateCache to the default value for TemplateProperty.
+            // If the default value is non-null then wire it to the current instance.
+            PropertyMetadata metadata = TemplateProperty.GetMetadata(this.GetType());
+            ControlTemplate defaultValue = (ControlTemplate)metadata.DefaultValue;
+            if (defaultValue != null)
+            {
+                OnTemplateChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, TemplateProperty));
+            }
+        }
+
+
         private bool _isDisabled = false;
 
         /// <summary>
         /// Derived classes can set this flag in their constructor to prevent the "Template" property from being applied.
         /// </summary>
+        [Obsolete("This value is ignored. ControlTemplate is always applied.")]
         protected bool INTERNAL_DoNotApplyControlTemplate = false;
 
 
@@ -134,7 +154,18 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                return this.INTERNAL_GetVisualStateGroups().ContainsVisualState(VisualStates.StateMouseOver);
+                if (StateGroupsRoot == null)
+                {
+                    return false;
+                }
+
+                IList<VisualStateGroup> groups = (Collection<VisualStateGroup>)this.GetValue(VisualStateManager.VisualStateGroupsProperty);
+                if (groups == null)
+                {
+                    return false;
+                }
+
+                return groups.Any(gr => ((IList<VisualState>)gr.States).Any(state => state.Name == VisualStates.StateMouseOver));
             }
         }
 
@@ -684,8 +715,12 @@ namespace Windows.UI.Xaml.Controls
                 INTERNAL_HtmlDomManager.SetDomElementAttribute(domElementConcernedByFocus, "tabIndex", index.ToString()); //note: not replaced with GetCSSEquivalent because it uses SetDomeElementAttribute (so it's not the style)
 
                 //in the case where the control should not have an outline even when focused or when the control has a template that defines the VisualState "Focused", we remove the default outline that browsers put:
-                if (!this.UseSystemFocusVisuals || this.INTERNAL_GetVisualStateGroups().ContainsVisualState("Focused"))
+                IList<VisualStateGroup> groups = this.StateGroupsRoot?.GetValue(VisualStateManager.VisualStateGroupsProperty) as Collection<VisualStateGroup>;
+                if (!this.UseSystemFocusVisuals || 
+                    (groups != null && groups.Any(gr => ((IList<VisualState>)gr.States).Any(state => state.Name == "Focused"))))
                 {
+
+                    // this.INTERNAL_GetVisualStateGroups().ContainsVisualState("Focused")
                     INTERNAL_HtmlDomManager.SetDomElementStyleProperty(domElementConcernedByFocus, new List<string>() { "outline" }, "none");
                 }
             }
@@ -734,18 +769,14 @@ namespace Windows.UI.Xaml.Controls
         // TEMPLATE
         //-----------------------
 
-        // todo: use only this or HasTemplate (whith IsTemplated's 
-        // efficiency, which means not reading the DependencyProperty 
-        // and HasTemplate's accuracy, which means taking into 
-        // consideration INTERNAL_DoNotApplyControlTemplate).
-        internal bool INTERNAL_IsTemplated = false; 
+        private ControlTemplate _templateCache;
 
         /// <summary>
         /// Gets or sets a control template.
         /// </summary>
         public ControlTemplate Template
         {
-            get { return (ControlTemplate)GetValue(TemplateProperty); }
+            get { return this._templateCache; }
             set { SetValue(TemplateProperty, value); }
         }
 
@@ -763,16 +794,11 @@ namespace Windows.UI.Xaml.Controls
         {
             Control control = (Control)d;
 
-            control.INTERNAL_IsTemplated = e.NewValue != null;
+            control._templateCache = (ControlTemplate)e.NewValue;
 
             // First detach previously attached template if any
-            if (control._renderedControlTemplate != null)
-            {
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(control._renderedControlTemplate, control);
-                control._renderedControlTemplate = null;
-                control.ClearRegisteredNames();
-                control.INTERNAL_GetVisualStateGroups().Clear();
-            }
+            control.TemplateChild = null;
+            control.ClearRegisteredNames();
 
             control.ApplyTemplate();
         }
@@ -782,15 +808,13 @@ namespace Windows.UI.Xaml.Controls
             bool visualsCreated = false;
             FrameworkElement visualChild = null;
 
-            if (this.INTERNAL_IsTemplated &&
-               !this.INTERNAL_DoNotApplyControlTemplate &&
-                INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            if (this._templateCache != null)
             {
                 ControlTemplate template = this.Template;
 
                 // we only apply the template if no template has been
                 // rendered already for this control.
-                if (this._renderedControlTemplate == null)
+                if (this.TemplateChild == null)
                 {
                     visualChild = template.INTERNAL_InstantiateFrameworkTemplate(this);
                     if (visualChild != null)
@@ -800,18 +824,19 @@ namespace Windows.UI.Xaml.Controls
                 }
                 else
                 {
-                    visualChild = this._renderedControlTemplate;
+                    visualChild = this.TemplateChild;
                 }
             }
 
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(visualChild, this);
-
             if (visualsCreated)
             {
-                this._renderedControlTemplate = visualChild;
-             
                 // Raise the OnApplyTemplate method
-                this.OnApplyTemplate();
+                this.TemplateChild = visualChild;
+
+                if (visualChild.Parent == this)
+                {
+                    this.OnApplyTemplate();
+                }
             }
 
             return visualsCreated;
@@ -821,7 +846,14 @@ namespace Windows.UI.Xaml.Controls
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            this.ApplyTemplate();
+            // Ensure that the template generated child (if any) is attached to this control.
+            if (this.TemplateChild != null &&
+                this.TemplateChild.Parent == null)
+            {
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.TemplateChild, this, 0);
+
+                this.OnApplyTemplate();
+            }
         }
 
         /// <summary>
@@ -925,24 +957,6 @@ namespace Windows.UI.Xaml.Controls
             set { _useSystemFocusVisuals = value; } //todo: change the element in the visual tree?
         }
 
-        private INTERNAL_VisualStateGroupCollection _visualStateGroups;
-        public INTERNAL_VisualStateGroupCollection INTERNAL_GetVisualStateGroups()
-        {
-            if (_visualStateGroups == null)
-            {
-                _visualStateGroups = new INTERNAL_VisualStateGroupCollection();
-            }
-            return _visualStateGroups;
-        }
-
-#if BRIDGE
-        // find "COMMENT 26.03.2020" at the beginning of this class for the reason of the existence of the method below:
-        private INTERNAL_VisualStateGroupCollection iNTERNAL_GetVisualStateGroups()
-        {
-            return INTERNAL_GetVisualStateGroups();
-        }
-#endif
-
 #if MIGRATION
         public override void OnApplyTemplate()
 #else
@@ -956,13 +970,40 @@ namespace Windows.UI.Xaml.Controls
                 // Go to the default state ("Normal" visual state):
                 UpdateVisualStates();
 
-                // Listen to the Pointer events:
-                if (_visualStateGroups != null
+                bool hasMouseOverState = false;
+                bool hasPressedState = false;
+                bool hasFocusedState = false;
+                Collection<VisualStateGroup> groups = (Collection<VisualStateGroup>)this.StateGroupsRoot?.GetValue(VisualStateManager.VisualStateGroupsProperty);
+                if (groups != null)
+                {
+                    foreach (VisualStateGroup group in groups)
+                    {
+                        foreach (VisualState state in group.States)
+                        {
 #if MIGRATION
-                    && _visualStateGroups.ContainsVisualState("MouseOver"))
+                            if (state.Name == "MouseOver")
 #else
- && _visualStateGroups.ContainsVisualState("PointerOver"))
+                            if (state.Name == "PointerOver")
 #endif
+                            {
+                                hasMouseOverState = true;
+                            }
+                            else if (state.Name == "Pressed")
+                            {
+                                hasPressedState = true;
+                            }
+                            else if (state.Name == "Focused")
+                            {
+                                hasFocusedState = true;
+                            }
+                        }   
+                    }
+                }
+
+
+
+                // Listen to the Pointer events:
+                if (hasMouseOverState)
                 {
                     // Note: We unregster the event before registering it because, in case the user removes the control from the visual tree and puts it back, the "OnApplyTemplate" is called again.
 #if MIGRATION
@@ -978,7 +1019,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
                 }
 
-                if (_visualStateGroups != null && _visualStateGroups.ContainsVisualState("Pressed"))
+                if (hasPressedState)
                 {
                     // Note: We unregster the event before registering it because, in case the user removes the control from the visual tree and puts it back, the "OnApplyTemplate" is called again.
 #if MIGRATION
@@ -994,7 +1035,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
                 }
 
-                if (_visualStateGroups != null && _visualStateGroups.ContainsVisualState("Focused"))
+                if (hasFocusedState)
                 {
                     // Note: We unregster the event before registering it because, in case the user removes the control from the visual tree and puts it back, the "OnApplyTemplate" is called again.
                     //#if MIGRATION
@@ -1137,7 +1178,7 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         {
             get
             {
-                return Template != null && INTERNAL_DoNotApplyControlTemplate == false;
+                return this._templateCache != null;
             }
         }
 
