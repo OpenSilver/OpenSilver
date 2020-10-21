@@ -78,42 +78,6 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Creates an instance of the Template, attaches it to the Visual Tree, and calls "OnApplyTemplate". This method is intented to be called for ControlTemplates only (not DataTemplates).
-        /// </summary>
-        /// <param name="templateOwner">The owner of the template is the control to which the template is applied.</param>
-        /// <returns>The instantiated control template.</returns>
-        internal FrameworkElement INTERNAL_InstantiateAndAttachControlTemplate(Control templateOwner)
-        {
-            if (templateOwner == null)
-            {
-                throw new ArgumentNullException("templateOwner");
-            }
-
-            templateOwner.INTERNAL_IsTemplated = true;
-
-            if (_methodToInstantiateFrameworkTemplate != null)
-            {
-
-                // Instantiate the ControlTemplate:
-                TemplateInstance templateInstance = _methodToInstantiateFrameworkTemplate(templateOwner);
-
-                // Attach it:
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(templateInstance.TemplateContent, templateOwner);
-
-                // Raise the "OnApplyTemplate" property:
-                if (templateOwner != null)
-                {
-                    templateOwner.RaiseOnApplyTemplate();
-                }
-                return templateInstance.TemplateContent;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
         /// Sets the method that will create the tree of elements.
         /// </summary>
         /// <param name="methodToInstantiateFrameworkTemplate">The method that will create the tree of elements.</param>

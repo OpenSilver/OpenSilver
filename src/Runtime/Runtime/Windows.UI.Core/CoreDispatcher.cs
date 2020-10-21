@@ -121,6 +121,14 @@ namespace Windows.UI.Core
             //Console.WriteLine("ON BEGININVOKE CALLED");
             if (!INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround)
             {
+                // While running unit tests, we do not call Cshtml5Initializer.Initialize.
+                // We just run the code synchronously in that case.
+                if (INTERNAL_Simulator.JavaScriptExecutionHandler == null)
+                {
+                    method();
+                    return;
+                }
+
                 CSHTML5.Interop.ExecuteJavaScriptAsync("setTimeout($0, 1)",
                     (Action)(() =>
                     {

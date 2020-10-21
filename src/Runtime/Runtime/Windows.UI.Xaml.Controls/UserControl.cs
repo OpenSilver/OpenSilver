@@ -42,6 +42,17 @@ namespace Windows.UI.Xaml.Controls
             IsTabStop = false; //we want to avoid stopping on this element's div when pressing tab.
         }
 
+        /// <summary>
+        /// Gets the element that should be used as the StateGroupRoot for VisualStateMangager.GoToState calls
+        /// </summary>
+        internal override FrameworkElement StateGroupsRoot
+        {
+            get
+            {
+                return Content as FrameworkElement;
+            }
+        }
+
 #if REVAMPPOINTEREVENTS
         internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
         {

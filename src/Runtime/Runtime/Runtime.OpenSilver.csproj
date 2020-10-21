@@ -307,7 +307,6 @@
 		<Compile Include="Windows.UI.Xaml\StyleTypedPropertyAttribute.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\SystemColors.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\SystemParameters.cs" />
-		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\VisualStateChangedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\AutomationElementIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\AutomationProperties.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\AutomationProperty.cs" />
@@ -1012,7 +1011,6 @@
 		<Compile Include="Windows.UI.Xaml\ICanConvertToCSSValues.cs" />
 		<Compile Include="Windows.UI.Xaml\ICloneOnAnimation.cs" />
 		<Compile Include="Windows.UI.Xaml\IHasAccessToPropertiesWhereItIsUsed.cs" />
-		<Compile Include="Windows.UI.Xaml\INTERNAL_VisualStateGroupCollection.cs" />
 		<Compile Include="Windows.UI.Xaml\MessageBox.cs" />
 		<Compile Include="Windows.UI.Xaml\MessageBoxButton.cs" />
 		<Compile Include="Windows.UI.Xaml\MessageBoxResult.cs" />
@@ -1049,8 +1047,7 @@
 		<Compile Include="Windows.UI.Xaml\VerticalAlignment.cs" />
 		<Compile Include="Windows.UI.Xaml\Visibility.cs" />
 		<Compile Include="Windows.UI.Xaml\VisualState.cs" />
-		<Compile Include="Windows.UI.Xaml\VisualStateChangedEventArgs.cs" />
-		<Compile Include="Windows.UI.Xaml\VisualStateChangedEventHandler.cs" />
+    <Compile Include="Windows.UI.Xaml\VisualStateChangedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml\VisualStateGroup.cs" />
 		<Compile Include="Windows.UI.Xaml\VisualStateManager.cs" />
 		<Compile Include="Windows.UI.Xaml\WhenToCallPropertyChangedEnum.cs" />

@@ -15,10 +15,8 @@
 
 using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.ObjectModel;
+
 #if MIGRATION
 using System.Windows.Input;
 #else
@@ -149,14 +147,36 @@ namespace Windows.UI.Xaml.Controls.Primitives
             base.OnApplyTemplate();
 
             Click += ToggleButton_Click;
-            var visualStateGroups = base.INTERNAL_GetVisualStateGroups();
+            
+            Collection<VisualStateGroup> visualStateGroups = (Collection<VisualStateGroup>)this.StateGroupsRoot?.GetValue(VisualStateManager.VisualStateGroupsProperty);
+            bool hasMouseOverState = false;
+            bool hasPressedState = false;
+            if (visualStateGroups != null)
+            {
+                foreach (VisualStateGroup group in visualStateGroups)
+                {
+                    foreach (VisualState state in group.States)
+                    {
+                        if (state.Name == "PointerOver" ||
+                            state.Name == "CheckedPointerOver" ||
+                            state.Name == "IndeterminatePointerOver")
+                        {
+                            hasMouseOverState = true;
+                        }
+                        else if (state.Name == "Pressed" ||
+                                 state.Name == "CheckedPressed" ||
+                                 state.Name == "IndeterminatePressed")
+                        {
+                            hasPressedState = true;
+                        }
+                    }
+                }
+            }
 
             // Apply the current state:
             UpdateVisualStates();
 
-            if (visualStateGroups != null
-                &&
-                (visualStateGroups.ContainsVisualState("PointerOver") || visualStateGroups.ContainsVisualState("CheckedPointerOver") || visualStateGroups.ContainsVisualState("IndeterminatePointerOver")))
+            if (hasMouseOverState)
             {
                 // Note: We unregster the event before registering it because, in case the user removes the control from the visual tree and puts it back, the "OnApplyTemplate" is called again.
 #if MIGRATION
@@ -176,9 +196,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #endif
             }
 
-            if (visualStateGroups != null
-                &&
-                (visualStateGroups.ContainsVisualState("Pressed") || visualStateGroups.ContainsVisualState("CheckedPressed") || visualStateGroups.ContainsVisualState("IndeterminatePressed")))
+            if (hasPressedState)
             {
                 // Note: We unregster the event before registering it because, in case the user removes the control from the visual tree and puts it back, the "OnApplyTemplate" is called again.
 #if MIGRATION

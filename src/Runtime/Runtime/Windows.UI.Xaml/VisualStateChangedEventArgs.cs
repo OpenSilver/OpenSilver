@@ -1,50 +1,67 @@
-﻿
+using System;
 
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+#if MIGRATION
+using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Controls;
+#endif
 
+#if MIGRATION
+namespace System.Windows
+#else
+namespace Windows.UI.Xaml
+#endif
+{
+    /// <summary>
+    ///     EventArgs for VisualStateGroup.CurrentStateChanging and CurrentStateChanged events.
+    /// </summary>
+    /// <remark>
+    ///     This class works on Framework elements, however we call the property 'Control' for name-compat with what SL already released.
+    /// </remark>
+    public sealed class VisualStateChangedEventArgs : EventArgs
+    {
+        internal VisualStateChangedEventArgs(VisualState oldState, VisualState newState, Control control)
+        {
+            _oldState = oldState;
+            _newState = newState;
+            _control = control;
+        }
 
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-//using Windows.UI.Xaml.Controls;
+        /// <summary>
+        ///     The old state the control is transitioning from
+        /// </summary>
+        public VisualState OldState
+        {
+            get
+            {
+                return _oldState;
+            }
+        }
 
-//namespace Windows.UI.Xaml
-//{
-//    /// <summary>
-//    /// Provides data for the CurrentStateChanging and CurrentStateChanged events.
-//    /// </summary>
-//    public sealed partial class VisualStateChangedEventArgs
-//    {
-//        /// <summary>
-//        /// Initializes a new instance of the VisualStateChangedEventArgs class.
-//        /// </summary>
-//        public VisualStateChangedEventArgs();
+        /// <summary>
+        ///     The new state the control is transitioning to
+        /// </summary>
+        public VisualState NewState
+        {
+            get
+            {
+                return _newState;
+            }
+        }
 
-//        /// <summary>
-//        /// Gets the Control that is changing states.
-//        /// </summary>
-//        public Control Control { get; set; }
-      
-//        /// <summary>
-//        /// Gets the state the Control is changing to or has changed to.
-//        /// </summary>
-//        public VisualState NewState { get; set; }
-       
-//        /// <summary>
-//        /// Gets the state the Control is changing from or has changed from.
-//        /// </summary>
-//        public VisualState OldState { get; set; }
-//    }
-//}
+        /// <summary>
+        ///     The control involved in the state change
+        /// </summary>
+        public Control Control
+        {
+            get
+            {
+                return _control;
+            }
+        }
+
+        private VisualState _oldState;
+        private VisualState _newState;
+        private Control _control;
+    }
+}

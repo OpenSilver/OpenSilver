@@ -16,10 +16,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
+using System.Diagnostics;
+
+#if MIGRATION
+using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Controls;
+#endif
 
 #if MIGRATION
 namespace System.Windows
@@ -34,41 +38,46 @@ namespace Windows.UI.Xaml
     [ContentProperty("States")]
     public sealed partial class VisualStateGroup : DependencyObject
     {
-        ///// <summary>
-        ///// Initializes a new instance of the VisualStateGroup class.
-        ///// </summary>
-        //public VisualStateGroup();
+        private VisualStatesCollection _states;
 
-        VisualState _currentState;
         /// <summary>
         /// Gets the most recently set VisualState from a successful call to the GoToState
         /// method.
         /// </summary>
         public VisualState CurrentState
         {
-            get { return _currentState; }
-            internal set { _currentState = value; }
+            get;
+            internal set;
         }
 
-        string _name;
         /// <summary>
         /// Gets the name of the VisualStateGroup.
         /// </summary>
         public string Name
         {
-            get { return _name; }
-            set { _name = value; } //todo: this was originally not public (but we need it in the compiler)
+            get;
+            set;
         }
 
-        private List<VisualState> _states = new List<VisualState>();
         /// <summary>
         /// Gets the collection of mutually exclusive VisualState objects.
         /// </summary>
-        public IList States { get { return _states; } } // Note: this returns "IList" instead of "IList<VisualState>" so that the XAML Code Editor does not complain.
+        public IList States
+        {
+            get 
+            {
+                if (this._states == null)
+                {
+                    this._states = new VisualStatesCollection(this);
+                }
+                return this._states; 
+            } 
+        } 
 
 #if WORKINPROGRESS
 
         private IList<VisualTransition> _transitions;
+
         /// <summary>
         /// Gets the collection of VisualTransition objects.
         /// </summary>
@@ -77,23 +86,136 @@ namespace Windows.UI.Xaml
         {
             get
             {
-                if(_transitions == null)
+                if(this._transitions == null)
                 {
-                    _transitions = new List<VisualTransition>();
+                    this._transitions = new List<VisualTransition>();
                 }
-                return _transitions;
+                return this._transitions;
             }
         }
 #endif
 
-        ///// <summary>
-        ///// Occurs after a control changes into a different state.
-        ///// </summary>
-        //public event VisualStateChangedEventHandler CurrentStateChanged;
+        internal VisualState GetState(string stateName)
+        {
+            for (int stateIndex = 0; stateIndex < States.Count; ++stateIndex)
+            {
+                VisualState state = (VisualState)States[stateIndex];
+                if (state.Name == stateName)
+                {
+                    return state;
+                }
+            }
 
-        ///// <summary>
-        ///// Occurs when a control begins changing into a different state.
-        ///// </summary>
-        //public event VisualStateChangedEventHandler CurrentStateChanging;
+            return null;
+        }
+
+        internal void RaiseCurrentStateChanging(FrameworkElement stateGroupsRoot, VisualState oldState, VisualState newState, Control control)
+        {
+            if (CurrentStateChanging != null)
+            {
+                CurrentStateChanging(stateGroupsRoot, new VisualStateChangedEventArgs(oldState, newState, control));
+            }
+        }
+
+        internal void RaiseCurrentStateChanged(FrameworkElement stateGroupsRoot, VisualState oldState, VisualState newState, Control control)
+        {
+            if (CurrentStateChanged != null)
+            {
+                CurrentStateChanged(stateGroupsRoot, new VisualStateChangedEventArgs(oldState, newState, control));
+            }
+        }
+
+        /// <summary>
+        ///     Raised when transition begins
+        /// </summary>
+        public event EventHandler<VisualStateChangedEventArgs> CurrentStateChanged;
+
+        /// <summary>
+        ///     Raised when transition ends and new state storyboard begins.
+        /// </summary>
+        public event EventHandler<VisualStateChangedEventArgs> CurrentStateChanging;
+    }
+
+    internal class VisualStatesCollection : PresentationFrameworkCollection<VisualState>
+    {
+        private readonly VisualStateGroup group;
+
+        internal VisualStatesCollection(VisualStateGroup group)
+        {
+            Debug.Assert(group != null, "group should not be null !"); 
+            this.group = group;
+        }
+
+        internal override void AddOverride(VisualState value)
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+            value.INTERNAL_Group = this.group;
+            this.AddDependencyObjectInternal(value);
+        }
+
+        internal override void ClearOverride()
+        {
+            foreach (VisualState state in this)
+            {
+                state.INTERNAL_Group = null;
+            }
+            this.ClearDependencyObjectInternal();
+        }
+
+        internal override VisualState GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
+        }
+
+        internal override void InsertOverride(int index, VisualState value)
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+            value.INTERNAL_Group = this.group;
+            this.InsertDependencyObjectInternal(index, value);
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            if (index < 0 || index >= this.CountInternal)
+            {
+                throw new ArgumentOutOfRangeException("index");
+            }
+            this.GetItemInternal(index).INTERNAL_Group = null;
+            this.RemoveAtDependencyObjectInternal(index);
+        }
+
+        internal override bool RemoveOverride(VisualState value)
+        {
+            int index = this.IndexOf(value);
+            if (index > -1)
+            {
+                value.INTERNAL_Group = null;
+                this.RemoveAtDependencyObjectInternal(index);
+                return true;
+            }
+            return false;
+        }
+
+        internal override void SetItemOverride(int index, VisualState value)
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+
+            if (index < 0 || index >= this.CountInternal - 1)
+            {
+                throw new ArgumentOutOfRangeException("index");
+            }
+
+            this.GetItemInternal(index).INTERNAL_Group = null;
+            this.SetItemDependencyObjectInternal(index, value);
+        }
     }
 }
