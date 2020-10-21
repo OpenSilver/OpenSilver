@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define USEASSERT
+using System;
 using System.Collections.Generic;
 #if MIGRATION
 using System.Windows;
@@ -351,12 +352,14 @@ namespace CSHTML5.Internal
 
                 currentExpr = (storage.IsExpression || storage.IsExpressionFromStyle) ? storage.ModifiedValue.BaseValue as BindingExpression : null;
 
+#if USEASSERT
                 // If the current base value is a BindingExpression, it should have been detached by now
                 // Or is the same instance as 'effectiveValue' (this occurs when we update a property bound to a
                 // BindingExpression)
                 global::System.Diagnostics.Debug.Assert(currentExpr == null ||
                                                         !currentExpr.IsAttached ||
                                                         object.ReferenceEquals(currentExpr, effectiveValue), "Binding expression should be detached.");
+#endif
 
                 storage.ResetValue();
 
@@ -378,7 +381,9 @@ namespace CSHTML5.Internal
                 }
                 else
                 {
+#if USEASSERT
                     global::System.Diagnostics.Debug.Assert(effectiveValueKind == BaseValueSourceInternal.Local || effectiveValueKind == BaseValueSourceInternal.LocalStyle);
+#endif
 
                     // If the new BindingExpression is the same as the current one,
                     // the BindingExpression is already attached
@@ -641,7 +646,7 @@ namespace CSHTML5.Internal
             return true;
         }
 
-        #endregion
+#endregion
 
         internal static void SetInheritedValue(INTERNAL_PropertyStorage storage, object newValue, bool recursively)
         {

@@ -458,6 +458,40 @@ namespace DotNetForHtml5.Compiler
                                                 {
                                                     string propertyNamespaceName, propertyLocalTypeName;
                                                     bool isTypeString, isTypeEnum;
+
+                                                    //Todo: remove what is irrelevant below:
+                                                    //Note: the code was copy-pasted from the Binding section from here. It is because we need to call SetBinding if a Custom marckup expression returns a Binding.
+                                                    string propertyDeclaringTypeName;
+                                                    string propertyTypeNamespace;
+                                                    string propertyTypeName;
+                                                    if (!isAttachedProperty)
+                                                    {
+                                                        reflectionOnSeparateAppDomain.GetPropertyOrFieldInfo(propertyName,
+                                                                                                             parent.Name.Namespace.NamespaceName,
+                                                                                                             parent.Name.LocalName,
+                                                                                                             out propertyDeclaringTypeName,
+                                                                                                             out propertyTypeNamespace,
+                                                                                                             out propertyTypeName,
+                                                                                                             out isTypeString,
+                                                                                                             out isTypeEnum,
+                                                                                                             assemblyNameIfAny,
+                                                                                                             false);
+                                                    }
+                                                    else
+                                                    {
+                                                        reflectionOnSeparateAppDomain.GetMethodInfo("Get" + propertyName,
+                                                                                                    elementName.Namespace.NamespaceName,
+                                                                                                    elementName.LocalName,
+                                                                                                    out propertyDeclaringTypeName,
+                                                                                                    out propertyTypeNamespace,
+                                                                                                    out propertyTypeName,
+                                                                                                    out isTypeString,
+                                                                                                    out isTypeEnum,
+                                                                                                    assemblyNameIfAny);
+                                                    }
+
+                                                    //-------------------------------To here.
+
                                                     reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
                                                         propertyName,
                                                         parent.Name.Namespace.NamespaceName,
@@ -468,13 +502,42 @@ namespace DotNetForHtml5.Compiler
                                                         out isTypeEnum,
                                                         assemblyNameIfAny);
 
+
+                                                    string customMarkupValueName = "customMarkupValue_" + Guid.NewGuid().ToString("N");
+                                                    string bindingBaseTypeString = isSLMigration ? "System.Windows.Data.Binding" : "Windows.UI.Xaml.Data.Binding";
+
+                                                    //todo: make this more readable by cutting it into parts ?
                                                     markupExtensionsAdditionalCode.Add(
-                                                        string.Format("{0}.{1} = ({2})({3}.ProvideValue(new global::System.ServiceProvider({0}, {4})));",
-                                                                      GetUniqueName(parent),
-                                                                      propertyName,
-                                                                      "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
-                                                                      childUniqueName,
-                                                                      propertyKeyString));
+                                                        string.Format(@"var {0} = {1}.ProvideValue(new global::System.ServiceProvider({2}, {3}));
+if({0} is {4})
+{{
+    {9}.BindingOperations.SetBinding({7}, {8}, ({4}){0});
+}}
+else
+{{
+    {2}.{5} = ({6}){0};
+}}",
+                                                                      customMarkupValueName, //0
+                                                                      childUniqueName,//1
+                                                                      GetUniqueName(parent),//2
+                                                                      propertyKeyString,//3
+                                                                      bindingBaseTypeString,//4
+                                                                      propertyName,//5
+                                                                      "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,//6
+                                                                      parentElementUniqueNameOrThisKeyword,//7
+                                                                      propertyDeclaringTypeName + "." + propertyName + "Property", //8
+                                                                      namespaceSystemWindowsData//9
+                                                                      ));
+
+                                                    //Note: the above is a mixture of the two following calls (the first one was here, the second one comes from the Binding section).
+                                                    //markupExtensionsAdditionalCode.Add(
+                                                    //    string.Format("{0}.{1} = ({2})({3}.ProvideValue(new global::System.ServiceProvider({0}, {4})));",
+                                                    //                  GetUniqueName(parent),
+                                                    //                  propertyName,
+                                                    //                  "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
+                                                    //                  childUniqueName,
+                                                    //                  propertyKeyString));
+                                                    //markupExtensionsAdditionalCode.Add(string.Format("{3}.BindingOperations.SetBinding({0}, {1}, {2});", parentElementUniqueNameOrThisKeyword, propertyDeclaringTypeName + "." + propertyName + "Property", GetUniqueName(child), namespaceSystemWindowsData)); //we add the container itself since we couldn't add it inside the while
                                                 }
                                             }
                                         }
