@@ -1099,12 +1099,6 @@
     <Content Include="DefaultStyles\INTERNAL_DefaultRepeatButtonStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultTileViewItemStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultTileViewStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
     <Content Include="DefaultStyles\INTERNAL_DefaultHeaderedContentControlStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
