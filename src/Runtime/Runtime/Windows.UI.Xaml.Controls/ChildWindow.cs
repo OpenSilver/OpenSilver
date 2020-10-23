@@ -328,7 +328,7 @@ namespace Windows.UI.Xaml.Controls
         /// Idetifies the ChildWindow.IsModal dependency property.
         /// </summary>
         public static readonly DependencyProperty IsModalProperty =
-            DependencyProperty.Register("IsModal", typeof(bool), typeof(ChildWindow), new PropertyMetadata(false, IsModal_Changed));
+            DependencyProperty.Register("IsModal", typeof(bool), typeof(ChildWindow), new PropertyMetadata(true, IsModal_Changed));
 
         private static void IsModal_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
