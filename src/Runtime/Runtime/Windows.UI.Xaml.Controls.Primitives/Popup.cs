@@ -47,7 +47,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         //      - The reference point is determined by the Placement and placement target. If the PlacementTarget property is not set, the placement target is the popup's parent. If the popup does not have a parent, then it is the top-left corner of the window (In wpf, it is the top-left corner of the screen but we're in a browser so we cannot do that).
         // Therefore, in order to correctly place the Popup, Horizontal and VerticalOffset should only be user-defined, and the only coordinates that should be internally set are those of the reference point.
 
-
+        static int _currentZIndex = 0; //This int is to be able to put newly created popups in front of the former ones, as well as allowing to click on a Modal ChildWindow to put it in front of the others.
         PopupRoot _popupRoot;
         Border _outerBorder; // Used for positioning and alignment.
         bool _isVisible;
@@ -92,6 +92,13 @@ namespace Windows.UI.Xaml.Controls.Primitives
             set { _placement = value; }
         }
 
+        /// <summary>
+        /// This boolean determines whether the popup can force its content to catch clicks.
+        /// It will usually need to be true (for example to allow clicking on a ComboBoxItem).
+        /// It should be set to false in specific cases like non-modal childWindows where we do not want the Overlay to catch and prevent all click events outside of the childWindow itself.
+        /// Defaults to True.
+        /// </summary>
+        public bool INTERNAL_AllowDisableClickTransparency = true;
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
@@ -432,7 +439,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     Child = child,
                     HorizontalAlignment = this.HorizontalContentAlignment,
                     VerticalAlignment = this.VerticalContentAlignment,
-                    INTERNAL_ForceEnableAllPointerEvents = !transparentToClicks, // This is here because we set "pointerEvents='none' to the PopupRoot, so we need to re-enable pointer events in the children (unless we have calculated that the popup should be "transparentToClicks").
+                    INTERNAL_ForceEnableAllPointerEvents = INTERNAL_AllowDisableClickTransparency && !transparentToClicks, // This is here because we set "pointerEvents='none' to the PopupRoot, so we need to re-enable pointer events in the children (unless we have calculated that the popup should be "transparentToClicks").
                 };
 
                 // Make sure that after the OuterBorder raises the Loaded event, the PopupRoot also raises the Loaded event:
@@ -440,6 +447,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 popupRoot.Content = _outerBorder;
                 _isVisible = true;
+                // Show the popup in front of any potential previously displayed popup:
+                PutPopupInFront();
             }
             else
             {
@@ -451,6 +460,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             if (_isVisible)
             {
+                //---------------------
+                // If the popup being closed is the one with the highest zIndex, we decrement it to reduce the chances of reaching the maximum value:
+                //---------------------
+                int closingPopupZIndex = Canvas.GetZIndex(_popupRoot);
+                if (closingPopupZIndex == _currentZIndex)
+                {
+                    --_currentZIndex;
+                }
+
                 //---------------------
                 // Hide the PopupRoot:
                 //---------------------
@@ -541,6 +559,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         }
 
+        internal void PutPopupInFront()
+        {
+            bool needsZIndexChange = _currentZIndex == 0 ? true : (Canvas.GetZIndex(_popupRoot) != _currentZIndex);
+            if (needsZIndexChange)
+            {
+                Canvas.SetZIndex(_popupRoot, ++_currentZIndex);
+            }
+        }
 #if WORKINPROGRESS
         public event EventHandler Closed;
 

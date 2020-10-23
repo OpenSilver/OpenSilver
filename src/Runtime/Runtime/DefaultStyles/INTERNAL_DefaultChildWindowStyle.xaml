@@ -25,8 +25,22 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ChildWindow">
                     <Grid x:Name="Root">
-                        <!--<VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="WindowStates">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup Name="ModalStates">
+                                <VisualState Name="NotModal">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Overlay" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame Value="{x:Null}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Overlay" Storyboard.TargetProperty="IsHitTestVisible">
+                                            <DiscreteObjectKeyFrame Value="False"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState Name="Modal">
+                                </VisualState>
+                            </VisualStateGroup>
+                                <!--<VisualStateGroup x:Name="WindowStates">
                                     <VisualState x:Name="Open">
                                         <Storyboard>
                                             <DoubleAnimationUsingKeyFrames BeginTime="0" Storyboard.TargetName="Overlay" Storyboard.TargetProperty="Opacity">
@@ -67,8 +81,8 @@
                                             </DoubleAnimationUsingKeyFrames>
                                         </Storyboard>
                                     </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>-->
+                                </VisualStateGroup>-->
+                            </VisualStateManager.VisualStateGroups>
                         <Grid x:Name="Overlay"
                               HorizontalAlignment="Stretch"
                               VerticalAlignment="Stretch"

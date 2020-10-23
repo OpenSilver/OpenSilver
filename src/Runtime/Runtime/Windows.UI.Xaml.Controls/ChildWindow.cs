@@ -313,6 +313,42 @@ namespace Windows.UI.Xaml.Controls
 
         #endregion public object Title
 
+
+
+        #region public bool IsModal
+        /// <summary>
+        /// Gets or sets a value indicating whether the ChildWindow is modal.
+        /// </summary>
+        public bool IsModal
+        {
+            get { return (bool)GetValue(IsModalProperty); }
+            set { SetValue(IsModalProperty, value); }
+        }
+        /// <summary>
+        /// Idetifies the ChildWindow.IsModal dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsModalProperty =
+            DependencyProperty.Register("IsModal", typeof(bool), typeof(ChildWindow), new PropertyMetadata(false, IsModal_Changed));
+
+        private static void IsModal_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ChildWindow)d).UpdateIsModalVisualState();
+        }
+        void UpdateIsModalVisualState()
+        {
+            if (IsModal)
+            {
+                VisualStateManager.GoToState(this, "Modal", false);
+            }
+            else
+            {
+                VisualStateManager.GoToState(this, "NotModal", false);
+            }
+        }
+        #endregion
+
+
+
         #endregion Static Fields and Constants
 
         #region Member Fields
@@ -433,9 +469,16 @@ namespace Windows.UI.Xaml.Controls
             // Set default style:
             this.DefaultStyleKey = typeof(ChildWindow);
 #endif
+            this.GotFocus += ChildWindow_GotFocus;
         }
 
-#endregion Constructors
+        
+        private void ChildWindow_GotFocus(object sender, RoutedEventArgs e)
+        {
+            ChildWindowPopup.PutPopupInFront();
+        }
+
+        #endregion Constructors
 
         #region Events
 
@@ -1079,6 +1122,8 @@ namespace Windows.UI.Xaml.Controls
 
             base.OnApplyTemplate();
 
+            UpdateIsModalVisualState();
+
             this.CloseButton = GetTemplateChild(PART_CloseButton) as ButtonBase;
 
             if (this.CloseButton != null)
@@ -1347,6 +1392,15 @@ namespace Windows.UI.Xaml.Controls
             this.MaxWidth = double.PositiveInfinity;
 #endif
 
+            if (IsModal)
+            {
+                this.ChildWindowPopup.INTERNAL_AllowDisableClickTransparency = true;
+            }
+            else
+            {
+                this.ChildWindowPopup.INTERNAL_AllowDisableClickTransparency = false;
+            }
+
             if (this.ChildWindowPopup != null)
             {
                 this.ChildWindowPopup.IsOpen = true;
@@ -1356,7 +1410,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             // disable the underlying UI
-            if (RootVisual != null)
+            if (IsModal && RootVisual != null)
             {
                 RootVisual.IsEnabled = false;
             }
