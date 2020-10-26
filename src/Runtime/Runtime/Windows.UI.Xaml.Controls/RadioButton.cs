@@ -140,7 +140,16 @@ var radioButtonDomElement = document.getElementById(""{1}"");
 
         internal void ChangedEventReceived()
         {
-            bool newIsChecked = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.checked", INTERNAL_OptionalSpecifyDomElementConcernedByFocus)); //Note: this should be sufficient since a RadioButton cannot be in an indeterminate state.
+            bool newIsChecked;
+            try
+            {
+                //Note: this should be sufficient since a RadioButton cannot be in an indeterminate state.
+                newIsChecked = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.checked", INTERNAL_OptionalSpecifyDomElementConcernedByFocus));
+            }
+            catch
+            {
+                newIsChecked = false;
+            }
             bool oldIsChecked = IsChecked == null ? false : (bool)IsChecked;
             if (oldIsChecked != newIsChecked)
             {

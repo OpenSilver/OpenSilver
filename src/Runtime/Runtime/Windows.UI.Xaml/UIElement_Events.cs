@@ -682,9 +682,9 @@ namespace Windows.UI.Xaml
             }
         }
 #endif
-        public static readonly RoutedEvent TextInputEvent;
-        public static readonly RoutedEvent TextInputStartEvent;
-        public static readonly RoutedEvent TextInputUpdateEvent;
+        public static readonly RoutedEvent TextInputEvent = new RoutedEvent("TextInputEvent");
+        public static readonly RoutedEvent TextInputStartEvent = new RoutedEvent("TextInputStartEvent");
+        public static readonly RoutedEvent TextInputUpdateEvent = new RoutedEvent("TextInputUpdateEvent");
 
         public event TextCompositionEventHandler TextInput;
         public event TextCompositionEventHandler TextInputStart;
@@ -1813,7 +1813,11 @@ namespace Windows.UI.Xaml
             }
             else
             {
-                throw new NotSupportedException("The following routed event cannot be used in the AddHandler method: " + routedEvent.ToString() + " - Please contact support.");
+#if WORKINPROGRESS
+                Console.WriteLine(string.Format("The following routed event cannot be used in the AddHandler method: {0} - Please contact support.", routedEvent));
+#else
+                throw new NotSupportedException(string.Format("The following routed event cannot be used in the AddHandler method: {0} - Please contact support.", routedEvent));
+#endif
             }
         }
 

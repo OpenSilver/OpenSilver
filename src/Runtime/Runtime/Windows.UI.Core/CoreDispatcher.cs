@@ -170,7 +170,7 @@ namespace Windows.UI.Core
 
         public bool CheckAccess()
         {
-            return false;
+            return true;
         }
 #endif
     }

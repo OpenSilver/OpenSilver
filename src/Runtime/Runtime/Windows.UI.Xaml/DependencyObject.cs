@@ -566,8 +566,17 @@ namespace Windows.UI.Xaml
 #if WORKINPROGRESS
         public bool CheckAccess()
         {
-            return false;
+            bool accessAllowed = true;
+
+            var dispatcher = Dispatcher;
+
+            if (dispatcher != null)
+            {
+                accessAllowed = dispatcher.CheckAccess();
+            }
+
+            return accessAllowed;
         }
 #endif
-    }
+        }
 }

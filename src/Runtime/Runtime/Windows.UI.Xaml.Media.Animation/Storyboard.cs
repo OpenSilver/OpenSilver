@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -177,24 +178,35 @@ namespace Windows.UI.Xaml.Media.Animation
             // Note: we use a Dispatcher in order to ensure that the page is fully loaded when starting the animation.
             .INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
             {
-                if (!this.isUnApplied) // Note: we use this variable because the animation start is done inside a Dispatcher, so if the user Starts then Stops the animation immediately (in the same thread), we want to cancel the start of the animation.
+#if WORKINPROGRESS
+                try
                 {
-                    Guid guid = Guid.NewGuid();
-                    IterationParameters parameters = new IterationParameters()
+#endif
+                    if (!this.isUnApplied) // Note: we use this variable because the animation start is done inside a Dispatcher, so if the user Starts then Stops the animation immediately (in the same thread), we want to cancel the start of the animation.
                     {
-                        Target = target,
-                        Guid = guid,
-                        UseTransitions = useTransitions,
-                        VisualStateGroupName = visualStateGroupName,
-                        IsVisualStateChange = isVisualStateChange
-                    };
+                        Guid guid = Guid.NewGuid();
+                        IterationParameters parameters = new IterationParameters()
+                        {
+                            Target = target,
+                            Guid = guid,
+                            UseTransitions = useTransitions,
+                            VisualStateGroupName = visualStateGroupName,
+                            IsVisualStateChange = isVisualStateChange
+                        };
 
-                    InitializeIteration();
+                        InitializeIteration();
 
-                    bool isThisSingleLoop = RepeatBehavior.Type == RepeatBehaviorType.Count && RepeatBehavior.Count == 1;
+                        bool isThisSingleLoop = RepeatBehavior.Type == RepeatBehaviorType.Count && RepeatBehavior.Count == 1;
 
-                    StartFirstIteration(parameters, isThisSingleLoop, new TimeSpan()); //todo: use a parameter instead of just a new TimeSpan since we can have a Storyboard inside a Storyboard.
+                        StartFirstIteration(parameters, isThisSingleLoop, new TimeSpan()); //todo: use a parameter instead of just a new TimeSpan since we can have a Storyboard inside a Storyboard.
+                    }
+#if WORKINPROGRESS
                 }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+#endif
             });
         }
 
