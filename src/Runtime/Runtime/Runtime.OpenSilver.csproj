@@ -154,6 +154,7 @@
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\QuinticEase.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\RepeatBehavior.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\SineEase.cs" />
+		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\SplinePointKeyFrame.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\CompositeTransform.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\MultiScaleTileSource.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\Polygon.cs" />
