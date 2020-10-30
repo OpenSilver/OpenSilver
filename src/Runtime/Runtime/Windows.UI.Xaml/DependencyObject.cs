@@ -481,7 +481,8 @@ namespace Windows.UI.Xaml
                 INTERNAL_PropertyStore.SetInheritedValue(storage, 
                                                          DependencyProperty.UnsetValue,
                                                          false); // recursively
-                if (storage.BaseValueSourceInternal == BaseValueSourceInternal.Default)
+                if (storage.BaseValueSourceInternal == BaseValueSourceInternal.Default &&
+                    (storage.PropertyListeners == null || storage.PropertyListeners.Count == 0)) //this second test is to make sure we keep any listener working (for example Bindings would stop working if we remove an element from the Visual tree then add it back))
                 {
                     // Remove storage if the effective value is the default value.
                     this.INTERNAL_AllInheritedProperties.Remove(storage.Property);
