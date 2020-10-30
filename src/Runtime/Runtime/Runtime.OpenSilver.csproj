@@ -111,6 +111,7 @@
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\MultipleViewPatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TableItemPatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TablePatternIdentifiers.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DatePickerTextBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\Common\Extensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
