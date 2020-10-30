@@ -111,6 +111,7 @@
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\MultipleViewPatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TableItemPatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TablePatternIdentifiers.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\AccordionButton.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridCellsPresenter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridColumnHeadersPresenter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridDetailsPresenter.cs" />
@@ -118,6 +119,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridRowHeader.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridRowsPresenter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DatePickerTextBox.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\ExpandableContentControl.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\Common\Extensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
@@ -127,12 +129,15 @@
 		<Compile Include="Windows.UI.Xaml.Controls\ValidationHelper.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ValidationMetadata.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ButtonSpinner.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\GridSplitter.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\IUpdateVisualState.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleSubImage.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Spinner.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SubImageEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SubImageRoutedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TextBlock.cs" />
