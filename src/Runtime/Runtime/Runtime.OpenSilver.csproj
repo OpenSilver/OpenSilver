@@ -117,6 +117,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridFrozenGrid.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridRowHeader.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridRowsPresenter.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DatePickerTextBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\Common\Extensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
