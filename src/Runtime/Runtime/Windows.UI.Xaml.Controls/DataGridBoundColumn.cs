@@ -30,9 +30,9 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public abstract partial class DataGridBoundColumn : DataGridColumn
     {
-        private BindingBase _binding;
+        private Binding _binding;
 
-        public BindingBase Binding
+        public Binding Binding
         {
             get
             {
