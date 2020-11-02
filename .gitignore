@@ -332,3 +332,4 @@ ASALocalRun/
 
 # NuGet package generation output
 build/output
+build/temp
