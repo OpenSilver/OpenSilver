@@ -98,6 +98,11 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        void BasePrepareContainerForItemOverride(DependencyObject element, object item)
+        {
+            base.PrepareContainerForItemOverride(element, item);
+        }
+
         protected override DependencyObject GetContainerForItemOverride()
         {
             return new ComboBoxItem();
@@ -172,7 +177,14 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (this._contentPresenter != null)
                 {
-                    this._contentPresenter.Content = this._selectedContent;
+                    // Get the actual content (if it is a ComboBoxItem, we want its content):
+                    object content = this._selectedContent;
+                    if (content is ComboBoxItem)
+                    {
+                        content = ((ComboBoxItem)content).Content;
+                    }
+                    // Display the content (if it is a UIElement, display as it is, otherwise, use the DisplayMemberPath/ItemTemplate).
+                    base.PrepareContainerForItemOverride(this._contentPresenter, content);
                 }
             }
         }
@@ -210,7 +222,14 @@ namespace Windows.UI.Xaml.Controls
             // Put the selected item into the ContentPresenter if the popup is closed
             if (this._contentPresenter != null)
             {
-                this._contentPresenter.Content = this._selectedContent;
+                // Get the actual content (if it is a ComboBoxItem, we want its content):
+                object content = this._selectedContent;
+                if (content is ComboBoxItem)
+                {
+                    content = ((ComboBoxItem)content).Content;
+                }
+                // Display the content (if it is a UIElement, display as it is, otherwise, use the DisplayMemberPath/ItemTemplate).
+                base.PrepareContainerForItemOverride(this._contentPresenter, content);
             }
         }
 
@@ -348,7 +367,14 @@ namespace Windows.UI.Xaml.Controls
                     // Put the selected item back into the ContentPresenter if it was removed when the ToggleButton was checked:
                     if (comboBox._contentPresenter != null && comboBox._contentPresenter.Content == null)
                     {
-                        comboBox._contentPresenter.Content = comboBox._selectedContent;
+                        // Get the actual content (if it is a ComboBoxItem, we want its content):
+                        object content = comboBox._selectedContent;
+                        if (content is ComboBoxItem)
+                        {
+                            content = ((ComboBoxItem)content).Content;
+                        }
+                        // Display the content (if it is a UIElement, display as it is, otherwise, use the DisplayMemberPath/ItemTemplate).
+                        comboBox.BasePrepareContainerForItemOverride(comboBox._contentPresenter, content);
                     }
 
                     // Ensure that the toggle button is unchecked:
