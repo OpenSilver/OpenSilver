@@ -148,11 +148,13 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MediaElement.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleSubImage.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\PopupTimeSelectionMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Separator.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Spinner.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SubImageEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SubImageRoutedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TextBlock.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TimePicker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TimePickerPopup.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TimeUpDown.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WrapPanel.cs" />

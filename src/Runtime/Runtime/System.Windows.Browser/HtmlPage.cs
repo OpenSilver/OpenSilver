@@ -81,6 +81,22 @@ namespace System.Windows.Browser
         public static bool IsEnabled { get; private set; }
 
         public static BrowserInformation BrowserInformation { get; private set; }
+
+        /// <summary>
+        /// Registers a managed object for scriptable access by JavaScript code.
+        /// </summary>
+        /// <param name="scriptKey">
+        /// The name used to register the managed object.
+        /// </param>
+        /// <param name="instance">
+        /// A managed object.
+        /// </param>
+        /// <exception cref="T:System.ArgumentNullException">
+        /// <paramref name="scriptKey" /> or <paramref name="instance" /> is null.
+        /// </exception>
+        public static void RegisterScriptableObject(string scriptKey, object instance)
+        {
+        }
 #endif
 
     }

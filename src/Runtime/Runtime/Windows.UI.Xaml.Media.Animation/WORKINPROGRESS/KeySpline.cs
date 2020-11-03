@@ -18,6 +18,7 @@ using System;
 using System.Windows;
 #else
 using Windows.UI.Xaml;
+using Windows.Foundation;
 #endif
 
 #if MIGRATION
@@ -29,6 +30,21 @@ namespace Windows.UI.Xaml.Media.Animation
 #if WORKINPROGRESS
     public sealed partial class KeySpline : DependencyObject
     {
+        /// <summary>
+        /// Gets or sets the first control point used to define a Bezier curve that describes a <see cref="T:System.Windows.Media.Animation.KeySpline" />.
+        /// </summary>
+        /// <returns>
+        /// The first control point used to define a Bezier curve that describes a <see cref="T:System.Windows.Media.Animation.KeySpline" />.
+        /// </returns>
+        public Point ControlPoint1 { get; set; }
+
+        /// <summary>
+        /// Gets or sets the second control point used to define a Bezier curve that describes a <see cref="T:System.Windows.Media.Animation.KeySpline" />.
+        /// </summary>
+        /// <returns>
+        /// The second control point used to define a Bezier curve that describes a <see cref="T:System.Windows.Media.Animation.KeySpline" />.
+        /// </returns>
+        public Point ControlPoint2 { get; set; }
     }
 #endif
 }
