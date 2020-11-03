@@ -39,6 +39,253 @@ namespace Windows.UI.Xaml.Controls
         {
             throw new NotImplementedException();
         }
+
+        #region public DateTime? Value
+        /// <summary>
+        /// Gets or sets the currently selected time.
+        /// </summary>
+        public virtual DateTime? Value
+        {
+            get => (DateTime?)GetValue(ValueProperty);
+            set => SetValue(ValueProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the Value dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ValueProperty =
+            DependencyProperty.Register(
+                "Value",
+                typeof(DateTime?),
+                typeof(TimePickerPopup),
+                new PropertyMetadata(default(DateTime?), OnValuePropertyChanged));
+
+        /// <summary>
+        /// ValueProperty property changed handler.
+        /// </summary>
+        /// <param name="d">UpDownBase whose Value changed.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnValuePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
+        #endregion public DateTime? Value
+
+        #region public DateTime? Minimum
+        /// <summary>
+        /// Gets or sets the Minimum time considered valid by the control.
+        /// </summary>
+        /// <remarks>
+        /// Setting the Minimum property will be used to prevent users
+        /// from choosing values out of range in the TimePickerPopup.
+        /// </remarks>
+        public DateTime? Minimum
+        {
+            get => (DateTime?)GetValue(MinimumProperty);
+            set => SetValue(MinimumProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the Minimum dependency property.
+        /// </summary>
+        public static readonly DependencyProperty MinimumProperty =
+            DependencyProperty.Register(
+                "Minimum",
+                typeof(DateTime?),
+                typeof(TimePickerPopup),
+                new PropertyMetadata(null, OnMinimumPropertyChanged));
+
+        /// <summary>
+        /// MinimumProperty property changed handler.
+        /// </summary>
+        /// <param name="d">
+        /// TimeUpDown that changed its Minimum.
+        /// </param>
+        /// <param name="e">
+        /// Event arguments.
+        /// </param>
+        private static void OnMinimumPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TimePickerPopup source = (TimePickerPopup)d;
+            DateTime? oldValue = (DateTime?)e.OldValue;
+            DateTime? newValue = (DateTime?)e.NewValue;
+
+            source.OnMinimumChanged(oldValue, newValue);
+        }
+
+        /// <summary>
+        /// Called when the Minimum property value has changed.
+        /// </summary>
+        /// <param name="oldValue">
+        /// Old value of the Minimum property.
+        /// </param>
+        /// <param name="newValue">
+        /// New value of the Minimum property.
+        /// </param>
+        protected virtual void OnMinimumChanged(DateTime? oldValue, DateTime? newValue)
+        {
+        }
+        #endregion public DateTime? Minimum
+
+        #region public DateTime? Maximum
+        /// <summary>
+        /// Gets or sets the Maximum time considered valid by the control.
+        /// </summary>
+        /// <remarks>
+        /// Setting the Maximum property will be used to prevent users
+        /// from choosing values out of range in the TimePickerPopup.
+        /// </remarks>
+        public DateTime? Maximum
+        {
+            get => (DateTime?)GetValue(MaximumProperty);
+            set => SetValue(MaximumProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the Maximum dependency property.
+        /// </summary>
+        public static readonly DependencyProperty MaximumProperty =
+            DependencyProperty.Register(
+                "Maximum",
+                typeof(DateTime?),
+                typeof(TimePickerPopup),
+                new PropertyMetadata(null, OnMaximumPropertyChanged));
+
+        /// <summary>
+        /// MaximumProperty property changed handler.
+        /// </summary>
+        /// <param name="d">
+        /// TimeUpDown that changed its Maximum.
+        /// </param>
+        /// <param name="e">
+        /// Event arguments.
+        /// </param>
+        private static void OnMaximumPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TimePickerPopup source = (TimePickerPopup)d;
+            DateTime? oldValue = (DateTime?)e.OldValue;
+            DateTime? newValue = (DateTime?)e.NewValue;
+
+            source.OnMaximumChanged(oldValue, newValue);
+        }
+
+        /// <summary>
+        /// Called when the Maximum property value has changed.
+        /// </summary>
+        /// <param name="oldValue">
+        /// Old value of the Maximum property.
+        /// </param>
+        /// <param name="newValue">
+        /// New value of the Maximum property.
+        /// </param>
+        protected virtual void OnMaximumChanged(DateTime? oldValue, DateTime? newValue)
+        {
+        }
+        #endregion public DateTime? Maximum
+
+        #region public int PopupMinutesInterval
+        /// <summary>
+        /// Gets or sets the interval of minutes that can be picked in a popup.
+        /// </summary>
+        public int PopupMinutesInterval
+        {
+            get => (int)GetValue(PopupMinutesIntervalProperty);
+            set => SetValue(PopupMinutesIntervalProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the PopupMinutesInterval dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PopupMinutesIntervalProperty =
+            DependencyProperty.Register(
+                "PopupMinutesInterval",
+                typeof(int),
+                typeof(TimePickerPopup),
+                new PropertyMetadata(OnPopupMinutesIntervalPropertyChanged));
+
+        /// <summary>
+        /// PopupMinutesIntervalProperty property changed handler.
+        /// </summary>
+        /// <param name="d">
+        /// TimePicker that changed its PopupMinutesInterval.
+        /// </param>
+        /// <param name="e">
+        /// Event arguments.
+        /// </param>
+        private static void OnPopupMinutesIntervalPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TimePickerPopup source = (TimePickerPopup)d;
+
+            int oldValue = (int)e.OldValue;
+            int newValue = (int)e.NewValue;
+
+            source.OnPopupMinutesIntervalChanged(oldValue, newValue);
+        }
+
+        /// <summary>
+        /// Called when the popup minutes interval changed.
+        /// </summary>
+        /// <param name="oldValue">
+        /// The old value.
+        /// </param>
+        /// <param name="newValue">
+        /// The new value.
+        /// </param>
+        protected virtual void OnPopupMinutesIntervalChanged(int oldValue, int newValue)
+        {
+        }
+        #endregion public int PopupMinutesInterval
+
+        #region public PopupTimeSelectionMode PopupTimeSelectionMode
+        /// <summary>
+        /// Gets or sets the whether the TimePickerPopup supports selecting designators and/or seconds.
+        /// </summary>
+        public PopupTimeSelectionMode PopupTimeSelectionMode
+        {
+            get => (PopupTimeSelectionMode)GetValue(PopupTimeSelectionModeProperty);
+            set => SetValue(PopupTimeSelectionModeProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the PopupTimeSelectionMode dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PopupTimeSelectionModeProperty =
+            DependencyProperty.Register(
+                "PopupTimeSelectionMode",
+                typeof(PopupTimeSelectionMode),
+                typeof(TimePickerPopup),
+                new PropertyMetadata(PopupTimeSelectionMode.HoursAndMinutesOnly, OnPopupTimeSelectionModePropertyChanged));
+
+        /// <summary>
+        /// PopupTimeSelectionModeProperty property changed handler.
+        /// </summary>
+        /// <param name="d">
+        /// TimePickerPopup that changed its PopupTimeSelectionMode.
+        /// </param>
+        /// <param name="e">
+        /// Event arguments.
+        /// </param>
+        private static void OnPopupTimeSelectionModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TimePickerPopup source = (TimePickerPopup)d;
+
+            PopupTimeSelectionMode value = (PopupTimeSelectionMode)e.NewValue;
+
+            source.OnPopupTimeSelectionModeChanged((PopupTimeSelectionMode)e.OldValue, (PopupTimeSelectionMode)e.NewValue);
+        }
+
+        /// <summary>
+        /// Called when the time selection mode is changed.
+        /// </summary>
+        /// <param name="oldValue">
+        /// The old value.
+        /// </param>
+        /// <param name="newValue">
+        /// The new value.
+        /// </param>
+        protected virtual void OnPopupTimeSelectionModeChanged(PopupTimeSelectionMode oldValue, PopupTimeSelectionMode newValue)
+        {
+        }
+        #endregion public PopupTimeSelectionMode PopupTimeSelectionMode
     }
 }
 #endif

@@ -453,6 +453,14 @@ namespace Windows.UI.Xaml.Media.Animation
         {
 
         }
+
+        /// <summary>
+        /// Resumes the animation clock, or run-time state, associated with the storyboard.
+        /// </summary>
+        public void Resume()
+        {
+
+        }
 #endif
 
     }
