@@ -1,0 +1,68 @@
+﻿
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+
+#if WORKINPROGRESS
+
+using System;
+
+#if MIGRATION
+namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
+{
+    /// <summary>
+    /// Base class for all controls that provide value manipulation with a 
+    /// Spinner and a text box.
+    /// </summary>
+    /// <remarks>
+    /// This non generic base class is used to specify default template,
+    /// and simulate covariance among sub classes of UpDownBase&lt;T&gt;.
+    /// </remarks>
+    public class UpDownBase : Control
+    {
+        #region public Style SpinnerStyle
+        /// <summary>
+        /// Gets or sets the Style that is applied to the spinner.
+        /// </summary>
+        public Style SpinnerStyle
+        {
+            get => (Style)GetValue(SpinnerStyleProperty);
+            set => SetValue(SpinnerStyleProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the SpinnerStyle dependency property.
+        /// </summary>
+        public static readonly DependencyProperty SpinnerStyleProperty =
+            DependencyProperty.Register(
+                "SpinnerStyle",
+                typeof(Style),
+                typeof(UpDownBase),
+                new PropertyMetadata(null, OnSpinnerStylePropertyChanged));
+
+        /// <summary>
+        /// Property changed callback for SpinnerStyleProperty.
+        /// </summary>
+        /// <param name="d">UpDownBase whose SpinnerStyleProperty changed.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnSpinnerStylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion public Style SpinnerStyle
+    }
+}
+#endif

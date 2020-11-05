@@ -18,6 +18,12 @@
 using System;
 
 #if MIGRATION
+using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Media;
+#endif
+
+#if MIGRATION
 namespace System.Windows.Controls
 #else
 namespace Windows.UI.Xaml.Controls
@@ -35,6 +41,26 @@ namespace Windows.UI.Xaml.Controls
         /// A collection of dates that cannot be selected. The default value is an empty collection.
         /// </returns>
         public CalendarBlackoutDatesCollection BlackoutDates { get; private set; }
+
+        /// <summary>
+        /// Identifies the <see cref="P:System.Windows.Controls.DatePicker.SelectionBackground" /> dependency property.
+        /// </summary>
+        /// <returns>
+        /// The identifier for the <see cref="P:System.Windows.Controls.DatePicker.SelectionBackground" /> dependency property.
+        /// </returns>
+        public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register(nameof(SelectionBackground), typeof(Brush), typeof(DatePicker), null);
+
+        /// <summary>
+        /// Gets or sets the background used for selected dates.
+        /// </summary>
+        /// <returns>
+        /// The background used for selected dates.
+        /// </returns>
+        public Brush SelectionBackground
+        {
+            get => (Brush)GetValue(SelectionBackgroundProperty);
+            set => SetValue(SelectionBackgroundProperty, value);
+        }
     }
 }
 #endif

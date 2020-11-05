@@ -182,6 +182,99 @@ namespace Windows.UI.Xaml.Controls
         }
         #endregion public DateTime? Maximum
 
+        #region public ITimeFormat Format
+        /// <summary>
+        /// Gets or sets the Format used by the control.
+        /// From XAML Use either "Short", "Long" or a custom format.
+        /// Custom formats can only contain "H", "h", "m", "s" or "t".
+        /// For example: use 'hh:mm:ss' is used to format time as "13:45:30".
+        /// </summary>
+        public ITimeFormat Format
+        {
+            get { return GetValue(FormatProperty) as ITimeFormat; }
+            set { SetValue(FormatProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the Format dependency property.
+        /// </summary>
+        public static readonly DependencyProperty FormatProperty =
+            DependencyProperty.Register(
+                "Format",
+                typeof(ITimeFormat),
+                typeof(TimePickerPopup),
+                new PropertyMetadata(OnFormatPropertyChanged));
+
+        /// <summary>
+        /// FormatProperty property changed handler.
+        /// </summary>
+        /// <param name="d">TimePickerPopup that changed its Format.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnFormatPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TimePickerPopup source = (TimePickerPopup)d;
+            ITimeFormat value = e.NewValue as ITimeFormat;
+
+            source.OnFormatChanged(e.OldValue as ITimeFormat, value);
+        }
+
+        /// <summary>
+        /// Called when display format changed.
+        /// </summary>
+        /// <param name="oldValue">The old format.</param>
+        /// <param name="newValue">The new format.</param>
+        protected virtual void OnFormatChanged(ITimeFormat oldValue, ITimeFormat newValue)
+        {
+        }
+        #endregion public ITimeFormat Format
+
+        #region public int PopupSecondsInterval
+        /// <summary>
+        /// Gets or sets the interval of seconds that can be
+        /// picked in a popup.
+        /// </summary>
+        public int PopupSecondsInterval
+        {
+            get => (int)GetValue(PopupSecondsIntervalProperty);
+            set => SetValue(PopupSecondsIntervalProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the PopupSecondsInterval dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PopupSecondsIntervalProperty =
+            DependencyProperty.Register(
+                "PopupSecondsInterval",
+                typeof(int),
+                typeof(TimePickerPopup),
+                new PropertyMetadata(OnPopupSecondsIntervalPropertyChanged));
+
+        /// <summary>
+        /// PopupSecondsIntervalProperty property changed handler.
+        /// </summary>
+        /// <param name="d">TimePicker that changed its PopupSecondsInterval.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnPopupSecondsIntervalPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TimePickerPopup source = (TimePickerPopup)d;
+
+            int oldValue = (int)e.OldValue;
+            int newValue = (int)e.NewValue;
+
+            source.OnPopupSecondsIntervalChanged(oldValue, newValue);
+        }
+
+        /// <summary>
+        /// Called when the popup seconds interval changed.
+        /// </summary>
+        /// <param name="oldValue">The old value.</param>
+        /// <param name="newValue">The new value.</param>
+        protected virtual void OnPopupSecondsIntervalChanged(int oldValue, int newValue)
+        {
+        }
+        #endregion public int PopupSecondsInterval
+
+
         #region public int PopupMinutesInterval
         /// <summary>
         /// Gets or sets the interval of minutes that can be picked in a popup.
