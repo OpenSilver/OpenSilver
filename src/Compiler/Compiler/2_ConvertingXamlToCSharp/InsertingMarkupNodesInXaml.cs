@@ -49,37 +49,41 @@ namespace DotNetForHtml5.Compiler
             {
                 if (IsMarkupExtension(currentAttribute))
                 {
-                    string currentElementTypeName = currentElement.Name.LocalName.Split('.')[0];
-                    string currentElementNamespaceName = currentElement.Name.NamespaceName;
-                    string currentAttributeTypeName;
-                    string currentAttributeName;
-                    string currentAttributeNamespaceName = currentAttribute.Name.NamespaceName;
-                    string currentAttributeValueEscaped = EscapeCommasInQuotes(currentAttribute.Value); // This will replace for example Fallback='3,3,3,3' with Fallback='3<COMMA>3<COMMA>3<COMMA>3' (to make later parsing easier)
-                    if (currentAttribute.Name.LocalName.Contains(".")) // case where the type of the currentAttribute is mentionned (ex : <Border Border.Background="..." />)
+                    // Skip if the attribute has a namespace but no "dot", such as d:DataContext="{...}", so that it is in line with what we do in "GeneratingCSharpCode.cs". This is actually needed to be able to compile because something like d:DataContext="{d:ClassThatDoesNotExist ...}" where "d" is in the list of "mc:Ignorable". //todo: a better approach would be to remove all attributes that have a prefix in the list of "mc:Ignorable".
+                    if (string.IsNullOrEmpty(currentAttribute.Name.NamespaceName) || currentAttribute.Name.LocalName.Contains("."))
                     {
-                        string[] attributeSplittedLocalName = currentAttribute.Name.LocalName.Split('.');
-                        currentAttributeTypeName = attributeSplittedLocalName[0];
-                        currentAttributeName = attributeSplittedLocalName[1];
+                        string currentElementTypeName = currentElement.Name.LocalName.Split('.')[0];
+                        string currentElementNamespaceName = currentElement.Name.NamespaceName;
+                        string currentAttributeTypeName;
+                        string currentAttributeName;
+                        string currentAttributeNamespaceName = currentAttribute.Name.NamespaceName;
+                        string currentAttributeValueEscaped = EscapeCommasInQuotes(currentAttribute.Value); // This will replace for example Fallback='3,3,3,3' with Fallback='3<COMMA>3<COMMA>3<COMMA>3' (to make later parsing easier)
+                        if (currentAttribute.Name.LocalName.Contains(".")) // case where the type of the currentAttribute is mentionned (ex : <Border Border.Background="..." />)
+                        {
+                            string[] attributeSplittedLocalName = currentAttribute.Name.LocalName.Split('.');
+                            currentAttributeTypeName = attributeSplittedLocalName[0];
+                            currentAttributeName = attributeSplittedLocalName[1];
+                        }
+                        else // if the type is not mentionned, we assume the property is defined in the type of currentElement (ex : <Border Background="..." />)
+                        {
+                            currentAttributeNamespaceName = currentElementNamespaceName;
+                            currentAttributeTypeName = currentElementTypeName;
+                            currentAttributeName = currentAttribute.Name.LocalName;
+                        }
+                        if (string.IsNullOrEmpty(currentAttributeNamespaceName)) // if the namespace of the currentAttribute is still empty at this point, it means that currentAttribute is an attached property defined in the current default namespace.
+                        {
+                            currentAttributeNamespaceName = currentDefaultNamespace.NamespaceName;
+                        }
+                        if (currentElementNamespaceName == currentAttributeNamespaceName && currentElementTypeName == currentAttributeTypeName) // currentAttribute is a property defined in the type of currentElement (or one of his parents)
+                        {
+                            currentElement.Add(GenerateNodeForAttribute(currentElement.Name + ("." + currentAttributeName), currentAttributeValueEscaped, currentDefaultNamespace, reflectionOnSeparateAppDomain, currentElement.GetNamespaceOfPrefix));
+                        }
+                        else // currentAttribute is an attached property
+                        {
+                            currentElement.Add(GenerateNodeForAttribute("{" + currentAttributeNamespaceName + "}" + currentAttributeTypeName + "." + currentAttributeName, currentAttributeValueEscaped, currentDefaultNamespace, reflectionOnSeparateAppDomain, currentElement.GetNamespaceOfPrefix));
+                        }
+                        currentAttribute.Remove();
                     }
-                    else // if the type is not mentionned, we assume the property is defined in the type of currentElement (ex : <Border Background="..." />)
-                    {
-                        currentAttributeNamespaceName = currentElementNamespaceName;
-                        currentAttributeTypeName = currentElementTypeName;
-                        currentAttributeName = currentAttribute.Name.LocalName;
-                    }
-                    if (string.IsNullOrEmpty(currentAttributeNamespaceName)) // if the namespace of the currentAttribute is still empty at this point, it means that currentAttribute is an attached property defined in the current default namespace.
-                    {
-                        currentAttributeNamespaceName = currentDefaultNamespace.NamespaceName;
-                    }
-                    if (currentElementNamespaceName == currentAttributeNamespaceName && currentElementTypeName == currentAttributeTypeName) // currentAttribute is a property defined in the type of currentElement (or one of his parents)
-                    {
-                        currentElement.Add(GenerateNodeForAttribute(currentElement.Name + ("." + currentAttributeName), currentAttributeValueEscaped, currentDefaultNamespace, reflectionOnSeparateAppDomain, currentElement.GetNamespaceOfPrefix));
-                    }
-                    else // currentAttribute is an attached property
-                    {
-                        currentElement.Add(GenerateNodeForAttribute("{" + currentAttributeNamespaceName + "}" + currentAttributeTypeName + "." + currentAttributeName, currentAttributeValueEscaped, currentDefaultNamespace, reflectionOnSeparateAppDomain, currentElement.GetNamespaceOfPrefix));
-                    }
-                    currentAttribute.Remove();
                 }
             }
 
