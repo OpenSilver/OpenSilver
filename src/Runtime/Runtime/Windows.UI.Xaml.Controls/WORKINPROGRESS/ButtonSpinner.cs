@@ -13,6 +13,8 @@
 \*====================================================================================*/
 
 
+using System.Windows.Markup;
+
 #if WORKINPROGRESS
 
 #if MIGRATION
@@ -28,8 +30,49 @@ namespace Windows.UI.Xaml.Controls
     /// ButtonSpinner inherits from Spinner.
     /// It adds two button template parts and a content property.
     /// </remarks>
+    [ContentProperty("Content")]
     public class ButtonSpinner : Spinner
     {
+        #region public object Content
+        /// <summary>
+        /// Gets or sets the content that is contained within the button spinner.
+        /// </summary>
+        public object Content
+        {
+            get => GetValue(ContentProperty);
+            set => SetValue(ContentProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the Content dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContentProperty =
+            DependencyProperty.Register(
+                "Content",
+                typeof(object),
+                typeof(ButtonSpinner),
+                new PropertyMetadata(null, OnContentPropertyChanged));
+
+        /// <summary>
+        /// ContentProperty property changed handler.
+        /// </summary>
+        /// <param name="d">ButtonSpinner that changed its Content.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnContentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var source = d as ButtonSpinner;
+            source.OnContentChanged(e.OldValue, e.NewValue);
+        }
+        #endregion public object Content
+
+        /// <summary>
+        /// Occurs when the Content property value changed.
+        /// </summary>
+        /// <param name="oldValue">The old value of the Content property.</param>
+        /// <param name="newValue">The new value of the Content property.</param>
+        protected virtual void OnContentChanged(object oldValue, object newValue)
+        {
+        }
     }
 }
 #endif

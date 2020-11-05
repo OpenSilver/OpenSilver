@@ -56,6 +56,60 @@ namespace Windows.UI.Xaml.Controls
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Identifies the <see cref="P:System.Windows.Controls.DataGrid.RowStyle" /> dependency property.
+        /// </summary>
+        /// <returns>
+        /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.RowStyle" /> dependency property.
+        /// </returns>
+        public static readonly DependencyProperty RowStyleProperty = DependencyProperty.Register(nameof(RowStyle), typeof(Style), typeof(DataGrid), new PropertyMetadata(new PropertyChangedCallback(DataGrid.OnRowStylePropertyChanged)));
+
+        /// <summary>
+        /// Gets or sets the style that is used when rendering the rows.
+        /// </summary>
+        /// <returns>
+        /// The style applied to rows. The default is null.
+        /// </returns>
+        public Style RowStyle
+        {
+            get => GetValue(RowStyleProperty) as Style;
+            set => SetValue(RowStyleProperty, value);
+        }
+
+        private static void OnRowStylePropertyChanged(
+            DependencyObject d,
+            DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="P:System.Windows.Controls.DataGrid.GridLinesVisibility" /> dependency property.
+        /// </summary>
+        /// <returns>
+        /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.GridLinesVisibility" /> dependency property.
+        /// </returns>
+        public static readonly DependencyProperty GridLinesVisibilityProperty = DependencyProperty.Register(nameof(GridLinesVisibility), typeof(DataGridGridLinesVisibility), typeof(DataGrid), new PropertyMetadata(new PropertyChangedCallback(DataGrid.OnGridLinesVisibilityPropertyChanged)));
+
+        /// <summary>
+        /// Gets or sets a value that indicates which grid lines separating inner cells are shown.
+        /// </summary>
+        /// <returns>
+        /// One of the enumeration values indicating which grid lines are shown. The default is <see cref="F:System.Windows.Controls.DataGridGridLinesVisibility.All" />.
+        /// </returns>
+        public DataGridGridLinesVisibility GridLinesVisibility
+        {
+            get => (DataGridGridLinesVisibility)GetValue(GridLinesVisibilityProperty);
+            set => SetValue(GridLinesVisibilityProperty, (object)value);
+        }
+
+        private static void OnGridLinesVisibilityPropertyChanged(
+            DependencyObject d,
+            DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 #endif
