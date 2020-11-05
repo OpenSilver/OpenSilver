@@ -38,5 +38,35 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public partial class ListBoxItem : SelectorItem
     {
+        protected internal override void HandleIsSelectedChanged(bool oldValue, bool newValue)
+        {
+            base.HandleIsSelectedChanged(oldValue, newValue);
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                //todo: remove what's inside the "if" above once we will have defined a default style for the ItemsControl, that does about the same thing.
+                if (INTERNAL_ParentSelectorControl != null)
+                {
+                    if (INTERNAL_ParentSelectorControl is MultiSelector)
+                    {
+                        var parent = (MultiSelector)INTERNAL_ParentSelectorControl;
+                        if (newValue)
+                        {
+                            if (!INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(parent.SelectedItems, this.INTERNAL_CorrespondingItem))
+                            {
+                                INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Add(parent.SelectedItems, this.INTERNAL_CorrespondingItem);
+                            }
+                        }
+                        else
+                        {
+                            if (INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(parent.SelectedItems, this.INTERNAL_CorrespondingItem))
+                            {
+                                INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Remove(parent.SelectedItems, this.INTERNAL_CorrespondingItem);
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
     }
 }

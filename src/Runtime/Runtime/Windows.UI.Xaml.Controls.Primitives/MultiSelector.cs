@@ -71,6 +71,23 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     SetItemVisualSelectionState(item, true);
                 }
             }
+            // Update the SelectedItem property:
+            // based on WPF's behaviour, SelectedItem is the item that was first selected among the currently selected items:
+            IList items = SelectedItems; //Note: items cannot be null as we came here as a result of it firing the CollectionChanged event.
+            if (items.Count > 0)
+            {
+                foreach (object item in items) //Note: items being an IList, we do not have access to ElementAt ot First so we do this.
+                {
+                    SelectedItem = item;
+                    break;
+                }
+            }
+
+            //Fire the SelectionChanged event:
+            var removedItems = e.OldItems ?? new Collection<object>();
+            var addedItems = e.NewItems ?? new Collection<object>();
+            OnSelectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
+
         }
 
         protected abstract void UnselectAllItems();

@@ -321,23 +321,23 @@ namespace Windows.UI.Xaml.Controls
             if (listBoxItem != null)
             {
                 listBoxItem.IsSelected = newState;
-                if (newState)
-                {
-                    SelectedItem = item;
-                }
-                else
-                {
-                    //trigger the OnSelectionChanged event:
-                    List<object> oldItems = new List<object>();
-                    oldItems.Add(item);
-                    List<object> newItems = new List<object>();
-                    //newItems.Add(null);
-                    OnSelectionChanged(new SelectionChangedEventArgs(oldItems, newItems));
-                }
+                //if (newState)
+                //{
+                //    SelectedItem = item;
+                //}
                 //else
                 //{
-                //    SelectedItem = null;
+                //    //trigger the OnSelectionChanged event:
+                //    List<object> oldItems = new List<object>();
+                //    oldItems.Add(item);
+                //    List<object> newItems = new List<object>();
+                //    //newItems.Add(null);
+                //    OnSelectionChanged(new SelectionChangedEventArgs(oldItems, newItems));
                 //}
+                ////else
+                ////{
+                ////    SelectedItem = null;
+                ////}
             }
         }
 

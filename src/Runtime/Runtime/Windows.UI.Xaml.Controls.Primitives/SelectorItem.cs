@@ -79,37 +79,41 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private static void IsSelected_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             SelectorItem selectorItem = (SelectorItem)d;
-            
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(selectorItem))
+            selectorItem.HandleIsSelectedChanged((bool)e.OldValue, (bool)e.NewValue);
+        }
+
+        virtual internal protected void HandleIsSelectedChanged(bool oldValue, bool newValue)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
                 //todo: remove what's inside the "if" above once we will have defined a default style for the ItemsControl, that does about the same thing.
-                if (selectorItem.INTERNAL_ParentSelectorControl != null)
+                if (INTERNAL_ParentSelectorControl != null)
                 {
-                    Selector selector = selectorItem.INTERNAL_ParentSelectorControl;
+                    Selector selector = INTERNAL_ParentSelectorControl;
 
                     if (selector.ItemContainerStyle == null)
                     {
-                        bool newValue = (bool)e.NewValue;
-                        if (newValue != (bool)e.OldValue)
+                        //bool newValue = (bool)e.NewValue;
+                        if (newValue != oldValue)
                         {
                             if (newValue)
                             {
                                 // Remember the values of the Background and Foreground before selection, in order to be able to revert them back when needed:
-                                selectorItem._backgroundBeforeBeingSelected = selectorItem.Background;
-                                selectorItem._foregroundBeforeBeingSelected = selectorItem.Foreground;
-                                selectorItem._hasEverBeenSelected = true;
+                                _backgroundBeforeBeingSelected = this.Background;
+                                _foregroundBeforeBeingSelected = this.Foreground;
+                                _hasEverBeenSelected = true;
 
                                 // Set the Background and Foreground:
-                                selectorItem.Background = selector.SelectedItemBackground;
-                                selectorItem.Foreground = selector.SelectedItemForeground;
+                                this.Background = selector.SelectedItemBackground;
+                                this.Foreground = selector.SelectedItemForeground;
                             }
                             else
                             {
                                 // Restore the Background and Foreground that the item had before being selected:
-                                if (selectorItem._hasEverBeenSelected)
+                                if (_hasEverBeenSelected)
                                 {
-                                    selectorItem.Background = selectorItem._backgroundBeforeBeingSelected;
-                                    selectorItem.Foreground = selectorItem._foregroundBeforeBeingSelected;
+                                    this.Background = _backgroundBeforeBeingSelected;
+                                    this.Foreground = _foregroundBeforeBeingSelected;
                                 }
                                 //selectorItem.Background = selector.UnselectedItemBackground ?? selector.Background;
                                 //selectorItem.Foreground = selector.UnselectedItemForeground ?? selector.Foreground;
@@ -118,13 +122,13 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     }
                 }
             }
-            if ((bool)e.NewValue)
+            if (newValue)
             {
-                VisualStateManager.GoToState(selectorItem, "Selected", false);
+                VisualStateManager.GoToState(this, "Selected", false);
             }
             else
             {
-                VisualStateManager.GoToState(selectorItem, "Unselected", false);
+                VisualStateManager.GoToState(this, "Unselected", false);
             }
         }
     }
