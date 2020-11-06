@@ -113,6 +113,7 @@
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TablePatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\AccordionButton.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridCellsPresenter.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridColumnHeader.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridColumnHeadersPresenter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridDetailsPresenter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridFrozenGrid.cs" />
@@ -122,9 +123,14 @@
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\ExpandableContentControl.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\Selector.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\AccordionSelectionMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\Common\Extensions.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\DataGridHeadersVisibility.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\DataGridRowDetailsVisibilityMode.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\ExpandDirection.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\PopulatingEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\SelectionSequence.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TileView.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TileViewItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ValidationHelper.cs" />
@@ -140,6 +146,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CustomTimeFormat.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridGridLinesVisibility.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePicker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
@@ -151,6 +158,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MediaElement.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleSubImage.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\NumericUpDown.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Picker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\PopupTimeSelectionMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Separator.cs" />

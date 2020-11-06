@@ -35,6 +35,93 @@ namespace Windows.UI.Xaml.Controls
         public event RoutedPropertyChangedEventHandler<DateTime?> ValueChanged;
 #endif
 
+        #region public DateTime? Minimum
+        /// <summary>
+        /// Gets or sets the minimum time considered valid by the control.
+        /// </summary>
+        /// <remarks>Setting the minimum property is applicable for the following
+        /// features: Selecting a value through a popup, Parsing a new value from
+        /// the textbox, spinning a new value and programmatically specifying a value.</remarks>
+        public DateTime? Minimum
+        {
+            get => (DateTime?)GetValue(MinimumProperty);
+            set => SetValue(MinimumProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the Minimum dependency property.
+        /// </summary>
+        public static readonly DependencyProperty MinimumProperty =
+            DependencyProperty.Register(
+                "Minimum",
+                typeof(DateTime?),
+                typeof(TimePicker),
+                new PropertyMetadata(null, OnMinimumPropertyChanged));
+
+        /// <summary>
+        /// MinimumProperty property changed handler.
+        /// </summary>
+        /// <param name="d">TimeUpDown that changed its Minimum.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnMinimumPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Called when the Minimum property value has changed.
+        /// </summary>
+        /// <param name="oldValue">Old value of the Minimum property.</param>
+        /// <param name="newValue">New value of the Minimum property.</param>
+        protected virtual void OnMinimumChanged(DateTime? oldValue, DateTime? newValue)
+        {
+        }
+        #endregion public DateTime? Minimum
+
+        #region public DateTime? Maximum
+        /// <summary>
+        /// Gets or sets the maximum time considered valid by the control.
+        /// </summary>
+        /// <remarks>Setting the Maximum property is applicable for the following
+        /// features: Selecting a value through a popup, Parsing a new value
+        /// from the textbox, spinning a new value and programmatically specifying
+        /// a value. </remarks>
+        public DateTime? Maximum
+        {
+            get => (DateTime?)GetValue(MaximumProperty);
+            set => SetValue(MaximumProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the Maximum dependency property.
+        /// </summary>
+        public static readonly DependencyProperty MaximumProperty =
+            DependencyProperty.Register(
+                "Maximum",
+                typeof(DateTime?),
+                typeof(TimePicker),
+                new PropertyMetadata(null, OnMaximumPropertyChanged));
+
+        /// <summary>
+        /// MaximumProperty property changed handler.
+        /// </summary>
+        /// <param name="d">TimeUpDown that changed its Maximum.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnMaximumPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Called when the Maximum property value has changed.
+        /// </summary>
+        /// <param name="oldValue">Old value of the Maximum property.</param>
+        /// <param name="newValue">New value of the Maximum property.</param>
+        protected virtual void OnMaximumChanged(DateTime? oldValue, DateTime? newValue)
+        {
+        }
+        #endregion public DateTime? Maximum
+
         #region public ITimeFormat Format
         /// <summary>
         /// Gets or sets the Format used by the control. From XAML Use either
@@ -181,14 +268,37 @@ namespace Windows.UI.Xaml.Controls
         }
         #endregion public PopupTimeSelectionMode PopupTimeSelectionMode
 
+        #region public ClickMode PopupButtonMode
         /// <summary>
         /// Gets or sets the button event that causes the popup portion of the
         /// Picker control to open.
         /// </summary>
         public ClickMode PopupButtonMode
         {
-            get; set;
+            get => (ClickMode)GetValue(PopupButtonModeProperty);
+            set => SetValue(PopupButtonModeProperty, value);
         }
+
+        /// <summary>
+        /// Identifies the PopupButtonMode dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PopupButtonModeProperty =
+            DependencyProperty.Register(
+                "PopupButtonMode",
+                typeof(ClickMode),
+                typeof(Picker),
+                new PropertyMetadata(ClickMode.Release, OnPopupButtonModePropertyChanged));
+
+        /// <summary>
+        /// PopupButtonModeProperty property changed handler.
+        /// </summary>
+        /// <param name="d">Picker that changed its PopupButtonMode.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnPopupButtonModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion public ClickMode PopupButtonMode
     }
 }
 #endif

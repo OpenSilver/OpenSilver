@@ -32,6 +32,21 @@ namespace Windows.UI.Xaml.Media.Animation
     /// </summary>
     public sealed partial class SplineColorKeyFrame : ColorKeyFrame
     {
+        /// <summary>Identifies the <see cref="P:System.Windows.Media.Animation.SplineColorKeyFrame.KeySpline" /> dependency property.</summary>
+        /// <returns>The identifier for the <see cref="P:System.Windows.Media.Animation.SplineColorKeyFrame.KeySpline" /> dependency property.</returns>
+        public static readonly DependencyProperty KeySplineProperty = DependencyProperty.Register("KeySpline", typeof(KeySpline), typeof(SplineColorKeyFrame), new PropertyMetadata(new KeySpline()));
+
+        /// <summary>
+        /// Gets or sets the two control points that define animation progress for this key frame.
+        /// </summary>
+        /// <returns>
+        /// The two control points that specify the cubic Bezier curve which defines the progress of the key frame.
+        /// </returns>
+        public KeySpline KeySpline
+        {
+            get => (KeySpline)GetValue(KeySplineProperty);
+            set => SetValue(KeySplineProperty, value);
+        }
     }
 #endif
 }

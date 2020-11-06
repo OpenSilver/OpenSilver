@@ -67,6 +67,171 @@ namespace Windows.UI.Xaml.Controls
         {
             throw new NotImplementedException();
         }
+
+
+        #region public AccordionSelectionMode SelectionMode
+        /// <summary>
+        /// Gets or sets the AccordionSelectionMode used to determine the minimum
+        /// and maximum selected AccordionItems allowed in the Accordion.
+        /// </summary>
+        public AccordionSelectionMode SelectionMode
+        {
+            get => (AccordionSelectionMode)GetValue(SelectionModeProperty);
+            set => SetValue(SelectionModeProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the SelectionMode dependency property.
+        /// </summary>
+        public static readonly DependencyProperty SelectionModeProperty =
+            DependencyProperty.Register(
+                "SelectionMode",
+                typeof(AccordionSelectionMode),
+                typeof(Accordion),
+                new PropertyMetadata(AccordionSelectionMode.One, OnSelectionModePropertyChanged));
+
+        /// <summary>
+        /// SelectionModeProperty property changed handler.
+        /// </summary>
+        /// <param name="d">Accordion that changed its SelectionMode.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnSelectionModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion public AccordionSelectionMode SelectionMode
+
+        #region public object SelectedItem
+        /// <summary>
+        /// Gets or sets the selected item.
+        /// </summary>
+        /// <remarks>
+        /// The default value is null.
+        /// When multiple items are allowed (IsMaximumOneSelected false),
+        /// return the first of the selectedItems.
+        /// </remarks>
+        public object SelectedItem
+        {
+            get => GetValue(SelectedItemProperty);
+            set => SetValue(SelectedItemProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the SelectedItem dependency property.
+        /// </summary>
+        public static readonly DependencyProperty SelectedItemProperty =
+            DependencyProperty.Register(
+                "SelectedItem",
+                typeof(object),
+                typeof(Accordion),
+                new PropertyMetadata(null, OnSelectedItemPropertyChanged));
+
+        /// <summary>
+        /// SelectedItemProperty property changed handler.
+        /// </summary>
+        /// <param name="d">Accordion that changed its SelectedItem.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnSelectedItemPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion public object SelectedItem
+
+
+        #region public SelectionSequence SelectionSequence
+        /// <summary>
+        /// Gets or sets the SelectionSequence used to determine
+        /// the order of AccordionItem selection.
+        /// </summary>
+        public SelectionSequence SelectionSequence
+        {
+            get => (SelectionSequence)GetValue(SelectionSequenceProperty);
+            set => SetValue(SelectionSequenceProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the SelectionSequence dependency property.
+        /// </summary>
+        public static readonly DependencyProperty SelectionSequenceProperty =
+            DependencyProperty.Register(
+                "SelectionSequence",
+                typeof(SelectionSequence),
+                typeof(Accordion),
+                new PropertyMetadata(SelectionSequence.Simultaneous, OnSelectionSequencePropertyChanged));
+
+        /// <summary>
+        /// Called when SelectionSequenceProperty changed.
+        /// </summary>
+        /// <param name="d">Accordion that changed its SelectionSequence property.</param>
+        /// <param name="e">The <see cref="System.Windows.DependencyPropertyChangedEventArgs"/>
+        /// instance containing the event data.</param>
+        private static void OnSelectionSequencePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion public SelectionSequence SelectionSequence
+
+        #region public Style AccordionButtonStyle
+        /// <summary>
+        /// Gets or sets the Style that is applied to AccordionButton elements
+        /// in the AccordionItems.
+        /// </summary>
+        public Style AccordionButtonStyle
+        {
+            get => GetValue(AccordionButtonStyleProperty) as Style;
+            set => SetValue(AccordionButtonStyleProperty, value);
+        }
+
+        /// <summary>
+        /// The name used to indicate AccordionButtonStyle property.
+        /// </summary>
+        private const string AccordionButtonStyleName = "AccordionButtonStyle";
+
+        /// <summary>
+        /// Identifies the AccordionButtonStyle dependency property.
+        /// </summary>
+        public static readonly DependencyProperty AccordionButtonStyleProperty =
+            DependencyProperty.Register(
+                AccordionButtonStyleName,
+                typeof(Style),
+                typeof(Accordion),
+                new PropertyMetadata(null, OnAccordionButtonStylePropertyChanged));
+
+        /// <summary>
+        /// AccordionButtonStyleProperty property changed handler.
+        /// </summary>
+        /// <param name="d">Accordion that changed its AccordionButtonStyle.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnAccordionButtonStylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
+        #endregion public Style AccordionButtonStyle
+
+        #region public DataTemplate ContentTemplate
+        /// <summary>
+        /// Gets or sets the DataTemplate used to display the content
+        /// of each generated AccordionItem.
+        /// </summary>
+        /// <remarks>Either ContentTemplate or ItemTemplate is used.
+        /// Setting both will result in an exception.</remarks>
+        public DataTemplate ContentTemplate
+        {
+            get => (DataTemplate)GetValue(ContentTemplateProperty);
+            set => SetValue(ContentTemplateProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the ContentTemplate dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContentTemplateProperty =
+            DependencyProperty.Register(
+                "ContentTemplate",
+                typeof(DataTemplate),
+                typeof(Accordion),
+                new PropertyMetadata(null));
+        #endregion public DataTemplate ContentTemplate
     }
 }
 #endif
