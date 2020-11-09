@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a System.Windows.Controls.DataGrid row.
     /// </summary>
-    public partial class DataGridRow : DependencyObject
+    public partial class DataGridRow : Control
     {
         public DataGridRow()
         {
