@@ -61,6 +61,33 @@ namespace Windows.UI.Xaml.Controls
             get => (Brush)GetValue(SelectionBackgroundProperty);
             set => SetValue(SelectionBackgroundProperty, value);
         }
+
+        /// <summary>
+        /// Identifies the <see cref="P:System.Windows.Controls.DatePicker.DisplayDateStart" /> dependency property.
+        /// </summary>
+        /// <returns>
+        /// The identifier for the <see cref="P:System.Windows.Controls.DatePicker.DisplayDateStart" /> dependency property.
+        /// </returns>
+        public static readonly DependencyProperty DisplayDateStartProperty = DependencyProperty.Register(nameof(DisplayDateStart), typeof(DateTime?), typeof(DatePicker), new PropertyMetadata(OnDisplayDateStartChanged));
+
+        /// <summary>
+        /// Gets or sets the first date to be displayed.
+        /// </summary>
+        /// <returns>
+        /// The first date to display.
+        /// </returns>
+        public DateTime? DisplayDateStart
+        {
+            get => (DateTime?)GetValue(DisplayDateStartProperty);
+            set => SetValue(DisplayDateStartProperty, value);
+        }
+
+        private static void OnDisplayDateStartChanged(
+            DependencyObject d,
+            DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 #endif

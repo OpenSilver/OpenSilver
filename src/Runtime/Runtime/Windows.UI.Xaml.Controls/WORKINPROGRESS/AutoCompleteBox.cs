@@ -8,7 +8,14 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-	public partial class AutoCompleteBox
+    /// <summary>
+    /// Represents the method that will handle the <see cref="E:System.Windows.Controls.AutoCompleteBox.Populating" /> event of a <see cref="T:System.Windows.Controls.AutoCompleteBox" /> control.
+    /// </summary>
+    /// <param name="sender">The source of the event. </param>
+    /// <param name="e">A <see cref="T:System.Windows.Controls.PopulatingEventArgs" /> that contains the event data.</param>
+    public delegate void PopulatingEventHandler(object sender, PopulatingEventArgs e);
+
+    public partial class AutoCompleteBox
 	{
 		
 		//
@@ -29,6 +36,22 @@ namespace Windows.UI.Xaml.Controls
         public void PopulateComplete()
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Occurs when the <see cref="T:System.Windows.Controls.AutoCompleteBox" /> is populating the drop-down with possible matches based on the <see cref="P:System.Windows.Controls.AutoCompleteBox.Text" /> property.
+        /// </summary>
+        public event PopulatingEventHandler Populating;
+
+        /// <summary>
+        /// Gets or sets the property path that is used to get the value for display in the text box portion of the <see cref="T:System.Windows.Controls.AutoCompleteBox" /> control, and to filter items for display in the drop-down.
+        /// </summary>
+        /// <returns>
+        /// The property path that is used to get values for display in the text box portion of the <see cref="T:System.Windows.Controls.AutoCompleteBox" /> control, and to filter items for display in the drop-down.
+        /// </returns>
+        public string ValueMemberPath
+        {
+            get; set;
         }
     }
 }

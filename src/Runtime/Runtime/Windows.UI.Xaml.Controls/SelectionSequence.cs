@@ -24,27 +24,19 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Represents a control that displays a header and has a collapsible
-    /// content window.
+    /// Determines the order in which visual states are set.
     /// </summary>
-    public class AccordionItem : HeaderedContentControl, IUpdateVisualState
+    public enum SelectionSequence
     {
         /// <summary>
-        /// Update the visual state of the control.
+        /// Collapses are set before expansions.
         /// </summary>
-        /// <param name="useTransitions">
-        /// A value indicating whether to automatically generate transitions to
-        /// the new state, or instantly transition to the new state.
-        /// </param>
-        void IUpdateVisualState.UpdateVisualState(bool useTransitions)
-        {
-            throw new NotImplementedException();
-        }
+        CollapseBeforeExpand,
 
         /// <summary>
-        /// Occurs when the accordionItem is selected.
+        /// No delays, all states are set immediately.
         /// </summary>
-        public event RoutedEventHandler Selected;
+        Simultaneous
     }
 }
 #endif

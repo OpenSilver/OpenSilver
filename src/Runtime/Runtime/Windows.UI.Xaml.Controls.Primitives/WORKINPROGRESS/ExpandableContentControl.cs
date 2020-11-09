@@ -15,6 +15,8 @@
 
 #if WORKINPROGRESS
 
+using System;
+
 #if MIGRATION
 namespace System.Windows.Controls.Primitives
 #else
@@ -27,6 +29,71 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// </summary>
     public class ExpandableContentControl : ContentControl
     {
+        #region public ExpandDirection RevealMode
+        /// <summary>
+        /// Gets or sets the direction in which the ExpandableContentControl
+        /// content window opens.
+        /// </summary>
+        public ExpandDirection RevealMode
+        {
+            get => (ExpandDirection)GetValue(RevealModeProperty);
+            set => SetValue(RevealModeProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the RevealMode dependency property.
+        /// </summary>
+        public static readonly DependencyProperty RevealModeProperty =
+            DependencyProperty.Register(
+                "RevealMode",
+                typeof(ExpandDirection),
+                typeof(ExpandableContentControl),
+                new PropertyMetadata(ExpandDirection.Down, OnRevealModePropertyChanged));
+
+        /// <summary>
+        /// RevealModeProperty property changed handler.
+        /// </summary>
+        /// <param name="d">ExpandableContentControl that changed its RevealMode.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnRevealModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion public ExpandDirection RevealMode
+
+        #region public double Percentage
+        /// <summary>
+        /// Gets or sets the relative percentage of the content that is
+        /// currently visible. A percentage of 1 corresponds to the complete
+        /// TargetSize.
+        /// </summary>
+        public double Percentage
+        {
+            get => (double)GetValue(PercentageProperty);
+            set => SetValue(PercentageProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the Percentage dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PercentageProperty =
+            DependencyProperty.Register(
+                "Percentage",
+                typeof(double),
+                typeof(ExpandableContentControl),
+                new PropertyMetadata(0.0, OnPercentagePropertyChanged));
+
+        /// <summary>
+        /// PercentageProperty property changed handler.
+        /// </summary>
+        /// <param name="d">Page that changed its Percentage.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnPercentagePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion public double Percentage
     }
 }
 #endif

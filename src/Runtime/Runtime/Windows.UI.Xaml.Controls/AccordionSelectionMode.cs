@@ -24,27 +24,29 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Represents a control that displays a header and has a collapsible
-    /// content window.
+    /// Defines the minimum and maximum number of selected items allowed in an Accordion control.
     /// </summary>
-    public class AccordionItem : HeaderedContentControl, IUpdateVisualState
+    public enum AccordionSelectionMode
     {
         /// <summary>
-        /// Update the visual state of the control.
+        /// Exactly one item must be selected in the Accordion.
         /// </summary>
-        /// <param name="useTransitions">
-        /// A value indicating whether to automatically generate transitions to
-        /// the new state, or instantly transition to the new state.
-        /// </param>
-        void IUpdateVisualState.UpdateVisualState(bool useTransitions)
-        {
-            throw new NotImplementedException();
-        }
+        One,
 
         /// <summary>
-        /// Occurs when the accordionItem is selected.
+        /// At least one item must be selected in the Accordion.
         /// </summary>
-        public event RoutedEventHandler Selected;
+        OneOrMore,
+
+        /// <summary>
+        /// No more than one item can be selected in the accordion.
+        /// </summary>
+        ZeroOrOne,
+
+        /// <summary>
+        /// Any number of  items can be selected in the Accordion.
+        /// </summary>
+        ZeroOrMore
     }
 }
 #endif
