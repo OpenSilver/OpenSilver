@@ -761,13 +761,17 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">Event data for the event.</param>
 #if MIGRATION
         protected virtual void OnDropDownClosed(EventArgs e)
+        {
+            if (DropDownClosed != null)
+                DropDownClosed(this, new RoutedPropertyChangedEventArgs<bool>(true, false));
+        }
 #else
         protected virtual void OnDropDownClosed(RoutedEventArgs e)
-#endif
         {
             if (DropDownClosed != null)
                 DropDownClosed(this, e);
         }
+#endif
 
         /// <summary>
         /// Invoked when the DropDownOpened event is raised.
@@ -812,7 +816,7 @@ namespace Windows.UI.Xaml.Controls
         /// Occurs when the drop-down portion of the ComboBox closes.
         /// </summary>
 #if MIGRATION
-        public event EventHandler DropDownClosed;
+        public event RoutedPropertyChangedEventHandler<bool> DropDownClosed;
 #else
         public event RoutedEventHandler DropDownClosed;
 #endif
