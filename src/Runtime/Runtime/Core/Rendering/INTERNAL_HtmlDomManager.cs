@@ -1210,7 +1210,7 @@ parentElement.appendChild(child);
         /// in the visual tree composition at the specified point.</returns>
         public static UIElement FindElementInHostCoordinates_UsedBySimulatorToo(double x, double y) // IMPORTANT: If you rename this method or change its signature, make sure to rename its dynamic call in the Simulator.
         {
-            object domElementAtCoordinates = Interop.ExecuteJavaScriptAsync(@"
+            object domElementAtCoordinates = Interop.ExecuteJavaScript(@"
 (function(){
     var domElementAtCoordinates = document.elementFromPoint($0, $1);
     if (!domElementAtCoordinates || domElementAtCoordinates === document.documentElement)
