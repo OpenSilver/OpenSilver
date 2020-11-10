@@ -211,8 +211,8 @@ namespace Windows.UI.Xaml.Controls
 #if CSHTML5_NOT_SUPPORTED
             DefaultStyleKey = typeof(GridSplitter);
 #else
-            // Set default style:
             this.DefaultStyleKey = typeof(GridSplitter);
+            this.Loaded += GridSplitter_Loaded;
 #endif
         }
 
@@ -225,11 +225,16 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnApplyTemplate();
 
+            // Note: the following block is not supported as in Silverlight,
+            // we are not sure that the Loaded event will be raised after the
+            // OnApplyTemplate method is called. This is moved to the constructor.
+#if CSHTML5_NOT_SUPPORTED
             // Unhook registered events
             Loaded -= GridSplitter_Loaded;
 
             // Register Events
             Loaded += GridSplitter_Loaded;
+#endif
 
             if (_hoverWrapper != null)
             {
@@ -239,12 +244,26 @@ namespace Windows.UI.Xaml.Controls
 #if CSHTML5_NOT_SUPPORTED
             ManipulationMode = ManipulationModes.TranslateX | ManipulationModes.TranslateY;
 #else
+            if (_thumb != null)
+            {
+                _thumb.DragDelta -= Thumb_DragDelta;
+                _thumb.DragStarted -= Thumb_DragStarted;
+                _thumb.DragCompleted -= Thumb_DragCompleted;
+            }
+
             _thumb = this.GetTemplateChild("PART_Thumb") as Thumb;
             // Note: the thumb control is here only in CSHTML5. We use it to compensate for the lack of the "Manipulation" events.
+            
+            if (_thumb != null)
+            {
+                _thumb.DragDelta += Thumb_DragDelta;
+                _thumb.DragStarted += Thumb_DragStarted;
+                _thumb.DragCompleted += Thumb_DragCompleted;
+            }
 #endif
         }
 #if WORKINPROGRESS
-        #region Not supported yet
+#region Not supported yet
 
         public static readonly DependencyProperty ShowsPreviewProperty = DependencyProperty.Register("ShowsPreview", typeof(bool), typeof(GridSplitter), null);
 
@@ -254,7 +273,7 @@ namespace Windows.UI.Xaml.Controls
             set { this.SetValue(GridSplitter.ShowsPreviewProperty, value); }
         }
 
-        #endregion
+#endregion
 #endif
     }
 }

@@ -97,13 +97,6 @@ namespace Windows.UI.Xaml.Controls
 #if CSHTML5_NOT_SUPPORTED
             ManipulationStarted += hoverWrapper.SplitterManipulationStarted;
             ManipulationCompleted += hoverWrapper.SplitterManipulationCompleted;
-#else
-            if (_thumb != null)
-            {
-                _thumb.DragDelta += Thumb_DragDelta;
-                _thumb.DragStarted += Thumb_DragStarted;
-                _thumb.DragCompleted += Thumb_DragCompleted;
-            }
 #endif
         }
 
