@@ -265,7 +265,7 @@ namespace Windows.UI.Xaml
         /// </summary>
         public Transform RenderTransform
         {
-            get { return (Transform)GetValue(RenderTransformProperty); }
+            get { return (Transform)GetValue(RenderTransformProperty) ?? new MatrixTransform(); }
             set { SetValue(RenderTransformProperty, value); }
         }
 
@@ -281,7 +281,7 @@ namespace Windows.UI.Xaml
                                             CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                                         });
 
-        static void RenderTransform_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void RenderTransform_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var uiElement = (UIElement)d;
             Transform newValue = (Transform)e.NewValue;
