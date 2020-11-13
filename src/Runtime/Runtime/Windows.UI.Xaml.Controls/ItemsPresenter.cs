@@ -15,13 +15,14 @@
 
 using CSHTML5.Internal;
 using System;
-using System.Collections.Specialized;
-using System.Linq;
 
 #if MIGRATION
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 #else
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
+using Windows.Foundation;
 #endif
 
 #if MIGRATION
@@ -36,8 +37,18 @@ namespace Windows.UI.Xaml.Controls
     public partial class ItemsPresenter : FrameworkElement
     {
         private ItemsPanelTemplate _templateCache;
-        private ItemsControl _owner;
-        private Panel _itemsHost;
+        private ItemsControl _owner; // templated parent.
+        private Panel _itemsHost; // template child
+
+        private new Panel TemplateChild
+        {
+            get { return this._itemsHost; }
+            set 
+            {
+                this._itemsHost = value;
+                base.TemplateChild = value; 
+            }
+        }
 
         internal ItemsControl Owner
         {
@@ -75,69 +86,63 @@ namespace Windows.UI.Xaml.Controls
             // Update template cache
             ip._templateCache = (ItemsPanelTemplate)e.NewValue;
 
-            ip.OnPanelChangedInternal();
+            ip.ClearPanel();
+
+            if (VisualTreeHelper.GetParent(ip) != null)
+            {
+                INTERNAL_VisualTreeManager.LayoutManager.MeasureQueue.Add(ip);
+            }
         }
 
-        internal void OnPanelChangedInternal()
+        private void ClearPanel()
         {
-            if (this.ItemsHost != null)
+            Panel oldPanel = this.TemplateChild;
+            if (oldPanel != null)
             {
-                // Panel is no longer ItemsHost
-                this.ItemsHost.IsItemsHost = false;
-
-                // Detach old panel
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(this.ItemsHost, this);
+                oldPanel.IsItemsHost = false;
             }
+            this.TemplateChild = null;
+            this.Owner.ItemContainerGenerator.INTERNAL_Clear();
+        }
 
-            if (this._templateCache != null)
+        private void AttachToOwner()
+        {
+            // Find the templated parent
+            // todo: change this once FrameworkElement.TemplatedParent is implemented.
+            ItemsControl owner = this._owner;
+            DependencyObject elt = this;
+            while (owner == null)
             {
-                // Create an instance of the Panel
-                FrameworkElement visualTree = this._templateCache.INTERNAL_InstantiateFrameworkTemplate(null);
-                Panel panel = visualTree as Panel;
-                if (panel != null)
+                // First try to find the visual parent.
+                DependencyObject parent = VisualTreeHelper.GetParent(elt);
+
+                // If visual parent is null, it could be that the element is the content
+                // of popup (cf. ComboBox default style), so we handle this case here.
+                if (parent == null)
                 {
-                    // Make sure that the panel contains no children
-                    if (panel.HasChildren)
+                    parent = (elt as PopupRoot)?.INTERNAL_LinkedPopup;
+                    if (parent == null)
                     {
-                        throw new InvalidOperationException("VisualTree of ItemsPanelTemplate must be a single element.");
+                        // no more visual parent, exit.
+                        break;
                     }
-
-                    this._itemsHost = panel;
-
-                    // set IsItemsHost flag
-                    panel.IsItemsHost = true;
-                }
-                else
-                {
-                    throw new InvalidOperationException(
-                        string.Format("VisualTree of ItemsPanelTemplate must contain a Panel. '{0}' is not a Panel.", 
-                                      visualTree.GetType()));
                 }
 
-                // attach the panel.
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(panel, this);
-
-                // Attach children to panel
-                if (this.Owner != null)
-                {
-                    this.Owner.Refresh();
-                }
+                owner = parent as ItemsControl;
+                elt = parent;
             }
-            else
-            {
-                this._itemsHost = null;
-                this.Owner.ItemContainerGenerator.INTERNAL_Clear();
-            }
-        }
 
-        internal void AttachToOwner(ItemsControl owner)
-        {
             this._owner = owner;
 
-            // create the panel, based either on ItemsControl.ItemsPanel
-            ItemsPanelTemplate template = (this._owner != null) ? this._owner.ItemsPanel : null;
+            ItemsPanelTemplate template = null;
+            if (this._owner != null)
+            {
+                this._owner.ItemsPresenter = this;
 
-            // Get Template from ItemsControl.ItemsPanel
+                // create the panel, based on ItemsControl.ItemsPanel
+                template = this._owner.ItemsPanel;
+            }
+
             this.Template = template;
         }
 
@@ -149,14 +154,89 @@ namespace Windows.UI.Xaml.Controls
             return VisualTreeHelper.GetParent(panel) as ItemsPresenter;
         }
 
+        internal override sealed Size MeasureCore()
+        {
+            if (!this.ApplyTemplate())
+            {
+                if (this.TemplateChild != null)
+                {
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.TemplateChild, this, 0);
+                }
+            }
+            return new Size(0, 0);
+        }
+
+        // todo: Move Control.ApplyTemplate() over to FrameworkElement
+        private bool ApplyTemplate()
+        {
+            bool visualsCreated = false;
+            FrameworkElement visualChild = null;
+
+            if (this._templateCache != null)
+            {
+                ItemsPanelTemplate template = this.Template;
+
+                // we only apply the template if no template has been
+                // rendered already for this control.
+                if (this.TemplateChild == null)
+                {
+                    visualChild = template.INTERNAL_InstantiateFrameworkTemplate();
+                    if (visualChild != null)
+                    {
+                        visualsCreated = true;
+                    }
+                }
+            }
+
+            if (visualsCreated)
+            {
+                Panel panel = visualChild as Panel;
+                if (panel == null)
+                {
+                    throw new InvalidOperationException(
+                        string.Format("VisualTree of ItemsPanelTemplate must contain a Panel. '{0}' is not a Panel.", 
+                                      panel.GetType()));
+                }
+                panel.IsItemsHost = true;
+                this.TemplateChild = panel;
+
+                // Call the OnApplyTemplate method
+                this.OnApplyTemplate();
+            }
+
+            return visualsCreated;
+        }
+
+        private void OnPreApplyTemplate()
+        {
+            this.AttachToOwner();
+        }
+
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
+        {
+            base.OnApplyTemplate();
+
+            // verify that the template produced a panel with no children
+            Panel panel = this.TemplateChild;
+            if (panel == null || panel.HasChildren)
+            {
+                throw new InvalidOperationException("Content of ItemsPanelTemplate must be a single Panel (with no children).");
+            }
+
+            // Attach children to panel
+            this.Owner.Refresh(false);
+        }
+
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            if (this.ItemsHost != null)
-            {
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.ItemsHost, this);
-            }
+            this.OnPreApplyTemplate();
+            INTERNAL_VisualTreeManager.LayoutManager.MeasureQueue.Add(this);
         }
     }
 }
