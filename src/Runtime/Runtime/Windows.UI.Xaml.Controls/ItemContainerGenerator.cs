@@ -40,11 +40,15 @@ namespace Windows.UI.Xaml.Controls
         List<object> _containers = new List<object>(); //this list is kept to get the index from the container (with minimum work to keep it updated, it might not be the most efficient method perf-wise).
 
         /// <summary>
-        /// Returns the container corresponding to the specified item, or null if no container was found.
+        /// Returns the container corresponding to the specified item.
         /// </summary>
-        /// <param name="item">The item to retrieve the container for.</param>
-        /// <returns>A container that corresponds to the specified item, if the item has a container
-        /// and exists in the collection; otherwise, null.</returns>
+        /// <param name="item">
+        /// The item to retrieve the container for.
+        /// </param>
+        /// <returns>
+        /// A container that corresponds to the specified item, if the item has a container
+        /// and exists in the collection; otherwise, null.
+        /// </returns>
         public DependencyObject ContainerFromItem(object item) //This signature is here to fit the original (Microsoft's) signature for this method.
         {
             return (DependencyObject)INTERNAL_ContainerFromItem(item);
@@ -203,6 +207,32 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        /// <summary>
+        /// Returns the item that corresponds to the specified, generated container.
+        /// </summary>
+        /// <param name="container">
+        /// The <see cref="DependencyObject"/> that corresponds to the item to be returned.
+        /// </param>
+        /// <returns>
+        /// The contained item, or the container if it does not contain an item.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// container is null.
+        /// </exception>
+        public object ItemFromContainer(DependencyObject container)
+        {
+            if (container == null)
+            {
+                throw new ArgumentNullException("container");
+            }
+            if (_containerToItem.ContainsKey(container))
+            {
+                return _containerToItem[container];
+            }
+
+            return DependencyProperty.UnsetValue;
+        }
+
 #if WORKINPROGRESS
         //
         // Summary:
@@ -240,30 +270,7 @@ namespace Windows.UI.Xaml.Controls
         {
             return 0;
         }
-        //
-        // Summary:
-        //     Returns the item that corresponds to the specified, generated container.
-        //
-        // Parameters:
-        //   container:
-        //     The System.Windows.DependencyObject that corresponds to the item to be returned.
-        //
-        // Returns:
-        //     The contained item, or the container if it does not contain an item.
-        //
-        // Exceptions:
-        //   T:System.ArgumentNullException:
-        //     container is null.
-        [OpenSilver.NotImplemented]
-        public object ItemFromContainer(DependencyObject container)
-        {
-            if (container != null && _containerToItem.ContainsKey(container))
-            {
-                return _containerToItem[container];
-            }
 
-            return null;
-        }
 #endif
     }
 }

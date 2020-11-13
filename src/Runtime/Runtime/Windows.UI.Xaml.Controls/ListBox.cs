@@ -114,6 +114,19 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        protected override void ClearContainerForItemOverride(DependencyObject element, object item)
+        {
+            base.ClearContainerForItemOverride(element, item);
+
+            ListBoxItem container = element as ListBoxItem;
+            if (container != null)
+            {
+                container.INTERNAL_CorrespondingItem = null;
+                container.INTERNAL_ParentSelectorControl = null;
+                container.Click -= listBoxItem_Click;
+            }
+        }
+
         protected override DependencyObject GetContainerForItemOverride()
         {
             return new ListBoxItem();
