@@ -78,7 +78,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 foreach (object item in items) //Note: items being an IList, we do not have access to ElementAt ot First so we do this.
                 {
-                    SelectedItem = item;
+                    if(SelectedItem != item)
+                    {
+                        SelectedItem = item;
+                    }
                     break;
                 }
             }

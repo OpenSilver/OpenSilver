@@ -183,8 +183,11 @@ namespace Windows.UI.Xaml.Controls
                 object item = Items[newValue];
                 if (SelectionMode == SelectionMode.Single)
                 {
-                    INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
-                    SelectedItems.Add(item);
+                    if (SelectedItems.Count != 1 || SelectedItems[0] != item) //this test is to prevent unnecessarily setting SelectedItems to its own value, thus sometimes causing infinite loops (cf ticket #1291, message from November 16, 2020).
+                    {
+                        INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+                        SelectedItems.Add(item);
+                    }
                 }
                 else if (!INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(SelectedItems, item))
                 {
