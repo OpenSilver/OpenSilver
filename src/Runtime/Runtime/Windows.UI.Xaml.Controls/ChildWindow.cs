@@ -475,7 +475,10 @@ namespace Windows.UI.Xaml.Controls
         
         private void ChildWindow_GotFocus(object sender, RoutedEventArgs e)
         {
-            ChildWindowPopup.PutPopupInFront();
+            if (this.ChildWindowPopup != null)
+            {
+                ChildWindowPopup.PutPopupInFront();
+            }
         }
 
         #endregion Constructors
