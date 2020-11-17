@@ -500,6 +500,35 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 Action<string> callback,
                 string soapVersion)
             {
+                BeginCallWebMethod(webMethodName, interfaceType, methodReturnType, "", originalRequestObject,
+                    callback, soapVersion);
+            }
+
+#if OPENSILVER
+            public void BeginCallWebMethod(
+                string webMethodName,
+                Type interfaceType,
+                Type methodReturnType,
+                IEnumerable<MessageHeader> messageHeaders,
+                IDictionary<string, object> originalRequestObject,
+                Action<string> callback,
+                string soapVersion)
+            {
+                BeginCallWebMethod(webMethodName, interfaceType, methodReturnType,
+                    GetEnvelopeHeaders(messageHeaders?.ToList()), originalRequestObject,
+                    callback, soapVersion);
+            }
+#endif
+
+            private void BeginCallWebMethod(
+                string webMethodName,
+                Type interfaceType,
+                Type methodReturnType,
+                string messageHeaders,
+                IDictionary<string, object> originalRequestObject,
+                Action<string> callback,
+                string soapVersion)
+            {
                 bool isXmlSerializer;
                 Dictionary<string, string> headers;
                 string request;
@@ -508,6 +537,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     "Begin" + webMethodName,
                     interfaceType,
                     methodReturnType,
+                    messageHeaders,
                     originalRequestObject,
                     soapVersion,
                     out isXmlSerializer,
@@ -652,6 +682,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     webMethodName + "Async",
                     interfaceType,
                     methodReturnType,
+                    null,
                     originalRequestObject,
                     soapVersion,
                     out isXmlSerializer,
@@ -742,6 +773,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     webMethodName,
                     interfaceType,
                     methodReturnType,
+                    null,
                     originalRequestObject,
                     soapVersion,
                     out isXmlSerializer,
@@ -798,11 +830,36 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 return false;
             }
 
+#if OPENSILVER
+            private static string GetEnvelopeHeaders(ICollection<MessageHeader> messageHeaders)
+            {
+                if (messageHeaders == null || !messageHeaders.Any())
+                {
+                    return "";
+                }
+
+                var settings = new XmlWriterSettings { OmitXmlDeclaration = true };
+
+                return string.Join("", messageHeaders.Select(mh =>
+                {
+                    using (var sw = new StringWriter())
+                    using (var xw = XmlWriter.Create(sw, settings))
+                    {
+                        mh.WriteHeader(xw, MessageVersion.Default);
+
+                        xw.Flush();
+                        return sw.ToString();
+                    }
+                }));
+            }
+#endif
+
             private void PrepareRequest(
                 string webMethodName, // webMethod
                 string methodName, // method to look for in 'interfaceType'
                 Type interfaceType,
                 Type methodReturnType,
+                string envelopeHeaders,
                 IDictionary<string, object> requestParameters,
                 string soapVersion,
                 out bool isXmlSerializer,
@@ -867,7 +924,12 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         headers.Add("Content-Type", @"text/xml; charset=utf-8");
                         headers.Add("SOAPAction", soapAction);
 
-                        requestFormat = "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"><s:Body>{0}</s:Body></s:Envelope>";
+                        if (!string.IsNullOrEmpty(envelopeHeaders))
+                        {
+                            envelopeHeaders = "<s:Header>" + envelopeHeaders + "</s:Header>";
+                        }
+                        requestFormat = string.Format("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">{0}<s:Body>{{0}}</s:Body></s:Envelope>",
+                            envelopeHeaders ?? "");
                         break;
 
                     case "1.2":
@@ -875,8 +937,8 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
                         soapAction = string.Format("http://tempuri.org/ServiceHost/{0}", 
                                                    webMethodName);
-                        requestFormat = string.Format("<s:Envelope xmlns:a=\"http://www.w3.org/2005/08/addressing\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"><s:Header><a:Action>{0}</a:Action></s:Header><s:Body>{{0}}</s:Body></s:Envelope>",
-                                                      soapAction);
+                        requestFormat = string.Format("<s:Envelope xmlns:a=\"http://www.w3.org/2005/08/addressing\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"><s:Header><a:Action>{0}</a:Action>{1}</s:Header><s:Body>{{0}}</s:Body></s:Envelope>",
+                            soapAction, envelopeHeaders ?? "");
                         break;
 
                     default:
