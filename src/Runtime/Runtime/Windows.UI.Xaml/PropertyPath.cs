@@ -13,15 +13,16 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+
+#if MIGRATION
+using CSHTML5.Internal.System.Windows.Data;
+#else
+using CSHTML5.Internal.Windows.UI.Xaml.Data;
+#endif
 
 #if MIGRATION
 namespace System.Windows
@@ -48,6 +49,12 @@ namespace Windows.UI.Xaml
         public PropertyPath(string path)
         {
             _path = path;
+
+            INTERNAL_AccessPropertyContainer = defaulAccessVisualStateProperty;
+            INTERNAL_PropertySetVisualState = defaultSetVisualStateProperty;
+            INTERNAL_PropertySetAnimationValue = defaultSetAnimationVisualStateProperty;
+            INTERNAL_PropertySetLocalValue = defaultSetLocalVisualStateProperty;
+            INTERNAL_PropertyGetVisualState = defaultGetVisualStateProperty;
         }
 
         public PropertyPath(DependencyProperty dependencyProperty)
@@ -64,12 +71,102 @@ namespace Windows.UI.Xaml
         }
 
         #region methods to access property for the PropertyPath(DependencyProperty) constructor
-        public static global::System.Collections.Generic.IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>> defaulAccessVisualStateProperty(DependencyObject rootTargetObjectInstance)
+        private IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>> defaulAccessVisualStateProperty(DependencyObject rootTargetObjectInstance)
         {
-            yield break;
+            PropertyPathParser parser = new PropertyPathParser(Path);
+            string typeName, propertyName, index;
+            PropertyNodeType type;
+            var nodes = new List<Tuple<PropertyNodeType, Tuple<string/*type*/, string/*property*/, string/*index*/>>>();
+            while ((type = parser.Step(out typeName, out propertyName, out index)) != PropertyNodeType.None)
+            {
+                nodes.Add(
+                    new Tuple<PropertyNodeType, Tuple<string, string, string>>(
+                        type, new Tuple<string, string, string>(typeName, propertyName, index)));
+            }
+            int count = Math.Max(0, nodes.Count - 1);
+            List<Tuple<DependencyObject, DependencyProperty, int?>> list = new List<Tuple<DependencyObject, DependencyProperty, int?>>(count);
+            for (int j = 0; j < count; ++j)
+            {
+                type = nodes[j].Item1;
+                typeName = nodes[j].Item2.Item1;
+                propertyName = nodes[j].Item2.Item2;
+                index = nodes[j].Item2.Item3;
+
+                Tuple<DependencyObject, DependencyProperty, int?> tuple;
+                DependencyObject targetDO;
+                switch (type)
+                {
+                    case PropertyNodeType.AttachedProperty:
+                    case PropertyNodeType.Property:
+                        targetDO = list.Count == 0 ?
+                            rootTargetObjectInstance :
+                            list[list.Count - 1].Item1;
+                        Type targetType = targetDO.GetType();
+                        PropertyInfo prop = targetType.GetProperty(propertyName);
+                        DependencyObject value = (DependencyObject)prop.GetValue(targetDO);
+                        DependencyProperty dp = (DependencyProperty)prop.DeclaringType.GetField(propertyName + "Property").GetValue(null);
+                        tuple = new Tuple<DependencyObject, DependencyProperty, int?>(
+                            value,
+                            dp,
+                            null);
+                        list.Add(tuple);
+                        yield return tuple;
+                        break;
+                    case PropertyNodeType.Indexed:
+                        int i;
+                        int.TryParse(index, out i);
+                        targetDO = rootTargetObjectInstance;
+                        if (list.Count > 0)
+                        {
+                            if (CSHTML5.Interop.IsRunningInTheSimulator)
+                            {
+                                // Note: In OpenSilver, we want to enter this case both in the simulator and
+                                // the browser.
+                                targetDO = (DependencyObject)((dynamic)list[list.Count - 1].Item1)[i];
+                            }
+                            else
+                            {
+                                // Note: getItem() is the indexer's name in the Bridge implementation.
+                                // The use of 'dynamic' makes the above line return undefined when the application
+                                // is running in javascript with CSHTML5.
+                                targetDO = (DependencyObject)((dynamic)list[list.Count - 1].Item1).getItem(i);
+                            }
+                        }
+                        tuple = new Tuple<DependencyObject, DependencyProperty, int?>(
+                            targetDO,
+                            null,
+                            i);
+                        list.Add(tuple);
+                        yield return tuple;
+                        break;
+                }
+            }
+            if (!INTERNAL_IsDirectlyDependencyPropertyPath)
+            {
+                bool success = false;
+                DependencyProperty dp = null;
+                try
+                {
+                    string name = nodes[nodes.Count - 1].Item2.Item2;
+                    DependencyObject finalDO = count == 0 ? rootTargetObjectInstance : list[list.Count - 1].Item1;
+                    dp = (DependencyProperty)finalDO.GetType()
+                        .GetField(name + "Property", BindingFlags.FlattenHierarchy | BindingFlags.Static | BindingFlags.Public)
+                        .GetValue(null);
+                    success = dp != null;
+                }
+                finally
+                {
+                    if (success)
+                    {
+                        INTERNAL_IsDirectlyDependencyPropertyPath = true;
+                        INTERNAL_DependencyProperty = dp;
+                        INTERNAL_DependencyPropertyName = dp.Name;
+                    }
+                }
+            }
         }
 
-        public void defaultSetVisualStateProperty(DependencyObject finalTargetInstance, object value)
+        private void defaultSetVisualStateProperty(DependencyObject finalTargetInstance, object value)
         {
             if (INTERNAL_IsDirectlyDependencyPropertyPath)
             {
@@ -81,7 +178,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        public void defaultSetAnimationVisualStateProperty(DependencyObject finalTargetInstance, object value)
+        private void defaultSetAnimationVisualStateProperty(DependencyObject finalTargetInstance, object value)
         {
             if (INTERNAL_IsDirectlyDependencyPropertyPath)
             {
@@ -93,7 +190,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        public void defaultSetLocalVisualStateProperty(DependencyObject finalTargetInstance, object value)
+        private void defaultSetLocalVisualStateProperty(DependencyObject finalTargetInstance, object value)
         {
             if (INTERNAL_IsDirectlyDependencyPropertyPath)
             {
@@ -105,7 +202,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        public global::System.Object defaultGetVisualStateProperty(DependencyObject finalTargetInstance)
+        private object defaultGetVisualStateProperty(DependencyObject finalTargetInstance)
         {
             if (INTERNAL_IsDirectlyDependencyPropertyPath)
             {
@@ -116,7 +213,7 @@ namespace Windows.UI.Xaml
                 throw new InvalidOperationException("The constructor: PropertyPath(string path) for storyboards is not supported yet. Please use PropertyPath(DependencyProperty dependencyProperty) or define your storyboard in the XAML.");
             }
         }
-        #endregion
+#endregion
 
         /// <summary>
         /// Initializes a new Instance of the PropertyPath class based on methods to access the property from a DependencyObject.
@@ -194,12 +291,12 @@ namespace Windows.UI.Xaml
             return new PropertyPath(path);
         }
 
-#if WORKINPROGRESS
-        public PropertyPath(string path, params object[] pathParameters)
+        public PropertyPath(string path, params object[] pathParameters) : this(path)
         {
-
+            if (pathParameters != null && pathParameters.Length > 0)
+            {
+                throw new ArgumentOutOfRangeException("pathParameters");
+            }
         }
-#endif
-
     }
 }
