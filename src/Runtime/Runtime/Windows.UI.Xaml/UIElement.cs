@@ -613,7 +613,7 @@ namespace Windows.UI.Xaml
                 {
                     return new CSSEquivalent()
                     {
-                        Value = (inst, value) => { return (Math.Floor((double)value * 1000) / 1000).ToString(); }, // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most.
+                        Value = (inst, value) => { return (Math.Floor(Convert.ToDouble(value) * 1000) / 1000).ToString(); }, // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most.
                         Name = new List<string> { "opacity" },
                         ApplyAlsoWhenThereIsAControlTemplate = true,
                     };
