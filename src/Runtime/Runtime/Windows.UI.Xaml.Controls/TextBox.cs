@@ -408,11 +408,15 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                 //outerDivStyle.borderWidth = "0px";
                 //outerDivStyle.width = "100%";
                 //outerDivStyle.height = "100%";
+                //Note2: We also reset the contentEditable value of the former contentEditable to false. Otherwise, the whole control will be considered editable.
                 dynamic additionalDivForMargins = INTERNAL_AdditionalOutsideDivForMargins;
-                CSHTML5.Interop.ExecuteJavaScript(@"var style = $0.firstChild.style;
+                CSHTML5.Interop.ExecuteJavaScript(@"var formerOuterDiv = $0.firstChild;
+var style = formerOuterDiv.style;
 style.borderWidth = '0px';
 style.width = '100%';
-style.height = '100%';", additionalDivForMargins);
+style.height = '100%';
+formerOuterDiv.firstChild.firstChild.setAttribute('contenteditable', 'false');
+", additionalDivForMargins);
                 //dynamic divPreviouslyModified = additionalDivForMargins.firstChild;
                 //dynamic stylePreviouslyModified = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(divPreviouslyModified);
                 //stylePreviouslyModified.borderWidth = "0px";
