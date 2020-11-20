@@ -323,10 +323,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 int index;
                 object item = s.FindItemWithValue(baseValue, out index);
 
-                // if the search fails, coerce the value to null.  Unless there
-                // are no items at all, in which case wait for the items to appear
-                // and search again.
-                if (item == DependencyProperty.UnsetValue && s.Items.Count > 0)
+                // if the search fails, coerce the value to null:
+                if (item == DependencyProperty.UnsetValue)
                 {
                     baseValue = null;
                 }
@@ -532,7 +530,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         protected override void OnItemsSourceChanged_BeforeVisualUpdate(IEnumerable oldValue, IEnumerable newValue)
         {
-            this.SetCurrentValue(Selector.SelectedIndexProperty, -1);
+            //Update the selection so th eselected item can be displayed as selected:
+            //Note: We call CoerceValue on all 3 properties because we don't know which property was set. Based on a test in wpf, SelectedIndex takes precedence over SelectedItem, which takes precedence over SelectedValue.
+            //      Precedence is applied below since when calling coerce: - if the value was set, it will go to the callback which changes the values of the other two
+            //                                                             - if the value was not set, it will not call the callback so no impact on the other ones.
+            this.CoerceValue(SelectedIndexProperty);
+            this.CoerceValue(SelectedItemProperty);
+            this.CoerceValue(SelectedValueProperty);
+            //this.SetCurrentValue(Selector.SelectedIndexProperty, -1); // Note: I don't know why this was there but it seemed incorrect so I commented it.
         }
 
         protected virtual void ApplySelectedIndex(int index)

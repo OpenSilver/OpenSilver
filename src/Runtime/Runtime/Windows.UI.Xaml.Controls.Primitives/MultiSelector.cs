@@ -89,7 +89,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
             //Fire the SelectionChanged event:
             var removedItems = e.OldItems ?? new Collection<object>();
             var addedItems = e.NewItems ?? new Collection<object>();
-            OnSelectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
+            Dispatcher.BeginInvoke(() => //Note: We need to delay firing the event so we're done with everything we need to do in case the user tries to modify the selection.
+            {
+                OnSelectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
+            });
 
         }
 
