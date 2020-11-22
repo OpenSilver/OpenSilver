@@ -21,32 +21,26 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if WORKINPROGRESS
     /// <summary>
-    /// This property determines how text is trimmed when it overflows the edge of its
-    /// container.
+    /// Describes how text is trimmed when it overflows the edge of its containing box.
     /// </summary>
     public enum TextTrimming
     {
         /// <summary>
-        /// Default no trimming
+        /// Text is not trimmed.
         /// </summary>
         None = 0,
 
         /// <summary>
-        /// Text is trimmed at a character boundary.
+        /// Text is trimmed at character boundary. An ellipsis (...) is drawn in place of remaining
+        /// text.
         /// </summary>
         CharacterEllipsis = 1,
 
         /// <summary>
-        /// Text is trimmed at word boundary.
+        /// Text is trimmed at a word boundary. An ellipsis (...) is drawn in place of remaining
+        /// text.
         /// </summary>
         WordEllipsis = 2,
-
-        /// <summary>
-        /// Text is trimmed at a pixel level, visually clipping the excess glyphs.
-        /// </summary>
-        Clip = 3,
     }
-#endif
 }

@@ -841,6 +841,7 @@
     <Compile Include="Windows.UI.Xaml\TemplatePartAttribute.cs" />
     <Compile Include="Windows.UI.Xaml\TemplateVisualStateAttribute.cs" />
     <Compile Include="Windows.UI.Xaml\TextAlignment.cs" />
+    <Compile Include="Windows.UI.Xaml\TextTrimming.cs" />
     <Compile Include="Windows.UI.Xaml\TextWrapping.cs" />
     <Compile Include="Windows.UI.Xaml\Thickness.cs" />
     <Compile Include="Windows.UI.Xaml\ThicknessConverter.cs" />
@@ -878,7 +879,6 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TemplateBindingExpression.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextDecoration.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextDecorationCollection.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextTrimming.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerAction.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerActionCollection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerBase.cs" />

@@ -81,10 +81,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Text dependency property.
         /// </summary>
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text",
-                                                                                             typeof(string),
-                                                                                             typeof(TextBlock),
-                                                                                             new PropertyMetadata(string.Empty, OnTextPropertyChanged));
+        public static readonly DependencyProperty TextProperty = 
+            DependencyProperty.Register(
+                "Text",
+                typeof(string),
+                typeof(TextBlock),
+                new PropertyMetadata(string.Empty, OnTextPropertyChanged));
 
         private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -122,13 +124,15 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the TextAlignment dependency property.
         /// </summary>
-        public static readonly DependencyProperty TextAlignmentProperty = DependencyProperty.Register("TextAlignment", 
-                                                                                                      typeof(TextAlignment), 
-                                                                                                      typeof(TextBlock), 
-                                                                                                      new PropertyMetadata(TextAlignment.Left) 
-                                                                                                      { 
-                                                                                                          MethodToUpdateDom = TextAlignment_MethodToUpdateDom
-                                                                                                      });
+        public static readonly DependencyProperty TextAlignmentProperty =
+            DependencyProperty.Register(
+                "TextAlignment", 
+                typeof(TextAlignment), 
+                typeof(TextBlock), 
+                new PropertyMetadata(TextAlignment.Left) 
+                { 
+                    MethodToUpdateDom = TextAlignment_MethodToUpdateDom
+                });
 
         static void TextAlignment_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -213,13 +217,31 @@ namespace Windows.UI.Xaml.Controls
             // and it is not supposed to be counted in tabbing
             return;
         }
-#if WORKINPROGRESS
 
-        // There is an implementation for TextTrimming in the shelvesheets
-        public static readonly DependencyProperty TextTrimmingProperty = DependencyProperty.Register("TextTrimming",
-                                                                                                     typeof(TextTrimming),
-                                                                                                     typeof(TextBlock),
-                                                                                                     new PropertyMetadata(TextTrimming.None));
+        public static readonly DependencyProperty TextTrimmingProperty = 
+            DependencyProperty.Register(
+                "TextTrimming",
+                typeof(TextTrimming),
+                typeof(TextBlock),
+                new PropertyMetadata(TextTrimming.None)
+                {
+                    MethodToUpdateDom = OnTextTrimmedChangedUpdateDOM
+                });
+
+        private static void OnTextTrimmedChangedUpdateDOM(DependencyObject d, object newValue)
+        {
+            dynamic style = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification((TextBlock)d);
+            switch ((TextTrimming)newValue)
+            {
+                case TextTrimming.CharacterEllipsis:
+                case TextTrimming.WordEllipsis:
+                    style.textOverflow = "ellipsis";
+                    break;
+                default:
+                    style.textOverflow = "clip";
+                    break;
+            }
+        }
 
         /// <summary>
         /// Gets or sets how the TextBlock trims text.
@@ -230,12 +252,17 @@ namespace Windows.UI.Xaml.Controls
             set { SetValue(TextTrimmingProperty, value); }
         }
 
+#if WORKINPROGRESS
+
         public double BaselineOffset { get; private set; }
 
-        public static readonly DependencyProperty CharacterSpacingProperty = DependencyProperty.Register("CharacterSpacing",
-                                                                                                         typeof(int),
-                                                                                                         typeof(TextBlock),
-                                                                                                         new PropertyMetadata(0));
+        public static readonly DependencyProperty CharacterSpacingProperty = 
+            DependencyProperty.Register(
+                "CharacterSpacing",
+                typeof(int),
+                typeof(TextBlock),
+                new PropertyMetadata(0));
+
         public int CharacterSpacing
         {
             get { return (int)this.GetValue(CharacterSpacingProperty); }
