@@ -90,7 +90,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (VisualTreeHelper.GetParent(ip) != null)
             {
-                INTERNAL_VisualTreeManager.LayoutManager.MeasureQueue.Add(ip);
+                ip.InvalidateMeasureInternal();
             }
         }
 
@@ -236,7 +236,7 @@ namespace Windows.UI.Xaml.Controls
             base.INTERNAL_OnAttachedToVisualTree();
 
             this.OnPreApplyTemplate();
-            INTERNAL_VisualTreeManager.LayoutManager.MeasureQueue.Add(this);
+            this.InvalidateMeasureInternal();
         }
     }
 }
