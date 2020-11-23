@@ -67,7 +67,18 @@ namespace CSHTML5.Internal
                         while (this._queue.Count > 0)
                         {
                             UIElement e = this._queue.Dequeue();
-                            e.MeasureCore();
+
+                            e.MeasureInProgress = true;
+                            try
+                            {
+                                e.MeasureCore();
+                            }
+                            finally
+                            {
+                                e.MeasureInProgress = false;
+                            }
+
+                            e.MeasureDirty = false;
                         }
                     }
                     finally
