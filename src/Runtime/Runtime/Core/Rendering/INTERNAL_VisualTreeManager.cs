@@ -382,6 +382,11 @@ if(nextSibling != undefined) {
                         innerDivOfWrapperForChild,
                         domElementWhereToPlaceChildStuff,
                         wrapperForChild);
+                    Grid grid = parent as Grid;
+                    if (grid != null)
+                    {
+                        grid.LocallyManageChildrenChanged();
+                    }
                 };
             }
             else if (EnableOptimizationWhereCollapsedControlsAreLoadedLast && child.Visibility == Visibility.Collapsed)
@@ -395,6 +400,11 @@ if(nextSibling != undefined) {
                         innerDivOfWrapperForChild,
                         domElementWhereToPlaceChildStuff,
                         wrapperForChild);
+                    Grid grid = parent as Grid;
+                    if (grid != null)
+                    {
+                        grid.LocallyManageChildrenChanged();
+                    }
                 };
                 INTERNAL_DispatcherHelpers.QueueAction(async () =>
                 {
