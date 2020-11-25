@@ -599,7 +599,8 @@ namespace CSHTML5.Internal
 
             if (storage.PropertyListeners != null)
             {
-                foreach (IPropertyChangedListener listener in storage.PropertyListeners)
+                IPropertyChangedListener[] listeners = storage.PropertyListeners.ToArray();
+                foreach (IPropertyChangedListener listener in listeners)
                 {
                     listener.OnPropertyChanged(sender, new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
                 }
