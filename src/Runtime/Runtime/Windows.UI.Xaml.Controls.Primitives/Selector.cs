@@ -124,14 +124,18 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 }
             }
 
-            // Raise the selection changed event
-            List<object> removedItems = new List<object>();
-            removedItems.Add(e.OldValue);
-            List<object> addedItems = new List<object>();
-            addedItems.Add(e.NewValue);
-            SelectionChangedEventArgs args = new SelectionChangedEventArgs(removedItems, addedItems);
+            //We do not want to raise the event here when we have a MultiSelector (or when SelectionMode is not Single ?)
+            if (!(s is MultiSelector))
+            {
+                // Raise the selection changed event
+                List<object> removedItems = new List<object>();
+                removedItems.Add(e.OldValue);
+                List<object> addedItems = new List<object>();
+                addedItems.Add(e.NewValue);
+                SelectionChangedEventArgs args = new SelectionChangedEventArgs(removedItems, addedItems);
 
-            s.OnSelectionChanged(args);
+                s.OnSelectionChanged(args);
+            }
         }
 
         private static object CoerceSelectedItem(DependencyObject d, object baseValue)

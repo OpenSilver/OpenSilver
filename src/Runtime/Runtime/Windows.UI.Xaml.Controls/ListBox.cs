@@ -131,7 +131,7 @@ namespace Windows.UI.Xaml.Controls
             ListBoxItem listBoxItem = item as ListBoxItem ?? new ListBoxItem();
             listBoxItem.INTERNAL_CorrespondingItem = item;
             listBoxItem.INTERNAL_ParentSelectorControl = this;
-            if(SelectedItems.Contains(item))
+            if (SelectedItems.Contains(item))
             {
                 // todo if possible: reuse the former items if they were already 
                 // created rather than recreating them. It would actually be 
@@ -143,7 +143,7 @@ namespace Windows.UI.Xaml.Controls
                 // modified before the ListBox.Loaded event happened (which 
                 // leads to an ItemsControl.UpdateItemsPanel, which then leads 
                 // here).
-                listBoxItem.IsSelected = true; 
+                listBoxItem.IsSelected = true;
             }
             listBoxItem.Click += listBoxItem_Click;
             return listBoxItem;
@@ -170,34 +170,84 @@ namespace Windows.UI.Xaml.Controls
 
         protected override void ManageSelectedIndex_Changed(DependencyPropertyChangedEventArgs e)
         {
-            // Note: in this method, we use "Convert.ToInt32()" intead of casting to "(int)" because otherwise the JS code is not compatible with IE 9 (or Windows Phone 8.0).
+            if (!_skipSelectionChangedEvent) //this test because if it is true (meaning the SelectionChanged event is dealt with somewhere else), it means that SelectedItems has already been updated.
+            {
+                bool skipSelectionEventHere = _skipSelectionChangedEvent;
+                _skipSelectionChangedEvent = true; // Note: we keep this to true for the whole method since this method will handle the SelectionChanged event itself.
 
-            base.ManageSelectedIndex_Changed(e);
-            if (e.OldValue != null && e.OldValue is int && Convert.ToInt32(e.OldValue) >= 0 && SelectionMode == SelectionMode.Single)
-            {
-                INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
-            }
-            if (e.NewValue != null && e.NewValue is int && Convert.ToInt32(e.NewValue) >= 0)
-            {
-                int newValue = Convert.ToInt32(e.NewValue);
-                object item = Items[newValue];
-                if (SelectionMode == SelectionMode.Single)
+                base.ManageSelectedIndex_Changed(e);
+
+                bool hasSelectionChanged = false;
+
+                List<object> addedItems = new List<object>();
+                List<object> removedItems = new List<object>();
+                HashSet<object> selectedItemsHashSet = null;
+
+                // Note: in this method, we use "Convert.ToInt32()" intead of casting to "(int)" because otherwise the JS code is not compatible with IE 9 (or Windows Phone 8.0).
+                bool isNewValueSet = e.NewValue != null && e.NewValue is int && Convert.ToInt32(e.NewValue) >= 0;
+                bool isOldValueSet = e.OldValue != null && e.OldValue is int && Convert.ToInt32(e.OldValue) >= 0;
+                bool isNewValueDifferentFromOldValue = e.NewValue != e.OldValue;
+                if (isOldValueSet && isNewValueDifferentFromOldValue)
                 {
-                    if (SelectedItems.Count != 1 || SelectedItems[0] != item) //this test is to prevent unnecessarily setting SelectedItems to its own value, thus sometimes causing infinite loops (cf ticket #1291, message from November 16, 2020).
+                    //We clear the selection and remember the old items if needed for the SelectionChanged event:
+                    if (!skipSelectionEventHere)
                     {
-                        INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+                        selectedItemsHashSet = CopyToHashSet(SelectedItems);
+                        hasSelectionChanged = true;
+                    }
+                    INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+                }
+                if (isNewValueSet)
+                {
+                    int newValue = Convert.ToInt32(e.NewValue);
+                    object item = Items[newValue];
+                    if (SelectedItems.Count == 0 || SelectedItems[0] != item) //If SelectedItem stays the same (the first item in SelectedItems), we do nothing
+                    {
+                        if (SelectedItems.Count != 0) //this test is to avoid calling clear (and entering MultiSelector.RefreshSelectedItems) for no reason.
+                        {
+                            if (!skipSelectionEventHere)
+                            {
+                                selectedItemsHashSet = CopyToHashSet(SelectedItems);
+                            }
+                            INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+                        }
                         SelectedItems.Add(item);
+                        if (!skipSelectionEventHere)
+                        {
+                            if (selectedItemsHashSet != null && selectedItemsHashSet.Contains(item))
+                            {
+                                selectedItemsHashSet.Remove(item);
+                            }
+                            addedItems.Add(item);
+                            hasSelectionChanged = true;
+                        }
                     }
                 }
-                else if (!INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(SelectedItems, item))
+                if (hasSelectionChanged && !skipSelectionEventHere)
                 {
-                    SelectedItems.Add(item);
+                    if (selectedItemsHashSet != null)
+                    {
+                        foreach (object item in selectedItemsHashSet)
+                        {
+                            removedItems.Add(item);
+                        }
+                    }
+                    OnSelectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
                 }
+                _skipSelectionChangedEvent = skipSelectionEventHere;
             }
         }
 
         void listBoxItem_Click(object sender, RoutedEventArgs e)
         {
+            _skipSelectionChangedEvent = true; // Note: we keep this to true for the whole method since this method will handle the SelectionChanged event itself (this way we don't risk having multiple calls to SelectionChanged when adding multiple elements for example).
+
+            //object[] oldItems = null;
+            bool hasSelectionChanged = false;
+
+            List<object> addedItems = new List<object>();
+            List<object> removedItems = new List<object>();
+
 #if MIGRATION
             ModifierKeys modifiersKey = new ModifierKeys();
             modifiersKey = Keyboard.Modifiers;
@@ -216,8 +266,22 @@ namespace Windows.UI.Xaml.Controls
             //---------------------------------------------------
             if (SelectionMode == SelectionMode.Single)
             {
-                INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
-                SelectedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
+                if (SelectedItem != selectorItem.INTERNAL_CorrespondingItem) //todo: SelectedItems contains more than one element (I'm pretty sure we ignore is as long as the clicked element is the SelectedItem).
+                {
+                    HashSet<object> selectedItemsHashSet = CopyToHashSet(SelectedItems);
+                    INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+                    SelectedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
+                    addedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
+                    if (selectedItemsHashSet.Contains(selectorItem.INTERNAL_CorrespondingItem))
+                    {
+                        selectedItemsHashSet.Remove(selectorItem.INTERNAL_CorrespondingItem);
+                    }
+                    foreach (object item in selectedItemsHashSet)
+                    {
+                        removedItems.Add(item);
+                    }
+                    hasSelectionChanged = true;
+                }
             }
             //---------------------------------------------------
             //Multiple
@@ -228,12 +292,15 @@ namespace Windows.UI.Xaml.Controls
                 if (INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(SelectedItems, selectorItem.INTERNAL_CorrespondingItem))//if we are in a multiple mode and the currently selected element is the one we clicked, we want to unselect it.
                 {
                     INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Remove(SelectedItems, selectorItem.INTERNAL_CorrespondingItem);
+                    removedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
                 }
                 //else  click on a new element
                 else
                 {
                     SelectedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
+                    addedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
                 }
+                hasSelectionChanged = true;
             }
             //---------------------------------------------------
             //Extended
@@ -258,7 +325,9 @@ namespace Windows.UI.Xaml.Controls
                         indexStart = change;
                     }
                     int index = 0;
-                    //clear before adding 
+                    //copy the SelectedItems in a hashset so we can easily know which items have been removed:
+                    HashSet<object> selectedItemsHashSet = CopyToHashSet(SelectedItems);
+                    //clear before adding
                     INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
                     foreach (object item in Items)
                     {
@@ -267,10 +336,21 @@ namespace Windows.UI.Xaml.Controls
                             if (!INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(SelectedItems, item)) //todo-perfs: use a dictionary
                             {
                                 SelectedItems.Add(item);
+                                addedItems.Add(item);
+                                if (selectedItemsHashSet.Contains(item))
+                                {
+                                    selectedItemsHashSet.Remove(item);
+                                }
                             }
                         }
                         index++;
                     }
+                    foreach (object item in selectedItemsHashSet)
+                    {
+                        removedItems.Add(item);
+                    }
+
+                    hasSelectionChanged = removedItems.Count > 0 || addedItems.Count > 0;
                 }
                 //if Control is pressed
                 else if (isControl)
@@ -279,19 +359,36 @@ namespace Windows.UI.Xaml.Controls
                     if (INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(SelectedItems, selectorItem.INTERNAL_CorrespondingItem))//if we are in a multiple mode and the currently selected element is the one we clicked, we want to unselect it.
                     {
                         INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Remove(SelectedItems, selectorItem.INTERNAL_CorrespondingItem);
+                        removedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
 
                     }
                     //else click on a new element
                     else
                     {
                         SelectedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
+                        addedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
                     }
+                    hasSelectionChanged = true;
                 }
                 //Nothing is pressed
                 else
                 {
-                    INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
-                    SelectedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
+                    if (SelectedItem != selectorItem.INTERNAL_CorrespondingItem)
+                    {
+                        HashSet<object> selectedItemsHashSet = CopyToHashSet(SelectedItems);
+                        INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+                        SelectedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
+                        addedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
+                        if (selectedItemsHashSet.Contains(selectorItem.INTERNAL_CorrespondingItem))
+                        {
+                            selectedItemsHashSet.Remove(selectorItem.INTERNAL_CorrespondingItem);
+                        }
+                        foreach (object item in selectedItemsHashSet)
+                        {
+                            removedItems.Add(item);
+                        }
+                        hasSelectionChanged = true;
+                    }
                 }
 
                 if (!isShift)
@@ -301,11 +398,23 @@ namespace Windows.UI.Xaml.Controls
             {
                 throw new NotSupportedException("SelectionMode is not Single, Multiple or Extended.");
             }
+
+            OnSelectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
+            _skipSelectionChangedEvent = false;
         }
 
-
-
-
+        HashSet<object> CopyToHashSet(IList iListToCopy)
+        {
+            HashSet<object> hashSet = new HashSet<object>();
+            if (iListToCopy != null)
+            {
+                foreach (object item in iListToCopy)
+                {
+                    hashSet.Add(item);
+                }
+            }
+            return hashSet;
+        }
 
 
         protected override void UnselectAllItems()
@@ -361,7 +470,7 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-#endregion
+        #endregion
 
 #if MIGRATION
         public override void OnApplyTemplate()

@@ -35,6 +35,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
     public abstract partial class MultiSelector : Selector
     {
         /// <summary>
+        /// This value is used to state that we do not want SelectedItems_Changed to fire the SelectionChanged event.
+        /// It should be set to true when the event is already fired by something else
+        /// (for example by Selector.OnSelectedItemChanged or by a subsequent modification on SelectedItems)
+        /// IMPORTANT: it needs to be set back to false once we want to allow SelectionChanged to be fired again.
+        /// </summary>
+        internal bool _skipSelectionChangedEvent = false;
+
+        /// <summary>
         /// Initializes a new instance of the System.Windows.Controls.Primitives.MultiSelector
         /// class.
         /// </summary>
@@ -74,25 +82,30 @@ namespace Windows.UI.Xaml.Controls.Primitives
             // Update the SelectedItem property:
             // based on WPF's behaviour, SelectedItem is the item that was first selected among the currently selected items:
             IList items = SelectedItems; //Note: items cannot be null as we came here as a result of it firing the CollectionChanged event.
+            bool isSelectedItemChanged = false; // we use this boolean to know if we changed SelectedItem. This way we know whether we need to fire the SelectionChanged event here or not since setting SelectedItem will already fire it.
             if (items.Count > 0)
             {
                 foreach (object item in items) //Note: items being an IList, we do not have access to ElementAt ot First so we do this.
                 {
-                    if(SelectedItem != item)
+                    if (SelectedItem != item)
                     {
                         SelectedItem = item;
+                        isSelectedItemChanged = true;
                     }
                     break;
                 }
-            }
+            } //todo: should we unset SelectedItem when the user clears SelectedItems? (in that case, do not do it if _isIntermediarySelectedItemChange is true)
 
-            //Fire the SelectionChanged event:
-            var removedItems = e.OldItems ?? new Collection<object>();
-            var addedItems = e.NewItems ?? new Collection<object>();
-            Dispatcher.BeginInvoke(() => //Note: We need to delay firing the event so we're done with everything we need to do in case the user tries to modify the selection.
+            if (!_skipSelectionChangedEvent && !isSelectedItemChanged)
             {
-                OnSelectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
-            });
+                //Fire the SelectionChanged event:
+                var removedItems = e.OldItems ?? new Collection<object>();
+                var addedItems = e.NewItems ?? new Collection<object>();
+                Dispatcher.BeginInvoke(() => //Note: We need to delay firing the event so we're done with everything we need to do in case the user tries to modify the selection.
+                {
+                    OnSelectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
+                });
+            }
 
         }
 
@@ -146,7 +159,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         ////     performing a bulk update to the System.Windows.Controls.Primitives.MultiSelector.SelectedItems
         ////     collection; otherwise, false.
         //protected bool IsUpdatingSelectedItems { get; }
-        
+
 
         //// Summary:
         ////     Starts a new selection transaction.
