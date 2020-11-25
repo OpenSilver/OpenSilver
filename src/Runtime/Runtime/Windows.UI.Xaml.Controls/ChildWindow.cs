@@ -1395,14 +1395,7 @@ namespace Windows.UI.Xaml.Controls
             this.MaxWidth = double.PositiveInfinity;
 #endif
 
-            if (IsModal)
-            {
-                this.ChildWindowPopup.INTERNAL_AllowDisableClickTransparency = true;
-            }
-            else
-            {
-                this.ChildWindowPopup.INTERNAL_AllowDisableClickTransparency = false;
-            }
+            this.ChildWindowPopup.INTERNAL_AllowDisableClickTransparency = false; //this is set to false because we want to be able to move from Modal to non-Modal, which needs click transparency (so we cannot disable it).
 
             if (this.ChildWindowPopup != null)
             {
