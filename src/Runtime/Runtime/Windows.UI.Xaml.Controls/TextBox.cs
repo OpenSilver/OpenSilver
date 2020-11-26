@@ -1110,6 +1110,12 @@ var range,selection;
             }
         }
 
+        protected internal override void INTERNAL_OnDetachedFromVisualTree()
+        {
+            base.INTERNAL_OnDetachedFromVisualTree();
+            UnapplyTemplate(this);
+        }
+
         #region Fix "input" event not working under IE.
 
         string previousInnerText = null;
