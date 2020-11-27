@@ -251,7 +251,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private new int CountInternal
+        internal override int CountInternal
         {
             get
             {

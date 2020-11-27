@@ -539,7 +539,7 @@ namespace Windows.UI.Xaml
         /// This property returns the same value as the Count property and is only here
         /// for performances.
         /// </summary>
-        internal int CountInternal
+        internal virtual int CountInternal
         {
             get { return this._collection.Count; }
         }
