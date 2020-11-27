@@ -16,7 +16,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                        <ContentPresenter x:Name="ContentElement" Padding="{TemplateBinding Padding}"/>
+                        <ContentPresenter x:Name="ContentElement" Margin="{TemplateBinding Padding}"/>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

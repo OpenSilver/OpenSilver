@@ -1000,10 +1000,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Content Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
+    <Page Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Content>
+    </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultButtonStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1040,10 +1040,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Content Include="DefaultStyles\INTERNAL_DefaultItemsControlStyle.xaml">
+    <Page Include="DefaultStyles\INTERNAL_DefaultItemsControlStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Content>
+    </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultHeaderedContentControlStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1088,14 +1088,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Content Include="DefaultStyles\INTERNAL_DefaultTileViewStyle.xaml">
+    <Page Include="DefaultStyles\INTERNAL_DefaultTileViewStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultTileViewItemStyle.xaml">
+    </Page>
+    <Page Include="DefaultStyles\INTERNAL_DefaultTileViewItemStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Content>
+    </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultTimePickerStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1112,14 +1112,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Content Include="DefaultStyles\INTERNAL_DefaultRepeatButtonStyle.xaml">
+    <Page Include="DefaultStyles\INTERNAL_DefaultRepeatButtonStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultListBoxStyle.xaml">
+    </Page>
+	  <Page Include="DefaultStyles\INTERNAL_DefaultListBoxStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Content>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />

@@ -747,7 +747,7 @@ if(nextSibling != undefined) {
             // IMPORTANT: This needs to be done AFTER the "OnApplyTemplate" (for example, the TextBox sets the "INTERNAL_OptionalSpecifyDomElementConcernedByFocus" in the "OnApplyTemplate").
             if (isChildAControl)
             {
-                if (!(child is ContentPresenter) && !(child is TextBlock)) //ContentPresenter should not count in tabbing, as well as TextBlock (especially since TextBlock is not supposed to be a Control).
+                if (!(child is TextBlock)) //ContentPresenter should not count in tabbing, as well as TextBlock (especially since TextBlock is not supposed to be a Control).
                 {
                     Control.TabIndexProperty_MethodToUpdateDom(child, ((Control)child).TabIndex);
                 }
