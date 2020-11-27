@@ -68,7 +68,6 @@ namespace Windows.UI.Xaml.Controls
         Popup _popup;
         ToggleButton _dropDownToggle;
         ContentPresenter _contentPresenter;
-        UIElement _selectedContent;
         SelectorItem _selectedItemContainer;
 
         [Obsolete("ComboBox does not support Native ComboBox. Use 'CSHTML5.Native.Html.Controls.NativeComboBox' instead.")]
@@ -111,11 +110,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        void BasePrepareContainerForItemOverride(DependencyObject element, object item)
-        {
-            base.PrepareContainerForItemOverride(element, item);
-        }
-
         protected override void ClearContainerForItemOverride(DependencyObject element, object item)
         {
             base.ClearContainerForItemOverride(element, item);
@@ -156,7 +150,6 @@ namespace Windows.UI.Xaml.Controls
         void ComboBoxItem_Click(object sender, RoutedEventArgs e)
         {
             var selectedContainer = (SelectorItem)sender;
-            _selectedContent = sender as UIElement;
 
             if (selectedContainer != _selectedItemContainer)
             {
@@ -179,49 +172,57 @@ namespace Windows.UI.Xaml.Controls
         {
             base.ApplySelectedIndex(index);
 
-            if (this.ItemsHost == null)
+            // Put the selected item into the ContentPresenter if the popup is closed
+            if (!this.IsDropDownOpen)
+            {
+                this.UpdateContentPresenter();
+            }
+        }
+
+        private void UpdateContentPresenter()
+        {
+            if (this._contentPresenter == null)
             {
                 return;
             }
 
-            UIElement newSelectedContent;
+            object content;
+            DataTemplate template;
 
-            if (index == -1)
+            object item = this.SelectedItem;
+            if (item == null)
             {
-                if (_contentPresenter != null)
-                {
-                    _contentPresenter.Content = null;
-                }
-
-                newSelectedContent = null;
-            }
-            else if (index < this.ItemsHost.Children.Count)
-            {
-                ComboBoxItem container = this.ItemsHost.Children[index] as ComboBoxItem;
-                newSelectedContent = container;
+                content = null;
+                template = null;
             }
             else
             {
-                throw new IndexOutOfRangeException();
-            }
-
-            _selectedContent = newSelectedContent;
-
-            // Put the selected item into the ContentPresenter if the popup is closed
-            if (!this.IsDropDownOpen)
-            {
-                if (this._contentPresenter != null)
+                ComboBoxItem cbi = item as ComboBoxItem;
+                if (cbi != null)
                 {
-                    // Get the actual content (if it is a ComboBoxItem, we want its content):
-                    object content = this._selectedContent;
-                    if (content is ComboBoxItem)
+                    content = cbi.Content;
+                    template = cbi.ContentTemplate;
+                }
+                else
+                {
+                    content = item;
+                    if (item is UIElement)
                     {
-                        content = ((ComboBoxItem)content).Content;
+                        template = null;
                     }
-                    // Display the content (if it is a UIElement, display as it is, otherwise, use the DisplayMemberPath/ItemTemplate).
-                    base.PrepareContainerForItemOverride(this._contentPresenter, content);
+                    else
+                    {
+                        template = this.ItemTemplate ?? ItemsControl.GetDataTemplateForDisplayMemberPath(this.DisplayMemberPath);
+                    }
                 }
             }
+
+            this._contentPresenter.Content = content;
+            this._contentPresenter.ContentTemplate = template;
+
+            // Update the SelectionBoxItem and SelectionBoxItemTemplate properties
+            this.SelectionBoxItem = content;
+            this.SelectionBoxItemTemplate = template;
         }
 
         protected override void OnSelectedItemChanged(object selectedItem)
@@ -270,19 +271,9 @@ namespace Windows.UI.Xaml.Controls
                 _popup.Opened += OnPopupOpened;
             }
 
-            ApplySelectedIndex(SelectedIndex);
-
-            // Put the selected item into the ContentPresenter if the popup is closed
-            if (this._contentPresenter != null)
+            if (!IsDropDownOpen)
             {
-                // Get the actual content (if it is a ComboBoxItem, we want its content):
-                object content = this._selectedContent;
-                if (content is ComboBoxItem comboBoxItem)
-                {
-                    content = comboBoxItem.Content;   
-                }
-                // Display the content (if it is a UIElement, display as it is, otherwise, use the DisplayMemberPath/ItemTemplate).
-                base.PrepareContainerForItemOverride(this._contentPresenter, content);
+                UpdateContentPresenter();
             }
         }
 
@@ -394,7 +385,11 @@ namespace Windows.UI.Xaml.Controls
 
                     // Empty the ContentPresenter so that, in case it is needed, the same item can be placed in the popup:
                     if (comboBox._contentPresenter != null)
+                    {
                         comboBox._contentPresenter.Content = null;
+                        comboBox.SelectionBoxItem = null;
+                        comboBox.SelectionBoxItemTemplate = null;
+                    }
 
                     // Show the popup:
                     if (comboBox._popup != null)
@@ -403,10 +398,11 @@ namespace Windows.UI.Xaml.Controls
 
                         comboBox._popup.IsOpen = true;
 
-                        // Make sure the Width of the popup is the same as the popup:
-                        double actualWidth = comboBox._popup.ActualWidth;
-                        if (!double.IsNaN(actualWidth) && comboBox._popup.Child is FrameworkElement)
-                            ((FrameworkElement)comboBox._popup.Child).Width = actualWidth;
+                        // Make sure the Width of the popup is at least the same as the popup
+                        if (comboBox._popup.Child is FrameworkElement child)
+                        {
+                            child.MinWidth = comboBox._popup.ActualWidth;
+                        }
                     }
 
                     // Ensure that the toggle button is checked:
@@ -435,18 +431,7 @@ namespace Windows.UI.Xaml.Controls
                     if (comboBox._popup != null)
                         comboBox._popup.IsOpen = false;
 
-                    // Put the selected item back into the ContentPresenter if it was removed when the ToggleButton was checked:
-                    if (comboBox._contentPresenter != null && comboBox._contentPresenter.Content == null)
-                    {
-                        // Get the actual content (if it is a ComboBoxItem, we want its content):
-                        object content = comboBox._selectedContent;
-                        if (content is ComboBoxItem)
-                        {
-                            content = ((ComboBoxItem)content).Content;
-                        }
-                        // Display the content (if it is a UIElement, display as it is, otherwise, use the DisplayMemberPath/ItemTemplate).
-                        comboBox.BasePrepareContainerForItemOverride(comboBox._contentPresenter, content);
-                    }
+                    comboBox.UpdateContentPresenter();
 
                     // Ensure that the toggle button is unchecked:
                     if (comboBox._dropDownToggle != null && comboBox._dropDownToggle.IsChecked == true)
@@ -518,52 +503,73 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        ////
-        //// Summary:
-        ////     Gets a value that indicates whether the user can edit text in the text box
-        ////     portion of the ComboBox. This property always returns false.
-        ////
-        //// Returns:
-        ////     False in all cases.
-        //public bool IsEditable { get { return false; } }
+        /// <summary>
+        /// Gets a value that indicates whether the user can edit text in the text box
+        /// portion of the ComboBox. This property always returns false.
+        /// </summary>
+        public bool IsEditable 
+        { 
+            get { return false; } 
+        }
 
-        //// Returns:
-        ////     True if the SelectionBoxItem is highlighted; otherwise, false. The default
-        ////     is true.
-        ///// <summary>
-        ///// Gets a value that indicates whether the SelectionBoxItem component is highlighted.
-        ///// </summary>
-        //public bool IsSelectionBoxHighlighted { get; }
+        /// <summary>
+        /// Identifies the <see cref="ComboBox.SelectionBoxItem"/> dependency property.
+        /// </summary>
+        private static readonly DependencyProperty SelectionBoxItemProperty =
+            DependencyProperty.Register(
+                nameof(SelectionBoxItem),
+                typeof(object),
+                typeof(ComboBox),
+                new PropertyMetadata((object)null));
 
-#if WORKINPROGRESS
-        //
-        // Summary:
-        //     Gets the item displayed in the selection box.
-        //
-        // Returns:
-        //     The item displayed in the selection box.
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Gets the item displayed in the selection box.
+        /// </summary>
         public object SelectionBoxItem
         {
-            get { return null; }
+            get { return this.GetValue(SelectionBoxItemProperty); }
+            private set { this.SetValue(SelectionBoxItemProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="ComboBox.SelectionBoxItemTemplate"/> dependency property.
+        /// </summary>
+        private static readonly DependencyProperty SelectionBoxItemTemplateProperty =
+            DependencyProperty.Register(
+                nameof(SelectionBoxItemTemplate),
+                typeof(DataTemplate),
+                typeof(ComboBox),
+                new PropertyMetadata((object)null));
+
+        /// <summary>
+        /// Gets the template applied to the selection box content.
+        /// </summary>
+        public DataTemplate SelectionBoxItemTemplate
+        {
+            get { return (DataTemplate)this.GetValue(SelectionBoxItemTemplateProperty); }
+            private set { this.SetValue(SelectionBoxItemTemplateProperty, value); }
+        }
+
+#if WORKINPROGRESS
+        /// <summary>
+        /// Identifies the <see cref="ComboBox.IsSelectionBoxHighlighted"/> dependency property.
+        /// </summary>
+        private static readonly DependencyProperty IsSelectionBoxHighlightedProperty =
+            DependencyProperty.Register(
+                nameof(IsSelectionBoxHighlighted),
+                typeof(bool),
+                typeof(ComboBox),
+                new PropertyMetadata(false));
+
+        /// <summary>
+        /// Gets a value that indicates whether the SelectionBoxItem component is highlighted.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public bool IsSelectionBoxHighlighted
+        {
+            get { return (bool)this.GetValue(IsSelectionBoxHighlightedProperty); }
+            private set { this.SetValue(IsSelectionBoxHighlightedProperty, value); }
         }
 #endif
-
-        ////
-        //// Summary:
-        ////     Gets the template applied to the selection box content.
-        ////
-        //// Returns:
-        ////     The template applied to the selection box content.
-        //public DataTemplate SelectionBoxItemTemplate { get; }
-
-        ////
-        //// Summary:
-        ////     Gets an object that provides calculated values that can be referenced as
-        ////     TemplateBinding sources when defining templates for a ComboBox control.
-        ////
-        //// Returns:
-        ////     An object that provides calculated values for templates.
-        //public ComboBoxTemplateSettings TemplateSettings { get; }
     }
 }
