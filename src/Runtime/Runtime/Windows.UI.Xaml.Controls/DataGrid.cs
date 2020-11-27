@@ -658,7 +658,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     _itemsPanelTemplate = new ItemsPanelTemplate()
                     {
-                        _methodToInstantiateFrameworkTemplate = (Control templateOwner) =>
+                        _methodToInstantiateFrameworkTemplate = (templateOwner) =>
                         {
                             Grid grid = new Grid();
 

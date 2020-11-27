@@ -39,7 +39,7 @@ namespace Windows.UI.Xaml
     [ContentProperty("ContentPropertyUsefulOnlyDuringTheCompilation")]
     public abstract partial class FrameworkTemplate : DependencyObject
     {
-        internal Func<Control, TemplateInstance> _methodToInstantiateFrameworkTemplate;
+        internal Func<FrameworkElement, TemplateInstance> _methodToInstantiateFrameworkTemplate;
 
         protected FrameworkTemplate()
         {
@@ -64,7 +64,7 @@ namespace Windows.UI.Xaml
         /// DataTemplate)
         /// </param>
         /// <returns></returns>
-        internal FrameworkElement INTERNAL_InstantiateFrameworkTemplate(Control templateOwner)
+        internal FrameworkElement INTERNAL_InstantiateFrameworkTemplate(FrameworkElement templateOwner)
         {
             if (_methodToInstantiateFrameworkTemplate != null)
             {
@@ -81,7 +81,7 @@ namespace Windows.UI.Xaml
         /// Sets the method that will create the tree of elements.
         /// </summary>
         /// <param name="methodToInstantiateFrameworkTemplate">The method that will create the tree of elements.</param>
-        public void SetMethodToInstantiateFrameworkTemplate(Func<Control, TemplateInstance> methodToInstantiateFrameworkTemplate)
+        public void SetMethodToInstantiateFrameworkTemplate(Func<FrameworkElement, TemplateInstance> methodToInstantiateFrameworkTemplate)
         {
             if (_isSealed)
             {

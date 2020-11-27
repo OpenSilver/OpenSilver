@@ -144,13 +144,11 @@ namespace Windows.UI.Xaml.Controls
         {
             ItemsPanelTemplate template = new ItemsPanelTemplate()
             {
-                _methodToInstantiateFrameworkTemplate = (Control templateOwner) =>
+                _methodToInstantiateFrameworkTemplate = (FrameworkElement templateOwner) =>
                 {
                     return new TemplateInstance()
                     {
-                        // Default items panel. 
-                        // Note: the parameter templateOwner is made necessary 
-                        // for the ControlTemplates but can be kept null for DataTemplates.
+                        TemplateOwner = templateOwner,
                         TemplateContent = new StackPanel()
                     };
                 }
