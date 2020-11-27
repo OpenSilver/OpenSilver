@@ -37,10 +37,10 @@ namespace Windows.UI.Xaml
         public HierarchicalDataTemplate()
         {
             // Workaround to avoid NullReferenceException since the compiler does not handle HierarchicalDataTemplate yet.
-            this._methodToInstantiateFrameworkTemplate = (control) =>
+            this._methodToInstantiateFrameworkTemplate = (owner) =>
             {
                 ContentPresenter presenter = new ContentPresenter();
-                presenter.SetBinding(ContentControl.ContentProperty, new Binding());
+                presenter.SetBinding(ContentPresenter.ContentProperty, new Binding());
                 return new TemplateInstance()
                 {
                     TemplateContent = presenter,

@@ -387,11 +387,11 @@ namespace Windows.UI.Xaml.Controls
 
         #endregion IGeneratorHost
 
-#region Public Methods
+        #region Public Methods
 
-#endregion Public Methods
+        #endregion Public Methods
 
-#region Protected Methods
+        #region Protected Methods
 
         protected virtual void ManageCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
@@ -449,9 +449,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Protected Methods
+        #endregion Protected Methods
 
-#region Internal Properties
+        #region Internal Properties
 
         /// <summary>
         /// Returns enumerator to logical children
@@ -496,9 +496,9 @@ namespace Windows.UI.Xaml.Controls
             get { return this._items != null && this._items.CountInternal > 0; }
         }
 
-#endregion Internal Properties
+        #endregion Internal Properties
 
-#region Internal Methods
+        #region Internal Methods
 
         // A version of Object.Equals with paranoia for mismatched types, to avoid problems
         // with classes that implement Object.Equals poorly, as in Dev11 439664, 746174, DDVSO 602650
@@ -668,7 +668,7 @@ namespace Windows.UI.Xaml.Controls
             this.OnItemsChanged(e);
         }
 
-#endregion Internal Methods
+        #endregion Internal Methods
 
         /// <summary>
         /// Undoes the effects of the PrepareContainerForItemOverride method.
@@ -682,13 +682,13 @@ namespace Windows.UI.Xaml.Controls
             //ContentControl cc;
             //ContentPresenter cp;
 
-            //if ((cp = element as ContentPresenter) != null)
+            //if ((cc = element as ContentControl) != null)
             //{
-            //    ClearContentPresenter(cp, item);
+            //    cc.ClearContentControl(item);
             //}
-            //else if ((cc = element as ContentControl) != null)
+            //else if ((cp = element as ContentPresenter) != null)
             //{
-            //    ClearContentControl(cc, item);
+            //    cp.ClearContentPresenter(item);
             //}
         }
 
@@ -748,13 +748,13 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
 
-            if ((cp = element as ContentPresenter) != null)
+            if ((cc = element as ContentControl) != null)
             {
-                PrepareContentPresenter(cp, item, template);
+                cc.PrepareContentControl(item, template);
             }
-            else if ((cc = element as ContentControl) != null)
+            else if ((cp = element as ContentPresenter) != null)
             {
-                PrepareContentControl(cc, item, template);
+                cp.PrepareContentPresenter(item, template);
             }
         }
 
@@ -775,53 +775,6 @@ namespace Windows.UI.Xaml.Controls
             };
 
             return template;
-        }
-
-        private static void PrepareContentControl(ContentControl cc,
-                                                  object item,
-                                                  DataTemplate template)
-        {
-            if (item != cc)
-            {
-                // don't treat Content as a logical child
-                cc.ContentIsNotLogical = true;
-
-                cc.ContentTemplate = template;
-                cc.Content = item;
-            }
-            else
-            {
-                cc.ContentIsNotLogical = false;
-            }
-        }
-
-        private static void PrepareContentPresenter(ContentPresenter cp,
-                                                    object item,
-                                                    DataTemplate template)
-        {
-            if (item != cp)
-            {
-                cp.ContentTemplate = template;
-                cp.Content = item;
-            }
-        }
-
-        private static void ClearContentControl(ContentControl cc,
-                                                object item)
-        {
-            if (cc != item)
-            {
-                cc.ClearValue(ContentControl.ContentProperty);
-            }
-        }
-
-        private static void ClearContentPresenter(ContentPresenter cp,
-                                                  object item)
-        {
-            if (cp != item)
-            {
-                cp.ClearValue(ContentPresenter.ContentProperty);
-            }
         }
 
         public static ItemsControl GetItemsOwner(DependencyObject element)
@@ -873,7 +826,7 @@ namespace Windows.UI.Xaml.Controls
             return ItemsControl.GetItemsOwner(ui);
         }
 
-#region Obsolete
+        #region Obsolete
 
         /// <summary>
         /// Derived classes can call this methed in their constructor if they 
@@ -941,7 +894,7 @@ namespace Windows.UI.Xaml.Controls
 
                     ContentPresenter container = new ContentPresenter();
                     Binding b = new Binding(this.DisplayMemberPath);
-                    container.SetBinding(ContentControl.ContentProperty, b);
+                    container.SetBinding(ContentPresenter.ContentProperty, b);
                     container.DataContext = item;
                     result = container;
                 }
@@ -964,6 +917,6 @@ namespace Windows.UI.Xaml.Controls
             return null;
         }
 
-#endregion Obsolete
+        #endregion Obsolete
     }
 }

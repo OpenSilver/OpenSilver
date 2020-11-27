@@ -1,6 +1,8 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultContentControlStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultItemsControlStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultAutoCompleteBoxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultButtonStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultChildWindowStyle.xaml" />
@@ -27,7 +29,6 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultToolTipStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultViewboxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultRepeatButtonStyle.xaml" />
-        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultItemsControlStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultHeaderedContentControlStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultBusyIndicatorStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerTextBoxStyle.xaml" />
