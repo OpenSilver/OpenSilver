@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml.Data
         public IPropertyPathNode _next;
         bool _isBroken;
         object _source;
-        object _value;
+        object _value = DependencyProperty.UnsetValue;
         internal DependencyProperty DependencyProperty;
         //todo: remove all the casts to Object when we check the (in)equality of PropertyInfo with something (simply find the References of the PropertyInfo property and remove the casts, it should be enough)
         internal PropertyInfo PropertyInfo; //this serves to find the property when using a INotifyPropertyChanged source (and not a DependencyProperty)
@@ -84,7 +84,7 @@ namespace Windows.UI.Xaml.Data
                 OnSourceChanged(oldSource, _source);
                 UpdateValue();
                 if (Next != null)
-                    Next.SetSource(_value);
+                    Next.SetSource(_value == DependencyProperty.UnsetValue ? null : _value);
             }
         }
 
