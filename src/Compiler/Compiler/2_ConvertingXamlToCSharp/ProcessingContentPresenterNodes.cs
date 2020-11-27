@@ -40,7 +40,7 @@ namespace DotNetForHtml5.Compiler
         {
             TraverseNextElement(doc.Root, false, reflectionOnSeparateAppDomain);
         }
-        
+
         static void TraverseNextElement(XElement currentElement, bool isInsideControlTemplate, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
         {
             if (currentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "ControlTemplate")
@@ -48,18 +48,25 @@ namespace DotNetForHtml5.Compiler
                 isInsideControlTemplate = true;
             }
 
-            if (isInsideControlTemplate
-                && currentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "ContentPresenter")
+            if (isInsideControlTemplate && !currentElement.Name.LocalName.Contains("."))
             {
-                if (currentElement.Attribute("Content") == null)
+                bool isContentPresenter = reflectionOnSeparateAppDomain.IsAssignableFrom(
+                    GeneratingCSharpCode.DefaultXamlNamespace.NamespaceName,
+                    "ContentPresenter",
+                    currentElement.Name.NamespaceName,
+                    currentElement.Name.LocalName);
+
+                if (isContentPresenter)
                 {
-                    if (!DoesContentPresenterContainDirectContent(currentElement))
+                    if (!HasAttribute(currentElement, "Content", reflectionOnSeparateAppDomain))
                     {
                         currentElement.Add(new XAttribute("Content", "{TemplateBinding Content}"));
                     }
+                    if (!HasAttribute(currentElement, "ContentTemplate", reflectionOnSeparateAppDomain))
+                    {
+                        currentElement.Add(new XAttribute("ContentTemplate", "{TemplateBinding ContentTemplate}"));
+                    }
                 }
-                if (currentElement.Attribute("ContentTemplate") == null) //todo: also check if there is a <ContentPresenter.ContentTemplate> child node.
-                    currentElement.Add(new XAttribute("ContentTemplate", "{TemplateBinding ContentTemplate}"));
             }
 
             // Recursion:
@@ -69,17 +76,39 @@ namespace DotNetForHtml5.Compiler
             }
         }
 
-        static bool DoesContentPresenterContainDirectContent(XElement contentPresenter)
+        private static bool HasAttribute(XElement cp, string attributeName, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
         {
-            // Check if there is direct content (note: we already added implicit nodes in a previous step):
-            foreach (var child in contentPresenter.Elements())
+            bool found = cp.Attribute(attributeName) != null;
+            if (!found)
             {
-                if (child.Name == GeneratingCSharpCode.DefaultXamlNamespace + "ContentPresenter.Content")
+                foreach (var child in cp.Elements())
                 {
-                    return true;
+                    string namespaceName = child.Name.NamespaceName;
+                    string[] typeAndProperty = child.Name.LocalName.Split('.');
+
+                    if (typeAndProperty.Length == 2)
+                    {
+                        // First check if this is the right property.
+                        if (typeAndProperty[1].Trim() == attributeName)
+                        {
+                            // Then make sure this is not an attached property.
+                            bool isProperty = reflectionOnSeparateAppDomain.IsAssignableFrom(
+                                GeneratingCSharpCode.DefaultXamlNamespace.NamespaceName,
+                                "ContentPresenter",
+                                namespaceName,
+                                typeAndProperty[0]);
+
+                            if (isProperty)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
-            return false;
+
+            return found;
         }
     }
 }
