@@ -58,7 +58,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 
         //this allows us to generate a header to allow selection (and most importantly deselection) of elements in the Grid.
-        private static TemplateInstance GenerateDefaultHeaderTemplateForExtendedSelectionMode(Control templateOwner = null) //The TemplateOwner parameter is made necessary by ControlTemplates but can be kept at null in DataTemplate.
+        private static TemplateInstance GenerateDefaultHeaderTemplateForExtendedSelectionMode(FrameworkElement templateOwner = null) //The TemplateOwner parameter is made necessary by ControlTemplates but can be kept at null in DataTemplate.
         {
             TemplateInstance templateInstance = new TemplateInstance();
             templateInstance.TemplateOwner = templateOwner;

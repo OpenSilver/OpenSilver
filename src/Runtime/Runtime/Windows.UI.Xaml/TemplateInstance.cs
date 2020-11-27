@@ -39,7 +39,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// The element that contains the FrameworkTemplate.
         /// </summary>
-        public Control TemplateOwner;
+        public FrameworkElement TemplateOwner;
 
         /// <summary>
         /// The visual subtree that has been generated for the FrameworkTemplate.
