@@ -83,7 +83,9 @@
                                 </ToggleButton>
                                 <ContentPresenter x:Name="ContentPresenter"
                                                   IsHitTestVisible="False"
-                                                  Margin="{TemplateBinding Padding}" />
+                                                  Margin="{TemplateBinding Padding}"
+                                                  Content=""
+                                                  ContentTemplate="{x:Null}" />
 
                                 <!-- This empty TextBlock allows to ensure that the minimum vertical size of 
                                 the ComboBox corresponds to the value of the inherited FontSize property -->
@@ -97,14 +99,23 @@
                         </Border>
                         <Popup x:Name="Popup"
                                IsOpen="False">
-                            <Border Background="White"
-                                    BorderBrush="Gray"
-                                    BorderThickness="1"
-                                    CornerRadius="3"
-                                    Padding="3">
+                            <Border HorizontalAlignment="Stretch" 
+                                    Height="Auto"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="3">
+                                <Border.Background>
+                                    <LinearGradientBrush EndPoint="0.5,1" 
+                                                         StartPoint="0.5,0">
+                                        <GradientStop Color="#FFFFFFFF" 
+                                                      Offset="0"/>
+                                        <GradientStop Color="#FFFEFEFE" 
+                                                      Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
                                 <ScrollViewer MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                                              VerticalScrollBarVisibility="Auto"
-                                              HorizontalScrollBarVisibility="Disabled">
+                                              BorderThickness="0"
+                                              Padding="1">
                                     <ItemsPresenter x:Name="ItemsHost" />
                                 </ScrollViewer>
                             </Border>
