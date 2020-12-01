@@ -73,6 +73,10 @@ namespace CSHTML5.Types
                 {
                     result = array[ArrayIndex];
                 }
+                else if(Value != null && Value.GetType().FullName == "DotNetBrowser.JSObject")
+                {
+                    result = ((dynamic)Value).GetProperty(ArrayIndex.ToString());
+                }
                 else
                 {
                     throw new InvalidOperationException("Value is marked as array but is neither an object[] nor a JSArray. ReferenceId: " + (this.ReferenceId ?? "n/a").ToString());
