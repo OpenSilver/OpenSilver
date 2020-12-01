@@ -1121,7 +1121,13 @@ var range,selection;
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
             base.INTERNAL_OnDetachedFromVisualTree();
-            UnapplyTemplate(this);
+
+            //if (this.Template != null)
+            //{
+            //    object local = this.ReadLocalValueInternal(TemplateProperty);
+            //    this.SetValue(TemplateProperty, null);
+            //    this.SetValue(TemplateProperty, local);
+            //}
         }
 
         #region Fix "input" event not working under IE.

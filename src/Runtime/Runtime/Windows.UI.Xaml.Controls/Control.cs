@@ -777,24 +777,6 @@ namespace Windows.UI.Xaml.Controls
             control.ApplyTemplate();
         }
 
-        /// <summary>
-        /// This method is meant to be called only when removing a control, in cases where the OnApplyTemplate method changes the dom tree (such as TextBox where it adds the contentEditable) so we need to ensure the template is not applied anymore.
-        /// todo: use a cleaner way to do the changes to the dom tree (when the template is not modified between the moment we remove the Control from the Visual tree and the moment we put it back, the _renderedControlTemplate is correct, we only need to apply the changes on the dom)
-        /// </summary>
-        /// <param name="c">The Control on which we want to unapply the template.</param>
-        internal static void UnapplyTemplate(Control c)
-        {
-            // An alternative for this method would be to systematically call another new method for stuff that always needs to be done after applying the Template (whether it already existed or not) and override that method where needed.
-            if (c._renderedControlTemplate != null)
-            {
-                //INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(c._renderedControlTemplate, c);
-                c.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = null; // Setting this to null because removing then re-adding a TextBox causes errors (visible at least in the Simulator) when it registers to the Got/LostFocus events.
-                c._renderedControlTemplate = null;
-                c.ClearRegisteredNames();
-                c.INTERNAL_GetVisualStateGroups().Clear();
-            }
-        }
-
         public bool ApplyTemplate()
         {
             bool visualsCreated = false;
