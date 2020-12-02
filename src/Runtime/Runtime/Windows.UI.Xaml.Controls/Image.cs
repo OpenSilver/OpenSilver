@@ -348,6 +348,17 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
         }
 #else
         INTERNAL_EventManager<ExceptionRoutedEventHandler, ExceptionRoutedEventArgs> _imageFailedEventManager = null;
+        INTERNAL_EventManager<ExceptionRoutedEventHandler, ExceptionRoutedEventArgs> ImageFailedEventManager
+        {
+            get
+            {
+                if(_imageFailedEventManager == null)
+                {
+                    _imageFailedEventManager = new INTERNAL_EventManager<ExceptionRoutedEventHandler, ExceptionRoutedEventArgs>(() => _imageDiv, "error", ProcessOnImageFailed);
+                }
+                return _imageFailedEventManager;
+            }
+        }
 
         /// <summary>
         /// Occurs when there is an error associated with image retrieval or format.
@@ -449,6 +460,18 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
         }
 #else
         INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs> _imageOpenedEventManager = null;
+        INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs> ImageOpenedEventManager
+        {
+            get
+            {
+                if(_imageOpenedEventManager == null)
+                {
+                    _imageOpenedEventManager = new INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>(() => _imageDiv, "load", ProcessOnImageOpened);
+                }
+                return _imageOpenedEventManager;
+            }
+        }
+
 
         /// <summary>
         /// Occurs when the image source is downloaded and decoded with no failure.
@@ -526,13 +549,21 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
         public override void INTERNAL_AttachToDomEvents()
         {
             base.INTERNAL_AttachToDomEvents();
+            if (_imageOpenedEventManager == null && INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>.IsEventCallbackOverridden(this, typeof(Image), "OnImageOpened"))
+            {
+                var v = ImageOpenedEventManager; //forces the creation of the event manager.
+            }
             if (_imageOpenedEventManager != null)
             {
-                _imageOpenedEventManager.AttachToDomEvents();
+                _imageOpenedEventManager.AttachToDomEvents(this, typeof(Image), "OnImageOpened");
+            }
+            if (_imageFailedEventManager == null && INTERNAL_EventManager<ExceptionRoutedEventHandler, ExceptionRoutedEventArgs>.IsEventCallbackOverridden(this, typeof(Image), "OnImageFailed"))
+            {
+                var v = _imageFailedEventManager; //forces the creation of the event manager.
             }
             if (_imageFailedEventManager != null)
             {
-                _imageFailedEventManager.AttachToDomEvents();
+                _imageFailedEventManager.AttachToDomEvents(this, typeof(Image), "OnImageFailed");
             }
         }
 

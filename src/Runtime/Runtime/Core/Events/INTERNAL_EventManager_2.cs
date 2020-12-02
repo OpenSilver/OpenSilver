@@ -51,6 +51,9 @@ namespace CSHTML5.Internal
         private List<EVENT_HANDLER> _handlers = new List<EVENT_HANDLER>();
         private List<EVENT_HANDLER> _handlersForHandledEventsToo = new List<EVENT_HANDLER>();
 
+        // Dictionary to remember which type overrides which event callback:
+        static Dictionary<Type, Dictionary<string, bool>> _typesToOverridenCallbacks = new Dictionary<Type, Dictionary<string, bool>>();
+
         public List<EVENT_HANDLER> Handlers
         {
             get { return _handlers; }
@@ -99,7 +102,7 @@ namespace CSHTML5.Internal
             if (handledEventsToo)
             {
                 _handlersForHandledEventsToo.Add(value);
-        }
+            }
             else
             {
                 _handlers.Add(value);
@@ -169,6 +172,60 @@ namespace CSHTML5.Internal
             {
                 StartListeningToDomEventsIfNotAlreadyListening();
             }
+        }
+
+        /// <summary>
+        /// Attaches the EventManager to the dom event if there are handlers for the event or if the callback method was overriden.
+        /// </summary>
+        /// <param name="instance">The instance on which the events should be fired (normally "this").</param>
+        /// <param name="callbackMethodOriginType">The type where the callback method was first defined (the method that is not an override, normally the type where the event manager was defined).</param>
+        /// <param name="callbackMethodName">The name of the callback method that was potentially overriden.</param>
+        public void AttachToDomEvents(object instance, Type callbackMethodOriginType, string callbackMethodName)
+        {
+            bool isMethodOverridden = IsEventCallbackOverridden(instance, callbackMethodOriginType, callbackMethodName);
+            
+
+            //attach to the dom event if needed:
+            if (isMethodOverridden || _handlers.Count > 0 || _handlersForHandledEventsToo.Count > 0)
+            {
+                StartListeningToDomEventsIfNotAlreadyListening();
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the method from the type of the given object is an override.
+        /// </summary>
+        /// <param name="instance">The instance on which we want to check whether the method was overridden.</param>
+        /// <param name="callbackMethodOriginType">The type that first defined the method.</param>
+        /// <param name="callbackMethodName">The name of the method.</param>
+        /// <returns></returns>
+        public static bool IsEventCallbackOverridden(object instance, Type callbackMethodOriginType, string callbackMethodName)
+        {
+            bool isMethodOverridden = false;
+            bool needReflection = true;
+            Type instanceType = instance.GetType();
+            if (_typesToOverridenCallbacks.ContainsKey(instanceType))
+            {
+                //Note: if _typesToOverridenCallbacks contains the instance type, we already initialized the corresponding dictionary.
+                if (_typesToOverridenCallbacks[instanceType].ContainsKey(callbackMethodName))
+                {
+                    isMethodOverridden = _typesToOverridenCallbacks[instanceType][callbackMethodName];
+                    needReflection = false;
+                }
+            }
+            else
+            {
+                //initialize the dictionary for the type:
+                _typesToOverridenCallbacks.Add(instanceType, new Dictionary<string, bool>());
+            }
+            if (needReflection)
+            {
+                isMethodOverridden = !(instanceType == callbackMethodOriginType || instanceType.GetMethod(callbackMethodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).DeclaringType == callbackMethodOriginType);
+                // Remember whether the event callback was overriden or not for the next time:
+                _typesToOverridenCallbacks[instanceType].Add(callbackMethodName, isMethodOverridden);
+            }
+
+            return isMethodOverridden;
         }
 
         public void DetachFromDomEvents()
