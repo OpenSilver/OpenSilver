@@ -51,8 +51,6 @@ namespace CSHTML5.Internal
         private List<EVENT_HANDLER> _handlers = new List<EVENT_HANDLER>();
         private List<EVENT_HANDLER> _handlersForHandledEventsToo = new List<EVENT_HANDLER>();
 
-        // Dictionary to remember which type overrides which event callback:
-        static Dictionary<Type, Dictionary<string, bool>> _typesToOverridenCallbacks = new Dictionary<Type, Dictionary<string, bool>>();
 
         public List<EVENT_HANDLER> Handlers
         {
@@ -182,7 +180,7 @@ namespace CSHTML5.Internal
         /// <param name="callbackMethod">The name of the callback method that was potentially overriden.</param>
         public void AttachToDomEvents(Type callbackMethodOriginType, Delegate callbackMethod)
         {
-            bool isMethodOverridden = IsEventCallbackOverridden(callbackMethodOriginType, callbackMethod);
+            bool isMethodOverridden = INTERNAL_EventsHelper.IsEventCallbackOverridden(callbackMethodOriginType, callbackMethod);
             
 
             //attach to the dom event if needed:
@@ -192,17 +190,7 @@ namespace CSHTML5.Internal
             }
         }
 
-        /// <summary>
-        /// Checks whether the method from the type of the given object is an override.
-        /// </summary>
-        /// <param name="instance">The instance on which we want to check whether the method was overridden.</param>
-        /// <param name="callbackMethodOriginType">The type that first defined the method.</param>
-        /// <param name="callbackMethodName">The name of the method.</param>
-        /// <returns></returns>
-        public static bool IsEventCallbackOverridden(Type callbackMethodOriginType, Delegate callbackMethod)
-        {
-            return callbackMethod.Method.DeclaringType != callbackMethodOriginType;
-        }
+        
 
         public void DetachFromDomEvents()
         {

@@ -432,6 +432,17 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
 
 #if WORKINPROGRESS
         INTERNAL_EventManager<EventHandler<RoutedEventArgs>, RoutedEventArgs> _imageOpenedEventManager = null;
+        INTERNAL_EventManager<EventHandler<RoutedEventArgs>, RoutedEventArgs> ImageOpenedEventManager
+        {
+            get
+            {
+                if (_imageOpenedEventManager == null)
+                {
+                    _imageOpenedEventManager = new INTERNAL_EventManager<EventHandler<RoutedEventArgs>, RoutedEventArgs>(() => _imageDiv, "load", ProcessOnImageOpened);
+                }
+                return _imageOpenedEventManager;
+            }
+        }
 
         /// <summary>
         /// Occurs when the image source is downloaded and decoded with no failure.
@@ -549,7 +560,7 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
         public override void INTERNAL_AttachToDomEvents()
         {
             base.INTERNAL_AttachToDomEvents();
-            if (_imageOpenedEventManager == null && INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>.IsEventCallbackOverridden(typeof(Image), (Action<RoutedEventArgs>)OnImageOpened))
+            if (_imageOpenedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(Image), (Action<RoutedEventArgs>)OnImageOpened))
             {
                 var v = ImageOpenedEventManager; //forces the creation of the event manager.
             }
@@ -557,7 +568,7 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
             {
                 _imageOpenedEventManager.AttachToDomEvents(typeof(Image), (Action<RoutedEventArgs>)OnImageOpened);
             }
-            if (_imageFailedEventManager == null && INTERNAL_EventManager<ExceptionRoutedEventHandler, ExceptionRoutedEventArgs>.IsEventCallbackOverridden(typeof(Image), (Action<ExceptionRoutedEventArgs>)OnImageFailed))
+            if (_imageFailedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(Image), (Action<ExceptionRoutedEventArgs>)OnImageFailed))
             {
                 var v = _imageFailedEventManager; //forces the creation of the event manager.
             }

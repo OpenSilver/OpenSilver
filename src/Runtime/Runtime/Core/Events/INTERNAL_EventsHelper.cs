@@ -112,6 +112,19 @@ namespace CSHTML5.Internal
 #endif
         }
 
+
+        /// <summary>
+        /// Checks whether the method passed as parameter is an override by checking whether its DeclaringType is the same as the type passed as parameter.
+        /// </summary>
+        /// <param name="callbackMethodOriginType">The type where the method was originally declared.</param>
+        /// <param name="callbackMethod">The method that will be checked whether it was declared in the type passed as parameter.</param>
+        /// <returns>True if the method is an override (its DeclaringType is different than the type passed as parameter).</returns>
+        public static bool IsEventCallbackOverridden(Type callbackMethodOriginType, Delegate callbackMethod)
+        {
+            return callbackMethod.Method.DeclaringType != callbackMethodOriginType;
+        }
+
+
         /*
 #if !BUILDINGDOCUMENTATION
         // This private method exists because of the current CORE architecture : 
