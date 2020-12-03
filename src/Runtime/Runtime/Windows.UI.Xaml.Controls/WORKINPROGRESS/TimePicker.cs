@@ -296,7 +296,6 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">Event arguments.</param>
         private static void OnPopupButtonModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            throw new NotImplementedException();
         }
         #endregion public ClickMode PopupButtonMode
     }
