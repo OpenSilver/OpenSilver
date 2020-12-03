@@ -1006,6 +1006,7 @@ namespace Windows.UI.Xaml
             if (eventArgs.Handled)
             {
                 CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                CSHTML5.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
             }
         }
 
@@ -1643,7 +1644,6 @@ namespace Windows.UI.Xaml
             }
             if (_pointerExitedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<MouseEventArgs>)OnMouseLeave))
             {
-                global::System.Diagnostics.Debug.WriteLine("Forcing PointerExited for type:" + this.GetType().FullName);
                 var v = PointerExitedEventManager; //forces the creation of the event manager.
             }
             if (_pointerExitedEventManager != null)
@@ -1733,7 +1733,6 @@ namespace Windows.UI.Xaml
             }
             if (_pointerExitedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<PointerRoutedEventArgs>)OnPointerExited))
             {
-                global::System.Diagnostics.Debug.WriteLine("Forcing PointerExited for type:" + this.GetType().FullName);
                 var v = PointerExitedEventManager; //forces the creation of the event manager.
             }
             if (_pointerExitedEventManager != null)
