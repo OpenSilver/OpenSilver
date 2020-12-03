@@ -407,6 +407,74 @@ namespace Windows.UI.Xaml
             return false;
         }
 
+        // Internal helper so the FrameworkElement could see the
+        // ControlTemplate/DataTemplate set on the
+        // Control/ContentPresenter/ItemsPresenter
+        internal virtual FrameworkTemplate TemplateInternal
+        {
+            get { return null; }
+        }
+
+        // Internal helper so the FrameworkElement could see the
+        // ControlTemplate/DataTemplate set on the
+        // Control/ContentPresenter/ItemsPresenter
+        internal virtual FrameworkTemplate TemplateCache
+        {
+            get { return null; }
+            set { }
+        }
+
+        internal bool ApplyTemplate()
+        {
+            if (VisualTreeHelper.GetParent(this) == null)
+            {
+                return false;
+            }
+
+            // Notify the ContentPresenter/ItemsPresenter that we are about to generate the
+            // template tree and allow them to choose the right template to be applied.
+            this.OnPreApplyTemplate();
+
+            bool visualsCreated = false;
+            FrameworkElement visualChild = null;
+
+            if (this.TemplateInternal != null)
+            {
+                FrameworkTemplate template = this.TemplateInternal;
+
+                // we only apply the template if no template has been
+                // rendered already for this control.
+                if (this.TemplateChild == null)
+                {
+                    visualChild = template.INTERNAL_InstantiateFrameworkTemplate(this);
+                    if (visualChild != null)
+                    {
+                        visualsCreated = true;
+                    }
+                }
+            }
+
+            if (visualsCreated)
+            {
+                this.TemplateChild = visualChild;
+
+                // Call the OnApplyTemplate method
+                this.OnApplyTemplate();
+            }
+
+            return visualsCreated;
+        }
+
+        /// <summary>
+        /// This virtual is called by FE.ApplyTemplate before it does work to generate the template tree.
+        /// </summary>
+        /// This virtual is overridden for the following reasons
+        /// 1. By ContentPresenter/ItemsPresenter to choose the template to be applied in this case.
+        internal virtual void OnPreApplyTemplate()
+        {
+
+        }
+
         /// <summary>
         /// Invoked whenever application code or internal processes (such as a rebuilding
         /// layout pass) call ApplyTemplate. In simplest terms, this means the method
@@ -420,6 +488,44 @@ namespace Windows.UI.Xaml
 #endif
         {
             
+        }
+
+        // Note: the returned Size is unused for now.
+        internal override sealed Size MeasureCore()
+        {
+            if (this.TemplateCache != null)
+            {
+                this.ClearRegisteredNames(); // todo: remove this once namescope is fixed.
+            }
+            if (!this.ApplyTemplate())
+            {
+                if (this.TemplateChild != null)
+                {
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.TemplateChild, this, 0);
+                }
+            }
+            return new Size();
+        }
+
+        //
+        //  This method
+        //  1. Updates the template cache for the given fe
+        //
+        internal static void UpdateTemplateCache(
+            FrameworkElement fe,
+            FrameworkTemplate oldTemplate,
+            FrameworkTemplate newTemplate,
+            DependencyProperty templateProperty)
+        {
+            if (newTemplate != null)
+            {
+                newTemplate.Seal();
+            }
+
+            // Update the template cache
+            fe.TemplateCache = newTemplate;
+
+            fe.TemplateChild = null;
         }
 
         /// <summary>
@@ -1342,9 +1448,9 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-        #endregion
+#endregion
 
-        #region ---------- INameScope implementation ----------
+#region ---------- INameScope implementation ----------
         //note: copy from UserControl
         Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
 
@@ -1392,7 +1498,7 @@ namespace Windows.UI.Xaml
         }
 
 
-        #endregion
+#endregion
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
@@ -1423,6 +1529,8 @@ namespace Windows.UI.Xaml
             {
                 UpdateThemeStyleProperty();
             }
+
+            InvalidateMeasureInternal();
         }
 
         // Extracts the required flag and returns

@@ -182,7 +182,6 @@ namespace Windows.UI.Xaml.Controls
                 typeof(ContentPresenter),
                 new PropertyMetadata(null, OnTemplateChanged));
 
-
         /// <summary>
         /// Template Property
         /// </summary>
@@ -196,11 +195,7 @@ namespace Windows.UI.Xaml.Controls
         private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ContentPresenter cp = (ContentPresenter)d;
-
-            // Update template cache
-            cp._templateCache = (DataTemplate)e.NewValue;
-
-            cp.TemplateChild = null;
+            FrameworkElement.UpdateTemplateCache(cp, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
             if (VisualTreeHelper.GetParent(cp) != null)
             {
@@ -211,6 +206,19 @@ namespace Windows.UI.Xaml.Controls
         #endregion Dependency Properties
 
         #region Internal Properties
+
+        // Internal Helper so the FrameworkElement could see this property
+        internal override FrameworkTemplate TemplateInternal
+        {
+            get { return Template; }
+        }
+
+        // Internal Helper so the FrameworkElement could see the template cache
+        internal override FrameworkTemplate TemplateCache
+        {
+            get { return _templateCache; }
+            set { _templateCache = (DataTemplate)value; }
+        }
 
         internal static DataTemplate DefaultContentTemplate
         {
@@ -318,63 +326,6 @@ namespace Windows.UI.Xaml.Controls
         }
 
         #endregion Private classes
-
-        // todo: move this to FrameworkElement
-        #region Layout related methods 
-
-        internal override sealed Size MeasureCore()
-        {
-            if (!this.ApplyTemplate())
-            {
-                if (this.TemplateChild != null)
-                {
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.TemplateChild, this, 0);
-                }
-            }
-            return new Size(0, 0);
-        }
-
-        // todo: Move Control.ApplyTemplate() over to FrameworkElement
-        private bool ApplyTemplate()
-        {
-            bool visualsCreated = false;
-            FrameworkElement visualChild = null;
-
-            if (this._templateCache != null)
-            {
-                DataTemplate template = this.Template;
-
-                // we only apply the template if no template has been
-                // rendered already for this control.
-                if (this.TemplateChild == null)
-                {
-                    visualChild = template.INTERNAL_InstantiateFrameworkTemplate(this);
-                    if (visualChild != null)
-                    {
-                        visualsCreated = true;
-                    }
-                }
-            }
-
-            if (visualsCreated)
-            {
-                this.TemplateChild = visualChild;
-
-                // Call the OnApplyTemplate method
-                this.OnApplyTemplate();
-            }
-
-            return visualsCreated;
-        }
-
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            base.INTERNAL_OnAttachedToVisualTree();
-
-            this.InvalidateMeasureInternal();
-        }
-
-        #endregion Layout related methods
     }
 }
 

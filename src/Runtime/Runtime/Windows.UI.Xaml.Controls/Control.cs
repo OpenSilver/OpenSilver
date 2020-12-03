@@ -42,23 +42,6 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public partial class Control : FrameworkElement
     {
-        // Note: the returned Size is unused for now.
-        internal override sealed Size MeasureCore()
-        {
-            if (this.HasTemplate)
-            {
-                this.ClearRegisteredNames(); // todo: remove this once namescope is fixed.
-            }
-            if (!this.ApplyTemplate())
-            {
-                if (this.TemplateChild != null)
-                {
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.TemplateChild, this, 0);
-                }
-            }
-            return new Size(0, 0);
-        }
-
         //COMMENT 26.03.2020:
         // ERROR DESCRIPTION:
         //  see Ticket #1711, problem about icons not appearing:
@@ -92,7 +75,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-
         private bool _isDisabled = false;
 
         /// <summary>
@@ -100,7 +82,6 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         [Obsolete("This value is ignored. ControlTemplate is always applied.")]
         protected bool INTERNAL_DoNotApplyControlTemplate = false;
-
 
         /// <summary>
         /// Derived classes can set this flag to True in their constructor in order to disable the "GoToState" calls of this class related to PointerOver/Pressed/Disabled, and handle them by themselves. An example is the ToggleButton control, which contains states such as "CheckedPressed", "CheckedPointerOver", etc.
@@ -128,7 +109,6 @@ namespace Windows.UI.Xaml.Controls
             _isDisabled = !isEnabled; // We remember the value so that when we update the visual states, we know whether we should go to the "Disabled" state or not.
             UpdateVisualStates();
         }
-
 
         //-----------------------
         // BACKGROUND
@@ -523,7 +503,7 @@ namespace Windows.UI.Xaml.Controls
 
         internal static CSSEquivalent INTERNAL_GetCSSEquivalentForTextDecorations(DependencyObject instance)
         {
-            return new CSSEquivalent()
+            return new CSSEquivalent
             {
                 Value = (inst, value) =>
                 {
@@ -564,15 +544,10 @@ namespace Windows.UI.Xaml.Controls
         }
 #endif
 
-
         //-----------------------
         // PADDING
         //-----------------------
 
-        // Returns:
-        //     The dimensions of the space between the border and its child as a Thickness
-        //     value. Thickness is a structure that stores dimension values using pixel
-        //     measures.
         /// <summary>
         /// Gets or sets the distance between the border and its child object.
         /// </summary>
@@ -795,6 +770,19 @@ namespace Windows.UI.Xaml.Controls
             set { SetValue(TemplateProperty, value); }
         }
 
+        // Internal Helper so the FrameworkElement could see this property
+        internal override FrameworkTemplate TemplateInternal
+        {
+            get { return Template; }
+        }
+
+        // Internal Helper so the FrameworkElement could see the template cache
+        internal override FrameworkTemplate TemplateCache
+        {
+            get { return _templateCache; }
+            set { _templateCache = (ControlTemplate)value; }
+        }
+
         /// <summary>
         /// Identifies the <see cref="Control.Template"/> dependency property.
         /// </summary>
@@ -808,11 +796,8 @@ namespace Windows.UI.Xaml.Controls
         private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Control control = (Control)d;
+            FrameworkElement.UpdateTemplateCache(control, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
-            control._templateCache = (ControlTemplate)e.NewValue;
-
-            // First detach previously attached template if any
-            control.TemplateChild = null;
             control.ClearRegisteredNames();
 
             if (VisualTreeHelper.GetParent(control) != null)
@@ -821,48 +806,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        public bool ApplyTemplate()
+        public new bool ApplyTemplate()
         {
-            if (this.INTERNAL_VisualParent == null)
-            {
-                return false;
-            }
-
-            bool visualsCreated = false;
-            FrameworkElement visualChild = null;
-
-            if (this._templateCache != null)
-            {
-                ControlTemplate template = this.Template;
-
-                // we only apply the template if no template has been
-                // rendered already for this control.
-                if (this.TemplateChild == null)
-                {
-                    visualChild = template.INTERNAL_InstantiateFrameworkTemplate(this);
-                    if (visualChild != null)
-                    {
-                        visualsCreated = true;
-                    }
-                }
-            }
-
-            if (visualsCreated)
-            {
-                this.TemplateChild = visualChild;
-
-                // Call the OnApplyTemplate method
-                this.OnApplyTemplate();
-            }
-
-            return visualsCreated;
-        }
-
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            base.INTERNAL_OnAttachedToVisualTree();
-
-            this.InvalidateMeasureInternal();
+            return base.ApplyTemplate();
         }
 
         /// <summary>

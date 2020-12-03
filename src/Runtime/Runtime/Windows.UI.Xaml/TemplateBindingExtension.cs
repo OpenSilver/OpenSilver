@@ -43,10 +43,11 @@ namespace Windows.UI.Xaml
             {
                 var dp = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(
                     provider.TargetObject?.GetType(), Path);
+                var source = provider.TargetObject as Control;
 
-                if (dp != null)
+                if (dp != null && source != null)
                 {
-                    return new TemplateBindingExpression(provider.TargetObject as Control, dp);
+                    return new TemplateBindingExpression(source, dp);
                 }
             }
 

@@ -40,13 +40,23 @@ namespace Windows.UI.Xaml.Controls
         private ItemsControl _owner; // templated parent.
         private Panel _itemsHost; // template child
 
-        private new Panel TemplateChild
+        internal sealed override FrameworkElement TemplateChild
         {
-            get { return this._itemsHost; }
-            set 
+            get { return base.TemplateChild; }
+            set
             {
-                this._itemsHost = value;
-                base.TemplateChild = value; 
+                Panel panel = null;
+                if (value != null)
+                {
+                    panel = value as Panel;
+                    if (panel == null)
+                    {
+                        throw new InvalidOperationException(string.Format("VisualTree of ItemsPanelTemplate must contain a Panel. '{0}' is not a Panel.", value.GetType()));
+                    }
+                    panel.IsItemsHost = true;
+                }
+                this._itemsHost = panel;
+                base.TemplateChild = value;
             }
         }
 
@@ -58,6 +68,19 @@ namespace Windows.UI.Xaml.Controls
         internal Panel ItemsHost
         {
             get { return _itemsHost; }
+        }
+
+        // Internal Helper so the FrameworkElement could see this property
+        internal override FrameworkTemplate TemplateInternal
+        {
+            get { return Template; }
+        }
+
+        // Internal Helper so the FrameworkElement could see the template cache
+        internal override FrameworkTemplate TemplateCache
+        {
+            get { return _templateCache; }
+            set { _templateCache = (ItemsPanelTemplate)value; }
         }
 
         /// <summary>
@@ -82,11 +105,8 @@ namespace Windows.UI.Xaml.Controls
         private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ItemsPresenter ip = (ItemsPresenter)d;
-
-            // Update template cache
-            ip._templateCache = (ItemsPanelTemplate)e.NewValue;
-
             ip.ClearPanel();
+            FrameworkElement.UpdateTemplateCache(ip, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
             if (VisualTreeHelper.GetParent(ip) != null)
             {
@@ -96,13 +116,11 @@ namespace Windows.UI.Xaml.Controls
 
         private void ClearPanel()
         {
-            Panel oldPanel = this.TemplateChild;
+            Panel oldPanel = this.ItemsHost;
             if (oldPanel != null)
             {
                 oldPanel.IsItemsHost = false;
             }
-            this.TemplateChild = null;
-            this.Owner.ItemContainerGenerator.INTERNAL_Clear();
         }
 
         private void AttachToOwner()
@@ -154,61 +172,12 @@ namespace Windows.UI.Xaml.Controls
             return VisualTreeHelper.GetParent(panel) as ItemsPresenter;
         }
 
-        internal override sealed Size MeasureCore()
+        /// <summary>
+        /// Called when the Template's tree is about to be generated
+        /// </summary>
+        internal override void OnPreApplyTemplate()
         {
-            if (!this.ApplyTemplate())
-            {
-                if (this.TemplateChild != null)
-                {
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.TemplateChild, this, 0);
-                }
-            }
-            return new Size(0, 0);
-        }
-
-        // todo: Move Control.ApplyTemplate() over to FrameworkElement
-        private bool ApplyTemplate()
-        {
-            bool visualsCreated = false;
-            FrameworkElement visualChild = null;
-
-            if (this._templateCache != null)
-            {
-                ItemsPanelTemplate template = this.Template;
-
-                // we only apply the template if no template has been
-                // rendered already for this control.
-                if (this.TemplateChild == null)
-                {
-                    visualChild = template.INTERNAL_InstantiateFrameworkTemplate();
-                    if (visualChild != null)
-                    {
-                        visualsCreated = true;
-                    }
-                }
-            }
-
-            if (visualsCreated)
-            {
-                Panel panel = visualChild as Panel;
-                if (panel == null)
-                {
-                    throw new InvalidOperationException(
-                        string.Format("VisualTree of ItemsPanelTemplate must contain a Panel. '{0}' is not a Panel.", 
-                                      panel.GetType()));
-                }
-                panel.IsItemsHost = true;
-                this.TemplateChild = panel;
-
-                // Call the OnApplyTemplate method
-                this.OnApplyTemplate();
-            }
-
-            return visualsCreated;
-        }
-
-        private void OnPreApplyTemplate()
-        {
+            base.OnPreApplyTemplate();
             this.AttachToOwner();
         }
 
@@ -221,7 +190,7 @@ namespace Windows.UI.Xaml.Controls
             base.OnApplyTemplate();
 
             // verify that the template produced a panel with no children
-            Panel panel = this.TemplateChild;
+            Panel panel = this.ItemsHost;
             if (panel == null || panel.HasChildren)
             {
                 throw new InvalidOperationException("Content of ItemsPanelTemplate must be a single Panel (with no children).");
@@ -229,14 +198,6 @@ namespace Windows.UI.Xaml.Controls
 
             // Attach children to panel
             this.Owner.Refresh(false);
-        }
-
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            base.INTERNAL_OnAttachedToVisualTree();
-
-            this.OnPreApplyTemplate();
-            this.InvalidateMeasureInternal();
         }
     }
 }
