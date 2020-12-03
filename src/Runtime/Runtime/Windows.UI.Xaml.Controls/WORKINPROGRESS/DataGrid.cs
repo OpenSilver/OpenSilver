@@ -81,7 +81,6 @@ namespace Windows.UI.Xaml.Controls
             DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -108,7 +107,6 @@ namespace Windows.UI.Xaml.Controls
             DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -136,7 +134,6 @@ namespace Windows.UI.Xaml.Controls
             DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -164,7 +161,6 @@ namespace Windows.UI.Xaml.Controls
             DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -192,7 +188,6 @@ namespace Windows.UI.Xaml.Controls
             DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -240,7 +235,6 @@ namespace Windows.UI.Xaml.Controls
             DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -267,7 +261,6 @@ namespace Windows.UI.Xaml.Controls
             DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         /// <summary>
