@@ -179,10 +179,10 @@ namespace CSHTML5.Internal
         /// </summary>
         /// <param name="instance">The instance on which the events should be fired (normally "this").</param>
         /// <param name="callbackMethodOriginType">The type where the callback method was first defined (the method that is not an override, normally the type where the event manager was defined).</param>
-        /// <param name="callbackMethodName">The name of the callback method that was potentially overriden.</param>
-        public void AttachToDomEvents(object instance, Type callbackMethodOriginType, string callbackMethodName)
+        /// <param name="callbackMethod">The name of the callback method that was potentially overriden.</param>
+        public void AttachToDomEvents(Type callbackMethodOriginType, Delegate callbackMethod)
         {
-            bool isMethodOverridden = IsEventCallbackOverridden(instance, callbackMethodOriginType, callbackMethodName);
+            bool isMethodOverridden = IsEventCallbackOverridden(callbackMethodOriginType, callbackMethod);
             
 
             //attach to the dom event if needed:
@@ -199,33 +199,9 @@ namespace CSHTML5.Internal
         /// <param name="callbackMethodOriginType">The type that first defined the method.</param>
         /// <param name="callbackMethodName">The name of the method.</param>
         /// <returns></returns>
-        public static bool IsEventCallbackOverridden(object instance, Type callbackMethodOriginType, string callbackMethodName)
+        public static bool IsEventCallbackOverridden(Type callbackMethodOriginType, Delegate callbackMethod)
         {
-            bool isMethodOverridden = false;
-            bool needReflection = true;
-            Type instanceType = instance.GetType();
-            if (_typesToOverridenCallbacks.ContainsKey(instanceType))
-            {
-                //Note: if _typesToOverridenCallbacks contains the instance type, we already initialized the corresponding dictionary.
-                if (_typesToOverridenCallbacks[instanceType].ContainsKey(callbackMethodName))
-                {
-                    isMethodOverridden = _typesToOverridenCallbacks[instanceType][callbackMethodName];
-                    needReflection = false;
-                }
-            }
-            else
-            {
-                //initialize the dictionary for the type:
-                _typesToOverridenCallbacks.Add(instanceType, new Dictionary<string, bool>());
-            }
-            if (needReflection)
-            {
-                isMethodOverridden = !(instanceType == callbackMethodOriginType || instanceType.GetMethod(callbackMethodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).DeclaringType == callbackMethodOriginType);
-                // Remember whether the event callback was overriden or not for the next time:
-                _typesToOverridenCallbacks[instanceType].Add(callbackMethodName, isMethodOverridden);
-            }
-
-            return isMethodOverridden;
+            return callbackMethod.Method.DeclaringType != callbackMethodOriginType;
         }
 
         public void DetachFromDomEvents()
