@@ -1479,6 +1479,8 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                             requestResponse = float.Parse(responseAsString); //todo: ensure this is the culture-invariant parsing!
                         else if (requestResponseType == typeof(double) || requestResponseType == typeof(double?))
                             requestResponse = double.Parse(responseAsString); //todo: ensure this is the culture-invariant parsing!
+                        else if (requestResponseType == typeof(decimal) || requestResponseType == typeof(decimal?))
+                            requestResponse = decimal.Parse(responseAsString); //todo: ensure this is the culture-invariant parsing!
                         else if (requestResponseType == typeof(char) || requestResponseType == typeof(char?))
                             requestResponse = (char)(int.Parse(responseAsString)); //todo: support encodings
                         else if (requestResponseType == typeof(DateTime) || requestResponseType == typeof(DateTime?))
