@@ -1436,25 +1436,23 @@ namespace Windows.UI.Xaml
         /// </summary>
         private void INTERNAL_AttachToFocusEvents()
         {
-            if (_gotFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<RoutedEventArgs>)OnGotFocus))
+            Type[] methodParameters = { typeof(RoutedEventArgs) };
+            
+            if (_gotFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnGotFocus", methodParameters))
             {
                 var v = GotFocusEventManager; //forces the creation of the event manager.
             }
             if (_gotFocusEventManager != null)
             {
-                _gotFocusEventManager.AttachToDomEvents(typeof(UIElement), (Action<RoutedEventArgs>)OnGotFocus);
+                _gotFocusEventManager.AttachToDomEvents(this, typeof(UIElement), "OnGotFocus", methodParameters);
             }
-#if MIGRATION
-            if (_lostFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<RoutedEventArgs>)OnLostFocus))
-#else
-            if (_lostFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<KeyRoutedEventArgs>)OnLostFocus))
-#endif
+            if (_lostFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnLostFocus", methodParameters))
             {
                 var v = LostFocusEventManager; //forces the creation of the event manager.
             }
             if (_lostFocusEventManager != null)
             {
-                _lostFocusEventManager.AttachToDomEvents(typeof(UIElement), (Action<RoutedEventArgs>)OnGotFocus);
+                _lostFocusEventManager.AttachToDomEvents(this, typeof(UIElement), "OnLostFocus", methodParameters);
             }
         }
 
@@ -1610,182 +1608,203 @@ namespace Windows.UI.Xaml
             }
 
 #if MIGRATION
-            if (_pointerMovedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<MouseEventArgs>)OnMouseMove))
+            Type[] methodParameters = new Type[] { typeof(MouseEventArgs) };
+            ///
+            if (_pointerMovedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseMove", methodParameters))
             {
                 var v = PointerMovedEventManager; //forces the creation of the event manager.
             }
             if (_pointerMovedEventManager != null)
             {
-                _pointerMovedEventManager.AttachToDomEvents(typeof(UIElement), (Action<MouseEventArgs>)OnMouseMove);
+                _pointerMovedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseMove", methodParameters);
             }
-            if (_pointerPressedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<MouseButtonEventArgs>)OnMouseLeftButtonDown))
-            {
-                var v = PointerPressedEventManager; //forces the creation of the event manager.
-            }
-            if (_pointerPressedEventManager != null)
-            {
-                _pointerPressedEventManager.AttachToDomEvents(typeof(UIElement), (Action<MouseButtonEventArgs>)OnMouseLeftButtonDown);
-            }
-            if (_pointerReleasedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<MouseButtonEventArgs>)OnMouseLeftButtonUp))
-            {
-                var v = PointerReleasedEventManager; //forces the creation of the event manager.
-            }
-            if (_pointerReleasedEventManager != null)
-            {
-                _pointerReleasedEventManager.AttachToDomEvents(typeof(UIElement), (Action<MouseButtonEventArgs>)OnMouseLeftButtonUp);
-            }
-            if (_pointerEnteredEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<MouseEventArgs>)OnMouseEnter))
+            ///
+            if (_pointerEnteredEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseEnter", methodParameters))
             {
                 var v = PointerEnteredEventManager; //forces the creation of the event manager.
             }
             if (_pointerEnteredEventManager != null)
             {
-                _pointerEnteredEventManager.AttachToDomEvents(typeof(UIElement), (Action<MouseEventArgs>)OnMouseEnter);
+                _pointerEnteredEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseEnter", methodParameters);
             }
-            if (_pointerExitedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<MouseEventArgs>)OnMouseLeave))
+            ///
+            if (_pointerExitedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseLeave", methodParameters))
             {
                 var v = PointerExitedEventManager; //forces the creation of the event manager.
             }
             if (_pointerExitedEventManager != null)
             {
-                _pointerExitedEventManager.AttachToDomEvents(typeof(UIElement), (Action<MouseEventArgs>)OnMouseLeave);
+                _pointerExitedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseLeave", methodParameters);
             }
-            if (_tappedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<TappedRoutedEventArgs>)OnTapped))
+            ///
+            methodParameters = new Type[] { typeof(TappedRoutedEventArgs) };
+            if (_tappedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnTapped", methodParameters))
             {
                 var v = TappedEventManager; //forces the creation of the event manager.
             }
             if (_tappedEventManager != null)
             {
-                _tappedEventManager.AttachToDomEvents(typeof(UIElement), (Action<TappedRoutedEventArgs>)OnTapped);
+                _tappedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnTapped", methodParameters);
             }
-            if (_rightTappedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<MouseButtonEventArgs>)OnMouseRightButtonUp))
+            ///
+            methodParameters = new Type[] { typeof(MouseButtonEventArgs) };
+            if (_pointerPressedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseLeftButtonDown", methodParameters))
+            {
+                var v = PointerPressedEventManager; //forces the creation of the event manager.
+            }
+            if (_pointerPressedEventManager != null)
+            {
+                _pointerPressedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseLeftButtonDown", methodParameters);
+            }
+            ///
+            if (_pointerReleasedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseLeftButtonUp", methodParameters))
+            {
+                var v = PointerReleasedEventManager; //forces the creation of the event manager.
+            }
+            if (_pointerReleasedEventManager != null)
+            {
+                _pointerReleasedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseLeftButtonUp", methodParameters);
+            }
+            ///
+            if (_rightTappedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseRightButtonUp", methodParameters))
             {
                 var v = RightTappedEventManager; //forces the creation of the event manager.
             }
             if (_rightTappedEventManager != null)
             {
-                _rightTappedEventManager.AttachToDomEvents(typeof(UIElement), (Action<MouseButtonEventArgs>)OnMouseRightButtonUp);
+                _rightTappedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseRightButtonUp", methodParameters);
             }
-            if (_keyDownEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<KeyEventArgs>)OnKeyDown))
+            ///
+            methodParameters = new Type[] { typeof(KeyEventArgs) };
+            if (_keyDownEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnKeyDown", methodParameters))
             {
                 var v = KeyDownEventManager; //forces the creation of the event manager.
             }
             if (_keyDownEventManager != null)
             {
-                _keyDownEventManager.AttachToDomEvents(typeof(UIElement), (Action<KeyEventArgs>)OnKeyDown);
+                _keyDownEventManager.AttachToDomEvents(this, typeof(UIElement), "OnKeyDown", methodParameters);
             }
-            if (_keyUpEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<KeyEventArgs>)OnKeyUp))
+            ///
+            if (_keyUpEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnKeyUp", methodParameters))
             {
                 var v = KeyUpEventManager; //forces the creation of the event manager.
             }
             if (_keyUpEventManager != null)
             {
-                _keyUpEventManager.AttachToDomEvents(typeof(UIElement), (Action<KeyEventArgs>)OnKeyUp);
+                _keyUpEventManager.AttachToDomEvents(this, typeof(UIElement), "OnKeyUp", methodParameters);
             }
-            if (_gotFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<RoutedEventArgs>)OnGotFocus))
+            ///
+            methodParameters = new Type[] { typeof(RoutedEventArgs) };
+            if (_gotFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnGotFocus", methodParameters))
             {
                 var v = GotFocusEventManager; //forces the creation of the event manager.
             }
             if (_gotFocusEventManager != null)
             {
-                _gotFocusEventManager.AttachToDomEvents(typeof(UIElement), (Action<RoutedEventArgs>)OnGotFocus);
+                _gotFocusEventManager.AttachToDomEvents(this, typeof(UIElement), "OnGotFocus", methodParameters);
             }
-            if (_lostFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<RoutedEventArgs>)OnLostFocus))
+            ///
+            if (_lostFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnLostFocus", methodParameters))
             {
                 var v = LostFocusEventManager; //forces the creation of the event manager.
             }
             if (_lostFocusEventManager != null)
             {
-                _lostFocusEventManager.AttachToDomEvents(typeof(UIElement), (Action<RoutedEventArgs>)OnLostFocus);
+                _lostFocusEventManager.AttachToDomEvents(this, typeof(UIElement), "OnLostFocus", methodParameters);
             }
 #else
-            if (_pointerMovedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<PointerRoutedEventArgs>)OnPointerMoved))
+            Type[] methodParameters = new Type[] { typeof(PointerRoutedEventArgs) };
+            if (_pointerMovedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnPointerMoved", methodParameters))
             {
                 var v = PointerMovedEventManager; //forces the creation of the event manager.
             }
             if (_pointerMovedEventManager != null)
             {
-                _pointerMovedEventManager.AttachToDomEvents(typeof(UIElement), (Action<PointerRoutedEventArgs>)OnPointerMoved);
+                _pointerMovedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnPointerMoved", methodParameters);
             }
-            if(_pointerPressedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<PointerRoutedEventArgs>)OnPointerPressed))
+            if(_pointerPressedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnPointerPressed", methodParameters))
             {
                 var v = PointerPressedEventManager; //forces the creation of the event manager.
             }
             if (_pointerPressedEventManager != null)
             {
-                _pointerPressedEventManager.AttachToDomEvents(typeof(UIElement), (Action<PointerRoutedEventArgs>)OnPointerPressed);
+                _pointerPressedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnPointerPressed", methodParameters);
             }
-            if (_pointerReleasedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<PointerRoutedEventArgs>)OnPointerReleased))
+            if (_pointerReleasedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnPointerReleased", methodParameters))
             {
                 var v = PointerReleasedEventManager; //forces the creation of the event manager.
             }
             if (_pointerReleasedEventManager != null)
             {
-                _pointerReleasedEventManager.AttachToDomEvents(typeof(UIElement), (Action<PointerRoutedEventArgs>)OnPointerReleased);
+                _pointerReleasedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnPointerReleased", methodParameters);
             }
-            if (_pointerEnteredEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<PointerRoutedEventArgs>)OnPointerEntered))
+            if (_pointerEnteredEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnPointerEntered", methodParameters))
             {
                 var v = PointerEnteredEventManager; //forces the creation of the event manager.
             }
             if (_pointerEnteredEventManager != null)
             {
-                _pointerEnteredEventManager.AttachToDomEvents(typeof(UIElement), (Action<PointerRoutedEventArgs>)OnPointerEntered);
+                _pointerEnteredEventManager.AttachToDomEvents(this, typeof(UIElement), "OnPointerEntered", methodParameters);
             }
-            if (_pointerExitedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<PointerRoutedEventArgs>)OnPointerExited))
+            if (_pointerExitedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnPointerExited", methodParameters))
             {
                 var v = PointerExitedEventManager; //forces the creation of the event manager.
             }
             if (_pointerExitedEventManager != null)
             {
-                _pointerExitedEventManager.AttachToDomEvents(typeof(UIElement), (Action<PointerRoutedEventArgs>)OnPointerExited);
+                _pointerExitedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnPointerExited", methodParameters);
             }
-            if (_tappedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<TappedRoutedEventArgs>)OnTapped))
+            methodParameters = new Type[] { typeof(TappedRoutedEventArgs) };
+            if (_tappedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnTapped", methodParameters))
             {
                 var v = TappedEventManager; //forces the creation of the event manager.
             }
             if (_tappedEventManager != null)
             {
-                _tappedEventManager.AttachToDomEvents(typeof(UIElement), (Action<TappedRoutedEventArgs>)OnTapped);
+                _tappedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnTapped", methodParameters);
             }
-            if (_rightTappedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<RightTappedRoutedEventArgs>)OnRightTapped))
+            methodParameters = new Type[] { typeof(RightTappedRoutedEventArgs) };
+            if (_rightTappedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnRightTapped", methodParameters))
             {
                 var v = RightTappedEventManager; //forces the creation of the event manager.
             }
             if (_rightTappedEventManager != null)
             {
-                _rightTappedEventManager.AttachToDomEvents(typeof(UIElement), (Action<RightTappedRoutedEventArgs>)OnRightTapped);
+                _rightTappedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnRightTapped", methodParameters);
             }
-            if (_keyDownEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<KeyRoutedEventArgs>)OnKeyDown))
+            methodParameters = new Type[] { typeof(KeyRoutedEventArgs) };
+            if (_keyDownEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnKeyDown", methodParameters))
             {
                 var v = KeyDownEventManager; //forces the creation of the event manager.
             }
             if (_keyDownEventManager != null)
             {
-                _keyDownEventManager.AttachToDomEvents(typeof(UIElement), (Action<KeyRoutedEventArgs>)OnKeyDown);
+                _keyDownEventManager.AttachToDomEvents(this, typeof(UIElement), "OnKeyDown", methodParameters);
             }
-            if (_keyUpEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<KeyRoutedEventArgs>)OnKeyUp))
+            if (_keyUpEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnKeyUp", methodParameters))
             {
                 var v = KeyUpEventManager; //forces the creation of the event manager.
             }
             if (_keyUpEventManager != null)
             {
-                _keyUpEventManager.AttachToDomEvents(typeof(UIElement), (Action<KeyRoutedEventArgs>)OnKeyUp);
+                _keyUpEventManager.AttachToDomEvents(this, typeof(UIElement), "OnKeyUp", methodParameters);
             }
-            if (_gotFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<RoutedEventArgs>)OnGotFocus))
+            methodParameters = new Type[] { typeof(RoutedEventArgs) };
+            if (_gotFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnGotFocus", methodParameters))
             {
                 var v = GotFocusEventManager; //forces the creation of the event manager.
             }
             if (_gotFocusEventManager != null)
             {
-                _gotFocusEventManager.AttachToDomEvents(typeof(UIElement), (Action<RoutedEventArgs>)OnGotFocus);
+                _gotFocusEventManager.AttachToDomEvents(this, typeof(UIElement), "OnGotFocus", methodParameters);
             }
-            if (_lostFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(UIElement), (Action<KeyRoutedEventArgs>)OnLostFocus))
+            if (_lostFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnLostFocus", methodParameters))
             {
                 var v = LostFocusEventManager; //forces the creation of the event manager.
             }
             if (_lostFocusEventManager != null)
             {
-                _lostFocusEventManager.AttachToDomEvents(typeof(UIElement), (Action<KeyRoutedEventArgs>)OnLostFocus);
+                _lostFocusEventManager.AttachToDomEvents(this, typeof(UIElement), "OnLostFocus", methodParameters);
             }
 #endif
         }

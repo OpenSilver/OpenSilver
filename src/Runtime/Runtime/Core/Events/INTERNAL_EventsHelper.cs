@@ -44,6 +44,8 @@ namespace CSHTML5.Internal
             AttachEvent(eventName, domElementRef, newProxy, eventHandlerWithJsEventArg);
             return newProxy;
         }
+        // Dictionary to remember which type overrides which event callback:
+        static Dictionary<Type, Dictionary<string, bool>> _typesToOverridenCallbacks = new Dictionary<Type, Dictionary<string, bool>>();
 
 #if !BRIDGE
         [JSReplacement("$domElementRef.addEventListener($eventName,$originalEventHandler)")]
@@ -119,10 +121,98 @@ namespace CSHTML5.Internal
         /// <param name="callbackMethodOriginType">The type where the method was originally declared.</param>
         /// <param name="callbackMethod">The method that will be checked whether it was declared in the type passed as parameter.</param>
         /// <returns>True if the method is an override (its DeclaringType is different than the type passed as parameter).</returns>
-        public static bool IsEventCallbackOverridden(Type callbackMethodOriginType, Delegate callbackMethod)
+        public static bool IsEventCallbackOverridden(object instance, Type callbackMethodOriginType, string callbackMethodName, Type[] callbackMethodParameterTypes)
         {
-            return callbackMethod.Method.DeclaringType != callbackMethodOriginType;
+            bool isMethodOverridden = false;
+            bool needReflection = true;
+            Type instanceType = instance.GetType();
+            if (_typesToOverridenCallbacks.ContainsKey(instanceType))
+            {
+                //Note: if _typesToOverridenCallbacks contains the instance type, we already initialized the corresponding dictionary.
+                if (_typesToOverridenCallbacks[instanceType].ContainsKey(callbackMethodName))
+                {
+                    isMethodOverridden = _typesToOverridenCallbacks[instanceType][callbackMethodName];
+                    needReflection = false;
+                }
+            }
+            else
+            {
+                //initialize the dictionary for the type:
+                _typesToOverridenCallbacks.Add(instanceType, new Dictionary<string, bool>());
+            }
+            if (needReflection)
+            {
+                if (instanceType == callbackMethodOriginType)
+                {
+                    isMethodOverridden = false;
+                }
+                else
+                {
+#if !NETSTANDARD
+                    if (Interop.IsRunningInTheSimulator) //Bridge does not provide a fitting existing (existing as in it exists in C#) overload for Type.GetMethod to get a method from a type, a name, and specific parameters when the method is not public, so we do our own. 
+                    {
+                        var methods = instanceType.GetMethods(global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance).Where((method) => { return method.Name == callbackMethodName; }).ToArray();
+                        if (methods.Length == 0)
+                        {
+                            throw new MissingMethodException("Could not find the method \"" + callbackMethodName + "\" in type " + instanceType.FullName);
+                        }
+                        global::System.Reflection.MethodInfo fittingMethod = null;
+                        foreach (var method in methods)
+                        {
+                            int i = 0;
+                            bool isTheOne = true;
+                            var parameters = method.GetParameters();
+                            foreach (var parameter in parameters)
+                            {
+                                if (parameter.ParameterType != callbackMethodParameterTypes[i])
+                                {
+                                    isTheOne = false;
+                                    break;
+                                }
+                                ++i;
+                            }
+                            if (isTheOne)
+                            {
+                                fittingMethod = method;
+                                break;
+                            }
+                        }
+
+                        if (fittingMethod == null)
+                        {
+                            List<string> parametersTypesAsString = new List<string>();
+                            foreach (var paramType in callbackMethodParameterTypes)
+                            {
+                                parametersTypesAsString.Add(paramType.FullName);
+                            }
+                            throw new MissingMethodException("Could not find the method \"" + callbackMethodName + "(" + string.Join(", ", parametersTypesAsString) + ")" + "\" in type " + instanceType.FullName);
+                        }
+
+                        // We foud a fitting method, now we check whether its declaring type is the same as the origin type:
+                        isMethodOverridden = fittingMethod.DeclaringType != callbackMethodOriginType;
+                    }
+                    else //Bridge provides Type.GetMethod(String, BindingFlags, Types[]) which does what we want but does not exist in actual C# so we use it when we are not in the simulator:
+                    {
+                        isMethodOverridden = IsMethodOverriden_BrowserOnly(callbackMethodOriginType, callbackMethodName, callbackMethodParameterTypes, instanceType);
+                    }
+#else
+                    isMethodOverridden = instanceType.GetMethod(callbackMethodName, global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, callbackMethodParameterTypes, null).DeclaringType != callbackMethodOriginType;
+#endif
+                }
+                // Remember whether the event callback was overriden or not for the next time:
+                _typesToOverridenCallbacks[instanceType].Add(callbackMethodName, isMethodOverridden);
+            }
+
+            return isMethodOverridden;
         }
+#if !NETSTANDARD
+        private static bool IsMethodOverriden_BrowserOnly(Type callbackMethodOriginType, string callbackMethodName, Type[] callbackMethodParameterTypes, Type instanceType)
+        {
+            // Note: This is in its own method because the signature of Type.GetMethod below does not exist in actual C# and we get an exception in the simulator
+            //       the moment we try to enter a method containing calls to methods that "do not exist" (it is defined in Bridge but not in C# so it does not exist from the point of vue of C#).
+            return instanceType.GetMethod(callbackMethodName, global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, callbackMethodParameterTypes).DeclaringType != callbackMethodOriginType;
+        }
+#endif
 
 
         /*

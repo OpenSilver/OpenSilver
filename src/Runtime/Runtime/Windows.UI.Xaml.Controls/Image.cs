@@ -560,21 +560,23 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
         public override void INTERNAL_AttachToDomEvents()
         {
             base.INTERNAL_AttachToDomEvents();
-            if (_imageOpenedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(Image), (Action<RoutedEventArgs>)OnImageOpened))
+            Type[] methodParameters = { typeof(RoutedEventArgs) };
+            if (_imageOpenedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(Image), "OnImageOpened", methodParameters))
             {
                 var v = ImageOpenedEventManager; //forces the creation of the event manager.
             }
             if (_imageOpenedEventManager != null)
             {
-                _imageOpenedEventManager.AttachToDomEvents(typeof(Image), (Action<RoutedEventArgs>)OnImageOpened);
+                _imageOpenedEventManager.AttachToDomEvents(this, typeof(Image), "OnImageOpened", methodParameters);
             }
-            if (_imageFailedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(typeof(Image), (Action<ExceptionRoutedEventArgs>)OnImageFailed))
+            methodParameters = new Type[] { typeof(ExceptionRoutedEventArgs) };
+            if (_imageFailedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(Image), "OnImageFailed", methodParameters))
             {
                 var v = _imageFailedEventManager; //forces the creation of the event manager.
             }
             if (_imageFailedEventManager != null)
             {
-                _imageFailedEventManager.AttachToDomEvents(typeof(Image), (Action<ExceptionRoutedEventArgs>)OnImageFailed);
+                _imageFailedEventManager.AttachToDomEvents(this, typeof(Image), "OnImageFailed", methodParameters);
             }
         }
 

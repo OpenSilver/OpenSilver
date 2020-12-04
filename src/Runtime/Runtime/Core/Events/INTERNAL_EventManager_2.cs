@@ -178,9 +178,9 @@ namespace CSHTML5.Internal
         /// <param name="instance">The instance on which the events should be fired (normally "this").</param>
         /// <param name="callbackMethodOriginType">The type where the callback method was first defined (the method that is not an override, normally the type where the event manager was defined).</param>
         /// <param name="callbackMethod">The name of the callback method that was potentially overriden.</param>
-        public void AttachToDomEvents(Type callbackMethodOriginType, Delegate callbackMethod)
+        public void AttachToDomEvents(object instance, Type callbackMethodOriginType, string callbackMethodName, Type[] callbackMethodParameterTypes)
         {
-            bool isMethodOverridden = INTERNAL_EventsHelper.IsEventCallbackOverridden(callbackMethodOriginType, callbackMethod);
+            bool isMethodOverridden = INTERNAL_EventsHelper.IsEventCallbackOverridden(instance, callbackMethodOriginType, callbackMethodName, callbackMethodParameterTypes);
             
 
             //attach to the dom event if needed:
