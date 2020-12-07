@@ -651,6 +651,14 @@ namespace Windows.System
         // Summary:
         //     The right menu key.
         RightMenu = 165,
+        //
+        // Summary:
+        //     The comma key.
+        Comma = 188,
+        //
+        // Summary:
+        //     The period key.
+        Period = 190,
 #endif
         //      An unknown key.
         Unknown = int.MaxValue,
@@ -659,16 +667,32 @@ namespace Windows.System
     {
         internal static bool IsUnknownKey(int intValue)
         {
-            if (intValue < 0 || intValue > 165)
+            if (intValue != 188 && intValue != 190 && (intValue < 0 || intValue > 165))
             {
                 return true;
             }
-            List<int> unknownKeys = new List<int>() { 7, 10, 11, 14, 15, 22, 26, 58, 59, 60, 61, 62, 63, 64, 94, 136, 137, 138, 139, 140, 141, 142, 143, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159 };
+            HashSet<int> unknownKeys = new HashSet<int>() { 7, 10, 11, 14, 15, 22, 26, 58, 59, 60, 61, 62, 63, 64, 94, 136, 137, 138, 139, 140, 141, 142, 143, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159 };
             if (unknownKeys.Contains(intValue))
             {
                 return true;
             }
             return false;
+        }
+
+        internal static VirtualKey GetKeyFromKeyCode(int keyCode)
+        {
+            VirtualKey key;
+            if(keyCode == 59) // The keyCode for the period in Firefox is 59 while it is 190 for IE, Chrome and Edge.
+            {
+                keyCode = 190;
+            }
+#if MIGRATION
+            key = (INTERNAL_VirtualKeysHelpers.IsUnknownKey(keyCode) ? Key.Unknown : (Key)keyCode);
+#else
+            key = (INTERNAL_VirtualKeysHelpers.IsUnknownKey(keyCode) ? VirtualKey.Unknown : (VirtualKey)keyCode);
+#endif
+
+            return key;
         }
 
 #if MIGRATION

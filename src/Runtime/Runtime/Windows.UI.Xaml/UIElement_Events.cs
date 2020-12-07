@@ -984,12 +984,7 @@ namespace Windows.UI.Xaml
             {
                 INTERNAL_OriginalJSEventArg = jsEventArg,
                 PlatformKeyCode = keyCode,
-#if MIGRATION
-
-                Key = (INTERNAL_VirtualKeysHelpers.IsUnknownKey(keyCode) ? Key.Unknown : (Key)keyCode),
-#else
-                Key = (INTERNAL_VirtualKeysHelpers.IsUnknownKey(keyCode) ? VirtualKey.Unknown : (VirtualKey)keyCode),
-#endif
+                Key = INTERNAL_VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
                 Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
             };
 
@@ -1100,11 +1095,7 @@ namespace Windows.UI.Xaml
             {
                 INTERNAL_OriginalJSEventArg = jsEventArg,
                 PlatformKeyCode = keyCode,
-#if MIGRATION
-                Key = (INTERNAL_VirtualKeysHelpers.IsUnknownKey(keyCode) ? Key.Unknown : (Key)keyCode),
-#else
-                Key = (INTERNAL_VirtualKeysHelpers.IsUnknownKey(keyCode) ? VirtualKey.Unknown : (VirtualKey)keyCode),
-#endif
+                Key = INTERNAL_VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
                 Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
             };
 
