@@ -677,19 +677,22 @@ namespace Windows.System
                 return true;
             }
             return false;
-        }
+      }
 
+#if MIGRATION
+       internal static Key GetKeyFromKeyCode(int keyCode)
+#else
         internal static VirtualKey GetKeyFromKeyCode(int keyCode)
-        {
-            VirtualKey key;
+#endif
+      {
             if(keyCode == 59) // The keyCode for the period in Firefox is 59 while it is 190 for IE, Chrome and Edge.
             {
                 keyCode = 190;
             }
 #if MIGRATION
-            key = (INTERNAL_VirtualKeysHelpers.IsUnknownKey(keyCode) ? Key.Unknown : (Key)keyCode);
+            var key = (INTERNAL_VirtualKeysHelpers.IsUnknownKey(keyCode) ? Key.Unknown : (Key)keyCode);
 #else
-            key = (INTERNAL_VirtualKeysHelpers.IsUnknownKey(keyCode) ? VirtualKey.Unknown : (VirtualKey)keyCode);
+            var key = (INTERNAL_VirtualKeysHelpers.IsUnknownKey(keyCode) ? VirtualKey.Unknown : (VirtualKey)keyCode);
 #endif
 
             return key;
