@@ -114,6 +114,7 @@ namespace Windows.UI.Xaml.Controls
                 string newPassword = e.NewValue as string ?? string.Empty;
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(passwordBox))
                     INTERNAL_HtmlDomManager.SetUIElementContentString(passwordBox, newPassword);
+                passwordBox.OnPasswordChanged(new RoutedEventArgs() { OriginalSource = passwordBox });
                 passwordBox._isCodeProgrammaticallyChangingPassword = false;
             }
         }
