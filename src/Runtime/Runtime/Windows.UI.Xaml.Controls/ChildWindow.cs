@@ -1409,11 +1409,11 @@ namespace Windows.UI.Xaml.Controls
                 this._dialogresult = null;
             }
 
-            // disable the underlying UI
-            if (IsModal && RootVisual != null)
-            {
-                RootVisual.IsEnabled = false;
-            }
+            //// disable the underlying UI
+            //if (IsModal && RootVisual != null)
+            //{
+            //    RootVisual.IsEnabled = false;
+            //}
 
             // if the template is already loaded, display loading visuals animation
             if (this.ContentRoot != null)
