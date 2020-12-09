@@ -340,7 +340,21 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             if (_outerBorder != null)
             {
-                _outerBorder.Margin = new Thickness(_referencePosition.X + horizontalOffset, _referencePosition.Y + verticalOffset, 0d, 0d);
+                _outerBorder.Margin = new Thickness(_referencePosition.X + horizontalOffset + _positionFixing.X, _referencePosition.Y + verticalOffset + _positionFixing.Y, 0d, 0d);
+            }
+        }
+
+        private Point _positionFixing = new Point();
+        /// <summary>
+        /// Use this for temporary changes in position of the Popup (for example, when scrolling)
+        /// </summary>
+        internal Point PositionFixing
+        {
+            get { return _positionFixing; }
+            set
+            {
+                _positionFixing = value;
+                RepositionPopup(HorizontalOffset, VerticalOffset);
             }
         }
 

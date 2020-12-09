@@ -283,18 +283,36 @@ $1.removeChild(popupRoot);
                     double popupY = popup.VerticalOffset + popupPosition.Y;
 
                     // Calculate the area of the popup that is outside the screen bounds:
-                    double widthOfAreaOutsideBounds = (popupX + popupActualWidth) - windowBounds.Width;
-                    double heightOfAreaOutsideBounds = (popupY + popupActualHeight) - windowBounds.Height;
+                    // Note: when adding widthOfLeftOverflow and heightOfTopOverflow, I guessed the X and Y of windowBounds were 0 because of the way widthOfRightOverflow and heightOfBottomOverflow was calculated.
+                    double widthOfRightOverflow = (popupX + popupActualWidth) - windowBounds.Width;
+                    double widthOfLeftOverflow = -popupX; // Note: this would be -(popupX - windowBounds.X)
+                    double heightOfBottomOverflow = (popupY + popupActualHeight) - windowBounds.Height;
+                    double heightOfTopOverflow = -popupY; // Note: this would be -(popupY - windowBounds.Y)
+                    double totalWidthOverflow = widthOfRightOverflow + widthOfLeftOverflow;
+                    double totalHeightOverflow = heightOfBottomOverflow + heightOfTopOverflow;
 
+                    //Arbitrary decision here: If the popup is too big to fit on screen, we align it with the left and the top of the screen (depending on whether it is too wide, too high, or both), and generally give priority to fixing left and top overflow.
+                    Point positionFixing = new Point();
                     // Adjust the position of the popup to remain on-screen:
-                    if (widthOfAreaOutsideBounds > 0)
+                    if(totalWidthOverflow > 0 || widthOfLeftOverflow > 0)
                     {
-                        popup.HorizontalOffset = popup.HorizontalOffset - widthOfAreaOutsideBounds; //todo: this is probably incorrect, popup.HorizontalOffset should not be changed internally, only the user should be allowed to change it. Add another internal Property to adjust the position.
+                        //align to the left:
+                        positionFixing.X = widthOfLeftOverflow;
                     }
-                    if (heightOfAreaOutsideBounds > 0)
+                    else if (widthOfRightOverflow > 0)
                     {
-                        popup.VerticalOffset = popup.VerticalOffset - heightOfAreaOutsideBounds; //todo: same as for HorizontalOffset.
+                        positionFixing.X = - widthOfRightOverflow;
                     }
+                    if(totalHeightOverflow > 0 || heightOfTopOverflow > 0)
+                    {
+                        positionFixing.Y = heightOfTopOverflow;
+                    }
+                    else if (heightOfBottomOverflow > 0)
+                    {
+                        positionFixing.Y = - heightOfBottomOverflow; //todo: same as for HorizontalOffset.
+                    }
+
+                    popup.PositionFixing = positionFixing;
                 }
             }
         }

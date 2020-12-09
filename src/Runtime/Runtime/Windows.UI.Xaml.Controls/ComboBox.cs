@@ -203,6 +203,10 @@ namespace Windows.UI.Xaml.Controls
             _popup = GetTemplateChild("Popup") as Popup;
             _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
             _contentPresenter = GetTemplateChild("ContentPresenter") as ContentPresenter;
+            //todo: once we will have made the following properties (PlacementTarget and Placement) Dependencyproperties, unset it here and set it in the default style.
+            _popup.PlacementTarget = _dropDownToggle;
+            _popup.Placement = PlacementMode.Bottom;
+            _popup.INTERNAL_PopupMoved += _popup_INTERNAL_PopupMoved;
 
             if (_dropDownToggle != null)
             {
@@ -231,6 +235,11 @@ namespace Windows.UI.Xaml.Controls
                 // Display the content (if it is a UIElement, display as it is, otherwise, use the DisplayMemberPath/ItemTemplate).
                 base.PrepareContainerForItemOverride(this._contentPresenter, content);
             }
+        }
+
+        private void _popup_INTERNAL_PopupMoved(object sender, EventArgs e)
+        {
+            INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(_popup);
         }
 
         void DropDownToggle_Checked(object sender, RoutedEventArgs e)
