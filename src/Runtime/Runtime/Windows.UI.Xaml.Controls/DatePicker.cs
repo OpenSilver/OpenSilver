@@ -51,6 +51,68 @@ namespace Windows.UI.Xaml.Controls
             this.DefaultStyleKey = typeof(DatePicker);
         }
 
+        private static DateTime? ParseText(string text)
+        {
+            if (DateTime.TryParse(text, out var dt))
+            {
+                return dt;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Updates selected date according to current Text property value
+        /// </summary>
+        private void SetSelectedDate()
+        {
+            var text = GetValue(TextProperty)?.ToString();
+            if (text != null)
+            {
+                if (!string.IsNullOrEmpty(text))
+                {
+                    if (SelectedDate.HasValue &&
+                        SetTextFromDate(SelectedDate.Value.ToString()) == text)
+                    {
+                        return;
+                    }
+
+                    var dt = ParseText(text);
+                    if (SelectedDate.Equals(dt))
+                    {
+                        return;
+                    }
+
+                    SetCurrentValue(SelectedDateProperty, dt);
+                }
+                else
+                {
+                    if (!SelectedDate.HasValue)
+                    {
+                        return;
+                    }
+
+                    //Behavior of Silverlight component
+                    SetCurrentValue(SelectedDateProperty, new DateTime());
+                }
+            }
+            else
+            {
+                var dt = ParseText(_defaultText);
+                if (SelectedDate.Equals(dt))
+                {
+                    return;
+                }
+
+                SetCurrentValue(SelectedDateProperty, dt);
+            }
+        }
+
+        protected override void OnTextChanged()
+        {
+            SetSelectedDate();
+        }
+
         protected override INTERNAL_CalendarOrClockBase GenerateCalendarOrClock()
         {
             return new Calendar();
@@ -58,9 +120,8 @@ namespace Windows.UI.Xaml.Controls
 
         protected override string SetTextFromDate(string newDate)
         {
-            string[] split = newDate.Split(' ');
-            string[] date = split[0].Split('/');
-            return date[0] + "-" + date[1] + "-" + date[2];
+            var split = newDate.Split(' ');
+            return split[0];
         }
 
         protected override void OnSelectionChanged(DateTime? newSelectedDate)
