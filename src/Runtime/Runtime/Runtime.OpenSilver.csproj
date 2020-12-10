@@ -226,6 +226,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TimeUpDown.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TreeViewItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\UpDownBase.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\ValidationItemCollection.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WebView.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ValidationUtil.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WeakEventListener.cs" />
@@ -310,7 +311,7 @@
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\IApplicationService.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\INativeCollectionWrapper.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\NullableBoolConverter.cs" />
-		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\StyleTypedPropertyAttribute.cs" />
+		<Compile Include="Windows.UI.Xaml\StyleTypedPropertyAttribute.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\SystemColors.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\SystemParameters.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\VisualStateChangedEventArgs.cs" />
@@ -369,16 +370,16 @@
 		<Compile Include="Windows.UI.Xaml.Automation.Provider\WORKINPROGRESS\IWindowProvider.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptableMemberAttribute.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptableTypeAttribute.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\FocusingInvalidControlEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\FocusingInvalidControlEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\OpenFileDialog.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\RichTextBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SaveFileDialog.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ScrollContentPresenter.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ValidationSummary.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ValidationSummaryFilters.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ValidationSummaryItem.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ValidationSummaryItemSource.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ValidationSummaryItemType.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\ValidationSummary.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryFilters.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItem.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItemSource.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItemType.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\VirtualizingPanel.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\VirtualizingStackPanel.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IItemContainerGenerator.cs" />
@@ -1208,6 +1209,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultValidationSummaryStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
 	</ItemGroup>

@@ -117,14 +117,21 @@
     <Compile Include="Windows.UI.Xaml.Controls\DataGridEditAction.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridHeadersVisibility.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridRowDetailsVisibilityMode.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\FocusingInvalidControlEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\PopulatingEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\RangeObservableCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TileView.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TileViewItem.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ValidationHelper.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ValidationItemCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ValidationMetadata.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummary.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryFilters.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItem.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItemSource.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItemType.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\BusyIndicator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Calendar.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CalendarBlackoutDatesCollection.cs" />
@@ -880,6 +887,7 @@
     <Compile Include="Windows.UI.Xaml\StartupEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\StartupEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml\Style.cs" />
+    <Compile Include="Windows.UI.Xaml\StyleTypedPropertyAttribute.cs" />
     <Compile Include="Windows.UI.Xaml\TemplateInstance.cs" />
     <Compile Include="Windows.UI.Xaml\TemplatePartAttribute.cs" />
     <Compile Include="Windows.UI.Xaml\TemplateVisualStateAttribute.cs" />
@@ -1088,6 +1096,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultToolTipStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DefaultStyles\INTERNAL_DefaultValidationSummaryStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

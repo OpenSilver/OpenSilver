@@ -51,9 +51,7 @@ namespace Windows.UI.Xaml.Controls
     [ContentPropertyAttribute("Content")]
     [TemplatePart(Name = DATAFORM_elementHeaderElement, Type = typeof(ContentControl))]
     [TemplatePart(Name = DATAFORM_elementContentPresenter, Type = typeof(ContentPresenter))]
-#if MIGRATION
     [TemplatePart(Name = DATAFORM_elementValidationSummary, Type = typeof(ValidationSummary))]
-#endif
     [TemplatePart(Name = DATAFORM_elementFirstItemButton, Type = typeof(ButtonBase))]
     [TemplatePart(Name = DATAFORM_elementPreviousItemButton, Type = typeof(ButtonBase))]
     [TemplatePart(Name = DATAFORM_elementNextItemButton, Type = typeof(ButtonBase))]
@@ -79,9 +77,7 @@ namespace Windows.UI.Xaml.Controls
     [StyleTypedProperty(Property = "CancelButtonStyle", StyleTargetType = typeof(ButtonBase))]
     [StyleTypedProperty(Property = "CommitButtonStyle", StyleTargetType = typeof(ButtonBase))]
     [StyleTypedProperty(Property = "DataFieldStyle", StyleTargetType = typeof(DataField))]
-#if MIGRATION
     [StyleTypedProperty(Property = "ValidationSummaryStyle", StyleTargetType = typeof(ValidationSummary))]
-#endif
     [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1724:TypeNamesShouldNotMatchNamespaces", Justification = "The DataForm is the main control that lives in the namespace.")]
     [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "The class is necessarily complicated because of what it does.")]
     public class DataForm : Control
@@ -489,12 +485,10 @@ namespace Windows.UI.Xaml.Controls
         {
             DataForm dataForm = d as DataForm;
 
-#if MIGRATION
             if (dataForm._validationSummary != null)
             {
                 dataForm._validationSummary.SetStyleWithType(dataForm.ValidationSummaryStyle);
             }
-#endif
         }
 
         /// <summary>
@@ -933,12 +927,10 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private ObservableCollection<ValidationSummaryItem> _entityLevelErrors;
 
-#if MIGRATION
         /// <summary>
         /// Private accessor to ValidationSummary.
         /// </summary>
         private ValidationSummary _validationSummary;
-#endif
 
         /// <summary>
         /// Holds the field-level validation errors.
@@ -1408,7 +1400,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#if MIGRATION
         /// <summary>
         /// Gets the ValidationSummary.
         /// </summary>
@@ -1419,7 +1410,6 @@ namespace Windows.UI.Xaml.Controls
                 return this._validationSummary;
             }
         }
-#endif
 
         /// <summary>
         /// Gets or sets the developer-specified style for the ValidationSummary.
@@ -2158,13 +2148,11 @@ namespace Windows.UI.Xaml.Controls
             this._fieldLevelErrors.Clear();
             this._entityLevelErrors.Clear();
 
-#if MIGRATION
             if (this._validationSummary != null)
             {
                 Debug.Assert(this._validationSummary.Errors != null, "ValidationSummary.Errors should never be null.");
                 this._validationSummary.Errors.Clear();
             }
-#endif
 
             this.IsItemValid = true;
             this._editablePropertiesOriginalValues.Clear();
@@ -2392,7 +2380,6 @@ namespace Windows.UI.Xaml.Controls
                 this._firstItemButton.Click += new RoutedEventHandler(this.OnMoveToFirstItemButtonClick);
             }
 
-#if MIGRATION
             if (this._validationSummary != null)
             {
                 this._validationSummary.Errors.CollectionChanged -= new NotifyCollectionChangedEventHandler(this.OnValidationSummaryErrorsCollectionChanged);
@@ -2411,7 +2398,6 @@ namespace Windows.UI.Xaml.Controls
                     this._validationSummary.Errors.Clear();
                 }
             }
-#endif
 
             if (this._previousItemButton != null)
             {
@@ -3657,7 +3643,6 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void ClearEntityErrors()
         {
-#if MIGRATION
             if (this.ValidationSummary != null)
             {
                 Debug.Assert(this.ValidationSummary.Errors != null, "Unexpected null ValidationSummary.Errors collection");
@@ -3671,7 +3656,6 @@ namespace Windows.UI.Xaml.Controls
                     }
                 }
             }
-#endif
 
             this._entityLevelErrors.Clear();
         }
@@ -3727,7 +3711,6 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>Whether or not the new error should be added to the list of errors.</returns>
         private bool EntityErrorShouldBeAdded(ValidationSummaryItem newError)
         {
-#if MIGRATION
             if (this.ValidationSummary != null)
             {
                 foreach (ValidationSummaryItem item in this.ValidationSummary.Errors)
@@ -3748,7 +3731,6 @@ namespace Windows.UI.Xaml.Controls
                     }
                 }
             }
-#endif
 
             return true;
         }
@@ -4615,11 +4597,7 @@ namespace Windows.UI.Xaml.Controls
             this.IsItemValid =
                 this._fieldLevelErrors.Count == 0 &&
                 this._entityLevelErrors.Count == 0 &&
-#if MIGRATION
                 (this._validationSummary == null || this._validationSummary.Errors.Count == 0);
-#else
-                true;
-#endif
 
             this.SetAllCanProperties();
             this.UpdateButtonsAndStates();
@@ -4908,22 +4886,18 @@ namespace Windows.UI.Xaml.Controls
                 if (contentPresenterContent != null)
                 {
                     contentPresenterContent.DataContext = this.CurrentItem;
-#if MIGRATION
                     if (this._validationSummary != null)
                     {
                         this._validationSummary.Target = contentPresenterContent;
                     }
-#endif
                 }
             }
             else
             {
-#if MIGRATION
                 if (this._validationSummary != null)
                 {
                     this._validationSummary.Target = null;
                 }
-#endif
             }
 
             this.UpdateButtonsAndStates();
@@ -4995,7 +4969,6 @@ namespace Windows.UI.Xaml.Controls
                         {
                             this._entityLevelErrors.Add(newError);
 
-#if MIGRATION
                             if (this.ValidationSummary != null)
                             {
                                 Debug.Assert(this.ValidationSummary.Errors != null, "ValidationSummary.Errors should never be null.");
@@ -5005,7 +4978,6 @@ namespace Windows.UI.Xaml.Controls
                                     this.ValidationSummary.Errors.Add(newError);
                                 }
                             }
-#endif
                         }
                     }
 
