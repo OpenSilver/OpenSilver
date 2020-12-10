@@ -267,6 +267,12 @@ namespace Windows.UI.Xaml.Controls
 
                 dp._textBox.Text = newText;
             }
+
+            dp.OnTextChanged();
+        }
+
+        protected virtual void OnTextChanged()
+        {
         }
 
         protected void RefreshTextBox()
