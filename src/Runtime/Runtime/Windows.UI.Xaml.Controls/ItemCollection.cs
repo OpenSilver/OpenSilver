@@ -126,7 +126,7 @@ namespace Windows.UI.Xaml.Controls
             }
             object originalItem = this.GetItemInternal(index);
             this.SetItemInternal(index, value);
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, originalItem, value, index));
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, originalItem, index));
         }
 
         internal override bool ContainsImpl(object value)

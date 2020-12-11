@@ -133,7 +133,7 @@ namespace Windows.UI.Xaml.Controls
             ColumnDefinition originalItem = this.GetItemInternal(index);
             originalItem.Parent = null;
             this.SetItemDependencyObjectInternal(index, value);
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, originalItem, value, index));
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, originalItem, index));
         }
 
         #endregion
