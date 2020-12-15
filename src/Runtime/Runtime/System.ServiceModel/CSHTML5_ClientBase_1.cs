@@ -573,6 +573,21 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                string xmlReturnedFromTheServer,
                string soapVersion)
             {
+                return EndCallWebMethod(webMethodName,
+                     interfaceType,
+                     methodReturnType,
+                     xmlReturnedFromTheServer,
+                     soapVersion);
+            }
+
+            public object EndCallWebMethod(
+                     string webMethodName,
+                     Type interfaceType,
+                     Type methodReturnType,
+                     IReadOnlyList<Type> knownTypes,
+                     string xmlReturnedFromTheServer,
+                     string soapVersion)
+            {
                 MethodInfo beginMethod = interfaceType.GetMethod("Begin" + webMethodName);
 
                 bool isXmlSerializer = IsXmlSerializer(webMethodName,
@@ -583,6 +598,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     xmlReturnedFromTheServer,
                     interfaceType,
                     methodReturnType,
+                    knownTypes,
                     faultException =>
                     {
                         throw faultException;
@@ -704,6 +720,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                             args2,
                             interfaceType,
                             methodReturnType,
+                            null,
                             isXmlSerializer,
                             soapVersion);
                     },
@@ -794,6 +811,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     response,
                     interfaceType,
                     methodReturnType,
+                    null,
                     faultException =>
                     {
                         throw faultException;
@@ -1063,6 +1081,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs e,
                 Type interfaceType,
                 Type requestResponseType,
+                IReadOnlyList<Type> knownTypes,
                 bool isXmlSerializer,
                 string soapVersion)
             {
@@ -1072,6 +1091,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         e.Result,
                         interfaceType,
                         requestResponseType,
+                        knownTypes,
                         faultException =>
                         {
                             taskCompletionSource.TrySetException(faultException);
@@ -1176,6 +1196,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 string responseAsString,
                 Type interfaceType,
                 Type requestResponseType,
+                IReadOnlyList<Type> knownTypes,
                 Action<FaultException> raiseFaultException,
                 bool isXmlSerializer,
                 string soapVersion)
@@ -1381,14 +1402,20 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     }
 
                     // get the known types from the interface type
-                    IEnumerable<Type> knownTypes =
+                    IEnumerable<Type> serviceKnownTypes =
                         interfaceType.GetCustomAttributes(typeof(ServiceKnownTypeAttribute), true)
                                      .Select(o => ((ServiceKnownTypeAttribute)o).Type);
 
+                    List<Type> types = new List<Type>(knownTypes ?? Enumerable.Empty<Type>());
+                    foreach (Type t in serviceKnownTypes)
+                    {
+                        types.Add(t);
+                    }
+
 #if CSHTML5BLAZOR
-                    DataContractSerializer_CSHTML5Ver deSerializer = new DataContractSerializer_CSHTML5Ver(typeToDeserialize, knownTypes);
+                    DataContractSerializer_CSHTML5Ver deSerializer = new DataContractSerializer_CSHTML5Ver(typeToDeserialize, types);
 #else
-                    DataContractSerializer deSerializer = new DataContractSerializer(typeToDeserialize, knownTypes);
+                    DataContractSerializer deSerializer = new DataContractSerializer(typeToDeserialize, types);
 #endif
                     VerifyThatResponseIsNotNullOrEmpty(responseAsString);
                     XDocument xDoc = XDocument.Parse(responseAsString);

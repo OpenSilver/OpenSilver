@@ -146,6 +146,21 @@ namespace System.ServiceModel
             IDictionary<string, object> requestParameters,
             string soapVersion) where INTERFACE_TYPE : class
         {
+            return EndCallWebMethod<INTERFACE_TYPE>(endpointAddress,
+               webMethodName,
+               methodReturnType,
+               null,
+               requestParameters,
+               soapVersion);
+        }
+
+        public static object EndCallWebMethod<INTERFACE_TYPE>(string endpointAddress,
+            string webMethodName,
+            Type methodReturnType,
+            IReadOnlyList<Type> knownTypes,
+            IDictionary<string, object> requestParameters,
+            string soapVersion) where INTERFACE_TYPE : class
+        {
             // Read the XML result from the parameters
             IAsyncResult asyncResult = (IAsyncResult)requestParameters["result"];
             WebMethodAsyncResult webMethodAsyncResult = (WebMethodAsyncResult)asyncResult;
@@ -158,6 +173,7 @@ namespace System.ServiceModel
                 webMethodName,
                 typeof(INTERFACE_TYPE),
                 methodReturnType,
+                knownTypes,
                 xmlReturnedFromTheServer,
                 soapVersion);
 
