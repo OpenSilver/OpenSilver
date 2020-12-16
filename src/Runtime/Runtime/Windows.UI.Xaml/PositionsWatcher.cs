@@ -54,7 +54,7 @@ namespace Windows.UI.Xaml
                 FrameworkElement control = controlToWatch.ControltoWatch as FrameworkElement;
                 if (control != null)
                 {
-                    elementCurrentSize = control.INTERNAL_GetActualWidthAndHeight();
+                    elementCurrentSize = control.INTERNAL_GetActualWidthAndHeightUsinggetboudingClientRect();
                 }
                 else
                 {

@@ -1495,6 +1495,56 @@ if ($0.tagName.toLowerCase() != 'span')
                 return new Size(0d, 0d);
         }
 
+        /// <summary>
+        /// Use this method for better performance in the Simulator compared to requesting the ActualWidth and ActualHeight separately.
+        /// </summary>
+        /// <returns>The actual size of the element.</returns>
+        internal Size INTERNAL_GetActualWidthAndHeightUsinggetboudingClientRect()
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && this.INTERNAL_OuterDomElement != null)
+            {
+#if !CSHTML5NETSTANDARD
+                if (IsRunningInJavaScript())
+                {
+                    var rect = this.INTERNAL_OuterDomElement.getBoundingClientRect();
+                    double actualWidth = rect.width;
+                    double actualHeight = rect.height;
+                    return new Size(actualWidth, actualHeight);
+                }
+                else
+                {
+#endif
+                    try
+                    {
+                        // Hack to improve the Simulator performance by making only one interop call rather than two:
+                        string concatenated = CSHTML5.Interop.ExecuteJavaScript("(function() { var v = $0.getBoundingClientRect(); return v.width.toFixed(3) + '|' + v.height.toFixed(3) })()", this.INTERNAL_OuterDomElement).ToString();
+                        global::System.Diagnostics.Debug.WriteLine(concatenated);
+                        int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
+                        if (sepIndex > -1)
+                        {
+                            string actualWidthAsString = concatenated.Substring(0, sepIndex);
+                            string actualHeightAsString = concatenated.Substring(sepIndex + 1);
+                            double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                            double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
+                            return new Size(actualWidth, actualHeight);
+                        }
+                        else
+                        {
+                            return new Size(0d, 0d);
+                        }
+                    }
+                    catch
+                    {
+                        return new Size(0d, 0d);
+                    }
+#if !CSHTML5NETSTANDARD
+                }
+#endif
+            }
+            else
+                return new Size(0d, 0d);
+        }
+
         #endregion
 
 

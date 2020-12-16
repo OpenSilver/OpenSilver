@@ -24,7 +24,9 @@ using DotNetForHtml5.Core;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Data;
 #else
+using Windows.UI.Xaml.Data;
 using Windows.Foundation;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Input;
@@ -71,26 +73,62 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
+        /// <summary>
+        /// Occurs when the System.Windows.Controls.Primitives.Popup.IsOpen property changes to true.
+        /// </summary>
+        public event EventHandler Opened;
+        void OnOpened()
+        {
+            if(Opened != null)
+            {
+                Opened(this, new EventArgs());
+            }
+        }
 
-        private UIElement _placementTarget;
+        /// <summary>
+        /// Occurs when the System.Windows.Controls.Primitives.Popup.IsOpen property changes to false.
+        /// </summary>
+        public event EventHandler Closed;
+        void OnClosed()
+        {
+            if (Closed != null)
+            {
+                Closed(this, new EventArgs());
+            }
+        }
+
         /// <summary>
         /// Gets or Sets the UIElement that the Popup will stick to. A null value will make the Popup stay at its originally defined position.
         /// </summary>
-        public UIElement PlacementTarget //todo: change this into a DependencyProperty
+        public UIElement PlacementTarget
         {
-            get { return _placementTarget; }
-            set { _placementTarget = value; }
+            get { return (UIElement)GetValue(PlacementTargetProperty); }
+            set { SetValue(PlacementTargetProperty, value); }
         }
+        /// <summary>
+        /// Gets the identifier for the PlacementTarget dependency property
+        /// </summary>
+        public static readonly DependencyProperty PlacementTargetProperty =
+            DependencyProperty.Register("PlacementTarget", typeof(UIElement), typeof(Popup), new PropertyMetadata(null));
 
-        private PlacementMode _placement;
+
+
+
         /// <summary>
         /// Gets or sets the position of the Popup relative to the UIElement it is attached to. NOTE: The only currently supported positions are Right and Bottom.
         /// </summary>
-        public PlacementMode Placement //todo: change this into a DependencyProperty
+        public PlacementMode Placement
         {
-            get { return _placement; }
-            set { _placement = value; }
+            get { return (PlacementMode)GetValue(PlacementProperty); }
+            set { SetValue(PlacementProperty, value); }
         }
+        /// <summary>
+        /// Gets the identifier for the Placement dependency property
+        /// </summary>
+        public static readonly DependencyProperty PlacementProperty =
+            DependencyProperty.Register("Placement", typeof(PlacementMode), typeof(Popup), new PropertyMetadata(PlacementMode.Right));
+
+
 
         /// <summary>
         /// This boolean determines whether the popup can force its content to catch clicks.
@@ -187,11 +225,13 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 // Show the popup if it was not already visible, or hide it if it was visible:
                 if (isOpen)
                 {
+                    popup.OnOpened();
                     // Show the popup:
                     popup.ShowPopupRootIfNotAlreadyVisible();
                 }
                 else
                 {
+                    popup.OnClosed();
                     // Hide the popup:
                     popup.HidePopupRootIfVisible();
                 }
@@ -208,6 +248,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     //the popup needs to be placed to a position relative to the popup.PlacementTarget element
                     if (isOpen)
                     {
+                        popup.OnOpened();
+
                         Window.Current.INTERNAL_PositionsWatcher.AddControlToWatch(targetElement, popup.RefreshPopupPosition);
                         popup.ShowPopupRootIfNotAlreadyVisible();
 
@@ -220,7 +262,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                         Size elementCurrentSize;
                         if (targetElement is FrameworkElement)
                         {
-                            elementCurrentSize = ((FrameworkElement)targetElement).INTERNAL_GetActualWidthAndHeight();
+                            elementCurrentSize = ((FrameworkElement)targetElement).INTERNAL_GetActualWidthAndHeightUsinggetboudingClientRect();
                         }
                         else
                         {
@@ -232,6 +274,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     }
                     else
                     {
+                        popup.OnClosed();
                         Window.Current.INTERNAL_PositionsWatcher.RemoveControlToWatch(popup._controlToWatch);
                         popup.HidePopupRootIfVisible();
                     }
@@ -276,6 +319,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 _referencePosition = placementTargetPosition;
                 RepositionPopup(HorizontalOffset, VerticalOffset);
+
+                if(StaysWithinScreenBounds)
+                {
+                    INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(this);
+                }
             }
 
             // Raise the internal "PopupMoved" event, which is useful for example to hide the validation popups of TextBoxes in case the user scrolls and the TextBox is no longer visible on screen (cf. ZenDesk 628):
@@ -413,6 +461,23 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 popup._outerBorder.VerticalAlignment = (VerticalAlignment)e.NewValue;
         }
 
+
+        /// <summary>
+        /// Get or sets a boolean stating whether the popup should stay within the screen boundaries or not.
+        /// </summary>
+        public bool StaysWithinScreenBounds
+        {
+            get { return (bool)GetValue(StaysWithinScreenBoundsProperty); }
+            set { SetValue(StaysWithinScreenBoundsProperty, value); }
+        }
+        /// <summary>
+        /// Identifies the StaysWithinScreenBounds dependency property.
+        /// </summary>
+        public static readonly DependencyProperty StaysWithinScreenBoundsProperty =
+            DependencyProperty.Register("StaysWithinScreenBounds", typeof(bool), typeof(Popup), new PropertyMetadata(false));
+
+
+
         #endregion
 
 
@@ -455,6 +520,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     VerticalAlignment = this.VerticalContentAlignment,
                     INTERNAL_ForceEnableAllPointerEvents = INTERNAL_AllowDisableClickTransparency && !transparentToClicks, // This is here because we set "pointerEvents='none' to the PopupRoot, so we need to re-enable pointer events in the children (unless we have calculated that the popup should be "transparentToClicks").
                 };
+                Binding b = new Binding("Width") { Source = this };
+                _outerBorder.SetBinding(Border.WidthProperty, b);
+                Binding b2 = new Binding("Height") { Source = this };
+                _outerBorder.SetBinding(Border.HeightProperty, b2);
 
                 // Make sure that after the OuterBorder raises the Loaded event, the PopupRoot also raises the Loaded event:
                 _outerBorder.Loaded += (s, e) => { popupRoot.INTERNAL_RaiseLoadedEvent(); };
@@ -502,7 +571,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private Window GetParentWindowOfPopup()
         {
             // If the popup has a placement target, and the latter is in the visual tree, we get the window from there. Otherwise, if the popup itself is inthe visual tree, "Popup.INTERNAL_ParentWindow" should be populated. Otherwise, we use the default window (MainWindow) to display the popup.
-            Window parentWindow = (this._placementTarget != null ? this._placementTarget.INTERNAL_ParentWindow : null) ?? this.INTERNAL_ParentWindow ?? Application.Current.MainWindow;
+            Window parentWindow = (this.PlacementTarget != null ? this.PlacementTarget.INTERNAL_ParentWindow : null) ?? this.INTERNAL_ParentWindow ?? Application.Current.MainWindow;
 
             return parentWindow;
         }
@@ -582,10 +651,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 #if WORKINPROGRESS
-        public event EventHandler Closed;
-
-        public event EventHandler Opened;
-
         public void SetWindow(Window associatedWindow)
         {
 
