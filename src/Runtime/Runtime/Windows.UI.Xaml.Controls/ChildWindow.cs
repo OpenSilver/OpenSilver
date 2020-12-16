@@ -656,6 +656,11 @@ namespace Windows.UI.Xaml.Controls
 
                 Point delta = new Point(posNow.X - this._clickPoint.X, posNow.Y - this._clickPoint.Y);
 
+                if(this._contentRootTransform != this.ContentRoot.RenderTransform) // Note: they can be different if this.ContentRoot.RenderTransform was set by the developper, in which case we want to use that value.
+                {
+                    this._contentRootTransform = this.ContentRoot.RenderTransform as TranslateTransform; // todo: what if it is another type (CompositeTransform for example)
+                }
+
                 if (this._contentRootTransform == null)
                 {
                     this._contentRootTransform = new TranslateTransform();
