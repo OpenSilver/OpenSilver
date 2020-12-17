@@ -836,6 +836,15 @@ namespace Windows.UI.Xaml.Controls
 
         protected override void ManageCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
+            //When ItemsSource is changed, this method is executed twice:
+            //with a new collection, and with a paged view.
+            //We ignore the first call.
+            //For more details, read the method OnItemsSourceChanged.
+            if (!Equals(ItemsSource, _pagedView) && ItemsSource != null)
+            {
+                return;
+            }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -945,91 +954,118 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="childData"></param>
         private bool AddChild(object childData)
         {
-            // Verify that the object we are adding is not already present (our implementation does not support adding twice the same object to the DataGrid source). //todo: support this?
-            if (!_objectsToDisplay.ContainsKey(childData))
+            return AddChildren(new List<object> {childData}).Single();
+        }
+
+
+        private IEnumerable<bool> AddChildren(IEnumerable<object> children)
+        {
+            var res = new List<bool>();
+            var rows = new List<RowDefinition>();
+            var cells = new List<DataGridCell>();
+
+            var rowCount = _grid.RowDefinitions.Count;
+            foreach (var childData in children)
             {
-                RowDefinition rowDefinition = new RowDefinition();
-                rowDefinition.Height = GridLength.Auto;
-                _grid.RowDefinitions.Add(rowDefinition);
-
-                DataGridRow objectRow = new DataGridRow();
-                objectRow._datagrid = this;
-                //we add the header:
-                objectRow._representationInRow.RowDefinition = rowDefinition;
-                objectRow._rowIndex = _grid.RowDefinitions.Count - 1;
-                objectRow.HeaderTemplate = GetActiveRowHeaderTemplate();
-
-                bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-
-                int currentColumnIndex = 1; //1 because of the column for the header
-                foreach (DataGridColumn column in Columns)
+                // Verify that the object we are adding is not already present (our implementation does not support adding twice the same object to the DataGrid source). //todo: support this?
+                if (!_objectsToDisplay.ContainsKey(childData))
                 {
-                    DataGridCell cell = new DataGridCell();
-                    cell.Item = childData;
-                    cell.DataContext = childData;
-                    cell.Column = column;
-                    FrameworkElement f = column.GenerateElement(childData);
-                    Grid.SetRow(cell, _grid.RowDefinitions.Count - 1);
-                    Grid.SetColumn(cell, currentColumnIndex);
-                    cell.Content = f;
-                    cell.RegisterToContentPressEvent();
-                    objectRow._representationInRow.ElementsInRow.Add(cell);
-                    cell.Click += CellElement_Click;
-                    _grid.Children.Add(cell);
-                    if (isCSSGrid)
+                    RowDefinition rowDefinition = new RowDefinition();
+                    rowDefinition.Height = GridLength.Auto;
+                    rows.Add(rowDefinition);
+                    rowCount++;
+
+                    DataGridRow objectRow = new DataGridRow();
+                    objectRow._datagrid = this;
+                    //we add the header:
+                    objectRow._representationInRow.RowDefinition = rowDefinition;
+                    objectRow._rowIndex = rowCount - 1;
+                    objectRow.HeaderTemplate = GetActiveRowHeaderTemplate();
+
+                    bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
+
+                    int currentColumnIndex = 1; //1 because of the column for the header
+                    foreach (DataGridColumn column in Columns)
                     {
-                        Brush brush = HorizontalGridLinesBrush;
-                        int HorizontalLinesThickness = HorizontalGridLinesBrush.Opacity > 0 ? 1 : 0;
-                        int VerticalLinesThickness = VerticalGridLinesBrush.Opacity > 0 ? 1 : 0;
-                        if (HorizontalLinesThickness == 0)
+                        DataGridCell cell = new DataGridCell();
+                        cell.Item = childData;
+                        cell.DataContext = childData;
+                        cell.Column = column;
+                        FrameworkElement f = column.GenerateElement(childData);
+                        Grid.SetRow(cell, rowCount - 1);
+                        Grid.SetColumn(cell, currentColumnIndex);
+                        cell.Content = f;
+                        cell.RegisterToContentPressEvent();
+                        objectRow._representationInRow.ElementsInRow.Add(cell);
+                        cell.Click += CellElement_Click;
+                        cells.Add(cell);
+                        if (isCSSGrid)
                         {
-                            brush = VerticalGridLinesBrush;
+                            Brush brush = HorizontalGridLinesBrush;
+                            int HorizontalLinesThickness = HorizontalGridLinesBrush.Opacity > 0 ? 1 : 0;
+                            int VerticalLinesThickness = VerticalGridLinesBrush.Opacity > 0 ? 1 : 0;
+                            if (HorizontalLinesThickness == 0)
+                            {
+                                brush = VerticalGridLinesBrush;
+                            }
+
+                            cell.BorderBrush = brush;
+                            cell.BorderThickness = new Thickness((currentColumnIndex == 1 ? VerticalLinesThickness : 0),
+                                (rowCount == 1 ? HorizontalLinesThickness : 0),
+                                VerticalLinesThickness,
+                                HorizontalLinesThickness);
+
+                            cell.Padding = new Thickness(4, VerticalCellPadding, 4, VerticalCellPadding);
                         }
-                        cell.BorderBrush = brush;
-                        cell.BorderThickness = new Thickness((currentColumnIndex == 1 ? VerticalLinesThickness : 0),
-                                                            (_grid.RowDefinitions.Count == 1 ? HorizontalLinesThickness : 0),
-                                                            VerticalLinesThickness,
-                                                            HorizontalLinesThickness);
-                        cell.Padding = new Thickness(4, VerticalCellPadding, 4, VerticalCellPadding);
+
+                        int elementRow = rowCount - 1;
+
+                        if (elementRow % 2 == 0 && elementRow != 0
+                        ) //todo: we assumed that the cell was not selected, if it can be selected at the moment where we add it (programatically for example), add the management of the case where it is selected.
+                        {
+                            cell.Background = AlternatingRowBackground;
+                        }
+                        else
+                        {
+                            cell.Background = RowBackground;
+                        }
+
+                        cell.Foreground = UnselectedItemForeground;
+
+                        if (column.CellStyle != null)
+                        {
+                            cell.Style = column.CellStyle;
+                        }
+                        else if (CellStyle != null)
+                        {
+                            cell.Style = CellStyle;
+                        }
+
+                        currentColumnIndex++;
                     }
 
-                    int elementRow = _grid.RowDefinitions.Count - 1;
+                    objectRow.INTERNAL_SetRowEvents();
 
-                    if (elementRow % 2 == 0 && elementRow != 0)//todo: we assumed that the cell was not selected, if it can be selected at the moment where we add it (programatically for example), add the management of the case where it is selected.
-                    {
-                        cell.Background = AlternatingRowBackground;
-                    }
-                    else
-                    {
-                        cell.Background = RowBackground;
-                    }
-                    cell.Foreground = UnselectedItemForeground;
+                    _objectsToDisplay.Add(childData, objectRow);
 
-                    if (column.CellStyle != null)
-                    {
-                        cell.Style = column.CellStyle;
-                    }
-                    else if(CellStyle != null)
-                    {
-                        cell.Style = CellStyle;
-                    }
-                    currentColumnIndex++;
+                    objectRow.INTERNAL_SetDataContext();
+
+                    OnLoadingRow(new DataGridRowEventArgs(objectRow));
+
+                    res.Add(true);
                 }
-
-                objectRow.INTERNAL_SetRowEvents();
-
-                _objectsToDisplay.Add(childData, objectRow);
-
-                objectRow.INTERNAL_SetDataContext();
-
-                OnLoadingRow(new DataGridRowEventArgs(objectRow));
-
-                return true;
+                else
+                {
+                    res.Add(false);
+                }
             }
-            else
+
+            foreach (var row in rows)
             {
-                return false;
+                _grid.RowDefinitions.Add(row);
             }
+            _grid.Children.AddRange(cells);
+            return res;
         }
 
         void CellElement_Click(object sender, RoutedEventArgs e)
@@ -1082,6 +1118,8 @@ namespace Windows.UI.Xaml.Controls
 
         private void RemoveAllChildren()
         {
+            var cells = new List<UIElement>();
+            var rows = new List<RowDefinition>();
             foreach (DataGridRow child in
 #if BRIDGE
                 INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(_objectsToDisplay)
@@ -1090,11 +1128,18 @@ namespace Windows.UI.Xaml.Controls
 #endif
                 )
             {
-                foreach (UIElement element in child._representationInRow.ElementsInRow)
+                foreach (var element in child._representationInRow.ElementsInRow)
                 {
-                    _grid.Children.Remove(element);
+                    cells.Add(element);
                 }
-                _grid.RowDefinitions.Remove(child._representationInRow.RowDefinition);
+                rows.Add(child._representationInRow.RowDefinition);
+            }
+
+            _grid.Children.RemoveRange(cells);
+
+            foreach(var row in rows)
+            {
+                _grid.RowDefinitions.Remove(row);
             }
             _objectsToDisplay.Clear();
         }
@@ -1461,10 +1506,7 @@ namespace Windows.UI.Xaml.Controls
                     }
                     if (newChildren != null)
                     {
-                        foreach (object newChild in newChildren)
-                        {
-                            AddChild(newChild);
-                        }
+                        AddChildren(newChildren);
                     }
                 }
                 else

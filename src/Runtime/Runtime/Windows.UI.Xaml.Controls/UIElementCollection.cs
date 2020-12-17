@@ -28,7 +28,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <exclude/>
-    public partial class UIElementCollection : ObservableCollection<UIElement>
+    public partial class UIElementCollection : RangeObservableCollection<UIElement>
     {
         public UIElementCollection()
         { 

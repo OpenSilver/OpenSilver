@@ -58,14 +58,13 @@ namespace CSHTML5.Internal
 
                 if (!string.IsNullOrWhiteSpace(aggregatedPendingJavaScriptCode))
                 {
-                    javaScriptToExecute = "// [START OF PENDING JAVASCRIPT]"
-                        + Environment.NewLine
-                        + aggregatedPendingJavaScriptCode
-                        + Environment.NewLine
-                        + "// [END OF PENDING JAVASCRIPT]"
-                        + Environment.NewLine
-                        + Environment.NewLine
-                        + javaScriptToExecute;
+                    javaScriptToExecute = string.Join(Environment.NewLine, new List<string>
+                    {
+                        "// [START OF PENDING JAVASCRIPT]",
+                        aggregatedPendingJavaScriptCode,
+                        "// [END OF PENDING JAVASCRIPT]" + Environment.NewLine,
+                        javaScriptToExecute
+                    });
                 }
             }
 

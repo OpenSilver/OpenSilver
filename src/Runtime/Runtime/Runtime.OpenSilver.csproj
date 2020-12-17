@@ -130,6 +130,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\ExpandDirection.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\PopulatingEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\RangeObservableCollection.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\SelectionSequence.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TileView.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TileViewItem.cs" />
