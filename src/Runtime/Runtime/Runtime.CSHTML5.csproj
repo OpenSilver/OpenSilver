@@ -60,6 +60,7 @@
     <Compile Include="PagedCollectionView\PagedCollectionViewResources.Designer.cs">
       <DependentUpon>PagedCollectionViewResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="PagedCollectionView\PropertyGroupDescription.cs" />
     <Compile Include="PagedCollectionView\TypeHelper.cs" />
     <Compile Include="PublicAPI\Internal\KnownTypesHelper.cs" />
     <Compile Include="PublicAPI\Internal\WebRequestsHelper.cs" />
@@ -69,7 +70,9 @@
     <Compile Include="System.ComponentModel\CurrentChangingEventArgs.cs" />
     <Compile Include="System.ComponentModel\GroupDescription.cs" />
     <Compile Include="System.ComponentModel\ICollectionView.cs" />
+    <Compile Include="System.ComponentModel\ICollectionViewFactory.cs" />
     <Compile Include="System.ComponentModel\IEditableCollectionView.cs" />
+    <Compile Include="System.ComponentModel\IItemProperties.cs" />
     <Compile Include="System.ComponentModel\ISupportInitialize.cs" />
     <Compile Include="System.ComponentModel\ListSortDirection.cs" />
     <Compile Include="System.ComponentModel\ReadOnlyAttribute.cs" />
@@ -80,6 +83,7 @@
     <Compile Include="System.Net\ServicePointManager.cs" />
     <Compile Include="System.Net\WORKINPROGRESS\HttpWebRequest.cs" />
     <Compile Include="System.Net\WORKINPROGRESS\WebRequest.cs" />
+    <Compile Include="System.Reflection\ICustomTypeProvider.cs" />
     <Compile Include="System.Resources\ResourceManager.cs" />
     <Compile Include="System.ServiceModel\CommunicationException.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\BrowserInformation.cs" />
@@ -94,6 +98,7 @@
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction.cs" />
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
+    <Compile Include="System\TypeExtensions.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IItemContainerGenerator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IRecyclingItemContainerGenerator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Common\Extensions.cs" />
@@ -108,12 +113,17 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Page.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\CollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\CollectionViewGroup.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\CollectionViewSource.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\DataExtensionMethods.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\EnumerableCollectionView.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\IndexedEnumerable.cs" />
     <Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Toolkit\ItemsControlExtensions.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\ListCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\Binding.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
-    <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\CollectionViewSource.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\EasingFunctionBase.cs" />
@@ -1050,6 +1060,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="System.ComponentModel\WORKINPROGRESS\" />
+    <Folder Include="System.Reflection\WORKINPROGRESS\" />
   </ItemGroup>
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' " />

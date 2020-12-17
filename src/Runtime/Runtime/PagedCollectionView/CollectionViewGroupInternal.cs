@@ -13,9 +13,11 @@ using System.ComponentModel;
 using System.Diagnostics;
 
 #if MIGRATION
-    using System.Windows;
+using System.Windows;
+using System.Windows.Controls;
 #else
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 #endif
 
 #if MIGRATION
@@ -187,9 +189,9 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-#endregion Internal Properties
+        #endregion Internal Properties
 
-#region Private Properties
+        #region Private Properties
 
         //------------------------------------------------------
         //
@@ -288,6 +290,82 @@ namespace Windows.UI.Xaml.Data
             }
 
             return index;
+        }
+
+        // move an item and return true if it really moved.
+        // Also translate the indices to "leaf" coordinates
+        internal bool Move(object item, IList list, ref int oldIndex, ref int newIndex)
+        {
+            int oldIndexLocal = -1, newIndexLocal = -1;
+            int localIndex = 0;
+            int n = ProtectedItems.Count;
+
+            // the input is in "full" coordinates.  Find the corresponding local coordinates
+            for (int fullIndex = 0; ; ++fullIndex)
+            {
+                if (fullIndex == oldIndex)
+                {
+                    oldIndexLocal = localIndex;
+                    if (newIndexLocal >= 0)
+                        break;
+                    ++localIndex;
+                }
+
+                if (fullIndex == newIndex)
+                {
+                    newIndexLocal = localIndex;
+                    if (oldIndexLocal >= 0)
+                    {
+                        --newIndexLocal;
+                        break;
+                    }
+                    ++fullIndex;
+                    ++oldIndex;
+                }
+
+                if (localIndex < n && ItemsControl.EqualsEx(ProtectedItems[localIndex], list[fullIndex]))
+                    ++localIndex;
+            }
+
+            // the move may be a no-op w.r.t. this group
+            if (oldIndexLocal == newIndexLocal)
+                return false;
+
+            // translate to "leaf" coordinates
+            int low, high, lowLeafIndex, delta = 0;
+            if (oldIndexLocal < newIndexLocal)
+            {
+                low = oldIndexLocal + 1;
+                high = newIndexLocal + 1;
+                lowLeafIndex = LeafIndexFromItem(null, oldIndexLocal);
+            }
+            else
+            {
+                low = newIndexLocal;
+                high = oldIndexLocal;
+                lowLeafIndex = LeafIndexFromItem(null, newIndexLocal);
+            }
+
+            for (int i = low; i < high; ++i)
+            {
+                CollectionViewGroupInternal subgroup = Items[i] as CollectionViewGroupInternal;
+                delta += (subgroup == null) ? 1 : subgroup.ItemCount;
+            }
+
+            if (oldIndexLocal < newIndexLocal)
+            {
+                oldIndex = lowLeafIndex;
+                newIndex = oldIndex + delta;
+            }
+            else
+            {
+                newIndex = lowLeafIndex;
+                oldIndex = newIndex + delta;
+            }
+
+            // do the actual move
+            ProtectedItems.Move(oldIndexLocal, newIndexLocal);
+            return true;
         }
 
         /// <summary>
@@ -533,7 +611,7 @@ namespace Windows.UI.Xaml.Data
             /// <returns>-1 if x is less than y, +1 otherwise</returns>
             public int Compare(object x, object y)
             {
-                if (Object.Equals(x, y))
+                if (ItemsControl.EqualsEx(x, y))
                 {
                     return 0;
                 }
@@ -543,11 +621,11 @@ namespace Windows.UI.Xaml.Data
                 for (; this._index < n; ++this._index)
                 {
                     object z = this._list[this._index];
-                    if (Object.Equals(x, z))
+                    if (ItemsControl.EqualsEx(x, z))
                     {
                         return -1;  // x occurs first, so x < y
                     }
-                    else if (Object.Equals(y, z))
+                    else if (ItemsControl.EqualsEx(y, z))
                     {
                         return +1;  // y occurs first, so x > y
                     }

@@ -323,6 +323,13 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
+        internal void MoveWithinSubgroups(object item, IList list, int oldIndex, int newIndex)
+        {
+            // recursively descend through the groups, moving the item within
+            // groups it belongs to
+            MoveWithinSubgroups(item, this, 0, list, oldIndex, newIndex);
+        }
+
         #endregion Methods
 
         #region Private Methods
@@ -623,6 +630,69 @@ namespace Windows.UI.Xaml.Data
                         this.RemoveItemFromSubgroupsByExhaustiveSearch(subgroup, item);
                     }
                 }
+            }
+        }
+
+        // move an item within the desired subgroup(s) of the given group
+        private void MoveWithinSubgroups(object item, CollectionViewGroupInternal group, int level, IList list, int oldIndex, int newIndex)
+        {
+            object name = GetGroupName(item, group.GroupBy, level);
+            ICollection nameList;
+
+            if (name == UseAsItemDirectly)
+            {
+                // the item belongs to the group itself (not to any subgroups)
+                MoveWithinSubgroup(item, group, list, oldIndex, newIndex);
+            }
+            else if ((nameList = name as ICollection) == null)
+            {
+                // the item belongs to one subgroup
+                MoveWithinSubgroup(item, group, level, name, list, oldIndex, newIndex);
+            }
+            else
+            {
+                // the item belongs to multiple subgroups
+                foreach (object o in nameList)
+                {
+                    MoveWithinSubgroup(item, group, level, o, list, oldIndex, newIndex);
+                }
+            }
+        }
+
+        // move an item within the subgroup with the given name
+        private void MoveWithinSubgroup(object item, CollectionViewGroupInternal group, int level, object name, IList list, int oldIndex, int newIndex)
+        {
+            CollectionViewGroupInternal subgroup;
+
+            // find the desired subgroup using linear search
+            for (int index = 0, n = group.Items.Count; index < n; ++index)
+            {
+                subgroup = group.Items[index] as CollectionViewGroupInternal;
+                if (subgroup == null)
+                    continue;           // skip children that are not groups
+
+                if (group.GroupBy.NamesMatch(subgroup.Name, name))
+                {
+                    // Recursively call the MoveWithinSubgroups method on subgroup.
+                    MoveWithinSubgroups(item, subgroup, level + 1, list, oldIndex, newIndex);
+                    return;
+                }
+            }
+
+            // the item didn't match any subgroups.  Something is wrong.
+            // This could happen if the app changes the item's group name (by changing
+            // properties that the name depends on) without notification.
+            // We don't support this - the Move is just a no-op.  But assert (in
+            // debug builds) to help diagnose the problem if it arises.
+            Debug.Assert(false, "Failed to find item in expected subgroup after Move");
+        }
+
+        // move the item within its group
+        private void MoveWithinSubgroup(object item, CollectionViewGroupInternal group, IList list, int oldIndex, int newIndex)
+        {
+            if (group.Move(item, list, ref oldIndex, ref newIndex))
+            {
+                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, item, newIndex, oldIndex));
             }
         }
 

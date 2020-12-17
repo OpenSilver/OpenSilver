@@ -18,7 +18,12 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+
+#if MIGRATION
 using System.Windows.Common;
+#else
+using Windows.UI.Xaml.Common;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Data
@@ -2528,7 +2533,7 @@ namespace Windows.UI.Xaml.Data
         /// <param name="propertyPath">property names path</param>
         /// <param name="propertyType">property type that we want to check for</param>
         /// <returns>child object</returns>
-        private static object InvokePath(object item, string propertyPath, Type propertyType)
+        internal static object InvokePath(object item, string propertyPath, Type propertyType)
         {
             Exception exception;
             object propertyValue = TypeHelper.GetNestedPropertyValue(item, propertyPath, propertyType, out exception);
@@ -4105,72 +4110,6 @@ namespace Windows.UI.Xaml.Data
 #region Private Classes
 
         /// <summary>
-        /// Creates a comparer class that takes in a CultureInfo as a parameter,
-        /// which it will use when comparing strings.
-        /// </summary>
-        private class CultureSensitiveComparer : IComparer<object>
-        {
-            /// <summary>
-            /// Private accessor for the CultureInfo of our comparer
-            /// </summary>
-            private CultureInfo _culture;
-
-            /// <summary>
-            /// Creates a comparer which will respect the CultureInfo
-            /// that is passed in when comparing strings.
-            /// </summary>
-            /// <param name="culture">The CultureInfo to use in string comparisons</param>
-            public CultureSensitiveComparer(CultureInfo culture)
-                : base()
-            {
-                this._culture = culture ?? CultureInfo.InvariantCulture;
-            }
-
-#region IComparer<object> Members
-
-            /// <summary>
-            /// Compares two objects and returns a value indicating whether one is less than, equal to or greater than the other.
-            /// </summary>
-            /// <param name="x">first item to compare</param>
-            /// <param name="y">second item to compare</param>
-            /// <returns>Negative number if x is less than y, zero if equal, and a positive number if x is greater than y</returns>
-            /// <remarks>
-            /// Compares the 2 items using the specified CultureInfo for string and using the default object comparer for all other objects.
-            /// </remarks>
-            public int Compare(object x, object y)
-            {
-                if (x == null)
-                {
-                    if (y != null)
-                    {
-                        return -1;
-                    }
-                    return 0;
-                }
-                if (y == null)
-                {
-                    return 1;
-                }
-
-                // at this point x and y are not null
-                if (x.GetType() == typeof(string) && y.GetType() == typeof(string))
-                {
-#if NETSTANDARD
-                    return this._culture.CompareInfo.Compare((string)x, (string)y);
-#else
-                    return string.Compare((string)x, (string)y, false, this._culture);
-#endif
-                }
-                else
-                {
-                    return Comparer<object>.Default.Compare(x, y);
-                }
-            }
-
-#endregion
-        }
-
-        /// <summary>
         /// Used to keep track of Defer calls on the PagedCollectionView, which
         /// will prevent the user from calling Refresh() on the view. In order
         /// to allow refreshes again, the user will have to call IDisposable.Dispose,
@@ -4376,190 +4315,261 @@ namespace Windows.UI.Xaml.Data
             private int _timestamp;
         }
 
-        /// <summary>
-        /// IComparer class to sort by class property value (using reflection).
-        /// </summary>
-        internal class SortFieldComparer : IComparer
-        {
+#endregion Private Classes
+    }
+
+    /// <summary>
+    /// IComparer class to sort by class property value (using reflection).
+    /// </summary>
+    internal class SortFieldComparer : IComparer
+    {
 #region Constructors
 
-            internal SortFieldComparer() { }
+        internal SortFieldComparer() { }
 
-            /// <summary>
-            /// Create a comparer, using the SortDescription and a Type;
-            /// tries to find a reflection PropertyInfo for each property name
-            /// </summary>
-            /// <param name="collectionView">CollectionView that contains list of property names and direction to sort by</param>
-            public SortFieldComparer(ICollectionView collectionView)
-            {
-                this._collectionView = collectionView;
-                this._sortFields = collectionView.SortDescriptions;
-                this._fields = CreatePropertyInfo(this._sortFields);
-                this._comparer = new CultureSensitiveComparer(collectionView.Culture);
-            }
+        /// <summary>
+        /// Create a comparer, using the SortDescription and a Type;
+        /// tries to find a reflection PropertyInfo for each property name
+        /// </summary>
+        /// <param name="collectionView">CollectionView that contains list of property names and direction to sort by</param>
+        public SortFieldComparer(ICollectionView collectionView)
+        {
+            this._collectionView = collectionView;
+            this._sortFields = collectionView.SortDescriptions;
+            this._fields = CreatePropertyInfo(this._sortFields);
+            this._comparer = new CultureSensitiveComparer(collectionView.Culture);
+        }
 
 #endregion
 
 #region Public Methods
 
-            /// <summary>
-            /// Compares two objects and returns a value indicating whether one is less than, equal to or greater than the other.
-            /// </summary>
-            /// <param name="x">first item to compare</param>
-            /// <param name="y">second item to compare</param>
-            /// <returns>Negative number if x is less than y, zero if equal, and a positive number if x is greater than y</returns>
-            /// <remarks>
-            /// Compares the 2 items using the list of property names and directions.
-            /// </remarks>
-            public int Compare(object x, object y)
+        /// <summary>
+        /// Compares two objects and returns a value indicating whether one is less than, equal to or greater than the other.
+        /// </summary>
+        /// <param name="x">first item to compare</param>
+        /// <param name="y">second item to compare</param>
+        /// <returns>Negative number if x is less than y, zero if equal, and a positive number if x is greater than y</returns>
+        /// <remarks>
+        /// Compares the 2 items using the list of property names and directions.
+        /// </remarks>
+        public int Compare(object x, object y)
+        {
+            int result = 0;
+
+            // compare both objects by each of the properties until property values don't match
+            for (int k = 0; k < this._fields.Length; ++k)
             {
-                int result = 0;
-
-                // compare both objects by each of the properties until property values don't match
-                for (int k = 0; k < this._fields.Length; ++k)
+                // if the property type is not yet determined, try
+                // obtaining it from the objects
+                Type propertyType = this._fields[k].PropertyType;
+                if (propertyType == null)
                 {
-                    // if the property type is not yet determined, try
-                    // obtaining it from the objects
-                    Type propertyType = this._fields[k].PropertyType;
-                    if (propertyType == null)
+                    if (x != null)
                     {
-                        if (x != null)
-                        {
-                            this._fields[k].PropertyType = x.GetType().GetNestedPropertyType(this._fields[k].PropertyPath);
-                            propertyType = this._fields[k].PropertyType;
-                        }
-                        if (this._fields[k].PropertyType == null && y != null)
-                        {
-                            this._fields[k].PropertyType = y.GetType().GetNestedPropertyType(this._fields[k].PropertyPath);
-                            propertyType = this._fields[k].PropertyType;
-                        }
+                        this._fields[k].PropertyType = x.GetType().GetNestedPropertyType(this._fields[k].PropertyPath);
+                        propertyType = this._fields[k].PropertyType;
                     }
-
-                    object v1 = this._fields[k].GetValue(x);
-                    object v2 = this._fields[k].GetValue(y);
-
-                    // this will handle the case with string comparisons
-                    if (propertyType == typeof(string))
+                    if (this._fields[k].PropertyType == null && y != null)
                     {
-                        result = this._comparer.Compare(v1, v2);
-                    }
-                    else
-                    {
-                        // try to also set the value for the comparer if this was 
-                        // not already calculated
-                        IComparer comparer = this._fields[k].Comparer;
-                        if (propertyType != null && comparer == null)
-                        {
-                            this._fields[k].Comparer = (typeof(Comparer<>).MakeGenericType(propertyType).GetProperty("Default")).GetValue(null, null) as IComparer;
-                            comparer = this._fields[k].Comparer;
-                        }
-
-                        result = (comparer != null) ? comparer.Compare(v1, v2) : 0 /*both values equal*/;
-                    }
-
-                    if (this._fields[k].Descending)
-                    {
-                        result = -result;
-                    }
-
-                    if (result != 0)
-                    {
-                        break;
+                        this._fields[k].PropertyType = y.GetType().GetNestedPropertyType(this._fields[k].PropertyPath);
+                        propertyType = this._fields[k].PropertyType;
                     }
                 }
 
-                return result;
-            }
+                object v1 = this._fields[k].GetValue(x);
+                object v2 = this._fields[k].GetValue(y);
 
-            /// <summary>
-            /// Steps through the given list using the comparer to find where
-            /// to insert the specified item to maintain sorted order
-            /// </summary>
-            /// <param name="x">Item to insert into the list</param>
-            /// <param name="list">List where we want to insert the item</param>
-            /// <returns>Index where we should insert into</returns>
-            public int FindInsertIndex(object x, IList list)
-            {
-                int min = 0;
-                int max = list.Count - 1;
-                int index;
-
-                // run a binary search to find the right index
-                // to insert into.
-                while (min <= max)
+                // this will handle the case with string comparisons
+                if (propertyType == typeof(string))
                 {
-                    index = (min + max) / 2;
+                    result = this._comparer.Compare(v1, v2);
+                }
+                else
+                {
+                    // try to also set the value for the comparer if this was 
+                    // not already calculated
+                    IComparer comparer = this._fields[k].Comparer;
+                    if (propertyType != null && comparer == null)
+                    {
+#if NETSTANDARD
+                        this._fields[k].Comparer = (typeof(Comparer<>).MakeGenericType(propertyType).GetProperty("Default")).GetValue(null, null) as IComparer;
+#else // BRIDGE
+                        this._fields[k].Comparer = (typeof(CSHTML5.Internal.Helpers.ComparerHelper<>).MakeGenericType(propertyType)
+                            .GetProperty("Default")).GetValue(null, null) as IComparer;
+#endif
+                        comparer = this._fields[k].Comparer;
+                    }
 
-                    int result = this.Compare(x, list[index]);
-                    if (result == 0)
-                    {
-                        return index;
-                    }
-                    else if (result > 0)
-                    {
-                        min = index + 1;
-                    }
-                    else
-                    {
-                        max = index - 1;
-                    }
+                    result = (comparer != null) ? comparer.Compare(v1, v2) : 0 /*both values equal*/;
                 }
 
-                return min;
+                if (this._fields[k].Descending)
+                {
+                    result = -result;
+                }
+
+                if (result != 0)
+                {
+                    break;
+                }
             }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Steps through the given list using the comparer to find where
+        /// to insert the specified item to maintain sorted order
+        /// </summary>
+        /// <param name="x">Item to insert into the list</param>
+        /// <param name="list">List where we want to insert the item</param>
+        /// <returns>Index where we should insert into</returns>
+        public int FindInsertIndex(object x, IList list)
+        {
+            int min = 0;
+            int max = list.Count - 1;
+            int index;
+
+            // run a binary search to find the right index
+            // to insert into.
+            while (min <= max)
+            {
+                index = (min + max) / 2;
+
+                int result = this.Compare(x, list[index]);
+                if (result == 0)
+                {
+                    return index;
+                }
+                else if (result > 0)
+                {
+                    min = index + 1;
+                }
+                else
+                {
+                    max = index - 1;
+                }
+            }
+
+            return min;
+        }
 
 #endregion
 
 #region Private Methods
 
-            private static SortPropertyInfo[] CreatePropertyInfo(SortDescriptionCollection sortFields)
+        private static SortPropertyInfo[] CreatePropertyInfo(SortDescriptionCollection sortFields)
+        {
+            SortPropertyInfo[] fields = new SortPropertyInfo[sortFields.Count];
+            for (int k = 0; k < sortFields.Count; ++k)
             {
-                SortPropertyInfo[] fields = new SortPropertyInfo[sortFields.Count];
-                for (int k = 0; k < sortFields.Count; ++k)
-                {
-                    // remember PropertyPath and Direction, used when actually sorting
-                    fields[k].PropertyPath = sortFields[k].PropertyName;
-                    fields[k].Descending = (sortFields[k].Direction == ListSortDirection.Descending);
-                }
-                return fields;
+                // remember PropertyPath and Direction, used when actually sorting
+                fields[k].PropertyPath = sortFields[k].PropertyName;
+                fields[k].Descending = (sortFields[k].Direction == ListSortDirection.Descending);
             }
+            return fields;
+        }
 
 #endregion
 
 #region Private Fields
 
-            struct SortPropertyInfo
+        struct SortPropertyInfo
+        {
+            internal IComparer Comparer;
+            internal bool Descending;
+            internal string PropertyPath;
+            internal Type PropertyType;
+
+            internal object GetValue(object o)
             {
-                internal IComparer Comparer;
-                internal bool Descending;
-                internal string PropertyPath;
-                internal Type PropertyType;
-
-                internal object GetValue(object o)
+                object value;
+                if (String.IsNullOrEmpty(this.PropertyPath))
                 {
-                    object value;
-                    if (String.IsNullOrEmpty(this.PropertyPath))
-                    {
-                        value = (this.PropertyType == o.GetType()) ? o : null;
-                    }
-                    else
-                    {
-                        value = PagedCollectionView.InvokePath(o, this.PropertyPath, this.PropertyType);
-                    }
-
-                    return value;
+                    value = (this.PropertyType == o.GetType()) ? o : null;
                 }
+                else
+                {
+                    value = PagedCollectionView.InvokePath(o, this.PropertyPath, this.PropertyType);
+                }
+
+                return value;
             }
-
-            private ICollectionView _collectionView;
-            private SortPropertyInfo[] _fields;
-            private SortDescriptionCollection _sortFields;
-            private IComparer<object> _comparer;
-
-#endregion
         }
 
-#endregion Private Classes
+        private ICollectionView _collectionView;
+        private SortPropertyInfo[] _fields;
+        private SortDescriptionCollection _sortFields;
+        private IComparer<object> _comparer;
+
+#endregion
+    }
+
+    /// <summary>
+    /// Creates a comparer class that takes in a CultureInfo as a parameter,
+    /// which it will use when comparing strings.
+    /// </summary>
+    internal class CultureSensitiveComparer : IComparer<object>
+    {
+        /// <summary>
+        /// Private accessor for the CultureInfo of our comparer
+        /// </summary>
+        private CultureInfo _culture;
+
+        /// <summary>
+        /// Creates a comparer which will respect the CultureInfo
+        /// that is passed in when comparing strings.
+        /// </summary>
+        /// <param name="culture">The CultureInfo to use in string comparisons</param>
+        public CultureSensitiveComparer(CultureInfo culture)
+            : base()
+        {
+            this._culture = culture ?? CultureInfo.InvariantCulture;
+        }
+
+#region IComparer<object> Members
+
+        /// <summary>
+        /// Compares two objects and returns a value indicating whether one is less than, equal to or greater than the other.
+        /// </summary>
+        /// <param name="x">first item to compare</param>
+        /// <param name="y">second item to compare</param>
+        /// <returns>Negative number if x is less than y, zero if equal, and a positive number if x is greater than y</returns>
+        /// <remarks>
+        /// Compares the 2 items using the specified CultureInfo for string and using the default object comparer for all other objects.
+        /// </remarks>
+        public int Compare(object x, object y)
+        {
+            if (x == null)
+            {
+                if (y != null)
+                {
+                    return -1;
+                }
+                return 0;
+            }
+            if (y == null)
+            {
+                return 1;
+            }
+
+            // at this point x and y are not null
+            if (x.GetType() == typeof(string) && y.GetType() == typeof(string))
+            {
+#if NETSTANDARD
+                return this._culture.CompareInfo.Compare((string)x, (string)y);
+#else
+                return string.Compare((string)x, (string)y, false, this._culture);
+#endif
+            }
+            else
+            {
+                return Comparer<object>.Default.Compare(x, y);
+            }
+        }
+
+#endregion
     }
 
     /// <summary>
@@ -4572,32 +4582,189 @@ namespace Windows.UI.Xaml.Data
     public delegate GroupDescription GroupDescriptionSelectorCallback(CollectionViewGroup group, int level);
 }
 
-#if !NETSTANDARD
+#if BRIDGE
 
-namespace System
+namespace System.Collections
 {
-    public static class TypeExtensions
-    {
-        // EmptyTypes is used to indicate that we are looking for someting without any parameters.
-        public readonly static Type[] EmptyTypes = EmptyArray<Type>.Value;
+    // Copyright (c) Microsoft Corporation.  All rights reserved.
 
-        public static Type MakeGenericType(this Type type, params Type[] typeArguments)
+    public sealed class Comparer : IComparer
+    {
+        private CultureInfo m_culture;
+
+        public static readonly Comparer Default = new Comparer(CultureInfo.CurrentCulture);
+        public static readonly Comparer DefaultInvariant = new Comparer(CultureInfo.InvariantCulture);
+
+        public Comparer(CultureInfo culture)
         {
-            if (type == null)
+            if (culture == null)
             {
-                throw new ArgumentNullException("type");
+                throw new ArgumentNullException("culture");
+            }
+            m_culture = culture;
+        }
+
+        // Compares two Objects by calling CompareTo.  If a == 
+        // b,0 is returned.  If a implements 
+        // IComparable, a.CompareTo(b) is returned.  If a 
+        // doesn't implement IComparable and b does, 
+        // -(b.CompareTo(a)) is returned, otherwise an 
+        // exception is thrown.
+        // 
+        public int Compare(Object a, Object b)
+        {
+            if (a == b)
+                return 0;
+            if (a == null)
+                return -1;
+            if (b == null)
+                return 1;
+            if (m_culture != null)
+            {
+                String sa = a as String;
+                String sb = b as String;
+                if (sa != null && sb != null)
+                    return string.Compare(sa, sb, false, m_culture);
             }
 
-            return type.MakeGenericType(typeArguments);
+            IComparable ia = a as IComparable;
+            if (ia != null)
+                return ia.CompareTo(b);
+
+            IComparable ib = b as IComparable;
+            if (ib != null)
+                return -ib.CompareTo(a);
+
+            throw new ArgumentException("At least one object must implement IComparable.");
+        }
+    }
+}
+
+namespace CSHTML5.Internal.Helpers
+{
+    // Copyright (c) Microsoft Corporation.  All rights reserved.
+
+    internal static class ComparerHelper<T>
+    {
+        static readonly Comparer<T> defaultComparer = CreateComparer();
+
+        public static Comparer<T> Default
+        {
+            get
+            {
+                return defaultComparer;
+            }
+        }
+
+        //
+        // Note that logic in this method is replicated in vm\compile.cpp to ensure that NGen
+        // saves the right instantiations
+        //
+        private static Comparer<T> CreateComparer()
+        {
+            Type t = typeof(T);
+
+            // If T implements IComparable<T> return a GenericComparer<T>
+            if (typeof(IComparable<T>).IsAssignableFrom(t))
+            {
+                return (Comparer<T>)Activator.CreateInstance(typeof(GenericComparer<>).MakeGenericType(t));
+            }
+
+            // If T is a Nullable<U> where U implements IComparable<U> return a NullableComparer<U>
+            if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                Type u = t.GetGenericArguments()[0];
+                if (typeof(IComparable<>).MakeGenericType(u).IsAssignableFrom(u))
+                {
+                    return (Comparer<T>)Activator.CreateInstance(typeof(NullableComparer<>).MakeGenericType(u));
+                }
+            }
+            // Otherwise return an ObjectComparer<T>
+            return new ObjectComparer<T>();
         }
     }
 
-    // Useful in number of places that return an empty byte array to avoid unnecessary memory allocation.
-    internal static class EmptyArray<T>
+    internal class GenericComparer<T> : Comparer<T> where T : IComparable<T>
     {
-        public static readonly T[] Value = new T[0];
+        public override int Compare(T x, T y)
+        {
+            if (x != null)
+            {
+                if (y != null)
+                    return x.CompareTo(y);
+                return 1;
+            }
+            if (y != null)
+                return -1;
+            return 0;
+        }
+
+        // Equals method for the comparer itself. 
+        public override bool Equals(Object obj)
+        {
+            GenericComparer<T> comparer = obj as GenericComparer<T>;
+            return comparer != null;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.GetType().Name.GetHashCode();
+        }
+    }
+
+    internal class NullableComparer<T> : Comparer<Nullable<T>> where T : struct, IComparable<T>
+    {
+        public override int Compare(Nullable<T> x, Nullable<T> y)
+        {
+            if (x.HasValue)
+            {
+                if (y.HasValue)
+                    return x.Value.CompareTo(y.Value);
+                return 1;
+            }
+            if (y.HasValue)
+                return -1;
+            return 0;
+        }
+
+        // Equals method for the comparer itself. 
+        public override bool Equals(Object obj)
+        {
+            NullableComparer<T> comparer = obj as NullableComparer<T>;
+            return comparer != null;
+        }
+
+
+        public override int GetHashCode()
+        {
+            return this.GetType().Name.GetHashCode();
+        }
+    }
+
+    internal class ObjectComparer<T> : Comparer<T>
+    {
+        public override int Compare(T x, T y)
+        {
+            return global::System.Collections.Comparer.Default.Compare(x, y);
+        }
+
+        // Equals method for the comparer itself. 
+        public override bool Equals(Object obj)
+        {
+            ObjectComparer<T> comparer = obj as ObjectComparer<T>;
+            return comparer != null;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.GetType().Name.GetHashCode();
+        }
     }
 }
+
+#endif // BRIDGE
+
+#if !NETSTANDARD
 
 namespace System.ComponentModel
 {

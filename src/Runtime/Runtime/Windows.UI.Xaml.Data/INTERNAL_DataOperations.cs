@@ -116,34 +116,19 @@ namespace Windows.UI.Xaml.Data
     /// <summary>
     /// Description of grouping based on a property value.
     /// </summary>
-#if WORKINPROGRESS
-    public partial class PropertyGroupDescription : GroupDescription
-#else
-    public partial class PropertyGroupDescription
-#endif
+    public partial class INTERNAL_PropertyGroupDescription
     {
-#if WORKINPROGRESS
-        public string PropertyName { get; set; }
-#else
         public string PropertyName { get; private set; }
-#endif
 
-        public PropertyGroupDescription()
+        public INTERNAL_PropertyGroupDescription()
         {
 
         }
 
-        public PropertyGroupDescription(string propertyName)
+        public INTERNAL_PropertyGroupDescription(string propertyName)
         {
             PropertyName = propertyName;
         }
-
-#if WORKINPROGRESS
-        public override object GroupNameFromItem(object item, int level, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-#endif
     }
 
     /// <summary>

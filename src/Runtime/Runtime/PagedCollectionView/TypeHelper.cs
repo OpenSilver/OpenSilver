@@ -7,6 +7,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -14,19 +15,23 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
+#if MIGRATION
 namespace System.Windows.Common
+#else
+namespace Windows.UI.Xaml.Common
+#endif
 {
     /// <summary>
     /// Utility class for Type related operations
     /// </summary>
     internal static class TypeHelper
     {
-        #region Internal Fields
+#region Internal Fields
         internal const char IndexParameterSeparator = ',';
         internal const char LeftIndexerToken = '[';
         internal const char PropertyNameSeparator = '.';
         internal const char RightIndexerToken = ']';
-        #endregion
+#endregion
 
         private static Type FindGenericType(Type definition, Type type)
         {
@@ -142,7 +147,7 @@ namespace System.Windows.Common
                 if (!propertyInfo.CanRead)
                 {
                     exception = new InvalidOperationException(string.Format(
-                        System.Globalization.CultureInfo.InvariantCulture,
+                        CultureInfo.InvariantCulture,
                         PagedCollectionViewResources.PropertyNotReadable,
                         propertyNames[i],
                         type.GetTypeName()));

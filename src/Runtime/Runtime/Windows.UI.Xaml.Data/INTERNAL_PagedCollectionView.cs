@@ -194,7 +194,7 @@ namespace Windows.UI.Xaml.Data
         // register the events
         void Init()
         {
-            GroupDescriptions = new ObservableCollection<PropertyGroupDescription>();
+            GroupDescriptions = new ObservableCollection<INTERNAL_PropertyGroupDescription>();
             SortDescriptions = new ObservableCollection<PropertySortDescription>();
 
             GroupDescriptions.CollectionChanged += OnGroupingChanged;
@@ -615,7 +615,7 @@ namespace Windows.UI.Xaml.Data
         public IEnumerable SourceCollection { get { return _originalDataSource; } }
 
         // get or set the list of grouping operations
-        public ObservableCollection<PropertyGroupDescription> GroupDescriptions { get; set; }
+        public ObservableCollection<INTERNAL_PropertyGroupDescription> GroupDescriptions { get; set; }
 
         // get or set the list of sorting operations
         public ObservableCollection<PropertySortDescription> SortDescriptions { get; set; }

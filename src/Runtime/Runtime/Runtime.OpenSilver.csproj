@@ -74,6 +74,7 @@
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\CompositionHost.cs" />
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\DeploymentCatalog.cs" />
 		<Compile Include="System.ComponentModel.Composition\WORKINPROGRESS\CompositionInitializer.cs" />
+		<Compile Include="System.ComponentModel\IItemProperties.cs" />
 		<Compile Include="System.Net\DownloadStringCompletedEventArgs.cs" />
 		<Compile Include="System.Net\DownloadStringCompletedEventHandler.cs" />
 		<Compile Include="System.Net\UploadStringCompletedEventArgs.cs" />
@@ -177,6 +178,12 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WrapPanel.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\Binding.cs" />
+		<Compile Include="Windows.UI.Xaml.Data\CollectionView.cs" />
+		<Compile Include="Windows.UI.Xaml.Data\DataExtensionMethods.cs" />
+		<Compile Include="Windows.UI.Xaml.Data\EnumerableCollectionView.cs" />
+		<Compile Include="Windows.UI.Xaml.Data\IndexedEnumerable.cs" />
+		<Compile Include="Windows.UI.Xaml.Data\ListCollectionView.cs" />
+		<Compile Include="PagedCollectionView\PropertyGroupDescription.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\BlockCollection.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Hyperlink.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
@@ -221,9 +228,9 @@
 		<Compile Include="Empty Namespaces\WORKINPROGRESS\SystemXaml.cs" />
 		<Compile Include="System\WORKINPROGRESS\AppDomainExtensions.cs" />
 		<Compile Include="System.Collections.Generic\WORKINPROGRESS\SynchronizedReadOnlyCollection.cs" />
-		<Compile Include="System.ComponentModel\WORKINPROGRESS\ICollectionViewFactory.cs" />
+		<Compile Include="System.ComponentModel\ICollectionViewFactory.cs" />
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\ExportProvider.cs" />
-		<Compile Include="System.Reflection\WORKINPROGRESS\ICustomTypeProvider.cs" />
+		<Compile Include="System.Reflection\ICustomTypeProvider.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\AssemblyBuilder.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\AssemblyBuilderAccess.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\FieldBuilder.cs" />
@@ -771,7 +778,7 @@
 		<Compile Include="Windows.UI.Xaml.Data\TemplateBinding.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\UpdateSourceTrigger.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
-		<Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\CollectionViewSource.cs" />
+		<Compile Include="Windows.UI.Xaml.Data\CollectionViewSource.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\Bold.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\Hyperlink.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\Inline.cs" />
@@ -1156,6 +1163,8 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="System.ComponentModel.Composition.Primitives\WORKINPROGRESS\" />
+	  <Folder Include="System.ComponentModel\WORKINPROGRESS\" />
+	  <Folder Include="System.Reflection\WORKINPROGRESS\" />
 	  <Folder Include="System.ServiceModel\WORKINPROGRESS\" />
 	</ItemGroup>
 	<ItemGroup>

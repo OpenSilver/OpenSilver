@@ -91,9 +91,9 @@ namespace Windows.UI.Xaml.Data
                         CustomSort(sortOperation);
 
                 }
-                else if (operation is PropertyGroupDescription)
+                else if (operation is INTERNAL_PropertyGroupDescription)
                 {
-                    PropertyGroupDescription groupOperation = (PropertyGroupDescription)operation;
+                    INTERNAL_PropertyGroupDescription groupOperation = (INTERNAL_PropertyGroupDescription)operation;
 
                     GroupBy(groupOperation);
                 }
@@ -296,7 +296,7 @@ namespace Windows.UI.Xaml.Data
         }
 
         // Generate sub-group based on property equality
-        void GroupBy(PropertyGroupDescription operation)
+        void GroupBy(INTERNAL_PropertyGroupDescription operation)
         {
             List<Collection<object>> childGroups = new List<Collection<object>>();
 
@@ -335,7 +335,7 @@ namespace Windows.UI.Xaml.Data
         }
 
         // Get the value of the property described in operation by reflection
-        object GetValue(object obj, PropertyGroupDescription operation)
+        object GetValue(object obj, INTERNAL_PropertyGroupDescription operation)
         {
             return obj.GetType().GetProperty(operation.PropertyName).GetValue(obj, null);
         }
