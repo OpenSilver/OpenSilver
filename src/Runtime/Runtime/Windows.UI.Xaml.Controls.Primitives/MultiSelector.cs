@@ -82,21 +82,23 @@ namespace Windows.UI.Xaml.Controls.Primitives
             // Update the SelectedItem property:
             // based on WPF's behaviour, SelectedItem is the item that was first selected among the currently selected items:
             IList items = SelectedItems; //Note: items cannot be null as we came here as a result of it firing the CollectionChanged event.
-            bool isSelectedItemChanged = false; // we use this boolean to know if we changed SelectedItem. This way we know whether we need to fire the SelectionChanged event here or not since setting SelectedItem will already fire it.
             if (items.Count > 0)
             {
+                bool tempSkipSelectionChangedEvent = _skipSelectionChangedEvent;
+                _skipSelectionChangedEvent = true; //setting this to true so setting SelectedItem will not remove the items from the list.
+
                 foreach (object item in items) //Note: items being an IList, we do not have access to ElementAt ot First so we do this.
                 {
                     if (SelectedItem != item)
                     {
                         SelectedItem = item;
-                        isSelectedItemChanged = true;
                     }
                     break;
                 }
+                _skipSelectionChangedEvent = tempSkipSelectionChangedEvent;
             } //todo: should we unset SelectedItem when the user clears SelectedItems? (in that case, do not do it if _isIntermediarySelectedItemChange is true)
 
-            if (!_skipSelectionChangedEvent && !isSelectedItemChanged)
+            if (!_skipSelectionChangedEvent)
             {
                 //Fire the SelectionChanged event:
                 var removedItems = e.OldItems ?? new Collection<object>();
