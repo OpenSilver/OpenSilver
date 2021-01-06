@@ -20,6 +20,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using CSHTML5.Internal;
+using Windows.UI.Xaml;
 #if MIGRATION
 using System.Windows.Controls;
 #else
@@ -102,6 +103,16 @@ namespace System
         }
 
         public bool EnableInvalidPropertyMetadataDefaultValueExceptions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the interval between each refresh of the position an element attached to another (for example Popups or Tooltips attached to a certain element).
+        /// Note: A refresh interval too low might negatively impact performances
+        /// </summary>
+        public TimeSpan PopupMoveDelay
+        {
+            get { return Window.Current.INTERNAL_PositionsWatcher.INTERNAL_WatchInterval; }
+            set { Window.Current.INTERNAL_PositionsWatcher.INTERNAL_WatchInterval = value; }
+        }
 
 #if WORKINPROGRESS
         public bool EnableAutoZoom { get; set; }

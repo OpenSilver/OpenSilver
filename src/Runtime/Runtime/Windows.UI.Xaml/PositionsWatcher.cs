@@ -36,10 +36,25 @@ namespace Windows.UI.Xaml
     {
         private List<ControlToWatch> _controlsToWatch = new List<ControlToWatch>();
         private DispatcherTimer _timer = new DispatcherTimer();
+        internal TimeSpan _watchInterval = new TimeSpan(0, 0, 0, 0, 500);
+
+        internal TimeSpan INTERNAL_WatchInterval
+        {
+            get { return _watchInterval; }
+            set
+            {
+                _watchInterval = value;
+                if (_timer != null)
+                {
+                    _timer.Interval = value;
+                }
+            }
+        }
+
 
         internal PositionsWatcher()
         {
-            _timer.Interval = new TimeSpan(0, 0, 0, 0, 500);
+            _timer.Interval = INTERNAL_WatchInterval;
             _timer.Tick += _timer_Tick;
         }
 
