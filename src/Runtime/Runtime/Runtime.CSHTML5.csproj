@@ -103,6 +103,7 @@
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IRecyclingItemContainerGenerator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Common\Extensions.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\RangeObservableCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TileView.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TileViewItem.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ValidationHelper.cs" />
