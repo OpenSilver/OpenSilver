@@ -13,17 +13,15 @@
 \*====================================================================================*/
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
 using CSHTML5.Internal;
-using Windows.UI.Xaml;
+using System;
+using System.Net;
+
 #if MIGRATION
+using System.Windows;
 using System.Windows.Controls;
 #else
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 #endif
 
