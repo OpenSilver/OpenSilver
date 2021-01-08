@@ -576,6 +576,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 return EndCallWebMethod(webMethodName,
                      interfaceType,
                      methodReturnType,
+                     null,
                      xmlReturnedFromTheServer,
                      soapVersion);
             }
