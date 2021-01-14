@@ -595,11 +595,31 @@ namespace DotNetForHtml5.Compiler
                 IEnumerable<Attribute> attributes = new List<Attribute>();
 
 #if CSHTML5BLAZOR
+                /*
                 // if assembly is loaded with reflection only we have to use GetCustomAttributesData instead of GetCustomAttributes
                 if (_onlyReflectionLoaded.ContainsKey(assembly) && _onlyReflectionLoaded[assembly])
                     attributesData = assembly.GetCustomAttributesData();
                 else
                     attributes = assembly.GetCustomAttributes(xmlnsDefinitionAttributeType);
+                */
+
+                // Instead of the commented code above, we now try both "GetCustomAttributes" and "GetCustomAttributesData"
+                // to fix the compilation issue experienced with Client_REP (with the delivery dated Dec 22, 2020)
+                try
+                {
+                    attributes = assembly.GetCustomAttributes(xmlnsDefinitionAttributeType);
+                }
+                catch
+                {
+                    try
+                    {
+                        attributesData = assembly.GetCustomAttributesData();
+                    }
+                    catch
+                    {
+                        // Fails silently
+                    }
+                }
 #else
                 attributes = assembly.GetCustomAttributes(xmlnsDefinitionAttributeType);
 #endif
