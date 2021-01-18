@@ -13,7 +13,6 @@
 \*====================================================================================*/
 
 
-using CSHTML5;
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
@@ -180,7 +179,7 @@ namespace Windows.UI.Xaml.Controls
                 //if the child of this.INTERNAL_AdditionalOutsideDivForMargins has the tagname "INPUT", replace it with a div:
                 var additionalDivForMargins = this.INTERNAL_AdditionalOutsideDivForMargins;
                 
-                dynamic newOuterDomElement = Interop.ExecuteJavaScript(@"(function() {
+                dynamic newOuterDomElement = CSHTML5.Interop.ExecuteJavaScript(@"(function() {
     var formerInputElement = $0.firstChild;
     var outerDomElement = formerInputElement;
     if(formerInputElement.tagName == 'INPUT') {
@@ -205,7 +204,7 @@ namespace Windows.UI.Xaml.Controls
     return outerDomElement;
 })()", additionalDivForMargins);
 
-                if(!Interop.IsRunningInTheSimulator)
+                if(!CSHTML5.Interop.IsRunningInTheSimulator)
                 {
                     //Note: we replaced the former <input> with a <div> in the DOM tree because it was created before knowing that there was a Template.
                     //      In the Simulator, there is no need to do anything because INTERNAL_OuterDomElement is only linked to the DOM element through its id (which was copied in the replacement <div>).
