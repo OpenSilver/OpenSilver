@@ -107,14 +107,31 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                INTERNAL_EventsHelper.AttachToDomEvents("change", innerElement, (Action<object>)(e =>
+                ((CheckBox)checkBoxOrRadioButton)._changeEventProxy = INTERNAL_EventsHelper.AttachToDomEvents("change", innerElement, (Action<object>)(e =>
                 {
                     IsCheckedValueChanged(checkBoxOrRadioButton);
                 }));
             }
         }
 
-        internal static void IsCheckedValueChanged(ToggleButton checkBoxOrRadioButton)
+        internal static void UnSubscribeFromBasicEvents(ToggleButton checkBoxOrRadioButton)
+        {
+            if (checkBoxOrRadioButton is RadioButton)
+            {
+                //for now we do nothing since I don't think it really poses a problem
+            }
+            else
+            {
+                CheckBox cb = checkBoxOrRadioButton as CheckBox;
+                if (cb._changeEventProxy != null)
+                {
+                    cb._changeEventProxy.Dispose();
+                    cb._changeEventProxy = null;
+                }
+            }
+        }
+
+                internal static void IsCheckedValueChanged(ToggleButton checkBoxOrRadioButton)
         {
             // We arrive here because the DOM has signaled a changed in the Checked state.
 

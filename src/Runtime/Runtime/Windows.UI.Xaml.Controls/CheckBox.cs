@@ -60,6 +60,12 @@ namespace Windows.UI.Xaml.Controls
     /// </example>
     public partial class CheckBox : ToggleButton
     {
+        /// <summary>
+        /// This is not to be used, it is only to remove the subscription to the 'change' event on the &lt;input&gt; element when a Template is applied, because this element is no longer supposed to exist (but is still sometimes created when the bug where we create the dom element before knowing that there is a template happens).
+        /// </summary>
+        internal HtmlEventProxy _changeEventProxy = null; //todo: remove this (and anything that uses it) as soon as we won't have the issue where a control is created before knowing it has a Template.
+        //todo: remove the changes made in the commit that added this (around 19th of january, 2021) as well as similar implicit style related changes in TextBox and PasswordBox once the  -- Adding item to the visual tree without knowing there is a Template then setting the template (probably through implicit style) and instanciating the Template, making the first initialization incorrect (because aimed at not templated version when it should be the one aimed at the templated one)
+
         internal sealed override bool INTERNAL_GetFocusInBrowser
         {
             get { return true; }
@@ -93,6 +99,21 @@ namespace Windows.UI.Xaml.Controls
         protected override void SetDefaultStyle() // Overridden in CheckBox and RadioButton
         {
             // No default style at the moment because we use the HTML5 native checkbox.
+        }
+
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
+        {
+            base.OnApplyTemplate();
+            INTERNAL_CheckBoxAndRadioButtonHelpers.UnSubscribeFromBasicEvents(this);
+            CSHTML5.Interop.ExecuteJavaScript(@"if($0.childNodes.length == 2){
+    $0.removeChild($0.firstChild);
+    $1.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = null;
+    $1.INTERNAL_OptionalSpecifyDomElementConcernedByIsEnabled = null;
+}", this.INTERNAL_OuterDomElement, this);
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
