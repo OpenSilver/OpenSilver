@@ -26,13 +26,8 @@ namespace Windows.UI.Xaml.Media
     /// Represents a collection of GradientStop objects that can be individually
     /// accessed by index.
     /// </summary>
-#if WORKINPROGRESS
     public sealed partial class GradientStopCollection : PresentationFrameworkCollection<GradientStop>
-#else
-    public sealed partial class GradientStopCollection : List<GradientStop>
-#endif
     {
-#if WORKINPROGRESS
         private Brush _parentBrush;
 
         internal void SetParentBrush(Brush brush)
@@ -111,6 +106,5 @@ namespace Windows.UI.Xaml.Media
             gradientStop.INTERNAL_ParentBrush = this._parentBrush;
             this.SetItemDependencyObjectInternal(index, gradientStop);
         }
-#endif
     }
 }
