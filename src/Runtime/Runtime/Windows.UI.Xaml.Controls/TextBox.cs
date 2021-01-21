@@ -95,6 +95,8 @@ namespace Windows.UI.Xaml.Controls
             UseSystemFocusVisuals = true;
         }
 
+        public double LineHeight { get; set; }
+
         internal sealed override bool INTERNAL_GetFocusInBrowser
         {
             get { return true; }
