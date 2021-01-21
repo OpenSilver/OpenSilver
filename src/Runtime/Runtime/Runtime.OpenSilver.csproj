@@ -164,6 +164,8 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Picker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\PopupTimeSelectionMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Separator.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SpinDirection.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SpinEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Spinner.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SubImageEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SubImageRoutedEventArgs.cs" />
