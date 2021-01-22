@@ -95,6 +95,7 @@ namespace Windows.UI.Xaml.Controls
             UseSystemFocusVisuals = true;
         }
 
+
         internal sealed override bool INTERNAL_GetFocusInBrowser
         {
             get { return true; }
@@ -1707,6 +1708,9 @@ element.setAttribute(""data-isreadonly"",""{1}"");
         }
 
         public string SelectedText { get; set; }
+
+        public double LineHeight { get; set; }
+
 #endif
 
     }

@@ -90,6 +90,11 @@ namespace Windows.UI.Xaml.Controls
             get; set;
         }
 
+        public double ActualWidth
+        {
+            get; set;
+        }
+
         /// <summary>
         /// Gets or sets the maximum column width in pixels.
         /// </summary>

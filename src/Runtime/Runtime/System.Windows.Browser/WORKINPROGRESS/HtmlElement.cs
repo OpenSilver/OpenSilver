@@ -30,6 +30,7 @@ namespace System.Windows.Browser
         {
             get { return _children; }
         }
+        public string Id { get; set; }
         #endregion
 
         #region Methods
@@ -67,6 +68,10 @@ namespace System.Windows.Browser
         }
         public void SetStyleAttribute(string @name, string @value)
         {
+        }
+        public void RemoveStyleAttribute(string name)
+        {
+
         }
         #endregion
     }
