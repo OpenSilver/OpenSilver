@@ -1009,15 +1009,14 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
                 OnAfterApplyHorizontalAlignmentAndWidth();
                 OnAfterApplyVerticalAlignmentAndWidth();
 
-                //register to focusin events on the OuterDomElement so that we can "reroute" the focus on the contentEditable element.
-                CSHTML5.Interop.ExecuteJavaScript(@"$0.tabIndex = 32767; $0.addEventListener('focusin', $1)", this.INTERNAL_OuterDomElement, (Action<object>)TextBox_GotFocus);
-                //Note on the line above: 32767 is the maximum value commonly allowed in browsers (and can be considered the default value)
-                if (INTERNAL_HtmlDomManager.IsInternetExplorer())
-                {
-                    //workaround due to IE setting the focus at the end of the click, (or at least after the focusin event), which cancels the work done during focusin.
-                    //if I'm not mistaken, the click event happens even when we click on a child of the element so we're all good. (We had to fix the case where a Button had a TextBox inside of it, which is why I assumed that).
-                    CSHTML5.Interop.ExecuteJavaScript(@"$0.addEventListener('click', $1)", this.INTERNAL_OuterDomElement, (Action<object>)TextBox_GotFocus);
-                }
+                //Note about tabbing: In WPF and SL, the elements in the template other than the input field can have focus but the input field will get any keypress not handled by them
+                //                    For example, you can set the focus on a button included in the template by clicking on it and pressing space will cause a button press, but any character will be added to the Text of the PasswordBox (but the button retains the focus)
+                //                    WPF and SL are different in that in SL, every focusable control in the template can get focus through tabbing while in WPF, the whole control is considered as a single tab stop (tabbing into the PasswordBox will directly put the focus on the input element)
+                //                    BUT in SL, the input will be first in tabOrder (unless maybe if tabIndex is specifically set, I didn't try that) so if the template goes <Stackpanel><Button/><ContentPresenter/></StackPanel>, by tabbing it will go ContentPresenter first then the Button (example simplified without the names, and also WPF and SL do not use a ContentPresenter but a ScrollViewer or Decorator in which to put the input area)
+                //
+                //                    In our case, tabbing will go through the elements accessible through tabbing, without changing the order, and text will only be added when the <input> has focus. On click, the focus will be redirected to the <input>, unless the click was on an element that absorbs pointer events.
+
+                CSHTML5.Interop.ExecuteJavaScript(@"$0.addEventListener('click', $1)", this.INTERNAL_OuterDomElement, (Action<object>)TextBox_GotFocus);
             }
             return outerDiv;
         }
@@ -1046,9 +1045,12 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
 
         void TextBox_GotFocus(object e)//object sender, RoutedEventArgs e)
         {
-            if (_contentEditableDiv != null)
+            bool ignoreEvent = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("document.checkForDivsThatAbsorbEvents($0)", e));
+            if (!ignoreEvent)
             {
-                CSHTML5.Interop.ExecuteJavaScript(@"
+                if (_contentEditableDiv != null)
+                {
+                    CSHTML5.Interop.ExecuteJavaScript(@"
 if($1.target != $0) {
 $0.focus()
 var range,selection;
@@ -1069,7 +1071,8 @@ var range,selection;
         range.select();//Select the range (make it the visible selection
     }
 }", _contentEditableDiv, e);
-                //NEW_SET_SELECTION(_tempSelectionStartIndex, _tempSelectionStartIndex + _tempSelectionLength);
+                    //NEW_SET_SELECTION(_tempSelectionStartIndex, _tempSelectionStartIndex + _tempSelectionLength);
+                }
             }
         }
 
