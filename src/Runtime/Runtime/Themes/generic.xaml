@@ -5,6 +5,7 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultButtonStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultChildWindowStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultComboBoxStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultContentControlStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDataGridStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDataPagerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerStyle.xaml" />
@@ -23,7 +24,6 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTileViewItemStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTileViewStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTimePickerStyle.xaml" />
-        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultToggleButtonStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultToolTipStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultViewboxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultRepeatButtonStyle.xaml" />

@@ -42,6 +42,29 @@ namespace Windows.UI.Xaml.Media
     public sealed partial class VisualTreeHelper
     {
         /// <summary>
+        /// Returns an object's root object in the visual tree.
+        /// </summary>
+        /// <param name="reference">
+        /// The object to get the root object for.
+        /// </param>
+        /// <returns>
+        /// The root object of the reference object in the visual tree.
+        /// </returns>
+        public static DependencyObject GetRoot(DependencyObject reference)
+        {
+            DependencyObject root = reference;
+
+            DependencyObject parent;
+            while ((parent = GetParent(root)) != null)
+            {
+                root = parent;
+            }
+
+            return root;
+        }
+
+
+        /// <summary>
         /// Returns an object's parent object in the visual tree.
         /// </summary>
         /// <param name="reference">The object for which to get the parent object.</param>
