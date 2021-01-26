@@ -741,7 +741,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\Image.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\INavigate.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\INTERNAL_CalendarOrClockBase.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\INTERNAL_CheckBoxAndRadioButtonHelpers.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\INTERNAL_ContextMenuHelpers.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DateTimePickerBase.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ItemCollection.cs" />
@@ -762,7 +761,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\PanelDragDropTarget.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\PasswordBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ProgressBar.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\RadioButton.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\RadioButton.OpenSilver.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\RowDefinition.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\RowDefinitionCollection.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ScrollBarVisibility.cs" />
