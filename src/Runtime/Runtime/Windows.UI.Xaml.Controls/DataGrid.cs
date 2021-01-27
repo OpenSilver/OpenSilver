@@ -1456,7 +1456,8 @@ namespace Windows.UI.Xaml.Controls
             {
                 var fakeColumn = new DataGridTextColumn()
                 {
-                    Width = new DataGridLength(1, DataGridLengthUnitType.Star)
+                    Width = new DataGridLength(1, DataGridLengthUnitType.Star),
+                    IsReadOnly = true
                 };
                 fakeColumn.Header = "";
                 Binding binding = new Binding("PROPERTY_THAT_DOES_NOT_EXIST"); // "PROPERTY_THAT_DOES_NOT_EXIST" is an arbitrary text to ensure that the binding is broken.
