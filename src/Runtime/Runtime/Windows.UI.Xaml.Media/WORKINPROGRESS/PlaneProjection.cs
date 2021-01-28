@@ -27,6 +27,30 @@ namespace Windows.UI.Xaml.Media
         {
             get; set;
         }
+
+        /// <summary>
+        /// Gets or sets the number of degrees to rotate the object around the x-axis of rotation.
+        /// </summary>
+        /// <returns>
+        /// The number of degrees to rotate the object around the x-axis of rotation. The default is 0.
+        /// </returns>
+        public double RotationX
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// Gets or sets the number of degrees to rotate the object around the y-axis of rotation.
+        /// </summary>
+        /// <returns>
+        /// The number of degrees to rotate the object around the y-axis of rotation. The default is 0.
+        /// </returns>
+        public double RotationY
+        {
+            get; set;
+        }
+
+
     }
 }
 #endif
