@@ -136,6 +136,7 @@
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\Binding.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
+    <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\FocusManager.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\EasingFunctionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\RepeatBehavior.cs" />

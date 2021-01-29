@@ -1,6 +1,6 @@
 #if WORKINPROGRESS
+
 using System;
-using System.Windows;
 
 #if MIGRATION
 namespace System.Windows.Input

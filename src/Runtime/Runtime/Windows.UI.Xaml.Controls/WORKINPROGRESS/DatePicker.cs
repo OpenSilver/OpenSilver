@@ -88,6 +88,12 @@ namespace Windows.UI.Xaml.Controls
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Occurs when the drop-down
+        /// <see cref="T:System.Windows.Controls.Calendar" /> is opened.
+        /// </summary>
+        public event RoutedEventHandler CalendarOpened;
     }
 }
 #endif
