@@ -29,8 +29,9 @@ namespace Windows.UI.Xaml
         public bool Handled { get; set; } 
         
         public ApplicationUnhandledExceptionEventArgs(Exception ex, bool handled) 
-        { 
-        
+        {
+            ExceptionObject = ex;
+            Handled = handled;
         } 
     } 
 #endif

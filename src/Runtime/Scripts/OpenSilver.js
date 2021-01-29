@@ -64,8 +64,17 @@ window.onCallBack = {}
 window.onCallBack.OnCallbackFromJavaScript = function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject) {
 	try {
 		DotNet.invokeMethod("OpenSilver", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, callbackArgsObject);
-	} catch (e)	{
-		DotNet.invokeMethod("OpenSilver.UWPCompatible", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, "");
+    } catch (e) {
+        if (e.message.startsWith("System.ArgumentException: There is no loaded assembly with the name")) {
+            try {
+                DotNet.invokeMethod("OpenSilver.UWPCompatible", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, "");
+            } catch (ex) {
+                throw ex;
+            }
+        }
+        else {
+            throw e;
+        }
 	}	
 };
 window.onCallBack.OnCallbackFromJavaScriptError = function (idWhereCallbackArgsAreStored) {
