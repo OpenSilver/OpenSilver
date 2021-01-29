@@ -12,31 +12,33 @@
 *  
 \*====================================================================================*/
 
+
 #if WORKINPROGRESS
 
-using System;
+#if !MIGRATION
+using Windows.Foundation;
+#endif
 
 #if MIGRATION
-namespace System.Windows.Navigation
+namespace System.Windows
 #else
-
-namespace Windows.UI.Xaml.Navigation
+namespace Windows.UI.Xaml
 #endif
 {
-    public sealed class NavigationService
+    /// <summary>
+    /// Contains state information and event data associated with a routed event.
+    /// </summary>
+    public partial class RoutedEventArgs
     {
-        public bool CanGoBack { get; }
-
-        public void GoBack()
-        {
-
-        }
-
-        public bool Navigate(Uri source)
-        {
-            return false;
-        }
-        
+        /// <summary>
+        ///     Returns a boolean flag indicating if or not this
+        ///     RoutedEvent has been handled this far in the route
+        /// </summary>
+        /// <remarks>
+        ///     Initially starts with a false value before routing
+        ///     has begun
+        /// </remarks>
+        public bool Handled { get; set; }
     }
 }
 
