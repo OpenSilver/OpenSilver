@@ -81,6 +81,7 @@ namespace Windows.UI.Xaml.Controls
             get => (DateTime?)GetValue(DisplayDateStartProperty);
             set => SetValue(DisplayDateStartProperty, value);
         }
+        public RoutedEventHandler CalendarOpened { get; set; }
 
         private static void OnDisplayDateStartChanged(
             DependencyObject d,

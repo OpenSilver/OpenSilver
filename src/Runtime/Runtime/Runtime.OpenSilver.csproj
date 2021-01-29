@@ -126,6 +126,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\AccordionSelectionMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\Common\Extensions.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\Common\TypeHelper.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DataGridHeadersVisibility.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DataGridRowDetailsVisibilityMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ExpandDirection.cs" />
@@ -140,6 +141,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Accordion.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AccordionItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Automation\DataFormAutomationPeer.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ButtonSpinner.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Calendar.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CalendarBlackoutDatesCollection.cs" />
@@ -147,6 +149,23 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CustomTimeFormat.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataField.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFieldEnums\DataFieldDescriptionViewerPosition.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFieldEnums\DataFieldLabelPosition.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFieldEnums\DataFieldMode.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataForm.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFormBindingInfo.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFormCommandButtonsVisibilityTypeConverter.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFormEnums\DataFormCommandButtonsVisibility.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFormEnums\DataFormEditAction.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFormEnums\DataFormMode.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFormEventArgs\DataFormAddingNewItemEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFormEventArgs\DataFormAutoGeneratingFieldEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFormEventArgs\DataFormContentLoadEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFormEventArgs\DataFormEditEndedEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFormEventArgs\DataFormEditEndingEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFormToStringConverter.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFormValueConverter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridGridLinesVisibility.cs" />
@@ -161,6 +180,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleSubImage.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\NumericUpDown.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\PathOrderPair.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Picker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\PopupTimeSelectionMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Separator.cs" />
@@ -178,6 +198,8 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TimeUpDown.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TreeViewItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\UpDownBase.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ValidationUtil.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WeakEventListener.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WrapPanel.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\Binding.cs" />
