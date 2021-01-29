@@ -46,6 +46,12 @@ using System.Windows;
 using Windows.UI.Xaml;
 #endif
 
+#if OPENSILVER
+using DataContractSerializerCustom = System.Runtime.Serialization.DataContractSerializer_CSHTML5Ver;
+#else // BRIDGE
+using DataContractSerializerCustom = System.Runtime.Serialization.DataContractSerializer;
+#endif
+
 namespace System.ServiceModel
 {
     /// <summary>
@@ -873,6 +879,15 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             }
 #endif
 
+            private void ProcessNode(XElement node, Action<XElement> action)
+            {
+                action(node);
+                foreach (XElement child in node.Elements())
+                {
+                    ProcessNode(child, action);
+                }
+            }
+
             private void PrepareRequest(
                 string webMethodName, // webMethod
                 string methodName, // method to look for in 'interfaceType'
@@ -992,19 +1007,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                                 interfaceType.GetCustomAttributes(typeof(ServiceKnownTypeAttribute), true)
                                              .Select(o => ((ServiceKnownTypeAttribute)o).Type);
 
-#if OPENSILVER
-                            DataContractSerializer_CSHTML5Ver dataContractSerializer = 
-                                new DataContractSerializer_CSHTML5Ver(
+                            DataContractSerializerCustom dataContractSerializer = 
+                                new DataContractSerializerCustom(
                                     requestBody.GetType(),
                                     knownTypes,
                                     isXmlSerializer);
-#else
-                            DataContractSerializer dataContractSerializer =
-                                new DataContractSerializer(
-                                    requestBody.GetType(),
-                                    knownTypes,
-                                    isXmlSerializer);
-#endif
 
                             XDocument xdoc = dataContractSerializer.SerializeToXDocument(requestBody);
 
@@ -1044,8 +1051,12 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                                     XElement xElement = currentNode as XElement;
                                     if (xElement != null)
                                     {
-                                        foreach (XNode node in xElement.Nodes())
+                                        foreach (XElement node in xElement.Elements())
                                         {
+                                            ProcessNode(node, x => x.Name = XNamespace.Get(string.IsNullOrEmpty(x.Name.NamespaceName) ? 
+                                                                                           interfaceTypeNamespace : 
+                                                                                           x.Name.NamespaceName)
+                                                                                      .GetName(x.Name.LocalName));
                                             methodNameElement.Add(node);
                                         }
                                     }
@@ -1132,13 +1143,9 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         detailElement = detailElement.Elements().First();
                         Type detailType = ResolveType(detailElement.Name);
 
-#if OPENSILVER
-                        DataContractSerializer_CSHTML5Ver serializer = 
-                            new DataContractSerializer_CSHTML5Ver(detailType, false);
-#else
-                        DataContractSerializer serializer = 
-                            new DataContractSerializer(detailType, false);
-#endif
+                        DataContractSerializerCustom serializer = 
+                            new DataContractSerializerCustom(detailType, false);
+
                         object detail = serializer.DeserializeFromXElement(detailElement);
 
                         XElement faultStringElement = faultElement.Element(XName.Get("faultstring"));
@@ -1413,11 +1420,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         types.Add(t);
                     }
 
-#if CSHTML5BLAZOR
-                    DataContractSerializer_CSHTML5Ver deSerializer = new DataContractSerializer_CSHTML5Ver(typeToDeserialize, types);
-#else
-                    DataContractSerializer deSerializer = new DataContractSerializer(typeToDeserialize, types);
-#endif
+                    DataContractSerializerCustom deSerializer = new DataContractSerializerCustom(typeToDeserialize, types);
                     VerifyThatResponseIsNotNullOrEmpty(responseAsString);
                     XDocument xDoc = XDocument.Parse(responseAsString);
                     responseAsString = RemoveUnparsableStrings(responseAsString);
