@@ -31,6 +31,16 @@ namespace System.Windows.Browser
             get { return _children; }
         }
         public string Id { get; set; }
+
+        //
+        // Summary:
+        //     Gets or sets the cascading style sheet (CSS) class string for the current
+        //     HTML element.
+        //
+        // Returns:
+        //     A CSS class string if the element is associated with a CSS class; otherwise,
+        //     an empty string.
+        public string CssClass { get; set; }
         #endregion
 
         #region Methods
@@ -70,6 +80,24 @@ namespace System.Windows.Browser
         {
         }
         public void RemoveStyleAttribute(string name)
+        {
+
+        }
+        //
+        // Summary:
+        //     Removes an attribute from the current HTML element.
+        //
+        // Parameters:
+        //   name:
+        //     The name of the attribute to remove.
+        //
+        // Exceptions:
+        //   System.ArgumentException:
+        //     name is an empty string.
+        //
+        //   System.ArgumentNullException:
+        //     name is null.
+        public void RemoveAttribute(string name)
         {
 
         }
