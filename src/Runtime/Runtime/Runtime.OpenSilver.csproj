@@ -151,6 +151,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridGridLinesVisibility.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePicker.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePickerFormat.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\GridSplitter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\HeaderedItemsControl.cs" />
