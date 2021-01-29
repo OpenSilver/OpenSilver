@@ -62,20 +62,11 @@ document.getElementsByTagName('head')[0].appendChild(velocityScript);
 
 window.onCallBack = {}
 window.onCallBack.OnCallbackFromJavaScript = function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject) {
-	try {
-		DotNet.invokeMethod("OpenSilver", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, callbackArgsObject);
+    try {
+        DotNet.invokeMethod("OpenSilver", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, callbackArgsObject);
     } catch (e) {
-        if (e.message.startsWith("System.ArgumentException: There is no loaded assembly with the name")) {
-            try {
-                DotNet.invokeMethod("OpenSilver.UWPCompatible", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, "");
-            } catch (ex) {
-                throw ex;
-            }
-        }
-        else {
-            throw e;
-        }
-	}	
+        DotNet.invokeMethod("OpenSilver.UWPCompatible", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, "");
+    }
 };
 window.onCallBack.OnCallbackFromJavaScriptError = function (idWhereCallbackArgsAreStored) {
     try {
