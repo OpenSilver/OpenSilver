@@ -151,6 +151,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridGridLinesVisibility.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRow.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePicker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\GridSplitter.cs" />
@@ -179,6 +180,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TimeUpDown.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TreeViewItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\UpDownBase.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WebView.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WrapPanel.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\Binding.cs" />
@@ -227,6 +229,7 @@
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DataTemplate.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\LineStackingStrategy.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\RoutedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\UIElement.cs" />
 		<Compile Include="Windows.UI\WORKINPROGRESS\Color.cs" />
 		<Compile Include="Empty Namespaces\WORKINPROGRESS\SystemXaml.cs" />

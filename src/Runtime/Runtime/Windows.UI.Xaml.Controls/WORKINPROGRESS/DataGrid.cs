@@ -434,6 +434,28 @@ namespace Windows.UI.Xaml.Controls
             get => GetValue(DropLocationIndicatorStyleProperty) as Style;
             set => SetValue(DropLocationIndicatorStyleProperty, value);
         }
+
+        /// <summary>
+        ///     Raises the CommitEdit command.
+        ///     If a cell is currently being edited, commits any pending changes to the cell, but
+        ///     leaves any pending changes to the row. This should mean that changes are propagated
+        ///     from the editing environment to the pending row.
+        ///     If a cell is not currently being edited, then commits any pending rows.
+        /// </summary>
+        /// <returns>true if the current cell or row exits edit mode, false otherwise.</returns>
+        public bool CommitEdit()
+        {
+            //if (IsEditingCurrentCell)
+            //{
+            //    return CommitEdit(DataGridEditingUnit.Cell, true);
+            //}
+            //else if (IsEditingRowItem || IsAddingNewItem)
+            //{
+            //    return CommitEdit(DataGridEditingUnit.Row, true);
+            //}
+
+            return true; // No one is in edit mode
+        }
     }
 }
 #endif
