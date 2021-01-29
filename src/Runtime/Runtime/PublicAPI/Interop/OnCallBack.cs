@@ -346,79 +346,82 @@ namespace CSHTML5.Internal
         {
             Action action = () =>
             {
-                //----------------------------------
-                // Get the C# callback from its ID:
-                //----------------------------------
-                Delegate callback = _dictionary[callbackId];
+                CSHTML5.Internal.INTERNAL_SimulatorExecuteJavaScript.RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction
+                   (() =>
+                   {
+                       //----------------------------------
+                       // Get the C# callback from its ID:
+                       //----------------------------------
+                       Delegate callback = _dictionary[callbackId];
 
-                Type callbackType = callback.GetType();
-                Type[] callbackGenericArgs = null;
-                if (callbackType.IsGenericType)
-                {
-                    callbackGenericArgs = callbackType.GetGenericArguments();
-                    callbackType = callbackType.GetGenericTypeDefinition();
-                }
-                var callbackArgs = callbackArgsObject;
+                       Type callbackType = callback.GetType();
+                       Type[] callbackGenericArgs = null;
+                       if (callbackType.IsGenericType)
+                       {
+                           callbackGenericArgs = callbackType.GetGenericArguments();
+                           callbackType = callbackType.GetGenericTypeDefinition();
+                       }
+                       var callbackArgs = callbackArgsObject;
 
-                //--------------------
-                // Call the callback:
-                //--------------------
+                       //--------------------
+                       // Call the callback:
+                       //--------------------
 #if CATCH_INTEROP_EXCEPTIONS // Note: previously, when using the "Awesomium" browser control in the Simulator, we handled the exceptions because otherwise they got captured by the WebBrowser control, due to the fact that the callback is executed in the context of the WebBrowser control. This is no longer true with the "DotNetBrowser" control.
                 try
                 {
 #endif
-                try
-                {
-                    if (callbackType == typeof(Action))
-                    {
-                        DelegateDynamicInvoke(callback);
-                    }
-                    else if (callbackType == typeof(Action<>))
-                    {
-                        DelegateDynamicInvoke(callback, MakeArgumentsForCallback(1, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-                    }
-                    else if (callbackType == typeof(Action<,>))
-                    {
-                        DelegateDynamicInvoke(callback, MakeArgumentsForCallback(2, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-                    }
-                    else if (callbackType == typeof(Action<,,>))
-                    {
-                        DelegateDynamicInvoke(callback, MakeArgumentsForCallback(3, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-                    }
-                    else if (callbackType == typeof(Action<,,,>))
-                    {
-                        DelegateDynamicInvoke(callback, MakeArgumentsForCallback(4, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-                    }
-                    else if (callbackType == typeof(Action<,,,,>))
-                    {
-                        DelegateDynamicInvoke(callback, MakeArgumentsForCallback(5, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-                    }
-                    else if (callbackType == typeof(Action<,,,,,>))
-                    {
-                        DelegateDynamicInvoke(callback, MakeArgumentsForCallback(6, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-                    }
-                    else if (callbackType == typeof(Action<,,,,,,>))
-                    {
-                        DelegateDynamicInvoke(callback, MakeArgumentsForCallback(7, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-                    }
-                    else if (callbackType == typeof(Action<,,,,,,,>))
-                    {
-                        DelegateDynamicInvoke(callback, MakeArgumentsForCallback(8, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-                    }
-                    else if (callbackType == typeof(Action<,,,,,,,,>))
-                    {
-                        DelegateDynamicInvoke(callback, MakeArgumentsForCallback(9, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-                    }
-                    else
-                        throw new Exception(string.Format("Callback type not supported: {0}  Please report this issue to support@cshtml5.com", callbackType.ToString()));
-                }
-                catch (Exception ex)
-                {
+                       try
+                       {
+                           if (callbackType == typeof(Action))
+                           {
+                               DelegateDynamicInvoke(callback);
+                           }
+                           else if (callbackType == typeof(Action<>))
+                           {
+                               DelegateDynamicInvoke(callback, MakeArgumentsForCallback(1, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
+                           }
+                           else if (callbackType == typeof(Action<,>))
+                           {
+                               DelegateDynamicInvoke(callback, MakeArgumentsForCallback(2, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
+                           }
+                           else if (callbackType == typeof(Action<,,>))
+                           {
+                               DelegateDynamicInvoke(callback, MakeArgumentsForCallback(3, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
+                           }
+                           else if (callbackType == typeof(Action<,,,>))
+                           {
+                               DelegateDynamicInvoke(callback, MakeArgumentsForCallback(4, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
+                           }
+                           else if (callbackType == typeof(Action<,,,,>))
+                           {
+                               DelegateDynamicInvoke(callback, MakeArgumentsForCallback(5, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
+                           }
+                           else if (callbackType == typeof(Action<,,,,,>))
+                           {
+                               DelegateDynamicInvoke(callback, MakeArgumentsForCallback(6, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
+                           }
+                           else if (callbackType == typeof(Action<,,,,,,>))
+                           {
+                               DelegateDynamicInvoke(callback, MakeArgumentsForCallback(7, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
+                           }
+                           else if (callbackType == typeof(Action<,,,,,,,>))
+                           {
+                               DelegateDynamicInvoke(callback, MakeArgumentsForCallback(8, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
+                           }
+                           else if (callbackType == typeof(Action<,,,,,,,,>))
+                           {
+                               DelegateDynamicInvoke(callback, MakeArgumentsForCallback(9, callbackId, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
+                           }
+                           else
+                               throw new Exception(string.Format("Callback type not supported: {0}  Please report this issue to support@cshtml5.com", callbackType.ToString()));
+                       }
+                       catch (Exception ex)
+                       {
 #if DEBUG
-                    Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
+                           Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
 #endif
-                    throw;
-                }
+                           throw;
+                       }
 #if CATCH_INTEROP_EXCEPTIONS // Note: previously, when using the "Awesomium" browser control in the Simulator, we handled the exceptions because otherwise they got captured by the WebBrowser control, due to the fact that the callback is executed in the context of the WebBrowser control. This is no longer true with the "DotNetBrowser" control.
                 }
                 catch (Exception ex) // We catch and handle the Exception because otherwise it gets captured by the WebBrowser control, due to the fact that the callback is executed in the context of the WebBrowser control.
@@ -448,6 +451,7 @@ namespace CSHTML5.Internal
                     }
                 }
 #endif
+                   });
             };
 
             if (Interop.IsRunningInTheSimulator_WorkAround)

@@ -48,6 +48,14 @@ namespace Windows.UI.Xaml
         /// </summary>
         public event EventHandler<ApplicationUnhandledExceptionEventArgs> UnhandledException;
 
+        internal void OnUnhandledException(Exception exception, bool handled)
+        {
+            if(UnhandledException != null)
+            {
+                UnhandledException(this, new ApplicationUnhandledExceptionEventArgs(exception, handled));
+            }
+        }
+
         //        void RaiseUnhandledException(object jsElement)
         //        {
         //#if !MIGRATION

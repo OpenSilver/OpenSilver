@@ -54,6 +54,8 @@ namespace DotNetForHtml5.Compiler
             {
                 InsertingImplicitNodesAndNoDirectTextContent.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain);
 
+                FixingPropertiesOrder.FixPropertiesOrder(doc, reflectionOnSeparateAppDomain);
+
                 // Process the "ContentPresenter" nodes in order to transform "<ContentPresenter />" into "<ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />"
                 ProcessingContentPresenterNodes.Process(doc, reflectionOnSeparateAppDomain);
 

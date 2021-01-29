@@ -73,5 +73,40 @@ namespace System.Windows.Browser
                 return returnValue;
             }
         }
+#if WORKINPROGRESS
+        //
+        // Summary:
+        //     Gets a single browser element.
+        //
+        // Parameters:
+        //   id:
+        //     A string identifier for a named browser element.
+        //
+        // Returns:
+        //     A reference to a browser element.
+        //
+        // Exceptions:
+        //   System.ArgumentException:
+        //     id is an empty string.
+        //
+        //   System.ArgumentNullException:
+        //     id is null.
+        //
+        //   System.InvalidOperationException:
+        //     An unexpected error occurred.
+        public HtmlElement GetElementById(string id)
+        {
+            return null;
+        }
+
+        //
+        // Summary:
+        //     Gets or sets the browser's cookie string.
+        //
+        // Returns:
+        //     The cookie string that is stored by the browser. If the browser does not
+        //     have a cookie string, the property returns an empty string.
+        public string Cookies { get; set; }
+#endif
     }
 }

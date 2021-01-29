@@ -94,6 +94,7 @@
     <Compile Include="1_CheckingProjectConformity\CheckingThatAnAssemblyCanBeReferenced.cs" />
     <Compile Include="1_CheckingProjectConformity\CheckingThatNoAssemblyReferenceIsMissing.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ConvertingStringToValue.cs" />
+    <Compile Include="2_ConvertingXamlToCSharp\FixingPropertiesOrder.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\FixingVisualStatesName.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ProcessingHtmlPresenterNodes.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ProcessingColorAnimationNodes.cs" />

@@ -26,6 +26,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DotNetForHtml5.Core;
+#if MIGRATION
+using System.Windows;
+#else
+using Windows.UI.Xaml;
+#endif
 
 namespace CSHTML5.Internal
 {
@@ -275,32 +280,43 @@ namespace CSHTML5.Internal
         /// <param name="action">The action to execute before flushing the pending JS code.</param>
         public static void RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction(Action action)
         {
+#if WORKINPROGRESS
+            try
+            { 
+#endif
             if (_isInsideMethodToRunAnActionAndThenExecuteItsPendingJS)
-            {
-                //-----------------------------
-                // This means that we have already planned an auto-flush, so we do
-                // not need to plan it again: we just execute the provided "action".
-                // This is usually the case when we are in a nested call, which
-                // means that this method is being execute from within itself.
-                //-----------------------------
+                {
+                    //-----------------------------
+                    // This means that we have already planned an auto-flush, so we do
+                    // not need to plan it again: we just execute the provided "action".
+                    // This is usually the case when we are in a nested call, which
+                    // means that this method is being execute from within itself.
+                    //-----------------------------
 
-                action();
-            }
-            else
-            {
-                _isInsideMethodToRunAnActionAndThenExecuteItsPendingJS = true;
+                    action();
+                }
+                else
+                {
+                    _isInsideMethodToRunAnActionAndThenExecuteItsPendingJS = true;
 
-                action();
+                    action();
 
-                _isInsideMethodToRunAnActionAndThenExecuteItsPendingJS = false;
+                    _isInsideMethodToRunAnActionAndThenExecuteItsPendingJS = false;
 
 #if OPTIMIZATION_LOG
                 Console.WriteLine("[OPTIMIZATION] Auto-flush");
 #endif
-                // After the action has finished execution, let's flush all the pending JavaScript calls if any:
-                ExecutePendingJavaScriptCode("AUTO-FLUSH");
+                    // After the action has finished execution, let's flush all the pending JavaScript calls if any:
+                    ExecutePendingJavaScriptCode("AUTO-FLUSH");
+                }
+#if WORKINPROGRESS
             }
+            catch (Exception e)
+            {
+                Application.Current.OnUnhandledException(e, false);
+            } 
+#endif
         }
 #endif
-            }
+    }
         }

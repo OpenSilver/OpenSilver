@@ -12,7 +12,15 @@
 *  
 \*====================================================================================*/
 
+
+#if WORKINPROGRESS
+
+#if MIGRATION
+using System.Windows.Navigation;
+#else
 using System;
+using Windows.UI.Xaml.Navigation;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -21,18 +29,18 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Specifies constants that define which <see cref="T:System.Windows.Controls.DataGrid" /> header cells are displayed.
+    /// Provides a control that hosts an HTML page in an app using an iframe.
+    /// Note: some websites explicitly forbid being embedded in an iframe.
+    /// Note: to embed a piece of HTML code without using an iframe, use the HtmlPresenter control instead.
     /// </summary>
-    [Flags]
-    public enum DataGridHeadersVisibility
+#if MIGRATION
+    public partial class WebBrowser : FrameworkElement
+#else
+    public partial class WebView : FrameworkElement
+#endif
     {
-        /// <summary>Both column and row header cells are displayed.</summary>
-        All = 3,
-        /// <summary>Only column header cells are displayed.</summary>
-        Column = 1,
-        /// <summary>Only row header cells are displayed.</summary>
-        Row = 2,
-        /// <summary>No header cells are displayed.</summary>
-        None = 0,
+        public event LoadCompletedEventHandler LoadCompleted;
     }
 }
+
+#endif

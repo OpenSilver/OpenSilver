@@ -63,7 +63,11 @@ namespace Windows.UI.Xaml.Controls
             iFrameStyle.height = "100%";
             iFrameStyle.border = "none";
 
+#if MIGRATION
+            var source = this.SourceUri;
+#else
             var source = this.Source;
+#endif
             if (source != null && !string.IsNullOrEmpty(source.OriginalString))
             {
                 CSHTML5.Interop.ExecuteJavaScriptAsync("$0.src = $1", _iFrame, source.OriginalString);
@@ -86,24 +90,32 @@ namespace Windows.UI.Xaml.Controls
         /// Note: some websites explicitly forbid being embedded in an iframe.
         /// Note: to embed a piece of HTML code without using an iframe, use the HtmlPresenter control instead.
         /// </summary>
+#if MIGRATION
+        public Uri SourceUri
+        {
+            get { return (Uri)GetValue(SourceUriProperty); }
+            set { SetValue(SourceUriProperty, value); }
+        }
+#else
         public Uri Source
         {
             get { return (Uri)GetValue(SourceProperty); }
             set { SetValue(SourceProperty, value); }
         }
-
+#endif
         /// <summary>
         /// Gets or sets the Uniform Resource Identifier (URI) source of the HTML content to display in the control inside an iframe.
         /// Note: some websites explicitly forbid being embedded in an iframe.
         /// Note: to embed a piece of HTML code without using an iframe, use the HtmlPresenter control instead.
         /// </summary>
-        public static readonly DependencyProperty SourceProperty =
 #if MIGRATION
-            DependencyProperty.Register("Source", typeof(Uri), typeof(WebBrowser), new PropertyMetadata(null, Source_Changed)
+        public static readonly DependencyProperty SourceUriProperty =
+            DependencyProperty.Register("SourceUri", typeof(Uri), typeof(WebBrowser), new PropertyMetadata(null, Source_Changed)
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 #else
+        public static readonly DependencyProperty SourceProperty =
             DependencyProperty.Register("Source", typeof(Uri), typeof(WebView), new PropertyMetadata(null, Source_Changed)
-        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 #endif
 
         private static void Source_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -116,7 +128,11 @@ namespace Windows.UI.Xaml.Controls
 
             if (webView._isLoaded) // Note: if not loaded, we will set the source later when adding the control to the visual tree.
             {
+#if MIGRATION
+                var source = webView.SourceUri;
+#else
                 var source = webView.Source;
+#endif
                 if (source != null && !string.IsNullOrEmpty(source.OriginalString))
                 {
                     string uri = INTERNAL_UriHelper.ConvertToHtml5Path(source.OriginalString, null);
@@ -137,7 +153,11 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="source">The Uniform Resource Identifier (URI) to load.</param>
         public void Navigate(Uri source)
         {
+#if MIGRATION
+            this.SourceUri = source;
+#else
             this.Source = source;
+#endif
         }
 
         /// <summary>
@@ -161,9 +181,5 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-
-#if WORKINPROGRESS
-        public event LoadCompletedEventHandler LoadCompleted;
-#endif
     }
 }
