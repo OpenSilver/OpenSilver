@@ -88,10 +88,7 @@ namespace Windows.UI.Xaml.Controls
         // Summary:
         //     Occurs when the drop-down System.Windows.Controls.Calendar is closed.
         public event RoutedEventHandler CalendarClosed;
-        //
-        // Summary:
-        //     Occurs when the drop-down System.Windows.Controls.Calendar is opened.
-        public event RoutedEventHandler CalendarOpened;
+        
 
         private static void OnDisplayDateStartChanged(
             DependencyObject d,
