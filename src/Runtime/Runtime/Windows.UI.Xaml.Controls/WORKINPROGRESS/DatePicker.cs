@@ -82,6 +82,14 @@ namespace Windows.UI.Xaml.Controls
             set => SetValue(DisplayDateStartProperty, value);
         }
 
+        public DatePickerFormat SelectedDateFormat { get; set; }
+
+        //
+        // Summary:
+        //     Occurs when the drop-down System.Windows.Controls.Calendar is closed.
+        public event RoutedEventHandler CalendarClosed;
+        
+
         private static void OnDisplayDateStartChanged(
             DependencyObject d,
             DependencyPropertyChangedEventArgs e)
