@@ -351,6 +351,8 @@ namespace DotNetForHtml5.Compiler
 
         static string PrepareStringForDuration(string elementTypeInCSharp, string valueAsString)
         {
+            if (valueAsString.ToLower() == "forever")
+                return elementTypeInCSharp + ".Forever";
             TimeSpan timeSpan = TimeSpan.Parse(valueAsString);
             return string.Format("new {0}(new global::System.TimeSpan({1}L))", elementTypeInCSharp, timeSpan.Ticks); ;
         }
