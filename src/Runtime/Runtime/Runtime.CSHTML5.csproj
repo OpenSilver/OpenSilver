@@ -118,6 +118,7 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridGridLinesVisibility.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRow.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTextColumn.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DescriptionViewer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Frame.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />

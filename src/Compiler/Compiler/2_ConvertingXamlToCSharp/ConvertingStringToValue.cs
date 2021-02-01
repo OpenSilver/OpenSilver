@@ -353,6 +353,8 @@ namespace DotNetForHtml5.Compiler
         {
             if (valueAsString.ToLower() == "forever")
                 return elementTypeInCSharp + ".Forever";
+            if (valueAsString.ToLower() == "automatic")
+                return elementTypeInCSharp + ".Automatic";
             TimeSpan timeSpan = TimeSpan.Parse(valueAsString);
             return string.Format("new {0}(new global::System.TimeSpan({1}L))", elementTypeInCSharp, timeSpan.Ticks); ;
         }

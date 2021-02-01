@@ -375,6 +375,8 @@ namespace Windows.UI.Xaml
         {
             if (p.ToLower() == "forever")
                 return Duration.Forever;
+            if (p.ToLower() == "automatic")
+                return Duration.Automatic;
 #if BRIDGE
             TimeSpan timeSpan = INTERNAL_BridgeWorkarounds.TimeSpanParse(p);
 #else
