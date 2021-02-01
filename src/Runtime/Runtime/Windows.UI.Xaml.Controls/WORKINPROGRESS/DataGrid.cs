@@ -34,6 +34,26 @@ namespace Windows.UI.Xaml.Controls
         public event EventHandler<EventArgs> CurrentCellChanged;
 
         /// <summary>
+        ///     Called just before a cell will change to edit mode
+        ///     to allow handlers to prevent the cell from entering edit mode.
+        /// </summary>
+        public event EventHandler<DataGridBeginningEditEventArgs> BeginningEdit;
+
+        /// <summary>
+        ///     Raised just before cell editing is ended.
+        ///     Gives handlers the opportunity to cancel the operation.
+        /// </summary>
+        public event EventHandler<DataGridCellEditEndingEventArgs> CellEditEnding;
+
+        /// <summary>
+        ///     Called after a cell has changed to editing mode to allow
+        ///     handlers to modify the contents of the cell.
+        /// </summary>
+        public event EventHandler<DataGridPreparingCellForEditEventArgs> PreparingCellForEdit;
+
+        public event EventHandler<DataGridCellEditEndedEventArgs> CellEditEnded;
+
+        /// <summary>
         /// Gets or sets the column that contains the current cell.
         /// </summary>
         /// <returns>

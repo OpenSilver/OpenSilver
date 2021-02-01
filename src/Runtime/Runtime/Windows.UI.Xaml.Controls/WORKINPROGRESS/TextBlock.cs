@@ -1,5 +1,7 @@
 #if WORKINPROGRESS
 
+using System.Windows;
+
 #if MIGRATION
 namespace System.Windows.Controls
 #else
@@ -31,6 +33,21 @@ namespace Windows.UI.Xaml.Controls
 		//     A value that indicates how a line box is determined for each line of text in
 		//     the System.Windows.Controls.TextBlock. The default is System.Windows.LineStackingStrategy.MaxHeight.
 		public LineStackingStrategy LineStackingStrategy { get; set; }
+
+		public double BaselineOffset { get; private set; }
+
+		public static readonly DependencyProperty CharacterSpacingProperty =
+			DependencyProperty.Register(
+				"CharacterSpacing",
+				typeof(int),
+				typeof(TextBlock),
+				new PropertyMetadata(0));
+
+		public int CharacterSpacing
+		{
+			get { return (int)this.GetValue(CharacterSpacingProperty); }
+			set { this.SetValue(CharacterSpacingProperty, value); }
+		}
 	}
 }
 

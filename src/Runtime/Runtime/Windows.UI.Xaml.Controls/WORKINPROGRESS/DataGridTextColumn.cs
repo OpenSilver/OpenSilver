@@ -15,6 +15,8 @@
 
 #if WORKINPROGRESS
 
+using System;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -27,7 +29,7 @@ namespace System.Windows.Controls
 #else
 namespace Windows.UI.Xaml.Controls
 #endif
-{
+{ 
     /// <summary>
     /// Represents a System.Windows.Controls.DataGrid column that hosts textual content
     /// in its cells.
@@ -60,6 +62,50 @@ namespace Windows.UI.Xaml.Controls
             //textColumn.NotifyPropertyChanged(DATAGRIDTEXTCOLUMN_fontFamilyName);
         }
         #endregion FontFamily
+
+        private double? _fontSize;
+
+        /// <summary>
+        /// Gets or sets the font size.
+        /// </summary>
+        // Use DefaultValue here so undo in the Designer will set this to NaN
+        [DefaultValue(double.NaN)]
+        public double FontSize
+        {
+            get
+            {
+                return this._fontSize ?? Double.NaN;
+            }
+            set
+            {
+                if (this._fontSize != value)
+                {
+                    this._fontSize = value;
+                    //NotifyPropertyChanged(DATAGRIDTEXTCOLUMN_fontSizeName);
+                }
+            }
+        }
+
+        private Brush _foreground;
+
+        /// <summary>
+        /// Gets or sets a brush that describes the foreground of the column cells.
+        /// </summary>
+        public Brush Foreground
+        {
+            get
+            {
+                return this._foreground;
+            }
+            set
+            {
+                if (this._foreground != value)
+                {
+                    this._foreground = value;
+                    //NotifyPropertyChanged(DATAGRIDTEXTCOLUMN_foregroundName);
+                }
+            }
+        }
     }
 }
 #endif
