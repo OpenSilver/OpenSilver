@@ -27,7 +27,7 @@ namespace Windows.UI.Xaml.Controls
     //     to manage virtualizing its child items.
     public enum VirtualizationMode
     {
-        // Summary:
+        // Summary:                                                                           
         //     Create and discard the item containers.
         Standard = 0,
         //
