@@ -171,6 +171,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridGridLinesVisibility.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRow.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTextColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePicker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePickerFormat.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />

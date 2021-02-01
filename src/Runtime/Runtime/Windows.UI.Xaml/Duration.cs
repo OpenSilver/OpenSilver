@@ -373,6 +373,10 @@ namespace Windows.UI.Xaml
 
         internal static object INTERNAL_ConvertFromString(string p)
         {
+            if (p.ToLower() == "forever")
+                return Duration.Forever;
+            if (p.ToLower() == "automatic")
+                return Duration.Automatic;
 #if BRIDGE
             TimeSpan timeSpan = INTERNAL_BridgeWorkarounds.TimeSpanParse(p);
 #else

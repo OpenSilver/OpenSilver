@@ -199,7 +199,7 @@ namespace Windows.UI.Xaml.Controls
             set { SetDisplayDateEnd(value); _displayDateEnd = value; }
         }
 
-        private DateTime? _displayDate;
+        private DateTime _displayDate;
         /// <summary>
         /// Gets or sets the date to display
         /// </summary>
@@ -207,7 +207,7 @@ namespace Windows.UI.Xaml.Controls
         //   System.ArgumentOutOfRangeException:
         //     The given date is not in the range specified by System.Windows.Controls.Calendar.DisplayDateStart
         //     and System.Windows.Controls.Calendar.DisplayDateEnd.
-        public DateTime? DisplayDate
+        public DateTime DisplayDate
         {
             get { return _displayDate; }
             set { SetDisplayDate(value); _displayDate = value; }

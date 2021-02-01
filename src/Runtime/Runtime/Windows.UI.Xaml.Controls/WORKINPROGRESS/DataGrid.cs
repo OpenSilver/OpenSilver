@@ -376,6 +376,42 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
+        ///     The default height of a row.
+        /// </summary>
+        public double RowHeight
+        {
+            get { return (double)GetValue(RowHeightProperty); }
+            set { SetValue(RowHeightProperty, value); }
+        }
+
+        /// <summary>
+        ///     The DependencyProperty for RowHeight.
+        /// </summary>
+        public static readonly DependencyProperty RowHeightProperty = DependencyProperty.Register(nameof(RowHeight), typeof(double), typeof(DataGrid), new PropertyMetadata(double.NaN, new PropertyChangedCallback(DataGrid.OnNotifyCellsPresenterPropertyChanged)));
+
+        /// <summary>
+        ///     The default minimum height of a row.
+        /// </summary>
+        public double MinRowHeight
+        {
+            get { return (double)GetValue(MinRowHeightProperty); }
+            set { SetValue(MinRowHeightProperty, value); }
+        }
+
+        /// <summary>
+        ///     The DependencyProperty for MinRowHeight.
+        /// </summary>
+        public static readonly DependencyProperty MinRowHeightProperty = DependencyProperty.Register(nameof(MinRowHeight), typeof(double), typeof(DataGrid), new PropertyMetadata(0.0, new PropertyChangedCallback(DataGrid.OnNotifyCellsPresenterPropertyChanged)));
+
+        /// <summary>
+        ///     Notifies each CellsPresenter about property changes.
+        /// </summary>
+        private static void OnNotifyCellsPresenterPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            //((DataGrid)d).NotifyPropertyChanged(d, e, DataGridNotificationTarget.CellsPresenter);
+        }
+
+        /// <summary>
         /// Identifies the <see cref="P:System.Windows.Controls.DataGrid.CanUserSortColumns" /> dependency property.
         /// </summary>
         /// <returns>
