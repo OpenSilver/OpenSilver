@@ -1306,7 +1306,7 @@ var {4} = {2}.GetValue({1});
                 {
                     //todo: this
                     string index = lastPartOfBlock.TrimEnd(']').TrimStart('[');
-                    generatedCode = string.Format("var {0} = {1}[{2}];", currentVarName, blockRootElement, index);
+                    generatedCode = string.Format("var {0} = ((dynamic){1})[{2}];", currentVarName, blockRootElement, index);
                     generatedCode += Environment.NewLine;
                     generatedCode += "int? " + indexName + " = " + index + ";";
                 }
