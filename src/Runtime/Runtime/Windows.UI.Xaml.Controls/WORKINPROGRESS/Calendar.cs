@@ -84,6 +84,8 @@ namespace Windows.UI.Xaml.Controls
         {
             throw new NotImplementedException();
         }
+
+        public Style CalendarDayButtonStyle { get; set; }
     }
 }
 #endif

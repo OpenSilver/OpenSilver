@@ -251,23 +251,5 @@ namespace Windows.UI.Xaml.Controls
             get { return (TextTrimming)GetValue(TextTrimmingProperty); }
             set { SetValue(TextTrimmingProperty, value); }
         }
-
-#if WORKINPROGRESS
-
-        public double BaselineOffset { get; private set; }
-
-        public static readonly DependencyProperty CharacterSpacingProperty = 
-            DependencyProperty.Register(
-                "CharacterSpacing",
-                typeof(int),
-                typeof(TextBlock),
-                new PropertyMetadata(0));
-
-        public int CharacterSpacing
-        {
-            get { return (int)this.GetValue(CharacterSpacingProperty); }
-            set { this.SetValue(CharacterSpacingProperty, value); }
-        }
-#endif
     }
 }

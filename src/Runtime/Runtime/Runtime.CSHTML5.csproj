@@ -100,9 +100,11 @@
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
     <Compile Include="System.Xml\WORKINPROGRESS\XmlSerializer.cs" />
     <Compile Include="System\TypeExtensions.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\CalendarDayButton.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IItemContainerGenerator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IRecyclingItemContainerGenerator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Common\Extensions.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\DataGridEditAction.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridHeadersVisibility.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridRowDetailsVisibilityMode.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
@@ -116,7 +118,11 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CalendarBlackoutDatesCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CalendarDateRange.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridBeginningEditEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridCellEditEndedEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridCellEditEndingEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridGridLinesVisibility.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridPreparingCellForEditEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRow.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTextColumn.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DescriptionViewer.cs" />
@@ -124,6 +130,7 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Page.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TextBlock.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WebView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\CollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\CollectionViewGroup.cs" />
@@ -886,6 +893,7 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\Freezable.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\HierarchicalDataTemplate.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\IDataObject.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\LineStackingStrategy.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\OutOfBrowserSettings.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\PresentationFrameworkCollection_1.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TabletDeviceType.cs" />

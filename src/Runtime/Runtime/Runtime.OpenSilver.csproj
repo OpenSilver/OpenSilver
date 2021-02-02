@@ -128,6 +128,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\AccordionSelectionMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\Common\Extensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\Common\TypeHelper.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\DataGridEditAction.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DataGridHeadersVisibility.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DataGridRowDetailsVisibilityMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ExpandDirection.cs" />
@@ -168,8 +169,12 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFormToStringConverter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataFormValueConverter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridBeginningEditEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridCellEditEndedEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridCellEditEndingEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridGridLinesVisibility.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridPreparingCellForEditEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRow.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTextColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePicker.cs" />
