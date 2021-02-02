@@ -240,21 +240,34 @@ namespace DotNetForHtml5.Compiler
 
         static string PrepareStringForDouble(string elementTypeInCSharp, string valueAsString)
         {
-            if (valueAsString.ToLower() == "auto" || valueAsString.ToLower() == "nan")
+            string trimmedString = valueAsString.Trim();
+
+            if (trimmedString.ToLower() == "auto" || trimmedString.ToLower() == "nan")
             {
                 return "global::System.Double.NaN";
             }
-            else if (valueAsString.ToLower() == "infinity")
+            else if (trimmedString.ToLower() == "infinity")
             {
                 return "global::System.Double.PositiveInfinity";
             }
-            else if (valueAsString.ToLower() == "-infinity")
+            else if (trimmedString.ToLower() == "-infinity")
             {
                 return "global::System.Double.NegativeInfinity";
             }
             else
             {
-                return PrepareStringForNumericType(valueAsString, 'D');
+                if (trimmedString == ".")
+                {
+                    return "0D";
+                }
+                else if (trimmedString.EndsWith("."))
+                {
+                    return PrepareStringForNumericType(trimmedString.Substring(0, trimmedString.Length - 1), 'D');
+                }
+                else
+                {
+                    return PrepareStringForNumericType(trimmedString, 'D');
+                }
             }
         }
 
