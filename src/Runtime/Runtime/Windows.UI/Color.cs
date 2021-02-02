@@ -103,47 +103,102 @@ namespace Windows.UI
             };
         }
 
+        public static Color FromScRgb(float a, float r, float g, float b)
+        {
+            return new Color()
+            {
+                A = (byte)(a * 255f),
+                R = ScRgbTosRgb(r),
+                G = ScRgbTosRgb(g),
+                B = ScRgbTosRgb(b),
+            };
+        }
+
+        private static byte ScRgbTosRgb(float val)
+        {
+            if (!(val > 0.0))       // Handles NaN case too
+            {
+                return (0);
+            }
+            else if (val <= 0.0031308)
+            {
+                return ((byte)((255.0f * val * 12.92f) + 0.5f));
+            }
+            else if (val < 1.0)
+            {
+                return ((byte)((255.0f * ((1.055f * (float)Math.Pow((double)val, (1.0 / 2.4))) - 0.055f)) + 0.5f));
+            }
+            else
+            {
+                return (255);
+            }
+        }
+
         internal string INTERNAL_ToHtmlString(double opacity) // Note: we didn't use a default value for the "opacity" argument to force the caller to ask herself if it is correct to call this method or if she should call "SolidColorBrush.INTERNAL_ToHtmlString()" instead (because the latter takes into account the "Brush.Opacity" property).
         {
             return "rgba(" + R.ToString() + ", " + G.ToString() + ", " + B.ToString() + ", " + (((double)A / 255) * opacity).ToString().Replace(',', '.') + ")"; //todo: instead of calling the "Replace" method, use ToString(CultureInfo.InvariantCulture) when CSHTML5 will support it.
         }
 
-        internal static object INTERNAL_ConvertFromString(string colorcode)
+        internal static object INTERNAL_ConvertFromString(string colorString)
         {
-            try
+            string trimmedString = colorString.Trim();
+            if (!string.IsNullOrEmpty(trimmedString) && (trimmedString[0] == '#'))
             {
-                // Check if the color is a named color:
-                if (!colorcode.StartsWith("#"))
+                string tokens = trimmedString.Substring(1);
+                if (tokens.Length == 6) // This is becaue XAML is tolerant when the user has forgot the alpha channel (eg. #DDDDDD for Gray).
+                    tokens = "FF" + tokens;
+
+#if NETSTANDARD
+                int color;
+                if (int.TryParse(tokens, NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo, out color))
                 {
-                    Colors.INTERNAL_ColorsEnum namedColor = (Colors.INTERNAL_ColorsEnum)Enum.Parse(typeof(Colors.INTERNAL_ColorsEnum), colorcode, true); // Note: "TryParse" does not seem to work in JSIL.
-                    return INTERNAL_ConvertFromInt32((int)namedColor);
+                    return INTERNAL_ConvertFromInt32(color);
+                }
+#else // BRIDGE
+                int color;
+                if (CSHTML5.Interop.IsRunningInTheSimulator)
+                {
+                    color = INTERNAL_BridgeWorkarounds.HexToInt_SimulatorOnly(tokens);
                 }
                 else
                 {
-                    colorcode = colorcode.Replace("#", "");
-                    if (colorcode.Length == 6) // This is becaue XAML is tolerant when the user has forgot the alpha channel (eg. #DDDDDD for Gray).
-                        colorcode = "FF" + colorcode;
-#if !BRIDGE
-                    int colorAsInt = int.Parse(colorcode.Replace("#", ""), NumberStyles.HexNumber);
-#else
-                    int colorAsInt;
-                    if (CSHTML5.Interop.IsRunningInTheSimulator)
-                    {
-                        colorcode = colorcode.Replace("#", "");
-                        colorAsInt = INTERNAL_BridgeWorkarounds.HexToInt_SimulatorOnly(colorcode);
-                    }
-                    else
-                    {
-                        colorAsInt = Script.Write<int>("parseInt({0}, 16);", colorcode.Replace("#", ""));
-                    }
+                    color = Script.Write<int>("parseInt({0}, 16);", tokens);
+                }
+
+                return INTERNAL_ConvertFromInt32(color);
 #endif
-                    return INTERNAL_ConvertFromInt32(colorAsInt);
+            }
+            else if (trimmedString != null && trimmedString.StartsWith("sc#", StringComparison.Ordinal))
+            {
+                string tokens = trimmedString.Substring(3);
+
+                char[] separators = new char[1] { ',' };
+                string[] words = tokens.Split(separators);
+                float[] values = new float[4];
+                for (int i = 0; i < 3; i++)
+                {                    
+                    values[i] = Convert.ToSingle(words[i]);
+                }
+                if (words.Length == 4)
+                {
+                    values[3] = Convert.ToSingle(words[3]);
+                    return Color.FromScRgb(values[0], values[1], values[2], values[3]);
+                }
+                else
+                {
+                    return Color.FromScRgb(1.0f, values[0], values[1], values[2]);
                 }
             }
-            catch (Exception ex)
+            else
             {
-                throw new Exception("Invalid color: " + colorcode, ex);
+                // Check if the color is a named color
+                Colors.INTERNAL_ColorsEnum namedColor;
+                if (Enum.TryParse(trimmedString, true, out namedColor))
+                {
+                    return INTERNAL_ConvertFromInt32((int)namedColor);
+                }
             }
+            throw new Exception(string.Format("Invalid color: {0}", colorString));
         }
 
         internal static Color INTERNAL_ConvertFromInt32(int colorAsInt32)

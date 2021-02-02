@@ -275,35 +275,64 @@ namespace DotNetForHtml5.Compiler
 
         static string PrepareStringForColor(string elementTypeInCSharp, string valueAsString)
         {
-            try
+            string trimmedString = valueAsString.Trim();
+            if (!string.IsNullOrEmpty(trimmedString) && (trimmedString[0] == '#'))
             {
-                int colorAsInt;
-                // Check if the color is a named color:
-                if (!valueAsString.StartsWith("#"))
+                string tokens = trimmedString.Substring(1);
+                if (tokens.Length == 6) // This is becaue XAML is tolerant when the user has forgot the alpha channel (eg. #DDDDDD for Gray).
+                    tokens = "FF" + tokens;
+
+                int color;
+                if (int.TryParse(tokens, NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo, out color))
                 {
-                    ColorsEnum namedColor = (ColorsEnum)Enum.Parse(typeof(ColorsEnum), valueAsString, true);
-                    colorAsInt = (int)namedColor;
+                    return string.Format("new {0}() {{ A = (byte){1}, R = (byte){2}, G = (byte){3}, B = (byte){4} }}",
+                        elementTypeInCSharp,
+                        (color >> 0x18) & 0xff,
+                        (color >> 0x10) & 0xff,
+                        (color >> 8) & 0xff,
+                        color & 0xff);
+                }
+            }
+            else if (trimmedString != null && trimmedString.StartsWith("sc#", StringComparison.Ordinal))
+            {
+                string tokens = trimmedString.Substring(3);
+
+                char[] separators = new char[1] { ',' };
+                string[] words = tokens.Split(separators);
+                float[] values = new float[4];
+                for (int i = 0; i < 3; i++)
+                {
+                    values[i] = Convert.ToSingle(words[i]);
+                }
+                if (words.Length == 4)
+                {
+                    values[3] = Convert.ToSingle(words[3]);
+                    return string.Format("{0}.FromScRgb((float){1}, (float){2}, (float){3}, (float){4})",
+                        elementTypeInCSharp,
+                        values[0], values[1], values[2], values[3]);
                 }
                 else
                 {
-                    valueAsString = valueAsString.Replace("#", "");
-                    if (valueAsString.Length == 6) // This is becaue XAML is tolerant when the user has forgot the alpha channel (eg. #DDDDDD for Gray).
-                        valueAsString = "FF" + valueAsString;
-
-                    colorAsInt = int.Parse(valueAsString.Replace("#", ""), NumberStyles.HexNumber);
+                    return string.Format("{0}.FromScRgb((float){1}, (float){2}, (float){3}, (float){4})",
+                        elementTypeInCSharp,
+                        1.0f, values[0], values[1], values[2]);
                 }
-                string result = string.Format("new {0}() {{ A = (byte){1}, R = (byte){2}, G = (byte){3}, B = (byte){4} }}",
-                    elementTypeInCSharp, //{0}
-                    (colorAsInt >> 0x18) & 0xff, //{1}
-                    (colorAsInt >> 0x10) & 0xff, //{2}
-                    (colorAsInt >> 8) & 0xff, //{3}
-                    colorAsInt & 0xff); //{4}
-                return result;
             }
-            catch (Exception ex)
+            else
             {
-                throw new wpf::System.Windows.Markup.XamlParseException("Invalid color: " + valueAsString, ex);
+                ColorsEnum namedColor;
+                if (Enum.TryParse(trimmedString, true, out namedColor))
+                {
+                    int color = (int)namedColor;
+                    return string.Format("new {0}() {{ A = (byte){1}, R = (byte){2}, G = (byte){3}, B = (byte){4} }}",
+                        elementTypeInCSharp,
+                        (color >> 0x18) & 0xff,
+                        (color >> 0x10) & 0xff,
+                        (color >> 8) & 0xff,
+                        color & 0xff);
+                }
             }
+            throw new wpf::System.Windows.Markup.XamlParseException(string.Format("Invalid color: {0}", valueAsString));
         }
 
         static string PrepareStringForBrush(string elementTypeInCSharp, string valueAsString)
