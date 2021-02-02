@@ -144,6 +144,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AccordionItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Automation\DataFormAutomationPeer.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\BusyIndicator.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ButtonSpinner.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Calendar.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CalendarBlackoutDatesCollection.cs" />
@@ -1205,6 +1206,11 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <None Include="Runtime.licenseheader" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
   
 	<!-- See ths comment on the first <Import> -->

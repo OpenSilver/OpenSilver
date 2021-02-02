@@ -17,7 +17,9 @@
                 </Style>
             </Setter.Value>
         </Setter>
-        <!--<Setter Property="ProgressBarStyle">
+        <!-- #if WORKINPROGRESS -->
+        <!--
+        <Setter Property="ProgressBarStyle">
             <Setter.Value>
                 <Style TargetType="ProgressBar">
                     <Setter Property="IsIndeterminate"
@@ -28,7 +30,9 @@
                             Value="8,0,8,8" />
                 </Style>
             </Setter.Value>
-        </Setter>-->
+        </Setter>
+        -->
+        <!-- #endif -->
         <Setter Property="DisplayAfter"
                 Value="00:00:00.1" />
         <Setter Property="HorizontalAlignment"
@@ -132,7 +136,12 @@
                                         VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
                         <Rectangle x:Name="overlay"
                                    Style="{TemplateBinding OverlayStyle}" />
-                        <Border x:Name="busycontent">
+                        <!-- #if WORKINPROGRESS -->
+                        <!--
+                        <ContentPresenter x:Name="busycontent">
+                        -->
+                        <!-- #endif -->
+                        <Border x:Name="busyContent">
                             <Grid HorizontalAlignment="Center"
                                   VerticalAlignment="Center">
                                 <Border Background="White"
@@ -164,19 +173,28 @@
                                         </Border.Background>
                                         <Grid MinWidth="150">
                                             <Grid.RowDefinitions>
-                                                <RowDefinition Height="*" />
+                                                <RowDefinition />
                                                 <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
                                             <ContentPresenter Content="{TemplateBinding BusyContent}"
                                                               ContentTemplate="{TemplateBinding BusyContentTemplate}"
                                                               Margin="8" />
-                                            <!--<ProgressBar Grid.Row="1"
-                                                         Style="{TemplateBinding ProgressBarStyle}" />-->
+                                            <!-- #if WORKINPROGRESS -->
+                                            <!--
+                                            <ProgressBar Grid.Row="1"
+                                                         Style="{TemplateBinding ProgressBarStyle}" />
+                                            -->
+                                            <!-- #endif -->
                                         </Grid>
                                     </Border>
                                 </Border>
                             </Grid>
                         </Border>
+                        <!-- #if WORKINPROGRESS -->
+                        <!--
+                        </ContentPresenter>
+                        -->
+                        <!-- #endif -->
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
