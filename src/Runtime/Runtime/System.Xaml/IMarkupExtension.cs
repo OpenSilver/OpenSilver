@@ -13,28 +13,29 @@
 \*====================================================================================*/
 
 
-using System;
-
 namespace System.Xaml
 {
     /// <summary>
-    /// Provides an interface basis for XAML markup extension implementations that can be supported by Silverlight XAML processors.
+    /// Provides an interface basis for XAML markup extension implementations that can be supported
+    /// by Silverlight XAML processors.
     /// </summary>
     /// <typeparam name="T">
-    /// The type of the object that is returned by the <see cref="M:System.Xaml.IMarkupExtension.ProvideValue(System.IServiceProvider)" /> implementation.
-    /// This type parameter is covariant. That is, you can use either the type you specified or any type that is more derived.
+    /// The type of the object that is returned by the <see cref="ProvideValue(IServiceProvider)" />
+    /// implementation. This type parameter is covariant. That is, you can use either 
+    /// the type you specified or any type that is more derived.
     /// </typeparam>
     public interface IMarkupExtension<out T> where T : class
     {
         /// <summary>
-        /// Returns an object that is provided as the value of the target property for the markup extension.
+        /// Returns an object that is provided as the value of the target property for the
+        /// markup extension.
         /// </summary>
-        /// <returns>
-        /// The value to set on the property where the extension is applied.
-        /// </returns>
         /// <param name="serviceProvider">
         /// A service provider helper that can provide services for the markup extension.
         /// </param>
+        /// <returns>
+        /// The value to set on the property where the extension is applied.
+        /// </returns>
         T ProvideValue(IServiceProvider serviceProvider);
     }
 }

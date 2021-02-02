@@ -12,35 +12,33 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xaml;
 
 namespace System.Windows.Markup
 {
     /// <summary>
-    /// Provides a base class for XAML markup extension implementations that can
-    /// be supported by .NET Framework XAML Services and other XAML readers and XAML
-    /// writers.
+    /// Provides a base class for XAML markup extension implementations that can be supported
+    /// by Silverlight XAML processors.
     /// </summary>
-    public abstract class MarkupExtension
+    public abstract class MarkupExtension : IMarkupExtension<object>
     {
         /// <summary>
-        /// Initializes a new instance of a class derived from System.Windows.Markup.MarkupExtension.
+        /// Initializes a new instance of the <see cref="MarkupExtension"/>.
         /// </summary>
-        //protected MarkupExtension();
+        protected MarkupExtension()
+        {
+        }
 
         /// <summary>
-        /// When implemented in a derived class, returns an object that is provided as
-        /// the value of the target property for this markup extension.
+        /// When implemented in a derived class, returns an object that is provided as the
+        /// value of the target property for this markup extension.
         /// </summary>
         /// <param name="serviceProvider">
         /// A service provider helper that can provide services for the markup extension.
         /// </param>
-        /// <returns>The object value to set on the property where the extension is applied.</returns>
+        /// <returns>
+        /// The object value to set on the property where the extension is applied.
+        /// </returns>
         public abstract object ProvideValue(IServiceProvider serviceProvider);
     }
 }
