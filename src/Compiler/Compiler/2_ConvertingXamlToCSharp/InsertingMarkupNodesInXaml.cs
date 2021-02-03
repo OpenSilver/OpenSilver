@@ -209,13 +209,13 @@ namespace DotNetForHtml5.Compiler
 
                     try
                     {
-                        int indexOfCharacterAfterClassName = currentAttribute.IndexOf(' ');
+                        string content = currentAttribute.TrimStart('{').TrimStart();
+                        int indexOfCharacterAfterClassName = content.IndexOf(' ');
                         if (indexOfCharacterAfterClassName < 0)
-                            indexOfCharacterAfterClassName = currentAttribute.IndexOf('}');
+                            indexOfCharacterAfterClassName = content.IndexOf('}');
 
-                        string currentSubAttributeWithoutUselessPart = currentAttribute;
-                        string nextClassName = currentAttribute.Substring(0, indexOfCharacterAfterClassName); //nextClassName = "{Binding"
-                        nextClassName = nextClassName.Remove(0, 1); //we remove the '{'
+                        string currentSubAttributeWithoutUselessPart = content;
+                        string nextClassName = content.Substring(0, indexOfCharacterAfterClassName); //nextClassName = "Binding"
 
                         currentSubAttributeWithoutUselessPart = currentSubAttributeWithoutUselessPart.Remove(0, indexOfCharacterAfterClassName).Trim();
                         currentSubAttributeWithoutUselessPart = currentSubAttributeWithoutUselessPart.Remove(currentSubAttributeWithoutUselessPart.Length - 1, 1); //to remove the '}' at the end
