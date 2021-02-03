@@ -1171,12 +1171,27 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public event EventHandler<CancelEventArgs> ValidatingItem;
 
-#endregion Events
+        #endregion Events
 
-#region Properties
+        #region Properties
 
-#region Public Properties
+        #region Public Properties
 
+
+
+        public ValidationSummary CustomValidationSummary
+        {
+            get { return (ValidationSummary)GetValue(CustomValidationSummaryProperty); }
+            set { SetValue(CustomValidationSummaryProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for CustomValidationSummary.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty CustomValidationSummaryProperty =
+            DependencyProperty.Register("CustomValidationSummary", typeof(ValidationSummary), typeof(DataForm), new PropertyMetadata(null));
+
+
+
+        //  public ValidationSummary CustomValidationSummary { get; set; }
         /// <summary>
         /// Gets or sets a value that indicates whether edited items are committed when the current item is changed.
         /// </summary>

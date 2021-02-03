@@ -92,14 +92,19 @@
 		<Compile Include="System.ServiceModel.Web\WORKINPROGRESS\WebGetAttribute.cs" />
 		<Compile Include="System.ServiceModel.Web\WORKINPROGRESS\WebInvokeAttribute.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlDocument.cs" />
+		<Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlPopupWindowOptions.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction_1.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase_1.cs" />
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\BlurEffect.cs" />
+		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\ListenFailedException.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\LocalMessageReceiver.cs" />
+		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\LocalMessageSender.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\MessageReceivedEventArgs.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\ReceiverNameScope.cs" />
+		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\SendCompletedEventArgs.cs" />
+		<Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontStretches.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\NotificationWindow.cs" />
@@ -144,6 +149,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AccordionItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Automation\DataFormAutomationPeer.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\BusyIndicator.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ButtonSpinner.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Calendar.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CalendarBlackoutDatesCollection.cs" />
@@ -192,6 +198,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\PathOrderPair.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Picker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\PopupTimeSelectionMode.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ScrollViewerExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Separator.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SpinDirection.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SpinEventArgs.cs" />

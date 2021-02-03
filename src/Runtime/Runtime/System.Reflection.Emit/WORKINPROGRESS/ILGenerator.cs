@@ -56,6 +56,12 @@ namespace System.Reflection.Emit
         {
 
         }
+
+        public virtual void Emit(OpCode opcode, string str)
+        {
+
+        }
+
     }
 }
 

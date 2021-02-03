@@ -28,7 +28,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-#if false
+#if true
     public partial class ProgressBar : RangeBase
     {
         //public bool IsIndeterminateProperty;
@@ -50,7 +50,6 @@ namespace Windows.UI.Xaml.Controls
         public ProgressBar()
         {
             // Set default style:
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultProgressBarStyle.GetDefaultStyle());
             //this.IsIndeterminate = false;
             this.SizeChanged += ProgressBar_SizeChanged;
         }

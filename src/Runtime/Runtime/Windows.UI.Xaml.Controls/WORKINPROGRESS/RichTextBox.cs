@@ -1,5 +1,5 @@
 #if WORKINPROGRESS
-
+using System.Windows.Markup;
 #if MIGRATION
 using System.Windows.Documents;
 #else
@@ -13,6 +13,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
+	[ContentProperty("Child")]
 	public partial class RichTextBox : Control
 	{
 		//

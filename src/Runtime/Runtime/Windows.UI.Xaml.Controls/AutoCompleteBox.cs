@@ -787,6 +787,21 @@ namespace Windows.UI.Xaml.Controls
                 DropDownOpened(this, e);
         }
 
+#if WORKINPROGRESS
+
+        // Summary:
+        //     Raises the System.Windows.Controls.AutoCompleteBox.DropDownOpening event.
+        //
+        // Parameters:
+        //   e:
+        //     A System.Windows.Controls.RoutedPropertyChangingEventArgs<T> that contains
+        //     the event data.
+        protected virtual void OnDropDownOpening(RoutedPropertyChangingEventArgs<bool> e)
+        {
+
+        }
+#endif
+
         /// <summary>
         /// Gets or sets the maximum height for a combo box drop-down.
         /// </summary>

@@ -42,7 +42,13 @@ namespace Windows.UI.Xaml.Documents
         {
             this.AddInternal(text);
         }
-        #endregion
+#if WORKINPROGRESS
+        public void RemoveAt(int index)
+        {
+
+        }
+#endif
+#endregion
 
         #region Internal Properties
         internal Inline FirstElement

@@ -59,6 +59,11 @@ namespace System.Windows.Browser
             }
         }
 #if WORKINPROGRESS
+
+        public static HtmlWindow PopupWindow(Uri navigateToUri, string target, HtmlPopupWindowOptions options)
+        {
+            return null;
+        }
         //
         // Summary:
         //     Gets a reference to the Silverlight plug-in that is defined within an <object>

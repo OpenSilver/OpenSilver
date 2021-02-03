@@ -469,6 +469,13 @@ namespace Windows.UI.Xaml
             return resourceInfo;
         }
 
+#if WORKINPROGRESS
+        public static StreamResourceInfo GetResourceStream(StreamResourceInfo zipPackageStreamResourceInfo, Uri uriResource)
+        {
+            return null;
+        }
+#endif
+
         public static event EventHandler INTERNAL_Reloaded;
 
         /// <summary>
