@@ -102,6 +102,87 @@ namespace Windows.UI.Xaml.Controls
         /// <see cref="T:System.Windows.Controls.Calendar" /> is opened.
         /// </summary>
         public event RoutedEventHandler CalendarOpened;
+
+        #region DisplayDate
+        /// <summary>
+        /// Gets or sets the date to display.
+        /// </summary>
+        /// <value>
+        /// The date to display. The default 
+        /// <see cref="DateTime.Today" />.
+        /// </value>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The specified date is not in the range defined by
+        /// <see cref="DatePicker.DisplayDateStart" />
+        /// and
+        /// <see cref="DatePicker.DisplayDateEnd" />.
+        /// </exception>
+        public DateTime DisplayDate
+        {
+            get { return (DateTime)GetValue(DisplayDateProperty); }
+            set { SetValue(DisplayDateProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="DatePicker.DisplayDate" />
+        /// dependency property.
+        /// </summary>
+        /// <value>
+        /// The identifier for the <see cref="DatePicker.DisplayDate" />
+        /// dependency property.
+        /// </value>
+        public static readonly DependencyProperty DisplayDateProperty =
+            DependencyProperty.Register(
+            "DisplayDate",
+            typeof(DateTime),
+            typeof(DatePicker),
+            new PropertyMetadata(OnDisplayDateChanged));
+
+        /// <summary>
+        /// DisplayDateProperty property changed handler.
+        /// </summary>
+        /// <param name="d">DatePicker that changed its DisplayDate.</param>
+        /// <param name="e">The DependencyPropertyChangedEventArgs.</param>
+        private static void OnDisplayDateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
+        #endregion DisplayDate
+
+        #region DisplayDateEnd
+        /// <summary>
+        /// Gets or sets the last date to be displayed.
+        /// </summary>
+        /// <value>The last date to display.</value>
+        public DateTime? DisplayDateEnd
+        {
+            get { return (DateTime?)GetValue(DisplayDateEndProperty); }
+            set { SetValue(DisplayDateEndProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="DatePicker.DisplayDateEnd" />
+        /// dependency property.
+        /// </summary>
+        /// <value>
+        /// The identifier for the <see cref="DatePicker.DisplayDateEnd" />
+        /// dependency property.
+        /// </value>
+        public static readonly DependencyProperty DisplayDateEndProperty =
+            DependencyProperty.Register(
+            "DisplayDateEnd",
+            typeof(DateTime?),
+            typeof(DatePicker),
+            new PropertyMetadata(OnDisplayDateEndChanged));
+
+        /// <summary>
+        /// DisplayDateEndProperty property changed handler.
+        /// </summary>
+        /// <param name="d">DatePicker that changed its DisplayDateEnd.</param>
+        /// <param name="e">The DependencyPropertyChangedEventArgs.</param>
+        private static void OnDisplayDateEndChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
+        #endregion DisplayDateEnd
     }
 }
 #endif

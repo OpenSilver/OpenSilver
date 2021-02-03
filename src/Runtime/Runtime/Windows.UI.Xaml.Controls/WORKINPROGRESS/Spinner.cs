@@ -33,6 +33,11 @@ namespace Windows.UI.Xaml.Controls
     public abstract partial class Spinner : Control, IUpdateVisualState
     {
         /// <summary>
+        /// Occurs when spinning is initiated by the end-user.
+        /// </summary>
+        public event EventHandler<SpinEventArgs> Spin;
+
+        /// <summary>
         /// Update the visual state of the control.
         /// </summary>
         /// <param name="useTransitions">A value indicating whether to automatically generate transitions to the new state, or instantly transition to the new state.</param>

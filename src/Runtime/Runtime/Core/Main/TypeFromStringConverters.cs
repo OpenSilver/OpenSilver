@@ -241,12 +241,18 @@ namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is cal
 
         static object ConvertDoubleFromString(string str)
         {
-            // Note: "double.TryParse" will work with InvariantCulture (required for XAML parsing) because in the "App.xaml.cs" of the Simulator we have set the global culture to Invariant.
-            //todo: ensure that it works the same in JavaScript, ie. that it does not depend on the culture or the browser.
             double returnValue;
-            if (str != null && str.ToLower() == "auto")
+            if (str != null && (str.ToLower() == "auto" || str.ToLower() == "nan"))
             {
                 returnValue = double.NaN;
+            }
+            else if (str.ToLower() == "infinity")
+            {
+                returnValue = double.PositiveInfinity;
+            }
+            else if (str.ToLower() == "-infinity")
+            {
+                returnValue = double.NegativeInfinity;
             }
             else if (!double.TryParse(str, out returnValue))
             {

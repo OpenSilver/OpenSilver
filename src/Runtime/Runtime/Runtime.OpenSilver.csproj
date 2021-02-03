@@ -199,6 +199,8 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Picker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\PopupTimeSelectionMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ScrollViewerExtensions.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\RichTextBlock.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\RichTextBlockOverflow.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Separator.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SpinDirection.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SpinEventArgs.cs" />
@@ -1212,6 +1214,11 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <None Include="Runtime.licenseheader" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
   
 	<!-- See ths comment on the first <Import> -->

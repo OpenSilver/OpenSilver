@@ -85,16 +85,19 @@ namespace Windows.UI.Xaml.Controls
             }
             set
             {
-                if (this._isLoaded)
+                if (!object.ReferenceEquals(value, _child))
                 {
-                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
+                    if (this._isLoaded)
+                    {
+                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
 #if REWORKLOADED
-                    this.AddVisualChild(value);
+                        this.AddVisualChild(value);
 #else
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
+                        INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
 #endif
+                    }
+                    _child = value;
                 }
-                _child = value;
             }
         }
 

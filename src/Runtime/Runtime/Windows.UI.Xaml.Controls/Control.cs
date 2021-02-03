@@ -802,6 +802,7 @@ namespace Windows.UI.Xaml.Controls
             if (c._renderedControlTemplate != null)
             {
                 //INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(c._renderedControlTemplate, c);
+                c.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = null; // Setting this to null because removing then re-adding a TextBox causes errors (visible at least in the Simulator) when it registers to the Got/LostFocus events.
                 c._renderedControlTemplate = null;
                 c.ClearRegisteredNames();
                 c.INTERNAL_GetVisualStateGroups().Clear();

@@ -1152,12 +1152,11 @@ namespace DotNetForHtml5.Compiler
             {
                 var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny);
 
-#if BRIDGE || CSHTML5BLAZOR
-                Type markupExtensionType = this.FindType("System.Windows.Markup", "MarkupExtension");
-#else
-                Type markupExtensionType = typeof(MarkupExtension);
-#endif
-                bool typeIsAMarkupExtension = (markupExtensionType.IsAssignableFrom(elementType) && elementType != typeof(string));
+                Type markupExtensionGeneric = this.FindType("System.Xaml", "IMarkupExtension`1");
+                Type objectType = this.FindType("System", "Object");
+                Type markupExtensionOfObject = markupExtensionGeneric.MakeGenericType(objectType);
+
+                bool typeIsAMarkupExtension = (markupExtensionOfObject.IsAssignableFrom(elementType) && elementType != typeof(string));
                 return typeIsAMarkupExtension;
             }
 

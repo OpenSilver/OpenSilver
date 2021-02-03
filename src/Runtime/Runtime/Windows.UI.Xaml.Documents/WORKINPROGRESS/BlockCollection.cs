@@ -6,9 +6,9 @@ namespace System.Windows.Documents
 namespace Windows.UI.Xaml.Documents
 #endif
 {
-	//
-	// Summary:
-	//     Represents a collection of System.Windows.Documents.Block elements.
+	/// <summary>
+	/// Represents a collection of <see cref="Block"/> elements.
+	/// </summary>
 	public sealed class BlockCollection : TextElementCollection<Block>
 	{
 		internal BlockCollection(DependencyObject owner, bool isOwnerParent)

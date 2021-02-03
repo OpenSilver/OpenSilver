@@ -44,13 +44,17 @@ namespace DotNetForHtml5.Compiler
             if (currentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "ColorAnimation")
             {
                 //Storyboard.TargetProperty="Background.Color"
-                string value = currentElement.Attribute("Storyboard.TargetProperty").Value;
-                if (!string.IsNullOrWhiteSpace(value) 
-                    && !(value.EndsWith(".Color") 
-                        || value.EndsWith(".Color)")))
+                XAttribute targetPropertyAttr = currentElement.Attribute("Storyboard.TargetProperty");
+                if (targetPropertyAttr != null)
                 {
-                    value += ".Color";
-                    currentElement.Attribute("Storyboard.TargetProperty").SetValue(value);
+                    string value = targetPropertyAttr.Value;
+                    if (!string.IsNullOrWhiteSpace(value)
+                        && !(value.EndsWith(".Color")
+                            || value.EndsWith(".Color)")))
+                    {
+                        value += ".Color";
+                        currentElement.Attribute("Storyboard.TargetProperty").SetValue(value);
+                    }
                 }
             }
 
