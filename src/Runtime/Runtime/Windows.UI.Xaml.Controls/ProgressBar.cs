@@ -12,6 +12,7 @@
 *  
 \*====================================================================================*/
 
+#if WORKINPROGRESS
 
 #if MIGRATION
 using System.Windows.Shapes;
@@ -28,7 +29,6 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-#if false
     public partial class ProgressBar : RangeBase
     {
         //public bool IsIndeterminateProperty;
@@ -36,25 +36,27 @@ namespace Windows.UI.Xaml.Controls
         Rectangle _rectangleBehind;
         Rectangle _rectangleInFront;
 
-        //public bool IsIndeterminate
-        //{
-        //    get { return (bool)GetValue(IsIndeterminateProperty); }
-        //    set { SetValue(IsIndeterminateProperty, value); }
-        //}
+        public bool IsIndeterminate
+        {
+            get { return (bool)GetValue(IsIndeterminateProperty); }
+            set { SetValue(IsIndeterminateProperty, value); }
+        }
 
-        //// Using a DependencyProperty as the backing store for IsIndeterminate.  This enables animation, styling, binding, etc...
-        //public static readonly DependencyProperty IsIndeterminateProperty =
-        //    DependencyProperty.Register("IsIndeterminate", typeof(bool), typeof(ProgressBar), new PropertyMetadata(false));
-
+        public static readonly DependencyProperty IsIndeterminateProperty =
+            DependencyProperty.Register(
+                "IsIndeterminate", 
+                typeof(bool), 
+                typeof(ProgressBar), 
+                new PropertyMetadata(false));
 
         public ProgressBar()
         {
-            // Set default style:
-            this.INTERNAL_SetDefaultStyle(INTERNAL_DefaultProgressBarStyle.GetDefaultStyle());
+            this.DefaultStyleKey = typeof(ProgressBar);
             //this.IsIndeterminate = false;
-            this.SizeChanged += ProgressBar_SizeChanged;
+            this.SizeChanged += OnSizeChanged;
         }
-        void ProgressBar_SizeChanged(object sender, SizeChangedEventArgs e)
+
+        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (_rectangleBehind != null && _rootCanvas != null && _rectangleInFront != null)
             {
@@ -64,9 +66,8 @@ namespace Windows.UI.Xaml.Controls
                 _rectangleBehind.ScheduleRedraw();
                 UpdateRectangleInFront();
             }
-
-
         }
+
 #if MIGRATION
         public override void OnApplyTemplate()
 #else
@@ -77,8 +78,6 @@ namespace Windows.UI.Xaml.Controls
              * Builds the visual tree for the ProgressBar control when a new template is applied. 
              * (Overrides FrameworkElement.OnApplyTemplate().)
              * */
-
-
             base.OnApplyTemplate();
             //----------------------------
             // Get a reference to the UI elements defined in the control template:
@@ -98,7 +97,7 @@ namespace Windows.UI.Xaml.Controls
 
         }
 
-        void UpdateRectangleInFront()
+        private void UpdateRectangleInFront()
         {
             if (_rootCanvas != null && _rectangleInFront != null && !double.IsNaN(_rootCanvas.ActualWidth))
             {
@@ -120,12 +119,14 @@ namespace Windows.UI.Xaml.Controls
             //The progress bar updates its appearance when the Maximum property changes.
             UpdateRectangleInFront();
         }
+
         protected override void OnMinimumChanged(double oldMinimum, double newMinimum)
         {
             base.OnMinimumChanged(oldMinimum, newMinimum);
             //The progress bar updates its appearance when the Minimum property changes.
             UpdateRectangleInFront();
         }
+
         protected override void OnValueChanged(double oldValue, double newValue)
         {
             base.OnValueChanged(oldValue, newValue);
@@ -133,5 +134,6 @@ namespace Windows.UI.Xaml.Controls
             UpdateRectangleInFront();
         }
     }
-#endif
 }
+
+#endif

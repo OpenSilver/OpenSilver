@@ -17,16 +17,39 @@ namespace Windows.UI.Xaml.Controls
 
     public partial class AutoCompleteBox
 	{
-		
-		//
-		// Summary:
-		//     Gets or sets a value that indicates whether the first possible match found during
-		//     the filtering process will be displayed automatically in the text box.
-		//
-		// Returns:
-		//     true if the first possible match found will be displayed automatically in the
-		//     text box; otherwise, false. The default is false.
-		public bool IsTextCompletionEnabled { get; set; }
+
+        #region public bool IsTextCompletionEnabled
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the first possible match
+        /// found during the filtering process will be displayed automatically
+        /// in the text box.
+        /// </summary>
+        /// <value>
+        /// True if the first possible match found will be displayed
+        /// automatically in the text box; otherwise, false. The default is
+        /// false.
+        /// </value>
+        public bool IsTextCompletionEnabled
+        {
+            get { return (bool)GetValue(IsTextCompletionEnabledProperty); }
+            set { SetValue(IsTextCompletionEnabledProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="AutoCompleteBox.IsTextCompletionEnabled" />
+        /// dependency property.
+        /// </summary>
+        /// <value>The identifier for the <see cref="AutoCompleteBox.IsTextCompletionEnabled" />
+        /// dependency property.</value>
+        public static readonly DependencyProperty IsTextCompletionEnabledProperty =
+            DependencyProperty.Register(
+                "IsTextCompletionEnabled",
+                typeof(bool),
+                typeof(AutoCompleteBox),
+                new PropertyMetadata(false, null));
+
+        #endregion public bool IsTextCompletionEnabled
 
         /// <summary>
         /// Notifies the <see cref="T:System.Windows.Controls.AutoCompleteBox" /> that

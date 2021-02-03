@@ -118,6 +118,42 @@ namespace Windows.UI.Xaml.Controls
 			get { return (bool)GetValue(IsReadOnlyProperty); }
 			set { SetValue(IsReadOnlyProperty, value); }
 		}
+
+		private ScrollBarVisibility _verticalScrollBarVisibility = ScrollBarVisibility.Auto;
+
+		/// <summary>
+		/// Gets or sets the visibility of the vertical scroll bar.
+		/// The default is <see cref="ScrollBarVisibility.Auto"/>.
+		/// </summary>
+		public ScrollBarVisibility VerticalScrollBarVisibility
+		{
+			get { return this._verticalScrollBarVisibility; }
+			set { this._verticalScrollBarVisibility = value; }
+		}
+
+		/// <summary>
+		/// Identifies the <see cref="RichTextBox.LineHeight"/> dependency property.
+		/// </summary>
+		public static readonly DependencyProperty LineHeightProperty =
+			DependencyProperty.Register(
+				"LineHeight",
+				typeof(double),
+				typeof(RichTextBox),
+				new PropertyMetadata(0d));
+
+		/// <summary>
+		/// Gets or sets the height of each line of content.
+		/// </summary>
+		/// <returns>
+		/// The height of each line in pixels. A value of 0 indicates that the line height
+		/// is determined automatically from the current font characteristics. The default
+		/// is 0.
+		/// </returns>
+		public double LineHeight
+		{
+			get { return (double)this.GetValue(LineHeightProperty); }
+			set { this.SetValue(LineHeightProperty, value); }
+		}
 	}
 }
 #endif
