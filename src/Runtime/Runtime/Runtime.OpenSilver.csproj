@@ -138,6 +138,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\SelectionSequence.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TileView.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TileViewItem.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\TimePickerPopupTemplate.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ValidationHelper.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ValidationMetadata.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Accordion.cs" />
@@ -247,6 +248,8 @@
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\SineEase.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\SplinePointKeyFrame.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\CompositeTransform.cs" />
+		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\EasingColorKeyFrame.cs" />
+		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\LinearColorKeyFrame.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\MultiScaleTileSource.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\Polygon.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\SkewTransform.cs" />

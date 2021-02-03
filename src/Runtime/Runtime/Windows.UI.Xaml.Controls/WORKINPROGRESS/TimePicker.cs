@@ -201,6 +201,43 @@ namespace Windows.UI.Xaml.Controls
         }
         #endregion public TimePickerPopup Popup
 
+        #region public TimePickerPopupTemplate PopupTemplate
+        /// <summary>
+        /// Gets or sets the template used as Popup. A Popup can also be set
+        /// directly on the Popup property. When both PopupTemplate and Popup
+        /// are set, Popup will be used. 
+        /// </summary>
+        public TimePickerPopupTemplate PopupTemplate
+        {
+            get { return GetValue(PopupTemplateProperty) as TimePickerPopupTemplate; }
+            set { SetValue(PopupTemplateProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the PopupTemplate dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PopupTemplateProperty =
+            DependencyProperty.Register(
+                "PopupTemplate",
+                typeof(TimePickerPopupTemplate),
+                typeof(TimePicker),
+                new PropertyMetadata(null, OnPopupTemplatePropertyChanged));
+
+        /// <summary>
+        /// PopupTemplateProperty property changed handler.
+        /// </summary>
+        /// <param name="d">TimePicker that changed its PopupTemplate.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnPopupTemplatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
+
+        /// <summary>
+        /// BackingField for InstantiatedPopupFromTemplate.
+        /// </summary>
+        private TimePickerPopup _instantiatedPopupFromTemplate;
+        #endregion public TimePickerPopupTemplate PopupTemplate
+
         #region public int PopupMinutesInterval
         /// <summary>
         /// Gets or sets the minutes interval between time values allowed by the TimePickerPopup.

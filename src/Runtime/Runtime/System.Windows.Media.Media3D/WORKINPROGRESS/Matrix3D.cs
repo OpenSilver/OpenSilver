@@ -1,10 +1,33 @@
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
 #if WORKINPROGRESS
+
 using System;
 
+#if MIGRATION
 namespace System.Windows.Media.Media3D
+#else
+namespace Windows.UI.Xaml.Media.Media3D
+#endif
 {
     public partial struct Matrix3D : IFormattable
     {
+        static Matrix3D()
+        {
+            _identity = new Matrix3D(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+        }
+
         private double _m11;
         private double _m12;
         private double _m13;
@@ -23,7 +46,6 @@ namespace System.Windows.Media.Media3D
         private static Matrix3D _identity;
         private bool _hasInverse;
         
-
         public double M11
         {
             get { return _m11; }
@@ -126,7 +148,6 @@ namespace System.Windows.Media.Media3D
             _offsetY = @offsetY;
             _offsetZ = @offsetZ;
             _m44 = @m44;
-            _identity = new Matrix3D();
             _hasInverse = false;
         }
         public override string ToString()
@@ -137,7 +158,7 @@ namespace System.Windows.Media.Media3D
         {
             return "";
         }
-        string System.IFormattable.ToString(string @format, IFormatProvider @provider)
+        string IFormattable.ToString(string @format, IFormatProvider @provider)
         {
             return "";
         }

@@ -1,7 +1,13 @@
 #if WORKINPROGRESS
-using System.Windows;
+
 using System;
+using System.Windows.Markup;
+
+#if MIGRATION
 using System.Windows.Media.Media3D;
+#else
+using Windows.UI.Xaml.Media.Media3D;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -9,24 +15,37 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+	/// <summary>
+	///  Enables you to apply a <see cref="Matrix3D"/> to an object.
+	/// </summary>
+	[ContentProperty("ProjectionMatrix")]
 	public sealed partial class Matrix3DProjection : Projection
 	{
-		public static readonly DependencyProperty ProjectionMatrixProperty = DependencyProperty.Register("ProjectionMatrixProperty", typeof(Matrix3D), typeof(Matrix3DProjection), new PropertyMetadata());
-		public Matrix3D ProjectionMatrix
-		{
-			get
-			{
-				return (Matrix3D)this.GetValue(Matrix3DProjection.ProjectionMatrixProperty);
-			}
-
-			set
-			{
-				this.SetValue(Matrix3DProjection.ProjectionMatrixProperty, value);
-			}
-		}
-
+		/// <summary>
+		/// Initializes a new instance of a <see cref="Matrix3DProjection"/> class.
+		/// </summary>
 		public Matrix3DProjection()
 		{
+		}
+
+		/// <summary>
+		/// Identifies the <see cref="Matrix3DProjection.ProjectionMatrix"/> dependency property.
+		/// </summary>
+		public static readonly DependencyProperty ProjectionMatrixProperty =
+			DependencyProperty.Register(
+				"ProjectionMatrix", 
+				typeof(Matrix3D), 
+				typeof(Matrix3DProjection), 
+				new PropertyMetadata(Matrix3D.Identity));
+
+		/// <summary>
+		/// Gets or sets the <see cref="Matrix3D"/> that is used for the projection
+		/// that is applied to the object.
+		/// </summary>
+		public Matrix3D ProjectionMatrix
+		{
+			get { return (Matrix3D)this.GetValue(ProjectionMatrixProperty); }
+			set { this.SetValue(ProjectionMatrixProperty, value); }
 		}
 	}
 }

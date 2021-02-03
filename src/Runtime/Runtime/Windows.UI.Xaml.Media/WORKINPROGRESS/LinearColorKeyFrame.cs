@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -14,16 +13,24 @@
 
 #if WORKINPROGRESS
 
-using System;
-
 #if MIGRATION
-namespace System.Windows.Media
+namespace System.Windows.Media.Animation
 #else
-namespace Windows.UI.Xaml.Media
+namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-    public abstract partial class Projection : DependencyObject
+    /// <summary>
+    /// Animates from the <see cref="Color" /> value of the previous key frame to its 
+    /// own <see cref="ColorKeyFrame.Value" /> using linear interpolation.  
+    /// </summary>
+    public sealed class LinearColorKeyFrame : ColorKeyFrame
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LinearColorKeyFrame"/> class.
+        /// </summary>
+        public LinearColorKeyFrame()
+        {
+        }
     }
 }
 
