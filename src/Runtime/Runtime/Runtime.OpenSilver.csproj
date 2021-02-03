@@ -75,6 +75,7 @@
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\DeploymentCatalog.cs" />
 		<Compile Include="System.ComponentModel.Composition\WORKINPROGRESS\CompositionInitializer.cs" />
 		<Compile Include="System.ComponentModel\IItemProperties.cs" />
+		<Compile Include="System.Linq\WORKINPROGRESS\FunctionalProgramming.cs" />
 		<Compile Include="System.Net\DownloadStringCompletedEventArgs.cs" />
 		<Compile Include="System.Net\DownloadStringCompletedEventHandler.cs" />
 		<Compile Include="System.Net\UploadStringCompletedEventArgs.cs" />
@@ -92,14 +93,19 @@
 		<Compile Include="System.ServiceModel.Web\WORKINPROGRESS\WebGetAttribute.cs" />
 		<Compile Include="System.ServiceModel.Web\WORKINPROGRESS\WebInvokeAttribute.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlDocument.cs" />
+		<Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlPopupWindowOptions.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction_1.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase_1.cs" />
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\BlurEffect.cs" />
+		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\ListenFailedException.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\LocalMessageReceiver.cs" />
+		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\LocalMessageSender.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\MessageReceivedEventArgs.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\ReceiverNameScope.cs" />
+		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\SendCompletedEventArgs.cs" />
+		<Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontStretches.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\NotificationWindow.cs" />
@@ -196,6 +202,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\PopupTimeSelectionMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\RichTextBlock.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\RichTextBlockOverflow.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ScrollViewerExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Separator.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SpinDirection.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SpinEventArgs.cs" />
@@ -229,7 +236,6 @@
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\LogicalDirection.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Paragraph.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Section.cs" />
-		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextElementCollection_1.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextPointer.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextSelection.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\BeginStoryboard.cs" />

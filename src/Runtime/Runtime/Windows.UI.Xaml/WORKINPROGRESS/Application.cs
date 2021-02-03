@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections;
+using System.Windows.Resources;
 
 #if MIGRATION
 namespace System.Windows
@@ -83,6 +84,11 @@ namespace Windows.UI.Xaml
 
                 return lifetime_objects; 
             } 
+        }
+
+        public static StreamResourceInfo GetResourceStream(StreamResourceInfo zipPackageStreamResourceInfo, Uri uriResource)
+        {
+            return null;
         }
     }
 }

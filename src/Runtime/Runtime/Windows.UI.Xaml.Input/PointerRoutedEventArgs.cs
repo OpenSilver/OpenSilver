@@ -387,6 +387,11 @@ namespace Windows.UI.Xaml.Input
 
 #if WORKINPROGRESS
         public StylusDevice StylusDevice { get; private set; }
+
+#if !MIGRATION
+        public int Delta { get; private set; }
+#endif
+
 #endif
     }
 }

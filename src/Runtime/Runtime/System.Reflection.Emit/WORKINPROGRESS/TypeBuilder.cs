@@ -180,6 +180,13 @@ namespace System.Reflection.Emit
         {
             return null;
         }
+
+  
+        public MethodBuilder DefineMethod(string name, MethodAttributes attributes, CallingConventions callingConvention, Type returnType, Type[] parameterTypes)
+        {
+            return null;
+        }
+
     }
 }
 
