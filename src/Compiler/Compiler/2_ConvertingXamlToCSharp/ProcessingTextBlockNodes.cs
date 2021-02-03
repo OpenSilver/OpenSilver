@@ -51,7 +51,8 @@ namespace DotNetForHtml5.Compiler
                     || parentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "Italic"
                     || parentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "Underline"
                     || parentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "Bold"
-                    || parentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "Hyperlink")
+                    || parentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "Hyperlink"
+                    || parentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "Paragraph")
                 {
                     // Surround with a <Run>:
                     XElement contentWrapper = new XElement(GeneratingCSharpCode.DefaultXamlNamespace + "Run"); //todo: read the "ContentWrapperAttribute" of the collection (cf. InlineCollection.cs) instead of hard-coding this.
