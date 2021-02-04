@@ -72,8 +72,8 @@
                                                   >
                                     <Path x:Name="arrow"
                                           Visibility="Visible"
-                                          Stroke="Black"
-                                          Fill="Black"
+                                          Stroke="{TemplateBinding Foreground}"
+                                          Fill="{TemplateBinding Foreground}"
                                           Width="5"
                                           Height="3"
                                           StrokeThickness="1"
