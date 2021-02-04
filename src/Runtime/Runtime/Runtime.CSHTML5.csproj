@@ -117,6 +117,8 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Calendar.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CalendarBlackoutDatesCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CalendarDateRange.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridBeginningEditEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridCellEditEndedEventArgs.cs" />
@@ -130,6 +132,7 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Page.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\RichTextBox.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TextBlock.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WebView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\CollectionView.cs" />
@@ -143,7 +146,13 @@
     <Compile Include="Windows.UI.Xaml.Data\ListCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\Binding.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Block.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\BlockCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\LogicalDirection.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextElementCollection_1.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextPointer.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextSelection.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\FocusManager.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\EasingFunctionBase.cs" />

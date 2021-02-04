@@ -11,7 +11,7 @@ namespace Windows.UI.Xaml.Documents
 {
 	public partial class TextElementCollection<T> : IList, ICollection<T> where T : TextElement
 	{
-		internal TextElementCollection(DependencyObject owner, bool isOwnerParent)
+		internal TextElementCollection(DependencyObject owner, bool isOwnerParent) : this(owner)
 		{
 			
 		}
