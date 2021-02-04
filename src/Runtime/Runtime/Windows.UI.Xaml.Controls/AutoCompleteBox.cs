@@ -762,8 +762,12 @@ namespace Windows.UI.Xaml.Controls
 #if MIGRATION
         protected virtual void OnDropDownClosed(EventArgs e)
         {
-            if (DropDownClosed != null)
-                DropDownClosed(this, new RoutedPropertyChangedEventArgs<bool>(true, false));
+            DropDownClosed?.Invoke(this, new RoutedPropertyChangedEventArgs<bool>(true, false));
+        }
+
+        protected virtual void OnDropDownClosed(RoutedPropertyChangedEventArgs<bool> e)
+        {
+            DropDownClosed?.Invoke(this, e);
         }
 #else
         protected virtual void OnDropDownClosed(RoutedEventArgs e)

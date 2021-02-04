@@ -126,6 +126,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\Selector.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\AccordionSelectionMode.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\AutoCompleteSearch.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\Common\Extensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\Common\TypeHelper.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DataGridEditAction.cs" />
