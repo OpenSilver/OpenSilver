@@ -1,20 +1,15 @@
 ﻿
-//===============================================================================
-//
-//  IMPORTANT NOTICE, PLEASE READ CAREFULLY:
-//
-//  => This code is licensed under the GNU General Public License (GPL v3). A copy of the license is available at:
-//        https://www.gnu.org/licenses/gpl.txt
-//
-//  => As stated in the license text linked above, "The GNU General Public License does not permit incorporating your program into proprietary programs". It also does not permit incorporating this code into non-GPL-licensed code (such as MIT-licensed code) in such a way that results in a non-GPL-licensed work (please refer to the license text for the precise terms).
-//
-//  => Licenses that permit proprietary use are available at:
-//        http://www.cshtml5.com
-//
-//  => Copyright 2019 Userware/CSHTML5. This code is part of the CSHTML5 product (cshtml5.com).
-//
-//===============================================================================
-
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
 
 
 using System;
@@ -28,21 +23,29 @@ namespace System.Windows.Markup
     /// of the attributed type.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    public partial class ContentPropertyAttribute : Attribute
+    public class ContentPropertyAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the ContentPropertyAttribute class.
+        /// Initializes a new instance of the <see cref="ContentPropertyAttribute"/>
+        /// class.
         /// </summary>
         public ContentPropertyAttribute() { }
 
         /// <summary>
-        /// Initializes a new instance of the ContentPropertyAttribute class with the specified name.
+        /// Initializes a new instance of the <see cref="ContentPropertyAttribute"/>
+        /// class, using the specified content property name.
         /// </summary>
-        /// <param name="name">The name of the ContentPropertyAttribute</param>
+        /// <param name="name">
+        /// The content property name.
+        /// </param>
         public ContentPropertyAttribute(string name)
         {
             Name = name;
         }
+
+        /// <summary>
+        /// Gets the name of the property that is the declared content property.
+        /// </summary>
         public string Name { get; set; }
     }
 }

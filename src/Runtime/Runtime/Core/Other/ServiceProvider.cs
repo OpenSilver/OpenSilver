@@ -12,13 +12,9 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
+
 #if MIGRATION
 using System.Windows;
 #else
@@ -31,20 +27,15 @@ namespace System
     /// Defines a mechanism for retrieving a service object; that is, an object that
     /// provides custom support to other objects.
     /// </summary>
-    /// <exclude/>
-    /// 
-#if !BRIDGE
+#if NETSTANDARD
     public class ServiceProvider : IServiceProvider, IProvideValueTarget
-#else
+#else // BRIDGE
     public class ServiceProvider : IProvideValueTarget
 #endif
     {
         /// <summary>
-        /// Constructor for the  ServiceProvider class
+        /// Initialize a new instance of the <see cref="ServiceProvider"/> class.
         /// </summary>
-        /// <param name="element"></param>
-        /// <param name="property"></param>
-        /// <param name="parents"></param>
         public ServiceProvider(object element, DependencyProperty property, List<object> parents)
         {
             TargetObject = element;
@@ -52,15 +43,19 @@ namespace System
             Parents = parents;
         }
 
+        /// <summary>
+        /// Initialize a new instance of the <see cref="ServiceProvider"/> class.
+        /// </summary>
         public ServiceProvider(object element, DependencyProperty property) : this(element, property, new List<object>())
         {
-
         }
         
         /// <summary>
         /// Gets the service object of the specified type.
         /// </summary>
-        /// <param name="serviceType">An object that specifies the type of service object to get.</param>
+        /// <param name="serviceType">
+        /// An object that specifies the type of service object to get.
+        /// </param>
         /// <returns>
         /// A service object of type serviceType.-or- null if there is no service object
         /// of type serviceType.

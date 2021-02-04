@@ -36,6 +36,10 @@ namespace System.Xaml
         /// <returns>
         /// The value to set on the property where the extension is applied.
         /// </returns>
+#if NETSTANDARD
         T ProvideValue(IServiceProvider serviceProvider);
+#else // BRIDGE
+        T ProvideValue(ServiceProvider serviceProvider);
+#endif
     }
 }
