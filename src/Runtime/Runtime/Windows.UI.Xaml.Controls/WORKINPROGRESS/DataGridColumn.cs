@@ -111,6 +111,33 @@ namespace Windows.UI.Xaml.Controls
         {
             get; set;
         }
+
+        //
+        // Summary:
+        //     Gets or sets the display position of the column relative to the other columns
+        //     in the System.Windows.Controls.DataGrid.
+        //
+        // Returns:
+        //     The zero-based position of the column as it is displayed in the associated System.Windows.Controls.DataGrid.
+        //     The default is the index of the corresponding System.Collections.ObjectModel.Collection`1.Item(System.Int32)
+        //     in the System.Windows.Controls.DataGrid.Columns collection.
+        //
+        // Exceptions:
+        //   T:System.ArgumentOutOfRangeException:
+        //     When setting this property, the specified value is less than -1 or equal to System.Int32.MaxValue.-or-When
+        //     setting this property on a column in a System.Windows.Controls.DataGrid, the
+        //     specified value is less than zero or greater than or equal to the number of columns
+        //     in the System.Windows.Controls.DataGrid.
+        //
+        //   T:System.InvalidOperationException:
+        //     When setting this property, the System.Windows.Controls.DataGrid is already making
+        //     System.Windows.Controls.DataGridColumn.DisplayIndex adjustments. For example,
+        //     this exception is thrown when you attempt to set System.Windows.Controls.DataGridColumn.DisplayIndex
+        //     in a System.Windows.Controls.DataGrid.ColumnDisplayIndexChanged event handler.-or-When
+        //     setting this property, the specified value would result in a frozen column being
+        //     displayed in the range of unfrozen columns, or an unfrozen column being displayed
+        //     in the range of frozen columns.
+        public int DisplayIndex { get; set; }
     }
 }
 #endif
