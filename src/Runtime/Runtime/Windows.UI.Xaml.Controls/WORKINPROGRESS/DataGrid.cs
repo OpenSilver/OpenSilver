@@ -509,9 +509,45 @@ namespace Windows.UI.Xaml.Controls
             //{
             //    return CommitEdit(DataGridEditingUnit.Row, true);
             //}
-
-            return true; // No one is in edit mode
+            //
+            //return true; // No one is in edit mode
+            return false;
         }
+
+        //
+        // Summary:
+        //     Causes the data grid to enter editing mode for the current cell and current row,
+        //     unless the data grid is already in editing mode.
+        //
+        // Returns:
+        //     true if the data grid enters editing mode; otherwise, false.
+        public bool BeginEdit()
+        {
+            return false;
+        }
+
+        //
+        // Summary:
+        //     Gets or sets a value that indicates whether the row details sections remain fixed
+        //     at the width of the display area or can scroll horizontally.
+        //
+        // Returns:
+        //     true if the row details sections are prevented from scrolling horizontally; otherwise,
+        //     false. The default is false.
+        public bool AreRowDetailsFrozen { get; set; }
+
+        //
+        // Summary:
+        //     Gets a value that indicates whether data in the grid is valid.
+        //
+        // Returns:
+        //     true if the data is valid; otherwise, false.
+        public bool IsValid { get; }
+    
+        //
+        // Summary:
+        //     Occurs when a row edit has been committed or canceled.
+        public event EventHandler<DataGridRowEditEndedEventArgs> RowEditEnded;
     }
 }
 #endif
