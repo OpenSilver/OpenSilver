@@ -112,6 +112,7 @@
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridRowHeader.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IItemContainerGenerator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IRecyclingItemContainerGenerator.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\AutoCompleteSearch.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Common\Extensions.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridEditAction.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridHeadersVisibility.cs" />
