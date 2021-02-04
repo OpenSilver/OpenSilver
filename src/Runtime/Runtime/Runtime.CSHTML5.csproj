@@ -100,6 +100,7 @@
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
     <Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
+    <Compile Include="System.Xaml\IMarkupExtension.cs" />
     <Compile Include="System.Xml\WORKINPROGRESS\XmlSerializer.cs" />
     <Compile Include="System\TypeExtensions.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\CalendarDayButton.cs" />
