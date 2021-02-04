@@ -2019,11 +2019,21 @@ public static void Main()
                 //----------------------------
                 // PROPERTY IS AN ENUM
                 //----------------------------
-                string fieldName = reflectionOnSeparateAppDomain.GetFieldName(valueAsString, valueNamespaceName, valueLocalTypeName, null);
-
-                return string.Format("{0}.{1}",
-                    valueTypeFullName,
-                    fieldName);
+                if (valueAsString.IndexOf(',') != -1)
+                {
+                    string[] values = valueAsString.Split(new char[] { ',' })
+                        .Select(v => 
+                        {
+                            return string.Format("{0}.{1}", valueTypeFullName,
+                                reflectionOnSeparateAppDomain.GetFieldName(v.Trim(), valueNamespaceName, valueLocalTypeName, null));
+                        }).ToArray();
+                    return string.Join(" | ", values);
+                }
+                else
+                {
+                    return string.Format("{0}.{1}", valueTypeFullName,
+                        reflectionOnSeparateAppDomain.GetFieldName(valueAsString, valueNamespaceName, valueLocalTypeName, null));
+                }
             }
             else if (valueTypeFullName == "global::System.Type")
             {

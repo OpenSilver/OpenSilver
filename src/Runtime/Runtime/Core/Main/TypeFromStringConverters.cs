@@ -16,19 +16,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CSHTML5;
-using CSHTML5.Internal;
-#if MIGRATION
-using System.Windows;
-#else
+using System.Globalization;
+
+#if !MIGRATION
 using Windows.UI.Text;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
 #endif
 
 namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is called by the XAML inspector of the Simulator using reflection. If you wish to remove or rename it, make sure to make the appropriate changes in the Simulator.
@@ -107,13 +98,12 @@ namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is cal
             //if the type is an Enum, we can simply convert the string into the enum value:
             else if (type.IsEnum)
             {
-                object enumValue = Enum.Parse(type, s, true);
-                return enumValue;
+                return ConvertEnumFromString(type, s);
             }
             else
             {
 #if WORKINPROGRESS && !CSHTML5NETSTANDARD
-                if (Interop.IsRunningInTheSimulator) // this is usefull if we need to call a static constructor of a type that is defined outside of core assembly, so that it registers the type's converter.
+                if (CSHTML5.Interop.IsRunningInTheSimulator) // this is usefull if we need to call a static constructor of a type that is defined outside of core assembly, so that it registers the type's converter.
                 {
                     INTERNAL_Simulator.SimulatorProxy.RunClassConstructor(type);
                 }
@@ -166,23 +156,20 @@ namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is cal
                 }
                 else
                 {
-                    //BRIDGETODO
-                    //verify the conditons matchs below with or without bridge
-#if !BRIDGE
-                if (type.IsGenericType && type.GenericTypeArguments.Length > 0)
-#else
-                    if (type.IsGenericType && type.GetGenericArguments().Length > 0)
-#endif
+#if NETSTANDARD
+                    if (type.IsGenericType && type.GenericTypeArguments.Length > 0)
                     {
-#if !BRIDGE
                         nonNullableType = type.GenericTypeArguments[0];
-#else
-                        nonNullableType = type.GetGenericArguments()[0];
-#endif
                     }
+#else // BRIDGE
+                    if (type.IsGenericType && type.GetGenericArguments().Length > 0)
+                    {
+                        nonNullableType = type.GetGenericArguments()[0];
+                    }
+#endif
                 }
             }
-
+            
             if (Converters.ContainsKey(nonNullableType))
             {
                 converter = Converters[nonNullableType];
@@ -339,16 +326,42 @@ namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is cal
         {
             try
             {
-#if BRIDGE
-                TimeSpan returnValue = INTERNAL_BridgeWorkarounds.TimeSpanParse(str);
-#else
+#if NETSTANDARD
                 TimeSpan returnValue = TimeSpan.Parse(str);
+#else // BRIDGE
+                TimeSpan returnValue = INTERNAL_BridgeWorkarounds.TimeSpanParse(str);
 #endif
                 return returnValue;
             }
             catch
             {
                 throw new Exception("Xaml exception: cannot convert \"" + str + "\" to TimeSpan. " + AdviseToFixTheError);
+            }
+        }
+
+        private static object ConvertEnumFromString(Type enumType, string str)
+        {
+            try
+            {
+                if (str.IndexOf(',') != -1)
+                {
+                    long convertedValue = 0;
+                    string[] values = str.Split(new char[] { ',' });
+                    foreach (string v in values)
+                    {
+                        convertedValue |= Convert.ToInt64((Enum)Enum.Parse(enumType, v, true), CultureInfo.InvariantCulture);
+                    }
+                    return Enum.ToObject(enumType, convertedValue);
+                }
+                else
+                {
+                    return Enum.Parse(enumType, str, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Xaml exception: cannot convert '{0}' to '{1}'.\n{2}",
+                    str, enumType.Name, AdviseToFixTheError), ex);
             }
         }
 
