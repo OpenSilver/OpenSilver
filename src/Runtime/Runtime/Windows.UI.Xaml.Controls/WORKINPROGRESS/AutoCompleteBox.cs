@@ -77,6 +77,34 @@ namespace Windows.UI.Xaml.Controls
             get; set;
         }
 
+        /// <summary>Identifies the <see cref="P:System.Windows.Controls.AutoCompleteBox.SearchText" /> dependency property.</summary>
+        /// <returns>The identifier for the <see cref="P:System.Windows.Controls.AutoCompleteBox.SearchText" /> dependency property.</returns>
+        public static readonly DependencyProperty SearchTextProperty = DependencyProperty.Register(nameof(SearchText), typeof(string), typeof(AutoCompleteBox), new PropertyMetadata(string.Empty, OnSearchTextPropertyChanged));
+
+        private static void OnSearchTextPropertyChanged(
+            DependencyObject d,
+            DependencyPropertyChangedEventArgs e)
+        {
+        }
+
+        /// <summary>Identifies the <see cref="P:System.Windows.Controls.AutoCompleteBox.TextFilter" /> dependency property.</summary>
+        /// <returns>The identifier for the <see cref="P:System.Windows.Controls.AutoCompleteBox.TextFilter" /> dependency property.</returns>
+        public static readonly DependencyProperty TextFilterProperty = DependencyProperty.Register(nameof(TextFilter), typeof(AutoCompleteFilterPredicate<string>), typeof(AutoCompleteBox), new PropertyMetadata(AutoCompleteSearch.GetFilter(AutoCompleteFilterMode.StartsWith)));
+
+        /// <summary>Gets or sets the custom method that uses the user-entered text to filter items specified by the <see cref="P:System.Windows.Controls.AutoCompleteBox.ItemsSource" /> property in a text-based way for display in the drop-down.</summary>
+        /// <returns>The custom method that uses the user-entered text to filter items specified by the <see cref="P:System.Windows.Controls.AutoCompleteBox.ItemsSource" /> property in a text-based way for display in the drop-down.</returns>
+        public AutoCompleteFilterPredicate<string> TextFilter
+        {
+            get => GetValue(TextFilterProperty) as AutoCompleteFilterPredicate<string>;
+            set => SetValue(TextFilterProperty, value);
+        }
+
+        /// <summary>Raises the <see cref="E:System.Windows.Controls.AutoCompleteBox.DropDownClosing" /> event.</summary>
+        /// <param name="e">A <see cref="T:System.Windows.Controls.RoutedPropertyChangingEventArgs`1" /> that contains the event data.</param>
+        protected virtual void OnDropDownClosing(RoutedPropertyChangingEventArgs<bool> e)
+        {
+        }
+
         /// <summary>
         /// Raises the System.Windows.Controls.AutoCompleteBox.DropDownOpening event.
         /// </summary>
