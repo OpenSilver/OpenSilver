@@ -12,6 +12,12 @@ namespace System.Reflection.Emit
         {
             return null;
         }
+
+        public ModuleBuilder DefineDynamicModule(string name, bool emitSymbolInfo)
+        {
+            return null;
+        }
+
     }
 }
 

@@ -179,7 +179,7 @@ namespace Windows.UI.Xaml.Documents
             this.Remove(value as T);
         }
 
-        void IList.RemoveAt(int index)
+        public void RemoveAt(int index)
         {
             T item = this._collection[index];
             this._collection.RemoveAt(index);

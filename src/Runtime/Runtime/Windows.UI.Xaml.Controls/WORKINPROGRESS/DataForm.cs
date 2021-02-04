@@ -1171,11 +1171,11 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public event EventHandler<CancelEventArgs> ValidatingItem;
 
-#endregion Events
+        #endregion Events
 
-#region Properties
+        #region Properties
 
-#region Public Properties
+        #region Public Properties
 
         /// <summary>
         /// Gets or sets a value that indicates whether edited items are committed when the current item is changed.

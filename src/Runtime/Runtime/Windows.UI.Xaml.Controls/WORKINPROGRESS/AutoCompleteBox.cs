@@ -76,6 +76,17 @@ namespace Windows.UI.Xaml.Controls
         {
             get; set;
         }
+
+        /// <summary>
+        /// Raises the System.Windows.Controls.AutoCompleteBox.DropDownOpening event.
+        /// </summary>
+        /// <param name="e">
+        /// A <see cref="RoutedPropertyChangingEventArgs{T}"/> that contains
+        /// the event data.
+        /// </param>
+        protected virtual void OnDropDownOpening(RoutedPropertyChangingEventArgs<bool> e)
+        {
+        }
     }
 }
 

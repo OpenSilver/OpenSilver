@@ -11,8 +11,7 @@ namespace Windows.UI.Xaml.Documents
 	/// </summary>
 	public sealed class BlockCollection : TextElementCollection<Block>
 	{
-		internal BlockCollection(DependencyObject owner, bool isOwnerParent)
-			: base(owner, isOwnerParent)
+		internal BlockCollection(DependencyObject owner, bool isOwnerParent) : base(owner)
 		{
 		}
 	}

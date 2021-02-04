@@ -658,30 +658,31 @@ namespace Windows.UI.Xaml
         #region Wheel event
 
 #if WORKINPROGRESS
+
 #if MIGRATION
-        //
-        // Summary:
-        //     Identifies the System.Windows.UIElement.MouseWheel routed event.
-        //
-        // Returns:
-        //     The identifier for the System.Windows.UIElement.MouseWheel routed event.
+        /// <summary>
+        /// Identifies the <see cref="UIElement.MouseWheel"/> routed event.
+        /// </summary>
         public static readonly RoutedEvent MouseWheelEvent = new RoutedEvent("MouseWheelEvent");
 
         /// <summary>
-        /// Occurs when a keyboard key is pressed while the UIElement has focus.
+        /// Occurs when the user rotates the mouse wheel while the mouse pointer is over
+        /// a <see cref="UIElement"/>, or the <see cref="UIElement"/> has focus.
         /// </summary>
-        public event MouseWheelEventHandler MouseWheel
-        {
-            add
-            {
+        public event MouseWheelEventHandler MouseWheel;
+#else
+        /// <summary>
+        /// Identifies the <see cref="UIElement.PointerWheelChanged"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent PointWheelEvent = new RoutedEvent("PointWheelEvent");
 
-            }
-            remove
-            {
-
-            }
-        }
+        /// <summary>
+        /// Occurs when the user rotates the mouse wheel while the mouse pointer is over
+        /// a <see cref="UIElement"/>, or the <see cref="UIElement"/> has focus.
+        /// </summary>
+        public event PointerEventHandler PointerWheelChanged;
 #endif
+
         public static readonly RoutedEvent TextInputEvent = new RoutedEvent("TextInputEvent");
         public static readonly RoutedEvent TextInputStartEvent = new RoutedEvent("TextInputStartEvent");
         public static readonly RoutedEvent TextInputUpdateEvent = new RoutedEvent("TextInputUpdateEvent");
@@ -694,7 +695,7 @@ namespace Windows.UI.Xaml
 
 #endif
 
-        #endregion
+#endregion
 
 
         #region Tapped event
