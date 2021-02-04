@@ -106,6 +106,15 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
+
+        //
+        // Summary:
+        //     Gets or sets the style that is used when rendering the element that the column
+        //     displays for a cell in editing mode.
+        //
+        // Returns:
+        //     The style that is used when rendering an editing element. The default is null.
+        public Style EditingElementStyle { get; set; }
     }
 }
 #endif

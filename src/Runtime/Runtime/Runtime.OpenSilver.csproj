@@ -81,6 +81,7 @@
 		<Compile Include="System.Net\UploadStringCompletedEventArgs.cs" />
 		<Compile Include="System.Net\UploadStringCompletedEventHandler.cs" />
 		<Compile Include="System.Net\WebClient.cs" />
+		<Compile Include="System.Net\WORKINPROGRESS\CookieContainer.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\ComInterfaces.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\CustomAttributeBuilder.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\DynamicMethod.cs" />
@@ -89,6 +90,7 @@
 		<Compile Include="System.Runtime.InteropServices.Automation\WORKINPROGRESS\AutomationEvent.cs" />
 		<Compile Include="System.Runtime.InteropServices.Automation\WORKINPROGRESS\AutomationEventArgs.cs" />
 		<Compile Include="System.Runtime.InteropServices.Automation\WORKINPROGRESS\AutomationFactory.cs" />
+		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\IHttpCookieContainerManager.cs" />
 		<Compile Include="System.ServiceModel.Description\WebHttpBehavior.cs" />
 		<Compile Include="System.ServiceModel.Web\WORKINPROGRESS\WebGetAttribute.cs" />
 		<Compile Include="System.ServiceModel.Web\WORKINPROGRESS\WebInvokeAttribute.cs" />
@@ -185,6 +187,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridGridLinesVisibility.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridPreparingCellForEditEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRow.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRowEditEndedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTextColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePicker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePickerFormat.cs" />
