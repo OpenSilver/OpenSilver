@@ -148,14 +148,24 @@ namespace System.Xml.Linq
                 //create a new node with the new name:
                 var newNode = CreateJsNodeForName(value);
 
+                List<XAttribute> attributes = new List<XAttribute>();
                 //copy the attributes into the new node:
                 foreach (XAttribute attribute in Attributes())
+                {
+                    attributes.Add(attribute);
+                }
+                foreach (XAttribute attribute in attributes)
                 {
                     MoveNodeElement(attribute, newNode);
                 }
 
+                List<XNode> nodes = new List<XNode>();
                 //copy the children into the new node:
                 foreach (XNode child in Nodes())
+                {
+                    nodes.Add(child);
+                }
+                foreach (XNode child in nodes)
                 {
                     MoveNodeElement(child, newNode);
                 }
@@ -165,7 +175,7 @@ namespace System.Xml.Linq
 
 
                 //remove the ancient node:
-                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.remove", INTERNAL_jsnode); //todo: check if we should use the whole name (including the NamespaceName), probably using createElementNS in js.
+                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.remove()", INTERNAL_jsnode); //todo: check if we should use the whole name (including the NamespaceName), probably using createElementNS in js.
 
                 //remember the newNode as the node of this element:
                 INTERNAL_jsnode = newNode;
