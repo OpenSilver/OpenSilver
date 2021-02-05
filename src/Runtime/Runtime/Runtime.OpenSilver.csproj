@@ -81,7 +81,6 @@
 		<Compile Include="System.Net\UploadStringCompletedEventArgs.cs" />
 		<Compile Include="System.Net\UploadStringCompletedEventHandler.cs" />
 		<Compile Include="System.Net\WebClient.cs" />
-		<Compile Include="System.Net\WORKINPROGRESS\CookieContainer.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\ComInterfaces.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\CustomAttributeBuilder.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\DynamicMethod.cs" />
@@ -90,7 +89,6 @@
 		<Compile Include="System.Runtime.InteropServices.Automation\WORKINPROGRESS\AutomationEvent.cs" />
 		<Compile Include="System.Runtime.InteropServices.Automation\WORKINPROGRESS\AutomationEventArgs.cs" />
 		<Compile Include="System.Runtime.InteropServices.Automation\WORKINPROGRESS\AutomationFactory.cs" />
-		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\IHttpCookieContainerManager.cs" />
 		<Compile Include="System.ServiceModel.Description\WebHttpBehavior.cs" />
 		<Compile Include="System.ServiceModel.Web\WORKINPROGRESS\WebGetAttribute.cs" />
 		<Compile Include="System.ServiceModel.Web\WORKINPROGRESS\WebInvokeAttribute.cs" />
@@ -1212,12 +1210,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="System.ComponentModel.Composition.Primitives\WORKINPROGRESS\" />
-	  <Folder Include="System.ComponentModel\WORKINPROGRESS\" />
-	  <Folder Include="System.Reflection\WORKINPROGRESS\" />
-	  <Folder Include="System.ServiceModel\WORKINPROGRESS\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Include="Runtime.licenseheader" />
