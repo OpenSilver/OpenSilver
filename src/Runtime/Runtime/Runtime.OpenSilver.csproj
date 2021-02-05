@@ -246,6 +246,7 @@
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextPointer.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextSelection.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\BeginStoryboard.cs" />
+		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\BounceEase.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\CircleEase.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\CubicEase.cs" />
 		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\DiscretePointKeyFrame.cs" />
