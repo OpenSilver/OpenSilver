@@ -1,4 +1,5 @@
-﻿/*===================================================================================
+﻿
+/*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
 *      
@@ -10,29 +11,131 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+#if WORKINPROGRESS
 
 namespace System.Windows.Browser
 {
-#if WORKINPROGRESS
+    /// <summary>
+    /// Provides methods for browser elements that are explicitly supplied by the HTML
+    /// features exposed by Silverlight.
+    /// </summary>
     public abstract partial class HtmlObject : ScriptObject
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HtmlObject"/> class.
+        /// </summary>
         protected HtmlObject()
         {
         }
-        public bool AttachEvent(string @eventName, EventHandler @handler)
+
+        /// <summary>
+        /// Attaches the specified .NET Framework event handler (<see cref="EventHandler"/>) to
+        /// the specified event on the current Document Object Model (DOM) object.
+        /// </summary>
+        /// <param name="eventName">
+        /// A named event on the DOM object.
+        /// </param>
+        /// <param name="handler">
+        /// The method that handles the event.
+        /// </param>
+        /// <returns>
+        /// true if the event was successfully attached; otherwise, false.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// eventName is an empty string.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// eventName is null.-or-handler is null.
+        /// </exception>
+        public bool AttachEvent(string eventName, EventHandler handler)
         {
             return false;
         }
-        public bool AttachEvent(string @eventName, EventHandler<HtmlEventArgs> @handler)
+
+        /// <summary>
+        /// Attaches the specified .NET Framework event handler (<see cref="EventHandler{TEventArgs}"/>) to
+        /// the specified event on the current Document Object Model (DOM) object.
+        /// </summary>
+        /// <param name="eventName">
+        /// A named event on the DOM object.
+        /// </param>
+        /// <param name="handler">
+        /// The method that handles the event.
+        /// </param>
+        /// <returns>
+        /// true if the event was successfully attached; otherwise, false.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// eventName is an empty string.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// eventName is null.-or-handler is null.
+        /// </exception>
+        public bool AttachEvent(string eventName, EventHandler<HtmlEventArgs> handler)
         {
             return false;
+        }
+
+        /// <summary>
+        /// Detaches the specified.NET Framework event handler (<see cref="EventHandler"/>) from
+        /// the specified event on the current Document Object Model (DOM) object.
+        /// </summary>
+        /// <param name="eventName">
+        /// A named event on the DOM object. 
+        /// </param>
+        /// <param name="handler">
+        /// The method that handles the event.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// eventName is an empty string.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// eventName is null.-or-handler is null.
+        /// </exception>
+        public void DetachEvent(string eventName, EventHandler handler)
+        {
+        }
+    
+        /// <summary>
+        /// Detaches the specified .NET Framework event handler (<see cref="EventHandler{TEventArgs}"/>) from
+        /// the specified event on the current Document Object Model (DOM) object.
+        /// </summary>
+        /// <param name="eventName">
+        /// A named event on the DOM object.
+        /// </param>
+        /// <param name="handler">
+        /// The method that handles the event.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// eventName is an empty string.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// eventName is null.-or-handler is null.
+        /// </exception>
+        public void DetachEvent(string eventName, EventHandler<HtmlEventArgs> handler)
+        {
+        }
+
+        /// <summary>
+        /// Converts the current object to a specified type. This method is not supported.
+        /// </summary>
+        /// <param name="targetType">
+        /// The conversion type.
+        /// </param>
+        /// <param name="allowSerialization">
+        /// true to allow JavaScript Object Notation (JSON) serialization; otherwise, false.
+        /// </param>
+        /// <returns>
+        /// None.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// In all cases.
+        /// </exception>
+        protected internal override object ConvertTo(Type targetType, bool allowSerialization)
+        {
+            return null;
         }
     }
-#endif
 }
+
+#endif

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,44 +11,84 @@
 *  
 \*====================================================================================*/
 
+#if WORKINPROGRESS
 
 using System;
 using System.Security;
 
 namespace System.Windows.Browser
 {
-    #if WORKINPROGRESS
+    /// <summary>
+    /// Represents an HTML element in the Document Object Model (DOM) of a Web page.
+    /// </summary>
     public sealed partial class HtmlElement : HtmlObject
     {
-        #region Fields
-        private ScriptObjectCollection _children;
-        #endregion
-
-        #region Properties
+        /// <summary>
+        /// Gets a read-only collection of HTML elements that are immediate descendants of
+        /// the current HTML element.
+        /// </summary>
+        /// <returns>
+        /// A collection of HTML elements. If the current HTML element has no children, the
+        /// returned collection is empty.
+        /// </returns>
         public ScriptObjectCollection Children
         {
-            get { return _children; }
+            get;
         }
+   
+        /// <summary>
+        /// Gets the identifier of the current HTML element.
+        /// </summary>
+        /// <returns>
+        /// An HTML element ID string if the current element has an identifier; otherwise,
+        /// an empty string.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// The property is set to an empty string.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// The property is set to null.
+        /// </exception>
         public string Id { get; set; }
 
-        //
-        // Summary:
-        //     Gets or sets the cascading style sheet (CSS) class string for the current
-        //     HTML element.
-        //
-        // Returns:
-        //     A CSS class string if the element is associated with a CSS class; otherwise,
-        //     an empty string.
-        public string CssClass { get; set; }
-        #endregion
+        /// <summary>
+        /// Gets a reference to the parent of the current HTML element.
+        /// </summary>
+        /// <returns>
+        /// An HTML element reference if the element has a parent; otherwise, null.
+        /// </returns>
+        public HtmlElement Parent
+        {
+            get;
+        }
+ 
+        /// <summary>
+        /// Gets the HTML tag name of the current HTML element.
+        /// </summary>
+        /// <returns>
+        /// An HTML element tag name, such as div or span.
+        /// </returns>
+        public string TagName 
+        { 
+            get;
+        }
 
-        #region Methods
-        // Summary:
-        //     Sets the browser focus to the current HTML element.
-        //
-        // Exceptions:
-        //   System.InvalidOperationException:
-        //     All errors.
+        /// <summary>
+        /// Gets or sets the cascading style sheet (CSS) class string for the current
+        /// HTML element.
+        /// </summary>
+        /// <returns>
+        /// A CSS class string if the element is associated with a CSS class; otherwise,
+        /// an empty string.
+        /// </returns>
+        public string CssClass { get; set; }
+
+        /// <summary>
+        /// Sets the browser focus to the current HTML element.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// All errors.
+        /// </exception>
         [SecuritySafeCritical]
         public void Focus()
         {
@@ -58,50 +97,175 @@ namespace System.Windows.Browser
 
         internal HtmlElement()
         {
-            _children = null;
         }
-        public void AppendChild(HtmlElement @element)
+
+        /// <summary>
+        /// Adds an element to the end of the child collection for the current HTML element.
+        /// </summary>
+        /// <param name="element">
+        /// The element to be added.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// element is a reference to this <see cref="HtmlElement"/>.
+        /// </exception>
+        public void AppendChild(HtmlElement element)
         {
         }
-        public void AppendChild(HtmlElement @element, HtmlElement @referenceElement)
+
+        /// <summary>
+        /// Adds an element at a specified location in the child element collection for the
+        /// current HTML element.
+        /// </summary>
+        /// <param name="element">
+        /// The element to be added.
+        /// </param>
+        /// <param name="referenceElement">
+        /// The location to insert the element. The element is added before referenceElement.
+        /// </param>
+        /// <exception cref="InvalidOperationException">
+        /// referenceElement is not in the child element collection of the current HTML element.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        [SecuritySafeCritical]
+        public void AppendChild(HtmlElement element, HtmlElement referenceElement)
         {
         }
-        public void RemoveChild(HtmlElement @element)
+
+        /// <summary>
+        /// Removes the specified element from the child element collection of the current
+        /// HTML element.
+        /// </summary>
+        /// <param name="element">
+        /// The element to remove.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// All other errors.
+        /// </exception>
+        [SecuritySafeCritical]
+        public void RemoveChild(HtmlElement element)
         {
         }
-        public void SetAttribute(string @name, string @value)
+
+        /// <summary>
+        /// Sets the value of an attribute on the current HTML element.
+        /// </summary>
+        /// <param name="name">
+        /// The attribute whose value will be set.
+        /// </param>
+        /// <param name="value">
+        /// The attribute's new value.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// name is an empty string.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// name is null.
+        /// </exception>
+        public void SetAttribute(string name, string value)
         {
         }
-        public string GetStyleAttribute(string @name)
+
+        /// <summary>
+        /// Gets the value of the specified attribute on the current HTML element.
+        /// </summary>
+        /// <param name="name">
+        /// The name of an attribute.
+        /// </param>
+        /// <returns>
+        /// An attribute on the current HTML element.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// name is an empty string.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// name is null.
+        /// </exception>
+        public string GetAttribute(string name)
         {
-            return default(string);
+            return string.Empty;
         }
-        public void SetStyleAttribute(string @name, string @value)
+
+        /// <summary>
+        /// Retrieves the specified style attribute for the current HTML element.
+        /// </summary>
+        /// <param name="name">
+        /// The name of the style attribute to retrieve.
+        /// </param>
+        /// <returns>
+        /// The style attribute for the current HTML element.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// name is an empty string.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// name is null.
+        /// </exception>
+        public string GetStyleAttribute(string name)
+        {
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Sets the value of a style attribute on the current HTML element.
+        /// </summary>
+        /// <param name="name">
+        /// The style attribute whose value will be set.
+        /// </param>
+        /// <param name="value">
+        /// The style attribute's new value.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// name is an empty string.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// name is null.
+        /// </exception>
+        public void SetStyleAttribute(string name, string value)
         {
         }
+
+        /// <summary>
+        /// Removes a style attribute on the current HTML element.
+        /// </summary>
+        /// <param name="name">
+        /// The style attribute to be removed.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// name is an empty string.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// name is null.
+        /// </exception>
         public void RemoveStyleAttribute(string name)
         {
 
         }
-        //
-        // Summary:
-        //     Removes an attribute from the current HTML element.
-        //
-        // Parameters:
-        //   name:
-        //     The name of the attribute to remove.
-        //
-        // Exceptions:
-        //   System.ArgumentException:
-        //     name is an empty string.
-        //
-        //   System.ArgumentNullException:
-        //     name is null.
+
+        /// <summary>
+        /// Removes an attribute from the current HTML element.
+        /// </summary>
+        /// <param name="name">
+        /// The name of the attribute to remove.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// name is an empty string.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// name is null.
+        /// </exception>
         public void RemoveAttribute(string name)
         {
 
         }
-        #endregion
     }
-#endif
 }
+
+#endif
