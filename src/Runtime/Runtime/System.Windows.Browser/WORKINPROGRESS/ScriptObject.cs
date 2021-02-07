@@ -49,8 +49,12 @@ namespace System.Windows.Browser
         /// The dispatcher associated with the user interface (UI) thread.
         /// </returns>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
+#if MIGRATION
         public Dispatcher Dispatcher { get; }
-  
+#else
+        public CoreDispatcher Dispatcher { get; }
+#endif
+
         /// <summary>
         /// Gets the underlying managed object reference of the <see cref="ScriptObject"/>.
         /// </summary>
