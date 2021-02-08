@@ -320,8 +320,16 @@ namespace Windows.UI.Xaml
                 // Gain access to the outer style:
                 var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement);
 
+                //We check if the element is the direct child of a ViewBox, in which case alignment has no meaning:
+                UIElement currentParent = frameworkElement.INTERNAL_VisualParent as UIElement;
+                //the test below is basically: frameworkElement.VisualParent.VisualParent.VisualParent is ViewBox
+                bool isParentAViewBox =
+                    currentParent != null
+                    && ((currentParent = currentParent.INTERNAL_VisualParent as UIElement) != null)
+                    && currentParent.INTERNAL_VisualParent as Viewbox != null; //todo: this test is unlikely to work with a custom Template on the ViewBox, use frameworkElement.LogicalParent (or something like that) once the logical tree branch will be integrated)
+
                 // If the element is inside a Canvas, we ignore alignment and only apply the Width/Height:
-                if (frameworkElement.INTERNAL_VisualParent is Canvas)
+                if (frameworkElement.INTERNAL_VisualParent is Canvas || isParentAViewBox) //todo: replace the second part of this test with something meaning "logical parent is ViewBox" instead once we will have the logical tree (we cannot do that yet since we cannot access the ViewBox from frameworkElement).
                 {
                     styleOfOuterDomElement.width = !double.IsNaN(frameworkElement.Width) ? frameworkElement.Width.ToString() + "px" : "auto";
                 }
@@ -710,8 +718,17 @@ if ($0.tagName.toLowerCase() != 'span')
                 // Gain access to the outer style:
                 var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement);
 
+                //We check if the element is the direct child of a ViewBox, in which case alignment has no meaning:
+                UIElement currentParent = frameworkElement.INTERNAL_VisualParent as UIElement;
+                //the test below is basically: frameworkElement.VisualParent.VisualParent.VisualParent is ViewBox
+                bool isParentAViewBox =
+                    currentParent != null
+                    && ((currentParent = currentParent.INTERNAL_VisualParent as UIElement) != null)
+                    && currentParent.INTERNAL_VisualParent as Viewbox != null; //todo: this test is unlikely to work with a custom Template on the ViewBox, use frameworkElement.LogicalParent (or something like that) once the logical tree branch will be integrated)
+
+
                 // If the element is inside a Canvas, we ignore alignment and only apply the Width/Height:
-                if (frameworkElement.INTERNAL_VisualParent is Canvas)
+                if (frameworkElement.INTERNAL_VisualParent is Canvas || isParentAViewBox)
                 {
                     styleOfOuterDomElement.height = !double.IsNaN(frameworkElement.Height) ? frameworkElement.Height.ToString() + "px" : "auto";
                 }
@@ -1229,8 +1246,8 @@ if ($0.tagName.toLowerCase() != 'span')
                                         typeof(double),
                                         typeof(FrameworkElement),
                                         new PropertyMetadata(0d, MinHeight_Changed)
-                                        { 
-                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
+                                        {
+                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                                         });
 
         private static void MinHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
