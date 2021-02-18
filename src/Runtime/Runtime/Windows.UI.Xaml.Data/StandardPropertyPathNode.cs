@@ -163,7 +163,13 @@ namespace Windows.UI.Xaml.Data
                 if (!BindsDirectlyToSource)
                 {
                     Type sourceType = Source.GetType();
-                    this.PropertyInfo = sourceType.GetProperty(_propertyName);
+                    for (Type t = sourceType; t != null;  t = t.BaseType)
+                    {
+                        if ((this.PropertyInfo = t.GetProperty(this._propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)) != null)
+                        {
+                            break;
+                        }
+                    }
                     if (this.PropertyInfo == null)
                     {
                         // Try in case it is a simple field instead of a property:
