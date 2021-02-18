@@ -127,7 +127,13 @@ namespace Windows.UI.Xaml.Controls
 
             _popup = GetTemplateChild("Popup") as Popup;
             _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
-            _textBox = GetTemplateChild("PART_TextBox") as TextBox;
+            _textBox = GetTemplateChild("Text") as TextBox;
+            if (_textBox == null)
+            {
+                // Note: Silverlight's expected template part is "Text". But since we named it 
+                // "PART_TextBox", we keep this for backward compatibility.
+                _textBox = GetTemplateChild("PART_TextBox") as TextBox;
+            }
 
             if (_dropDownToggle != null)
             {
@@ -138,13 +144,12 @@ namespace Windows.UI.Xaml.Controls
             if (_textBox != null)
             {
                 _textBox.TextChanged += OnTextBoxTextChanged;
-            }
-
 #if MIGRATION
-            _textBox.MouseLeftButtonDown += TextBox_MouseLeftButtonDown;
+                _textBox.MouseLeftButtonDown += TextBox_MouseLeftButtonDown;
 #else
-            _textBox.PointerPressed += TextBox_PointerPressed;
+                _textBox.PointerPressed += TextBox_PointerPressed;
 #endif
+            }
 
             this.UpdateToggleButton(this.IsArrowVisible);
 
