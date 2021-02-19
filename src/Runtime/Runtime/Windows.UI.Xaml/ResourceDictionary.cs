@@ -1303,6 +1303,7 @@ namespace Windows.UI.Xaml
 
         #region Private Types
 
+        [Flags]
         private enum PrivateFlags : byte
         {
             IsInitialized = 0x01,

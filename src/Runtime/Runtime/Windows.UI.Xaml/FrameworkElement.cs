@@ -1243,6 +1243,7 @@ namespace Windows.UI.Xaml
         private InternalFlags _flags = 0; // Stores Flags (see Flags enum)
     }
 
+    [Flags]
     internal enum InternalFlags : uint
     {
         //// Does the instance have ResourceReference properties

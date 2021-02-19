@@ -224,7 +224,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                     }
 
                     // Otherwise, failure:
-                    MessageBox.Show(string.Format("Could not find the type \"{1}\" in the core assembly.", typeName));
+                    MessageBox.Show(string.Format("Could not find the type \"{0}\" in the core assembly.", typeName));
                     return false;
                 }
                 else

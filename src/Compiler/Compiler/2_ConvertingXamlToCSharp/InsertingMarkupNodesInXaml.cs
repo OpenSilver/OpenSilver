@@ -335,7 +335,7 @@ namespace DotNetForHtml5.Compiler
                 else
                 {
                     // Empty prefix.
-                    throw new wpf::System.Windows.Markup.XamlParseException(string.Format("Empty prefix in '{1}'", prefix, nameThatMayHaveAPrefix));
+                    throw new wpf::System.Windows.Markup.XamlParseException(string.Format("Empty prefix in '{0}'", nameThatMayHaveAPrefix));
                 }
             }
             else

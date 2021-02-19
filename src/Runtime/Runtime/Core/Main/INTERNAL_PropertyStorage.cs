@@ -296,6 +296,7 @@ namespace CSHTML5.Internal
         }
     }
 
+    [Flags]
     internal enum FullValueSource : short
     {
         // Bit used to store BaseValueSourceInternal = 0x01

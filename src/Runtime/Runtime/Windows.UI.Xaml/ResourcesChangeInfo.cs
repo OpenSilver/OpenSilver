@@ -320,6 +320,7 @@ namespace Windows.UI.Xaml
 
         #region PrivateDataStructures
 
+        [Flags]
         private enum PrivateFlags : byte
         {
             IsThemeChange = 0x01,
