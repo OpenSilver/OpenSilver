@@ -340,8 +340,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
             private void INTERNAL_RaiseCompletedEvent()
             {
-                if (Completed != null)
-                    Completed(this, new EventArgs());
+                Completed?.Invoke(this, new EventArgs());
             }
 
             internal void Start()

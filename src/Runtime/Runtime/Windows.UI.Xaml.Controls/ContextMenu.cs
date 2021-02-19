@@ -258,8 +258,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">The event data for the System.Windows.Controls.ContextMenu.Closed event.</param>
         protected virtual void OnClosed(RoutedEventArgs e)
         {
-            if (this.Closed != null)
-                this.Closed(this, new RoutedEventArgs());
+            Closed?.Invoke(this, new RoutedEventArgs());
         }
 
         /// <summary>
@@ -268,8 +267,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">The event data for the System.Windows.Controls.ContextMenu.Opened event.</param>
         protected virtual void OnOpened(RoutedEventArgs e)
         {
-            if (this.Opened != null)
-                this.Opened(this, new RoutedEventArgs());
+            Opened?.Invoke(this, new RoutedEventArgs());
         }
 
         #endregion

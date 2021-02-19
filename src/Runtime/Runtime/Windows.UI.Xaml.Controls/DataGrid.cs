@@ -123,10 +123,7 @@ namespace Windows.UI.Xaml.Controls
 
         protected virtual void OnLoadingRow(DataGridRowEventArgs e)
         {
-            if (LoadingRow != null)
-            {
-                LoadingRow(this, e);
-            }
+            LoadingRow?.Invoke(this, e);
         }
 
         [Obsolete("Use AlternatingRowBackground instead")]

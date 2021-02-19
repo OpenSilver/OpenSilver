@@ -169,8 +169,7 @@ namespace Windows.UI.Xaml.Controls
                     ItemDragEventArgs itemDragStartingEventArgs = new ItemDragEventArgs(selectionCollection);
 
                     // Raise the "ItemDragStarting" event:
-                    if (ItemDragStarting != null)
-                        ItemDragStarting(this, itemDragStartingEventArgs);
+                    ItemDragStarting?.Invoke(this, itemDragStartingEventArgs);
 
                     // Show the popup, unless the user has cancelled the drag operation:
                     if (itemDragStartingEventArgs.Handled && itemDragStartingEventArgs.Cancel)
@@ -426,7 +425,7 @@ namespace Windows.UI.Xaml.Controls
                             dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
 
 #if !(BRIDGE && MIGRATION)
-                            dragDropTargetUnderPointer.ItemDroppedOnSource(dragDropTargetUnderPointer, new MS.DragEventArgs(dataObject, e));
+                            dragDropTargetUnderPointer.ItemDroppedOnSource?.Invoke(dragDropTargetUnderPointer, new MS.DragEventArgs(dataObject, e));
 #endif
                         }
                     }
@@ -449,7 +448,7 @@ namespace Windows.UI.Xaml.Controls
 
                             // Raise the Drop event:
 #if !(BRIDGE && MIGRATION)
-                            dragDropTargetUnderPointer.Drop(dragDropTargetUnderPointer, new MS.DragEventArgs(dataObject, e));
+                            dragDropTargetUnderPointer.Drop?.Invoke(dragDropTargetUnderPointer, new MS.DragEventArgs(dataObject, e));
 #endif
                         }
 
@@ -472,8 +471,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             // Raise the "ItemDragCompleted" event:
-            if (ItemDragCompleted != null)
-                ItemDragCompleted(this, new ItemDragEventArgs(selectionCollection));
+            ItemDragCompleted?.Invoke(this, new ItemDragEventArgs(selectionCollection));
         }
 
         void PutSourceBackToOriginalPlace()
@@ -516,10 +514,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="dragOverEventArgs">Information about the event.</param>
         protected virtual void OnDragOver(MS.DragEventArgs dragOverEventArgs)
         {
-            if (this.DragOver != null)
-            {
-                this.DragOver(this, dragOverEventArgs);
-            }
+            DragOver?.Invoke(this, dragOverEventArgs);
 
         }
 

@@ -76,8 +76,7 @@ namespace Windows.UI.Xaml.Documents
         void Hyperlink_PointerPressed(object sender, PointerRoutedEventArgs e)
 #endif
         {
-            if (Click != null)
-                Click(this, new RoutedEventArgs());
+            Click?.Invoke(this, new RoutedEventArgs());
 
             if (_uri != null)
                 HtmlPage.Window.Navigate(_uri, "_blank");

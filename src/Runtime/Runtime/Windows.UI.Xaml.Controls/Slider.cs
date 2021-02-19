@@ -236,8 +236,7 @@ namespace Windows.UI.Xaml.Controls
             if (newValue != this.Value)
             {
                 this.SetCurrentValue(RangeBase.ValueProperty, newValue); // Note: we do not use "this.Value = newValue" because it deletes any bindings that the user may have set to the scrollbar with <ScrollBar Value="{Binding...}"/>.
-                if (this.Scroll != null)
-                    this.Scroll(this, new ScrollEventArgs(newValue, scrollEventType));
+                Scroll?.Invoke(this, new ScrollEventArgs(newValue, scrollEventType));
             }
 
             if (Orientation == Orientation.Horizontal)
@@ -294,8 +293,7 @@ namespace Windows.UI.Xaml.Controls
         void OnDragCompleted()
         {
             // Call the "Scroll" event passing the "EndScroll" argument:
-            if (this.Scroll != null)
-                this.Scroll(this, new ScrollEventArgs(this.Value, ScrollEventType.EndScroll));
+            Scroll?.Invoke(this, new ScrollEventArgs(this.Value, ScrollEventType.EndScroll));
 
             if (_horizontalLargeDecrease != null)
                 _horizontalLargeDecrease.IsHitTestVisible = true;
@@ -342,8 +340,7 @@ namespace Windows.UI.Xaml.Controls
                     UpdateThumbPositionAndSize(totalControlSizeInMainDirection);
 
                     // Call the "Scroll" event:
-                    if (this.Scroll != null)
-                        this.Scroll(this, new ScrollEventArgs(newValue, ScrollEventType.ThumbTrack));
+                    Scroll?.Invoke(this, new ScrollEventArgs(newValue, ScrollEventType.ThumbTrack));
                 }
             }
         }

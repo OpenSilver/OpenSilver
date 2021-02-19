@@ -391,8 +391,7 @@ namespace Windows.UI.Xaml.Controls
 
         protected virtual void OnTextChanged(RoutedEventArgs e)
         {
-            if (TextChanged != null)
-                TextChanged(this, e);
+            TextChanged?.Invoke(this, e);
         }
 
         /// <summary>
@@ -777,8 +776,7 @@ namespace Windows.UI.Xaml.Controls
 #else
         protected virtual void OnDropDownClosed(RoutedEventArgs e)
         {
-            if (DropDownClosed != null)
-                DropDownClosed(this, e);
+            DropDownClosed?.Invoke(this, e);
         }
 #endif
 
@@ -792,8 +790,7 @@ namespace Windows.UI.Xaml.Controls
         protected virtual void OnDropDownOpened(RoutedEventArgs e)
 #endif
         {
-            if (DropDownOpened != null)
-                DropDownOpened(this, e);
+            DropDownOpened?.Invoke(this, e);
         }
 
         /// <summary>

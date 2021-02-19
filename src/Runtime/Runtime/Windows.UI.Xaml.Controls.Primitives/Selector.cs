@@ -475,10 +475,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <param name="e">The arguments for the event.</param>
         protected virtual void OnSelectionChanged(SelectionChangedEventArgs e)
         {
-            if (this.SelectionChanged != null)
-            {
-                this.SelectionChanged(this, e);
-            }
+            SelectionChanged?.Invoke(this, e);
         }
 
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)

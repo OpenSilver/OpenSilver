@@ -34,7 +34,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             set
             {
                 _title = value;
-                NotifiyPropertyChanged("Title");
+                NotifyPropertyChanged("Title");
             }
         }
 
@@ -45,7 +45,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             set
             {
                 _name = value;
-                NotifiyPropertyChanged("Name");
+                NotifyPropertyChanged("Name");
             }
         }
 
@@ -57,7 +57,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             set
             {
                 _children = value;
-                NotifiyPropertyChanged("Children");
+                NotifyPropertyChanged("Children");
             }
         }
 
@@ -68,7 +68,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             set
             {
                 _element = value;
-                NotifiyPropertyChanged("Element");
+                NotifyPropertyChanged("Element");
             }
         }
 
@@ -79,7 +79,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             set
             {
                 _isNodeForXamlSourcePath = value;
-                NotifiyPropertyChanged("IsNodeForXamlSourcePath");
+                NotifyPropertyChanged("IsNodeForXamlSourcePath");
             }
         }
 
@@ -90,15 +90,14 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             set
             {
                 _xamlSourcePathOrNull = value;
-                NotifiyPropertyChanged("XamlSourcePathOrNull");
+                NotifyPropertyChanged("XamlSourcePathOrNull");
             }
         }
 
 
-        void NotifiyPropertyChanged(string property)
+        void NotifyPropertyChanged(string property)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(property));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

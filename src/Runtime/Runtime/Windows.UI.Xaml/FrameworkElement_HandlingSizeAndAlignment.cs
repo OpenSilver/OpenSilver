@@ -1677,8 +1677,7 @@ if ($0.tagName.toLowerCase() != 'span')
 
         internal void INTERNAL_RaiseContextMenuOpeningEvent(double pointerLeft, double pointerTop)
         {
-            if (ContextMenuOpening != null)
-                ContextMenuOpening(this, new ContextMenuEventArgs(pointerLeft, pointerTop));
+            ContextMenuOpening?.Invoke(this, new ContextMenuEventArgs(pointerLeft, pointerTop));
         }
 
         #endregion

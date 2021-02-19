@@ -129,12 +129,11 @@ namespace DotNetForHtml5.Compiler
         {
             for (int i = indent; i > 0; i--)
             {
-                if (OnWrite != null)
-                    OnWrite(this, new OnWriteEventArgs() { Text = "\t" });
+                OnWrite?.Invoke(this, new OnWriteEventArgs() { Text = "\t" });
                 //streamWriter.Write("\t");
             }
-            if (OnWrite != null)
-                OnWrite(this, new OnWriteEventArgs() { Text = line + e.Message });
+
+            OnWrite?.Invoke(this, new OnWriteEventArgs() { Text = line + e.Message });
             //streamWriter.WriteLine(line + e.Message);
         }
 

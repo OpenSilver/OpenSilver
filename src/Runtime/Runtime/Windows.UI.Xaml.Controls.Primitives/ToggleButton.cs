@@ -424,13 +424,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         protected void OnChecked()
         {
-            if (Checked != null)
+            Checked?.Invoke(this, new RoutedEventArgs
             {
-                Checked(this, new RoutedEventArgs()
-                {
-                    OriginalSource = this
-                });
-            }
+                OriginalSource = this
+            });
             _isChecked = true;
             UpdateVisualStates();
         }
@@ -444,13 +441,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         protected void OnIndeterminate()
         {
-            if (Indeterminate != null)
+            Indeterminate?.Invoke(this, new RoutedEventArgs
             {
-                Indeterminate(this, new RoutedEventArgs()
-                {
-                    OriginalSource = this
-                });
-            }
+                OriginalSource = this
+            });
             _isChecked = null;
             UpdateVisualStates();
         }
@@ -464,13 +458,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         protected void OnUnchecked()
         {
-            if (Unchecked != null)
+            Unchecked?.Invoke(this, new RoutedEventArgs
             {
-                Unchecked(this, new RoutedEventArgs()
-                {
-                    OriginalSource = this
-                });
-            }
+                OriginalSource = this
+            });
             _isChecked = false;
             UpdateVisualStates();
 

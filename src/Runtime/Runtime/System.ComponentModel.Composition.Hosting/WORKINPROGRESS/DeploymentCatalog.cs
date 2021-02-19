@@ -213,10 +213,7 @@ namespace System.ComponentModel.Composition.Hosting
         /// </param>
         protected virtual void OnChanged(ComposablePartCatalogChangeEventArgs e)
         {
-            if (this.Changed != null)
-            {
-                this.Changed(this, e);
-            }
+            Changed?.Invoke(this, e);
         }
 
         /// <summary>
@@ -227,10 +224,7 @@ namespace System.ComponentModel.Composition.Hosting
         /// </param>
         protected virtual void OnChanging(ComposablePartCatalogChangeEventArgs e)
         {
-            if (this.Changing != null)
-            {
-                this.Changing(this, e);
-            }
+            Changing?.Invoke(this, e);
         }
 
         /// <summary>

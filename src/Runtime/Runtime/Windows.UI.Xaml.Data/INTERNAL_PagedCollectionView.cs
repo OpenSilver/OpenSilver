@@ -321,10 +321,7 @@ namespace Windows.UI.Xaml.Data
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 #endif
         // old version 
@@ -578,10 +575,7 @@ namespace Windows.UI.Xaml.Data
 
         private void OnPageChanged()
         {
-            if (PageChanged != null)
-            {
-                PageChanged(this, new EventArgs());
-            }
+            PageChanged?.Invoke(this, new EventArgs());
             ChangeOutputColletion();
             _isPageChanging = false;
         }

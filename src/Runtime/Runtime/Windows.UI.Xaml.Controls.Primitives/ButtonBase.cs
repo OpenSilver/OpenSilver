@@ -130,11 +130,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         protected virtual void OnClick()
         {
-            if (Click != null)
-                Click(this, new RoutedEventArgs()
-                {
-                    OriginalSource = this //todo: the OriginalSource should not aways be the button itself: if the button contains inner elements, it is supposed to be the inner element on which the user has clicked.
-                });
+            Click?.Invoke(this, new RoutedEventArgs
+            {
+                OriginalSource = this //todo: the OriginalSource should not aways be the button itself: if the button contains inner elements, it is supposed to be the inner element on which the user has clicked.
+            });
         }
 
 #if MIGRATION

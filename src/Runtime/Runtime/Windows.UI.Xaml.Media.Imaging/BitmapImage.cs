@@ -164,13 +164,10 @@ namespace Windows.UI.Xaml.Media.Imaging
         public event ExceptionRoutedEventHandler ImageFailed;
         protected void OnImageFailed()
         {
-            if (ImageFailed != null)
+            ImageFailed?.Invoke(this, new ExceptionRoutedEventArgs()
             {
-                ImageFailed(this, new ExceptionRoutedEventArgs()
-                {
-                    OriginalSource = this
-                });
-            }
+                OriginalSource = this
+            });
         }
 
         /// <summary>
@@ -179,13 +176,10 @@ namespace Windows.UI.Xaml.Media.Imaging
         public event RoutedEventHandler ImageOpened;
         protected void OnImageOpened()
         {
-            if (ImageOpened != null)
+            ImageOpened?.Invoke(this, new RoutedEventArgs()
             {
-                ImageOpened(this, new RoutedEventArgs()
-                {
-                    OriginalSource = this
-                });
-            }
+                OriginalSource = this
+            });
         }
 
         //internal override void INTERNAL_AttachToDomEvents()
@@ -213,10 +207,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         public event EventHandler UriSourceChanged;
         protected void OnUriSourceChanged()
         {
-            if (UriSourceChanged != null)
-            {
-                UriSourceChanged(this, new EventArgs());
-            }
+            UriSourceChanged?.Invoke(this, new EventArgs());
         }
 
 #if WORKINPROGRESS

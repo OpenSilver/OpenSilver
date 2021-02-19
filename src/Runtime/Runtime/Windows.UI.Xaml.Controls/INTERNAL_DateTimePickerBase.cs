@@ -208,8 +208,7 @@ namespace Windows.UI.Xaml.Controls
 
             RefreshTextBox();
 
-            if (SelectedDateChanged != null)
-                SelectedDateChanged(this, e); // fire public event
+            SelectedDateChanged?.Invoke(this, e); // fire public event
         }
 
         protected abstract INTERNAL_CalendarOrClockBase GenerateCalendarOrClock();

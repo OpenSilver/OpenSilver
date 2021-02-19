@@ -719,10 +719,7 @@ namespace Windows.UI.Xaml.Data
         /// </summary>
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, e);
-            }
+            PropertyChanged?.Invoke(this, e);
         }
 
         /// <summary>
@@ -815,13 +812,12 @@ namespace Windows.UI.Xaml.Data
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
             if (args == null)
-                throw new ArgumentNullException("args");
+                throw new ArgumentNullException(nameof(args));
 
             unchecked
             { ++_timestamp; }    // invalidate enumerators because of a change
 
-            if (CollectionChanged != null)
-                CollectionChanged(this, args);
+            CollectionChanged?.Invoke(this, args);
 
             // Collection changes change the count unless an item is being
             // replaced or moved within the collection.
@@ -938,10 +934,7 @@ namespace Windows.UI.Xaml.Data
                 return;
             }
 
-            if (CurrentChanging != null)
-            {
-                CurrentChanging(this, args);
-            }
+            CurrentChanging?.Invoke(this, args);
         }
 
         /// <summary>

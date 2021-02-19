@@ -88,8 +88,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             this.IsDragging = true;
 
             // Raise the "DragStarted" event:
-            if (DragStarted != null)
-                DragStarted(this, new DragStartedEventArgs(_pointerX, _pointerY));
+            DragStarted?.Invoke(this, new DragStartedEventArgs(_pointerX, _pointerY));
         }
 
 #if MIGRATION
@@ -122,8 +121,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 double verticalChange = e.GetCurrentPoint(null).Position.Y - _pointerY;
 #endif
                 // Raise the "DragDelta" event:
-                if (DragDelta != null)
-                    DragDelta(this, new DragDeltaEventArgs(horizontalChange, verticalChange));
+                DragDelta?.Invoke(this, new DragDeltaEventArgs(horizontalChange, verticalChange));
 
                 // Remember the new pointer position:
 #if MIGRATION
@@ -155,8 +153,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 this.IsDragging = false;
 
                 // Raise the "DragCompleted" event:
-                if (DragCompleted != null)
-                    DragCompleted(this, new DragCompletedEventArgs(0d, 0d, false));
+                DragCompleted?.Invoke(this, new DragCompletedEventArgs(0d, 0d, false));
             }
         }
 

@@ -229,8 +229,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             if (newValue != this.Value)
             {
                 this.SetCurrentValue(RangeBase.ValueProperty, newValue); // Note: we do not use "this.Value = newValue" because it deletes any bindings that the user may have set to the scrollbar with <ScrollBar Value="{Binding...}"/>.
-                if (this.Scroll != null)
-                    this.Scroll(this, new ScrollEventArgs(newValue, scrollEventType));
+                Scroll?.Invoke(this, new ScrollEventArgs(newValue, scrollEventType));
             }
         }
 
@@ -263,8 +262,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 _horizontalLargeIncrease.IsHitTestVisible = true;
 
             // Call the "Scroll" event passing the "EndScroll" argument:
-            if (this.Scroll != null)
-                this.Scroll(this, new ScrollEventArgs(this.Value, ScrollEventType.EndScroll));
+            Scroll?.Invoke(this, new ScrollEventArgs(this.Value, ScrollEventType.EndScroll));
         }
 
         void ChangeValueBasedOnPointerMovement(double pointerMovementInPixels)
@@ -306,8 +304,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     UpdateThumbPositionAndSize(totalControlSizeInMainDirection);
 
                     // Call the "Scroll" event:
-                    if (this.Scroll != null)
-                        this.Scroll(this, new ScrollEventArgs(newValue, ScrollEventType.ThumbTrack));
+                    Scroll?.Invoke(this, new ScrollEventArgs(newValue, ScrollEventType.ThumbTrack));
                 }
             }
         }

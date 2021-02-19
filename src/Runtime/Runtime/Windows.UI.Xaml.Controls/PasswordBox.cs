@@ -131,10 +131,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         protected void OnPasswordChanged(RoutedEventArgs eventArgs)
         {
-            if (PasswordChanged != null)
-            {
-                PasswordChanged(this, eventArgs);
-            }
+            PasswordChanged?.Invoke(this, eventArgs);
         }
 
         #endregion

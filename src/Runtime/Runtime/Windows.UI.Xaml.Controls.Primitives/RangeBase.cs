@@ -210,11 +210,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <param name="newValue">New value of the Value property.</param>
         protected virtual void OnValueChanged(double oldValue, double newValue)
         {
-            if (this.ValueChanged != null)
 #if MIGRATION
-                this.ValueChanged(this, new RoutedPropertyChangedEventArgs<double>(oldValue, newValue));
+            ValueChanged?.Invoke(this, new RoutedPropertyChangedEventArgs<double>(oldValue, newValue));
 #else
-                this.ValueChanged(this, new RangeBaseValueChangedEventArgs(oldValue, newValue));
+            ValueChanged?.Invoke(this, new RangeBaseValueChangedEventArgs(oldValue, newValue));
 #endif
         }
     }

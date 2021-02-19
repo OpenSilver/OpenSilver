@@ -366,10 +366,7 @@ namespace Windows.UI.Xaml
         private static void IsEnabled_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             FrameworkElement frameworkElement = (FrameworkElement)d;
-            if (frameworkElement.IsEnabledChanged != null)
-            {
-                frameworkElement.IsEnabledChanged(frameworkElement, e);
-            }
+            frameworkElement.IsEnabledChanged?.Invoke(frameworkElement, e);
             UIElement.InvalidateForceInheritPropertyOnChildren(frameworkElement, e.Property);
         }
 
@@ -524,10 +521,7 @@ namespace Windows.UI.Xaml
 
         private void RaiseDataContextChangedEvent(DependencyPropertyChangedEventArgs e)
         {
-            if (this.DataContextChanged != null)
-            {
-                this.DataContextChanged(this, e);
-            }
+            DataContextChanged?.Invoke(this, e);
         }
 
         /// <summary>Occurs when the data context for this element changes. </summary>
@@ -1100,8 +1094,7 @@ namespace Windows.UI.Xaml
 
         internal void INTERNAL_RaiseLoadedEvent()
         {
-            if (Loaded != null)
-                Loaded(this, new RoutedEventArgs());
+            Loaded?.Invoke(this, new RoutedEventArgs());
         }
 
         /// <summary>
@@ -1111,8 +1104,7 @@ namespace Windows.UI.Xaml
 
         internal void INTERNAL_RaiseUnloadedEvent()
         {
-            if (Unloaded != null)
-                Unloaded(this, new RoutedEventArgs());
+            Unloaded?.Invoke(this, new RoutedEventArgs());
         }
 
         #endregion

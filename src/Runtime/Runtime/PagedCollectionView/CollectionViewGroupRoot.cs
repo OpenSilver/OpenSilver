@@ -262,10 +262,7 @@ namespace Windows.UI.Xaml.Data
         {
             Debug.Assert(args != null, "Arguments passed in should not be null");
 
-            if (this.CollectionChanged != null)
-            {
-                this.CollectionChanged(this, args);
-            }
+            CollectionChanged?.Invoke(this, args);
         }
 
         /// <summary>
@@ -273,10 +270,7 @@ namespace Windows.UI.Xaml.Data
         /// </summary>
         protected override void OnGroupByChanged()
         {
-            if (this.GroupDescriptionChanged != null)
-            {
-                this.GroupDescriptionChanged(this, EventArgs.Empty);
-            }
+            GroupDescriptionChanged?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>

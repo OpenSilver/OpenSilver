@@ -116,10 +116,7 @@ namespace Windows.UI.Xaml
         /// </summary>
         protected void OnTick()
         {
-            if (Tick != null)
-            {
-                Tick(this, new EventArgs());
-            }
+            Tick?.Invoke(this, new EventArgs());
         }
 
         /// <summary>

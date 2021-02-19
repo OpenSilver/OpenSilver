@@ -141,8 +141,7 @@ namespace Windows.UI.Xaml
                 .INTERNAL_GetCurrentDispatcher().BeginInvoke((Action)(() =>
             {
                 // Raise the "Startup" event:
-                if (this.Startup != null)
-                    Startup(this, new StartupEventArgs());
+                Startup?.Invoke(this, new StartupEventArgs());
 
                 // Call the "OnLaunched" method:
                 this.OnLaunched(new LaunchActivatedEventArgs());

@@ -79,10 +79,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         public event EventHandler Opened;
         void OnOpened()
         {
-            if(Opened != null)
-            {
-                Opened(this, new EventArgs());
-            }
+            Opened?.Invoke(this, new EventArgs());
         }
 
         /// <summary>
@@ -91,10 +88,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         public event EventHandler Closed;
         void OnClosed()
         {
-            if (Closed != null)
-            {
-                Closed(this, new EventArgs());
-            }
+            Closed?.Invoke(this, new EventArgs());
         }
 
         /// <summary>
@@ -327,8 +321,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
 
             // Raise the internal "PopupMoved" event, which is useful for example to hide the validation popups of TextBoxes in case the user scrolls and the TextBox is no longer visible on screen (cf. ZenDesk 628):
-            if (INTERNAL_PopupMoved != null)
-                INTERNAL_PopupMoved(this, new EventArgs());
+            INTERNAL_PopupMoved?.Invoke(this, new EventArgs());
         }
 
 
@@ -599,8 +592,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         internal void CloseFromAnOutsideClick()
         {
-            if (ClosedDueToOutsideClick != null)
-                ClosedDueToOutsideClick(this, new EventArgs());
+            ClosedDueToOutsideClick?.Invoke(this, new EventArgs());
 
             if (IsOpen)
                 this.IsOpen = false;

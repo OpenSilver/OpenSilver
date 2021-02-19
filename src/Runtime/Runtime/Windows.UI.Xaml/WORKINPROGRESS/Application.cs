@@ -51,10 +51,7 @@ namespace Windows.UI.Xaml
 
         internal void OnUnhandledException(Exception exception, bool handled)
         {
-            if(UnhandledException != null)
-            {
-                UnhandledException(this, new ApplicationUnhandledExceptionEventArgs(exception, handled));
-            }
+            UnhandledException?.Invoke(this, new ApplicationUnhandledExceptionEventArgs(exception, handled));
         }
 
         //        void RaiseUnhandledException(object jsElement)

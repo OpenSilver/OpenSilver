@@ -115,18 +115,12 @@ namespace System.ComponentModel
         /// </summary>
         private void OnCollectionChanged(NotifyCollectionChangedAction action, object item, int index)
         {
-            if (CollectionChanged != null)
-            {
-                CollectionChanged(this, new NotifyCollectionChangedEventArgs(action, item, index));
-            }
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, item, index));
         }
         // raise CollectionChanged event to any listeners
         void OnCollectionChanged(NotifyCollectionChangedAction action)
         {
-            if (CollectionChanged != null)
-            {
-                CollectionChanged(this, new NotifyCollectionChangedEventArgs(action));
-            }
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action));
         }
         #endregion Protected Methods
 

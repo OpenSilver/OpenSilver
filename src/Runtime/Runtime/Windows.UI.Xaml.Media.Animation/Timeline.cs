@@ -252,8 +252,7 @@ namespace Windows.UI.Xaml.Media.Animation
         public event EventHandler Completed;
         internal void INTERNAL_RaiseCompletedEvent()
         {
-            if (Completed != null)
-                Completed(this, new EventArgs());
+            Completed?.Invoke(this, new EventArgs());
         }
 
         internal HashSet2<Guid> CompletedGuids = new HashSet2<Guid>();
@@ -267,8 +266,8 @@ namespace Windows.UI.Xaml.Media.Animation
             {
                 CompletedGuids.Add(guid);
             }
-            if (Completed != null)
-                Completed(this, new EventArgs());
+
+            Completed?.Invoke(this, new EventArgs());
         }
 
         internal virtual void Stop(FrameworkElement frameworkElement, string groupName, bool revertToFormerValue = false)

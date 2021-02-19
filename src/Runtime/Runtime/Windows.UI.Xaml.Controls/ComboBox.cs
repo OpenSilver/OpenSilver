@@ -263,8 +263,7 @@ namespace Windows.UI.Xaml.Controls
         protected virtual void OnDropDownClosed(RoutedEventArgs e)
 #endif
         {
-            if (DropDownClosed != null)
-                DropDownClosed(this, e);
+            DropDownClosed?.Invoke(this, e);
         }
 
         /// <summary>
@@ -277,8 +276,7 @@ namespace Windows.UI.Xaml.Controls
         protected virtual void OnDropDownOpened(RoutedEventArgs e)
 #endif
         {
-            if (DropDownOpened != null)
-                DropDownOpened(this, e);
+            DropDownOpened?.Invoke(this, e);
         }
 
         /// <summary>

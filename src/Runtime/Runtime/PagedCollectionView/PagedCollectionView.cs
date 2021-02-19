@@ -3078,10 +3078,7 @@ namespace Windows.UI.Xaml.Data
                 return;
             }
 
-            if (this.CurrentChanging != null)
-            {
-                this.CurrentChanging(this, args);
-            }
+            CurrentChanging?.Invoke(this, args);
         }
 
         /// <summary>
@@ -3136,10 +3133,7 @@ namespace Windows.UI.Xaml.Data
         /// <param name="e">PropertyChangedEventArgs for this change</param>
         private void OnPropertyChanged(PropertyChangedEventArgs e)
         {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged(this, e);
-            }
+            PropertyChanged?.Invoke(this, e);
         }
 
         /// <summary>

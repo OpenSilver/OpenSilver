@@ -42,19 +42,13 @@ namespace Windows.UI.Xaml.Controls
         internal void Maximize()
         {
             VisualStateManager.GoToState(this, "Maximized", false);
-            if (OnMaximize != null)
-            {
-                OnMaximize(this, null);
-            }
+            OnMaximize?.Invoke(this, null);
         }
 
         internal void Minimize()
         {
             VisualStateManager.GoToState(this, "Minimized", false);
-            if (OnMinimize != null)
-            {
-                OnMinimize(this, null);
-            }
+            OnMinimize?.Invoke(this, null);
         }
 
         public event EventHandler OnMaximize;

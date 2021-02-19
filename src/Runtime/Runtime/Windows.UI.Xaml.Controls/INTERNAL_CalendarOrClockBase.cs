@@ -121,14 +121,8 @@ namespace Windows.UI.Xaml.Controls
 
         internal void OnSelectedDatesCollectionChanged(SelectionChangedEventArgs e)
         {
-            if (SelectionChanged != null)
-            {
-                SelectionChanged(this, e);
-            }
-            if (SelectedDatesChanged != null)
-            {
-                SelectedDatesChanged(this, e);
-            }
+            SelectionChanged?.Invoke(this, e);
+            SelectedDatesChanged?.Invoke(this, e);
         }
 
         #endregion

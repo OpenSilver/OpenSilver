@@ -136,10 +136,7 @@ namespace System.Net
         //todo: replace that with something in javascript (and see todo on INTERNAL_TestIfCompletedStatus even though this will not be used that way)
         void OnDownloadStringCompleted(object sender, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs e)
         {
-            if (DownloadStringCompleted != null)
-            {
-                DownloadStringCompleted(sender, new DownloadStringCompletedEventArgs(e));
-            }
+            DownloadStringCompleted?.Invoke(sender, new DownloadStringCompletedEventArgs(e));
         }
 
         // Exceptions:
@@ -801,10 +798,7 @@ namespace System.Net
         public event UploadStringCompletedEventHandler UploadStringCompleted;
         void OnUploadStringCompleted(object sender, UploadStringCompletedEventArgs e)
         {
-            if (UploadStringCompleted != null)
-            {
-                UploadStringCompleted(sender, e);
-            }
+            UploadStringCompleted?.Invoke(sender, e);
         }
 
 

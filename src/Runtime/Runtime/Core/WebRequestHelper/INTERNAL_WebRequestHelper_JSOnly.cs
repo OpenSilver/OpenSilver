@@ -434,10 +434,7 @@ namespace System
             SetEventArgs(e);
             if (!_isFirstTryAtSendingUnsafeRequest || !IsCrashInPreflight) // if NOT(first unsafe try AND preflight error). The only case we do not want to enter this if is when the request will be resent without credentials.
             {
-                if (DownloadStringCompleted != null)
-                {
-                    DownloadStringCompleted(_sender, e);
-                }
+                DownloadStringCompleted?.Invoke(_sender, e);
             }
             _isFirstTryAtSendingUnsafeRequest = false;
         }

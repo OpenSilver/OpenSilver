@@ -5259,7 +5259,7 @@ namespace Windows.UI.Xaml.Controls
                             propertyInfo.Name,
                             textBox.Text,
                             true /* doConversion */,
-                            propertyInfo != null ? propertyInfo.PropertyType : null,
+                            propertyInfo.PropertyType,
                             bindingExpression.ParentBinding.Converter,
                             bindingExpression.ParentBinding.ConverterParameter,
 #if MIGRATION

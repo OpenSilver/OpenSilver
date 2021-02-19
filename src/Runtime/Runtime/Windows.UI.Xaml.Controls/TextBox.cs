@@ -316,10 +316,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
         /// <param name="eventArgs">The arguments for the event.</param>
         protected virtual void OnTextChanged(TextChangedEventArgs eventArgs)
         {
-            if (TextChanged != null)
-            {
-                TextChanged(this, eventArgs);
-            }
+            TextChanged?.Invoke(this, eventArgs);
         }
 
         #endregion

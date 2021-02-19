@@ -142,8 +142,7 @@ namespace Windows.UI.Xaml.Controls
                         toolTip._timerForClosingTooltipAfter5Seconds.Start();
 
                         // Raise the "Opened" event:
-                        if (toolTip.Opened != null)
-                            toolTip.Opened(toolTip, new RoutedEventArgs());
+                        toolTip.Opened?.Invoke(toolTip, new RoutedEventArgs());
                     }
                 }
                 else
@@ -156,8 +155,7 @@ namespace Windows.UI.Xaml.Controls
                         toolTip._parentPopup.IsOpen = false;
 
                         // Raise the "Closed" event:
-                        if (toolTip.Closed != null)
-                            toolTip.Closed(toolTip, new RoutedEventArgs());
+                        toolTip.Closed?.Invoke(toolTip, new RoutedEventArgs());
                     }
                 }
             }

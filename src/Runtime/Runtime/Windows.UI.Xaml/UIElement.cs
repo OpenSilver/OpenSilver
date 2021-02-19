@@ -550,10 +550,7 @@ namespace Windows.UI.Xaml
             // Invalidate the children so that they will inherit the new value.
             InvalidateForceInheritPropertyOnChildren((UIElement)d, e.Property);
 
-            if (uiElement.IsVisibleChanged != null)
-            {    
-                uiElement.IsVisibleChanged(d, e);
-            }
+            uiElement.IsVisibleChanged?.Invoke(d, e);
         }
 
         private static object CoerceIsVisibleProperty(DependencyObject d, object baseValue)
@@ -1148,11 +1145,9 @@ namespace Windows.UI.Xaml
 #endif
         {
 #if MIGRATION
-            if (LostMouseCapture != null)
-                LostMouseCapture(this, e);
+            LostMouseCapture?.Invoke(this, e);
 #else
-            if (PointerCaptureLost != null)
-                PointerCaptureLost(this, e);
+            PointerCaptureLost?.Invoke(this, e);
 #endif
         }
 

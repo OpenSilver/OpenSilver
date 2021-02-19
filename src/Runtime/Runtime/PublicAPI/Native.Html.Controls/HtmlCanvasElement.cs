@@ -486,50 +486,32 @@ $0.miterLimit = $1", jsContext2d,
 
         public virtual void OnPointerMoved(HtmlCanvasPointerRoutedEventArgs e)
         {
-            if (PointerMoved != null)
-            {
-                PointerMoved(this, e);
-            }
+            PointerMoved?.Invoke(this, e);
         }
 
         public virtual void OnPointerPressed(HtmlCanvasPointerRoutedEventArgs e)
         {
-            if (PointerPressed != null)
-            {
-                PointerPressed(this, e);
-            }
+            PointerPressed?.Invoke(this, e);
         }
 
         public virtual void OnRightTapped(HtmlCanvasPointerRoutedEventArgs e)
         {
-            if (RightTapped != null)
-            {
-                RightTapped(this, e);
-            }
+            RightTapped?.Invoke(this, e);
         }
 
         public virtual void OnPointerReleased(HtmlCanvasPointerRoutedEventArgs e)
         {
-            if (PointerReleased != null)
-            {
-                PointerReleased(this, e);
-            }
+            PointerReleased?.Invoke(this, e);
         }
 
         public virtual void OnPointerEntered(HtmlCanvasPointerRoutedEventArgs e)
         {
-            if (PointerEntered != null)
-            {
-                PointerEntered(this, e);
-            }
+            PointerEntered?.Invoke(this, e);
         }
 
         public virtual void OnPointerExited(HtmlCanvasPointerRoutedEventArgs e)
         {
-            if (PointerExited != null)
-            {
-                PointerExited(this, e);
-            }
+            PointerExited?.Invoke(this, e);
         }
 
         ContextMenu _contextMenu;
@@ -553,8 +535,7 @@ $0.miterLimit = $1", jsContext2d,
 
         internal void INTERNAL_RaiseContextMenuOpeningEvent(double pointerLeft, double pointerTop)
         {
-            if (ContextMenuOpening != null)
-                ContextMenuOpening(this, new ContextMenuEventArgs(pointerLeft, pointerTop));
+            ContextMenuOpening?.Invoke(this, new ContextMenuEventArgs(pointerLeft, pointerTop));
         }
     }
 }

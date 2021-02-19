@@ -91,14 +91,11 @@ namespace Windows.UI.Xaml.Controls
         public void OnMouseLeftButtonUp(object sender, PointerRoutedEventArgs e)
 #endif
         {
-            if (MouseLeftButtonUp != null)
-            {
 #if MIGRATION
-                MouseLeftButtonUp(this, new MouseButtonEventArgs());
+            MouseLeftButtonUp?.Invoke(this, new MouseButtonEventArgs());
 #else
-                MouseLeftButtonUp(this, new PointerRoutedEventArgs());
+            MouseLeftButtonUp?.Invoke(this, new PointerRoutedEventArgs());
 #endif
-            }
         }
 
         //public object Header //todo: see what it should actually be.

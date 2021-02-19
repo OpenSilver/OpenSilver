@@ -193,10 +193,7 @@ namespace Windows.UI.Xaml
 
         private void OnInheritedContextChanged(FrameworkElement newParent)
         {
-            if (this.InheritedContextChanged != null)
-            {
-                this.InheritedContextChanged(this, EventArgs.Empty);
-            }
+            InheritedContextChanged?.Invoke(this, EventArgs.Empty);
             foreach (DependencyObject listener in this._contextListeners)
             {
                 listener._inheritedParent = newParent;
