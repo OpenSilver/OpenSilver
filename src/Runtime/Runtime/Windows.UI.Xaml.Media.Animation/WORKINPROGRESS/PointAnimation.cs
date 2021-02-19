@@ -14,9 +14,9 @@ namespace Windows.UI.Xaml.Media.Animation
 {
 	public sealed partial class PointAnimation : Timeline
 	{
-		public static readonly DependencyProperty FromProperty = DependencyProperty.Register("FromProperty", typeof(Nullable<Point>), typeof(PointAnimation), new PropertyMetadata());
-		public static readonly DependencyProperty ToProperty = DependencyProperty.Register("ToProperty", typeof(Nullable<Point>), typeof(PointAnimation), new PropertyMetadata());
-		public static readonly DependencyProperty ByProperty = DependencyProperty.Register("ByProperty", typeof(Nullable<Point>), typeof(PointAnimation), new PropertyMetadata());
+		public static readonly DependencyProperty FromProperty = DependencyProperty.Register(nameof(From), typeof(Nullable<Point>), typeof(PointAnimation), new PropertyMetadata());
+		public static readonly DependencyProperty ToProperty = DependencyProperty.Register(nameof(To), typeof(Nullable<Point>), typeof(PointAnimation), new PropertyMetadata());
+		public static readonly DependencyProperty ByProperty = DependencyProperty.Register(nameof(By), typeof(Nullable<Point>), typeof(PointAnimation), new PropertyMetadata());
 		public Nullable<Point> From
 		{
 			get

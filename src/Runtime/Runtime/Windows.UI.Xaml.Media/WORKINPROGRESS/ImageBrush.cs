@@ -10,7 +10,7 @@ namespace Windows.UI.Xaml.Media
 {
 	public sealed partial class ImageBrush : TileBrush
 	{
-		public static readonly DependencyProperty ImageSourceProperty = DependencyProperty.Register("ImageSourceProperty", typeof(ImageSource), typeof(ImageBrush), new PropertyMetadata());
+		public static readonly DependencyProperty ImageSourceProperty = DependencyProperty.Register(nameof(ImageSource), typeof(ImageSource), typeof(ImageBrush), new PropertyMetadata());
 		public ImageSource ImageSource
 		{
 			get

@@ -1684,7 +1684,7 @@ element.setAttribute(""data-isreadonly"",""{1}"");
 
         public event RoutedEventHandler SelectionChanged;
 
-        public static readonly DependencyProperty SelectionForegroundProperty = DependencyProperty.Register("SelectiongoreGround", typeof(Brush), typeof(TextBox), null);
+        public static readonly DependencyProperty SelectionForegroundProperty = DependencyProperty.Register(nameof(SelectionForeground), typeof(Brush), typeof(TextBox), null);
 
         public Brush SelectionForeground
         {
