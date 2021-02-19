@@ -1207,17 +1207,15 @@
     <Content Include="DefaultStyles\INTERNAL_DefaultHeaderedContentControlStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
 	</ItemGroup>
 	<ItemGroup>
 	  <EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Include="Runtime.licenseheader" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Page Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
 	</ItemGroup>
   
 	<!-- See ths comment on the first <Import> -->
