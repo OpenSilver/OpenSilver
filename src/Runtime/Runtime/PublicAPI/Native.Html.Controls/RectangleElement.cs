@@ -34,7 +34,7 @@ namespace CSHTML5.Native.Html.Controls
     /// <example>
     /// You can add a rectangle to the XAML as follows:
     /// <code lang="XAML" xml:space="preserve">
-    /// <native:HtmlCanvas Width="1000" Height"500" xmlns:native="using:CSHTML5.Native.Html.Controls">
+    /// <native:HtmlCanvas Width="1000" Height="500" xmlns:native="using:CSHTML5.Native.Html.Controls">
     ///     <native:RectangleElement X="200" Y="42" Width="100" Height="50" FillColor="Blue"/>
     /// </native:HtmlCanvas>
     /// </code>

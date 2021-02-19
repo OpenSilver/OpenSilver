@@ -37,7 +37,7 @@ namespace CSHTML5.Native.Html.Controls
     /// <example>
     /// You can add text to the XAML as follows:
     /// <code lang="XAML" xml:space="preserve">
-    /// <native:HtmlCanvas Width="1000" Height"500" xmlns:native="using:CSHTML5.Native.Html.Controls">
+    /// <native:HtmlCanvas Width="1000" Height="500" xmlns:native="using:CSHTML5.Native.Html.Controls">
     ///     <native:TextElement X="200" Y="42" Text="I am the text" Font="20px Arial"/>
     /// </native:HtmlCanvas>
     /// </code>

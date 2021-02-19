@@ -1601,7 +1601,7 @@ namespace Windows.UI.Xaml
 
 #if MIGRATION
             Type[] methodParameters = new Type[] { typeof(MouseEventArgs) };
-            ///
+            //
             if (_pointerMovedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseMove", methodParameters))
             {
                 var v = PointerMovedEventManager; //forces the creation of the event manager.
@@ -1610,7 +1610,7 @@ namespace Windows.UI.Xaml
             {
                 _pointerMovedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseMove", methodParameters);
             }
-            ///
+            //
             if (_pointerEnteredEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseEnter", methodParameters))
             {
                 var v = PointerEnteredEventManager; //forces the creation of the event manager.
@@ -1619,7 +1619,7 @@ namespace Windows.UI.Xaml
             {
                 _pointerEnteredEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseEnter", methodParameters);
             }
-            ///
+            //
             if (_pointerExitedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseLeave", methodParameters))
             {
                 var v = PointerExitedEventManager; //forces the creation of the event manager.
@@ -1628,7 +1628,7 @@ namespace Windows.UI.Xaml
             {
                 _pointerExitedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseLeave", methodParameters);
             }
-            ///
+            //
             methodParameters = new Type[] { typeof(TappedRoutedEventArgs) };
             if (_tappedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnTapped", methodParameters))
             {
@@ -1638,7 +1638,7 @@ namespace Windows.UI.Xaml
             {
                 _tappedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnTapped", methodParameters);
             }
-            ///
+            //
             methodParameters = new Type[] { typeof(MouseButtonEventArgs) };
             if (_pointerPressedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseLeftButtonDown", methodParameters))
             {
@@ -1648,7 +1648,7 @@ namespace Windows.UI.Xaml
             {
                 _pointerPressedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseLeftButtonDown", methodParameters);
             }
-            ///
+            //
             if (_pointerReleasedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseLeftButtonUp", methodParameters))
             {
                 var v = PointerReleasedEventManager; //forces the creation of the event manager.
@@ -1657,7 +1657,7 @@ namespace Windows.UI.Xaml
             {
                 _pointerReleasedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseLeftButtonUp", methodParameters);
             }
-            ///
+            //
             if (_rightTappedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseRightButtonUp", methodParameters))
             {
                 var v = RightTappedEventManager; //forces the creation of the event manager.
@@ -1666,7 +1666,7 @@ namespace Windows.UI.Xaml
             {
                 _rightTappedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseRightButtonUp", methodParameters);
             }
-            ///
+            //
             methodParameters = new Type[] { typeof(KeyEventArgs) };
             if (_keyDownEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnKeyDown", methodParameters))
             {
@@ -1676,7 +1676,7 @@ namespace Windows.UI.Xaml
             {
                 _keyDownEventManager.AttachToDomEvents(this, typeof(UIElement), "OnKeyDown", methodParameters);
             }
-            ///
+            //
             if (_keyUpEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnKeyUp", methodParameters))
             {
                 var v = KeyUpEventManager; //forces the creation of the event manager.
@@ -1685,7 +1685,7 @@ namespace Windows.UI.Xaml
             {
                 _keyUpEventManager.AttachToDomEvents(this, typeof(UIElement), "OnKeyUp", methodParameters);
             }
-            ///
+            //
             methodParameters = new Type[] { typeof(RoutedEventArgs) };
             if (_gotFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnGotFocus", methodParameters))
             {
@@ -1695,7 +1695,7 @@ namespace Windows.UI.Xaml
             {
                 _gotFocusEventManager.AttachToDomEvents(this, typeof(UIElement), "OnGotFocus", methodParameters);
             }
-            ///
+            //
             if (_lostFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnLostFocus", methodParameters))
             {
                 var v = LostFocusEventManager; //forces the creation of the event manager.

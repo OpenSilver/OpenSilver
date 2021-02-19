@@ -142,14 +142,14 @@ if (requestMethod) { // Native exit full screen.
         //     mode.
         //public event EventHandler FullScreenChanged;
 
-         /// <summary>
-         /// Occurs when the System.Windows.Interop.Content.ActualHeight or the System.Windows.Interop.Content.ActualWidth 
-         /// of the Silverlight plug-in change.
-         /// </summary>
+        /// <summary>
+        /// Occurs when the System.Windows.Interop.Content.ActualHeight or the System.Windows.Interop.Content.ActualWidth 
+        /// of the Silverlight plug-in change.
+        /// </summary>
         public event EventHandler Resized;
 
         /// <summary>
-        //  Occurs when the zoom setting in the host browser window changes or is initialized.
+        /// Occurs when the zoom setting in the host browser window changes or is initialized.
         /// </summary>
         public event EventHandler Zoomed;
 

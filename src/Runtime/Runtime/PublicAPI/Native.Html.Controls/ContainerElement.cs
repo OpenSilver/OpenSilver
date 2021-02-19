@@ -37,7 +37,7 @@ namespace CSHTML5.Native.Html.Controls
     /// <example>
     /// You can add a Container to the XAML as follows:
     /// <code lang="XAML" xml:space="preserve">
-    /// <native:Canvas Width="1000" Height"500" xmlns:native="using:CSHTML5.Native.Html.Controls">
+    /// <native:Canvas Width="1000" Height="500" xmlns:native="using:CSHTML5.Native.Html.Controls">
     ///     <native:Container X="200" Y="42" Width="100" Height="50" FillColor="Blue">
     ///             <!-- Place children here -->
     ///     </native:Container>
