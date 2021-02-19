@@ -44,7 +44,7 @@ namespace CSHTML5.Native.Html.Controls
     /// <code lang="XAML" xml:space="preserve">
     /// <native:HtmlCanvas Width="100" Height="100" xmlns:native="using:CSHTML5.Native.Html.Controls">
     ///     <!-- Place children here -->
-    /// </native:Canvas>
+    /// </native:HtmlCanvas>
     /// </code>
     /// Or in C#:
     /// <code lang="C#">

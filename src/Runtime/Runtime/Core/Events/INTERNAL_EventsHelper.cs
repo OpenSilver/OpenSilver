@@ -118,8 +118,10 @@ namespace CSHTML5.Internal
         /// <summary>
         /// Checks whether the method passed as parameter is an override by checking whether its DeclaringType is the same as the type passed as parameter.
         /// </summary>
+        /// <param name="instance">The instance on which the events should be fired (normally "this").</param>
         /// <param name="callbackMethodOriginType">The type where the method was originally declared.</param>
-        /// <param name="callbackMethod">The method that will be checked whether it was declared in the type passed as parameter.</param>
+        /// <param name="callbackMethodName">The method that will be checked whether it was declared in the type passed as parameter.</param>
+        /// <param name="callbackMethodParameterTypes">The list of the callback method argument types.</param>
         /// <returns>True if the method is an override (its DeclaringType is different than the type passed as parameter).</returns>
         public static bool IsEventCallbackOverridden(object instance, Type callbackMethodOriginType, string callbackMethodName, Type[] callbackMethodParameterTypes)
         {

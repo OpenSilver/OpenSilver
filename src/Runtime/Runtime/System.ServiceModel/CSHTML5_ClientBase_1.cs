@@ -1630,7 +1630,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         protected class ChannelBase<T> where T : class
         {
             /// <summary>
-            /// Initializes a new instance of the System.ServiceModel.ClientBase<TChannel>.ChannelBase<T>
+            /// Initializes a new instance of the <see cref="System.ServiceModel.ClientBase{TChannel}.ChannelBase{T}"/>
             /// class from an existing instance of the class.
             /// </summary>
             /// <param name="client">The object used to initialize the new instance of the class.</param>

@@ -35,7 +35,7 @@ namespace CSHTML5.Native.Html.Controls
     /// <example>
     /// You can add an image to the XAML as follows:
     /// <code lang="XAML" xml:space="preserve">
-    /// <native:HtmlCanvas Width="1000" Height"500" xmlns:native="using:CSHTML5.Native.Html.Controls">
+    /// <native:HtmlCanvas Width="1000" Height="500" xmlns:native="using:CSHTML5.Native.Html.Controls">
     ///     <native:ImageElement Source="ms-appx:///MyAssembly/MyFolder/Image.png" X="200" Y="42" Width="100" Height="50"/>
     /// </native:HtmlCanvas>
     /// </code>
