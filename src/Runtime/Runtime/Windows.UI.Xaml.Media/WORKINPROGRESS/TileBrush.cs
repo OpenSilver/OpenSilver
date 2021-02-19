@@ -10,9 +10,9 @@ namespace Windows.UI.Xaml.Media
 {
 	public abstract partial class TileBrush : Brush
 	{
-		public static readonly DependencyProperty AlignmentXProperty = DependencyProperty.Register("AlignmentXProperty", typeof(AlignmentX), typeof(TileBrush), new PropertyMetadata());
-		public static readonly DependencyProperty AlignmentYProperty = DependencyProperty.Register("AlignmentYProperty", typeof(AlignmentY), typeof(TileBrush), new PropertyMetadata());
-		public static readonly DependencyProperty StretchProperty = DependencyProperty.Register("StretchProperty", typeof(Stretch), typeof(TileBrush), new PropertyMetadata());
+		public static readonly DependencyProperty AlignmentXProperty = DependencyProperty.Register(nameof(AlignmentX), typeof(AlignmentX), typeof(TileBrush), new PropertyMetadata());
+		public static readonly DependencyProperty AlignmentYProperty = DependencyProperty.Register(nameof(AlignmentY), typeof(AlignmentY), typeof(TileBrush), new PropertyMetadata());
+		public static readonly DependencyProperty StretchProperty = DependencyProperty.Register(nameof(Stretch), typeof(Stretch), typeof(TileBrush), new PropertyMetadata());
 		public AlignmentX AlignmentX
 		{
 			get

@@ -7,7 +7,7 @@ namespace System.Windows.Media.Effects
 {
     public abstract partial class ShaderEffect : Effect
     {
-        protected static readonly DependencyProperty PixelShaderProperty = DependencyProperty.Register("PixelShaderProperty", typeof(PixelShader), typeof(ShaderEffect), new PropertyMetadata());
+        protected static readonly DependencyProperty PixelShaderProperty = DependencyProperty.Register(nameof(PixelShader), typeof(PixelShader), typeof(ShaderEffect), new PropertyMetadata());
         
 
         protected PixelShader PixelShader

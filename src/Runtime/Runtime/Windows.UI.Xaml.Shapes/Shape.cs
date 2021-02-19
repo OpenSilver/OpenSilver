@@ -1017,7 +1017,7 @@ context.restore();
         public PenLineCap StrokeDashCap
         {
             get { return (PenLineCap)GetValue(StrokeDashCapProperty); }
-            set { SetValue(StrokeStartLineCapProperty, value); }
+            set { SetValue(StrokeDashCapProperty, value); }
         }
 
         /// <summary>
@@ -1027,7 +1027,7 @@ context.restore();
         /// The identifier for the StrokeDashCap dependency property.
         /// </returns>
         public static readonly DependencyProperty StrokeDashCapProperty =
-            DependencyProperty.Register("StrokeDashCap", typeof(PenLineCap), typeof(Shape), new PropertyMetadata(PenLineCap.Flat));
+            DependencyProperty.Register(nameof(StrokeDashCap), typeof(PenLineCap), typeof(Shape), new PropertyMetadata(PenLineCap.Flat));
 
 #endif
 

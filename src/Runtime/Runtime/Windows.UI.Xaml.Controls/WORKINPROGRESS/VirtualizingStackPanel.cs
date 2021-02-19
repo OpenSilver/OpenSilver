@@ -17,7 +17,7 @@ namespace Windows.UI.Xaml.Controls
 	{
 		public static readonly DependencyProperty VirtualizationModeProperty = DependencyProperty.Register("VirtualizationMode", typeof(VirtualizationMode), typeof(VirtualizingStackPanel), null);
 		public static readonly DependencyProperty IsVirtualizingProperty = DependencyProperty.Register("IsVirtualizing", typeof(bool), typeof(VirtualizingStackPanel), null);
-		public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("OrientationProperty", typeof(Orientation), typeof(VirtualizingStackPanel), new PropertyMetadata());
+		public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register(nameof(Orientation), typeof(Orientation), typeof(VirtualizingStackPanel), new PropertyMetadata());
 		public Orientation Orientation
 		{
 			get
