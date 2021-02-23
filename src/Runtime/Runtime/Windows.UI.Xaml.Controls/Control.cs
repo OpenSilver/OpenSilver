@@ -844,10 +844,10 @@ namespace Windows.UI.Xaml.Controls
 
             if (visualsCreated)
             {
+                this._renderedControlTemplate = visualChild;
+             
                 // Raise the OnApplyTemplate method
                 this.OnApplyTemplate();
-
-                this._renderedControlTemplate = visualChild;
             }
 
             return visualsCreated;
