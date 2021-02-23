@@ -265,7 +265,7 @@ namespace Windows.UI.Xaml.Media
                     children = new List<DependencyObject>();
 
                     // If the content of the content property is a single item, we return it. Otherwise we return the whole collection:
-                    if (value is DependencyObject)
+                    if (value is UIElement)
                     {
                         children.Add((DependencyObject)value);
                     }
@@ -273,7 +273,7 @@ namespace Windows.UI.Xaml.Media
                     {
                         foreach (var item in (IEnumerable)value)
                         {
-                            if (!(item is DependencyObject))
+                            if (!(item is UIElement))
                             {
                                 children = null;
 
@@ -320,12 +320,12 @@ namespace Windows.UI.Xaml.Media
 #if WORKINPROGRESS
         public static IEnumerable<Popup> GetOpenPopups()
         {
-            return null;
+            return new List<Popup>();
         }
 
         public static IEnumerable<Popup> GetOpenPopups(Window window)
         {
-            return null;
+            return new List<Popup>();
         }
 
         public static IEnumerable<UIElement> FindElementsInHostCoordinates(Rect intersectingRect, UIElement subtree)
