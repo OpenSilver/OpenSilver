@@ -265,120 +265,180 @@ ends with "".Browser"" in your solution.";
             }
         }
 
-        //void MainWebBrowser_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
-        //{
-        //    var relativePosition = e.GetPosition(MainWebBrowser);
-        //    Test.Text = relativePosition.X + ", " + relativePosition.Y;
-        //}
-
+#if OPENSILVER
         Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             string assemblyLocalName = args.Name.IndexOf(',') >= 0 ? args.Name.Substring(0, args.Name.IndexOf(',')) : args.Name;
-#if OPENSILVER
-            if (assemblyLocalName == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR
-                || assemblyLocalName == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR)
-#else
-            if (assemblyLocalName == Constants.NAME_OF_CORE_ASSEMBLY
-                || assemblyLocalName == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION)
-#endif
+
+            switch (assemblyLocalName)
             {
-                // If specified DLL has absolute path, look in same folder:
-                string pathOfAssemblyThatContainsEntryPoint;
-                string candidatePath;
-                if (ReflectionInUserAssembliesHelper.TryGetPathOfAssemblyThatContainsEntryPoint(out pathOfAssemblyThatContainsEntryPoint))
-                {
-                    bool isPathAbsolute = pathOfAssemblyThatContainsEntryPoint.Contains("\\");
-                    if (isPathAbsolute)
+                //case Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR:
+                case Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR:
+                case "OpenSilver.Controls.Data.DataForm.Toolkit":
+                    // If specified DLL has absolute path, look in same folder:
+                    string pathOfAssemblyThatContainsEntryPoint;
+                    string candidatePath;
+                    if (ReflectionInUserAssembliesHelper.TryGetPathOfAssemblyThatContainsEntryPoint(out pathOfAssemblyThatContainsEntryPoint))
                     {
-#if OPENSILVER
-                        candidatePath = Path.GetDirectoryName(pathOfAssemblyThatContainsEntryPoint) + "\\" + Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR + ".dll";
-
-#else
-                        candidatePath = Path.GetDirectoryName(pathOfAssemblyThatContainsEntryPoint) + "\\" + Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION + ".dll";
-#endif
-                        if (!File.Exists(candidatePath)) // We look for both the standard and the "SLMigration" versions of the core assembly.
-#if OPENSILVER
-                            candidatePath = Path.GetDirectoryName(pathOfAssemblyThatContainsEntryPoint) + "\\" + Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR + ".dll";
-#else
-                            candidatePath = Path.GetDirectoryName(pathOfAssemblyThatContainsEntryPoint) + "\\" + Constants.NAME_OF_CORE_ASSEMBLY + ".dll";
-#endif
-                        return Assembly.LoadFile(candidatePath);
+                        if (pathOfAssemblyThatContainsEntryPoint.Contains("\\"))
+                        {
+                            candidatePath = $"{Path.GetDirectoryName(pathOfAssemblyThatContainsEntryPoint)}\\{assemblyLocalName}.dll";
+                            return Assembly.LoadFile(candidatePath);
+                        }
                     }
-                }
-                // Otherwise look in current execution folder:
-                candidatePath = Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION + ".dll";
-                if (!File.Exists(Constants.NAME_OF_CORE_ASSEMBLY + ".dll")) // We look for both the standard and the "SLMigration" versions of the core assembly.
-                    candidatePath = Constants.NAME_OF_CORE_ASSEMBLY + ".dll";
-                return Assembly.LoadFile(candidatePath);
-            }
-            else if (assemblyLocalName == "CSharpXamlForHtml5.System.dll"
-                || assemblyLocalName == "SLMigration.CSharpXamlForHtml5.System.dll")
-            {
-                var assembly = Assembly.GetAssembly(typeof(Queue<>)); // Note: Queue<> is defined in System.dll
-                return assembly;
-            }
-            else if (assemblyLocalName == "CSharpXamlForHtml5.System.Xaml.dll"
-                || assemblyLocalName == "SLMigration.CSharpXamlForHtml5.System.Xaml.dll")
-            {
-                var assembly = Assembly.GetAssembly(typeof(XamlException)); // Note: XamlException is defined in System.Xaml.dll
-                return assembly;
-            }
-            else if (assemblyLocalName == "CSharpXamlForHtml5.System.Xml.dll"
-                || assemblyLocalName == "SLMigration.CSharpXamlForHtml5.System.Xml.dll")
-            {
-                var assembly = Assembly.GetAssembly(typeof(XmlSerializer)); // Note: XmlSerializer is defined in System.Xml.dll
-                return assembly;
-            }
-            else if (assemblyLocalName == "CSharpXamlForHtml5.System.Runtime.Serialization.dll"
-                || assemblyLocalName == "SLMigration.CSharpXamlForHtml5.System.Runtime.Serialization.dll")
-            {
-                var assembly = Assembly.GetAssembly(typeof(DataContractAttribute)); // Note: DataContractAttribute is defined in System.Runtime.Serialization.dll
-                return assembly;
-            }
-            else if (assemblyLocalName == "CSharpXamlForHtml5.System.ServiceModel.dll"
-                || assemblyLocalName == "SLMigration.CSharpXamlForHtml5.System.ServiceModel.dll")
-            {
-                var assembly = Assembly.GetAssembly(typeof(EndpointAddress)); // Note: EndpointAddress is defined in System.ServiceModel.dll
-                return assembly;
-            }
-            else if (assemblyLocalName == "CSharpXamlForHtml5.ToBeReplacedAtRuntime.System.ServiceModel.dll"
-                || assemblyLocalName == "SLMigration.CSharpXamlForHtml5.ToBeReplacedAtRuntime.System.ServiceModel.dll")
-            {
-                var assembly = Assembly.GetAssembly(typeof(EndpointAddress)); // Note: EndpointAddress is defined in System.ServiceModel.dll
-                return assembly;
-            }
-            else if (assemblyLocalName.ToLower() == "bridge"
-                || assemblyLocalName.ToLower() == "cshtml5.stubs") // Note: this corresponds to the assembly produced by the project "DotNetForHtml5.Bridge.TypesThatWillBeForwarded"
-            {
-                return _typeForwardingAssembly;
-            }
-            else if (args.RequestingAssembly != null)
-            {
-                string assemblyFileName = $"{assemblyLocalName}.dll";
-                string invariantFullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), assemblyFileName));
-                string fullPath;
 
-                if (!File.Exists(invariantFullPath))
-                {
-                    string cultureName = Thread.CurrentThread.CurrentCulture.Name;
-                    fullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), cultureName, assemblyFileName));
-                }
-                else
-                {
-                    fullPath = invariantFullPath;
-                }
+                    // Otherwise look in current execution folder:
+                    return Assembly.LoadFile($"{assemblyLocalName}.dll");
 
-                if (File.Exists(fullPath))
-                {
-                    var assembly = Assembly.LoadFile(fullPath);
-                    return assembly;
-                }
-                else
-                    throw new FileNotFoundException($"Assembly {assemblyFileName} not found.\nSearched at:\n{invariantFullPath}\n{fullPath}");
+                default:
+                    if (args.RequestingAssembly != null)
+                    {
+                        string assemblyFileName = $"{assemblyLocalName}.dll";
+                        string invariantFullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), assemblyFileName));
+
+                        string fullPath;
+                        if (!File.Exists(invariantFullPath))
+                        {
+                            string cultureName = Thread.CurrentThread.CurrentCulture.Name;
+                            fullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), cultureName, assemblyFileName));
+                        }
+                        else
+                        {
+                            fullPath = invariantFullPath;
+                        }
+
+                        if (File.Exists(fullPath))
+                        {
+                            var assembly = Assembly.LoadFile(fullPath);
+                            return assembly;
+                        }
+                        else
+                        {
+                            throw new FileNotFoundException($"Assembly {assemblyFileName} not found.\nSearched at:\n{invariantFullPath}\n{fullPath}");
+                        }
+                    }
+                    return null;
             }
-            else
-                return null;
         }
+#elif BRIDGE
+        Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            string assemblyLocalName = args.Name.IndexOf(',') >= 0 ? args.Name.Substring(0, args.Name.IndexOf(',')) : args.Name;
+
+            // Note: this corresponds to the assembly produced by the project 
+            // "DotNetForHtml5.Bridge.TypesThatWillBeForwarded"
+            switch (assemblyLocalName.ToLower())
+            {
+                case "bridge":
+                case "cshtml5.stubs":
+                    return _typeForwardingAssembly;
+
+                default:
+                    if (args.RequestingAssembly != null)
+                    {
+                        string assemblyFileName = $"{assemblyLocalName}.dll";
+                        string invariantFullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), assemblyFileName));
+                        string fullPath;
+
+                        if (!File.Exists(invariantFullPath))
+                        {
+                            string cultureName = Thread.CurrentThread.CurrentCulture.Name;
+                            fullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), cultureName, assemblyFileName));
+                        }
+                        else
+                        {
+                            fullPath = invariantFullPath;
+                        }
+
+                        if (File.Exists(fullPath))
+                        {
+                            var assembly = Assembly.LoadFile(fullPath);
+                            return assembly;
+                        }
+                        else
+                            throw new FileNotFoundException($"Assembly {assemblyFileName} not found.\nSearched at:\n{invariantFullPath}\n{fullPath}");
+                    }
+                    return null;
+            }
+        }
+#else // JSIL, Obsolete, remove this
+        Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            string assemblyLocalName = args.Name.IndexOf(',') >= 0 ? args.Name.Substring(0, args.Name.IndexOf(',')) : args.Name;
+
+            switch (assemblyLocalName)
+            {
+                case Constants.NAME_OF_CORE_ASSEMBLY:
+                case Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION:
+                    // If specified DLL has absolute path, look in same folder:
+                    string pathOfAssemblyThatContainsEntryPoint;
+                    string candidatePath;
+                    if (ReflectionInUserAssembliesHelper.TryGetPathOfAssemblyThatContainsEntryPoint(out pathOfAssemblyThatContainsEntryPoint))
+                    {
+                        if (pathOfAssemblyThatContainsEntryPoint.Contains("\\"))
+                        {
+                            candidatePath = $"{Path.GetDirectoryName(pathOfAssemblyThatContainsEntryPoint)}\\{assemblyLocalName}.dll";
+                            return Assembly.LoadFile(candidatePath);
+                        }
+                    }
+                    // Otherwise look in current execution folder:
+                    return Assembly.LoadFile($"{assemblyLocalName}.dll");
+
+                case "CSharpXamlForHtml5.System.dll":
+                case "SLMigration.CSharpXamlForHtml5.System.dll":
+                    return Assembly.GetAssembly(typeof(Queue<>)); // Note: Queue<> is defined in System.dll
+
+                case "CSharpXamlForHtml5.System.Xaml.dll":
+                case "SLMigration.CSharpXamlForHtml5.System.Xaml.dll":
+                    return Assembly.GetAssembly(typeof(XamlException)); // Note: XamlException is defined in System.Xaml.dll
+
+                case "CSharpXamlForHtml5.System.Xml.dll":
+                case "SLMigration.CSharpXamlForHtml5.System.Xml.dll":
+                    return Assembly.GetAssembly(typeof(XmlSerializer)); // Note: XmlSerializer is defined in System.Xml.dll
+
+                case "CSharpXamlForHtml5.System.Runtime.Serialization.dll":
+                case "SLMigration.CSharpXamlForHtml5.System.Runtime.Serialization.dll":
+                    return Assembly.GetAssembly(typeof(DataContractAttribute)); // Note: DataContractAttribute is defined in System.Runtime.Serialization.dll
+
+                case "CSharpXamlForHtml5.System.ServiceModel.dll":
+                case "SLMigration.CSharpXamlForHtml5.System.ServiceModel.dll":
+                    return Assembly.GetAssembly(typeof(EndpointAddress)); // Note: EndpointAddress is defined in System.ServiceModel.dll
+                
+                case "CSharpXamlForHtml5.ToBeReplacedAtRuntime.System.ServiceModel.dll":
+                case "SLMigration.CSharpXamlForHtml5.ToBeReplacedAtRuntime.System.ServiceModel.dll":
+                    return Assembly.GetAssembly(typeof(EndpointAddress)); // Note: EndpointAddress is defined in System.ServiceModel.dll
+
+                default:
+                    if (args.RequestingAssembly != null)
+                    {
+                        string assemblyFileName = $"{assemblyLocalName}.dll";
+                        string invariantFullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), assemblyFileName));
+
+                        string fullPath;
+                        if (!File.Exists(invariantFullPath))
+                        {
+                            string cultureName = Thread.CurrentThread.CurrentCulture.Name;
+                            fullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), cultureName, assemblyFileName));
+                        }
+                        else
+                        {
+                            fullPath = invariantFullPath;
+                        }
+
+                        if (File.Exists(fullPath))
+                        {
+                            var assembly = Assembly.LoadFile(fullPath);
+                            return assembly;
+                        }
+                        else
+                        {
+                            throw new FileNotFoundException($"Assembly {assemblyFileName} not found.\nSearched at:\n{invariantFullPath}\n{fullPath}");
+                        }
+                    }
+                    return null;
+            }
+        }
+#endif
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {

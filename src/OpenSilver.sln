@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Targets", "Targets", "{AA67
 		Targets\OpenSilver.UwpCompatible.targets = Targets\OpenSilver.UwpCompatible.targets
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataForm.Toolkit.OpenSilver", "Runtime\DataForm.Toolkit\DataForm.Toolkit.OpenSilver.csproj", "{2D8E03A2-A9E2-4CD7-81A4-A268D0E28BD8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		SL.WorkInProgress|Any CPU = SL.WorkInProgress|Any CPU
@@ -83,6 +85,14 @@ Global
 		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.UWP.WorkInProgress|Any CPU.Build.0 = UWP.WorkInProgress|Any CPU
 		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.UWP|Any CPU.ActiveCfg = UWP|Any CPU
 		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.UWP|Any CPU.Build.0 = UWP|Any CPU
+		{2D8E03A2-A9E2-4CD7-81A4-A268D0E28BD8}.SL.WorkInProgress|Any CPU.ActiveCfg = SL.WorkInProgress|Any CPU
+		{2D8E03A2-A9E2-4CD7-81A4-A268D0E28BD8}.SL.WorkInProgress|Any CPU.Build.0 = SL.WorkInProgress|Any CPU
+		{2D8E03A2-A9E2-4CD7-81A4-A268D0E28BD8}.SL|Any CPU.ActiveCfg = SL|Any CPU
+		{2D8E03A2-A9E2-4CD7-81A4-A268D0E28BD8}.SL|Any CPU.Build.0 = SL|Any CPU
+		{2D8E03A2-A9E2-4CD7-81A4-A268D0E28BD8}.UWP.WorkInProgress|Any CPU.ActiveCfg = UWP.WorkInProgress|Any CPU
+		{2D8E03A2-A9E2-4CD7-81A4-A268D0E28BD8}.UWP.WorkInProgress|Any CPU.Build.0 = UWP.WorkInProgress|Any CPU
+		{2D8E03A2-A9E2-4CD7-81A4-A268D0E28BD8}.UWP|Any CPU.ActiveCfg = UWP|Any CPU
+		{2D8E03A2-A9E2-4CD7-81A4-A268D0E28BD8}.UWP|Any CPU.Build.0 = UWP|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -94,6 +104,7 @@ Global
 		{4DDCEEBE-B5CA-4A29-87B0-29FF42AB7A0D} = {EE82C82C-611F-4CD8-8786-2E1C91EC243E}
 		{4D0CA743-4F06-40DA-92D7-F31D8F395E2A} = {EE82C82C-611F-4CD8-8786-2E1C91EC243E}
 		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0} = {F3405D9A-9228-4579-97B7-6BFB11D2D582}
+		{2D8E03A2-A9E2-4CD7-81A4-A268D0E28BD8} = {BDA9A1B3-15CD-4068-9A6D-BDA030FBEC5E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A13C12CC-0544-49D7-A852-FCE1C884AA54}
