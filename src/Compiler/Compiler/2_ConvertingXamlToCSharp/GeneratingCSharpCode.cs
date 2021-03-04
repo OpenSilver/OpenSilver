@@ -156,15 +156,18 @@ namespace DotNetForHtml5.Compiler
                         }
                         if (!isPropertyDealtWith)
                         {
-                            // Add the code of the children elements:
                             stringBuilder.Clear();
-                            int childrenCount = element.Elements().Count(); //todo-performance: find a more performant way to count the children?
-                            foreach (var childCode in PopElementsFromStackAndReadThemInReverseOrder<string>(codeStack, childrenCount)) // Note: this is supposed to not raise OutOfIndex because child nodes are supposed to have added code to the stack.
+                            
+                            if (isFirstPass)
                             {
-                                stringBuilder.AppendLine(childCode);
+                                // Add the code of the children elements:
+                                int childrenCount = element.Elements().Count(); //todo-performance: find a more performant way to count the children?
+                                foreach (var childCode in PopElementsFromStackAndReadThemInReverseOrder<string>(codeStack, childrenCount)) // Note: this is supposed to not raise OutOfIndex because child nodes are supposed to have added code to the stack.
+                                {
+                                    stringBuilder.AppendLine(childCode);
+                                }
                             }
-
-                            if (!isFirstPass) // We ignore this during the first pass because the DLL has not been compiled yet so we don't have access to all the types.
+                            else
                             {
                                 bool isAttachedProperty = GettingInformationAboutXamlTypes.IsPropertyAttached(element, reflectionOnSeparateAppDomain); //(parentElement.Name != elementName) && !GettingInformationAboutXamlTypes.IsTypeAssignableFrom(parentElement.Name, elementName, reflectionOnSeparateAppDomain); // Note: the comparison includes the namespace. // eg. <Grid><VisualStateManager.VisualStateGroups>...</VisualStateManager.VisualStateGroups></Grid> should return "true", while <n:MyUserControl><UserControl.Resources>...</n:MyUserControl></UserControl.Resources> should return "false".
 
@@ -212,6 +215,7 @@ namespace DotNetForHtml5.Compiler
 
                                     // Add the children to the collection/dictionary:
                                     GenerateCodeForAddingChildrenToCollectionOrDictionary(
+                                        codeStack: codeStack,
                                         stringBuilder: stringBuilder,
                                         enumerableType: enumerableType,
                                         codeToAccessTheEnumerable: codeToAccessTheEnumerable,
@@ -223,6 +227,13 @@ namespace DotNetForHtml5.Compiler
                                     //------------------------
                                     // PROPERTY TYPE IS NOT A COLLECTION
                                     //------------------------
+
+                                    // Add the code of the children elements:
+                                    int childrenCount = element.Elements().Count(); //todo-performance: find a more performant way to count the children?
+                                    foreach (var childCode in PopElementsFromStackAndReadThemInReverseOrder<string>(codeStack, childrenCount)) // Note: this is supposed to not raise OutOfIndex because child nodes are supposed to have added code to the stack.
+                                    {
+                                        stringBuilder.AppendLine(childCode);
+                                    }
 
                                     bool first = true;
                                     foreach (XElement child in element.Elements())
@@ -254,9 +265,6 @@ namespace DotNetForHtml5.Compiler
                                             // MARKUP EXTENSIONS:
                                             //------------------------------
 
-                                            // Get a reference to the list to which we add the generated markup extensions code:
-                                            List<string> markupExtensionsAdditionalCode = GetListThatContainsAdditionalCodeFromDictionary(elementThatIsRootOfTheCurrentNamescope, namescopeRootToMarkupExtensionsAdditionalCode);
-
                                             XElement parent = element.Parent;
 
                                             if (child.Name.LocalName == "StaticResource" || child.Name.LocalName == "StaticResourceExtension" || child.Name.LocalName == "ThemeResourceExtension") //todo: see if there are other elements than StaticResource that need the parents //todo: check namespace as well?
@@ -268,7 +276,8 @@ namespace DotNetForHtml5.Compiler
                                                 //we generate a list of the parents of the element so that we can search their resources if needed
                                                 XElement elementForSearch = element.Parent;
                                                 string nameForParentsCollection = GeneratingUniqueNames.GenerateUniqueNameFromString("parents"); // Example: parents_4541C363579C48A981219C392BF8ACD5
-                                                markupExtensionsAdditionalCode.Add("global::System.Collections.Generic.List<global::System.Object> " + nameForParentsCollection + " = new global::System.Collections.Generic.List<global::System.Object>();");
+                                                stringBuilder.AppendLine(string.Format("var {0} = new global::System.Collections.Generic.List<global::System.Object>();",
+                                                    nameForParentsCollection));
                                                 while (elementForSearch != null && elementForSearch.Parent != null) //we check for the parent because the last parent will be the container(for example a Page) and the generated code doesn't create an instance for itself.
                                                 {
                                                     if (elementForSearch != elementThatIsRootOfTheCurrentNamescope)
@@ -276,12 +285,15 @@ namespace DotNetForHtml5.Compiler
                                                         if (!elementForSearch.Name.LocalName.Contains('.'))
                                                         {
                                                             if (!GettingInformationAboutXamlTypes.IsElementAMarkupExtension(elementForSearch, reflectionOnSeparateAppDomain)) //we don't want to add the MarkupExtensions in the list of the parents (A MarkupExtension is not a DependencyObject)
-                                                                markupExtensionsAdditionalCode.Add(string.Format("{0}.Add({1});", nameForParentsCollection, GetUniqueName(elementForSearch)));
+                                                            {
+                                                                stringBuilder.AppendLine(string.Format("{0}.Add({1});", 
+                                                                    nameForParentsCollection, GetUniqueName(elementForSearch)));
+                                                            }
                                                         }
                                                     }
                                                     elementForSearch = elementForSearch.Parent;
                                                 }
-                                                markupExtensionsAdditionalCode.Add(string.Format("{0}.Add(this);", nameForParentsCollection)); //we add the container itself since we couldn't add it inside the while
+                                                stringBuilder.AppendLine(string.Format("{0}.Add(this);", nameForParentsCollection));
 
                                                 string[] splittedLocalName = element.Name.LocalName.Split('.');
                                                 string propertyKey = GettingInformationAboutXamlTypes.GetKeyNameOfProperty(parent, splittedLocalName[1], reflectionOnSeparateAppDomain);
@@ -294,7 +306,7 @@ namespace DotNetForHtml5.Compiler
                                                 {
                                                     elementTypeInCSharp = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(element.Name.NamespaceName, splittedLocalName[0], assemblyNameIfAny, ifTypeNotFoundTryGuessing: isFirstPass);
                                                     reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(propertyName, element.Name.NamespaceName, splittedLocalName[0], out propertyNamespaceName, out propertyLocalTypeName, out isTypeString, out isTypeEnum, assemblyNameIfAny, isAttached: true);
-                                                    markupExtensionsAdditionalCode.Add(string.Format("{0}.Set{1}({2},({3})({4}.ProvideValue(new global::System.ServiceProvider({2}, {5}, {6}))));",
+                                                    stringBuilder.AppendLine(string.Format("{0}.Set{1}({2},({3})({4}.ProvideValue(new global::System.ServiceProvider({2}, {5}, {6}))));",
                                                         elementTypeInCSharp,
                                                         propertyName,
                                                         GetUniqueName(parent),
@@ -307,7 +319,7 @@ namespace DotNetForHtml5.Compiler
                                                 {
                                                     elementTypeInCSharp = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(parent.Name.NamespaceName, parent.Name.LocalName, assemblyNameIfAny, ifTypeNotFoundTryGuessing: isFirstPass);
                                                     reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(propertyName, parent.Name.Namespace.NamespaceName, parent.Name.LocalName, out propertyNamespaceName, out propertyLocalTypeName, out isTypeString, out isTypeEnum, assemblyNameIfAny, isAttached: false);
-                                                    markupExtensionsAdditionalCode.Add(string.Format("{0}.{1} = ({2})({3}.ProvideValue(new global::System.ServiceProvider({0}, {4}, {5})));",
+                                                    stringBuilder.AppendLine(string.Format("{0}.{1} = ({2})({3}.ProvideValue(new global::System.ServiceProvider({0}, {4}, {5})));",
                                                         GetUniqueName(parent),
                                                         propertyName,
                                                         "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
@@ -321,6 +333,10 @@ namespace DotNetForHtml5.Compiler
                                                 //------------------------------
                                                 // {Binding ...}
                                                 //------------------------------
+
+                                                // Get a reference to the list to which we add the generated markup extensions code
+                                                List<string> markupExtensionsAdditionalCode = GetListThatContainsAdditionalCodeFromDictionary(
+                                                    elementThatIsRootOfTheCurrentNamescope, namescopeRootToMarkupExtensionsAdditionalCode);
 
                                                 string propertyDeclaringTypeName;
                                                 string propertyTypeNamespace;
@@ -446,7 +462,7 @@ namespace DotNetForHtml5.Compiler
                                                                                            GetUniqueName(parent),
                                                                                            propertyKeyString);
 
-                                                    markupExtensionsAdditionalCode.Add(
+                                                    stringBuilder.AppendLine(
                                                         string.Format("{0}.Set{1}({2}, ({3}){4});",
                                                                       elementTypeInCSharp,
                                                                       propertyName,
@@ -507,7 +523,7 @@ namespace DotNetForHtml5.Compiler
                                                     string bindingBaseTypeString = isSLMigration ? "System.Windows.Data.Binding" : "Windows.UI.Xaml.Data.Binding";
 
                                                     //todo: make this more readable by cutting it into parts ?
-                                                    markupExtensionsAdditionalCode.Add(
+                                                    stringBuilder.AppendLine(
                                                         string.Format(@"var {0} = {1}.ProvideValue(new global::System.ServiceProvider({2}, {3}));
 if({0} is {4})
 {{
@@ -528,16 +544,6 @@ else
                                                                       propertyDeclaringTypeName + "." + propertyName + "Property", //8
                                                                       namespaceSystemWindowsData//9
                                                                       ));
-
-                                                    //Note: the above is a mixture of the two following calls (the first one was here, the second one comes from the Binding section).
-                                                    //markupExtensionsAdditionalCode.Add(
-                                                    //    string.Format("{0}.{1} = ({2})({3}.ProvideValue(new global::System.ServiceProvider({0}, {4})));",
-                                                    //                  GetUniqueName(parent),
-                                                    //                  propertyName,
-                                                    //                  "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
-                                                    //                  childUniqueName,
-                                                    //                  propertyKeyString));
-                                                    //markupExtensionsAdditionalCode.Add(string.Format("{3}.BindingOperations.SetBinding({0}, {1}, {2});", parentElementUniqueNameOrThisKeyword, propertyDeclaringTypeName + "." + propertyName + "Property", GetUniqueName(child), namespaceSystemWindowsData)); //we add the container itself since we couldn't add it inside the while
                                                 }
                                             }
                                         }
@@ -567,8 +573,7 @@ else
 
                         // Add the constructor (in case of object) or a direct initialization (in case of system type or "isInitializeFromString" or referenced ResourceDictionary) (unless this is the root element):
                         string elementUniqueNameOrThisKeyword = GetUniqueName(element);
-                        string elementTypeInCSharp;
-                        elementTypeInCSharp = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(namespaceName, localTypeName, assemblyNameIfAny, ifTypeNotFoundTryGuessing: isFirstPass);
+                        string elementTypeInCSharp = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(namespaceName, localTypeName, assemblyNameIfAny, ifTypeNotFoundTryGuessing: isFirstPass);
                         stringBuilder.Clear();
                         if (!isRootElement)
                         {
@@ -958,14 +963,16 @@ else
                             }
                         }
 
-                        // Add the code of the children elements:
-                        int childrenCount = element.Elements().Count(); //todo-performance: find a more performant way to count the children?
-                        foreach (var childCode in PopElementsFromStackAndReadThemInReverseOrder<string>(codeStack, childrenCount)) // Note: this is supposed to not raise OutOfIndex because child nodes are supposed to have added code to the stack.
+                        if (isFirstPass)
                         {
-                            stringBuilder.AppendLine(childCode);
+                            // Add the code of the children elements:
+                            int childrenCount = element.Elements().Count(); //todo-performance: find a more performant way to count the children?
+                            foreach (var childCode in PopElementsFromStackAndReadThemInReverseOrder<string>(codeStack, childrenCount)) // Note: this is supposed to not raise OutOfIndex because child nodes are supposed to have added code to the stack.
+                            {
+                                stringBuilder.AppendLine(childCode);
+                            }
                         }
-
-                        if (!isFirstPass) // We ignore this during the first pass because the DLL has not been compiled yet so we don't have access to all the types.
+                        else
                         {
                             // Determine if the element is a collection or a dictionary:
                             EnumerableType enumerableType = EnumerableType.None;
@@ -978,11 +985,21 @@ else
                             {
                                 // Add the children to the collection/dictionary:
                                 GenerateCodeForAddingChildrenToCollectionOrDictionary(
+                                    codeStack: codeStack,
                                     stringBuilder: stringBuilder,
                                     enumerableType: enumerableType,
                                     codeToAccessTheEnumerable: elementUniqueNameOrThisKeyword,
                                     elementThatContainsTheChildrenToAdd: element,
                                     reflectionOnSeparateAppDomain: reflectionOnSeparateAppDomain);
+                            }
+                            else
+                            {
+                                // Add the code of the children elements:
+                                int childrenCount = element.Elements().Count(); //todo-performance: find a more performant way to count the children?
+                                foreach (var childCode in PopElementsFromStackAndReadThemInReverseOrder<string>(codeStack, childrenCount)) // Note: this is supposed to not raise OutOfIndex because child nodes are supposed to have added code to the stack.
+                                {
+                                    stringBuilder.AppendLine(childCode);
+                                }
                             }
                         }
 
@@ -1534,14 +1551,19 @@ var {4} = {2}.GetValue({1});
             None, Collection, Dictionary
         }
 
-        static void GenerateCodeForAddingChildrenToCollectionOrDictionary(StringBuilder stringBuilder, EnumerableType enumerableType, string codeToAccessTheEnumerable, XElement elementThatContainsTheChildrenToAdd, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+        static void GenerateCodeForAddingChildrenToCollectionOrDictionary(Stack<string> codeStack, StringBuilder stringBuilder, EnumerableType enumerableType, string codeToAccessTheEnumerable, XElement elementThatContainsTheChildrenToAdd, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
         {
+            List<XElement> children = elementThatContainsTheChildrenToAdd.Elements().ToList();
+            List<string> childrenCode = PopElementsFromStackAndReadThemInReverseOrder(codeStack, children.Count).ToList();
+
             switch (enumerableType)
             {
                 // If it is a simple Collection, we can Add elements without keys:
                 case EnumerableType.Collection:
-                    foreach (XElement child in elementThatContainsTheChildrenToAdd.Elements())
+                    for (int i = 0; i < children.Count; i++)
                     {
+                        XElement child = children[i];
+                        stringBuilder.AppendLine(childrenCode[i]);
                         bool isChildAProperty = child.Name.LocalName.Contains('.');
                         if (!isChildAProperty) // This will skip for example "<ResourceDictionary.MergedDictionaries>". In fact, if we are inside a <ResourceDictionary></ResourceDictionary>, we want to add all the directly-defined children but not the property ".MergedDictionaries".
                         {
@@ -1552,8 +1574,10 @@ var {4} = {2}.GetValue({1});
                     break;
                 // If it is a Dictionary (such as <ResourceDictionary></ResourceDictionary>), we need a key to add the element:
                 case EnumerableType.Dictionary:
-                    foreach (XElement child in elementThatContainsTheChildrenToAdd.Elements())
+                    for (int i = 0; i < children.Count; i++)
                     {
+                        XElement child = children[i];
+                        stringBuilder.AppendLine(childrenCode[i]);
                         bool isChildAProperty = child.Name.LocalName.Contains('.');
                         if (!isChildAProperty) // This will skip for example "<ResourceDictionary.MergedDictionaries>". In fact, if we are inside a <ResourceDictionary></ResourceDictionary>, we want to add all the directly-defined children but not the property ".MergedDictionaries".
                         {
