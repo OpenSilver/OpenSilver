@@ -1620,7 +1620,10 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         //    /// </summary>
         //    /// <typeparam name="T">The type that is identified as reference or numeric by the keyword.</typeparam>
         //    /// <returns>Returns null if T is a reference type and zero if T is a numeric value type.</returns>
-        //    protected T GetDefaultValueForInitialization<T>();
+        protected T GetDefaultValueForInitialization<T>()
+        {
+            return default(T);
+        }
 
         /// <summary>
         /// Generic ChannelBase class.

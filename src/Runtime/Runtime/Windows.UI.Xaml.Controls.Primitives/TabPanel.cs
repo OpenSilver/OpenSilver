@@ -13,37 +13,30 @@
 \*====================================================================================*/
 
 
-#if WORKINPROGRESS
-
-#if MIGRATION
-using System.Windows.Navigation;
-#else
-using Windows.UI.Xaml.Navigation;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+#if !MIGRATION
+using Windows.UI.Xaml.Controls;
 #endif
 
 #if MIGRATION
-namespace System.Windows.Controls
+namespace System.Windows.Controls.Primitives
 #else
-namespace Windows.UI.Xaml.Controls
+namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
-    public partial class Page : UserControl
+    /// <summary>
+    /// Handles the layout of <see cref="T:System.Windows.Controls.TabItem" />
+    /// objects on a <see cref="T:System.Windows.Controls.TabControl" />.
+    /// </summary>
+    public partial class TabPanel : WrapPanel
     {
-        public NavigationService NavigationService { get; }
-
-        private string _title;
-
-        /// <summary>
-        /// Gets or sets the name for the page.
-        /// </summary>
-        public string Title
+        public TabPanel()
         {
-            get { return _title; }
-            set { _title = value; }
+            this.Orientation = Orientation.Horizontal;
         }
-
-        public NavigationContext NavigationContext { get; }
     }
 }
-
-#endif

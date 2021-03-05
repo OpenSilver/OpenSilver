@@ -176,7 +176,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        /*
+
         /// <summary>
         /// Gets the ToolTipService.Placement XAML attached property value for the specified target element.
         /// </summary>
@@ -189,7 +189,7 @@ namespace Windows.UI.Xaml.Controls
 
             return (PlacementMode)element.GetValue(PlacementProperty);
         }
-         */
+
 
         /// <summary>Gets the visual element that the tooltip is positioned relative to.</summary>
         /// <returns>The visual element that the tooltip is positioned relative to.</returns>
@@ -220,7 +220,7 @@ namespace Windows.UI.Xaml.Controls
             return (object)element.GetValue(ToolTipProperty);
         }
 
-        /*
+        
         /// <summary>
         /// Sets the ToolTipService.Placement XAML attached property value for the specified target element.
         /// </summary>
@@ -233,7 +233,7 @@ namespace Windows.UI.Xaml.Controls
 
             element.SetValue(PlacementProperty, value);
         }
-         */
+         
 
         /*
         /// <summary>

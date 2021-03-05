@@ -13,30 +13,29 @@
 \*====================================================================================*/
 
 
-using System;
+#if WORKINPROGRESS
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.UI.Xaml.Controls;
-#endif
 
 #if MIGRATION
-namespace System.Windows.Controls
+namespace System.Windows.Navigation
 #else
-namespace Windows.UI.Xaml.Controls
+namespace Windows.UI.Xaml.Navigation
 #endif
 {
-    /// <summary>
-    /// Handles the layout of <see cref="T:System.Windows.Controls.TabItem" />
-    /// objects on a <see cref="T:System.Windows.Controls.TabControl" />.
-    /// </summary>
-    public partial class TabPanel : WrapPanel
+    //
+    // Summary:
+    //     Represents the state of a navigation operation.
+    public sealed class NavigationContext
     {
-        public TabPanel()
-        {
-            this.Orientation = Orientation.Horizontal;
-        }
+        //
+        // Summary:
+        //     Gets a collection of query string values.
+        //
+        // Returns:
+        //     A collection that contains the query string values.
+        public IDictionary<string, string> QueryString { get; }
     }
 }
+
+#endif

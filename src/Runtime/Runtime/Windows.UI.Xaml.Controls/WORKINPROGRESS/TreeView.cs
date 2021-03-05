@@ -31,6 +31,25 @@ namespace Windows.UI.Xaml.Controls
             get { return (object)this.GetValue(TreeView.SelectedItemProperty); }
         }
 
+        /// <summary>
+        ///     The DependencyProperty for the <see cref="SelectedValue"/> property.
+        ///     Default Value: null
+        /// </summary>
+        public static readonly DependencyProperty SelectedValueProperty =
+            DependencyProperty.Register("SelectedValue",
+                typeof(object),
+                typeof(TreeView),
+                null);
+
+        /// <summary>
+        ///     Specifies the a value on the selected item as defined by <see cref="SelectedValuePath" />.
+        /// </summary>
+        public object SelectedValue
+        {
+            get { return GetValue(SelectedValueProperty); }
+            set { SetValue(SelectedValueProperty, value); }
+        }
+
 #if MIGRATION
         public event RoutedPropertyChangedEventHandler<object> SelectedItemChanged;
 #else
