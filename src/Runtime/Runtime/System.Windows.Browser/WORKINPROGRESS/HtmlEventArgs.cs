@@ -43,6 +43,12 @@ namespace System.Windows.Browser
         {
             get { return _eventObject; }
         }
+        public bool AltKey { get; }
+        public bool CtrlKey { get; }
+        public int ClientX { get; }
+        public int ClientY { get; }
+        public bool ShiftKey { get; }
+
         #endregion
 
         #region Methods

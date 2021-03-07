@@ -82,6 +82,7 @@
 		<Compile Include="System.Net\UploadStringCompletedEventHandler.cs" />
 		<Compile Include="System.Net\WebClient.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\ComInterfaces.cs" />
+		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\ConstructorBuilder.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\CustomAttributeBuilder.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\DynamicMethod.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\ParameterBuilder.cs" />
@@ -125,6 +126,7 @@
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TableItemPatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TablePatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\AccordionButton.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\CalendarItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridCellsPresenter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridColumnHeader.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridColumnHeadersPresenter.cs" />
@@ -192,8 +194,10 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRow.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRowEditEndedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTextColumn.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataPager.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePicker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePickerFormat.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Expander.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\GridSplitter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\HeaderedItemsControl.cs" />
@@ -274,6 +278,7 @@
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TextOptions.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TextRenderingMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\VisualTreeHelper.cs" />
+		<Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationContext.cs" />
 		<Compile Include="Windows.UI.Xaml\ResourceDictionaryCollection.cs" />
 		<Compile Include="Windows.UI.Xaml\ResourcesChangeInfo.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationLifetimeObjectsCollection.cs" />
@@ -781,7 +786,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\StretchDirection.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TabControl.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TabItem.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\TabPanel.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls.Primitives\TabPanel.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TextBlock.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TextBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TextChangedEventArgs.cs" />

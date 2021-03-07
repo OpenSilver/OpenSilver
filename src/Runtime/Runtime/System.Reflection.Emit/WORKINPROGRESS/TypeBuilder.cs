@@ -187,6 +187,11 @@ namespace System.Reflection.Emit
             return null;
         }
 
+        public ConstructorBuilder DefineDefaultConstructor(MethodAttributes attributes)
+        {
+            return null;
+        }
+
     }
 }
 
