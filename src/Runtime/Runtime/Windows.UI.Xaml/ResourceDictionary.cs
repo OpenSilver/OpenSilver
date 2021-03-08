@@ -393,14 +393,18 @@ namespace Windows.UI.Xaml
         /// </exception>
         public void Remove(object key)
         {
-            // remove the inheritance context from the value, if it came from
-            // this dictionary
-            this.RemoveInheritanceContext(this._baseDictionary[key]);
+            object resource;
+            if (this._baseDictionary.TryGetValue(key, out resource))
+            {
+                // remove the inheritance context from the value, if it came from
+                // this dictionary
+                this.RemoveInheritanceContext(resource);
 
-            this._baseDictionary.Remove(key);
+                this._baseDictionary.Remove(key);
 
-            // Notify owners of the change and fire invalidate if already initialized
-            this.NotifyOwners(new ResourcesChangeInfo(key));
+                // Notify owners of the change and fire invalidate if already initialized
+                this.NotifyOwners(new ResourcesChangeInfo(key));
+            }            
         }
 
         /// <summary>
