@@ -82,10 +82,48 @@ namespace DotNetForHtml5.Compiler
                     bool isElementInRootNamescope = (elementThatIsRootOfTheCurrentNamescope.Parent == null); // Check if the root of the current namescope is also the root of the XAML (note: to be the root of the XAML means that the parent is null).
 
                     // Check if the element is DataTemplate property, or a general property, or an object:
+                    bool isDataTemplateProperty = (element.Name.Namespace == DefaultXamlNamespace && element.Name.LocalName.Contains(".") && DoesClassInheritFromFrameworkTemplate(element.Name.LocalName.Substring(0, element.Name.LocalName.IndexOf('.'))));
                     bool isAProperty = element.Name.LocalName.Contains('.');
-                        
+                    #region CASE: the element is a DataTemplate property
+                    if (isDataTemplateProperty)
+                    {
+                        //------------------------------
+                        // IF THE ELEMENT IS A DATATEMPLATE PROPERTY:
+                        //------------------------------
+                        var classLocalName = element.Name.LocalName.Substring(0, element.Name.LocalName.IndexOf('.')); //eg. "DataTemplate"
+                        if (!isFirstPass) // We ignore this during the first pass because the DLL has not been compiled yet so we don't have access to all the types.
+                        {
+                            // Verify that the DataTemplate contains exactly one element:
+                            if (codeStack.Count == 0 || element.Elements().FirstOrDefault() == null)
+                                throw new wpf::System.Windows.Markup.XamlParseException(string.Format("A {0} cannot be empty.", classLocalName));
+                            else if (element.Elements().Count() > 1)
+                                throw new wpf::System.Windows.Markup.XamlParseException(string.Format("A {0} cannot contain more than one child element.", classLocalName));
+
+                            // Create the method to instantiate the DataTemplate:
+                            //we create a frameworkTemplate element to allow Binding with RelativeSource = TemplatedParent:
+                            string templateInstanceUniqueName = GeneratingUniqueNames.GenerateUniqueNameFromString("templateInstance");
+
+                            string codeToInstantiateTheDataTemplate = codeStack.Pop();
+
+                            //we replace the Placeholder that was put for the template name:
+                            codeToInstantiateTheDataTemplate = codeToInstantiateTheDataTemplate.Replace(GeneratingCSharpCode.TemplateOwnerValuePlaceHolder, templateInstanceUniqueName);
+
+                            string frameworkTemplateUniqueName = GetUniqueName(element.Parent); // Never null because <DataTemplate.ContentPropertyUsefulOnlyDuringTheCompilation> is necessary inside a tag "<DataTemplate>"
+                            string childUniqueName = GetUniqueName(element.Elements().First());
+                            string objectsToInstantiateAtTheBeginningOfTheDataTemplate = string.Join("\r\n", GetNameToUniqueNameDictionary(elementThatIsRootOfTheCurrentNamescope, namescopeRootToElementsUniqueNameToInstantiatedObjects).Select(x => x.Value));
+                            string markupExtensionsAdditionalCode = string.Join("\r\n", GetListThatContainsAdditionalCodeFromDictionary(elementThatIsRootOfTheCurrentNamescope, namescopeRootToMarkupExtensionsAdditionalCode));
+                            string storyboardsAdditionalCode = string.Join("\r\n", GetListThatContainsAdditionalCodeFromDictionary(elementThatIsRootOfTheCurrentNamescope, namescopeRootToStoryboardsAdditionalCode));
+                            string additionalCodeToPlaceAtTheEndOfTheMethod = markupExtensionsAdditionalCode + Environment.NewLine + storyboardsAdditionalCode;
+
+                            string dataTemplateMethod = CreateDataTemplateLambda(codeToInstantiateTheDataTemplate, frameworkTemplateUniqueName, childUniqueName, templateInstanceUniqueName, objectsToInstantiateAtTheBeginningOfTheDataTemplate, additionalCodeToPlaceAtTheEndOfTheMethod, namespaceSystemWindows);
+                            // Create the code that sets the "MethodToInstantiateDataTemplate":
+                            string codeToSetTheMethod = string.Format("{0}.SetMethodToInstantiateFrameworkTemplate({1});", frameworkTemplateUniqueName, dataTemplateMethod);
+                            codeStack.Push(codeToSetTheMethod); // Note: the codeStack at this point normally contains the code of the children. In this case we use the codeStack for a different purpose, but it fits well because the parent element expects each child to have added some code to the Stack.
+                        }
+                    }
+                    #endregion
                     #region CASE: the element is a Property
-                    if (isAProperty)
+                    else if (isAProperty)
                     // Check if the element is a property:
                     {
                         //------------------------------
@@ -95,91 +133,43 @@ namespace DotNetForHtml5.Compiler
                         // Get information about the parent element (to which the property applies) and the element itself:
                         var parentElement = element.Parent;
                         string parentElementUniqueNameOrThisKeyword = GetUniqueName(parentElement);
-                        string typeName = element.Name.LocalName.Split('.')[0];
-                        string propertyName = element.Name.LocalName.Split('.')[1];
-                        XName elementName = element.Name.Namespace + typeName; // eg. if the element is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
+                        XName elementName = element.Name.Namespace + element.Name.LocalName.Split('.')[0]; // eg. if the element is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
+                        string propertyName = element.Name.LocalName.Split('.')[1]; //todo: support namespaces?
+                        bool isPropertyDealtWith = false; //this boolean states whether there is still code to add in the stringBuilder for the current property. It was added for the special case of the MergedDictionaries where we need to add the dictionaries as they come instead of creating them all then adding them all (this allows the later ones to use resources from the former ones).
 
-                        stringBuilder.Clear();
-                        if (isFirstPass)
+                        //Special case: MergedDictionaries. We need to handle these differently because we cannot create all the dictionaries then create them because they may need the resources from one another so we need to add them one by one.
+                        if (!isFirstPass && elementName.Namespace == DefaultXamlNamespace && elementName.LocalName == "ResourceDictionary" && propertyName == "MergedDictionaries")
                         {
-                            // Add the code of the children elements
-                            int childrenCount = element.Elements().Count();
-                            foreach (var childCode in PopElementsFromStackAndReadThemInReverseOrder(codeStack, childrenCount))
-                            {
-                                stringBuilder.AppendLine(childCode);
-                            }
-                        }
-                        else if (elementName.Namespace == DefaultXamlNamespace && elementName.LocalName == "ResourceDictionary" && propertyName == "MergedDictionaries")
-                        {
-                            // Add the code of the children elements
+                            // Add the code of the children elements:
+                            stringBuilder.Clear();
                             var childrenElements = element.Elements();
                             int currentChildIndex = 0;
-                            int childrenCount = childrenElements.Count();
-                            foreach (var childCode in PopElementsFromStackAndReadThemInReverseOrder(codeStack, childrenCount))
+                            int childrenCount = childrenElements.Count(); //todo-performance: find a more performant way to count the children?
+                            foreach (var childCode in PopElementsFromStackAndReadThemInReverseOrder<string>(codeStack, childrenCount)) // Note: this is supposed to not raise OutOfIndex because child nodes are supposed to have added code to the stack.
                             {
                                 stringBuilder.AppendLine(childCode);
                                 string childUniqueName = GetUniqueName(childrenElements.ElementAt(currentChildIndex));
-                                stringBuilder.AppendLine(string.Format("{0}.{1}.Add({2});", parentElementUniqueNameOrThisKeyword, propertyName, childUniqueName));
+                                stringBuilder.AppendLine(string.Format("{0}.Add({1});", parentElementUniqueNameOrThisKeyword + "." + propertyName, childUniqueName)); //this line and the one above come from the GenerateCodeForAddingChildrenToCollectionOrDictionary method.
                                 ++currentChildIndex;
                             }
+                            isPropertyDealtWith = true;
                         }
-                        else
+                        if (!isPropertyDealtWith)
                         {
-                            bool isFrameworkTemplate = propertyName == "ContentPropertyUsefulOnlyDuringTheCompilation" &&
-                                reflectionOnSeparateAppDomain.IsAssignableFrom(namespaceSystemWindows, "FrameworkTemplate", element.Name.NamespaceName, typeName);
-
-                            if (isFrameworkTemplate)
+                            stringBuilder.Clear();
+                            
+                            if (isFirstPass)
                             {
-                                //--------------------------------
-                                // The element is the content of a 
-                                // FrameworkTemplate derived type
-                                //--------------------------------
-
-                                // Verify that the DataTemplate contains exactly one element
-                                if (codeStack.Count == 0 || element.Elements().FirstOrDefault() == null)
-                                    throw new wpf::System.Windows.Markup.XamlParseException(string.Format("A {0} cannot be empty.", typeName));
-                                else if (element.Elements().Count() > 1)
-                                    throw new wpf::System.Windows.Markup.XamlParseException(string.Format("A {0} cannot contain more than one child element.", typeName));
-
-                                // Create the method to instantiate the DataTemplate:
-                                //we create a frameworkTemplate element to allow Binding with RelativeSource = TemplatedParent:
-                                string templateInstanceUniqueName = GeneratingUniqueNames.GenerateUniqueNameFromString("templateInstance");
-
-                                string codeToInstantiateTheDataTemplate = codeStack.Pop();
-
-                                //we replace the Placeholder that was put for the template name:
-                                codeToInstantiateTheDataTemplate = codeToInstantiateTheDataTemplate.Replace(GeneratingCSharpCode.TemplateOwnerValuePlaceHolder, templateInstanceUniqueName);
-
-                                string frameworkTemplateUniqueName = GetUniqueName(element.Parent);
-                                string childUniqueName = GetUniqueName(element.Elements().First());
-                                string objectsToInstantiateAtTheBeginningOfTheDataTemplate = string.Join("\r\n", 
-                                    GetNameToUniqueNameDictionary(elementThatIsRootOfTheCurrentNamescope, 
-                                        namescopeRootToElementsUniqueNameToInstantiatedObjects).Select(x => x.Value));
-                                string markupExtensionsAdditionalCode = string.Join("\r\n", 
-                                    GetListThatContainsAdditionalCodeFromDictionary(elementThatIsRootOfTheCurrentNamescope, 
-                                        namescopeRootToMarkupExtensionsAdditionalCode));
-                                string storyboardsAdditionalCode = string.Join("\r\n", 
-                                    GetListThatContainsAdditionalCodeFromDictionary(elementThatIsRootOfTheCurrentNamescope, 
-                                        namescopeRootToStoryboardsAdditionalCode));
-                                string additionalCodeToPlaceAtTheEndOfTheMethod = markupExtensionsAdditionalCode + Environment.NewLine + storyboardsAdditionalCode;
-
-                                string dataTemplateMethod = CreateDataTemplateLambda(codeToInstantiateTheDataTemplate, 
-                                    frameworkTemplateUniqueName, 
-                                    childUniqueName, 
-                                    templateInstanceUniqueName, 
-                                    objectsToInstantiateAtTheBeginningOfTheDataTemplate, 
-                                    additionalCodeToPlaceAtTheEndOfTheMethod, 
-                                    namespaceSystemWindows);
-
-                                // Create the code that sets the "MethodToInstantiateDataTemplate"
-                                string codeToSetTheMethod = string.Format("{0}.SetMethodToInstantiateFrameworkTemplate({1});", 
-                                    frameworkTemplateUniqueName, dataTemplateMethod);
-
-                                stringBuilder.Append(codeToSetTheMethod);
+                                // Add the code of the children elements:
+                                int childrenCount = element.Elements().Count(); //todo-performance: find a more performant way to count the children?
+                                foreach (var childCode in PopElementsFromStackAndReadThemInReverseOrder<string>(codeStack, childrenCount)) // Note: this is supposed to not raise OutOfIndex because child nodes are supposed to have added code to the stack.
+                                {
+                                    stringBuilder.AppendLine(childCode);
+                                }
                             }
                             else
                             {
-                                bool isAttachedProperty = GettingInformationAboutXamlTypes.IsPropertyAttached(element, reflectionOnSeparateAppDomain);
+                                bool isAttachedProperty = GettingInformationAboutXamlTypes.IsPropertyAttached(element, reflectionOnSeparateAppDomain); //(parentElement.Name != elementName) && !GettingInformationAboutXamlTypes.IsTypeAssignableFrom(parentElement.Name, elementName, reflectionOnSeparateAppDomain); // Note: the comparison includes the namespace. // eg. <Grid><VisualStateManager.VisualStateGroups>...</VisualStateManager.VisualStateGroups></Grid> should return "true", while <n:MyUserControl><UserControl.Resources>...</n:MyUserControl></UserControl.Resources> should return "false".
 
                                 // Check if the property is a collection, in which case we must use ".Add(...)", otherwise a simple "=" is enough:
                                 if (GettingInformationAboutXamlTypes.IsPropertyOrFieldACollection(element, reflectionOnSeparateAppDomain, isAttachedProperty)
@@ -204,8 +194,7 @@ namespace DotNetForHtml5.Compiler
                                         string elementTypeInCSharp = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny, ifTypeNotFoundTryGuessing: isFirstPass);
                                         if (elementTypeInCSharp == namespaceSystemWindows + ".VisualStateManager" && propertyName == "VisualStateGroups")
                                         {
-                                            if (reflectionOnSeparateAppDomain.IsAssignableFrom(namespaceSystemWindows, "FrameworkTemplate",
-                                                elementThatIsRootOfTheCurrentNamescope.Name.NamespaceName, elementThatIsRootOfTheCurrentNamescope.Name.LocalName))
+                                            if (DoesClassInheritFromFrameworkTemplate(elementThatIsRootOfTheCurrentNamescope.Name.LocalName))
                                             {
                                                 codeToAccessTheEnumerable = string.Format("templateOwner_{0}.INTERNAL_GetVisualStateGroups()", GetUniqueName(elementThatIsRootOfTheCurrentNamescope)); //codeToAccessTheEnumerable = "global::Windows.UI.Xaml.VisualStateManager.GetVisualStateGroups(templateOwner)";
                                             }
@@ -224,7 +213,7 @@ namespace DotNetForHtml5.Compiler
                                         codeToAccessTheEnumerable = parentElementUniqueNameOrThisKeyword + "." + propertyName;
                                     }
 
-                                    // Add the children to the collection/dictionary
+                                    // Add the children to the collection/dictionary:
                                     GenerateCodeForAddingChildrenToCollectionOrDictionary(
                                         codeStack: codeStack,
                                         stringBuilder: stringBuilder,
@@ -297,7 +286,7 @@ namespace DotNetForHtml5.Compiler
                                                         {
                                                             if (!GettingInformationAboutXamlTypes.IsElementAMarkupExtension(elementForSearch, reflectionOnSeparateAppDomain)) //we don't want to add the MarkupExtensions in the list of the parents (A MarkupExtension is not a DependencyObject)
                                                             {
-                                                                stringBuilder.AppendLine(string.Format("{0}.Add({1});",
+                                                                stringBuilder.AppendLine(string.Format("{0}.Add({1});", 
                                                                     nameForParentsCollection, GetUniqueName(elementForSearch)));
                                                             }
                                                         }
@@ -447,9 +436,9 @@ namespace DotNetForHtml5.Compiler
                                                 if (isAttachedProperty)
                                                 {
                                                     string elementTypeInCSharp = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
-                                                        elementName.Namespace.NamespaceName,
-                                                        elementName.LocalName,
-                                                        assemblyNameIfAny,
+                                                        elementName.Namespace.NamespaceName, 
+                                                        elementName.LocalName, 
+                                                        assemblyNameIfAny, 
                                                         ifTypeNotFoundTryGuessing: isFirstPass);
 
                                                     string[] splittedLocalName = element.Name.LocalName.Split('.');
@@ -563,7 +552,6 @@ else
                                 }
                             }
                         }
-                        
                         // Put the whole code into the stack:
                         var resultingForTheElementAndAllItsChildren = stringBuilder.ToString();
                         codeStack.Push(resultingForTheElementAndAllItsChildren);
