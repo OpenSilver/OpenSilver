@@ -106,6 +106,9 @@ namespace Windows.UI.Xaml
             // Keep a reference to the app:
             Application.Current = this;
 
+            // Get default font-family from css
+            INTERNAL_FontsHelper.DefaultCssFontFamily = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("window.getComputedStyle(document.getElementsByTagName('body')[0]).getPropertyValue(\"font-family\")"));
+
             // Initialize the window:
             if (_mainWindow == null) // Note: it could be != null if the user clicks "Restart" from the Simulator advanced options.
             {
