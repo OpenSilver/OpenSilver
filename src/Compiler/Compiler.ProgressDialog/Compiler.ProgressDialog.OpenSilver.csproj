@@ -7,6 +7,7 @@
     <ProjectGuid>{4DDCEEBE-B5CA-4A29-87B0-29FF42AB7A0D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
+    <AssemblyName>OpenSilver.Compiler.ProgressDialog</AssemblyName>
     <RootNamespace>DotNetForHtml5.Compiler.ProgressDialog</RootNamespace>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -18,19 +19,15 @@
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-    <AssemblyName>OpenSilver.Compiler.ProgressDialog</AssemblyName>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU'">
-    <AssemblyName>OpenSilver.Compiler.ProgressDialog</AssemblyName>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP|AnyCPU'">
-    <AssemblyName>OpenSilver.UWPCompatible.Compiler.ProgressDialog</AssemblyName>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU'">
-    <AssemblyName>OpenSilver.UWPCompatible.Compiler.ProgressDialog</AssemblyName>
   </PropertyGroup>
   
   <ItemGroup>

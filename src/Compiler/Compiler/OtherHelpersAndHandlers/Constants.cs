@@ -30,7 +30,7 @@ namespace DotNetForHtml5.Compiler
 
         public const string NAME_OF_CORE_ASSEMBLY = "CSharpXamlForHtml5";
         public const string NAME_OF_CORE_ASSEMBLY_USING_BRIDGE = "CSHTML5";
-        public const string NAME_OF_CORE_ASSEMBLY_USING_BLAZOR = "OpenSilver.UWPCompatible";
+        public const string NAME_OF_CORE_ASSEMBLY_USING_BLAZOR = "OpenSilver";
         public const string NAME_OF_CORE_ASSEMBLY_SLMIGRATION = "SLMigration.CSharpXamlForHtml5";
         public const string NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE = "CSHTML5.Migration";
         public const string NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR = "OpenSilver";

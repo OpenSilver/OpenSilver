@@ -9,7 +9,8 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
     <Configurations>SL;SL.WorkInProgress;UWP;UWP.WorkInProgress</Configurations>
 		<Platforms>AnyCPU</Platforms>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>OpenSilver</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
 		<NoWarn>1591</NoWarn>
 		<DebugSymbols>true</DebugSymbols>
@@ -20,22 +21,18 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-		<AssemblyName>OpenSilver</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' ">
-		<AssemblyName>OpenSilver</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER;WORKINPROGRESS;REVAMPPOINTEREVENTS;WCF_STACK;GD_WIP</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
-		<AssemblyName>OpenSilver.UWPCompatible</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' ">
-		<AssemblyName>OpenSilver.UWPCompatible</AssemblyName>
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER;WORKINPROGRESS</DefineConstants>
 	</PropertyGroup>
 

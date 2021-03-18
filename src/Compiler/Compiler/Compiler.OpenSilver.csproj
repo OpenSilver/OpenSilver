@@ -7,6 +7,7 @@
     <ProjectGuid>{B8EBBAB8-D2A2-4B65-A196-245F5BA573D0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
+    <AssemblyName>OpenSilver.Compiler</AssemblyName>
     <RootNamespace>DotNetForHtml5.Compiler</RootNamespace>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -17,19 +18,15 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;SILVERLIGHTCOMPATIBLEVERSION;MIGRATION</DefineConstants>
-    <AssemblyName>OpenSilver.Compiler</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;SILVERLIGHTCOMPATIBLEVERSION;MIGRATION;WORKINPROGRESS</DefineConstants>
-    <AssemblyName>OpenSilver.Compiler</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR</DefineConstants>
-    <AssemblyName>OpenSilver.UWPCompatible.Compiler</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;WORKINPROGRESS</DefineConstants>
-    <AssemblyName>OpenSilver.UWPCompatible.Compiler</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Compiler.Common\Compiler.Common.OpenSilver.csproj">
