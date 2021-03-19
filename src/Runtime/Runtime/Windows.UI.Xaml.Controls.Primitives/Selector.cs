@@ -422,7 +422,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 "SelectedItemForeground",
                 typeof(Brush),
                 typeof(Selector),
-                new PropertyMetadata(new SolidColorBrush(Colors.White)));
+                new PropertyMetadata(new SolidColorBrush(Colors.Black)));
 
         /// <summary>
         /// Gets or sets the bakground color of the Items that are not selected.

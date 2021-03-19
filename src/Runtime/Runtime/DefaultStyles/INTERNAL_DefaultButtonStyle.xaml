@@ -7,11 +7,13 @@
     <!--<Style x:Key="FlatButtonStyle" TargetType="Button">-->
     <Style TargetType="Button">
         <Setter Property="Background"
-                Value="#FFE2E2E2" />
+                Value="#FF1F3B53" />
         <Setter Property="Foreground"
                 Value="Black" />
         <Setter Property="BorderThickness"
-                Value="0" />
+                Value="1" />
+        <Setter Property="BorderBrush"
+                Value="#FF718597" />
         <Setter Property="Padding"
                 Value="3" />
         <Setter Property="Cursor"
@@ -23,53 +25,81 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="OuterBorder"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
+                    <Grid>
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup Name="CommonStates">
                                 <VisualState Name="Normal">
                                 </VisualState>
                                 <VisualState Name="PointerOver">
                                     <Storyboard>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="BackgroundAnimation" Storyboard.TargetProperty="Opacity" To="1"/>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
-                                                                       Storyboard.TargetName="InnerBorder">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="#11000000" />
+                                                                       Storyboard.TargetName="BackgroundGradient">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <LinearGradientBrush StartPoint=".7,0" EndPoint=".7,1">
+                                                        <GradientStop Color="#FFFFFFFF" Offset="0" />
+                                                        <GradientStop Color="#F2FFFFFF" Offset="0.375" />
+                                                        <GradientStop Color="#CCFFFFFF" Offset="0.625" />
+                                                        <GradientStop Color="#7FFFFFFF" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState Name="Pressed">
                                     <Storyboard>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="BackgroundAnimation" Storyboard.TargetProperty="Opacity" To="1"/>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
-                                                                       Storyboard.TargetName="InnerBorder">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="#22000000" />
+                                                                       Storyboard.TargetName="BackgroundGradient">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <LinearGradientBrush StartPoint=".7,0" EndPoint=".7,1">
+                                                        <GradientStop Color="#D8FFFFFF" Offset="0" />
+                                                        <GradientStop Color="#C6FFFFFF" Offset="0.375" />
+                                                        <GradientStop Color="#8CFFFFFF" Offset="0.625" />
+                                                        <GradientStop Color="#3FFFFFFF" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState Name="Disabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
-                                                                       Storyboard.TargetName="InnerBorder">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="#33FFFFFF" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="DisabledVisualElement" Storyboard.TargetProperty="Opacity" To=".55"/>
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <Border x:Name="InnerBorder"
-                                Background="{TemplateBinding Background}">
-                            <ContentPresenter x:Name="ContentPresenter"
+                        <Border x:Name="Background"
+                                CornerRadius="3"
+                                Background="White"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                            <Grid Background="{TemplateBinding Background}"  Margin="1">
+                                <Border Opacity="0" x:Name="BackgroundAnimation" Background="#FF448DCA" />
+                                <Border x:Name="BackgroundGradient" >
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint=".7,0" EndPoint=".7,1">
+                                            <GradientStop Color="#FFFFFFFF" Offset="0" />
+                                            <GradientStop Color="#F9FFFFFF" Offset="0.375" />
+                                            <GradientStop Color="#E5FFFFFF" Offset="0.625" />
+                                            <GradientStop Color="#C6FFFFFF" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <ContentPresenter x:Name="ContentPresenter"
                                               ContentTemplate="{TemplateBinding ContentTemplate}"
                                               Content="{TemplateBinding Content}"
                                               Margin="{TemplateBinding Padding}"
                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                        </Border>
-                    </Border>
+                        <Border x:Name="DisabledVisualElement" CornerRadius="3" Background="#FFFFFFFF" Opacity="0" IsHitTestVisible="false" />
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
