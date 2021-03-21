@@ -15,55 +15,54 @@
             <Setter.Value>
                 <ControlTemplate TargetType="localprimitives:DataGridColumnHeader">
                     <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard>
+                                        <ColorAnimation Duration="0" Storyboard.TargetName="BackgroundRectangle" Storyboard.TargetProperty="Background" To="#FF448DCA"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
+                                                                       Storyboard.TargetName="BackgroundGradient">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <LinearGradientBrush StartPoint=".7,0" EndPoint=".7,1">
+                                                        <GradientStop Color="#F2FFFFFF" Offset="0.375" />
+                                                        <GradientStop Color="#CCFFFFFF" Offset="0.6" />
+                                                        <GradientStop Color="#7FFFFFFF" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <ColorAnimation Duration="0" Storyboard.TargetName="BackgroundRectangle" Storyboard.TargetProperty="Background" To="#FF448DCA"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
+                                                                       Storyboard.TargetName="BackgroundGradient">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <LinearGradientBrush StartPoint=".7,0" EndPoint=".7,1">
+                                                        <GradientStop Color="#D8FFFFFF" Offset="0.015" />
+                                                        <GradientStop Color="#C6FFFFFF" Offset="0.375" />
+                                                        <GradientStop Color="#8CFFFFFF" Offset="0.6" />
+                                                        <GradientStop Color="#3FFFFFFF" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SortStates">
+                                <VisualState x:Name="Unsorted" />
+                                <VisualState x:Name="SortAscending">
+                                </VisualState>
+                                <VisualState x:Name="SortDescending">
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
                         <Grid Name="Root">
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="CommonStates">
-                                    <VisualState x:Name="Normal" />
-                                    <VisualState x:Name="PointerOver">
-                                        <Storyboard>
-                                            <ColorAnimation Duration="0" Storyboard.TargetName="BackgroundRectangle" Storyboard.TargetProperty="Background" To="#FF448DCA"/>
-                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
-                                                                       Storyboard.TargetName="BackgroundGradient">
-                                                <DiscreteObjectKeyFrame KeyTime="0">
-                                                    <DiscreteObjectKeyFrame.Value>
-                                                        <LinearGradientBrush StartPoint=".7,0" EndPoint=".7,1">
-                                                            <GradientStop Color="#F2FFFFFF" Offset="0.375" />
-                                                            <GradientStop Color="#CCFFFFFF" Offset="0.6" />
-                                                            <GradientStop Color="#7FFFFFFF" Offset="1" />
-                                                        </LinearGradientBrush>
-                                                    </DiscreteObjectKeyFrame.Value>
-                                                </DiscreteObjectKeyFrame>
-                                            </ObjectAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </VisualState>
-                                    <VisualState x:Name="Pressed">
-                                        <Storyboard>
-                                            <ColorAnimation Duration="0" Storyboard.TargetName="BackgroundRectangle" Storyboard.TargetProperty="Background" To="#FF448DCA"/>
-                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
-                                                                       Storyboard.TargetName="BackgroundGradient">
-                                                <DiscreteObjectKeyFrame KeyTime="0">
-                                                    <DiscreteObjectKeyFrame.Value>
-                                                        <LinearGradientBrush StartPoint=".7,0" EndPoint=".7,1">
-                                                            <GradientStop Color="#D8FFFFFF" Offset="0.015" />
-                                                            <GradientStop Color="#C6FFFFFF" Offset="0.375" />
-                                                            <GradientStop Color="#8CFFFFFF" Offset="0.6" />
-                                                            <GradientStop Color="#3FFFFFFF" Offset="1" />
-                                                        </LinearGradientBrush>
-                                                    </DiscreteObjectKeyFrame.Value>
-                                                </DiscreteObjectKeyFrame>
-                                            </ObjectAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </VisualState>
-                                </VisualStateGroup>
-                                <VisualStateGroup x:Name="SortStates">
-                                    <VisualState x:Name="Unsorted" />
-                                    <VisualState x:Name="SortAscending">
-                                    </VisualState>
-                                    <VisualState x:Name="SortDescending">
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-
                             <Border x:Name="BackgroundRectangle" Background="#FF1F3B53" />
 
                             <Border x:Name="BackgroundGradient" >
@@ -76,8 +75,8 @@
                                     </LinearGradientBrush>
                                 </Border.Background>
                             </Border>
-
-                            <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}">
+                            <!-- Temporary removing Margin="{TemplateBinding Padding}" -->
+                            <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
                                     <ColumnDefinition Width="Auto" />

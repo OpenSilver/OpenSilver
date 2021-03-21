@@ -1285,7 +1285,8 @@ namespace Windows.UI.Xaml.Controls
 
                     Grid.SetRow(editableVersionOfCell, Grid.GetRow(cell));
                     Grid.SetColumn(editableVersionOfCell, cellColumn);
-                    editableVersionOfCell.LostFocus += CurrentEditionElement_LostFocus;
+                    if (!(column is DataGridTemplateColumn) && !(column is DataGridComboBoxColumn))
+                        editableVersionOfCell.LostFocus += CurrentEditionElement_LostFocus;
 
                     _grid.Children.Add(editableVersionOfCell);
                     if (column is DataGridTextColumn)
