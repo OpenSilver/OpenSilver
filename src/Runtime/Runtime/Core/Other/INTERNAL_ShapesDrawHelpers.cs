@@ -63,7 +63,8 @@ namespace CSHTML5.Internal
         /// <param name="maxY">The maximum Y-coordinate of the points in the Shape.</param>
         /// <param name="stretch">The Stretch mode to apply on the Shape</param>
         /// <param name="shapeActualSize"></param>
-        internal static void PrepareStretch(FrameworkElement frameworkElement, object canvasDomElement, double minX, double maxX, double minY, double maxY, Stretch stretch, out Size shapeActualSize)
+        /// <param name="strokeThickness">The stroke thickness of the shape</param>
+        internal static void PrepareStretch(FrameworkElement frameworkElement, object canvasDomElement, double minX, double maxX, double minY, double maxY, Stretch stretch, out Size shapeActualSize, double? strokeThickness = null)
         {
             var canvasStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(canvasDomElement);
 
@@ -131,6 +132,11 @@ namespace CSHTML5.Internal
             else
             {
                 shapeActualSize = frameworkElement.INTERNAL_GetActualWidthAndHeight(); //Note: in case that the framework element is constrained, it won't take the size of its canvas2d content, so we then resize the canvas2d content so that the shape stretches.
+                if (strokeThickness.HasValue)
+                {
+                    shapeActualSize.Width += strokeThickness.Value;
+                    shapeActualSize.Height += strokeThickness.Value + 4;
+                }
                 if (frameworkElementWidthWasSpecified)
                     shapeActualSize.Width = frameworkElementWidth;
                 if (frameworkElementHeightWasSpecified)

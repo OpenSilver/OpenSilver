@@ -185,7 +185,7 @@ namespace Windows.UI.Xaml.Shapes
                 }
 
                 Size shapeActualSize;
-                INTERNAL_ShapesDrawHelpers.PrepareStretch(this, _canvasDomElement, minX, maxX, minY, maxY, Stretch, out shapeActualSize);
+                INTERNAL_ShapesDrawHelpers.PrepareStretch(this, _canvasDomElement, minX, maxX, minY, maxY, Stretch, out shapeActualSize, StrokeThickness);
 
                 double horizontalMultiplicator;
                 double verticalMultiplicator;
