@@ -1600,6 +1600,14 @@ if ($0.tagName.toLowerCase() != 'span')
             // We reset the previous size value so that the SizeChanged event can be called (see the comment in "HandleSizeChanged"):
             _valueOfLastSizeChanged = Size.Empty;
             HandleSizeChanged();
+
+            if (this._sizeChangedEventHandlers != null &&
+                this._sizeChangedEventHandlers.Count > 0 &&
+                this._resizeSensor == null)
+            {
+                object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action)this.HandleSizeChanged);
+                this._resizeSensor = sensor;
+            }
         }
 
         public event SizeChangedEventHandler SizeChanged
@@ -1610,9 +1618,10 @@ if ($0.tagName.toLowerCase() != 'span')
                 {
                     this._sizeChangedEventHandlers = new List<SizeChangedEventHandler>();
                 }
-                if (this._sizeChangedEventHandlers.Count == 0 && this.INTERNAL_OuterDomElement != null)
+                if (this._resizeSensor == null && this.INTERNAL_OuterDomElement != null)
                 {
-                    this._resizeSensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action)this.HandleSizeChanged);
+                    object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action)this.HandleSizeChanged);
+                    this._resizeSensor = sensor;
                 }
                 this._sizeChangedEventHandlers.Add(value);
             }
@@ -1628,6 +1637,7 @@ if ($0.tagName.toLowerCase() != 'span')
                     if (this._sizeChangedEventHandlers.Count == 0 && this._resizeSensor != null)
                     {
                         CSHTML5.Interop.ExecuteJavaScript("$0.detach($1)", this._resizeSensor, this.INTERNAL_OuterDomElement);
+                        this._resizeSensor = null;
                     }
                 }
             }
