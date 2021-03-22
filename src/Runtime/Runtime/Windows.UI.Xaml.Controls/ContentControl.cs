@@ -143,11 +143,7 @@ namespace Windows.UI.Xaml.Controls
             UIElement newChildAsUIElement = newChild as UIElement;
             if(newChildAsUIElement != null)
             {
-#if REWORKLOADED
-                this.AddVisualChild(newChildAsUIElement);
-#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChildAsUIElement, this);
-#endif
                 this.Child = newChildAsUIElement;
             }
             else

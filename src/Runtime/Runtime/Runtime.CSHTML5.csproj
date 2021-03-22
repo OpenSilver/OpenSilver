@@ -33,7 +33,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' ">
     <AssemblyName>CSHTML5</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;BRIDGE;WORKINPROGRESS;REWORKLOADED</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;WORKINPROGRESS</DefineConstants>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>$(BinFolder)\Debug.WorkInProgress\CSHTML5.xml</DocumentationFile>
   </PropertyGroup>
@@ -45,7 +45,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">
     <AssemblyName>CSHTML5.Migration</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS;REWORKLOADED</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS</DefineConstants>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>$(BinFolder)\Migration.WorkInProgress\CSHTML5.Migration.xml</DocumentationFile>
   </PropertyGroup>

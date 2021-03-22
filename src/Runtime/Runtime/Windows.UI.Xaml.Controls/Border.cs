@@ -90,11 +90,7 @@ namespace Windows.UI.Xaml.Controls
                     if (this._isLoaded)
                     {
                         INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
-#if REWORKLOADED
-                        this.AddVisualChild(value);
-#else
                         INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
-#endif
                     }
                     _child = value;
                 }
@@ -112,11 +108,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (!this.INTERNAL_EnableProgressiveLoading)
             {
-#if REWORKLOADED
-                this.AddVisualChild(this._child);
-#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
-#endif
             }
             else
             {
@@ -132,11 +124,7 @@ namespace Windows.UI.Xaml.Controls
                 //this can happen if the Panel is detached during the delay.
                 return;
             }
-#if REWORKLOADED
-            this.AddVisualChild(this._child);
-#else
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
-#endif
         }
 
         /// <summary>

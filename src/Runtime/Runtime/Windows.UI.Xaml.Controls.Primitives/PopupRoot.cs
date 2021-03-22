@@ -67,11 +67,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             UIElement newChild = (UIElement)e.NewValue;
 
             INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, parent);
-#if REWORKLOADED
-            parent.AddVisualChild(newChild);
-#else
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, parent);
-#endif
         }
     }
 }

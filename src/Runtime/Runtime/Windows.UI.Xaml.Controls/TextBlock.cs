@@ -203,11 +203,7 @@ namespace Windows.UI.Xaml.Controls
 
             foreach (Inline child in this.Inlines)
             {
-#if REWORKLOADED
-                this.AddVisualChild(child);
-#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
-#endif
             }
         }
 

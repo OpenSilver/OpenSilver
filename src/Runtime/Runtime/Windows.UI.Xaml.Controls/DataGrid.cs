@@ -1567,20 +1567,12 @@ namespace Windows.UI.Xaml.Controls
         {
             if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(_grid))
             {
-#if REWORKLOADED
-                this.ItemsHost.AddVisualChild(this._grid);
-#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_grid, this);
-#endif
 
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_pagerUI))
                     throw new Exception("The DataPager is already attached and cannot be attached twice.");
 
-#if REWORKLOADED
-                this.ItemsHost.AddVisualChild(this._pagerUI);
-#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_pagerUI, this);
-#endif
             }
 
             // Work around a vertical alignment issue due to the fact that we attach both the DataGrid and the DataPager (cf. ticket #1290):
