@@ -213,7 +213,7 @@ namespace DotNetForHtml5.Compiler
                         string typeName = element.Name.LocalName.Split('.')[0];
                         string propertyName = element.Name.LocalName.Split('.')[1];
                         XName elementName = element.Name.Namespace + typeName; // eg. if the element is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
-                        
+
                         stringBuilder.Clear();
 
                         //Special case: MergedDictionaries. We need to handle these differently because we cannot create all the dictionaries then create them because they may need the resources from one another so we need to add them one by one.
@@ -256,25 +256,26 @@ namespace DotNetForHtml5.Compiler
                                 //we replace the Placeholder that was put for the template name:
                                 codeToInstantiateTheDataTemplate = codeToInstantiateTheDataTemplate.Replace(GeneratingCSharpCode.TemplateOwnerValuePlaceHolder, templateInstanceUniqueName);
 
-                                string frameworkTemplateUniqueName = GetUniqueName(element.Parent);
+                                XElement frameworkTemplateRoot = element.Parent;
+                                string frameworkTemplateUniqueName = GetUniqueName(frameworkTemplateRoot);
                                 string childUniqueName = GetUniqueName(element.Elements().First());
                                 string objectsToInstantiateAtTheBeginningOfTheDataTemplate = string.Join("\r\n",
-                                   GetNameToUniqueNameDictionary(elementThatIsRootOfTheCurrentNamescope,
+                                   GetNameToUniqueNameDictionary(frameworkTemplateRoot,
                                        namescopeRootToElementsUniqueNameToInstantiatedObjects).Select(x => x.Value));
-                                string markupExtensionsAdditionalCode = string.Join("\r\n", 
-                                    GetListThatContainsAdditionalCodeFromDictionary(elementThatIsRootOfTheCurrentNamescope, 
+                                string markupExtensionsAdditionalCode = string.Join("\r\n",
+                                    GetListThatContainsAdditionalCodeFromDictionary(frameworkTemplateRoot,
                                         namescopeRootToMarkupExtensionsAdditionalCode));
-                                string storyboardsAdditionalCode = string.Join("\r\n", 
-                                    GetListThatContainsAdditionalCodeFromDictionary(elementThatIsRootOfTheCurrentNamescope, 
+                                string storyboardsAdditionalCode = string.Join("\r\n",
+                                    GetListThatContainsAdditionalCodeFromDictionary(frameworkTemplateRoot,
                                         namescopeRootToStoryboardsAdditionalCode));
                                 string additionalCodeToPlaceAtTheEndOfTheMethod = markupExtensionsAdditionalCode + Environment.NewLine + storyboardsAdditionalCode;
 
-                                string dataTemplateMethod = CreateDataTemplateLambda(codeToInstantiateTheDataTemplate, 
-                                    frameworkTemplateUniqueName, 
-                                    childUniqueName, 
+                                string dataTemplateMethod = CreateDataTemplateLambda(codeToInstantiateTheDataTemplate,
+                                    frameworkTemplateUniqueName,
+                                    childUniqueName,
                                     templateInstanceUniqueName,
-                                    objectsToInstantiateAtTheBeginningOfTheDataTemplate, 
-                                    additionalCodeToPlaceAtTheEndOfTheMethod, 
+                                    objectsToInstantiateAtTheBeginningOfTheDataTemplate,
+                                    additionalCodeToPlaceAtTheEndOfTheMethod,
                                     namespaceSystemWindows);
                                 // Create the code that sets the "MethodToInstantiateDataTemplate":
                                 string codeToSetTheMethod = string.Format("{0}.SetMethodToInstantiateFrameworkTemplate({1});", frameworkTemplateUniqueName, dataTemplateMethod);
@@ -484,41 +485,25 @@ namespace DotNetForHtml5.Compiler
                                                 }
                                                 string propertyTypeFullName = (!string.IsNullOrEmpty(propertyTypeNamespace) ? propertyTypeNamespace + "." : "") + propertyTypeName;
 
-                                                // Check if the property is of type "Binding" (or "BindingBase"), in which case we should directly assign the value instead of calling "SetBinding":
+                                                if (BindingRelativeSourceIsTemplatedParent(child))
+                                                {
+                                                    stringBuilder.AppendLine(string.Format("{0}.TemplateOwner = {1};", GetUniqueName(child), GeneratingCSharpCode.TemplateOwnerValuePlaceHolder));
+                                                }
+
+                                                // Check if the property is of type "Binding" (or "BindingBase"), in which 
+                                                // case we should directly assign the value instead of calling "SetBinding"
                                                 bool isPropertyOfTypeBinding = (
                                                     (!isSLMigration && propertyTypeFullName == "Windows.UI.Xaml.Data.Binding")
                                                     || (!isSLMigration && propertyTypeFullName == "Windows.UI.Xaml.Data.BindingBase")
                                                     || (isSLMigration && propertyTypeFullName == "System.Windows.Data.Binding")
-                                                    || (isSLMigration && propertyTypeFullName == "System.Windows.Data.BindingBase")
-                                                    );
-
+                                                    || (isSLMigration && propertyTypeFullName == "System.Windows.Data.BindingBase"));
                                                 if (isPropertyOfTypeBinding)
                                                 {
-                                                    markupExtensionsAdditionalCode.Add(string.Format("{0}.{1} = {2};", parentElementUniqueNameOrThisKeyword, propertyName, GetUniqueName(child)));
-
+                                                    stringBuilder.AppendLine(string.Format("{0}.{1} = {2};", parentElementUniqueNameOrThisKeyword, propertyName, GetUniqueName(child)));
                                                 }
-                                                // Note: the following block has been commented out because it is sometimes difficult to find the type of a property, especially in case of generics (to reproduce, refer to the compilation errors in the Client_LD solution).
-                                                //var inheritsFromBindingBase = !propertyTypeFullName.StartsWith("System.Nullable<") && reflectionOnSeparateAppDomain.IsTypeAssignableFrom(propertyTypeNamespace, propertyTypeName, null, isSLMigration ? "System.Windows.Data" : "Windows.UI.Xaml.Data", "BindingBase", null);
-                                                //if (inheritsFromBindingBase || (!isSLMigration && propertyTypeFullName == "Windows.UI.Xaml.Data.Binding") || (isSLMigration && propertyTypeFullName == "System.Windows.Data.Binding"))
-                                                //{
-                                                //    if (inheritsFromBindingBase)
-                                                //    {
-                                                //        //Note: we are specifically adding a cast here but I think it is pointless since the Type needs to have the cast operator implemented for it to work. We cannot create a Binding and set it as a value of a property of a type that inherits from Binding otherwise.
-                                                //        markupExtensionsAdditionalCode.Add(string.Format("{0}.{1} = ({2}){3};", parentElementUniqueNameOrThisKeyword, propertyName, propertyTypeFullName, GetUniqueName(child)));
-                                                //    }
-                                                //    else
-                                                //    {
-                                                //        markupExtensionsAdditionalCode.Add(string.Format("{0}.{1} = {2};", parentElementUniqueNameOrThisKeyword, propertyName, GetUniqueName(child)));
-                                                //    }
-                                                //}
                                                 else
                                                 {
                                                     markupExtensionsAdditionalCode.Add(string.Format("{3}.BindingOperations.SetBinding({0}, {1}, {2});", parentElementUniqueNameOrThisKeyword, propertyDeclaringTypeName + "." + propertyName + "Property", GetUniqueName(child), namespaceSystemWindowsData)); //we add the container itself since we couldn't add it inside the while
-                                                }
-                                                if (BindingRelativeSourceIsTemplatedParent(child))
-                                                {
-                                                    //child.SetAttributeValue("TemplateOwner", GeneratingCSharpCode.TemplateOwnerValuePlaceHolder);
-                                                    stringBuilder.AppendLine(string.Format("{0}.TemplateOwner = {1};", GetUniqueName(child), GeneratingCSharpCode.TemplateOwnerValuePlaceHolder));
                                                 }
                                             }
                                             else if (child.Name == xNamespace + "NullExtension")
@@ -1419,16 +1404,26 @@ var {4} = {2}.GetValue({1});
 
         private static XElement GetRootOfCurrentNamescopeForRuntime(XElement element, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
         {
-            while (element.Parent != null)
+            XElement currentElement = element;
+            bool skipTemplateNode = true;
+            while (currentElement.Parent != null)
             {
-                if (!element.Name.LocalName.Contains(".") && reflectionOnSeparateAppDomain.IsAssignableFrom(DefaultXamlNamespace.NamespaceName, "FrameworkTemplate",
-                    element.Name.NamespaceName, element.Name.LocalName)) 
+                if (!currentElement.Name.LocalName.Contains("."))
                 {
-                    return element;
+                    if (reflectionOnSeparateAppDomain.IsAssignableFrom(DefaultXamlNamespace.NamespaceName, "FrameworkTemplate",
+                        currentElement.Name.NamespaceName, currentElement.Name.LocalName))
+                    {
+                        if (!skipTemplateNode)
+                        {
+                            return currentElement;
+                        }
+                    }
+                    skipTemplateNode = false;
                 }
-                element = element.Parent;
+
+                currentElement = currentElement.Parent;
             }
-            return element;
+            return currentElement;
         }
 
         internal static int GetLineNumber(XNode element)
@@ -1506,9 +1501,9 @@ var {4} = {2}.GetValue({1});
             }
         }
 
-        private static void PopulateDictionaryThatAssociatesNamesToUniqueNames(XDocument doc, 
+        private static void PopulateDictionaryThatAssociatesNamesToUniqueNames(XDocument doc,
             Dictionary<XElement, Dictionary<string, string>> namescopeRootToNameToUniqueNameDictionary,
-            Dictionary<XElement, Dictionary<string, string>> namescopeRootToElementsUniqueNameToInstantiatedObjects, 
+            Dictionary<XElement, Dictionary<string, string>> namescopeRootToElementsUniqueNameToInstantiatedObjects,
             ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
         {
             foreach (var element in PostOrderTreeTraversal.TraverseTreeInPostOrder(doc.Root)) // Note: any order is fine here.
