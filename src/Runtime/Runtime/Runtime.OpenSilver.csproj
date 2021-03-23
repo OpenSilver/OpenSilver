@@ -403,7 +403,7 @@
 		<Compile Include="Windows.UI.Xaml.Interop\WORKINPROGRESS\SilverlightHost.cs" />
 		<Compile Include="System.Windows.Markup\WORKINPROGRESS\IXamlTypeResolver.cs" />
 		<Compile Include="System.Windows.Markup\WORKINPROGRESS\XamlReader.cs" />
-		<Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlnsPrefixAttribute.cs" />
+		<Compile Include="System.Windows.Markup\XmlnsPrefixAttribute.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\AlignmentX.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\AlignmentY.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\CompositionTarget.cs" />

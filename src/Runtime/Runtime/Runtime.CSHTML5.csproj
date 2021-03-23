@@ -101,6 +101,7 @@
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction.cs" />
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
+    <Compile Include="System.Windows.Markup\XmlnsPrefixAttribute.cs" />
     <Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
     <Compile Include="System.Xaml\IMarkupExtension.cs" />
     <Compile Include="System.Xml\WORKINPROGRESS\XmlSerializer.cs" />
