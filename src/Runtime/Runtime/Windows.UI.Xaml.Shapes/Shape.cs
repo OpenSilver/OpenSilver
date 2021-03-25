@@ -708,12 +708,7 @@ $0.save()", context);
 
                 if (fillAsLinearGradientBrush.SpreadMethod == GradientSpreadMethod.Pad)
                 {
-                    returnValue = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.createLinearGradient($1,$2,$3,$4)", context, x0, y0, x1, y1);
-
-                    foreach (GradientStop gradientStop in fillAsLinearGradientBrush.GradientStops)
-                    {
-                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.addColorStop($1,$2)", returnValue, gradientStop.Offset, gradientStop.Color.INTERNAL_ToHtmlString(opacity));
-                    }
+                    returnValue = createLinearGradient(context, x0, y0, x1, y1, fillAsLinearGradientBrush, opacity);
                 }
                 else
                 {
@@ -809,33 +804,19 @@ $0.style.width = $1;
 $0.style.height = $2", canvas, distance + "px", tempCanvasHeight + "px");
 
                     var ctx = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", canvas);
-                    var gradient = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.createLinearGradient(0, 0, $1, 0)", ctx, distance);
 
-                    foreach (GradientStop gradientStop in fillAsLinearGradientBrush.GradientStops)
-                    {
-                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.addColorStop($1,$2)", gradient, gradientStop.Offset, gradientStop.Color.INTERNAL_ToHtmlString(opacity));
-                    }
+                    var gradient = createLinearGradient(ctx, 0d, 0d, distance, 0d, fillAsLinearGradientBrush, opacity);
 
                     CSHTML5.Interop.ExecuteJavaScriptAsync(@"
 $2.fillStyle = $3;
 $2.fillRect(0, 0, $4, $7);
-
 if($0 != undefined && $0 != null) {
 var context = $0.getContext('2d');
-//context.save();
 context.rotate($5);
 context.translate($6, 0);
-//var pat = context.createPattern($1, 'repeat');
+}", shape._canvasDomElement, canvas, ctx, gradient, distance, angle, offset, tempCanvasHeight);
 
-//context.fillStyle = pat;
-//context.fill();
-//context.restore();
-}
-", shape._canvasDomElement, canvas, ctx, gradient, distance, angle, offset, tempCanvasHeight);
-
-
-                    returnValue = CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.createPattern($1, 'repeat')", context, canvas);
+                    returnValue = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.createPattern($1, 'repeat')", context, canvas);
                 }
             }
             else if (brush is RadialGradientBrush)
@@ -877,18 +858,8 @@ $0.createPattern($1, 'repeat')", context, canvas);
                 CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.scale($1,1)", context, radiusScaling);
                 if (fillAsRadialGradientBrush.SpreadMethod == GradientSpreadMethod.Pad)
                 {
-                    returnValue = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.createRadialGradient($1,$2,0,$3,$4,$5)", 
-                                                                         context, 
-                                                                         gradientOriginX, 
-                                                                         gradientOriginY, 
-                                                                         centerX, 
-                                                                         centerY, 
-                                                                         r);
-
-                    foreach (GradientStop gradientStop in fillAsRadialGradientBrush.GradientStops.OrderBy((element) => { return element.Offset; }))
-                    {
-                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.addColorStop($1,$2)", returnValue, gradientStop.Offset, gradientStop.Color.INTERNAL_ToHtmlString(opacity));
-                    }
+                    returnValue = createRadialGradient(context, gradientOriginX, gradientOriginY, 0d, centerX, centerY, r,
+                        fillAsRadialGradientBrush, opacity);
                 }
                 else
                 {
@@ -913,26 +884,21 @@ $0.createPattern($1, 'repeat')", context, canvas);
                     }
                     int additionalRepetitions = repeatingTimes - 1;
 
-                    returnValue = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.createRadialGradient($1,$2,0,$3,$4,$5)", 
-                                                                         context, 
-                                                                         gradientOriginX, 
-                                                                         gradientOriginY, 
-                                                                         centerX - xCorrection * additionalRepetitions * r, 
-                                                                         centerY - yCorrection * additionalRepetitions * r, 
-                                                                         r + additionalRepetitions * r);
+                    returnValue = createRadialGradient(context, gradientOriginX, gradientOriginY, 0d,
+                        centerX - xCorrection * additionalRepetitions * r, 
+                        centerY - yCorrection * additionalRepetitions * r,
+                        r + additionalRepetitions * r,
+                        null,
+                        opacity);
 
-                    var orderedGradients = fillAsRadialGradientBrush.GradientStops.OrderBy((element) => { return element.Offset; });
+                    var orderedGradients = fillAsRadialGradientBrush.GradientStops.OrderBy(gs => gs.Offset);
                     double repetitionOffset = 1.0 / repeatingTimes;
 
-                    for(int i = 0; i< repeatingTimes; ++i)
+                    for (int i = 0; i < repeatingTimes; ++i)
                     {
-                        foreach (GradientStop gradientStop in orderedGradients)
-                        {
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.addColorStop($1,$2)", 
-                                                                   returnValue, 
-                                                                   gradientStop.Offset / repeatingTimes + i * repetitionOffset, 
-                                                                   gradientStop.Color.INTERNAL_ToHtmlString(opacity));
-                        }
+                        List<Tuple<double, Color>> gradients = orderedGradients.Select(gs => new Tuple<double, Color>(
+                            gs.Offset / repeatingTimes + i * repetitionOffset, gs.Color)).ToList();
+                        addColorStops(returnValue, gradients, opacity);
                     }
                 }
             }
@@ -1001,6 +967,114 @@ context.restore();
 }}", javascript, ((INTERNAL_HtmlDomElementReference)canvasDomElement).UniqueIdentifier);
 
             INTERNAL_HtmlDomManager.ExecuteJavaScript(str);
+        }
+
+        private static void addColorStops(object canvasGradient, IList<Tuple<double, Color>> gradients, double opacity)
+        {
+            if (gradients.Count == 0)
+            {
+                return;
+            }
+            else if (gradients.Count == 1)
+            {
+                Tuple<double, Color> gs = gradients[0];
+                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.addColorStop($1, $2)",
+                    canvasGradient,
+                    Math.Max(Math.Min(gs.Item1, 1d), 0d),
+                    gs.Item2.INTERNAL_ToHtmlString(opacity));
+            }
+            else
+            {
+                List<Tuple<double, Color>> orderedGradientStops = gradients.OrderBy(gs => gs.Item1).ToList();
+
+                int i = 0;
+                // todo: add support for negative offset
+                // currently, gradients with negative offset are ignored, unless they
+                // are all negative, in which case we use the last one only.
+                while (i < orderedGradientStops.Count - 1 && orderedGradientStops[i].Item1 < 0d)
+                    i++;
+
+                for (; i < orderedGradientStops.Count; i++)
+                {
+                    Tuple<double, Color> target_gs = orderedGradientStops[i];
+
+                    Color color;
+                    double offset;
+                    bool exit;
+
+                    if (target_gs.Item1 >= 0d && target_gs.Item1 <= 1d)
+                    {
+                        color = target_gs.Item2;
+                        offset = target_gs.Item1;
+                        exit = (target_gs.Item1 == 1d);
+                    }
+                    else if (target_gs.Item1 < 0d)
+                    {
+                        color = target_gs.Item2;
+                        offset = 0d;
+                        exit = true;
+                    }
+                    else
+                    {
+                        if (i == 0)
+                        {
+                            color = target_gs.Item2;
+                        }
+                        else
+                        {
+                            Tuple<double, Color> current_gs = orderedGradientStops[i - 1];
+                            double distance = (1 - current_gs.Item1) / (target_gs.Item1 - current_gs.Item1);
+
+                            byte a, r, g, b;
+                            a = (byte)((target_gs.Item2.A - current_gs.Item2.A) * distance + current_gs.Item2.A);
+                            r = (byte)((target_gs.Item2.R - current_gs.Item2.R) * distance + current_gs.Item2.R);
+                            g = (byte)((target_gs.Item2.G - current_gs.Item2.G) * distance + current_gs.Item2.G);
+                            b = (byte)((target_gs.Item2.B - current_gs.Item2.B) * distance + current_gs.Item2.B);
+
+                            color = Color.FromArgb(a, r, g, b);
+                        }
+
+                        offset = 1d;
+                        exit = true;
+                    }
+
+                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.addColorStop($1, $2)",
+                        canvasGradient,
+                        offset,
+                        color.INTERNAL_ToHtmlString(opacity));
+
+                    if (exit)
+                        break;
+                }
+            }
+        }
+
+        private static object createLinearGradient(object context2d, double x0, double y0, double x1, double y1,
+            LinearGradientBrush lgb, double opacity)
+        {
+            object canvasGradient = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.createLinearGradient($1, $2, $3, $4)",
+                context2d, x0, y0, x1, y1);
+
+            if (lgb != null)
+            {
+                addColorStops(canvasGradient, lgb.GradientStops.Select(gs => new Tuple<double, Color>(gs.Offset, gs.Color)).ToList(), opacity);
+            }
+
+            return canvasGradient;
+        }
+
+        private static object createRadialGradient(object context2d, double x0, double y0, double r0, double x1, double y1, double r1,
+            RadialGradientBrush rgb, double opacity)
+        {
+            object canvasGradient = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.createRadialGradient($1, $2, $3, $4, $5, $6)",
+                context2d, x0, y0, r0, x1, y1, r1);
+
+            if (rgb != null)
+            {
+                addColorStops(canvasGradient, rgb.GradientStops.Select(gs => new Tuple<double, Color>(gs.Offset, gs.Color)).ToList(), opacity);
+            }
+
+            return canvasGradient;
         }
 
         #endregion
