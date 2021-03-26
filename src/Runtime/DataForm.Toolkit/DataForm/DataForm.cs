@@ -2703,6 +2703,12 @@ namespace Windows.UI.Xaml.Controls
                 if (contentRootElement != null)
                 {
                     contentRootElement.Loaded += new RoutedEventHandler(this.OnContentRootElementLoaded);
+#if OPENSILVER
+                    // Note: we need to set the DataContext to the right value before adding 'contentRootElement'
+                    // to the ContentPresenter or the DataContext will be inherited from the DataForm and then
+                    // propagated to the generated fields.
+                    contentRootElement.DataContext = this.CurrentItem;
+#endif
                 }
 
                 this._contentPresenter.Content = contentRootElement;
