@@ -173,6 +173,12 @@ namespace Windows.UI.Xaml.Automation.Peers
 		public void InvalidatePeer()
 		{
 		}
+
+		public string GetClassName() => this.GetClassNameCore();
+
+		public string GetHelpText() => this.GetHelpTextCore();
+
+		public string GetAutomationId() => this.GetAutomationIdCore();
 	}
 }
 #endif
