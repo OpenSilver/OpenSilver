@@ -35,6 +35,13 @@ namespace Windows.UI.Xaml.Controls
         public event NavigatingCancelEventHandler Navigating;
 
         public event NavigationStoppedEventHandler NavigationStopped;
+
+        /// <summary>
+        /// Reloads the current page.
+        /// </summary>
+        public void Refresh()
+        {
+        }
     }
 }
 

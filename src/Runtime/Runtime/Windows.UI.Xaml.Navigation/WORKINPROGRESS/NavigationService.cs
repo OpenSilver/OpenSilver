@@ -36,7 +36,17 @@ namespace Windows.UI.Xaml.Navigation
         {
             return false;
         }
-        
+
+        /// <summary>Gets or sets the uniform resource identifier (URI) of the current content or the content that is being navigated to.</summary>
+        /// <returns>A value that represents the URI of the current content or the content that is being navigated to.</returns>
+        public Uri Source { get; set; }
+
+        /// <summary>
+        /// Reloads the current page. 
+        /// </summary>
+        public void Refresh()
+        {
+        }
     }
 }
 
