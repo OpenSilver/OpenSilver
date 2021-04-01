@@ -17,7 +17,6 @@ using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Collections;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Markup;
@@ -319,38 +318,42 @@ namespace Windows.UI.Xaml.Media
         }
 
 #if WORKINPROGRESS
+
+        /// <summary>
+        /// Gets all open <see cref="Popup"/> controls.
+        /// </summary>
+        /// <returns>A list of all open <see cref="Popup"/> controls.</returns>
         public static IEnumerable<Popup> GetOpenPopups()
         {
             return GetOpenPopups(Window.Current);
         }
 
+        /// <summary>
+        /// Gets all open <see cref="Popup"/> controls for the specified <see cref="Window"/>.
+        /// </summary>
+        /// <param name="window">The <see cref="Window"/> to get <see cref="Popup"/> for.</param>
+        /// <returns>A list of all open <see cref="Popup"/> controls.</returns>
         public static IEnumerable<Popup> GetOpenPopups(Window window)
-        {
-            var popups = GetNestedPopups(window);
-
-            return popups.Where(p => p.IsOpen);
-        }
-
-        private static IEnumerable<Popup> GetNestedPopups(UIElement element)
         {
             var popups = new List<Popup>();
 
+            // Stack used for traversing the DOM nodes.
             var nodes = new Stack<UIElement>();
 
-            nodes.Push(element);
+            nodes.Push(window);
 
             while (nodes.Any())
             {
                 var current = nodes.Pop();
-                
-                // If element has no children.
-                if (current?.INTERNAL_VisualChildrenInformation == null)
+
+                // If element has no children move on to the next node.
+                if (current.INTERNAL_VisualChildrenInformation == null)
                 {
                     continue;
                 }
 
                 var children = current.INTERNAL_VisualChildrenInformation.Keys;
-                
+
                 foreach (var directChild in children)
                 {
                     nodes.Push(directChild);
@@ -362,7 +365,7 @@ namespace Windows.UI.Xaml.Media
                 }
             }
 
-            return popups;
+            return popups.Where(p => p.IsOpen);
         }
 
         public static IEnumerable<UIElement> FindElementsInHostCoordinates(Rect intersectingRect, UIElement subtree)
