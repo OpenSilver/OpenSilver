@@ -17,6 +17,7 @@ using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Markup;
@@ -320,12 +321,48 @@ namespace Windows.UI.Xaml.Media
 #if WORKINPROGRESS
         public static IEnumerable<Popup> GetOpenPopups()
         {
-            return new List<Popup>();
+            return GetOpenPopups(Window.Current);
         }
 
         public static IEnumerable<Popup> GetOpenPopups(Window window)
         {
-            return new List<Popup>();
+            var popups = GetNestedPopups(window);
+
+            return popups.Where(p => p.IsOpen);
+        }
+
+        private static IEnumerable<Popup> GetNestedPopups(UIElement element)
+        {
+            var popups = new List<Popup>();
+
+            var nodes = new Stack<UIElement>();
+
+            nodes.Push(element);
+
+            while (nodes.Any())
+            {
+                var current = nodes.Pop();
+                
+                // If element has no children.
+                if (current?.INTERNAL_VisualChildrenInformation == null)
+                {
+                    continue;
+                }
+
+                var children = current.INTERNAL_VisualChildrenInformation.Keys;
+                
+                foreach (var directChild in children)
+                {
+                    nodes.Push(directChild);
+
+                    if (directChild is Popup popup)
+                    {
+                        popups.Add(popup);
+                    }
+                }
+            }
+
+            return popups;
         }
 
         public static IEnumerable<UIElement> FindElementsInHostCoordinates(Rect intersectingRect, UIElement subtree)
