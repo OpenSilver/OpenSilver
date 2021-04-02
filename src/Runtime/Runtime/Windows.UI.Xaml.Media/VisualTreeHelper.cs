@@ -20,7 +20,7 @@ using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Markup;
-
+using DotNetForHtml5.Core;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls.Primitives;
@@ -335,37 +335,16 @@ namespace Windows.UI.Xaml.Media
         /// <returns>A list of all open <see cref="Popup"/> controls.</returns>
         public static IEnumerable<Popup> GetOpenPopups(Window window)
         {
-            var popups = new List<Popup>();
+            var popupRoots = INTERNAL_PopupsManager.GetAllRootUIElements().OfType<PopupRoot>();
 
-            // Stack used for traversing the DOM nodes.
-            var nodes = new Stack<UIElement>();
-
-            nodes.Push(window);
-
-            while (nodes.Any())
+            foreach (var root in popupRoots)
             {
-                var current = nodes.Pop();
-
-                // If element has no children move on to the next node.
-                if (current.INTERNAL_VisualChildrenInformation == null)
+                if (root.INTERNAL_ParentWindow == window && root.INTERNAL_LinkedPopup.IsOpen
+                    && root.INTERNAL_LinkedPopup.Child != null)
                 {
-                    continue;
-                }
-
-                var children = current.INTERNAL_VisualChildrenInformation.Keys;
-
-                foreach (var directChild in children)
-                {
-                    nodes.Push(directChild);
-
-                    if (directChild is Popup popup)
-                    {
-                        popups.Add(popup);
-                    }
+                    yield return root.INTERNAL_LinkedPopup;
                 }
             }
-
-            return popups.Where(p => p.IsOpen);
         }
 
         public static IEnumerable<UIElement> FindElementsInHostCoordinates(Rect intersectingRect, UIElement subtree)
