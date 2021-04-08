@@ -20,7 +20,7 @@ using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Markup;
-
+using DotNetForHtml5.Core;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls.Primitives;
@@ -317,16 +317,39 @@ namespace Windows.UI.Xaml.Media
             return null; // no attribute found
         }
 
-#if WORKINPROGRESS
-        public static IEnumerable<Popup> GetOpenPopups()
+        /// <summary>
+        /// Gets all open <see cref="Popup"/> controls.
+        /// </summary>
+        /// <returns>A list of all open <see cref="Popup"/> controls.</returns>
+        public static List<Popup> GetOpenPopups()
         {
-            return new List<Popup>();
+            return GetOpenPopups(Window.Current);
         }
 
-        public static IEnumerable<Popup> GetOpenPopups(Window window)
+        /// <summary>
+        /// Gets all open <see cref="Popup"/> controls for the specified <see cref="Window"/>.
+        /// </summary>
+        /// <param name="window">The <see cref="Window"/> to get <see cref="Popup"/> for.</param>
+        /// <returns>A list of all open <see cref="Popup"/> controls.</returns>
+        public static List<Popup> GetOpenPopups(Window window)
         {
-            return new List<Popup>();
+            var result = new List<Popup>();
+
+            var popupRoots = INTERNAL_PopupsManager.GetAllRootUIElements().OfType<PopupRoot>();
+
+            foreach (var root in popupRoots)
+            {
+                if (root.INTERNAL_ParentWindow == window && root.INTERNAL_LinkedPopup.IsOpen
+                                                         && root.INTERNAL_LinkedPopup.Child != null)
+                {
+                    result.Add(root.INTERNAL_LinkedPopup);
+                }
+            }
+
+            return result;
         }
+
+#if WORKINPROGRESS
 
         public static IEnumerable<UIElement> FindElementsInHostCoordinates(Rect intersectingRect, UIElement subtree)
         {
