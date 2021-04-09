@@ -1,11 +1,12 @@
 ﻿#if WORKINPROGRESS
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
+using System;
+
+#if MIGRATION
 namespace System.Windows.Printing
+#else
+namespace Windows.UI.Xaml.Input.Printing
+#endif
 {
     public partial class PrintDocument : DependencyObject
     {

@@ -1,11 +1,12 @@
 ﻿#if WORKINPROGRESS
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
+using System;
+
+#if MIGRATION
 namespace System.Windows.Input
+#else
+namespace Windows.UI.Xaml.Input
+#endif
 {
     public static partial class Cursors
     {

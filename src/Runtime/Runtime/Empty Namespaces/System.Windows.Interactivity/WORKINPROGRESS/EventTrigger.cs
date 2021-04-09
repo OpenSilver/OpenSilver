@@ -1,11 +1,12 @@
 ﻿#if WORKINPROGRESS
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
+using System;
+
+#if MIGRATION
 namespace System.Windows.Interactivity
+#else
+namespace Windows.UI.Xaml.Input.Interactivity
+#endif
 {
     public partial class EventTrigger
     {

@@ -1,11 +1,12 @@
 ﻿#if WORKINPROGRESS
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
+using System;
+
+#if MIGRATION
 namespace System.Windows
+#else
+namespace Windows.UI.Xaml
+#endif
 {
     public enum InstallState
     {
@@ -27,21 +28,6 @@ namespace System.Windows
         public void RegisterName(string name, object scopedElement)
         {
 
-        }
-    }
-
-    public partial class VisualStateGroup : DependencyObject
-    {
-        public VisualStateGroup() { }
-        public event EventHandler<VisualStateChangedEventArgs> CurrentStateChanged;
-    }
-
-    public partial class Window
-    {
-        public string Title { get; set; }
-        public bool Install()
-        {
-            return true;
         }
     }
 }
