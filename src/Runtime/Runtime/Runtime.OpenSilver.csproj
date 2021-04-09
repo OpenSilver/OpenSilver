@@ -49,6 +49,13 @@
 		<Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
+		<Compile Include="Empty Namespaces\WORKINPROGRESS\System.Windows.Controls.cs" />
+		<Compile Include="Empty Namespaces\WORKINPROGRESS\System.Windows.cs" />
+		<Compile Include="Empty Namespaces\WORKINPROGRESS\System.Windows.Data.cs" />
+		<Compile Include="Empty Namespaces\WORKINPROGRESS\System.Windows.Documents.cs" />
+		<Compile Include="Empty Namespaces\WORKINPROGRESS\System.Windows.Input.cs" />
+		<Compile Include="Empty Namespaces\WORKINPROGRESS\System.Windows.Interactivity.cs" />
+		<Compile Include="Empty Namespaces\WORKINPROGRESS\System.Windows.Printing.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ChangePropertyAction.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ComparisonConditionType.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ControlStoryboardAction.cs" />

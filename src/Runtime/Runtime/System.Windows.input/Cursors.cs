@@ -24,7 +24,7 @@ namespace System.Windows.Input
     /// <summary>
     /// Defines a set of default cursors.
     /// </summary>
-    public static class Cursors
+    public static partial class Cursors
     {
         internal static Dictionary<INTERNAL_CursorsEnum, string> INTERNAL_cursorEnumToCursorString;
 

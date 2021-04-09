@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a control that contains a header and collection of items.
     /// </summary>
-    public class HeaderedItemsControl : ItemsControl
+    public partial class HeaderedItemsControl : ItemsControl
     {
     }
 }
