@@ -1,7 +1,12 @@
 ﻿#if WORKINPROGRESS
 
+using System;
 using System.Collections;
+
+#if MIGRATION
 using System.Windows.Input;
+#else
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls

@@ -20,7 +20,7 @@ namespace Windows.UI.Xaml.Controls
             get; set;
         }
 
-        public System.Uri Source { get; set; }
+        public Uri Source { get; set; }
     }
 }
 #endif

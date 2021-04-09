@@ -1,8 +1,12 @@
 ﻿#if WORKINPROGRESS
 
 using System;
-using System.Windows.Controls.Primitives;
+
+#if MIGRATION
 using System.Windows.Documents;
+#else
+using Windows.UI.Xaml.Documents;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -10,13 +14,11 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public partial class AutoCompleteBox : Selector
+    public partial class TextBlock : Control
     {
-        virtual protected void OnPopulated(PopulatedEventArgs e)
-        {
+        public FontSource FontSource { get; set; }
 
-        }
-        public static DependencyProperty ItemFilterProperty
+        public static DependencyProperty LineHeightProperty
         {
             get; set;
         }

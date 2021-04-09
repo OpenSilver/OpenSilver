@@ -8,12 +8,9 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public partial class DatePicker
+    public partial class HeaderedItemsControl : ItemsControl
     {
-        public static System.Windows.DependencyProperty CalendarStyleProperty
-        {
-            get; set;
-        }
+        public object Header { get; set; }
     }
 }
 #endif

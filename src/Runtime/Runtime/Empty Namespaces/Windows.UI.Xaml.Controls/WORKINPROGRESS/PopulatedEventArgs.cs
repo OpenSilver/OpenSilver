@@ -1,7 +1,6 @@
 ﻿#if WORKINPROGRESS
 
 using System;
-using System.Windows.Documents;
 
 #if MIGRATION
 namespace System.Windows.Controls

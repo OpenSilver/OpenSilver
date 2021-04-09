@@ -3,6 +3,12 @@
 using System;
 
 #if MIGRATION
+using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Media;
+#endif
+
+#if MIGRATION
 namespace System.Windows.Controls
 #else
 namespace Windows.UI.Xaml.Controls
@@ -12,9 +18,9 @@ namespace Windows.UI.Xaml.Controls
     {
         public string SourceName { get; set; }
         public bool IsTabStop { get; set; }
-        public System.Windows.Media.Brush Background { get; set; }
-        public System.Windows.Thickness Padding { get; set; }
-        public System.Windows.Thickness BorderThickness { get; set; }
+        public Brush Background { get; set; }
+        public Thickness Padding { get; set; }
+        public Thickness BorderThickness { get; set; }
 
         public static DependencyProperty IsTabStopProperty
         {

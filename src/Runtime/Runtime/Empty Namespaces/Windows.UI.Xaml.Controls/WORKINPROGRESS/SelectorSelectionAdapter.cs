@@ -2,8 +2,12 @@
 
 using System;
 using System.Collections;
+#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+#else
+using Windows.UI.Xaml.Controls.Primitives;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
