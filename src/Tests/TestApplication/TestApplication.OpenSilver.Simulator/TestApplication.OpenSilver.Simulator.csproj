@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <StartAction>Program</StartAction>
+    <Configurations>SL;SL.WorkInProgress;</Configurations>
+    <RootNamespace>TestApplication.OpenSilver.Simulator</RootNamespace>
+    <AssemblyName>TestApplication.OpenSilver.Simulator</AssemblyName>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <StartProgram>$(NuGetPackageRoot)\opensilver.workinprogress\1.0.0-alpha-018\tools\simulator\CSharpXamlForHtml5.Simulator.exe</StartProgram>
+    <StartArguments>"..\..\..\TestApplication\bin\OpenSilver\$(Configuration)\netstandard2.0\TestApplication.OpenSilver.dll"</StartArguments>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\TestApplication\TestApplication.OpenSilver.csproj" />
+  </ItemGroup>
+  
+</Project>
+

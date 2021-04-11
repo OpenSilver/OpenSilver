@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+	<PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">SL</Configuration>
+		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+		<ProjectGuid>{BA5BB6E1-5F2B-475A-85C6-EAAC3F1173B1}</ProjectGuid>
+		<OutputType>Library</OutputType>
+		<AppDesignerFolder>Properties</AppDesignerFolder>
+		<RootNamespace>TestApplication</RootNamespace>
+		<AssemblyName>TestApplication.CSHTML5</AssemblyName>
+		<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+		<FileAlignment>512</FileAlignment>
+		<IsCSharpXamlForHtml5>true</IsCSharpXamlForHtml5>
+		<CSharpXamlForHtml5OutputType>Application</CSharpXamlForHtml5OutputType>
+		<IsCshtml5>true</IsCshtml5>
+		<Cshtml5OutputType>Application</Cshtml5OutputType>
+		<StartAction>Program</StartAction>
+		<StartArguments>"TestApplication.CSHTML5.dll"</StartArguments>
+		<OutputPath>bin\CSHTML5\$(Configuration)\</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<!-- Change this to upgrade the CSHTML5 version -->
+		<!-- Also change the version in packages.config -->
+		<CSHTML5Version>2.0.0-alpha85-105</CSHTML5Version>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<DefineConstants>DEBUG;TRACE;CSHTML5;SLMIGRATION</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<NoStdLib>true</NoStdLib>
+	</PropertyGroup>
+
+	<!-- Cannot be used until we find a way to pick a different nuget packages per build config -->
+	<!-- Switching to PackageReference should allow to use Condition with the following workaround: https://github.com/dotnet/project-system/issues/4175#issuecomment-434080407, however, the CSHTML5 compiler doesn't seems to be very happy about that -->
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL.WIP|AnyCPU' ">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<DefineConstants>DEBUG;TRACE;CSHTML5;SLMIGRATION;WORKINPROGRESS</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<NoStdLib>true</NoStdLib>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="App.xaml.cs">
+			<DependentUpon>App.xaml</DependentUpon>
+		</Compile>
+		<Compile Include="HintBehavior.cs" />
+		<Compile Include="LinqSamples.cs" />
+		<Compile Include="MainPage.xaml.cs">
+			<DependentUpon>MainPage.xaml</DependentUpon>
+		</Compile>
+		<Compile Include="MyCustomImageControl.cs" />
+		<Compile Include="Properties\AssemblyInfo.cs" />
+		<Compile Include="SampleHeaderedContainer.xaml.cs">
+			<DependentUpon>SampleHeaderedContainer.xaml</DependentUpon>
+		</Compile>
+		<Compile Include="TestingChildWindow\LoginWindow.xaml.cs">
+			<DependentUpon>LoginWindow.xaml</DependentUpon>
+		</Compile>
+		<Compile Include="VideoPlayerControl.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="App.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Images\arrow_left.png" />
+		<Content Include="Images\arrow_right.png" />
+		<Content Include="Images\arrow_right_and_left.png" />
+		<Content Include="Images\Logo1.png" />
+		<Content Include="MainPage.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Include="SampleHeaderedContainer.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Include="TestingChildWindow\LoginWindow.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Page>
+	</ItemGroup>
+
+	<!-- TODO: find a way to use $(CSHTML5Version) instead of hardcoded version for the following references -->
+	<ItemGroup>
+		<Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+			<HintPath>..\packages\CSHTML5.Migration.2.0.0-alpha85-105\lib\net40\Bridge.dll</HintPath>
+			<Private>True</Private>
+		</Reference>
+		<Reference Include="CSHTML5.Migration, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+			<HintPath>..\packages\CSHTML5.Migration.2.0.0-alpha85-105\lib\net40\CSHTML5.Migration.dll</HintPath>
+			<Private>True</Private>
+		</Reference>
+		<Reference Include="CSHTML5.Stubs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+			<HintPath>..\packages\CSHTML5.Migration.2.0.0-alpha85-105\lib\net40\CSHTML5.Stubs.dll</HintPath>
+			<Private>True</Private>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="bridge.json" />
+		<None Include="packages.config" />
+	</ItemGroup>
+
+	<Import Project="..\packages\CSHTML5.Migration.$(CSHTML5Version)\build\CSHTML5.Migration.targets" Condition="Exists('..\packages\CSHTML5.Migration.$(CSHTML5Version)\build\CSHTML5.Migration.targets')" />
+
+	<Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+		<PropertyGroup>
+			<ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+		</PropertyGroup>
+		<Error Condition="!Exists('..\packages\CSHTML5.Migration.$(CSHTML5Version)\build\CSHTML5.Migration.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CSHTML5.Migration.$(CSHTML5Version)\build\CSHTML5.Migration.targets'))" />
+	</Target>
+	<!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+		 Other similar extension points exist, see Microsoft.Common.targets.
+	<Target Name="BeforeBuild">
+	</Target>
+	<Target Name="AfterBuild">
+	</Target>
+	-->
+</Project>

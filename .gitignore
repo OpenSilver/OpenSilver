@@ -333,3 +333,8 @@ ASALocalRun/
 # NuGet package generation output
 build/output
 build/temp
+
+# Ignore wwwroot of test application, except index.html
+src/Tests/TestApplication/TestApplication.OpenSilver.Browser/wwwroot/*
+!src/Tests/TestApplication/TestApplication.OpenSilver.Browser/wwwroot/index.html
+

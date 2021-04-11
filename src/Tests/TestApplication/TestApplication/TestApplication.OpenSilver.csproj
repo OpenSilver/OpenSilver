@@ -1,0 +1,72 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Configurations>SL;SL.WorkInProgress;</Configurations>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<RazorLangVersion>3.0</RazorLangVersion>
+		<EnableDefaultItems>false</EnableDefaultItems>
+    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<!-- Change this to upgrade the OpenSilver version -->
+		<OpenSilverVersion>1.0.0-alpha-018</OpenSilverVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SL|AnyCPU'">
+		<DebugType>full</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<Optimize>false</Optimize>
+		<DefineConstants>DEBUG;TRACE;OPENSILVER;SLMIGRATION</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SL.WorkInProgress|AnyCPU'">
+		<DebugType>full</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<Optimize>false</Optimize>
+		<DefineConstants>DEBUG;TRACE;OPENSILVER;SLMIGRATION;WORKINPROGRESS</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="OpenSilver" 				  Version="$(OpenSilverVersion)" Condition="'$(Configuration)' == 'SL'" />
+		<PackageReference Include="OpenSilver.WorkInProgress" Version="$(OpenSilverVersion)" Condition="'$(Configuration)' == 'SL.WorkInProgress'" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="App.xaml.cs" />
+		<Compile Include="HintBehavior.cs" />
+		<Compile Include="LinqSamples.cs" />
+		<Compile Include="MainPage.xaml.cs" />
+		<Compile Include="MyCustomImageControl.cs" />
+		<Compile Include="SampleHeaderedContainer.xaml.cs" />
+		<Compile Include="TestingChildWindow\LoginWindow.xaml.cs" />
+		<Compile Include="VideoPlayerControl.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Images\arrow_left.png" />
+		<Content Include="Images\arrow_right.png" />
+		<Content Include="Images\arrow_right_and_left.png" />
+		<Content Include="Images\Logo1.png" />
+		<Content Include="App.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="MainPage.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Include="SampleHeaderedContainer.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Include="TestingChildWindow\LoginWindow.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Page>
+	</ItemGroup>
+
+</Project>
