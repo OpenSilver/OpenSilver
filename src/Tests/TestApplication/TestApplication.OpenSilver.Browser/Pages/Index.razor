@@ -1,0 +1,14 @@
+﻿@page "/"
+@using DotNetForHtml5;
+@inject IJSRuntime JSRuntime;
+
+@code{
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        JavaScriptExecutionHandler javaScriptExecutionHandler = (JavaScriptExecutionHandler)DotNetForHtml5.Core.INTERNAL_Simulator.JavaScriptExecutionHandler;
+        javaScriptExecutionHandler.JSRuntime = JSRuntime;
+
+        Program.RunApplication();	
+    }
+}

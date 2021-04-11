@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31129.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApplication.CSHTML5", "TestApplication\TestApplication.CSHTML5.csproj", "{BA5BB6E1-5F2B-475A-85C6-EAAC3F1173B1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		SL.WIP (disabled, see csproj)|Any CPU = SL.WIP (disabled, see csproj)|Any CPU
+		SL|Any CPU = SL|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BA5BB6E1-5F2B-475A-85C6-EAAC3F1173B1}.SL.WIP (disabled, see csproj)|Any CPU.ActiveCfg = SL.WIP|Any CPU
+		{BA5BB6E1-5F2B-475A-85C6-EAAC3F1173B1}.SL.WIP (disabled, see csproj)|Any CPU.Build.0 = SL.WIP|Any CPU
+		{BA5BB6E1-5F2B-475A-85C6-EAAC3F1173B1}.SL|Any CPU.ActiveCfg = SL|Any CPU
+		{BA5BB6E1-5F2B-475A-85C6-EAAC3F1173B1}.SL|Any CPU.Build.0 = SL|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0AC02EC8-FBD2-4164-A3B0-06D816AB947D}
+	EndGlobalSection
+EndGlobal
