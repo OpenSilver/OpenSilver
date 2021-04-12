@@ -27,44 +27,52 @@ namespace Windows.UI.Xaml.Media.Tests
 #endif
 {
     [TestClass]
-    public class TranslateTransformTest
+    public class MatrixTransformTest
     {
         [TestMethod]
-        public void Inverse()
+        public void Inverse_When_Not_Invertible()
         {
-            var transform = new TranslateTransform { X = 123, Y = 321 };
+            var transform = new MatrixTransform(MatrixTest.GetSingularMatrix(2, 4));
+            var invertedTransform = transform.Inverse;
+            invertedTransform.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void Inverse_When_Invertible()
+        {
+            var transform = new MatrixTransform(MatrixTest.GetIncrementalMatrix(0, 1));
             var invertedTransform = transform.Inverse as MatrixTransform;
             invertedTransform.Should().NotBeNull();
             var m = invertedTransform.Matrix;
-            m.M11.Should().Be(1);
-            m.M12.Should().Be(0);
-            m.M21.Should().Be(0);
-            m.M22.Should().Be(1);
-            m.OffsetX.Should().Be(-123);
-            m.OffsetY.Should().Be(-321);
+            m.M11.Should().Be(-1.5);
+            m.M12.Should().Be(0.5);
+            m.M21.Should().Be(1);
+            m.M22.Should().Be(0);
+            m.OffsetX.Should().Be(1);
+            m.OffsetY.Should().Be(-2);
         }
 
         [TestMethod]
         public void TransformBounds()
         {
-            var rect = new Rect(0, 0, 100, 100);
-            var transform = new TranslateTransform { X = 100, Y = 200 };
+            var rect = new Rect(-1, 1, 5, 2);
+            var transform = new MatrixTransform(MatrixTest.GetIncrementalMatrix(10, 3));
             var result = transform.TransformBounds(rect);
-            result.X.Should().Be(100);
-            result.Y.Should().Be(200);
-            result.Width.Should().Be(100);
-            result.Height.Should().Be(100);
+            result.X.Should().Be(28);
+            result.Y.Should().Be(31);
+            result.Width.Should().Be(82);
+            result.Height.Should().Be(103);
         }
 
         [TestMethod]
         public void TryTransform()
         {
-            var point = new Point(0, 0);
-            var transform = new TranslateTransform { X = 100, Y = 200 };
+            var point = new Point(1, 2);
+            var transform = new MatrixTransform(MatrixTest.GetIncrementalMatrix(-5, 2));
             var result = transform.TryTransform(point, out var outPoint);
             result.Should().BeTrue();
-            outPoint.X.Should().Be(100);
-            outPoint.Y.Should().Be(200);
+            outPoint.X.Should().Be(-4);
+            outPoint.Y.Should().Be(4);
         }
     }
 }

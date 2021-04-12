@@ -27,44 +27,45 @@ namespace Windows.UI.Xaml.Media.Tests
 #endif
 {
     [TestClass]
-    public class TranslateTransformTest
+    public class RotateTransformTest
     {
         [TestMethod]
         public void Inverse()
         {
-            var transform = new TranslateTransform { X = 123, Y = 321 };
+            var transform = new RotateTransform { Angle = 30 };
             var invertedTransform = transform.Inverse as MatrixTransform;
             invertedTransform.Should().NotBeNull();
             var m = invertedTransform.Matrix;
-            m.M11.Should().Be(1);
-            m.M12.Should().Be(0);
-            m.M21.Should().Be(0);
-            m.M22.Should().Be(1);
-            m.OffsetX.Should().Be(-123);
-            m.OffsetY.Should().Be(-321);
+
+            m.M11.Should().BeInRange(0.866025, 0.866026);
+            m.M12.Should().BeInRange(-0.5, -0.499999);
+            m.M21.Should().BeInRange(0.499999, 0.5);
+            m.M22.Should().BeInRange(0.866025, 0.866026);
+            m.OffsetX.Should().BeInRange(-0.000001, 0.000001);
+            m.OffsetY.Should().BeInRange(-0.000001, 0.000001);
         }
 
         [TestMethod]
         public void TransformBounds()
         {
-            var rect = new Rect(0, 0, 100, 100);
-            var transform = new TranslateTransform { X = 100, Y = 200 };
+            var rect = new Rect(-5, -5, 25, 10);
+            var transform = new RotateTransform { Angle = 45 };
             var result = transform.TransformBounds(rect);
-            result.X.Should().Be(100);
-            result.Y.Should().Be(200);
-            result.Width.Should().Be(100);
-            result.Height.Should().Be(100);
+            result.X.Should().BeInRange(-7.071068, -7.071067);
+            result.Y.Should().BeInRange(-7.071068, -7.071067);
+            result.Height.Should().BeInRange(24.748737, 24.748738);
+            result.Width.Should().BeInRange(24.748737, 24.748738);
         }
 
         [TestMethod]
         public void TryTransform()
         {
-            var point = new Point(0, 0);
-            var transform = new TranslateTransform { X = 100, Y = 200 };
+            var point = new Point(10, 10);
+            var transform = new RotateTransform { Angle = 90 };
             var result = transform.TryTransform(point, out var outPoint);
             result.Should().BeTrue();
-            outPoint.X.Should().Be(100);
-            outPoint.Y.Should().Be(200);
+            outPoint.X.Should().Be(-10);
+            outPoint.Y.Should().Be(10);
         }
     }
 }

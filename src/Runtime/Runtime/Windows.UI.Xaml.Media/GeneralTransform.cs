@@ -14,10 +14,7 @@
 
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -36,40 +33,28 @@ namespace Windows.UI.Xaml.Media
     {
         internal UIElement INTERNAL_parent;
 
-
         /// <summary>
-        /// Provides base class initialization behavior for GeneralTransform-derived
-        /// classes.
+        /// Initializes a new instance of the <see cref="GeneralTransform"/> class.
         /// </summary>
         protected GeneralTransform()
         {
-
         }
 
-        // Must be implemented by the concrete class:
-        protected abstract Point INTERNAL_TransformPoint(Point point);
-
-        //
-        // Summary:
-        //     Transforms the specified point and returns the result.
-        //
-        // Parameters:
-        //   point:
-        //     The point to transform.  
-        //
-        // Returns:
-        //     The result of transforming point.
+        // For UWP compatibility
         /// <summary>
         /// Transforms the specified point and returns the result.
         /// </summary>
-        /// <param name="point">The point to transform.</param>
-        /// <returns>The result of transforming point.</returns>
+        /// <param name="point">
+        /// The point to transform.
+        /// </param>
+        /// <returns>
+        /// The result of transforming point.
+        /// </returns>
         public Point TransformPoint(Point point)
         {
-            return INTERNAL_TransformPoint(point);
+            return Transform(point);
         }
 
-        //---- FOR SILVERLIGHT BACKWARD COMPATIBILITY: ----
         /// <summary>
         /// Transforms the specified point and returns the result.
         /// </summary>
@@ -77,103 +62,57 @@ namespace Windows.UI.Xaml.Media
         /// <returns>The result of transforming point.</returns>
         public Point Transform(Point point)
         {
-            // (For Silverlight backward compatibility only)
+            Point transformedPoint;
 
-            return TransformPoint(point);
+            if (!TryTransform(point, out transformedPoint))
+            {
+                throw new InvalidOperationException("Could not transform");
+            }
+            return transformedPoint;
         }
 
+        /// <summary>
+        /// Attempts to transform the specified point and returns a value that indicates
+        /// whether the transformation was successful.
+        /// </summary>
+        /// <param name="inPoint">
+        /// The point to transform.
+        /// </param>
+        /// <param name="outPoint">
+        /// The result of transforming inPoint.
+        /// </param>
+        /// <returns>
+        /// True if inPoint was transformed; otherwise, false.
+        /// </returns>
+        public abstract bool TryTransform(Point inPoint, out Point outPoint);
 
-        // Returns:
-        //     An inverse of this instance, if possible; otherwise null.
-        //// <summary>
-        //// Gets the inverse transformation of this GeneralTransform, if possible.
-        //// </summary>
-        //public GeneralTransform Inverse { get; } 
-
-
-        // Returns:
-        //     The value that should be returned as Inverse by the GeneralTransform.
-        //// <summary>
-        //// Implements the behavior for return value of Inverse in a derived or custom
-        //// GeneralTransform.
-        //// </summary>
-        //protected virtual GeneralTransform InverseCore { get; }
-
-
-
-        // Summary:
-        //     Transforms the specified bounding box and returns an axis-aligned bounding
-        //     box that is exactly large enough to contain it.
-        //
-        // Parameters:
-        //   rect:
-        //     The bounding box to transform.
-        //
-        // Returns:
-        //     The smallest axis-aligned bounding box possible that contains the transformed
-        //     rect.
-        //public Rect TransformBounds(Rect rect);
-
-
-
-
-        //
-        // Summary:
-        //     Provides the means to override the TransformBounds behavior in a derived
-        //     transform class.
-        //
-        // Parameters:
-        //   rect:
-        //     The bounding box to transform.
-        //
-        // Returns:
-        //     The smallest axis-aligned bounding box possible that contains the transformed
-        //     rect.
-        //protected virtual Rect TransformBoundsCore(Rect rect);
-
-
-
-
-        //
-        // Summary:
-        //     Attempts to transform the specified point and returns a value that indicates
-        //     whether the transformation was successful.
-        //
-        // Parameters:
-        //   inPoint:
-        //     The point to transform.
-        //
-        //   outPoint:
-        //     The result of transforming inPoint.
-        //
-        // Returns:
-        //     True if inPoint was transformed; otherwise, false.
-        //public bool TryTransform(Point inPoint, out Point outPoint);
-
-
-
-        //
-        // Summary:
-        //     Provides the means to override the TryTransform behavior in a derived transform
-        //     class.
-        //
-        // Parameters:
-        //   inPoint:
-        //     The point to transform.
-        //
-        //   outPoint:
-        //     The result of transforming inPoint.
-        //
-        // Returns:
-        //     True if inPoint was transformed; otherwise, false.
-        //protected virtual bool TryTransformCore(Point inPoint, out Point outPoint);
-
-#if WORKINPROGRESS
-        public abstract GeneralTransform Inverse { get; }
-
+        /// <summary>
+        /// When overridden in a derived class, transforms the specified bounding box and
+        /// returns an axis-aligned bounding box that is exactly large enough to contain
+        /// it.
+        /// </summary>
+        /// <param name="rect">
+        /// The bounding box to transform.
+        /// </param>
+        /// <returns>
+        /// The smallest axis-aligned bounding box possible that contains the transformed
+        /// rect.
+        /// </returns>
         public abstract Rect TransformBounds(Rect rect);
 
-        public abstract bool TryTransform(Point inPoint, out Point outPoint);
-#endif
+        /// <summary>
+        /// Gets the inverse transformation of this <see cref="GeneralTransform"/>,
+        /// if possible.
+        /// </summary>
+        /// <returns>
+        /// An inverse of this instance, if possible; otherwise null.
+        /// </returns>
+        public abstract GeneralTransform Inverse { get; }
+
+        [Obsolete("Use TryTransform() instead.", true)]
+        protected virtual Point INTERNAL_TransformPoint(Point point)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

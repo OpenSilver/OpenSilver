@@ -35,6 +35,19 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public sealed partial class MatrixTransform : Transform
     {
+        #region Constructors
+
+        public MatrixTransform()
+        {
+        }
+
+        internal MatrixTransform(Matrix matrix)
+        {
+            Matrix = matrix;
+        }
+
+        #endregion Constructors
+
         /// <summary>
         /// Gets or sets the Matrix that defines this transformation. The default is an
         /// identity Matrix. An identity matrix has a value of 1 in coefficients [1,1],
@@ -50,84 +63,57 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the Matrix dependency property.
         /// </summary>
         public static readonly DependencyProperty MatrixProperty =
-            DependencyProperty.Register("Matrix", typeof(Matrix), typeof(MatrixTransform), new PropertyMetadata(Matrix.Identity));
-        //{
-        //    GetCSSEquivalent = (instance) =>
-        //    {
-        //        if (((GeneralTransform)instance).INTERNAL_parent != null)
-        //        {
-        //            return new CSSEquivalent()
-        //            {
-        //                DomElement = ((GeneralTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
-        //                Value = (inst, value) =>
-        //                {
-        //                    return "1.06, 1.84, 0.54, 2.8, 466px, 482px";
-        //                },
-        //                Name = new List<string> { "transform" },
-        //                UIElement = ((GeneralTransform)instance).INTERNAL_parent,
-        //                ApplyAlsoWhenThereIsAControlTemplate = true,
-        //                OnlyUseVelocity = false
-        //            };
-        //        }
-        //        else
-        //            return null;
-        //    }
-        //});
+            DependencyProperty.Register(
+                nameof(Matrix),
+                typeof(Matrix),
+                typeof(MatrixTransform),
+                new PropertyMetadata(Matrix.Identity)
+                {
+                    GetCSSEquivalent = (instance) =>
+                    {
+                        var target = ((MatrixTransform)instance).INTERNAL_parent;
+                        if (target != null)
+                        {
+                            return new CSSEquivalent()
+                            {
+                                DomElement = target.INTERNAL_OuterDomElement,
+                                Value = (inst, value) =>
+                                {
+                                    var m = (Matrix)value;
+                                    return string.Format(CultureInfo.InvariantCulture,
+                                        "matrix({0}, {1}, {2}, {3}, {4}, {5})",
+                                        m.M11, m.M12, m.M21, m.M22, m.OffsetX, m.OffsetY);
+                                },
+                                Name = new List<string>(1) { "transform" },
+                                UIElement = target,
+                                ApplyAlsoWhenThereIsAControlTemplate = true,
+                                OnlyUseVelocity = false
+                            };
+                        }
+                        return null;
+                    }
+                });
 
-        private void ApplyCSSChanges(MatrixTransform matrixTransform)
-        {
-            throw new NotImplementedException();
-        }
+        internal override Matrix Value => this.Matrix;
 
-        internal override void INTERNAL_ApplyCSSChanges()
+        private void ApplyCSSChanges(Matrix matrix)
         {
-            ApplyCSSChanges(this);
-        }
-
-        internal override void INTERNAL_UnapplyCSSChanges()
-        {
-            ApplyCSSChanges(this);
+            CSSEquivalent cssEquivalent = MatrixProperty.GetTypeMetaData(typeof(MatrixTransform)).GetCSSEquivalent(this);
+            if (cssEquivalent != null)
+            {
+                object domElement = cssEquivalent.DomElement;
+                INTERNAL_HtmlDomManager.SetDomElementStyleProperty(
+                    cssEquivalent.DomElement, 
+                    cssEquivalent.Name, 
+                    cssEquivalent.Value(this, matrix));
+            }
         }
 
         internal override void INTERNAL_ApplyTransform()
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-                dynamic domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this.INTERNAL_parent);
-
-                var matrix = this.Matrix;
-
-                string value = "matrix("
-                    + matrix.M11.ToString(CultureInfo.InvariantCulture) + ","
-                    + matrix.M12.ToString(CultureInfo.InvariantCulture) + ","
-                    + matrix.M21.ToString(CultureInfo.InvariantCulture) + ","
-                    + matrix.M22.ToString(CultureInfo.InvariantCulture) + ","
-                    + matrix.OffsetX.ToString(CultureInfo.InvariantCulture) + ","
-                    + matrix.OffsetY.ToString(CultureInfo.InvariantCulture)
-                    + ")";
-
-                try
-                {
-                    domStyle.transform = value;
-                }
-                catch
-                {
-                }
-                try
-                {
-                    domStyle.msTransform = value;
-                }
-                catch
-                {
-                }
-                try // Prevents crash in the simulator that uses IE.
-                {
-                    domStyle.WebkitTransform = value;
-                }
-                catch
-                {
-                }
-
+                ApplyCSSChanges(this.Matrix);
             }
         }
 
@@ -135,59 +121,8 @@ namespace Windows.UI.Xaml.Media
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-                dynamic domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this.INTERNAL_parent);
-
-                string value = "";
-
-                try
-                {
-                    domStyle.transform = value;
-                }
-                catch
-                {
-                }
-                try
-                {
-                    domStyle.msTransform = value;
-                }
-                catch
-                {
-                }
-                try // Prevents crash in the simulator that uses IE.
-                {
-                    domStyle.WebkitTransform = value;
-                }
-                catch
-                {
-                }
+                ApplyCSSChanges(Matrix.Identity);
             }
         }
-
-        protected override Point INTERNAL_TransformPoint(Point point)
-        {
-#if WORKINPROGRESS
-            return this.Matrix.Transform(point);
-#else
-            throw new NotImplementedException("Please contact support@cshtml5.com");
-#endif
-        }
-
-#if WORKINPROGRESS
-        public override GeneralTransform Inverse
-        {
-            get { return null; }
-        }
-
-        public override Rect TransformBounds(Rect rect)
-        {
-            return new Rect();
-        }
-
-        public override bool TryTransform(Point inPoint, out Point outPoint)
-        {
-            outPoint = new Point();
-            return false;
-        }
-#endif
     }
 }

@@ -35,10 +35,10 @@ namespace Windows.Foundation
         //todo: Add the interface IFormattable
 
 
-        double _x;
-        double _y;
-        double _width;
-        double _height;
+        internal double _x;
+        internal double _y;
+        internal double _width;
+        internal double _height;
 
 
         //public Rect()

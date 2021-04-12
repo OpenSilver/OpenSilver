@@ -16,6 +16,8 @@
 using System.Windows.Markup;
 using CSHTML5.Internal;
 using System.Collections.Generic;
+using System.Globalization;
+
 #if MIGRATION
 using System.Windows;
 #else
@@ -29,12 +31,11 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    [ContentProperty("Children")]
+    [ContentProperty(nameof(Children))]
     public sealed partial class TransformGroup : Transform
     {
         public TransformGroup()
         {
-
         }
         
         public TransformCollection Children
@@ -53,97 +54,61 @@ namespace Windows.UI.Xaml.Media
         }
 
         public static readonly DependencyProperty ChildrenProperty =
-            DependencyProperty.Register("Children", typeof(TransformCollection), typeof(TransformGroup), new PropertyMetadata(null));
+            DependencyProperty.Register(
+                nameof(Children), 
+                typeof(TransformCollection), 
+                typeof(TransformGroup), 
+                new PropertyMetadata((object)null));
 
-        protected override Point INTERNAL_TransformPoint(Point point)
+        internal override Matrix Value
         {
-            return new Point();
-        }
-
-        private void ApplyCSSChanges(TransformGroup transformGroup, TransformCollection children)
-        {
-            int childrenCount = (children != null) ? children.Count : 0;
-            UIElement parent = transformGroup.INTERNAL_parent;
-            Transform child;
-            for (int i = childrenCount - 1; i > -1; i--)
+            get
             {
-                child = children[i];
-                if (child.INTERNAL_parent != parent)
+                TransformCollection children = Children;
+                if ((children == null) || (children.Count == 0))
                 {
-                    child.INTERNAL_parent = parent;
+                    return new Matrix();
                 }
-                child.INTERNAL_ApplyCSSChanges();
-            }
-        }
 
-        private void UnapplyCSSChanges(TransformGroup transformGroup, TransformCollection children)
-        {
-            int childrenCount = (children != null) ? children.Count : 0;
-            UIElement parent = transformGroup.INTERNAL_parent;
-            Transform child;
-            for (int i = childrenCount - 1; i > -1; i--)
-            {
-                child = children[i];
-                if (child.INTERNAL_parent != parent)
+                Matrix transform = children[0].Value;
+
+                for (int i = 1; i < children.Count; i++)
                 {
-                    child.INTERNAL_parent = parent;
+                    transform = Matrix.Multiply(transform, children[i].Value);
                 }
-                child.INTERNAL_UnapplyCSSChanges();
+
+                return transform;
             }
         }
 
-        internal override void INTERNAL_ApplyCSSChanges()
+        private void ApplyCSSChanges(Matrix m)
         {
-            ApplyCSSChanges(this, Children);
-        }
-
-        internal override void INTERNAL_UnapplyCSSChanges()
-        {
-            UnapplyCSSChanges(this, Children);
-        }
-
-        internal void ApplyTransformGroup(TransformCollection children)
-        {
-            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
+            var target = this.INTERNAL_parent;
+            if (target != null)
             {
-                ApplyCSSChanges(this, children);
-            }
-        }
-
-        internal void UnapplyTransformGroup(TransformCollection children)
-        {
-            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
-            {
-                UnapplyCSSChanges(this, children);
+                INTERNAL_HtmlDomManager.SetDomElementStyleProperty(
+                target.INTERNAL_OuterDomElement,
+                new List<string>(1) { "transform" },
+                string.Format(CultureInfo.InvariantCulture,
+                              "matrix({0}, {1}, {2}, {3}, {4}, {5})",
+                              m.M11, m.M12, m.M21, m.M22, m.OffsetX, m.OffsetY));
             }
         }
 
         internal override void INTERNAL_ApplyTransform()
         {
-            ApplyTransformGroup(Children);
+            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
+            {
+                ApplyCSSChanges(this.Value);
+            }
         }
 
         internal override void INTERNAL_UnapplyTransform()
         {
-            UnapplyTransformGroup(Children);
+            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
+            {
+                ApplyCSSChanges(Matrix.Identity);
+            }
         }
-
-#if WORKINPROGRESS
-        public override GeneralTransform Inverse
-        {
-            get { return null; }
-        }
-
-        public override Rect TransformBounds(Rect rect)
-        {
-            return new Rect();
-        }
-
-        public override bool TryTransform(Point inPoint, out Point outPoint)
-        {
-            outPoint = new Point();
-            return false;
-        }
-#endif
     }
 }

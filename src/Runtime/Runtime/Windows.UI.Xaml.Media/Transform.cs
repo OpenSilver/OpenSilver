@@ -12,12 +12,9 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+#if !MIGRATION
+using Windows.Foundation;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -30,10 +27,65 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public abstract partial class Transform : GeneralTransform
     {
+        internal Transform()
+        {
+        }
+
+        ///<summary>
+        /// Return the current transformation value.
+        ///</summary>
+        internal abstract Matrix Value { get; }
+
+        /// <summary>
+        /// Attempts to transform the specified point and returns a value that indicates
+        /// whether the transformation was successful.
+        /// </summary>
+        /// <param name="inPoint">
+        /// The point to transform.
+        /// </param>
+        /// <param name="outPoint">
+        /// The result of transforming inPoint.
+        /// </param>
+        /// <returns>
+        /// true if inPoint was transformed; otherwise, false.
+        /// </returns>
+        public override bool TryTransform(Point inPoint, out Point outPoint)
+        {
+            Matrix m = this.Value;
+            outPoint = m.Transform(inPoint);
+            return true;
+        }
+
+        public override Rect TransformBounds(Rect rect)
+        {
+            Matrix matrix = Value;
+            MatrixUtil.TransformRect(ref rect, ref matrix);
+            return rect;
+        }
+
+        /// <summary>
+        /// Gets the inverse of this transform, if it exists.
+        /// </summary>
+        /// <returns>
+        /// The inverse of this transform, if it exists; otherwise, null.
+        /// </returns>
+        public override GeneralTransform Inverse
+        {
+            get
+            {
+                Matrix matrix = Value;
+                if (!matrix.HasInverse)
+                {
+                    return null;
+                }
+
+                matrix.Invert();
+                return new MatrixTransform(matrix);
+            }
+        }
+
         // Must be implemented by the concrete class:
         internal abstract void INTERNAL_ApplyTransform();
         internal abstract void INTERNAL_UnapplyTransform();
-        internal abstract void INTERNAL_ApplyCSSChanges();
-        internal abstract void INTERNAL_UnapplyCSSChanges();
     }
 }

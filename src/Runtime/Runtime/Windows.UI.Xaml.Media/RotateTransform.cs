@@ -16,6 +16,7 @@
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
+
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -43,172 +44,124 @@ namespace Windows.UI.Xaml.Media
             get { return (double)GetValue(AngleProperty); }
             set { SetValue(AngleProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Angle dependency property.
         /// </summary>
         public static readonly DependencyProperty AngleProperty =
-            DependencyProperty.Register("Angle", typeof(double), typeof(RotateTransform), new PropertyMetadata(0d)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(Angle), 
+                typeof(double), 
+                typeof(RotateTransform), 
+                new PropertyMetadata(0d)
                 {
-                    if (((RotateTransform)instance).INTERNAL_parent != null)
+                    GetCSSEquivalent = (instance) =>
                     {
-                        return new CSSEquivalent()
+                        var target = ((RotateTransform)instance).INTERNAL_parent;
+                        if (target != null)
                         {
-                            DomElement = ((RotateTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
-                            Value = (inst, value) =>
+                            return new CSSEquivalent()
                             {
-                                return value + "deg";
-                            },
-                            Name = new List<string> { "rotateZ" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                            UIElement = ((RotateTransform)instance).INTERNAL_parent,
-                            ApplyAlsoWhenThereIsAControlTemplate = true,
-                            OnlyUseVelocity = true
-                        };
+                                DomElement = target.INTERNAL_OuterDomElement,
+                                Value = (inst, value) =>
+                                {
+                                    return value + "deg";
+                                },
+                                Name = new List<string> { "rotateZ" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
+                                UIElement = target,
+                                ApplyAlsoWhenThereIsAControlTemplate = true,
+                                OnlyUseVelocity = true
+                            };
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            });
+                });
 
-        private void ApplyCSSChanges(RotateTransform rotateTransform, double angle)
+        private void ApplyCSSChanges(double angle)
         {
-            CSSEquivalent anglecssEquivalent = AngleProperty.GetTypeMetaData(typeof(RotateTransform)).GetCSSEquivalent(rotateTransform);
+            CSSEquivalent anglecssEquivalent = AngleProperty.GetTypeMetaData(typeof(RotateTransform)).GetCSSEquivalent(this);
             if (anglecssEquivalent != null)
             {
                 object domElement = anglecssEquivalent.DomElement;
-                if (angle != _appliedCssAngle || (_domElementToWhichTheCssWasApplied != null && domElement != _domElementToWhichTheCssWasApplied)) // Optimization to avoid setting the transform if the value is 0 or if it is the same as the last time.
+                if (angle != _appliedCssAngle || (_domElementToWhichTheCssWasApplied != null && 
+                    domElement != _domElementToWhichTheCssWasApplied)) // Optimization to avoid setting the transform if the value is 0 or if it is the same as the last time.
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(anglecssEquivalent.DomElement, anglecssEquivalent.Name, anglecssEquivalent.Value(rotateTransform, angle));
+                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
+                        anglecssEquivalent.DomElement, 
+                        anglecssEquivalent.Name, 
+                        anglecssEquivalent.Value(this, angle));
                     _appliedCssAngle = angle;
                     _domElementToWhichTheCssWasApplied = domElement;
                 }
             }
         }
 
-        internal override void INTERNAL_ApplyCSSChanges()
-        {
-            ApplyCSSChanges(this, this.Angle);
-        }
-
-        internal override void INTERNAL_UnapplyCSSChanges()
-        {
-            ApplyCSSChanges(this, 0);
-        }
-
-        void ApplyRotateTransform(double angle)
+        internal override void INTERNAL_ApplyTransform()
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-                ApplyCSSChanges(this, angle);
-
-                //dynamic domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this.INTERNAL_parent);
-
-                //string value = "rotate(" + angle + "deg)"; //todo: make sure that the conversion from double to string is culture-invariant so that it uses dots instead of commas for the decimal separator.
-
-                //try
-                //{
-                //    domStyle.transform = value;
-                //}
-                //catch
-                //{
-                //    //do nothing
-                //}
-                //try
-                //{
-                //    domStyle.msTransform = value;
-                //}
-                //catch
-                //{
-                //    //do nothing
-                //}
-                //try // Prevents crash in the simulator that uses IE.
-                //{
-                //    domStyle.WebkitTransform = value;
-                //}
-                //catch
-                //{
-                //    //do nothing
-                //}
+                ApplyCSSChanges(this.Angle);
             }
-        }
-
-        // NOTE: CenterX and CenterY are currently not supported because in CSS there is only the "transformOrigin" property, which is used for the "UIElement.RenderTransformOrigin" property.
-
-
-        internal override void INTERNAL_ApplyTransform()
-        {
-            this.ApplyRotateTransform(this.Angle);
         }
 
         internal override void INTERNAL_UnapplyTransform()
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-                INTERNAL_UnapplyCSSChanges();
+                ApplyCSSChanges(0);
             }
         }
 
-        protected override Point INTERNAL_TransformPoint(Point point)
+        internal override Matrix Value
         {
-            throw new NotImplementedException("Please contact support@cshtml5.com");
+            get
+            {
+                Matrix m = new Matrix();
+
+#if WORKINPROGRESS
+                m.RotateAt(Angle, CenterX, CenterY);
+#else
+                m.RotateAt(Angle, 0.0, 0.0);
+#endif
+
+                return m;
+            }
         }
+
 #if WORKINPROGRESS
         /// <summary>
-        ///     CenterX - double.  Default value is 0.0.
+        /// Gets or sets the x-coordinate of the rotation center point.
+        /// The default is 0.
         /// </summary>
         public double CenterX
         {
-            get
-            {
-                return (double)GetValue(CenterXProperty);
-            }
-            set
-            {
-                SetValue(CenterXProperty, value);
-            }
+            get => (double)GetValue(CenterXProperty);
+            set => SetValue(CenterXProperty, value);
         }
 
-        public static readonly DependencyProperty CenterXProperty = DependencyProperty.Register("CenterX", typeof(double), typeof(RotateTransform), new PropertyMetadata(null));
+        public static readonly DependencyProperty CenterXProperty = 
+            DependencyProperty.Register(
+                nameof(CenterX), 
+                typeof(double), 
+                typeof(RotateTransform), 
+                new PropertyMetadata(0.0));
 
         /// <summary>
-        ///     CenterY - double.  Default value is 0.0.
+        /// Gets or sets the y-coordinate of the rotation center point.
+        /// The default is 0.
         /// </summary>
         public double CenterY
         {
-            get
-            {
-                return (double)GetValue(CenterYProperty);
-            }
-            set
-            {
-                SetValue(CenterYProperty, value);
-            }
+            get => (double)GetValue(CenterYProperty);
+            set => SetValue(CenterYProperty, value);
         }
 
-        public static readonly DependencyProperty CenterYProperty = DependencyProperty.Register("CenterY", typeof(double), typeof(RotateTransform), new PropertyMetadata(null));
-
-        //TODO: needs verification
-        public override GeneralTransform Inverse
-        {
-            get
-            {
-                return new RotateTransform()
-                {
-                    Angle = -Angle
-                };
-            }
-        }
-
-        public override Rect TransformBounds(Rect rect)
-        {
-            return new Rect();
-        }
-
-        public override bool TryTransform(Point inPoint, out Point outPoint)
-        {
-            outPoint = new Point();
-            return false;
-        }
+        public static readonly DependencyProperty CenterYProperty = 
+            DependencyProperty.Register(
+                nameof(CenterY), 
+                typeof(double), 
+                typeof(RotateTransform), 
+                new PropertyMetadata(0.0));
 #endif
     }
 }

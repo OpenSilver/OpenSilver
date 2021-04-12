@@ -16,6 +16,7 @@
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
+
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -49,30 +50,33 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the ScaleX dependency property.
         /// </summary>
         public static readonly DependencyProperty ScaleXProperty =
-            DependencyProperty.Register("ScaleX", typeof(double), typeof(ScaleTransform), new PropertyMetadata(1d)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(ScaleX), 
+                typeof(double), 
+                typeof(ScaleTransform), 
+                new PropertyMetadata(1d)
                 {
-                    if (((ScaleTransform)instance).INTERNAL_parent != null)
+                    GetCSSEquivalent = (instance) =>
                     {
-                        return new CSSEquivalent()
+                        var target = ((ScaleTransform)instance).INTERNAL_parent;
+                        if (target != null)
                         {
-                            DomElement = ((ScaleTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
-                            Value = (inst, value) =>
+                            return new CSSEquivalent()
+                            {
+                                DomElement = target.INTERNAL_OuterDomElement,
+                                Value = (inst, value) =>
                                 {
                                     return value;
                                 },
-                            Name = new List<string> { "scaleX" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                            UIElement = ((ScaleTransform)instance).INTERNAL_parent,
-                            ApplyAlsoWhenThereIsAControlTemplate = true,
-                            OnlyUseVelocity = true
-                        };
+                                Name = new List<string> { "scaleX" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
+                                UIElement = target,
+                                ApplyAlsoWhenThereIsAControlTemplate = true,
+                                OnlyUseVelocity = true
+                            };
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            });
-
-
+                });
 
         /// <summary>
         /// Gets or sets the y-axis scale factor.
@@ -87,157 +91,140 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the ScaleY dependency property.
         /// </summary>
         public static readonly DependencyProperty ScaleYProperty =
-            DependencyProperty.Register("ScaleY", typeof(double), typeof(ScaleTransform), new PropertyMetadata(1d)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(ScaleY), 
+                typeof(double), 
+                typeof(ScaleTransform), 
+                new PropertyMetadata(1d)
+                {
+                    GetCSSEquivalent = (instance) =>
                     {
-                        if (((ScaleTransform)instance).INTERNAL_parent != null)
+                        var target = ((ScaleTransform)instance).INTERNAL_parent;
+                        if (target != null)
                         {
                             return new CSSEquivalent()
                             {
-                                DomElement = ((ScaleTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
+                                DomElement = target.INTERNAL_OuterDomElement,
                                 Value = (inst, value) =>
                                     {
                                         return value;
                                     },
                                 Name = new List<string> { "scaleY" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                                UIElement = ((ScaleTransform)instance).INTERNAL_parent,
+                                UIElement = target,
                                 ApplyAlsoWhenThereIsAControlTemplate = true,
                                 OnlyUseVelocity = true
                             };
                         }
                         return null;
                     }
-            });
+                });
 
-        private void ApplyCSSChanges(ScaleTransform scaleTransform, double scaleX, double scaleY)
+        private void ApplyCSSChanges(double scaleX, double scaleY)
         {
-            CSSEquivalent scaleXcssEquivalent = ScaleXProperty.GetTypeMetaData(typeof(ScaleTransform)).GetCSSEquivalent(scaleTransform);
+            CSSEquivalent scaleXcssEquivalent = ScaleXProperty.GetTypeMetaData(typeof(ScaleTransform)).GetCSSEquivalent(this);
             if (scaleXcssEquivalent != null)
             {
                 object domElementX = scaleXcssEquivalent.DomElement;
-                if (scaleX != _appliedCssScaleX || (_domElementToWhichTheCssScaleXWasApplied != null && domElementX != _domElementToWhichTheCssScaleXWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
+                if (scaleX != _appliedCssScaleX || (_domElementToWhichTheCssScaleXWasApplied != null && 
+                    domElementX != _domElementToWhichTheCssScaleXWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleXcssEquivalent.DomElement, scaleXcssEquivalent.Name, scaleXcssEquivalent.Value(scaleTransform, scaleX));
+                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
+                        scaleXcssEquivalent.DomElement, 
+                        scaleXcssEquivalent.Name, 
+                        scaleXcssEquivalent.Value(this, scaleX));
                     _appliedCssScaleX = scaleX;
                     _domElementToWhichTheCssScaleXWasApplied = domElementX;
                 }
             }
 
-            CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetTypeMetaData(typeof(ScaleTransform)).GetCSSEquivalent(scaleTransform);
+            CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetTypeMetaData(typeof(ScaleTransform)).GetCSSEquivalent(this);
             if (scaleYcssEquivalent != null)
             {
                 object domElementY = scaleYcssEquivalent.DomElement;
-                if (scaleY != _appliedCssScaleY || (_domElementToWhichTheCssScaleYWasApplied != null && domElementY != _domElementToWhichTheCssScaleYWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
+                if ((scaleY != _appliedCssScaleY) || 
+                    (_domElementToWhichTheCssScaleYWasApplied != null && domElementY != _domElementToWhichTheCssScaleYWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleYcssEquivalent.DomElement, scaleYcssEquivalent.Name, scaleYcssEquivalent.Value(scaleTransform, scaleY));
+                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
+                        scaleYcssEquivalent.DomElement, 
+                        scaleYcssEquivalent.Name, 
+                        scaleYcssEquivalent.Value(this, scaleY));
                     _appliedCssScaleY = scaleY;
                     _domElementToWhichTheCssScaleYWasApplied = domElementY;
                 }
             }
         }
 
-        internal override void INTERNAL_ApplyCSSChanges()
-        {
-            ApplyCSSChanges(this, this.ScaleX, this.ScaleY);
-        }
-
-        internal override void INTERNAL_UnapplyCSSChanges()
-        {
-            ApplyCSSChanges(this, 1, 1);
-        }
-
-        internal void ApplyScaleTransform(double scaleX, double scaleY)
-        {
-
-            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
-            {
-                ApplyCSSChanges(this, scaleX, scaleY);
-
-                //string value = "scale(" + scaleX + ", " + scaleY + ")"; //todo: make sure that the conversion from double to string is culture-invariant so that it uses dots instead of commas for the decimal separator.
-
-                //try
-                //{
-                //    domStyle.transform = value;
-                //}
-                //catch
-                //{
-                //}
-                //try
-                //{
-                //    domStyle.msTransform = value;
-                //}
-                //catch
-                //{
-                //}
-                //try // Prevents crash in the simulator that uses IE.
-                //{
-                //    domStyle.WebkitTransform = value;
-                //}
-                //catch
-                //{
-                //}
-            }
-        }
-
-        // NOTE: CenterX and CenterY are currently not supported because in CSS there is only the "transformOrigin" property, which is used for the "UIElement.RenderTransformOrigin" property.
-
         internal override void INTERNAL_ApplyTransform()
         {
-            this.ApplyScaleTransform(this.ScaleX, this.ScaleY);
+            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
+            {
+                ApplyCSSChanges(this.ScaleX, this.ScaleY);
+            }
         }
 
         internal override void INTERNAL_UnapplyTransform()
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-                INTERNAL_UnapplyCSSChanges();
+                ApplyCSSChanges(1, 1);
             }
         }
 
-        protected override Point INTERNAL_TransformPoint(Point point)
+        internal override Matrix Value
         {
-            throw new NotImplementedException("Please contact support@cshtml5.com");
+            get
+            {
+                Matrix m = new Matrix();
+
+#if WORKINPROGRESS
+                m.ScaleAt(ScaleX, ScaleY, CenterX, CenterY);
+#else
+                m.ScaleAt(ScaleX, ScaleY, 0.0, 0.0);
+#endif
+
+                return m;
+            }
         }
 
 #if WORKINPROGRESS
-        public static readonly DependencyProperty CenterXProperty = DependencyProperty.Register("CenterX", typeof(double), typeof(ScaleTransform), null);
+        /// <summary>
+        /// Identifies the <see cref="ScaleTransform.CenterX"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CenterXProperty = 
+            DependencyProperty.Register(
+                nameof(CenterX), 
+                typeof(double), 
+                typeof(ScaleTransform), 
+                new PropertyMetadata(0.0));
+
+        /// <summary>
+        /// Gets or sets the x-coordinate of the center point of this <see cref="ScaleTransform"/>.
+        /// The default is 0.
+        /// </summary>
         public double CenterX
         {
             get { return (double)this.GetValue(CenterXProperty); }
             set { this.SetValue(CenterXProperty, value); }
         }
 
-        public static readonly DependencyProperty CenterYProperty = DependencyProperty.Register("CenterY", typeof(double), typeof(ScaleTransform), null);
+        /// <summary>
+        /// Identifies the <see cref="ScaleTransform.CenterY"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CenterYProperty = 
+            DependencyProperty.Register(
+                nameof(CenterY), 
+                typeof(double), 
+                typeof(ScaleTransform),
+                new PropertyMetadata(0.0));
 
+        /// <summary>
+        /// Gets or sets the y-coordinate of the center point of this <see cref="ScaleTransform"/>.
+        /// The default is 0.
+        /// </summary>
         public double CenterY
         {
             get { return (double)this.GetValue(CenterYProperty); }
             set { this.SetValue(CenterYProperty, value); }
-        }
-
-        //TODO: needs verification
-        public override GeneralTransform Inverse
-        {
-            get
-            {
-                return new ScaleTransform()
-                {
-                    ScaleX = ScaleX != 0 ? 1/ScaleX : 0,
-                    ScaleY = ScaleY != 0 ? 1/ScaleY : 0
-                };
-            }
-        }
-
-        public override Rect TransformBounds(Rect rect)
-        {
-            return new Rect();
-        }
-
-        public override bool TryTransform(Point inPoint, out Point outPoint)
-        {
-            outPoint = new Point();
-            return false;
         }
 #endif
     }
