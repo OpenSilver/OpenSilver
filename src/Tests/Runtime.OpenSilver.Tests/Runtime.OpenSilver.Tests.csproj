@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Runtime\Runtime\Runtime.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\Runtime\Runtime\Runtime.OpenSilver.csproj" />
   </ItemGroup>
 
 </Project>
