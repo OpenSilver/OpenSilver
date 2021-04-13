@@ -86,6 +86,23 @@ namespace Windows.UI.Xaml.Media
             get { return (double)GetValue(YProperty); }
             set { SetValue(YProperty, value); }
         }
+
+        /// <inheritdoc/>
+        public override GeneralTransform Inverse => new TranslateTransform { X = -X, Y = -Y };
+
+        /// <inheritdoc/>
+        public override Rect TransformBounds(Rect rect)
+        {
+            return new Rect(this.X + rect.X, this.Y + rect.Y, rect.Width, rect.Height);
+        }
+
+        /// <inheritdoc/>
+        public override bool TryTransform(Point inPoint, out Point outPoint)
+        {
+            outPoint = new Point(this.X + inPoint.X, this.Y + inPoint.Y);
+            return true;
+        }
+
         /// <summary>
         /// Identifies the Y dependency property
         /// </summary>
@@ -208,31 +225,5 @@ namespace Windows.UI.Xaml.Media
         {
             return new Point(point.X + X, point.Y + Y);
         }
-
-#if WORKINPROGRESS
-        //TODO: needs verification
-        public override GeneralTransform Inverse
-        {
-            get
-            {
-                return new TranslateTransform()
-                {
-                    X = -X,
-                    Y = -Y
-                };
-            }
-        }
-
-        public override Rect TransformBounds(Rect rect)
-        {
-            return new Rect();
-        }
-
-        public override bool TryTransform(Point inPoint, out Point outPoint)
-        {
-            outPoint = new Point();
-            return false;
-        }
-#endif
     }
 }
