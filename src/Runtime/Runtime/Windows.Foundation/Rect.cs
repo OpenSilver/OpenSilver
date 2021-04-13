@@ -133,7 +133,7 @@ namespace Windows.Foundation
             _y = 0;
             _width = 0;
             _height = 0;
-            
+
             Width = size.Width;
             Height = size.Height;
         }
@@ -230,7 +230,7 @@ namespace Windows.Foundation
                 _height = value;
             }
         }
-        
+
         /// <summary>
         /// Gets a value that indicates whether the rectangle is
         /// the Windows.Foundation.Rect.Empty rectangle.
@@ -244,7 +244,7 @@ namespace Windows.Foundation
             }
         }
 
-       
+
         /// <summary>
         /// Gets the x-axis value of the left side of the rectangle.
         /// </summary>
@@ -270,7 +270,7 @@ namespace Windows.Foundation
             {
                 if (IsEmpty)
                     throw new InvalidOperationException("Cannot modify empty Rect.");
-                
+
                 X = value.X;
                 Y = value.Y;
             }
@@ -290,7 +290,7 @@ namespace Windows.Foundation
                 return X + Width;
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the width and height of the rectangle.
         /// </summary>
@@ -301,7 +301,7 @@ namespace Windows.Foundation
             {
                 if (IsEmpty)
                     throw new InvalidOperationException("Cannot modify empty Rect.");
-                
+
                 Width = value.Width;
                 Height = value.Height;
             }
@@ -380,7 +380,7 @@ namespace Windows.Foundation
             {
                 if (IsEmpty)
                     throw new InvalidOperationException("Cannot modify empty Rect.");
-                
+
                 _x = value;
             }
         }
@@ -399,7 +399,7 @@ namespace Windows.Foundation
             {
                 if (IsEmpty)
                     throw new InvalidOperationException("Cannot modify empty Rect.");
-                
+
                 _y = value;
             }
         }
@@ -464,31 +464,45 @@ namespace Windows.Foundation
             return X.GetHashCode() ^ Y.GetHashCode() ^ Width.GetHashCode() ^ Height.GetHashCode();
         }
 
-#if WORKINPROGRESS
+
+        /// <summary>
+        /// Finds the intersection of the rectangle represented by the current <see cref="Rect" />
+        /// and the rectangle represented by the specified <see cref="Rect" />,
+        /// and stores the result as the current <see cref="Rect"/>.
+        /// </summary>
+        /// <param name="rect">The rectangle to intersect with the current rectangle.</param>
         public void Intersect(Rect rect)
         {
-            //todo: finish this
-
-            //Rect intersection = Rect.Empty;
-            //if (rect.X <= X && rect.Width + rect.X >= X)
-            //{
-            //    intersection.X = X;
-            //}
-            //if (rect.Y <= Y && rect.Height + rect.Y >= Y)
-            //{
-            //    intersection.Y = Y;
-            //}
-
-            //if (X <= rect.X && Width + X >= rect.X)
-            //{
-            //    intersection.X = rect.X;
-            //}
-            //if (Y <= rect.Y && Height + Y >= rect.Y)
-            //{
-            //    intersection.Y = rect.Y;
-            //}
+            if (!this.IntersectsWith(rect))
+            {
+                this = Rect.Empty;
+            }
+            else
+            {
+                var num1 = Math.Max(this._x, rect.X);
+                var num2 = Math.Max(this._y, rect.Y);
+                this._width = Math.Max(Math.Min(this._x + this._width, rect.X + rect.Width) - num1, 0.0);
+                this._height = Math.Max(Math.Min(this._y + this._height, rect.Y + rect.Height) - num2, 0.0);
+                this._x = num1;
+                this._y = num2;
+            }
         }
 
+        /// <summary>
+        /// Checks if the current <see cref="Rect" /> intersects with the specified <see cref="Rect" />.
+        /// </summary>
+        /// <param name="rect">The rectangle to intersect with the current rectangle.</param>
+        /// <returns><c>true</c> if the current rectangle intersects with the specified rectangle, <c>false</c> otherwise</returns>
+        private bool IntersectsWith(Rect rect)
+        {
+            return this._width >= 0.0 && rect.Width >= 0.0
+                                      && rect.X <= this._x + this._width
+                                      && rect.X + rect.Width >= this._x
+                                      && rect.Y <= this._y + this._height
+                                      && rect.Y + rect.Height >= this._y;
+        }
+
+#if WORKINPROGRESS
         /// <summary>
         /// Returns a string representation of the rectangle by using
         /// the specified format provider.
@@ -508,9 +522,9 @@ namespace Windows.Foundation
             {
                 double x, y, width, height;
 #if OPENSILVER
-                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out x) && 
-                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out y) && 
-                    double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out width) && 
+                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out x) &&
+                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out y) &&
+                    double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out width) &&
                     double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out height))
 #else
                 if (double.TryParse(splittedString[0], out x) &&
@@ -520,8 +534,8 @@ namespace Windows.Foundation
 #endif
                     return new Rect(x, y, width, height);
             }
-            
-            throw new FormatException(rectAsString + "is not an eligible value for Rect"); 
+
+            throw new FormatException(rectAsString + "is not an eligible value for Rect");
         }
 
         /// <summary>
@@ -572,7 +586,7 @@ namespace Windows.Foundation
                 Height = Height + point.Y - Y;
             }
         }
-        
+
         /// <summary>
         /// Expands the rectangle represented by the current Windows.Foundation.Rect
         /// exactly enough to contain the specified rectangle.
