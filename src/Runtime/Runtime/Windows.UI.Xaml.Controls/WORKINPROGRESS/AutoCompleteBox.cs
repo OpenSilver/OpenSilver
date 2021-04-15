@@ -1,12 +1,7 @@
 #if WORKINPROGRESS
 
 using System;
-
-#if MIGRATION
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Data;
-#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
