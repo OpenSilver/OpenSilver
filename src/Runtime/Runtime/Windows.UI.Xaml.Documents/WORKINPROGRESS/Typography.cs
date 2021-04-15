@@ -1,7 +1,5 @@
 ﻿#if WORKINPROGRESS
 
-using System;
-
 #if MIGRATION
 namespace System.Windows.Documents
 #else
