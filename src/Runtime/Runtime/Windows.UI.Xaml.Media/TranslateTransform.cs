@@ -87,6 +87,7 @@ namespace Windows.UI.Xaml.Media
             set { SetValue(YProperty, value); }
         }
 
+#if WORKINPROGRESS
         /// <inheritdoc/>
         public override GeneralTransform Inverse => new TranslateTransform { X = -X, Y = -Y };
 
@@ -102,6 +103,7 @@ namespace Windows.UI.Xaml.Media
             outPoint = new Point(this.X + inPoint.X, this.Y + inPoint.Y);
             return true;
         }
+#endif
 
         /// <summary>
         /// Identifies the Y dependency property
