@@ -8,9 +8,10 @@ using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml.Automation.Provider;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives
+using Windows.UI.Xaml.Controls.Primitives;
 #endif
 
 #if MIGRATION
