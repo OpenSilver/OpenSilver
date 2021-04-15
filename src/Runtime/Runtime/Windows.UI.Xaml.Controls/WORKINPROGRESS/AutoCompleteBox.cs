@@ -1,7 +1,12 @@
 #if WORKINPROGRESS
 
 using System;
+
+#if MIGRATION
 using System.Windows.Data;
+#else
+using Windows.UI.Xaml.Data;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -19,7 +24,7 @@ namespace Windows.UI.Xaml.Controls
     public partial class AutoCompleteBox
 	{
 
-        #region public bool IsTextCompletionEnabled
+#region public bool IsTextCompletionEnabled
 
         /// <summary>
         /// Gets or sets a value indicating whether the first possible match
@@ -50,7 +55,7 @@ namespace Windows.UI.Xaml.Controls
                 typeof(AutoCompleteBox),
                 new PropertyMetadata(false, null));
 
-        #endregion public bool IsTextCompletionEnabled
+#endregion public bool IsTextCompletionEnabled
 
         /// <summary>
         /// Notifies the <see cref="T:System.Windows.Controls.AutoCompleteBox" /> that
