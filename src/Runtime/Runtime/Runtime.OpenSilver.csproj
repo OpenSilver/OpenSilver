@@ -87,11 +87,16 @@
 		<Compile Include="System.Runtime.InteropServices.Automation\WORKINPROGRESS\AutomationEvent.cs" />
 		<Compile Include="System.Runtime.InteropServices.Automation\WORKINPROGRESS\AutomationEventArgs.cs" />
 		<Compile Include="System.Runtime.InteropServices.Automation\WORKINPROGRESS\AutomationFactory.cs" />
+		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\IPollingDuplexListenerSettings.cs" />
+		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\IPollingDuplexSettings.cs" />
+		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\PollingDuplexBindingElement.cs" />
 		<Compile Include="System.ServiceModel.Description\WebHttpBehavior.cs" />
 		<Compile Include="System.ServiceModel.Web\WORKINPROGRESS\WebGetAttribute.cs" />
 		<Compile Include="System.ServiceModel.Web\WORKINPROGRESS\WebInvokeAttribute.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlDocument.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlPopupWindowOptions.cs" />
+		<Compile Include="System.Windows.Interactivity\CustomPropertyValueEditor.cs" />
+		<Compile Include="System.Windows.Interactivity\CustomPropertyValueEditorAttribute.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction_1.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase.cs" />
@@ -110,16 +115,21 @@
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\SendCompletedEventArgs.cs" />
 		<Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
+		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Typography.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontCapitals.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontStretches.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\NotificationWindow.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\WebRequestCreator.cs" />
 		<Compile Include="System.Xaml\IMarkupExtension.cs" />
 		<Compile Include="Windows.Foundation\WORKINPROGRESS\Point.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\DescriptionViewerAutomationPeer.cs" />
+		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\RangeBaseAutomationPeer.cs" />
+		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\ScrollBarAutomationPeer.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Provider\WORKINPROGRESS\IDockProvider.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Text\WORKINPROGRESS\TextPatternRangeEndpoint.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Text\WORKINPROGRESS\TextUnit.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\DockPosition.cs" />
+		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\ElementNotAvailableException.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\MultipleViewPatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TableItemPatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TablePatternIdentifiers.cs" />
@@ -1210,5 +1220,5 @@
 	<Import Project="..\..\packages\OpenSilver.WorkInProgress.$(OpenSilverVersion)\build\OpenSilver.WorkInProgress.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' " />
 	<Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
 	<Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' " />
-	
+
 </Project>
