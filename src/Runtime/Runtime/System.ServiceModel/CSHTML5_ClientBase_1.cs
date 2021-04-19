@@ -535,18 +535,20 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 Action<string> callback,
                 string soapVersion)
             {
-                bool isXmlSerializer;
+                MethodInfo method = ResolveMethod(interfaceType, webMethodName, "Begin" + webMethodName);
+                bool isXmlSerializer = IsXmlSerializer(webMethodName, methodReturnType, method);
+
                 Dictionary<string, string> headers;
                 string request;
                 PrepareRequest(
                     webMethodName,
-                    "Begin" + webMethodName,
+                    method,
                     interfaceType,
                     methodReturnType,
                     messageHeaders,
                     originalRequestObject,
                     soapVersion,
-                    out isXmlSerializer,
+                    isXmlSerializer,
                     out headers,
                     out request);
 
@@ -595,8 +597,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                      string xmlReturnedFromTheServer,
                      string soapVersion)
             {
-                MethodInfo beginMethod = interfaceType.GetMethod("Begin" + webMethodName);
-
+                MethodInfo beginMethod = ResolveMethod(interfaceType, webMethodName, "Begin" + webMethodName);
                 bool isXmlSerializer = IsXmlSerializer(webMethodName,
                                                        methodReturnType,
                                                        beginMethod);
@@ -657,7 +658,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 });
                 object asyncState = null;
 
-                WebMethodAsyncResult webMethodAsyncResult = new WebMethodAsyncResult(callback, asyncState); 
+                WebMethodAsyncResult webMethodAsyncResult = new WebMethodAsyncResult(callback, asyncState);
 
                 BeginCallWebMethod(
                     webMethodName,
@@ -696,19 +697,20 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             {
                 // todo: find out what happens with methods that take multiple arguments 
                 // (if possible) and change the parameterName to a string[].
-                bool isXmlSerializer;
+                MethodInfo method = ResolveMethod(interfaceType, webMethodName, webMethodName + "Async");
+                bool isXmlSerializer = IsXmlSerializer(webMethodName, methodReturnType, method);
+
                 Dictionary<string, string> headers;
                 string request;
-
                 PrepareRequest(
                     webMethodName,
-                    webMethodName + "Async",
+                    method,
                     interfaceType,
                     methodReturnType,
                     null,
                     originalRequestObject,
                     soapVersion,
-                    out isXmlSerializer,
+                    isXmlSerializer,
                     out headers,
                     out request);
 
@@ -788,19 +790,20 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 //</s:Envelope>
                 //**************************************
 
-                bool isXmlSerializer;
+                MethodInfo method = ResolveMethod(interfaceType, webMethodName, webMethodName, "Begin" + webMethodName);
+                bool isXmlSerializer = IsXmlSerializer(webMethodName, methodReturnType, method);
+
                 Dictionary<string, string> headers;
                 string request;
-
                 PrepareRequest(
                     webMethodName,
-                    webMethodName,
+                    method,
                     interfaceType,
                     methodReturnType,
                     null,
                     originalRequestObject,
                     soapVersion,
-                    out isXmlSerializer,
+                    isXmlSerializer,
                     out headers,
                     out request);
 
@@ -827,8 +830,23 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     soapVersion);
             }
 
+            private static MethodInfo ResolveMethod(Type interfaceType, string webMethodName, params string[] methodNames)
+            {
+                MethodInfo method = null;
+                if (methodNames != null)
+                {
+                    for (int i = 0; i < methodNames.Length; i++)
+                    {
+                        if ((method = interfaceType.GetMethod(methodNames[i])) != null)
+                            break;
+                    }
+                }
+                return method ?? throw new MissingMethodException(
+                    string.Format("Cannot find an operation named '{0}'.", webMethodName));
+            }
+
             private static bool IsXmlSerializer(
-                string webMethodName, 
+                string webMethodName,
                 Type methodReturnType,
                 MethodInfo method)
             {
@@ -840,7 +858,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         return true;
                     }
                 }
-                
+
                 if (method != null)
                 {
                     ParameterInfo[] parameterInfos = method.GetParameters();
@@ -890,13 +908,13 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
             private void PrepareRequest(
                 string webMethodName, // webMethod
-                string methodName, // method to look for in 'interfaceType'
+                MethodInfo method, // method to look for in 'interfaceType'
                 Type interfaceType,
                 Type methodReturnType,
                 string envelopeHeaders,
                 IDictionary<string, object> requestParameters,
                 string soapVersion,
-                out bool isXmlSerializer,
+                bool isXmlSerializer,
                 out Dictionary<string, string> headers,
                 out string request)
             {
@@ -907,15 +925,6 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 string interfaceTypeNamespace = "http://tempuri.org/"; // default value
                 string soapAction = string.Empty;
 
-                MethodInfo method = interfaceType.GetMethod(methodName);
-                if (method == null)
-                {
-                    throw new MissingMethodException(
-                        string.Format("Method '{0}' was not in found in interface '{1}'.", 
-                                      methodName, 
-                                      interfaceType.Name));
-                }
-                isXmlSerializer = IsXmlSerializer(webMethodName, methodReturnType, method);
 
                 ServiceContractAttribute serviceContractAttr =
                     (ServiceContractAttribute)interfaceType.GetCustomAttributes(typeof(ServiceContractAttribute), false)
@@ -969,7 +978,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     case "1.2":
                         headers.Add("Content-Type", @"application/soap+xml; charset=utf-8");
 
-                        soapAction = string.Format("http://tempuri.org/ServiceHost/{0}", 
+                        soapAction = string.Format("http://tempuri.org/ServiceHost/{0}",
                                                    webMethodName);
                         requestFormat = string.Format("<s:Envelope xmlns:a=\"http://www.w3.org/2005/08/addressing\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"><s:Header><a:Action>{0}</a:Action>{1}</s:Header><s:Body>{{0}}</s:Body></s:Envelope>",
                             soapAction, envelopeHeaders ?? "");
@@ -982,7 +991,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 }
 
                 // in every case, we want the name of the method as a XElement
-                XElement methodNameElement = 
+                XElement methodNameElement =
                     new XElement(XNamespace.Get(interfaceTypeNamespace)
                                            .GetName(webMethodName));
 
@@ -1007,7 +1016,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                                 interfaceType.GetCustomAttributes(typeof(ServiceKnownTypeAttribute), true)
                                              .Select(o => ((ServiceKnownTypeAttribute)o).Type);
 
-                            DataContractSerializerCustom dataContractSerializer = 
+                            DataContractSerializerCustom dataContractSerializer =
                                 new DataContractSerializerCustom(
                                     requestBody.GetType(),
                                     knownTypes,
@@ -1053,8 +1062,8 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                                     {
                                         foreach (XElement node in xElement.Elements())
                                         {
-                                            ProcessNode(node, x => x.Name = XNamespace.Get(string.IsNullOrEmpty(x.Name.NamespaceName) ? 
-                                                                                           interfaceTypeNamespace : 
+                                            ProcessNode(node, x => x.Name = XNamespace.Get(string.IsNullOrEmpty(x.Name.NamespaceName) ?
+                                                                                           interfaceTypeNamespace :
                                                                                            x.Name.NamespaceName)
                                                                                       .GetName(x.Name.LocalName));
                                             methodNameElement.Add(node);
@@ -1080,7 +1089,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 }
 
 #if OPENSILVER
-                request = string.Format(requestFormat, 
+                request = string.Format(requestFormat,
                                         methodNameElement.ToString(SaveOptions.DisableFormatting));
 #else
                 request = string.Format(requestFormat, 
@@ -1143,7 +1152,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         detailElement = detailElement.Elements().First();
                         Type detailType = ResolveType(detailElement.Name);
 
-                        DataContractSerializerCustom serializer = 
+                        DataContractSerializerCustom serializer =
                             new DataContractSerializerCustom(detailType, false);
 
                         object detail = serializer.DeserializeFromXElement(detailElement);
@@ -1431,11 +1440,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     // they should always be the two outermost elements
                     if (soapVersion == "1.1")
                     {
-                        xElement = xElement.Elements().FirstOrDefault() ?? xElement; // move inside of the <Enveloppe> tag
+                        xElement = xElement.Element(XName.Get("Body", "http://schemas.xmlsoap.org/soap/envelope/")) ?? xElement;
                     }
                     else
                     {
-                        Debug.Assert(soapVersion == "1.2", 
+                        Debug.Assert(soapVersion == "1.2",
                                      string.Format("Unexpected soap version ({0}) !", soapVersion));
                         xElement = xElement.Element(XName.Get("Body", "http://www.w3.org/2003/05/soap-envelope"));
                     }
@@ -1518,7 +1527,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                             requestResponse = INTERNAL_DateTimeHelpers.ToDateTime(responseAsString); //todo: ensure this is the culture-invariant parsing!
                         else
                             throw new NotSupportedException(
-                                string.Format("The following type is not supported in the current WCF implementation: '{0}'. \nPlease report this issue to support@cshtml5.com", 
+                                string.Format("The following type is not supported in the current WCF implementation: '{0}'. \nPlease report this issue to support@cshtml5.com",
                                               requestResponseType));
                     }
                     else
@@ -1567,10 +1576,10 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         }
 #endif
 
-            #region work in progress
+        #region work in progress
 
 #if WORKINPROGRESS && (!CSHTML5BLAZOR || WORKINPROGRESS)
-            #region Not Supported Stuff
+        #region Not Supported Stuff
 
         //    /// <summary>
         //    /// Gets the underlying System.ServiceModel.ChannelFactory<TChannel> object.
@@ -1671,11 +1680,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         }
 
 
-            #endregion
+        #endregion
 #endif
 
 #if WORKINPROGRESS && !CSHTML5BLAZOR
-            #region ICommunicationObject methods
+        #region ICommunicationObject methods
 
         CommunicationState ICommunicationObject.State
         {
@@ -1771,9 +1780,9 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         //{
 
         //}
-            #endregion
+        #endregion
 #endif
 
-            #endregion work in progress
-        }
+        #endregion work in progress
+    }
 }
