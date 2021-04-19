@@ -26,18 +26,26 @@ namespace DotNetForHtml5.Compiler
 {
     internal static class SystemTypesHelper
     {
+        private const string InvariantCulture = "global::System.Globalization.CultureInfo.InvariantCulture";
+
         static Dictionary<string, Func<string, string>> LowercaseSupportedTypesAndHowToConvertFromXamlValueToCSharp
             = new Dictionary<string, Func<string, string>>()
         {
-            { "double", x => "global::System.Double.Parse(" + "\"" + x + "\"" + ")" }, //todo: parse using "InvariantCulture" when supported! (so that it uses a dot for the decimal separator)
-            { "string", x => "@\"" + x.Replace("\"", "\"\"") + "\"" },
+#if BRIDGE || CSHTML5BLAZOR
+            { "double", x => $"global::System.Double.Parse(\"{x}\", {InvariantCulture})" },
+            { "single", x => $"global::System.Single.Parse(\"{x}\", {InvariantCulture})" },
+            { "timespan", x => $"global::System.TimeSpan.Parse(\"{x}\", {InvariantCulture})" },
+#else // Obsolete, JSIL
+            { "double", x => "global::System.Double.Parse(" + "\"" + x + "\"" + ")" },
+            { "single", x => "global::System.Single.Parse(" + "\"" + x + "\"" + ")" },
+            { "timespan", x => "global::System.TimeSpan.Parse(" + "\"" + x + "\"" + ")" }
+#endif
+            { "string", x => $"@\"{x.Replace("\"", "\"\"")}\"" },
+            { "boolean", x => x.ToLower() },
+            { "byte", x => $"(global::System.Byte){x}" },
             { "int16", x => x },
             { "int32", x => x },
             { "int64", x => x },
-            { "boolean", x => x.ToLower() },
-            { "single", x => "global::System.Single.Parse(" + "\"" + x + "\"" + ")" }, //todo: parse using "InvariantCulture" when supported! (so that it uses a dot for the decimal separator)
-            { "byte", x => "(global::System.Byte)" + x },
-            { "timespan", x => "global::System.TimeSpan.Parse(" + "\"" + x + "\"" + ")" }
         };
 
         static Dictionary<string, string> DefaultValueOfSystemTypes =
