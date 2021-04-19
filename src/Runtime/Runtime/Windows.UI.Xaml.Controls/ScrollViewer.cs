@@ -120,7 +120,15 @@ namespace Windows.UI.Xaml.Controls
             {
                 // Note: we did not create a DependencyProperty because we do not want to slow down the scroll by calling SetValue during the scroll.
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-                    _horizontalOffset = (double)INTERNAL_HtmlDomManager.GetDomElementAttribute(this.INTERNAL_OuterDomElement, "scrollLeft");
+                {
+                    try
+                    {
+                        _horizontalOffset = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0[$1]", this.INTERNAL_OuterDomElement, "scrollLeft"));
+                    }
+                    catch (InvalidCastException) 
+                    {
+                    }
+                }
                 return _horizontalOffset;
             }
         }
@@ -464,7 +472,15 @@ namespace Windows.UI.Xaml.Controls
             {
                 // Note: we did not create a DependencyProperty because we do not want to slow down the scroll by calling SetValue during the scroll.
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-                    _verticalOffset = (double)INTERNAL_HtmlDomManager.GetDomElementAttribute(this.INTERNAL_OuterDomElement, "scrollTop");
+                {
+                    try
+                    {
+                        _verticalOffset = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0[$1]", this.INTERNAL_OuterDomElement, "scrollTop"));
+                    }
+                    catch (InvalidCastException)
+                    {
+                    }
+                }
                 return _verticalOffset;
             }
         }
