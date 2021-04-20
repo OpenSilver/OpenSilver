@@ -32,9 +32,23 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Defines column-specific properties that apply to Grid objects.
     /// </summary>
+#if WORKINPROGRESS
+    public sealed partial class ColumnDefinition : DependencyObject, IDefinitionBase
+    {
+        internal Grid Parent;
+        public ColumnDefinition()
+        {
+            MinWidth = 0;
+        }
+        double IDefinitionBase.MinLength { get { return MinWidth; } }
+        double IDefinitionBase.MaxLength { get { return MaxWidth; } }
+        GridLength IDefinitionBase.Length { get { return Width; } }
+
+#else
     public sealed partial class ColumnDefinition : DependencyObject
     {
         internal Grid Parent;
+#endif
 
         /// <summary>
         /// Returns a copy of the current ColumnDefinition.

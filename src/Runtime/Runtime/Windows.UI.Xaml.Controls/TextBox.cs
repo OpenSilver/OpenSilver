@@ -380,6 +380,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
+            Console.WriteLine("CreateDomElement TextBox");
             // Note: we use 3 divs instead of 1 due to the way HorizontalAlignment/VerticalAlignment works in the FrameworkElement class. In fact, if "display" is "Table" or "TableCell", the "contentEditable" attribute does not work properly.
             return AddContentEditableDomElement(parentRef, out domElementWhereToPlaceChildren, false);
         }
@@ -1697,6 +1698,7 @@ element.setAttribute(""data-isreadonly"",""{1}"");
 #if WORKINPROGRESS
         #region SelectionBackground
         public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register("SelectionBackground", typeof(Brush), typeof(TextBox), null);
+        // private Size noWrapSize = Size.Empty;
 
         public Brush SelectionBackground
         {
@@ -1714,6 +1716,21 @@ element.setAttribute(""data-isreadonly"",""{1}"");
 
         public double LineHeight { get; set; }
 
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            //Console.WriteLine($"TextBox {((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier}");
+            /*if (noWrapSize == Size.Empty)
+            {
+                noWrapSize = Application.Current.TextMeasurementService.Measure(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, Double.PositiveInfinity);
+            }
+
+            if (TextWrapping == TextWrapping.NoWrap || noWrapSize.Width <= availableSize.Width)
+            {
+                return noWrapSize;
+            }*/
+            
+            return Application.Current.TextMeasurementService.Measure(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, Padding, availableSize.Width);
+        }
 #endif
 
     }

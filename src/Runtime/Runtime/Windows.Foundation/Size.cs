@@ -39,9 +39,16 @@ namespace Windows.Foundation
     {
         // Caching is actually over twice faster than creating a new Size, even though it is a Value Type
         private static readonly Size emptySize;
+        private static readonly Size zeroSize;
+        private static readonly Size infinitySize;
         
         private double _width;
         private double _height;
+
+        public bool IsWidthEmpty { get { return Double.IsNaN(_width); } }
+        public bool IsHeightEmpty { get { return Double.IsNaN(_height); } }
+        public bool IsEmpty { get { return IsWidthEmpty && IsHeightEmpty; } }
+        public bool IsPartiallyEmpty { get { return IsWidthEmpty || IsHeightEmpty; } }
 
         static Size()
         {
@@ -50,6 +57,9 @@ namespace Windows.Foundation
                 _width = double.NegativeInfinity,
                 _height = double.NegativeInfinity
             };
+            zeroSize = new Size(0, 0);
+            infinitySize = new Size(Double.PositiveInfinity, Double.PositiveInfinity);
+
             TypeFromStringConverters.RegisterConverter(typeof(Size), s => Parse(s));
         }
 
@@ -105,6 +115,46 @@ namespace Windows.Foundation
             return size1.Height == size2.Height && size1.Width == size2.Width;
         }
 
+        public static Size operator -(Size size)
+        {
+            if (size == Size.Zero)
+            {
+                return size;
+            }
+
+            return new Size(-size.Width, -size.Height);
+        }
+
+        public static Size operator -(Size size1, Size size2)
+        {
+            if (size1 == Size.Zero)
+            {
+                return -size2;
+            }
+
+            if (size2 == Size.Zero)
+            {
+                return size1;
+            }
+
+            return new Size(size1.Width - size2.Width, size1.Height - size2.Height);
+        }
+
+        public static Size operator +(Size size1, Size size2)
+        {
+            if (size1 == Size.Zero)
+            {
+                return size2;
+            }
+
+            if (size2 == Size.Zero)
+            {
+                return size1;
+            }
+
+            return new Size(size1.Width + size2.Width, size1.Height + size2.Height);
+        }
+
         /// <summary>
         /// Gets a value that represents a static empty Windows.Foundation.Size.
         /// </summary>
@@ -115,6 +165,29 @@ namespace Windows.Foundation
                 return emptySize;
             }
         }
+
+        /// <summary>
+        /// Gets a value that represents a static zero Windows.Foundation.Size.
+        /// </summary>
+        public static Size Zero
+        {
+            get
+            {
+                return zeroSize;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value that represents a static infinity Windows.Foundation.Size.
+        /// </summary>
+        public static Size Infinity
+        {
+            get
+            {
+                return infinitySize;
+            }
+        }
+        
 
         /// <summary>
         /// Gets or sets the height of this instance of Windows.Foundation.Size in pixels. The default is 0. The value cannot be negative.
@@ -138,19 +211,7 @@ namespace Windows.Foundation
                 this._height = value;
             }
         }
-      
-        /// <summary>
-        /// Gets a value that indicates whether this instance of
-        /// Windows.Foundation.Size is Windows.Foundation.Size.Empty.
-        /// </summary>
-        public bool IsEmpty
-        {
-            get
-            {
-                return this._width < 0;
-            }
-        }
-      
+            
         /// <summary>
         /// Gets or sets the width of this instance of Windows.Foundation.Size.
         /// </summary>
@@ -263,5 +324,101 @@ namespace Windows.Foundation
             throw new FormatException(sizeAsString + " is not an eligible value for a Size");
         }
 
+    }
+
+    public static class SizeExtensions
+    {
+        public static Size Combine(this Size size, Size fallback)
+        {
+            if (!(Double.IsNaN(size.Width) || Double.IsNaN(size.Height)))
+            {
+                return size;
+            }
+
+            if (Double.IsNaN(size.Width) && Double.IsNaN(size.Height))
+            {
+                return fallback;
+            }
+
+            return new Size(
+                Double.IsNaN(size.Width) ? fallback.Width : size.Width,
+                Double.IsNaN(size.Height) ? fallback.Height : size.Height);
+        }
+
+        public static Size Bounds(this Size size, Size minimum, Size maximum)
+        {
+            if (minimum.Width > maximum.Width || minimum.Height > maximum.Height)
+            {
+                throw new Exception($"Invalid bounds (minimum: {minimum}, maximum: {maximum})");
+            }
+
+            return size.Max(minimum).Min(maximum);
+        }
+
+#if WORKINPROGRESS
+        public static bool IsClose(this Size @this, Size size)
+        {
+            return @this.Width.IsClose(size.Width) && @this.Height.IsClose(size.Height);
+        }
+#endif
+        public static Size Min(this Size @this, Size size)
+        {
+            if (@this.IsEmpty)
+            {
+                return size;
+            }
+
+            if (size.IsEmpty)
+            {
+                return @this;
+            }
+
+            if (!@this.IsPartiallyEmpty && !@size.IsPartiallyEmpty)
+            {
+                if (@this.Width < size.Width && @this.Height < size.Height)
+                {
+                    return @this;
+                }
+
+                if (@this.Width >= size.Width && @this.Height >= size.Height)
+                {
+                    return size;
+                }
+            }
+
+            return new Size(
+                @this.IsWidthEmpty ? size.Width : (size.IsWidthEmpty ? @this.Width : Math.Min(@this.Width, size.Width)),
+                @this.IsHeightEmpty ? size.Height : (size.IsHeightEmpty ? @this.Height : Math.Min(@this.Height, size.Height)));
+        }
+
+        public static Size Max(this Size @this, Size size)
+        {
+            if (@this.IsEmpty)
+            {
+                return size;
+            }
+
+            if (size.IsEmpty)
+            {
+                return @this;
+            }
+
+            if (!@this.IsPartiallyEmpty && !@size.IsPartiallyEmpty)
+            {
+                if (@this.Width > size.Width && @this.Height > size.Height)
+                {
+                    return @this;
+                }
+
+                if (@this.Width <= size.Width && @this.Height <= size.Height)
+                {
+                    return size;
+                }
+            }
+
+            return new Size(
+                @this.IsWidthEmpty ? size.Width : (size.IsWidthEmpty ? @this.Width : Math.Max(@this.Width, size.Width)),
+                @this.IsHeightEmpty ? size.Height : (size.IsHeightEmpty ? @this.Height : Math.Max(@this.Height, size.Height)));
+        }
     }
 }

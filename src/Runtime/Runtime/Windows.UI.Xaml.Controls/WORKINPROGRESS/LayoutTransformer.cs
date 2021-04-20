@@ -97,7 +97,8 @@ namespace System.Windows.Controls
         //     clarity
         protected override Size ArrangeOverride(Size finalSize)
         {
-				return default(Size);
+            Console.WriteLine($"TODO {this} ArrangeOverride");
+            throw new NotImplementedException("The method or operation is not implemented.");
         }
         //
         // Summary:
@@ -112,7 +113,8 @@ namespace System.Windows.Controls
         //     of child element sizes.
         protected override Size MeasureOverride(Size availableSize)
         {
-			return default(Size);
+            Console.WriteLine($"TODO {this} MeasureOverride");
+            throw new NotImplementedException("The method or operation is not implemented.");
         }
     }
 }

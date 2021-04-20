@@ -83,6 +83,17 @@ namespace Windows.UI.Xaml.Controls
 		{
 			element.SetValue(VirtualizationModeProperty, value);
 		}
+
+		protected override Size MeasureOverride(Size availableSize)
+		{
+			Console.WriteLine($"TODO {this} MeasureOverride");
+			throw new NotImplementedException("The method or operation is not implemented.");
+		}
+		protected override Size ArrangeOverride(Size finalSize)
+		{
+			Console.WriteLine($"TODO {this} ArrangeOverride");
+			throw new NotImplementedException("The method or operation is not implemented.");
+		}
 	}
 }
 #endif

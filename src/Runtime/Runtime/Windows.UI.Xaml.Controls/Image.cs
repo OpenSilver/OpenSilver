@@ -131,6 +131,9 @@ namespace Windows.UI.Xaml.Controls
                     bmpImage.UriSourceChanged += image.bmpImage_UriSourceChanged;
                 }
                 image.RefreshSource();
+#if WORKINPROGRESS
+                image.InvalidateMeasure();
+#endif
             }
         }
 
@@ -237,6 +240,9 @@ namespace Windows.UI.Xaml.Controls
                     //_imageDiv.style.height = parentHeight;
                 }
             }
+#if WORKINPROGRESS
+            InvalidateMeasure();
+#endif
         }
 
         void bmpImage_ImageOpened(object sender, RoutedEventArgs e)
@@ -315,7 +321,7 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
 
 
 
-        #region Image failed event
+#region Image failed event
 
 #if WORKINPROGRESS
         INTERNAL_EventManager<EventHandler<ExceptionRoutedEventArgs>, ExceptionRoutedEventArgs> _imageFailedEventManager = null;

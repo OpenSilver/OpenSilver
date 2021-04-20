@@ -16,6 +16,9 @@
 #if WORKINPROGRESS
 
 #if MIGRATION
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Controls.Primitives;
 using System.Windows.Navigation;
 #else
 using Windows.UI.Xaml.Navigation;
@@ -40,6 +43,16 @@ namespace Windows.UI.Xaml.Controls
         {
             get { return _title; }
             set { _title = value; }
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            return base.MeasureOverride(availableSize);
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            return base.ArrangeOverride(finalSize);
         }
 
     }
