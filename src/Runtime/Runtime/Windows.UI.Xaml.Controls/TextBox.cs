@@ -215,6 +215,20 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
         private static void UpdateDomText(DependencyObject d, object newValue)
         {
             var textBox = (TextBox)d;
+#if WORKINPROGRESS
+            if (textBox.INTERNAL_OuterDomElement != null &&
+                ((INTERNAL_HtmlDomElementReference)textBox.INTERNAL_OuterDomElement).UniqueIdentifier == Application.Current.TextMeasurementService.GetTextMeasureDivID())
+            {
+                string text = textBox.Text ?? string.Empty;
+                if (textBox._contentEditableDiv != null || textBox.Template == null)
+                {
+                    textBox._isCodeProgrammaticallyChangingText = true;
+                    INTERNAL_HtmlDomManager.SetContentString(textBox, text);
+                    textBox._isCodeProgrammaticallyChangingText = false;
+                }
+                return;
+            }
+#endif
             if (!textBox._isUserChangingText)
             {
                 string displayedText = INTERNAL_HtmlDomManager.GetTextBoxText(textBox.INTERNAL_InnerDomElement);

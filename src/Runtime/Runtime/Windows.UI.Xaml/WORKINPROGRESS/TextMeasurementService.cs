@@ -39,6 +39,11 @@ namespace Windows.UI.Xaml
 
         public void CreateMeasurementText(UIElement parent)
         {
+            if (associatedTextUI != null)
+            {
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(associatedTextUI, parent);
+            }
+
             associatedTextUI = new TextBox();
 #if REWORKLOADED
                 this.AddVisualChild(associatedUI);
@@ -49,7 +54,7 @@ namespace Windows.UI.Xaml
             textDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textDivReference);
 
             textDivStyle.position = "absolute";
-            //textDivStyle.visibility = "hidden";
+            textDivStyle.visibility = "hidden";
             textDivStyle.height = "";
             textDivStyle.width = "";
             textDivStyle.top = "0px";
@@ -90,6 +95,12 @@ namespace Windows.UI.Xaml
                 associatedTextUI.TextWrapping = TextWrapping.Wrap;
                 textDivStyle.width = String.Format("{0}px", maxWidth);
                 textDivStyle.maxWidth = String.Format("{0}px", maxWidth);
+            }
+
+            // On Simulator, it needs time to get actualwidth and actualheight
+            if (CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
+            {
+                System.Threading.Thread.Sleep(20);
             }
 
             return new Size(associatedTextUI.ActualWidth + 1, associatedTextUI.ActualHeight);

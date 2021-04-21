@@ -600,6 +600,12 @@ namespace Windows.UI.Xaml
         public override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             base.OnPropertyChanged(e);
+            
+            // Skip when loading or changed on TextMeasurement Div.
+            if (this.INTERNAL_OuterDomElement == null || ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier == Application.Current.TextMeasurementService.GetTextMeasureDivID())
+                return;
+
+            //InvalidateMeasure();
             //Console.WriteLine($"FrameworkElement OnPropertyChanged {e.Property.Name} {e.OldValue}=>{e.NewValue}");
             // TODO Invalidate
         }
