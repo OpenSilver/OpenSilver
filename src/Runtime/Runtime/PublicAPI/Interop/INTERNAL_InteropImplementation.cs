@@ -289,6 +289,11 @@ result;
 #if CSHTML5BLAZOR
             if (!Interop.IsRunningInTheSimulator_WorkAround)
             {
+                if (obj != null && (obj is string || obj.GetType().IsPrimitive))
+                {
+                    return obj;
+                }
+
                 JsonElement jsonElement = (JsonElement)obj;
                 object res;
                 switch (jsonElement.ValueKind)

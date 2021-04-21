@@ -84,3 +84,15 @@ window.callJS = function (javaScriptToExecute) {
         return result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")";
     }
 };
+
+window.callJSUnmarshalled = function (javaScriptToExecute) {
+    javaScriptToExecute = BINDING.conv_string(javaScriptToExecute);
+    var result = eval(javaScriptToExecute);
+    var resultType = typeof result;
+    if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
+        return BINDING.js_to_mono_obj(result);
+    }
+    else {
+        return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
+    }
+};
