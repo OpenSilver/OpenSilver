@@ -7,6 +7,8 @@ using Windows.UI.Xaml;
 
 namespace TestApplication
 {
+    // SLDISABLED
+    /*
     public class VideoPlayerControl : FrameworkElement
     {
         public VideoPlayerControl()
@@ -162,4 +164,5 @@ namespace TestApplication
         public event ExceptionRoutedEventHandler MediaFailed;
 
     }
+    */
 }

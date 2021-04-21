@@ -19,8 +19,7 @@ namespace TestApplication
 
             // Enter construction logic here...
 
-            var mainPage = new MainPage();
-            Window.Current.Content = mainPage;
+            this.RootVisual = new MainPage();
         }
     }
 }
