@@ -29,11 +29,13 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a collection of TimeParser objects.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class TimeParserCollection : Collection<TimeParser>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TimeParserCollection"/> class.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public TimeParserCollection()
         {
         }
@@ -43,6 +45,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="parsers">A sequence of TimeParser objects that will
         /// be copied into this collection.</param>
+        [OpenSilver.NotImplemented]
         public TimeParserCollection(IEnumerable<TimeParser> parsers)
         {
             if (parsers != null)
@@ -61,6 +64,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="culture">The culture being used.</param>
         /// <param name="result">The parsed DateTime.</param>
         /// <returns>True if the parse was successful, false if it was not.</returns>
+        [OpenSilver.NotImplemented]
         public virtual bool TryParse(string text, CultureInfo culture, out DateTime? result)
         {
             result = null;

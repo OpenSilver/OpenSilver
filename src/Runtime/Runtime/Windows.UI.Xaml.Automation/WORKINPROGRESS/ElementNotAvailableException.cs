@@ -9,8 +9,10 @@ namespace System.Windows.Automation
 namespace Windows.UI.Xaml.Automation
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public partial class ElementNotAvailableException : Exception
 	{
+        [OpenSilver.NotImplemented]
 		public ElementNotAvailableException()
 		{
 		}

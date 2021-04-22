@@ -11,7 +11,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
 	public partial interface IItemContainerGenerator
-	{
+    {
 		ItemContainerGenerator GetItemContainerGeneratorForPanel(Panel panel);
 		IDisposable StartAt(GeneratorPosition position, GeneratorDirection direction, bool allowStartAtRealizedItem);
 		DependencyObject GenerateNext(out bool isNewlyRealized);

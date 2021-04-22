@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
+    <Compile Include="OpenSilver\NotImplementedAttribute.cs" />
     <Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
     <Compile Include="PagedCollectionView\CollectionViewGroupRoot.cs" />
     <Compile Include="PagedCollectionView\IPagedCollectionView.cs" />
@@ -740,7 +741,6 @@
     <Compile Include="Windows.UI.Xaml.Media.Animation\TimelineCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\Transition.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\TransitionCollection.cs" />
-    <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\Animatable.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\AnimationTimeline.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\BackEase.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\ClockState.cs" />
@@ -752,7 +752,6 @@
     <Compile Include="Windows.UI.Xaml.Media.Animation\DoubleKeyFrameCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\EasingDoubleKeyFrame.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\FillBehavior.cs" />
-    <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\IAnimatable.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\IEasingFunction.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\IKeyFrame.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\KeySpline.cs" />
@@ -925,7 +924,6 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\EventTrigger.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FlowDirection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontStretch.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\Freezable.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\HierarchicalDataTemplate.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\IDataObject.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\LineStackingStrategy.cs" />

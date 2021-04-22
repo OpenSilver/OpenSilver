@@ -26,6 +26,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Base class for all controls that have popup functionality.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public abstract class Picker : Control, IUpdateVisualState
     {
         /// <summary>
@@ -45,6 +46,7 @@ namespace Windows.UI.Xaml.Controls
         /// Gets or sets the button event that causes the popup portion of the 
         /// Picker control to open.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public ClickMode PopupButtonMode
         {
             get => (ClickMode)GetValue(PopupButtonModeProperty);
@@ -54,6 +56,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the PopupButtonMode dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PopupButtonModeProperty =
             DependencyProperty.Register(
                 "PopupButtonMode",

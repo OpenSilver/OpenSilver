@@ -13,6 +13,7 @@ namespace Windows.UI.Xaml.Documents
 	//
 	// Summary:
 	//     Represents a position within a System.Windows.Controls.RichTextBox.
+    [OpenSilver.NotImplemented]
 	public class TextPointer
 	{
 		//
@@ -21,6 +22,7 @@ namespace Windows.UI.Xaml.Documents
 		//
 		// Returns:
 		//     true if the current position is an insertion position; otherwise, false.
+        [OpenSilver.NotImplemented]
 		public bool IsAtInsertionPosition { get; }
 		//
 		// Summary:
@@ -30,6 +32,7 @@ namespace Windows.UI.Xaml.Documents
 		// Returns:
 		//     The System.Windows.Documents.LogicalDirection value that is associated with the
 		//     current position.
+        [OpenSilver.NotImplemented]
 		public LogicalDirection LogicalDirection { get; }
 		//
 		// Summary:
@@ -38,6 +41,7 @@ namespace Windows.UI.Xaml.Documents
 		// Returns:
 		//     The logical parent that contains the current position. Can return the System.Windows.Controls.RichTextBox
 		//     when at the top of the content stack.
+        [OpenSilver.NotImplemented]
 		public DependencyObject Parent { get; }
 		//
 		// Summary:
@@ -45,6 +49,7 @@ namespace Windows.UI.Xaml.Documents
 		//
 		// Returns:
 		//     The visual tree parent of the System.Windows.Documents.TextPointer object.
+        [OpenSilver.NotImplemented]
 		public FrameworkElement VisualParent { get; }
 
 		//
@@ -66,6 +71,7 @@ namespace Windows.UI.Xaml.Documents
 		//   T:System.ArgumentException:
 		//     position specifies a position from a different System.Windows.Controls.RichTextBox
 		//     associated with the current position.
+        [OpenSilver.NotImplemented]
 		public int CompareTo(TextPointer position)
 		{
 			return default(int);
@@ -85,6 +91,7 @@ namespace Windows.UI.Xaml.Documents
 		//     A System.Windows.Rect for content that borders the current System.Windows.Documents.TextPointer
 		//     in the specified direction, or System.Windows.Rect.Empty if current and valid
 		//     layout information is unavailable.
+        [OpenSilver.NotImplemented]
 		public Rect GetCharacterRect(LogicalDirection direction)
 		{
 			return default(Rect);
@@ -103,6 +110,7 @@ namespace Windows.UI.Xaml.Documents
 		// Returns:
 		//     A System.Windows.Documents.TextPointer that identifies the next insertion position
 		//     in the requested direction, or null if no next insertion position can be found.
+        [OpenSilver.NotImplemented]
 		public TextPointer GetNextInsertionPosition(LogicalDirection direction)
 		{
 			return default(TextPointer);
@@ -128,6 +136,7 @@ namespace Windows.UI.Xaml.Documents
 		//     A System.Windows.Documents.TextPointer to the position indicated by the specified
 		//     offset and in the direction specified by the direction parameter, or null if
 		//     the offset extends past the end of the content.
+        [OpenSilver.NotImplemented]
 		public TextPointer GetPositionAtOffset(int offset, LogicalDirection direction)
 		{
 			return default(TextPointer);

@@ -386,9 +386,11 @@ namespace Windows.UI.Xaml.Input
         //}
 
 #if WORKINPROGRESS
+        [OpenSilver.NotImplemented]
         public StylusDevice StylusDevice { get; private set; }
 
 #if !MIGRATION
+        [OpenSilver.NotImplemented]
         public int Delta { get; private set; }
 #endif
 

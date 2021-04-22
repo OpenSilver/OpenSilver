@@ -6,11 +6,13 @@ namespace System.Runtime.InteropServices.Automation
 	//
 	// Summary:
 	//     Represents an Automation event.
+	[OpenSilver.NotImplemented]
 	public sealed class AutomationEvent
 	{
 		//
 		// Summary:
 		//     Occurs when the Automation event occurs.
+		[OpenSilver.NotImplemented]
 		public event EventHandler<AutomationEventArgs> EventRaised;
 
 		//
@@ -20,6 +22,7 @@ namespace System.Runtime.InteropServices.Automation
 		// Parameters:
 		//   handler:
 		//     The delegate to attach to the event.
+		[OpenSilver.NotImplemented]
 		public void AddEventHandler(Delegate handler)
 		{
 			
@@ -32,6 +35,7 @@ namespace System.Runtime.InteropServices.Automation
 		// Parameters:
 		//   handler:
 		//     The delegate to detach from the event.
+		[OpenSilver.NotImplemented]
 		public void RemoveEventHandler(Delegate handler)
 		{
 			

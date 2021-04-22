@@ -25,11 +25,13 @@ namespace Windows.UI.Xaml.Controls
     /// Enables the user to search a list of items in an <see cref="ItemsControl"/>
     /// using keyboard input.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public sealed class TextSearch : DependencyObject
     {
         /// <summary>
         /// Identifies the TextSearch.TextPath attached property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TextPathProperty =
             DependencyProperty.RegisterAttached(
                 "TextPath",
@@ -47,6 +49,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The name of the property that identifies the item to the user.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static string GetTextPath(DependencyObject element)
         {
             if (element == null)
@@ -66,6 +69,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="path">
         /// The name of the property that identifies an item.
         /// </param>
+        [OpenSilver.NotImplemented]
         public static void SetTextPath(DependencyObject element, string path)
         {
             if (element == null)

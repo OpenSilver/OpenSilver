@@ -28,6 +28,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// of key frames.
     /// </summary>
     [ContentProperty("KeyFrames")]
+    [OpenSilver.NotImplemented]
     public partial class ColorAnimationUsingKeyFrames : AnimationTimeline
     {
         private ColorKeyFrameCollection _keyFrames;
@@ -38,6 +39,7 @@ namespace Windows.UI.Xaml.Media.Animation
         // Returns:
         //     The collection of System.Windows.Media.Animation.ColorKeyFrame objects that
         //     define the animation. The default is an empty collection.
+        [OpenSilver.NotImplemented]
         public ColorKeyFrameCollection KeyFrames
         {
             get

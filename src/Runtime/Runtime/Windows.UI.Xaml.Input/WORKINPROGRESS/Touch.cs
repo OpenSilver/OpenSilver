@@ -7,8 +7,10 @@ namespace System.Windows.Input
 namespace Windows.UI.Xaml.Input
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public static partial class Touch
 	{
+        [OpenSilver.NotImplemented]
 		public static event TouchFrameEventHandler FrameReported;
 	}
 }

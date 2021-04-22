@@ -23,11 +23,13 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Animates from the <see cref="Color" /> value of the previous key frame to its 
     /// own <see cref="ColorKeyFrame.Value" /> using linear interpolation.  
     /// </summary>
+    [OpenSilver.NotImplemented]
     public sealed class LinearColorKeyFrame : ColorKeyFrame
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LinearColorKeyFrame"/> class.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public LinearColorKeyFrame()
         {
         }

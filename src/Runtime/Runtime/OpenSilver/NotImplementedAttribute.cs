@@ -1,6 +1,4 @@
-﻿
-
-/*===================================================================================
+﻿/*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
 *      
@@ -12,26 +10,17 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-#if MIGRATION
-using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
-#if MIGRATION
-namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
+namespace OpenSilver
 {
-#if false
-#if WORKINPROGRESS
-    public abstract partial class Animatable : Freezable, IAnimatable
+    [AttributeUsage(AttributeTargets.All, Inherited = true, AllowMultiple = false)]
+    public sealed class NotImplementedAttribute : Attribute
     {
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NotImplementedAttribute"/>
+        /// class.
+        /// </summary>
+        public NotImplementedAttribute() { }
     }
-#endif
-#endif
 }

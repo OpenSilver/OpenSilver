@@ -9,8 +9,10 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public partial class Typeface
 	{
+        [OpenSilver.NotImplemented]
 		public bool TryGetGlyphTypeface(out GlyphTypeface glyphTypeface)
 		{
 			glyphTypeface = null;

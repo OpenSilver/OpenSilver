@@ -27,6 +27,7 @@ namespace Windows.UI.Xaml.Media
 		/// <summary>
 		/// Identifies the <see cref="SkewTransform.CenterX"/> dependency property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty CenterXProperty =
 			DependencyProperty.Register(
 				nameof(CenterX),
@@ -38,8 +39,9 @@ namespace Windows.UI.Xaml.Media
 		/// Gets or sets the x-coordinate of the transform center.
 		/// The default is 0.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public double CenterX
-        {
+		{
 			get => (double)GetValue(CenterXProperty);
 			set => SetValue(CenterXProperty, value);
         }
@@ -47,6 +49,7 @@ namespace Windows.UI.Xaml.Media
 		/// <summary>
 		/// Identifies the <see cref="SkewTransform.CenterY"/> dependency property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty CenterYProperty =
 			DependencyProperty.Register(
 				nameof(CenterY),
@@ -58,8 +61,9 @@ namespace Windows.UI.Xaml.Media
 		/// Gets or sets the y-coordinate of the transform center.
 		/// The default is 0.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public double CenterY
-        {
+		{
 			get => (double)GetValue(CenterYProperty);
 			set => SetValue(CenterYProperty, value);
         }

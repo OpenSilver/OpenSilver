@@ -220,6 +220,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         }
 
 #if WORKINPROGRESS
+        [OpenSilver.NotImplemented]
         public BitmapCreateOptions CreateOptions { get; set; }
 #endif
     }

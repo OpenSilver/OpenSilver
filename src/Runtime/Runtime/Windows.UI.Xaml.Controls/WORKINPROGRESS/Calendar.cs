@@ -34,6 +34,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A collection of dates that cannot be selected. The default value is an empty collection.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public CalendarBlackoutDatesCollection BlackoutDates { get; private set; }
 
         /// <summary>
@@ -42,6 +43,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.Calendar.SelectedDate" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectedDateProperty = DependencyProperty.Register(nameof(SelectedDate), typeof(DateTime?), typeof(Calendar), new PropertyMetadata(OnSelectedDateChanged));
 
         /// <summary>
@@ -57,6 +59,7 @@ namespace Windows.UI.Xaml.Controls
         /// <exception cref="T:System.InvalidOperationException">
         /// If set to anything other than null when <see cref="P:System.Windows.Controls.Calendar.SelectionMode" /> is set to <see cref="F:System.Windows.Controls.CalendarSelectionMode.None" />.
         /// </exception>
+        [OpenSilver.NotImplemented]
         public DateTime? SelectedDate
         {
             get => (DateTime?)GetValue(SelectedDateProperty);
@@ -76,6 +79,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.Calendar.DisplayDate" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty DisplayDateProperty = DependencyProperty.Register(nameof(DisplayDate), typeof(DateTime), typeof(Calendar), new PropertyMetadata(DateTime.Today, OnDisplayDateChanged));
 
         private static void OnDisplayDateChanged(
@@ -85,6 +89,7 @@ namespace Windows.UI.Xaml.Controls
             throw new NotImplementedException();
         }
 
+        [OpenSilver.NotImplemented]
         public Style CalendarDayButtonStyle { get; set; }
     }
 }

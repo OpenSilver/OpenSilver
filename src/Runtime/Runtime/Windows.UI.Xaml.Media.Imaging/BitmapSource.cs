@@ -112,6 +112,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         /// <summary>
         /// Gets the height of the bitmap in pixels.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public int PixelHeight
         {
             get { return (int)this.GetValue(BitmapSource.PixelHeightProperty); }
@@ -122,11 +123,13 @@ namespace Windows.UI.Xaml.Media.Imaging
         /// 
         /// Returns the identifier for the PixelHeight dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PixelHeightProperty = DependencyProperty.Register("PixelHeight", typeof(int), typeof(BitmapSource), new PropertyMetadata(0));
 
         /// <summary>
         /// Gets the width of the bitmap in pixels.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public int PixelWidth
         {
             get { return (int)this.GetValue(BitmapSource.PixelWidthProperty); }
@@ -137,6 +140,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         /// 
         /// Returns the identifier for the PixelWidth dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PixelWidthProperty = DependencyProperty.Register("PixelWidth", typeof(int), typeof(BitmapSource), new PropertyMetadata(0));
         
         

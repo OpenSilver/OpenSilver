@@ -163,11 +163,13 @@ namespace Windows.UI.Core
         }
 
 #if WORKINPROGRESS
+		[OpenSilver.NotImplemented]
         public DispatcherOperation BeginInvoke(Delegate d, params object[] args)
         {
             return null;
         }
 
+		[OpenSilver.NotImplemented]
         public bool CheckAccess()
         {
             return true;

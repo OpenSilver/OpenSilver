@@ -26,10 +26,13 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
+	[OpenSilver.NotImplemented]
     public sealed partial class OutOfBrowserSettings : DependencyObject
     {
 
+		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty WindowSettingsProperty = DependencyProperty.Register("WindowSettings", typeof(WindowSettings), typeof(OutOfBrowserSettings), null);
+		[OpenSilver.NotImplemented]
         public WindowSettings WindowSettings
         {
             get { return (WindowSettings)this.GetValue(WindowSettingsProperty); }

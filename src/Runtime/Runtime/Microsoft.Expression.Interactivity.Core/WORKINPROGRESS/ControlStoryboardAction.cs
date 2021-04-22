@@ -9,19 +9,23 @@ namespace Microsoft.Expression.Interactivity.Core
 	//
 	// Summary:
 	//     An action that will change the state of a targeted storyboard when invoked.
+	[OpenSilver.NotImplemented]
 	public partial class ControlStoryboardAction : StoryboardAction
 	{
+		[OpenSilver.NotImplemented]
 		public static readonly DependencyProperty ControlStoryboardProperty =
 			DependencyProperty.Register(nameof(ControlStoryboardOption),
 										typeof(ControlStoryboardOption),
 										typeof(ControlStoryboardAction),
 										null);
-
+		
+		[OpenSilver.NotImplemented]
 		public ControlStoryboardAction()
 		{
 			
 		}
 
+		[OpenSilver.NotImplemented]
 		public ControlStoryboardOption ControlStoryboardOption
 		{
 			get { return (ControlStoryboardOption)GetValue(ControlStoryboardProperty); }
@@ -36,11 +40,13 @@ namespace Microsoft.Expression.Interactivity.Core
 		//
 		// Parameters:
 		//   parameter:
+		[OpenSilver.NotImplemented]
 		protected override void Invoke(object parameter)
 		{
 			
 		}
 
+		[OpenSilver.NotImplemented]
 		protected override void OnStoryboardChanged(DependencyPropertyChangedEventArgs args)
 		{
 			

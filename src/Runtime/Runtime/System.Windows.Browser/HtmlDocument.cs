@@ -94,6 +94,7 @@ namespace System.Windows.Browser
         //
         //   System.InvalidOperationException:
         //     An unexpected error occurred.
+		[OpenSilver.NotImplemented]
         public HtmlElement GetElementById(string id)
         {
             return null;
@@ -106,6 +107,7 @@ namespace System.Windows.Browser
         // Returns:
         //     The cookie string that is stored by the browser. If the browser does not
         //     have a cookie string, the property returns an empty string.
+		[OpenSilver.NotImplemented]
         public string Cookies { get; set; }
 #endif
     }

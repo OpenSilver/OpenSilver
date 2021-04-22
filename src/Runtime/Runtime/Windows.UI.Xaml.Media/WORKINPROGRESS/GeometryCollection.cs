@@ -29,6 +29,7 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+    [OpenSilver.NotImplemented]
     public sealed partial class GeometryCollection : PresentationFrameworkCollection<Geometry>
     {
         internal override void AddOverride(Geometry value)

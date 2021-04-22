@@ -351,6 +351,7 @@ namespace Windows.UI.Xaml.Media
 
 #if WORKINPROGRESS
 
+        [OpenSilver.NotImplemented]
         public static IEnumerable<UIElement> FindElementsInHostCoordinates(Rect intersectingRect, UIElement subtree)
         {
             return null;

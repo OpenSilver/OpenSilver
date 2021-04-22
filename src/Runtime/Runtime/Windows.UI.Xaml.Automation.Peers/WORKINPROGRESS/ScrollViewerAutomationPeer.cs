@@ -17,8 +17,10 @@ namespace System.Windows.Automation.Peers
 namespace Windows.UI.Xaml.Automation.Peers
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public partial class ScrollViewerAutomationPeer : FrameworkElementAutomationPeer, IScrollProvider
 	{
+        [OpenSilver.NotImplemented]
 		public ScrollViewerAutomationPeer(ScrollViewer owner): base(owner)
 		{
 		}

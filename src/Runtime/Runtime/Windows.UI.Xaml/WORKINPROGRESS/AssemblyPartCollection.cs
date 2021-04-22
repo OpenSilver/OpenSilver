@@ -27,6 +27,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
+	[OpenSilver.NotImplemented]
     public sealed partial class AssemblyPartCollection : PresentationFrameworkCollection<AssemblyPart>
     {
         internal override void AddOverride(AssemblyPart value)

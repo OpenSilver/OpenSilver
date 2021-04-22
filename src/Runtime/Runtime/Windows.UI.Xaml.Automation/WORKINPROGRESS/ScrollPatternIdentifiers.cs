@@ -10,11 +10,13 @@ namespace Windows.UI.Xaml.Automation
 	//     Contains values used as automation property identifiers specifically for properties
 	//     of the System.Windows.Automation.Provider.IScrollProvider pattern, as well as
 	//     the System.Windows.Automation.ScrollPatternIdentifiers.NoScroll constant.
+    [OpenSilver.NotImplemented]
 	public static partial class ScrollPatternIdentifiers
 	{
 		//
 		// Summary:
 		//     Specifies that scrolling should not be performed.
+        [OpenSilver.NotImplemented]
 		public const double NoScroll = -1;
 		//
 		// Summary:
@@ -23,6 +25,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty HorizontallyScrollableProperty;
 		//
 		// Summary:
@@ -31,6 +34,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty HorizontalScrollPercentProperty;
 		//
 		// Summary:
@@ -39,6 +43,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty HorizontalViewSizeProperty;
 		//
 		// Summary:
@@ -47,6 +52,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty VerticallyScrollableProperty;
 		//
 		// Summary:
@@ -55,6 +61,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty VerticalScrollPercentProperty;
 		//
 		// Summary:
@@ -63,6 +70,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty VerticalViewSizeProperty;
 	}
 }

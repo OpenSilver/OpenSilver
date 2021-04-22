@@ -26,6 +26,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Provides a hierarchical selectable item for the <see cref="T:System.Windows.Controls.TreeView" /> control.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class TreeViewItem : HeaderedItemsControl, IUpdateVisualState
     {
         /// <summary>
@@ -44,6 +45,7 @@ namespace Windows.UI.Xaml.Controls
         ///     The DependencyProperty for the <see cref="IsSelected"/> property.
         ///     Default Value: false
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty IsSelectedProperty =
             DependencyProperty.Register(
                     "IsSelected",
@@ -54,6 +56,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         ///     Specifies whether this item is selected or not.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public bool IsSelected
         {
             get { return (bool)GetValue(IsSelectedProperty); }
@@ -64,6 +67,7 @@ namespace Windows.UI.Xaml.Controls
         ///     The DependencyProperty for the <see cref="IsExpanded"/> property.
         ///     Default Value: false
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty IsExpandedProperty =
             DependencyProperty.Register(
                     "IsExpanded",
@@ -74,6 +78,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         ///     Specifies whether this item has expanded its children or not.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public bool IsExpanded
         {
             get { return (bool)GetValue(IsExpandedProperty); }

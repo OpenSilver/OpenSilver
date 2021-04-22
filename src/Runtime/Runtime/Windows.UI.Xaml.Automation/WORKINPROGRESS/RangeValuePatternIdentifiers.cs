@@ -9,6 +9,7 @@ namespace Windows.UI.Xaml.Automation
 	// Summary:
 	//     Contains values used as automation property identifiers specifically for properties
 	//     of the System.Windows.Automation.Provider.IRangeValueProvider pattern.
+    [OpenSilver.NotImplemented]
 	public static partial class RangeValuePatternIdentifiers
 	{
 		//
@@ -18,6 +19,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty IsReadOnlyProperty;
 		//
 		// Summary:
@@ -26,6 +28,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty LargeChangeProperty;
 		//
 		// Summary:
@@ -34,6 +37,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty MaximumProperty;
 		//
 		// Summary:
@@ -42,6 +46,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty MinimumProperty;
 		//
 		// Summary:
@@ -50,6 +55,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty SmallChangeProperty;
 		//
 		// Summary:
@@ -58,6 +64,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty ValueProperty;
 	}
 }

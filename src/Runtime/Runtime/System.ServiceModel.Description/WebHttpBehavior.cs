@@ -7,12 +7,14 @@ namespace System.ServiceModel.Description
     //
     // Summary:
     //     Enables the Web programming model for a Silverlight client.
+	[OpenSilver.NotImplemented]
     public class WebHttpBehavior : IEndpointBehavior
     {
         //
         // Summary:
         //     Initializes a new instance of the System.ServiceModel.Description.WebHttpBehavior
         //     class.
+		[OpenSilver.NotImplemented]
         public WebHttpBehavior()
         {
 
@@ -25,6 +27,7 @@ namespace System.ServiceModel.Description
         // Returns:
         //     One of the values defined in the System.ServiceModel.Web.WebMessageBodyStyle
         //     enumeration.
+		[OpenSilver.NotImplemented]
         public virtual WebMessageBodyStyle DefaultBodyStyle { get; set; }
         //
         // Summary:
@@ -32,6 +35,7 @@ namespace System.ServiceModel.Description
         //
         // Returns:
         //     One of the values defined in the System.ServiceModel.Web.WebMessageFormat enumeration.
+		[OpenSilver.NotImplemented]
         public virtual WebMessageFormat DefaultOutgoingRequestFormat { get; set; }
         //
         // Summary:
@@ -39,6 +43,7 @@ namespace System.ServiceModel.Description
         //
         // Returns:
         //     One of the values defined in the System.ServiceModel.Web.WebMessageFormat enumeration.
+		[OpenSilver.NotImplemented]
         public virtual WebMessageFormat DefaultOutgoingResponseFormat { get; set; }
         //
         // Summary:
@@ -47,6 +52,7 @@ namespace System.ServiceModel.Description
         //
         // Returns:
         //     Returns true if the flag is enabled; otherwise returns false.
+		[OpenSilver.NotImplemented]
         public virtual bool FaultExceptionEnabled { get; set; }
 
         //
@@ -59,6 +65,7 @@ namespace System.ServiceModel.Description
         //
         //   bindingParameters:
         //     The binding parameters that support modifying the bindings.
+		[OpenSilver.NotImplemented]
         public virtual void AddBindingParameters(ServiceEndpoint endpoint, BindingParameterCollection bindingParameters)
         {
 
@@ -78,6 +85,7 @@ namespace System.ServiceModel.Description
         // Exceptions:
         //   T:System.ArgumentNullException:
         //     Either the endpoint of the clientRuntime is null.
+		[OpenSilver.NotImplemented]
         public virtual void ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime)
         {
 
@@ -92,6 +100,7 @@ namespace System.ServiceModel.Description
         //
         //   endpointDispatcher:
         //     The endpoint dispatcher to which the behavior is applied.
+		[OpenSilver.NotImplemented]
         public virtual void ApplyDispatchBehavior(ServiceEndpoint endpoint, EndpointDispatcher endpointDispatcher)
         {
 
@@ -111,6 +120,7 @@ namespace System.ServiceModel.Description
         //   T:System.InvalidOperationException:
         //     Message headers are included or the a scheme other than HTTP(S) is used or manual
         //     addressing is configured incorrectly.
+		[OpenSilver.NotImplemented]
         public virtual void Validate(ServiceEndpoint endpoint)
         {
 
@@ -125,6 +135,7 @@ namespace System.ServiceModel.Description
         //
         //   clientRuntime:
         //     The client runtime.
+		[OpenSilver.NotImplemented]
         protected virtual void AddClientErrorInspector(ServiceEndpoint endpoint, ClientRuntime clientRuntime)
         {
 
@@ -139,6 +150,7 @@ namespace System.ServiceModel.Description
         //
         // Returns:
         //     A System.ServiceModel.Dispatcher.QueryStringConverter instance.
+		[OpenSilver.NotImplemented]
         protected virtual QueryStringConverter GetQueryStringConverter(OperationDescription operationDescription)
         {
             return null;
@@ -158,6 +170,7 @@ namespace System.ServiceModel.Description
         // Returns:
         //     An System.ServiceModel.Dispatcher.IClientMessageFormatter reference to the reply
         //     formatter on the client for the specified operation and endpoint.
+		[OpenSilver.NotImplemented]
         protected virtual IClientMessageFormatter GetReplyClientFormatter(OperationDescription operationDescription, ServiceEndpoint endpoint)
         {
             return null;
@@ -181,6 +194,7 @@ namespace System.ServiceModel.Description
         // Exceptions:
         //   T:System.NotSupportedException:
         //     The JSON format is not currently supported in Silverlight.
+		[OpenSilver.NotImplemented]
         protected virtual IClientMessageFormatter GetRequestClientFormatter(OperationDescription operationDescription, ServiceEndpoint endpoint)
         {
             return null;
@@ -192,6 +206,7 @@ namespace System.ServiceModel.Description
         // Parameters:
         //   endpoint:
         //     The service endpoint.
+		[OpenSilver.NotImplemented]
         protected virtual void ValidateBinding(ServiceEndpoint endpoint)
         {
 
@@ -204,12 +219,14 @@ namespace System.ServiceModel.Dispatcher
     //
     // Summary:
     //     This class converts a parameter from an object to its query string representation.
+	[OpenSilver.NotImplemented]
     public class QueryStringConverter
     {
         //
         // Summary:
         //     Initializes a new instance of the System.ServiceModel.Dispatcher.QueryStringConverter
         //     class.
+		[OpenSilver.NotImplemented]
         public QueryStringConverter()
         {
 
@@ -225,6 +242,7 @@ namespace System.ServiceModel.Dispatcher
         //
         // Returns:
         //     A value that specifies whether the type can be converted.
+		[OpenSilver.NotImplemented]
         public virtual bool CanConvert(Type type)
         {
             return false;
@@ -242,6 +260,7 @@ namespace System.ServiceModel.Dispatcher
         //
         // Returns:
         //     The parameter name and value.
+		[OpenSilver.NotImplemented]
         public virtual string ConvertValueToString(object parameter, Type parameterType)
         {
             return null;
@@ -299,12 +318,14 @@ namespace System.ServiceModel.Channels
     //
     // Summary:
     //     Enables management of how HTTP cookies are handled in HTTP requests and responses.
+	[OpenSilver.NotImplemented]
     public class HttpCookieContainerBindingElement : BindingElement
     {
         //
         // Summary:
         //     Initializes a new instance of the System.ServiceModel.Channels.HttpCookieContainerBindingElement
         //     class.
+		[OpenSilver.NotImplemented]
         public HttpCookieContainerBindingElement()
         {
 
@@ -317,6 +338,7 @@ namespace System.ServiceModel.Channels
         // Parameters:
         //   elementToBeCloned:
         //     The System.ServiceModel.Channels.BindingElement to be cloned.
+		[OpenSilver.NotImplemented]
         protected HttpCookieContainerBindingElement(HttpCookieContainerBindingElement elementToBeCloned)
         {
 
@@ -343,6 +365,7 @@ namespace System.ServiceModel.Channels
         // Exceptions:
         //   T:System.ArgumentNullException:
         //     context is null.
+		[OpenSilver.NotImplemented]
         public override IChannelFactory<TChannel> BuildChannelFactory<TChannel>(BindingContext context)
         {
             return null;
@@ -354,6 +377,7 @@ namespace System.ServiceModel.Channels
         // Returns:
         //     The System.ServiceModel.Channels.BindingElement object that is a deep clone of
         //     the original.
+		[OpenSilver.NotImplemented]
         public override BindingElement Clone()
         {
             return null;
@@ -377,6 +401,7 @@ namespace System.ServiceModel.Channels
         // Exceptions:
         //   T:System.ArgumentNullException:
         //     context is null.
+		[OpenSilver.NotImplemented]
         public override T GetProperty<T>(BindingContext context)
         {
             return default(T);

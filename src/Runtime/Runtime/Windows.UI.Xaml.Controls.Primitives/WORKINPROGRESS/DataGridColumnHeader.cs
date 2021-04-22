@@ -35,6 +35,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.Primitives.DataGridColumnHeader.SeparatorBrush" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SeparatorBrushProperty = DependencyProperty.Register(nameof(SeparatorBrush), typeof(Brush), typeof(DataGridColumnHeader), null);
 
         /// <summary>
@@ -43,6 +44,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <returns>
         /// The brush used to paint column header separator lines.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public Brush SeparatorBrush
         {
             get => GetValue(SeparatorBrushProperty) as Brush;

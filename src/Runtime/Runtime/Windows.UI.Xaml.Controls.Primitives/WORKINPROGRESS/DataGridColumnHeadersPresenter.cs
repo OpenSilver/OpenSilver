@@ -24,6 +24,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Used within the template of a <see cref="T:System.Windows.Controls.DataGrid" /> to specify the location in the control's visual tree where the column headers are to be added.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public sealed class DataGridColumnHeadersPresenter : Panel
     {
     }

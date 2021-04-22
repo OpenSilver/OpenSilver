@@ -9,9 +9,12 @@ namespace System.Windows.Automation
 namespace Windows.UI.Xaml.Automation
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public static partial class SelectionItemPatternIdentifiers
 	{
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty IsSelectedProperty;
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty SelectionContainerProperty;
 	}
 }

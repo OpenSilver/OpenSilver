@@ -25,11 +25,13 @@ namespace System.Windows.Controls
     //     Represents a control that applies a layout transformation to its Content.
     [TemplatePart(Name = "Presenter", Type = typeof(ContentPresenter))]
     [TemplatePart(Name = "TransformRoot", Type = typeof(Grid))]
+    [OpenSilver.NotImplemented]
     public sealed class LayoutTransformer : ContentControl
     {
         //
         // Summary:
         //     Identifies the LayoutTransform DependencyProperty.
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LayoutTransformProperty =
             DependencyProperty.Register("LayoutTransform",
                                         typeof(Transform),
@@ -39,6 +41,7 @@ namespace System.Windows.Controls
         //
         // Summary:
         //     Initializes a new instance of the LayoutTransformer class.
+        [OpenSilver.NotImplemented]
         public LayoutTransformer()
         {
 
@@ -50,6 +53,7 @@ namespace System.Windows.Controls
         //
         // Remarks:
         //     Corresponds to UIElement.LayoutTransform.
+        [OpenSilver.NotImplemented]
         public Transform LayoutTransform
         {
             get { return (Transform)GetValue(LayoutTransformProperty); }
@@ -64,6 +68,7 @@ namespace System.Windows.Controls
         //     Only used in advanced scenarios (like animating the LayoutTransform). Should
         //     be used to notify the LayoutTransformer control that some aspect of its Transform
         //     property has changed.
+        [OpenSilver.NotImplemented]
         public void ApplyLayoutTransform()
         {
 
@@ -72,6 +77,7 @@ namespace System.Windows.Controls
         // Summary:
         //     Builds the visual tree for the LayoutTransformer control when a new template
         //     is applied.
+        [OpenSilver.NotImplemented]
 #if MIGRATION
         public override void OnApplyTemplate()
 #else
@@ -95,9 +101,10 @@ namespace System.Windows.Controls
         // Remarks:
         //     Using the WPF paramater name finalSize instead of Silverlight's finalSize for
         //     clarity
+        [OpenSilver.NotImplemented]
         protected override Size ArrangeOverride(Size finalSize)
         {
-				return default(Size);
+            return default(Size);
         }
         //
         // Summary:
@@ -110,6 +117,7 @@ namespace System.Windows.Controls
         // Returns:
         //     The size that this element determines it needs during layout, based on its calculations
         //     of child element sizes.
+        [OpenSilver.NotImplemented]
         protected override Size MeasureOverride(Size availableSize)
         {
 			return default(Size);

@@ -36,6 +36,7 @@ namespace Windows.UI.Xaml.Controls
         /// DecimalPlaces decides output format of Value property.
         /// It is implemented via formatString field and FormatValue override.
         /// </remarks>
+        [OpenSilver.NotImplemented]
         public int DecimalPlaces
         {
             get => (int)GetValue(DecimalPlacesProperty);
@@ -45,6 +46,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the DecimalPlaces dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty DecimalPlacesProperty =
             DependencyProperty.Register(
                 "DecimalPlaces",

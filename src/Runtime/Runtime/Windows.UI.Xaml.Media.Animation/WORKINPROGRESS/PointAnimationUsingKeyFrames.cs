@@ -8,7 +8,8 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-    [ContentProperty("KeyFrames")]
+    [ContentProperty("KeyFrames")]  
+    [OpenSilver.NotImplemented]
     public sealed class PointAnimationUsingKeyFrames : Timeline
     {
         private PointKeyFrameCollection _keyFrames;
@@ -17,6 +18,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Initializes a new instance of the <see cref="PointAnimationUsingKeyFrames"/>
         /// class.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public PointAnimationUsingKeyFrames()
         {
 
@@ -30,6 +32,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// The collection of <see cref="PointKeyFrame"/> objects that define
         /// the animation. The default is an empty collection.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public PointKeyFrameCollection KeyFrames
         {
             get 

@@ -24,6 +24,7 @@ namespace System.Windows.Browser
         /// <summary>
         /// Initializes a new instance of the <see cref="HtmlObject"/> class.
         /// </summary>
+		[OpenSilver.NotImplemented]
         protected HtmlObject()
         {
         }
@@ -47,6 +48,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// eventName is null.-or-handler is null.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public bool AttachEvent(string eventName, EventHandler handler)
         {
             return false;
@@ -71,6 +73,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// eventName is null.-or-handler is null.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public bool AttachEvent(string eventName, EventHandler<HtmlEventArgs> handler)
         {
             return false;
@@ -92,6 +95,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// eventName is null.-or-handler is null.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public void DetachEvent(string eventName, EventHandler handler)
         {
         }
@@ -112,6 +116,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// eventName is null.-or-handler is null.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public void DetachEvent(string eventName, EventHandler<HtmlEventArgs> handler)
         {
         }
@@ -131,6 +136,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentException">
         /// In all cases.
         /// </exception>
+		[OpenSilver.NotImplemented]
         protected internal override object ConvertTo(Type targetType, bool allowSerialization)
         {
             return null;

@@ -8,6 +8,7 @@ namespace System.Windows.Input
 namespace Windows.UI.Xaml.Input
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public sealed partial class TouchPointCollection : PresentationFrameworkCollection<TouchPoint>
 	{
 		internal TouchPointCollection()

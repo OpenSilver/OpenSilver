@@ -34,6 +34,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
 	[ContentProperty("Blocks")]
+    [OpenSilver.NotImplemented]
 	public partial class RichTextBox : Control
 	{
 		#region Constructor
@@ -41,6 +42,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RichTextBox"/> class.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public RichTextBox()
         {
 			this.DefaultStyleKey = typeof(RichTextBox);
@@ -53,11 +55,13 @@ namespace Windows.UI.Xaml.Controls
 		/// <summary>
 		/// Occurs when the content changes in a <see cref="RichTextBox"/>.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public event ContentChangedEventHandler ContentChanged;
 
 		/// <summary>
 		/// Occurs when the text selection has changed.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public event RoutedEventHandler SelectionChanged;
 
 		#endregion Public Events
@@ -70,6 +74,7 @@ namespace Windows.UI.Xaml.Controls
 		/// Gets or sets the visibility of the vertical scroll bar.
 		/// The default is <see cref="ScrollBarVisibility.Auto"/>.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public ScrollBarVisibility VerticalScrollBarVisibility
 		{
 			get { return this._verticalScrollBarVisibility; }
@@ -85,6 +90,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <returns>
 		/// The visibility of the horizontal scroll bar. The default is <see cref="ScrollBarVisibility.Hidden"/>.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public ScrollBarVisibility HorizontalScrollBarVisibility
         {
             get { return this._horizontalScrollBarVisibility; }
@@ -97,6 +103,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <returns>
 		/// A <see cref="String"/> object that is a XAML representation of the content in the <see cref="RichTextBox"/>.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public string Xaml
 		{
 			get;
@@ -112,6 +119,7 @@ namespace Windows.UI.Xaml.Controls
 		/// The computed baseline for the first paragraph, or 0 if the <see cref="RichTextBox"/>
 		/// is empty.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public double BaselineOffset { get; }
 
 		/// <summary>
@@ -121,6 +129,7 @@ namespace Windows.UI.Xaml.Controls
 		/// A <see cref="TextSelection"/> that represents the selected text in
 		/// the <see cref="RichTextBox"/>.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public TextSelection Selection { get; }
 
 		/// <summary>
@@ -131,6 +140,7 @@ namespace Windows.UI.Xaml.Controls
 		/// A <see cref="TextPointer"/> that indicates the end of content in the
 		/// <see cref="RichTextBox"/>.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public TextPointer ContentEnd { get; }
 
 		/// <summary>
@@ -141,6 +151,7 @@ namespace Windows.UI.Xaml.Controls
 		/// A <see cref="TextPointer"/> that indicates the start of content in
 		/// the <see cref="RichTextBox"/>.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public TextPointer ContentStart { get; }
 
 		/// <summary>
@@ -150,6 +161,7 @@ namespace Windows.UI.Xaml.Controls
 		/// A <see cref="BlockCollection"/> that contains the contents of the
 		/// <see cref="RichTextBox"/>.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public BlockCollection Blocks { get; }
 
 		#region Dependency Properties
@@ -157,6 +169,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <summary>
 		/// Identifies the <see cref="RichTextBox.IsReadOnly"/> dependency property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty IsReadOnlyProperty =
 			DependencyProperty.Register(
 				"IsReadOnly",
@@ -169,6 +182,7 @@ namespace Windows.UI.Xaml.Controls
 		/// the <see cref="RichTextBox"/>.
 		/// The default is false.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public bool IsReadOnly
 		{
 			get { return (bool)GetValue(IsReadOnlyProperty); }
@@ -178,6 +192,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <summary>
 		/// Identifies the <see cref="RichTextBox.LineHeight"/> dependency property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty LineHeightProperty =
 			DependencyProperty.Register(
 				"LineHeight",
@@ -193,6 +208,7 @@ namespace Windows.UI.Xaml.Controls
 		/// is determined automatically from the current font characteristics. The default
 		/// is 0.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public double LineHeight
 		{
 			get { return (double)this.GetValue(LineHeightProperty); }
@@ -202,6 +218,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <summary>
 		/// Identifies the <see cref="RichTextBox.AcceptsReturn"/> dependency property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty AcceptsReturnProperty =
 			DependencyProperty.Register(
 				"AcceptsReturn",
@@ -218,8 +235,9 @@ namespace Windows.UI.Xaml.Controls
 		/// true if the <see cref="RichTextBox"/> allows newline characters; otherwise,
 		/// false. The default is true.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public bool AcceptsReturn
-        {
+		{
             get { return (bool)this.GetValue(AcceptsReturnProperty); }
             set { this.SetValue(AcceptsReturnProperty, value); }
         }
@@ -227,6 +245,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <summary>
 		/// Identifies the <see cref="RichTextBox.CaretBrush"/> dependency property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty CaretBrushProperty =
 			DependencyProperty.Register(
 				"CaretBrush",
@@ -242,8 +261,9 @@ namespace Windows.UI.Xaml.Controls
 		/// A brush that is used to render the vertical bar that indicates the insertion
 		/// point.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public Brush CaretBrush
-        {
+		{
             get { return (Brush)this.GetValue(CaretBrushProperty); }
             set { this.SetValue(CaretBrushProperty, value); }
         }
@@ -252,6 +272,7 @@ namespace Windows.UI.Xaml.Controls
 		/// Identifies the <see cref="RichTextBox.LineStackingStrategy"/> dependency
 		/// property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty LineStackingStrategyProperty =
 			DependencyProperty.Register(
 				"LineStackingStrategy",
@@ -267,8 +288,9 @@ namespace Windows.UI.Xaml.Controls
 		/// A value that indicates how a line box is determined for each line of text in
 		/// the <see cref="RichTextBox"/>. The default is <see cref="LineStackingStrategy.MaxHeight"/>.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public LineStackingStrategy LineStackingStrategy
-        {
+		{
             get { return (LineStackingStrategy)this.GetValue(LineStackingStrategyProperty); }
             set { this.SetValue(LineStackingStrategyProperty, value); }
         }
@@ -276,6 +298,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <summary>
 		/// Identifies the <see cref="RichTextBox.TextAlignment"/> dependency property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty TextAlignmentProperty =
 			DependencyProperty.Register(
 				"TextAlignment",
@@ -289,8 +312,9 @@ namespace Windows.UI.Xaml.Controls
 		/// <returns>
 		/// One of the <see cref="TextAlignment"/> enumeration values. The default is Left.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public TextAlignment TextAlignment
-        {
+		{
             get { return (TextAlignment)this.GetValue(TextAlignmentProperty); }
             set { this.SetValue(TextAlignmentProperty, value); }
         }
@@ -298,6 +322,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <summary>
 		/// Identifies the <see cref="RichTextBox.TextWrapping"/> dependency property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty TextWrappingProperty =
 			DependencyProperty.Register(
 				"TextWrapping",
@@ -312,6 +337,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <returns>
 		/// One of the <see cref="TextWrapping"/> values. The default is <see cref="TextWrapping.Wrap"/>.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public TextWrapping TextWrapping
         {
             get { return (TextWrapping)this.GetValue(TextWrappingProperty); }
@@ -336,6 +362,7 @@ namespace Windows.UI.Xaml.Controls
 		/// A <see cref="TextPointer"/> that indicates the closest insertion position
 		/// for the specified point.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public TextPointer GetPositionFromPoint(Point point)
 		{
 			return null;
@@ -344,6 +371,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <summary>
 		/// Selects the entire contents in the <see cref="RichTextBox"/>.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public void SelectAll()
 		{
 		}
@@ -361,6 +389,7 @@ namespace Windows.UI.Xaml.Controls
 		/// A <see cref="RichTextBoxAutomationPeer"/> for the <see cref="RichTextBox"/>
 		/// object.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		protected override AutomationPeer OnCreateAutomationPeer()
         {
 			return null;
@@ -373,6 +402,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <param name="e">
 		/// The data for the event.
 		/// </param>
+        [OpenSilver.NotImplemented]
 		protected override void OnGotFocus(RoutedEventArgs e)
         {
         }
@@ -383,6 +413,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <param name="e">
 		/// The data for the event.
 		/// </param>
+        [OpenSilver.NotImplemented]
 #if MIGRATION
 		protected override void OnKeyDown(KeyEventArgs e)
 #else
@@ -397,6 +428,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <param name="e">
 		/// The data for the event.
 		/// </param>
+        [OpenSilver.NotImplemented]
 #if MIGRATION
 		protected override void OnKeyUp(KeyEventArgs e)
 #else
@@ -411,6 +443,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <param name="e">
 		/// The data for the event.
 		/// </param>
+        [OpenSilver.NotImplemented]
 		protected override void OnLostFocus(RoutedEventArgs e)
         {
         }
@@ -421,6 +454,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <param name="e">
 		/// A <see cref="MouseEventArgs"/> that contains the event data.
 		/// </param>
+        [OpenSilver.NotImplemented]
 #if MIGRATION
 		protected override void OnLostMouseCapture(MouseEventArgs e)
 #else
@@ -435,6 +469,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <param name="e">
 		/// The data for the event.
 		/// </param>
+        [OpenSilver.NotImplemented]
 #if MIGRATION
 		protected override void OnMouseEnter(MouseEventArgs e)
 #else
@@ -449,6 +484,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <param name="e">
 		/// The data for the event.
 		/// </param>
+        [OpenSilver.NotImplemented]
 #if MIGRATION
 		protected internal override void OnMouseLeave(MouseEventArgs e)
 #else
@@ -463,6 +499,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <param name="e">
 		/// The data for the event.
 		/// </param>
+        [OpenSilver.NotImplemented]
 #if MIGRATION
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 #else
@@ -477,6 +514,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <param name="e">
 		/// The data for the event.
 		/// </param>
+        [OpenSilver.NotImplemented]
 #if MIGRATION
 		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
 #else
@@ -491,6 +529,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <param name="e">
 		/// The data for the event.
 		/// </param>
+        [OpenSilver.NotImplemented]
 #if MIGRATION
 		protected override void OnMouseMove(MouseEventArgs e)
 #else
@@ -505,6 +544,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <param name="e">
 		/// The data for the event.
 		/// </param>
+        [OpenSilver.NotImplemented]
 		protected override void OnTextInput(TextCompositionEventArgs e)
         {
         }
@@ -515,6 +555,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <param name="e">
 		/// The data for the event.
 		/// </param>
+        [OpenSilver.NotImplemented]
 		protected override void OnTextInputStart(TextCompositionEventArgs e)
         {
         }
@@ -525,6 +566,7 @@ namespace Windows.UI.Xaml.Controls
 		/// <param name="e">
 		/// The data for the event.
 		/// </param>
+        [OpenSilver.NotImplemented]
 		protected override void OnTextInputUpdate(TextCompositionEventArgs e)
         {
         }

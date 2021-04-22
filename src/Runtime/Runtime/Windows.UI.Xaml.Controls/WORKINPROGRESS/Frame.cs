@@ -30,15 +30,19 @@ namespace Windows.UI.Xaml.Controls
 {
     public partial class Frame : ContentControl, INavigate
     {
+        [OpenSilver.NotImplemented]
         public Uri CurrentSource { get; private set; }
 
+        [OpenSilver.NotImplemented]
         public event NavigatingCancelEventHandler Navigating;
 
+        [OpenSilver.NotImplemented]
         public event NavigationStoppedEventHandler NavigationStopped;
 
         /// <summary>
         /// Reloads the current page.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public void Refresh()
         {
         }

@@ -4,7 +4,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-public enum DatePickerFormat
+    public enum DatePickerFormat
     {
         Long,
         Short,

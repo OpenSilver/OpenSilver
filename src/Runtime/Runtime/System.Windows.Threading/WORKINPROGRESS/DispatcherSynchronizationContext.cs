@@ -10,13 +10,16 @@ using Windows.UI.Core;
 
 namespace System.Windows.Threading
 {
+	[OpenSilver.NotImplemented]
     public partial class DispatcherSynchronizationContext : SynchronizationContext
     {
+		[OpenSilver.NotImplemented]
         public DispatcherSynchronizationContext()
         {
 
         }
 
+		[OpenSilver.NotImplemented]
 #if MIGRATION
         public DispatcherSynchronizationContext(Dispatcher dispatcher)
 #else

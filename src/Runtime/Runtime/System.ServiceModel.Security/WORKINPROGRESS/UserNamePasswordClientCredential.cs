@@ -4,6 +4,7 @@ namespace System.ServiceModel.Security
     //
     // Summary:
     //     Represents a client credential based on user name and password.
+	[OpenSilver.NotImplemented]
     public sealed partial class UserNamePasswordClientCredential
     {
         //
@@ -12,6 +13,7 @@ namespace System.ServiceModel.Security
         //
         // Returns:
         //     The password.
+		[OpenSilver.NotImplemented]
         public string Password { get; set; }
         //
         // Summary:
@@ -19,6 +21,7 @@ namespace System.ServiceModel.Security
         //
         // Returns:
         //     The user name.
+		[OpenSilver.NotImplemented]
         public string UserName { get; set; }
     }
 }

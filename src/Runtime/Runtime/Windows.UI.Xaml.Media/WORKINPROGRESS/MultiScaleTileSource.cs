@@ -8,6 +8,7 @@ namespace System.Windows.Media
 	//
 	// Summary:
 	//     Used to specify the source of Deep Zoom images.
+    [OpenSilver.NotImplemented]
 	public abstract partial class MultiScaleTileSource : DependencyObject
 	{
 		//
@@ -34,6 +35,7 @@ namespace System.Windows.Media
 		// Exceptions:
 		//   T:System.ArgumentException:
 		//     One or more arguments are invalid.
+        [OpenSilver.NotImplemented]
 		public MultiScaleTileSource(int imageWidth, int imageHeight, int tileWidth, int tileHeight, int tileOverlap)
 		{
 			
@@ -62,6 +64,7 @@ namespace System.Windows.Media
 		// Exceptions:
 		//   T:System.ArgumentException:
 		//     One or more arguments are invalid.
+        [OpenSilver.NotImplemented]
 		public MultiScaleTileSource(long imageWidth, long imageHeight, int tileWidth, int tileHeight, int tileOverlap)
 		{
 			
@@ -74,6 +77,7 @@ namespace System.Windows.Media
 		//
 		// Returns:
 		//     The amount of time to blend a new level of detail when a tile becomes available.
+        [OpenSilver.NotImplemented]
 		protected TimeSpan TileBlendTime { get; set; }
 
 		//
@@ -92,6 +96,7 @@ namespace System.Windows.Media
 		//
 		//   tileImageLayerSources:
 		//     Source of the tile image layer, which is a collection of URIs.
+        [OpenSilver.NotImplemented]
 		protected abstract void GetTileLayers(int tileLevel, int tilePositionX, int tilePositionY, IList<object> tileImageLayerSources);
 		//
 		// Summary:
@@ -109,6 +114,7 @@ namespace System.Windows.Media
 		//
 		//   tileLayer:
 		//     Layer of the tile.
+        [OpenSilver.NotImplemented]
 		protected void InvalidateTileLayer(int level, int tilePositionX, int tilePositionY, int tileLayer)
 		{
 			

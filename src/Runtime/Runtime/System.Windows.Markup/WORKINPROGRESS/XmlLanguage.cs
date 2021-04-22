@@ -17,10 +17,13 @@
 
 namespace System.Windows.Markup
 {
+	[OpenSilver.NotImplemented]
     public sealed partial class XmlLanguage
     {
+		[OpenSilver.NotImplemented]
         public string IetfLanguageTag { get; private set; }
 
+		[OpenSilver.NotImplemented]
         public static XmlLanguage GetLanguage(string ietfLanguageTag)
         {
             return null;

@@ -9,6 +9,7 @@ namespace Windows.UI.Xaml.Automation
 	// Summary:
 	//     Contains values used as automation property identifiers by UI automation providers
 	//     and UI automation clients.
+    [OpenSilver.NotImplemented]
 	public static partial class AutomationElementIdentifiers
 	{
 		//
@@ -19,6 +20,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty AcceleratorKeyProperty;
 		//
 		// Summary:
@@ -28,6 +30,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty AccessKeyProperty;
 		//
 		// Summary:
@@ -37,6 +40,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty AutomationIdProperty;
 		//
 		// Summary:
@@ -46,6 +50,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty BoundingRectangleProperty;
 		//
 		// Summary:
@@ -55,6 +60,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty ClassNameProperty;
 		//
 		// Summary:
@@ -64,6 +70,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty ClickablePointProperty;
 		//
 		// Summary:
@@ -73,6 +80,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty ControlTypeProperty;
 		//
 		// Summary:
@@ -82,6 +90,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty HasKeyboardFocusProperty;
 		//
 		// Summary:
@@ -90,6 +99,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty HelpTextProperty;
 		//
 		// Summary:
@@ -100,6 +110,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty IsContentElementProperty;
 		//
 		// Summary:
@@ -110,6 +121,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty IsControlElementProperty;
 		//
 		// Summary:
@@ -120,6 +132,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty IsEnabledProperty;
 		//
 		// Summary:
@@ -129,6 +142,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty IsKeyboardFocusableProperty;
 		//
 		// Summary:
@@ -139,6 +153,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty IsOffscreenProperty;
 		//
 		// Summary:
@@ -149,6 +164,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty IsPasswordProperty;
 		//
 		// Summary:
@@ -159,6 +175,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty IsRequiredForFormProperty;
 		//
 		// Summary:
@@ -167,6 +184,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty ItemStatusProperty;
 		//
 		// Summary:
@@ -175,6 +193,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty ItemTypeProperty;
 		//
 		// Summary:
@@ -183,6 +202,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty LabeledByProperty;
 		//
 		// Summary:
@@ -192,6 +212,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty LocalizedControlTypeProperty;
 		//
 		// Summary:
@@ -200,6 +221,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty NameProperty;
 		//
 		// Summary:
@@ -209,6 +231,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty OrientationProperty;
 	}
 }

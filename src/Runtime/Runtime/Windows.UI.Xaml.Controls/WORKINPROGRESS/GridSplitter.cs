@@ -13,6 +13,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     An identifier for the System.Windows.Controls.GridSplitter.PreviewStyle dependency
 		//     property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty PreviewStyleProperty =
 			DependencyProperty.Register("PreviewStyle",
 										typeof(Style),
@@ -25,6 +26,7 @@ namespace System.Windows.Controls
 		//
 		// Returns:
 		//     The style that is used to preview changes.
+        [OpenSilver.NotImplemented]
 		public Style PreviewStyle
 		{
 			get { return (Style)GetValue(PreviewStyleProperty); }

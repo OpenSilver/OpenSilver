@@ -9,8 +9,10 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public static partial class Fonts
 	{
+        [OpenSilver.NotImplemented]
 		public static ICollection<Typeface> SystemTypefaces
 		{
 			get;

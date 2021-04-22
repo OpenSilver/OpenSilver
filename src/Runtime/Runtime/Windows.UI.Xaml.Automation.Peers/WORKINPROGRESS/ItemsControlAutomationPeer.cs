@@ -15,17 +15,21 @@ namespace System.Windows.Automation.Peers
 namespace Windows.UI.Xaml.Automation.Peers
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public abstract partial class ItemsControlAutomationPeer : FrameworkElementAutomationPeer
 	{
+        [OpenSilver.NotImplemented]
 		protected ItemsControlAutomationPeer(ItemsControl owner): base(owner)
 		{
 		}
 
+        [OpenSilver.NotImplemented]
 		protected virtual ItemAutomationPeer CreateItemAutomationPeer(object item)
 		{
 			return null;
 		}
 
+        [OpenSilver.NotImplemented]
 		protected override List<AutomationPeer> GetChildrenCore()
 		{
 			return null;

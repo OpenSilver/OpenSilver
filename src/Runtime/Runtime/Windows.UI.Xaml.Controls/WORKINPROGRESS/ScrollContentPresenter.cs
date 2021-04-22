@@ -14,8 +14,10 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
+	[OpenSilver.NotImplemented]
 	public sealed partial class ScrollContentPresenter : ContentPresenter, IScrollInfo
 	{
+        [OpenSilver.NotImplemented]
 		public Rect MakeVisible(UIElement visual, Rect rectangle)
 		{
 			return default(Rect);

@@ -31,6 +31,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The path to the data-item member to sort by.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public string SortMemberPath { get; set; }
 
         /// <summary>
@@ -40,6 +41,7 @@ namespace Windows.UI.Xaml.Controls
         /// true if the user can drag the column header to a new position; otherwise, false.
         /// The default is the current <see cref="P:System.Windows.Controls.DataGrid.CanUserReorderColumns" /> property value.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public bool CanUserReorder
         {
             get; set;
@@ -52,6 +54,7 @@ namespace Windows.UI.Xaml.Controls
         /// true if the user can resize the column; false if the user cannot resize the column.
         /// The default is the current <see cref="P:System.Windows.Controls.DataGrid.CanUserResizeColumns" /> property value.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public bool CanUserResize
         {
             get; set;
@@ -64,6 +67,7 @@ namespace Windows.UI.Xaml.Controls
         /// true if the user can sort the column; false if the user cannot sort the column.
         /// The default is the current <see cref="P:System.Windows.Controls.DataGrid.CanUserSortColumns" /> property value.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public bool CanUserSort
         {
             get; set;
@@ -85,11 +89,13 @@ namespace Windows.UI.Xaml.Controls
         /// The specified value is <see cref="F:System.Double.NaN" />.
         /// -or-The specified value is <see cref="F:System.Double.PositiveInfinity" />.
         /// </exception>
+        [OpenSilver.NotImplemented]
         public double MinWidth
         {
             get; set;
         }
 
+        [OpenSilver.NotImplemented]
         public double ActualWidth
         {
             get; set;
@@ -107,6 +113,7 @@ namespace Windows.UI.Xaml.Controls
         /// -or-The specified value is less than the <see cref="P:System.Windows.Controls.DataGrid.MinColumnWidth" />
         /// and the <see cref="P:System.Windows.Controls.DataGridColumn.MinWidth" /> is not set.
         /// </exception>
+        [OpenSilver.NotImplemented]
         public double MaxWidth
         {
             get; set;
@@ -137,6 +144,7 @@ namespace Windows.UI.Xaml.Controls
         //     setting this property, the specified value would result in a frozen column being
         //     displayed in the range of unfrozen columns, or an unfrozen column being displayed
         //     in the range of frozen columns.
+        [OpenSilver.NotImplemented]
         public int DisplayIndex { get; set; }
     }
 }

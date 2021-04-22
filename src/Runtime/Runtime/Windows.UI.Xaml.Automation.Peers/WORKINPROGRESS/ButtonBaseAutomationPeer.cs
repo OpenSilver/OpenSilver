@@ -15,6 +15,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 	// Summary:
 	//     Represents a base class for exposing classes derived from System.Windows.Controls.Primitives.ButtonBase
 	//     to UI automation.
+    [OpenSilver.NotImplemented]
 	public abstract partial class ButtonBaseAutomationPeer : FrameworkElementAutomationPeer
 	{
 		//
@@ -25,6 +26,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 		// Parameters:
 		//   owner:
 		//     The System.Windows.Controls.Primitives.ButtonBase to associate with this peer.
+        [OpenSilver.NotImplemented]
 		protected ButtonBaseAutomationPeer(ButtonBase owner): base(owner)
 		{
 		}
@@ -36,6 +38,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 		//
 		// Returns:
 		//     The UI Automation Name for the associated element.
+        [OpenSilver.NotImplemented]
 		protected override string GetNameCore()
 		{
 			return null;

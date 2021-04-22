@@ -20,19 +20,25 @@ namespace System.Windows.Automation.Peers
 namespace Windows.UI.Xaml.Automation.Peers
 #endif
 {
+    [OpenSilver.NotImplemented]
     public class ScrollBarAutomationPeer : RangeBaseAutomationPeer
     {
+        [OpenSilver.NotImplemented]
         public ScrollBarAutomationPeer(ScrollBar owner)
           : base((RangeBase)owner)
         {
         }
 
+        [OpenSilver.NotImplemented]
         protected override string GetClassNameCore() => "ScrollBar";
 
+        [OpenSilver.NotImplemented]
         protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.ScrollBar;
 
+        [OpenSilver.NotImplemented]
         protected override Point GetClickablePointCore() => new Point(double.NaN, double.NaN);
 
+        [OpenSilver.NotImplemented]
         protected override AutomationOrientation GetOrientationCore() => ((ScrollBar)this.Owner).Orientation != Orientation.Horizontal ? AutomationOrientation.Vertical : AutomationOrientation.Horizontal;
     }
 }

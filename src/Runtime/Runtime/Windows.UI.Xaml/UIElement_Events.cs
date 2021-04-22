@@ -180,6 +180,7 @@ namespace Windows.UI.Xaml
         //
         // Returns:
         //     The identifier for the System.Windows.UIElement.MouseRightButtonDown routed event.
+        [OpenSilver.NotImplemented]
         public static readonly RoutedEvent MouseRightButtonDownEvent = new RoutedEvent("MouseRightButtonDownEvent");
 #endif
 #endif
@@ -683,23 +684,27 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Identifies the <see cref="UIElement.MouseWheel"/> routed event.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly RoutedEvent MouseWheelEvent = new RoutedEvent("MouseWheelEvent");
 
         /// <summary>
         /// Occurs when the user rotates the mouse wheel while the mouse pointer is over
         /// a <see cref="UIElement"/>, or the <see cref="UIElement"/> has focus.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public event MouseWheelEventHandler MouseWheel;
 #else
         /// <summary>
         /// Identifies the <see cref="UIElement.PointerWheelChanged"/> routed event.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly RoutedEvent PointWheelEvent = new RoutedEvent("PointWheelEvent");
 
         /// <summary>
         /// Occurs when the user rotates the mouse wheel while the mouse pointer is over
         /// a <see cref="UIElement"/>, or the <see cref="UIElement"/> has focus.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public event PointerEventHandler PointerWheelChanged;
 #endif
 

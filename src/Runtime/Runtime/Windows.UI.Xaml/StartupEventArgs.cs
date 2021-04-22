@@ -37,6 +37,7 @@ namespace Windows.UI.Xaml
         // Returns:
         //     The set of initialization parameters, as a dictionary with key strings and
         //     value strings.
+        [OpenSilver.NotImplemented]
         public IDictionary<string, string> InitParams
         {
             get { return new Dictionary<string, string>(); }

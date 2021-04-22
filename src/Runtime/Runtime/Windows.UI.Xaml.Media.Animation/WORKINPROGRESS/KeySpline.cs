@@ -28,6 +28,7 @@ namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
 #if WORKINPROGRESS
+    [OpenSilver.NotImplemented]
     public sealed partial class KeySpline : DependencyObject
     {
         /// <summary>
@@ -36,6 +37,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <returns>
         /// The first control point used to define a Bezier curve that describes a <see cref="T:System.Windows.Media.Animation.KeySpline" />.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public Point ControlPoint1 { get; set; }
 
         /// <summary>
@@ -44,6 +46,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <returns>
         /// The second control point used to define a Bezier curve that describes a <see cref="T:System.Windows.Media.Animation.KeySpline" />.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public Point ControlPoint2 { get; set; }
     }
 #endif

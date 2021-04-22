@@ -40,6 +40,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Gets or sets the font name.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public FontFamily FontFamily
         {
             get { return (FontFamily)GetValue(FontFamilyProperty); }
@@ -49,6 +50,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the FontFamily dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FontFamilyProperty =
             DependencyProperty.Register(
                 "FontFamily",
@@ -70,6 +72,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         // Use DefaultValue here so undo in the Designer will set this to NaN
         [DefaultValue(double.NaN)]
+        [OpenSilver.NotImplemented]
         public double FontSize
         {
             get
@@ -91,6 +94,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Gets or sets a brush that describes the foreground of the column cells.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public Brush Foreground
         {
             get
@@ -114,6 +118,7 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The style that is used when rendering an editing element. The default is null.
+        [OpenSilver.NotImplemented]
         public Style EditingElementStyle { get; set; }
     }
 }

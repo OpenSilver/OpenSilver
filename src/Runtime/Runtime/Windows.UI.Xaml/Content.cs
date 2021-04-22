@@ -132,6 +132,7 @@ if (requestMethod) { // Native exit full screen.
         /// <returns> 
         /// The zoom setting for the current browser window.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public double ZoomFactor
         {
             get { return 0; }
@@ -146,13 +147,16 @@ if (requestMethod) { // Native exit full screen.
         /// Occurs when the System.Windows.Interop.Content.ActualHeight or the System.Windows.Interop.Content.ActualWidth 
         /// of the Silverlight plug-in change.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public event EventHandler Resized;
 
         /// <summary>
         /// Occurs when the zoom setting in the host browser window changes or is initialized.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public event EventHandler Zoomed;
 
+        [OpenSilver.NotImplemented]
         public event EventHandler FullScreenChanged;
 #endif
     }

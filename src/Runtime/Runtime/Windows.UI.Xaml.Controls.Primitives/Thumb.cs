@@ -203,7 +203,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
 #if WORKINPROGRESS
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty IsFocusedProperty = DependencyProperty.Register("IsFocused", typeof(bool), typeof(Thumb), null);
+        [OpenSilver.NotImplemented]
         public bool IsFocused
         {
             get { return (bool)this.GetValue(IsFocusedProperty); }
