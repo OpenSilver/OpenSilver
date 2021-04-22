@@ -27,6 +27,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Converts the specified string representation of a time to its DateTime equivalent.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public abstract class TimeParser
     {
         /// <summary>
@@ -38,6 +39,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="culture">The culture being used.</param>
         /// <param name="result">The parsed DateTime.</param>
         /// <returns>True if the parse was successful, false if it was not.</returns>
+        [OpenSilver.NotImplemented]
         public virtual bool TryParse(string text, CultureInfo culture, out DateTime? result)
         {
             result = null;

@@ -414,28 +414,36 @@ namespace Windows.UI.Xaml
         #endregion
 
 #if WORKINPROGRESS
+        [OpenSilver.NotImplemented]
         public bool IsActive { get; private set; }
+        [OpenSilver.NotImplemented]
         public bool IsVisible { get; private set; }
 
+        [OpenSilver.NotImplemented]
         public WindowStyle WindowStyle { get; set; }
 
+        [OpenSilver.NotImplemented]
         public static Window GetWindow(DependencyObject dependencyObject)
         {
             return null;
         }
 
+        [OpenSilver.NotImplemented]
         public WindowState WindowState { get; set; }
 
+        [OpenSilver.NotImplemented]
         public void Close()
         {
 
         }
 
+        [OpenSilver.NotImplemented]
         public void DragMove()
         {
 
         }
 
+        [OpenSilver.NotImplemented]
         public void DragResize(WindowResizeEdge resizeEdge)
         {
 

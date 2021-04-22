@@ -40,7 +40,9 @@ namespace Windows.UI.Xaml.Documents
         }
 
 #if WORKINPROGRESS
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CharacterSpacingProperty = DependencyProperty.Register("CharacterSpacing", typeof(int), typeof(TextElement), null);
+        [OpenSilver.NotImplemented]
         public int CharacterSpacing
         {
             get { return (int)this.GetValue(CharacterSpacingProperty); }

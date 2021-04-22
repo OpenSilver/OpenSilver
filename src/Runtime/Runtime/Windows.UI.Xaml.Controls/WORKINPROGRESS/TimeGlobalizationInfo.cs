@@ -30,6 +30,7 @@ namespace Windows.UI.Xaml.Controls
     /// <remarks>TimeInput supports only the following formatting characters:
     /// 'h', 'm', 's', 'H', 't'. All other characters are filtered out:
     /// 'd', 'f', 'F', 'g', 'K', 'M', 'y', 'z'.</remarks>
+    [OpenSilver.NotImplemented]
     public class TimeGlobalizationInfo
     {
         /// <summary>

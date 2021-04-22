@@ -10,6 +10,7 @@ namespace Windows.UI.Xaml.Automation
 	// Summary:
 	//     Contains values used as automation property identifiers specifically for properties
 	//     of the System.Windows.Automation.Provider.ITableProvider pattern.
+    [OpenSilver.NotImplemented]
 	public static class TableItemPatternIdentifiers
 	{
 		//
@@ -19,6 +20,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty ColumnHeaderItemsProperty;
 		//
 		// Summary:
@@ -27,6 +29,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty RowHeaderItemsProperty;
 	}
 }

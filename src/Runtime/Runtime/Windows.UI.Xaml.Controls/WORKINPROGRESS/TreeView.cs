@@ -22,10 +22,13 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
 #if WORKINPROGRESS
+    [OpenSilver.NotImplemented]
     public partial class TreeView : ItemsControl
     {
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register("SelectedItem", typeof(object), typeof(TreeView), null);
 
+        [OpenSilver.NotImplemented]
         public object SelectedItem
         {
             get { return (object)this.GetValue(TreeView.SelectedItemProperty); }
@@ -35,6 +38,7 @@ namespace Windows.UI.Xaml.Controls
         ///     The DependencyProperty for the <see cref="SelectedValue"/> property.
         ///     Default Value: null
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectedValueProperty =
             DependencyProperty.Register("SelectedValue",
                 typeof(object),
@@ -44,6 +48,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         ///     Specifies the a value on the selected item as defined by <see cref="SelectedValuePath" />.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public object SelectedValue
         {
             get { return GetValue(SelectedValueProperty); }
@@ -51,6 +56,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
 #if MIGRATION
+        [OpenSilver.NotImplemented]
         public event RoutedPropertyChangedEventHandler<object> SelectedItemChanged;
 #else
 #endif

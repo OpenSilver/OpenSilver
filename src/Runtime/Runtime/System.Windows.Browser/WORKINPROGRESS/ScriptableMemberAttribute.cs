@@ -6,12 +6,14 @@ namespace System.Windows.Browser
 	//     Indicates that a specific property, method, or event is accessible to JavaScript
 	//     callers.
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Event, AllowMultiple = false, Inherited = true)]
+	[OpenSilver.NotImplemented]
 	public sealed partial class ScriptableMemberAttribute : Attribute
 	{
 		//
 		// Summary:
 		//     Initializes a new instance of the System.Windows.Browser.ScriptableMemberAttribute
 		//     class.
+		[OpenSilver.NotImplemented]
 		public ScriptableMemberAttribute()
 		{
 
@@ -26,6 +28,7 @@ namespace System.Windows.Browser
 		//     true if the HTML bridge feature should automatically generate helper methods
 		//     in the scope of the registered scriptable type; otherwise, false. The default
 		//     is true.
+		[OpenSilver.NotImplemented]
 		public bool EnableCreateableTypes { get; set; }
 		//
 		// Summary:
@@ -42,6 +45,7 @@ namespace System.Windows.Browser
 		//
 		//   T:System.ArgumentNullException:
 		//     The alias is set to null.
+		[OpenSilver.NotImplemented]
 		public string ScriptAlias { get; set; }
 	}
 }

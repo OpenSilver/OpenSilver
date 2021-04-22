@@ -617,22 +617,28 @@ namespace Windows.UI.Xaml.Media.Animation
         }
 #if WORKINPROGRESS
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SpeedRatioProperty = DependencyProperty.Register("SpeedRatio", typeof(double), typeof(Timeline), new PropertyMetadata(1d));
 
+        [OpenSilver.NotImplemented]
         public double SpeedRatio
         {
             get { return (double)this.GetValue(Timeline.SpeedRatioProperty); }
             set { this.SetValue(Timeline.SpeedRatioProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty AutoReverseProperty = DependencyProperty.Register("AutoReverse", typeof(bool), typeof(Timeline), null);
+        [OpenSilver.NotImplemented]
         public bool AutoReverse
         {
             get { return (bool)this.GetValue(AutoReverseProperty); }
             set { this.SetValue(AutoReverseProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FillBehaviorProperty = DependencyProperty.Register("FillBehavior", typeof(FillBehavior), typeof(Timeline), null);
+        [OpenSilver.NotImplemented]
         public FillBehavior FillBehavior
         {
             get { return (FillBehavior)this.GetValue(FillBehaviorProperty); }

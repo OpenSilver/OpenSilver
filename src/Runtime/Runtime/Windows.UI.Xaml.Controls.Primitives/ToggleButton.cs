@@ -480,6 +480,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Called when the ToggleButton receives toggle stimulus.
         /// </summary>
+        [OpenSilver.NotImplemented]
         protected virtual void OnToggle() //todo: see what it is supposed to do and implement it
         {
 

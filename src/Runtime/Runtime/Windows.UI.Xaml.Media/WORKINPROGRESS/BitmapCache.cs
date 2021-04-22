@@ -22,6 +22,7 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
 #if WORKINPROGRESS
+    [OpenSilver.NotImplemented]
     public sealed partial class BitmapCache : CacheMode
     {
     }

@@ -29,6 +29,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
+    [OpenSilver.NotImplemented]
     public partial class ProgressBar : RangeBase
     {
         //public bool IsIndeterminateProperty;

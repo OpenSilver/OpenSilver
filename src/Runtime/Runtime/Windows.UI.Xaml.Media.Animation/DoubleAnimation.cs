@@ -275,7 +275,9 @@ namespace Windows.UI.Xaml.Media.Animation
         }
 
 #if WORKINPROGRESS
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ByProperty = DependencyProperty.Register("By", typeof(double?), typeof(DoubleAnimation), null);
+        [OpenSilver.NotImplemented]
         public double? By
         {
             get { return (double?)this.GetValue(ByProperty); }

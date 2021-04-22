@@ -12,11 +12,16 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public sealed partial class PointAnimation : Timeline
 	{
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty FromProperty = DependencyProperty.Register(nameof(From), typeof(Nullable<Point>), typeof(PointAnimation), new PropertyMetadata());
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty ToProperty = DependencyProperty.Register(nameof(To), typeof(Nullable<Point>), typeof(PointAnimation), new PropertyMetadata());
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty ByProperty = DependencyProperty.Register(nameof(By), typeof(Nullable<Point>), typeof(PointAnimation), new PropertyMetadata());
+        [OpenSilver.NotImplemented]
 		public Nullable<Point> From
 		{
 			get
@@ -30,6 +35,7 @@ namespace Windows.UI.Xaml.Media.Animation
 			}
 		}
 
+        [OpenSilver.NotImplemented]
 		public Nullable<Point> To
 		{
 			get
@@ -43,6 +49,7 @@ namespace Windows.UI.Xaml.Media.Animation
 			}
 		}
 
+        [OpenSilver.NotImplemented]
 		public Nullable<Point> By
 		{
 			get
@@ -56,6 +63,7 @@ namespace Windows.UI.Xaml.Media.Animation
 			}
 		}
 
+        [OpenSilver.NotImplemented]
 		public PointAnimation()
 		{
 		}

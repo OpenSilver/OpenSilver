@@ -49,6 +49,7 @@ namespace System.Windows.Browser
         /// The dispatcher associated with the user interface (UI) thread.
         /// </returns>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
+		[OpenSilver.NotImplemented]
 #if MIGRATION
         public Dispatcher Dispatcher { get; }
 #else
@@ -62,6 +63,7 @@ namespace System.Windows.Browser
         /// A managed object reference if the current <see cref="ScriptObject"/>
         /// wraps a managed type; otherwise, null.
         /// </returns>
+		[OpenSilver.NotImplemented]
         public object ManagedObject { get; }
 
         /// <summary>
@@ -72,6 +74,7 @@ namespace System.Windows.Browser
         /// thread.
         /// </returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
+		[OpenSilver.NotImplemented]
         public bool CheckAccess()
         {
             return false;
@@ -89,6 +92,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentException">
         /// The conversion failed or is not supported.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public T ConvertTo<T>()
         {
             return default(T);
@@ -105,6 +109,7 @@ namespace System.Windows.Browser
         /// A null reference if the property does not exist or
         /// if the underlying <see cref="ScriptObject"/> is a managed type.
         /// </returns>
+		[OpenSilver.NotImplemented]
         public object GetProperty(int index)
         {
             return null;
@@ -127,6 +132,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentException">
         /// name is an empty string.-or-name contains an embedded null character (\0).
         /// </exception>
+		[OpenSilver.NotImplemented]
         public virtual object GetProperty(string name)
         {
             return null;
@@ -156,6 +162,7 @@ namespace System.Windows.Browser
         /// The underlying method invocation results in an error. The .NET Framework attempts
         /// to return the error text that is associated with the error.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public virtual object Invoke(string name, params object[] args)
         {
             return null;
@@ -182,6 +189,7 @@ namespace System.Windows.Browser
         /// The current <see cref="ScriptObject"/> is not a method.-or-The underlying
         /// method invocation results in an error.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public virtual object InvokeSelf(params object[] args)
         {
             return null;
@@ -207,6 +215,7 @@ namespace System.Windows.Browser
         /// A type mismatch exists between the supplied type and the target property.-or-The
         /// property is not settable.-or-All other failures.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public void SetProperty(int index, object value)
         {
         }
@@ -230,6 +239,7 @@ namespace System.Windows.Browser
         /// A type mismatch exists between the supplied type and the target property.-or-The
         /// property is not settable.-or-All other failures.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public virtual void SetProperty(string name, object value)
         {
         }
@@ -251,6 +261,7 @@ namespace System.Windows.Browser
         /// <param name="releaseReferenceOnDispose">
         /// true to release the reference on dispose; otherwise, false.
         /// </param>
+		[OpenSilver.NotImplemented]
         protected void Initialize(IntPtr handle, IntPtr identity, bool addReference, bool releaseReferenceOnDispose)
         {
         }
@@ -272,6 +283,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentException">
         /// The conversion failed or is not supported.
         /// </exception>
+		[OpenSilver.NotImplemented]
         protected internal virtual object ConvertTo(Type targetType, bool allowSerialization)
         {
             return null;

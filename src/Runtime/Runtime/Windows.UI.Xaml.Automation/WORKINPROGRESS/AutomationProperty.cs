@@ -9,6 +9,7 @@ namespace System.Windows.Automation
 namespace Windows.UI.Xaml.Automation
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public partial class AutomationProperty
 	{
 	}

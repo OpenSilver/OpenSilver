@@ -4,12 +4,14 @@ namespace System.ServiceModel.Channels
     //
     // Summary:
     //     Provides a reply that is correlated to an incoming request.
+	[OpenSilver.NotImplemented]
     public abstract partial class RequestContext : IDisposable
     {
         //
         // Summary:
         //     Initializes a new instance of the System.ServiceModel.Channels.RequestContext
         //     class.
+		[OpenSilver.NotImplemented]
         protected RequestContext()
         {
 
@@ -21,12 +23,14 @@ namespace System.ServiceModel.Channels
         //
         // Returns:
         //     The System.ServiceModel.Channels.Message that contains the request.
+		[OpenSilver.NotImplemented]
         public abstract Message RequestMessage { get; }
 
         //
         // Summary:
         //     When overridden in a derived class, aborts processing the request associated
         //     with the context.
+		[OpenSilver.NotImplemented]
         public abstract void Abort();
         //
         // Summary:
@@ -47,6 +51,7 @@ namespace System.ServiceModel.Channels
         //
         // Returns:
         //     The System.IAsyncResult that references the asynchronous reply operation.
+		[OpenSilver.NotImplemented]
         public abstract IAsyncResult BeginReply(Message message, AsyncCallback callback, object state);
         //
         // Summary:
@@ -72,11 +77,13 @@ namespace System.ServiceModel.Channels
         //
         // Returns:
         //     The System.IAsyncResult that references the asynchronous reply operation.
+		[OpenSilver.NotImplemented]
         public abstract IAsyncResult BeginReply(Message message, TimeSpan timeout, AsyncCallback callback, object state);
         //
         // Summary:
         //     When overridden in a derived class, closes the operation that is replying to
         //     the request context associated with the current context.
+		[OpenSilver.NotImplemented]
         public abstract void Close();
         //
         // Summary:
@@ -88,6 +95,7 @@ namespace System.ServiceModel.Channels
         //   timeout:
         //     The System.Timespan that specifies the interval of time within which the reply
         //     operation associated with the current context must close.
+		[OpenSilver.NotImplemented]
         public abstract void Close(TimeSpan timeout);
         //
         // Summary:
@@ -98,6 +106,7 @@ namespace System.ServiceModel.Channels
         //   result:
         //     The System.IAsyncResult returned by a call to one of the Overload:System.ServiceModel.Channels.RequestContext.BeginReply
         //     methods.
+		[OpenSilver.NotImplemented]
         public abstract void EndReply(IAsyncResult result);
         //
         // Summary:
@@ -106,6 +115,7 @@ namespace System.ServiceModel.Channels
         // Parameters:
         //   message:
         //     The incoming System.ServiceModel.Channels.Message that contains the request.
+		[OpenSilver.NotImplemented]
         public abstract void Reply(Message message);
         //
         // Summary:
@@ -119,6 +129,7 @@ namespace System.ServiceModel.Channels
         //   timeout:
         //     The System.Timespan that specifies the interval of time to wait for the reply
         //     to a request.
+		[OpenSilver.NotImplemented]
         public abstract void Reply(Message message, TimeSpan timeout);
         //
         // Summary:
@@ -128,6 +139,7 @@ namespace System.ServiceModel.Channels
         //   disposing:
         //     true to release both managed and unmanaged resources; false to release only unmanaged
         //     resources.
+		[OpenSilver.NotImplemented]
         protected virtual void Dispose(bool disposing)
         {
 

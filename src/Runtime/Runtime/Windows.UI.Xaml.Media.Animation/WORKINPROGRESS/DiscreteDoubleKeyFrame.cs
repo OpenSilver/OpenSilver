@@ -8,8 +8,10 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public sealed partial class DiscreteDoubleKeyFrame : DoubleKeyFrame
 	{
+        [OpenSilver.NotImplemented]
 		public DiscreteDoubleKeyFrame()
 		{
 		}

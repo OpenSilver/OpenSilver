@@ -19,11 +19,13 @@ namespace Windows.UI.Xaml.Media
 	///  Enables you to apply a <see cref="Matrix3D"/> to an object.
 	/// </summary>
 	[ContentProperty("ProjectionMatrix")]
+    [OpenSilver.NotImplemented]
 	public sealed partial class Matrix3DProjection : Projection
 	{
 		/// <summary>
 		/// Initializes a new instance of a <see cref="Matrix3DProjection"/> class.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public Matrix3DProjection()
 		{
 		}
@@ -31,6 +33,7 @@ namespace Windows.UI.Xaml.Media
 		/// <summary>
 		/// Identifies the <see cref="Matrix3DProjection.ProjectionMatrix"/> dependency property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty ProjectionMatrixProperty =
 			DependencyProperty.Register(
 				"ProjectionMatrix", 
@@ -42,6 +45,7 @@ namespace Windows.UI.Xaml.Media
 		/// Gets or sets the <see cref="Matrix3D"/> that is used for the projection
 		/// that is applied to the object.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public Matrix3D ProjectionMatrix
 		{
 			get { return (Matrix3D)this.GetValue(ProjectionMatrixProperty); }

@@ -34,6 +34,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.Primitives.Selector.IsSynchronizedWithCurrentItem" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty IsSynchronizedWithCurrentItemProperty = DependencyProperty.Register(nameof(IsSynchronizedWithCurrentItem), typeof(bool?), typeof(Selector), new PropertyMetadata(OnIsSynchronizedWithCurrentItemChanged));
 
         /// <summary>
@@ -48,6 +49,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <exception cref="T:System.ArgumentException">
         /// <see cref="P:System.Windows.Controls.Primitives.Selector.IsSynchronizedWithCurrentItem" /> is set to true.
         /// </exception>
+        [OpenSilver.NotImplemented]
         public bool? IsSynchronizedWithCurrentItem
         {
             get => (bool?)GetValue(IsSynchronizedWithCurrentItemProperty);

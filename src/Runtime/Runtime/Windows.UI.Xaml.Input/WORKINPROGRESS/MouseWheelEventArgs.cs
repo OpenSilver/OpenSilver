@@ -27,12 +27,14 @@ namespace Windows.UI.Xaml.Input
 #endif
 {
 #if WORKINPROGRESS
+    [OpenSilver.NotImplemented]
 #if MIGRATION
     public partial class MouseWheelEventArgs : MouseEventArgs
 #else
     public partial class MouseWheelEventArgs
 #endif
     {
+        [OpenSilver.NotImplemented]
         public int Delta { get; private set; }
     }
 #endif

@@ -103,6 +103,7 @@ namespace System.Windows.Browser
         }
 
 #if WORKINPROGRESS
+		[OpenSilver.NotImplemented]
         public string CurrentBookmark { get; set; }
 #endif
     }

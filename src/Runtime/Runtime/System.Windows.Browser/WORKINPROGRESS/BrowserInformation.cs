@@ -19,6 +19,7 @@ using System;
 
 namespace System.Windows.Browser
 {
+	[OpenSilver.NotImplemented]
     public sealed partial class BrowserInformation
     {
         //
@@ -28,6 +29,7 @@ namespace System.Windows.Browser
         //
         // Returns:
         //     The version of the underlying browser technology.
+		[OpenSilver.NotImplemented]
         public Version BrowserVersion { get; private set; }
         //
         // Summary:
@@ -35,6 +37,7 @@ namespace System.Windows.Browser
         //
         // Returns:
         //     true if the browser supports cookies; otherwise, false.
+		[OpenSilver.NotImplemented]
         public bool CookiesEnabled { get; private set; }
         //
         // Summary:
@@ -42,6 +45,7 @@ namespace System.Windows.Browser
         //
         // Returns:
         //     The name of the underlying browser technology.
+		[OpenSilver.NotImplemented]
         public string Name { get; private set; }
         //
         // Summary:
@@ -49,6 +53,7 @@ namespace System.Windows.Browser
         //
         // Returns:
         //     The name of the operating system that the browser is running on.
+		[OpenSilver.NotImplemented]
         public string Platform { get; private set; }
         //
         // Summary:
@@ -56,6 +61,7 @@ namespace System.Windows.Browser
         //
         // Returns:
         //     The product name of the browser.
+		[OpenSilver.NotImplemented]
         public string ProductName { get; private set; }
         //
         // Summary:
@@ -63,6 +69,7 @@ namespace System.Windows.Browser
         //
         // Returns:
         //     The product version number of the browser.
+		[OpenSilver.NotImplemented]
         public string ProductVersion { get; private set; }
         //
         // Summary:
@@ -70,6 +77,7 @@ namespace System.Windows.Browser
         //
         // Returns:
         //     The user agent string that identifies the browser.
+		[OpenSilver.NotImplemented]
         public string UserAgent { get; private set; }
 
     }

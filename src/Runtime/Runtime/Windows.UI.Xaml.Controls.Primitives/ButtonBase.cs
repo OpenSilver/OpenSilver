@@ -379,6 +379,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Identifies the <see cref="ButtonBase.IsFocused"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty IsFocusedProperty =
             DependencyProperty.Register("IsFocused",
                                         typeof(bool),
@@ -388,6 +389,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Identifies the <see cref="ButtonBase.IsMouseOver"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty IsMouseOverProperty =
             DependencyProperty.Register("IsMouseOver",
                                         typeof(bool),
@@ -397,6 +399,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Gets a value that determines whether the button has focus.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public bool IsFocused
         {
             get { return (bool)GetValue(IsFocusedProperty); }
@@ -405,6 +408,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Gets a value indicating whether the mouse pointer is located over this button control.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public bool IsMouseOver
         {
             get { return (bool)GetValue(IsMouseOverProperty); }
@@ -415,6 +419,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Called when the value of the <see cref="ButtonBase.IsPressed"/> property changes.
         /// </summary>
         /// <param name="e">The data for <see cref="DependencyPropertyChangedEventArgs"/></param>
+        [OpenSilver.NotImplemented]
         protected virtual void OnIsPressedChanged(DependencyPropertyChangedEventArgs e)
         {
 

@@ -13,6 +13,7 @@ namespace System.Collections.Generic
     //   T:
     //     The type of object contained as items in the thread-safe, read-only collection.
     [ComVisible(false)]
+	[OpenSilver.NotImplemented]
     public partial class SynchronizedReadOnlyCollection<T> : IList<T>, ICollection<T>, IEnumerable<T>, IList, ICollection, IEnumerable
     {
         //
@@ -28,6 +29,7 @@ namespace System.Collections.Generic
         //   list:
         //     The System.Collections.Generic.IEnumerable`1 collection of elements used to initialize
         //     the thread-safe, read-only collection.
+		[OpenSilver.NotImplemented]
         public SynchronizedReadOnlyCollection(object syncRoot, IEnumerable<T> list) { }
 
         //
@@ -40,6 +42,7 @@ namespace System.Collections.Generic
         //
         // Returns:
         //     The element from read-only collection with the specified index.
+		[OpenSilver.NotImplemented]
         public T this[int index]
         {
             get { return default(T); }
@@ -77,6 +80,7 @@ namespace System.Collections.Generic
         //
         // Returns:
         //     The number of elements contained in the thread-safe, read-only collection.
+		[OpenSilver.NotImplemented]
         public int Count { get; }
         //
         // Summary:
@@ -85,6 +89,7 @@ namespace System.Collections.Generic
         // Returns:
         //     The System.Collections.Generic.IList`1 of elements that are contained in the
         //     thread-safe, read-only collection.
+		[OpenSilver.NotImplemented]
         protected IList<T> Items { get; }
 
         int ICollection<T>.Count
@@ -157,6 +162,7 @@ namespace System.Collections.Generic
         // Exceptions:
         //   T:System.ArgumentException:
         //     value is not an object of the type contained in the collection.
+		[OpenSilver.NotImplemented]
         public bool Contains(T value)
         {
             return false;
@@ -172,6 +178,7 @@ namespace System.Collections.Generic
         //
         //   index:
         //     The zero-based index in the array at which copying begins.
+		[OpenSilver.NotImplemented]
         public void CopyTo(T[] array, int index)
         {
 
@@ -183,6 +190,7 @@ namespace System.Collections.Generic
         // Returns:
         //     An System.Collections.Generic.IEnumerator`1 for objects of the type stored in
         //     the collection.
+		[OpenSilver.NotImplemented]
         public IEnumerator<T> GetEnumerator()
         {
             return null;
@@ -197,6 +205,7 @@ namespace System.Collections.Generic
         //
         // Returns:
         //     The zero-based index of the first occurrence of the value in the collection.
+		[OpenSilver.NotImplemented]
         public int IndexOf(T value)
         {
             return -1;

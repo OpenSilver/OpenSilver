@@ -28,6 +28,7 @@ namespace Windows.UI.Xaml
     //
     // Summary:
     //     Provides data for drag-and-drop events in Silverlight.
+	[OpenSilver.NotImplemented]
     public sealed partial class DragEventArgs : RoutedEventArgs
     {
         //
@@ -39,6 +40,7 @@ namespace Windows.UI.Xaml
         // Returns:
         //     The data object that contains the data that is associated with the corresponding
         //     drag event.
+		[OpenSilver.NotImplemented]
         public IDataObject Data { get; private set; }
         //
         // Summary:
@@ -47,6 +49,7 @@ namespace Windows.UI.Xaml
         //
         // Returns:
         //     true if the event is marked handled; otherwise, false. The default value is false.
+		[OpenSilver.NotImplemented]
         public bool Handled { get; set; }
 
         //
@@ -59,6 +62,7 @@ namespace Windows.UI.Xaml
         //
         // Returns:
         //     A drop point that is relative to the element specified in relativeTo.
+		[OpenSilver.NotImplemented]
         public Point GetPosition(UIElement relativeTo)
         {
             return new Point();

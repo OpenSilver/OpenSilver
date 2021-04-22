@@ -22,6 +22,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// ExpandDirection specifies to which direction the content will expand
         /// </summary>
+        [OpenSilver.NotImplemented]
         public ExpandDirection ExpandDirection
         {
             get { return (ExpandDirection)GetValue(ExpandDirectionProperty); }
@@ -32,6 +33,7 @@ namespace Windows.UI.Xaml.Controls
         /// The DependencyProperty for the ExpandDirection property.
         /// Default Value: ExpandDirection.Down
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ExpandDirectionProperty =
                 DependencyProperty.Register(
                         "ExpandDirection",

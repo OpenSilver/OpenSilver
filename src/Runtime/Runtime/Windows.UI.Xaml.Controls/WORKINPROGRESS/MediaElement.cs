@@ -31,6 +31,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Stops and resets media to be played from the beginning.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public void Stop()
         {
             throw new NotImplementedException();

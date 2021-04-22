@@ -24,11 +24,13 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Control that is used to separate items in items controls.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class Separator : Control
     {
         /// <summary>
         /// Initializes a new instance of the Separator class.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public Separator()
         {
             DefaultStyleKey = typeof(Separator);

@@ -10,6 +10,7 @@ namespace System.Reflection.Emit
 	[ClassInterface(ClassInterfaceType.None)]
 	[ComDefaultInterface(typeof(_CustomAttributeBuilder))]
 	[ComVisible(true)]
+	[OpenSilver.NotImplemented]
 	public class CustomAttributeBuilder : _CustomAttributeBuilder
 	{
 		//
@@ -34,6 +35,7 @@ namespace System.Reflection.Emit
 		//
 		//   T:System.ArgumentNullException:
 		//     con or constructorArgs is null.
+		[OpenSilver.NotImplemented]
 		public CustomAttributeBuilder(ConstructorInfo con, object[] constructorArgs)
 		{
 			
@@ -71,6 +73,7 @@ namespace System.Reflection.Emit
 		//
 		//   T:System.ArgumentNullException:
 		//     One of the parameters is null.
+		[OpenSilver.NotImplemented]
 		public CustomAttributeBuilder(ConstructorInfo con, object[] constructorArgs, PropertyInfo[] namedProperties, object[] propertyValues)
 		{
 			
@@ -107,6 +110,7 @@ namespace System.Reflection.Emit
 		//
 		//   T:System.ArgumentNullException:
 		//     One of the parameters is null.
+		[OpenSilver.NotImplemented]
 		public CustomAttributeBuilder(ConstructorInfo con, object[] constructorArgs, FieldInfo[] namedFields, object[] fieldValues)
 		{
 			
@@ -152,6 +156,7 @@ namespace System.Reflection.Emit
 		//
 		//   T:System.ArgumentNullException:
 		//     One of the parameters is null.
+		[OpenSilver.NotImplemented]
 		public CustomAttributeBuilder(ConstructorInfo con, object[] constructorArgs, PropertyInfo[] namedProperties, object[] propertyValues, FieldInfo[] namedFields, object[] fieldValues)
 		{
 			

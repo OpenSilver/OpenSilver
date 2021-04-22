@@ -31,26 +31,31 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Occurs when a different cell becomes the current cell.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public event EventHandler<EventArgs> CurrentCellChanged;
 
         /// <summary>
         ///     Called just before a cell will change to edit mode
         ///     to allow handlers to prevent the cell from entering edit mode.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public event EventHandler<DataGridBeginningEditEventArgs> BeginningEdit;
 
         /// <summary>
         ///     Raised just before cell editing is ended.
         ///     Gives handlers the opportunity to cancel the operation.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public event EventHandler<DataGridCellEditEndingEventArgs> CellEditEnding;
 
         /// <summary>
         ///     Called after a cell has changed to editing mode to allow
         ///     handlers to modify the contents of the cell.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public event EventHandler<DataGridPreparingCellForEditEventArgs> PreparingCellForEdit;
 
+        [OpenSilver.NotImplemented]
         public event EventHandler<DataGridCellEditEndedEventArgs> CellEditEnded;
 
         /// <summary>
@@ -59,6 +64,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The column that contains the current cell.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public DataGridColumn CurrentColumn { get; set; }
 
         /// <summary>
@@ -72,6 +78,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="column">
         /// The column to scroll to.
         /// </param>
+        [OpenSilver.NotImplemented]
         public void ScrollIntoView(object item, DataGridColumn column)
         {
             throw new NotImplementedException();
@@ -83,6 +90,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.RowStyle" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RowStyleProperty = DependencyProperty.Register(nameof(RowStyle), typeof(Style), typeof(DataGrid), new PropertyMetadata(new PropertyChangedCallback(DataGrid.OnRowStylePropertyChanged)));
 
         /// <summary>
@@ -91,11 +99,13 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The style applied to rows. The default is null.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public Style RowStyle
         {
             get => GetValue(RowStyleProperty) as Style;
             set => SetValue(RowStyleProperty, value);
         }
+
 
         private static void OnRowStylePropertyChanged(
             DependencyObject d,
@@ -109,6 +119,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.GridLinesVisibility" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty GridLinesVisibilityProperty = DependencyProperty.Register(nameof(GridLinesVisibility), typeof(DataGridGridLinesVisibility), typeof(DataGrid), new PropertyMetadata(new PropertyChangedCallback(DataGrid.OnGridLinesVisibilityPropertyChanged)));
 
         /// <summary>
@@ -117,11 +128,13 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// One of the enumeration values indicating which grid lines are shown. The default is <see cref="F:System.Windows.Controls.DataGridGridLinesVisibility.All" />.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public DataGridGridLinesVisibility GridLinesVisibility
         {
             get => (DataGridGridLinesVisibility)GetValue(GridLinesVisibilityProperty);
             set => SetValue(GridLinesVisibilityProperty, (object)value);
         }
+
 
         private static void OnGridLinesVisibilityPropertyChanged(
             DependencyObject d,
@@ -135,6 +148,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.RowDetailsVisibilityMode" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RowDetailsVisibilityModeProperty = DependencyProperty.Register(nameof(RowDetailsVisibilityMode), typeof(DataGridRowDetailsVisibilityMode), typeof(DataGrid), new PropertyMetadata(OnRowDetailsVisibilityModePropertyChanged));
 
         /// <summary>
@@ -144,6 +158,7 @@ namespace Windows.UI.Xaml.Controls
         /// An enumeration value that specifies the visibility of row details.
         /// The default is <see cref="F:System.Windows.Controls.DataGridRowDetailsVisibilityMode.VisibleWhenSelected" />.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public DataGridRowDetailsVisibilityMode RowDetailsVisibilityMode
         {
             get => (DataGridRowDetailsVisibilityMode)GetValue(RowDetailsVisibilityModeProperty);
@@ -162,6 +177,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.VerticalScrollBarVisibility" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty VerticalScrollBarVisibilityProperty = DependencyProperty.Register(nameof(VerticalScrollBarVisibility), typeof(ScrollBarVisibility), typeof(DataGrid), new PropertyMetadata(new PropertyChangedCallback(DataGrid.OnVerticalScrollBarVisibilityPropertyChanged)));
 
         /// <summary>
@@ -171,6 +187,7 @@ namespace Windows.UI.Xaml.Controls
         /// One of the enumeration values that specifies the vertical scroll bar visibility.
         /// The default is <see cref="F:System.Windows.Controls.ScrollBarVisibility.Auto" />.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public ScrollBarVisibility VerticalScrollBarVisibility
         {
             get => (ScrollBarVisibility)GetValue(VerticalScrollBarVisibilityProperty);
@@ -189,6 +206,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.HorizontalScrollBarVisibility" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty HorizontalScrollBarVisibilityProperty = DependencyProperty.Register(nameof(HorizontalScrollBarVisibility), typeof(ScrollBarVisibility), typeof(DataGrid), new PropertyMetadata(new PropertyChangedCallback(DataGrid.OnHorizontalScrollBarVisibilityPropertyChanged)));
 
         /// <summary>
@@ -198,6 +216,7 @@ namespace Windows.UI.Xaml.Controls
         /// One of the enumeration values that specifies the horizontal scroll bar visibility.
         /// The default is <see cref="F:System.Windows.Controls.ScrollBarVisibility.Auto" />.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public ScrollBarVisibility HorizontalScrollBarVisibility
         {
             get => (ScrollBarVisibility)GetValue(HorizontalScrollBarVisibilityProperty);
@@ -216,6 +235,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.CanUserReorderColumns" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CanUserReorderColumnsProperty = DependencyProperty.Register(nameof(CanUserReorderColumns), typeof(bool), typeof(DataGrid), null);
 
         /// <summary>
@@ -224,6 +244,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// true if the user can reorder columns; otherwise, false.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public bool CanUserReorderColumns
         {
             get => (bool)GetValue(CanUserReorderColumnsProperty);
@@ -236,6 +257,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.HeadersVisibility" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty HeadersVisibilityProperty = DependencyProperty.Register(nameof(HeadersVisibility), typeof(DataGridHeadersVisibility), typeof(DataGrid), new PropertyMetadata(new PropertyChangedCallback(DataGrid.OnHeadersVisibilityPropertyChanged)));
 
         /// <summary>
@@ -245,6 +267,7 @@ namespace Windows.UI.Xaml.Controls
         /// One of the enumeration values that indicates the visibility of row and column headers.
         /// The default is <see cref="F:System.Windows.Controls.DataGridHeadersVisibility.Column" />.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public DataGridHeadersVisibility HeadersVisibility
         {
             get => (DataGridHeadersVisibility)GetValue(HeadersVisibilityProperty);
@@ -263,6 +286,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.CanUserResizeColumns" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CanUserResizeColumnsProperty = DependencyProperty.Register(nameof(CanUserResizeColumns), typeof(bool), typeof(DataGrid), new PropertyMetadata(new PropertyChangedCallback(DataGrid.OnCanUserResizeColumnsPropertyChanged)));
 
         /// <summary>
@@ -271,6 +295,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// true if the user can resize columns; otherwise, false. The default is true.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public bool CanUserResizeColumns
         {
             get => (bool)GetValue(CanUserResizeColumnsProperty);
@@ -289,6 +314,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.RowDetailsTemplate" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RowDetailsTemplateProperty = DependencyProperty.Register(nameof(RowDetailsTemplate), typeof(DataTemplate), typeof(DataGrid), new PropertyMetadata(new PropertyChangedCallback(DataGrid.OnRowDetailsTemplatePropertyChanged)));
 
         /// <summary>
@@ -297,6 +323,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The template that is used to display row details. The default is null.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public DataTemplate RowDetailsTemplate
         {
             get => GetValue(RowDetailsTemplateProperty) as DataTemplate;
@@ -316,6 +343,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.ColumnWidth" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ColumnWidthProperty = DependencyProperty.Register(nameof(ColumnWidth), typeof(DataGridLength), typeof(DataGrid), new PropertyMetadata((object)DataGridLength.Auto, DataGrid.OnColumnWidthPropertyChanged));
 
         /// <summary>
@@ -325,6 +353,7 @@ namespace Windows.UI.Xaml.Controls
         /// A structure that represents the standard width or automatic sizing mode of columns in the <see cref="T:System.Windows.Controls.DataGrid" />.
         /// The default is <see cref="P:System.Windows.Controls.DataGridLength.Auto" />.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public DataGridLength ColumnWidth
         {
             get => (DataGridLength)GetValue(ColumnWidthProperty);
@@ -344,6 +373,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.FrozenColumnCount" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FrozenColumnCountProperty = DependencyProperty.Register(nameof(FrozenColumnCount), typeof(int), typeof(DataGrid), new PropertyMetadata(new PropertyChangedCallback(DataGrid.OnFrozenColumnCountPropertyChanged)));
 
         /// <summary>
@@ -352,6 +382,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The number of non-scrolling columns.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public int FrozenColumnCount
         {
             get => (int)GetValue(FrozenColumnCountProperty);
@@ -371,6 +402,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.MinColumnWidth" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty MinColumnWidthProperty = DependencyProperty.Register(nameof(MinColumnWidth), typeof(double), typeof(DataGrid), new PropertyMetadata((object)20.0, new PropertyChangedCallback(DataGrid.OnMinColumnWidthPropertyChanged)));
 
         /// <summary>
@@ -382,6 +414,7 @@ namespace Windows.UI.Xaml.Controls
         /// <exception cref="T:System.ArgumentOutOfRangeException">
         /// When setting this property, the specified value is less than zero or greater than <see cref="P:System.Windows.Controls.DataGrid.MaxColumnWidth" />.
         /// </exception>
+        [OpenSilver.NotImplemented]
         public double MinColumnWidth
         {
             get => (double)GetValue(MinColumnWidthProperty);
@@ -398,6 +431,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         ///     The default height of a row.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double RowHeight
         {
             get { return (double)GetValue(RowHeightProperty); }
@@ -407,11 +441,13 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         ///     The DependencyProperty for RowHeight.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RowHeightProperty = DependencyProperty.Register(nameof(RowHeight), typeof(double), typeof(DataGrid), new PropertyMetadata(double.NaN, new PropertyChangedCallback(DataGrid.OnNotifyCellsPresenterPropertyChanged)));
 
         /// <summary>
         ///     The default minimum height of a row.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double MinRowHeight
         {
             get { return (double)GetValue(MinRowHeightProperty); }
@@ -421,6 +457,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         ///     The DependencyProperty for MinRowHeight.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty MinRowHeightProperty = DependencyProperty.Register(nameof(MinRowHeight), typeof(double), typeof(DataGrid), new PropertyMetadata(0.0, new PropertyChangedCallback(DataGrid.OnNotifyCellsPresenterPropertyChanged)));
 
         /// <summary>
@@ -437,6 +474,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.CanUserSortColumns" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CanUserSortColumnsProperty = DependencyProperty.Register(nameof(CanUserSortColumns), typeof(bool), typeof(DataGrid), null);
 
         /// <summary>
@@ -445,6 +483,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// true if the user can sort columns; otherwise, false. The default is true.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public bool CanUserSortColumns
         {
             get => (bool)GetValue(CanUserSortColumnsProperty);
@@ -457,6 +496,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.DragIndicatorStyle" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty DragIndicatorStyleProperty = DependencyProperty.Register(nameof(DragIndicatorStyle), typeof(Style), typeof(DataGrid), null);
 
         /// <summary>
@@ -465,6 +505,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The style applied to column headers.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public Style DragIndicatorStyle
         {
             get => GetValue(DragIndicatorStyleProperty) as Style;
@@ -477,6 +518,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.DropLocationIndicatorStyle" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty DropLocationIndicatorStyleProperty = DependencyProperty.Register(nameof(DropLocationIndicatorStyle), typeof(Style), typeof(DataGrid), null);
 
         /// <summary>
@@ -485,6 +527,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The style applied to column headers.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public Style DropLocationIndicatorStyle
         {
             get => GetValue(DropLocationIndicatorStyleProperty) as Style;
@@ -499,6 +542,7 @@ namespace Windows.UI.Xaml.Controls
         ///     If a cell is not currently being edited, then commits any pending rows.
         /// </summary>
         /// <returns>true if the current cell or row exits edit mode, false otherwise.</returns>
+        [OpenSilver.NotImplemented]
         public bool CommitEdit()
         {
             //if (IsEditingCurrentCell)
@@ -521,6 +565,7 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     true if the data grid enters editing mode; otherwise, false.
+        [OpenSilver.NotImplemented]
         public bool BeginEdit()
         {
             return false;
@@ -534,6 +579,7 @@ namespace Windows.UI.Xaml.Controls
         // Returns:
         //     true if the row details sections are prevented from scrolling horizontally; otherwise,
         //     false. The default is false.
+        [OpenSilver.NotImplemented]
         public bool AreRowDetailsFrozen { get; set; }
 
         //
@@ -542,11 +588,13 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     true if the data is valid; otherwise, false.
+        [OpenSilver.NotImplemented]
         public bool IsValid { get; }
-    
+
         //
         // Summary:
         //     Occurs when a row edit has been committed or canceled.
+        [OpenSilver.NotImplemented]
         public event EventHandler<DataGridRowEditEndedEventArgs> RowEditEnded;
     }
 }

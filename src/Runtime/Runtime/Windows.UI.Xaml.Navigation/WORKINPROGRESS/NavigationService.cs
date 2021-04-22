@@ -23,15 +23,19 @@ namespace System.Windows.Navigation
 namespace Windows.UI.Xaml.Navigation
 #endif
 {
+    [OpenSilver.NotImplemented]
     public sealed class NavigationService
     {
+        [OpenSilver.NotImplemented]
         public bool CanGoBack { get; }
 
+        [OpenSilver.NotImplemented]
         public void GoBack()
         {
 
         }
 
+        [OpenSilver.NotImplemented]
         public bool Navigate(Uri source)
         {
             return false;
@@ -39,11 +43,13 @@ namespace Windows.UI.Xaml.Navigation
 
         /// <summary>Gets or sets the uniform resource identifier (URI) of the current content or the content that is being navigated to.</summary>
         /// <returns>A value that represents the URI of the current content or the content that is being navigated to.</returns>
+        [OpenSilver.NotImplemented]
         public Uri Source { get; set; }
 
         /// <summary>
         /// Reloads the current page. 
         /// </summary>
+        [OpenSilver.NotImplemented]
         public void Refresh()
         {
         }

@@ -21,6 +21,7 @@ namespace System.Windows.Media.Media3D
 namespace Windows.UI.Xaml.Media.Media3D
 #endif
 {
+	[OpenSilver.NotImplemented]
     public partial struct Matrix3D : IFormattable
     {
         static Matrix3D()
@@ -46,91 +47,109 @@ namespace Windows.UI.Xaml.Media.Media3D
         private static Matrix3D _identity;
         private bool _hasInverse;
         
+		[OpenSilver.NotImplemented]
         public double M11
         {
             get { return _m11; }
             set { _m11 = value; }
         }
+		[OpenSilver.NotImplemented]
         public double M12
         {
             get { return _m12; }
             set { _m12 = value; }
         }
+		[OpenSilver.NotImplemented]
         public double M13
         {
             get { return _m13; }
             set { _m13 = value; }
         }
+		[OpenSilver.NotImplemented]
         public double M14
         {
             get { return _m14; }
             set { _m14 = value; }
         }
+		[OpenSilver.NotImplemented]
         public double M21
         {
             get { return _m21; }
             set { _m21 = value; }
         }
+		[OpenSilver.NotImplemented]
         public double M22
         {
             get { return _m22; }
             set { _m22 = value; }
         }
+		[OpenSilver.NotImplemented]
         public double M23
         {
             get { return _m23; }
             set { _m23 = value; }
         }
+		[OpenSilver.NotImplemented]
         public double M24
         {
             get { return _m24; }
             set { _m24 = value; }
         }
+		[OpenSilver.NotImplemented]
         public double M31
         {
             get { return _m31; }
             set { _m31 = value; }
         }
+		[OpenSilver.NotImplemented]
         public double M32
         {
             get { return _m32; }
             set { _m32 = value; }
         }
+		[OpenSilver.NotImplemented]
         public double M33
         {
             get { return _m33; }
             set { _m33 = value; }
         }
+		[OpenSilver.NotImplemented]
         public double OffsetX
         {
             get { return _offsetX; }
             set { _offsetX = value; }
         }
+		[OpenSilver.NotImplemented]
         public double OffsetY
         {
             get { return _offsetY; }
             set { _offsetY = value; }
         }
+		[OpenSilver.NotImplemented]
         public double OffsetZ
         {
             get { return _offsetZ; }
             set { _offsetZ = value; }
         }
+		[OpenSilver.NotImplemented]
         public double M44
         {
             get { return _m44; }
             set { _m44 = value; }
         }
+		[OpenSilver.NotImplemented]
         public static Matrix3D Identity
         {
             get { return _identity; }
         }
+		[OpenSilver.NotImplemented]
         public bool HasInverse
         {
             get { return _hasInverse; }
         }
         
 
+		[OpenSilver.NotImplemented]
         public Matrix3D(double @m11, double @m12, double @m13, double @m14, double @m21, double @m22, double @m23, double @m24, double @m31, double @m32, double @m33, double @m34, double @offsetX, double @offsetY, double @offsetZ, double @m44)
         {
             _m11 = @m11;
@@ -150,10 +169,12 @@ namespace Windows.UI.Xaml.Media.Media3D
             _m44 = @m44;
             _hasInverse = false;
         }
+		[OpenSilver.NotImplemented]
         public override string ToString()
         {
             return "";
         }
+		[OpenSilver.NotImplemented]
         public string ToString(IFormatProvider @provider)
         {
             return "";
@@ -162,10 +183,12 @@ namespace Windows.UI.Xaml.Media.Media3D
         {
             return "";
         }
-        public static Matrix3D operator*(Matrix3D @matrix1, Matrix3D @matrix2)
+		[OpenSilver.NotImplemented]
+        public static Matrix3D operator *(Matrix3D @matrix1, Matrix3D @matrix2)
         {
             return new Matrix3D();
         }
+		[OpenSilver.NotImplemented]
         public void Invert()
         {
         }

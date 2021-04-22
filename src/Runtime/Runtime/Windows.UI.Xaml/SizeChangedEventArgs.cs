@@ -52,6 +52,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Gets the previous size of the object reporting the size change.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public Size PreviousSize { get; private set; }
 #endif
     }

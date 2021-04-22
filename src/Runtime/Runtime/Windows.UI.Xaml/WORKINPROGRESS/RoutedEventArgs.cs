@@ -38,6 +38,7 @@ namespace Windows.UI.Xaml
         ///     Initially starts with a false value before routing
         ///     has begun
         /// </remarks>
+		[OpenSilver.NotImplemented]
         public bool Handled { get; set; }
     }
 }

@@ -26,11 +26,13 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Represents a non-scrollable grid that contains <see cref="T:System.Windows.Controls.DataGrid" /> row headers.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class DataGridFrozenGrid : Grid
     {
         /// <summary>
         /// Identifies the <see cref="P:System.Windows.Controls.Primitives.DataGridFrozenGrid.IsFrozen" /> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty IsFrozenProperty = DependencyProperty.RegisterAttached("IsFrozen", typeof(bool), typeof(DataGridFrozenGrid), null);
 
         /// <summary>
@@ -45,6 +47,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <exception cref="T:System.ArgumentNullException">
         /// <paramref name="element" /> is null.
         /// </exception>
+        [OpenSilver.NotImplemented]
         public static bool GetIsFrozen(DependencyObject element) => (bool?) element?.GetValue(IsFrozenProperty) ?? throw new ArgumentNullException(nameof(element));
 
         /// <summary>
@@ -59,6 +62,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <exception cref="T:System.ArgumentNullException">
         /// <paramref name="element" /> is null.
         /// </exception>
+        [OpenSilver.NotImplemented]
         public static void SetIsFrozen(DependencyObject element, bool value)
         {
             if (element == null)

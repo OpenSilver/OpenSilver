@@ -37,6 +37,7 @@ namespace System.ComponentModel.Composition.Hosting
         /// class using the XAP file at the specified relative URI.
         /// </summary>
         /// <param name="uriRelative">The URI of the XAP file.</param>
+		[OpenSilver.NotImplemented]
         public DeploymentCatalog(string uriRelative)
         {
             this._uri = new Uri(uriRelative, UriKind.Relative);
@@ -47,6 +48,7 @@ namespace System.ComponentModel.Composition.Hosting
         /// class using the XAP file at the specified URI.
         /// </summary>
         /// <param name="uri">The URI of the XAP file.</param>
+		[OpenSilver.NotImplemented]
         public DeploymentCatalog(Uri uri)
         {
             this._uri = uri;
@@ -95,6 +97,7 @@ namespace System.ComponentModel.Composition.Hosting
         /// <summary>
         /// Occurs when the XAP file has finished downloading, or there has been an error.
         /// </summary>
+		[OpenSilver.NotImplemented]
         public event EventHandler<AsyncCompletedEventArgs> DownloadCompleted
         {
             add
@@ -110,6 +113,7 @@ namespace System.ComponentModel.Composition.Hosting
         /// <summary>
         /// Occurs when the download progress of the XAP file changes.
         /// </summary>
+		[OpenSilver.NotImplemented]
         public event EventHandler<DownloadProgressChangedEventArgs> DownloadProgressChanged
         {
             add
@@ -129,6 +133,7 @@ namespace System.ComponentModel.Composition.Hosting
         /// The method is called before <see cref="DeploymentCatalog.DownloadAsync"/>
         /// or after the <see cref="DeploymentCatalog.DownloadCompleted"/> event has occurred.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public void CancelAsync()
         {
             throw new NotImplementedException("The method or operation is not implemented.");
@@ -141,6 +146,7 @@ namespace System.ComponentModel.Composition.Hosting
         /// This method is called more than once, or after the <see cref="DeploymentCatalog.CancelAsync"/>
         /// method.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public void DownloadAsync()
         {
             throw new NotImplementedException("The method or operation is not implemented.");
@@ -239,6 +245,7 @@ namespace System.ComponentModel.Composition.Hosting
         /// <param name="e">
         /// A <see cref="AsyncCompletedEventArgs"/> object that contains the event data.
         /// </param>
+		[OpenSilver.NotImplemented]
         protected virtual void OnDownloadCompleted(AsyncCompletedEventArgs e)
         {
             throw new NotImplementedException("The method or operation is not implemented.");
@@ -250,6 +257,7 @@ namespace System.ComponentModel.Composition.Hosting
         /// <param name="e">
         /// A <see cref="DownloadProgressChangedEventArgs"/> object that contains the event data.
         /// </param>
+		[OpenSilver.NotImplemented]
         protected virtual void OnDownloadProgressChanged(DownloadProgressChangedEventArgs e)
         {
             throw new NotImplementedException("The method or operation is not implemented.");

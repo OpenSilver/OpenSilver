@@ -9,6 +9,7 @@ namespace Windows.UI.Xaml.Automation
 	// Summary:
 	//     Contains values used as automation property identifiers specifically for properties
 	//     of the System.Windows.Automation.Provider.IWindowProvider pattern.
+    [OpenSilver.NotImplemented]
 	public static partial class WindowPatternIdentifiers
 	{
 		//
@@ -18,6 +19,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty CanMaximizeProperty;
 		//
 		// Summary:
@@ -26,6 +28,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty CanMinimizeProperty;
 		//
 		// Summary:
@@ -34,6 +37,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty IsModalProperty;
 		//
 		// Summary:
@@ -42,6 +46,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty IsTopmostProperty;
 		//
 		// Summary:
@@ -50,6 +55,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty WindowInteractionStateProperty;
 		//
 		// Summary:
@@ -58,6 +64,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty WindowVisualStateProperty;
 	}
 }

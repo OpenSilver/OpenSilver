@@ -23,6 +23,7 @@ namespace Windows.UI.Xaml.Data
 {
 	public partial class Binding
 	{
+        [OpenSilver.NotImplemented]
 		public Binding(Binding original)
 		{
 			original?.CopyTo(this);
@@ -35,6 +36,7 @@ namespace Windows.UI.Xaml.Data
         /// <returns>
         /// true if the binding binds directly to the data source; otherwise, false.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public bool BindsDirectlyToSource { get; set; }
 
         /// <summary>
@@ -46,6 +48,7 @@ namespace Windows.UI.Xaml.Data
         /// true if the binding engine will report System.ComponentModel.INotifyDataErrorInfo
         /// validation errors; otherwise, false. The default is true.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public bool ValidatesOnNotifyDataErrors { get; set; }
 
         /// <summary>
@@ -57,6 +60,7 @@ namespace Windows.UI.Xaml.Data
         /// true if the binding engine will report System.ComponentModel.IDataErrorInfo validation
         /// errors; otherwise, false. The default is false.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public bool ValidatesOnDataErrors { get; set; }
     }
 }

@@ -23,6 +23,7 @@ namespace Windows.UI
 		//
 		// Returns:
 		//     The string representation of the color.
+		[OpenSilver.NotImplemented]
 		public string ToString(IFormatProvider provider)
 		{
 			return default(string);

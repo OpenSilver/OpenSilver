@@ -9,6 +9,7 @@ namespace Windows.UI.Xaml.Documents
 	/// <summary>
 	/// Represents a collection of <see cref="Block"/> elements.
 	/// </summary>
+    [OpenSilver.NotImplemented]
 	public sealed class BlockCollection : TextElementCollection<Block>
 	{
 		internal BlockCollection(DependencyObject owner, bool isOwnerParent) : base(owner)

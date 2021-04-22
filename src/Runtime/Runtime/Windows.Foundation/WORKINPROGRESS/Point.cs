@@ -20,6 +20,7 @@ namespace Windows.Foundation
 		/// A System.String containing the Windows.Foundation.Point.X and Windows.Foundation.Point.Y
 		/// values of this Windows.Foundation.Point structure.
 		/// </returns>
+		[OpenSilver.NotImplemented]
 		public string ToString(IFormatProvider provider)
 		{
 			return default(string);

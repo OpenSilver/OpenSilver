@@ -14,12 +14,14 @@ namespace Windows.UI.Xaml.Printing
 	//
 	// Summary:
 	//     Provides data for the System.Windows.Printing.PrintDocument.PrintPage event.
+	[OpenSilver.NotImplemented]
 	public sealed partial class PrintPageEventArgs : EventArgs
 	{
 		//
 		// Summary:
 		//     Initializes a new instance of the System.Windows.Printing.PrintPageEventArgs
 		//     class.
+		[OpenSilver.NotImplemented]
 		public PrintPageEventArgs()
 		{
 		}
@@ -31,6 +33,7 @@ namespace Windows.UI.Xaml.Printing
 		// Returns:
 		//     true if there are additional pages to print; otherwise, false. The default is
 		//     false.
+		[OpenSilver.NotImplemented]
 		public bool HasMorePages
 		{
 			get;
@@ -43,6 +46,7 @@ namespace Windows.UI.Xaml.Printing
 		//
 		// Returns:
 		//     The margins of the page that is currently printing.
+		[OpenSilver.NotImplemented]
 		public Thickness PageMargins
 		{
 			get;
@@ -55,6 +59,7 @@ namespace Windows.UI.Xaml.Printing
 		//
 		// Returns:
 		//     The visual element to print. The default is null.
+		[OpenSilver.NotImplemented]
 		public UIElement PageVisual
 		{
 			get;
@@ -67,6 +72,7 @@ namespace Windows.UI.Xaml.Printing
 		//
 		// Returns:
 		//     The size of the printable area in screen pixels. The default is 0.0F.
+		[OpenSilver.NotImplemented]
 		public Size PrintableArea
 		{
 			get;

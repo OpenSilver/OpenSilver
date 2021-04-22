@@ -24,6 +24,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a control that contains a header and collection of items.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class HeaderedItemsControl : ItemsControl
     {
     }

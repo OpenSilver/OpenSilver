@@ -10,6 +10,7 @@ namespace System.Reflection.Emit
 	[ClassInterface(ClassInterfaceType.None)]
 	[ComDefaultInterface(typeof(_ParameterBuilder))]
 	[ComVisible(true)]
+	[OpenSilver.NotImplemented]
 	public class ParameterBuilder : _ParameterBuilder
 	{
 		//
@@ -18,6 +19,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     Read-only. Retrieves the attributes for this parameter.
+		[OpenSilver.NotImplemented]
 		public virtual int Attributes { get; }
 		//
 		// Summary:
@@ -25,6 +27,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     Retrieves whether this is an input parameter.
+		[OpenSilver.NotImplemented]
 		public bool IsIn { get; }
 		//
 		// Summary:
@@ -32,6 +35,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     A value that indicates whether this parameter is optional.
+		[OpenSilver.NotImplemented]
 		public bool IsOptional { get; }
 		//
 		// Summary:
@@ -39,6 +43,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     Retrieves whether this parameter is an output parameter.
+		[OpenSilver.NotImplemented]
 		public bool IsOut { get; }
 		//
 		// Summary:
@@ -46,6 +51,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     The name of this parameter.
+		[OpenSilver.NotImplemented]
 		public virtual string Name { get; }
 		//
 		// Summary:
@@ -53,6 +59,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     The signature position for this parameter.
+		[OpenSilver.NotImplemented]
 		public virtual int Position { get; }
 
 		//
@@ -61,6 +68,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     The token for this parameter.
+		[OpenSilver.NotImplemented]
 		public virtual ParameterToken GetToken()
 		{
 			return default(ParameterToken);
@@ -80,6 +88,7 @@ namespace System.Reflection.Emit
 		//     or other reference type, defaultValue is not null, and the value cannot be assigned
 		//     to the reference type.
 		[SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
 		public virtual void SetConstant(object defaultValue)
 		{
 			
@@ -96,6 +105,7 @@ namespace System.Reflection.Emit
 		//   T:System.ArgumentNullException:
 		//     con is null.
 		[SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
 		public void SetCustomAttribute(CustomAttributeBuilder customBuilder)
 		{
 			

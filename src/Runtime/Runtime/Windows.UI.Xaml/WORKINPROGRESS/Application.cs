@@ -42,6 +42,7 @@ namespace Windows.UI.Xaml
         //
         //   T:System.UnauthorizedAccessException:
         //     The current thread is not the user interface (UI) thread.
+		[OpenSilver.NotImplemented]
         public WindowCollection Windows { get; }
 
         /// <summary>
@@ -66,11 +67,13 @@ namespace Windows.UI.Xaml
         //#endif
         //        }
 
+		[OpenSilver.NotImplemented]
         public bool IsRunningOutOfBrowser
         {
             get { return false; }
         }
 
+		[OpenSilver.NotImplemented]
         public bool HasElevatedPermissions { get; set; }
 
         ApplicationLifetimeObjectsCollection lifetime_objects;
@@ -86,6 +89,7 @@ namespace Windows.UI.Xaml
             } 
         }
 
+		[OpenSilver.NotImplemented]
         public static StreamResourceInfo GetResourceStream(StreamResourceInfo zipPackageStreamResourceInfo, Uri uriResource)
         {
             return null;

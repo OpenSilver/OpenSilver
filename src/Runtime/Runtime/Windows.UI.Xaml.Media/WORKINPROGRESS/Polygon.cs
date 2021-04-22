@@ -15,6 +15,7 @@ namespace Windows.UI.Xaml.Media
 	//
 	// Summary:
 	//     Draws a polygon, which is a connected series of lines that form a closed shape.
+    [OpenSilver.NotImplemented]
 	public sealed class Polygon : Shape
 	{
 		//
@@ -23,6 +24,7 @@ namespace Windows.UI.Xaml.Media
 		//
 		// Returns:
 		//     The identifier for the System.Windows.Shapes.Polygon.FillRule dependency property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty FillRuleProperty =
 			DependencyProperty.Register("FillRule",
 										typeof(FillRule),
@@ -34,6 +36,7 @@ namespace Windows.UI.Xaml.Media
 		//
 		// Returns:
 		//     The identifier for the System.Windows.Shapes.Polygon.Points dependency property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty PointsProperty =
 			DependencyProperty.Register("Points",
 										typeof(PointCollection),
@@ -43,6 +46,7 @@ namespace Windows.UI.Xaml.Media
 		//
 		// Summary:
 		//     Initializes a new instance of the System.Windows.Shapes.Polygon class.
+        [OpenSilver.NotImplemented]
 		public Polygon()
 		{
 			
@@ -54,6 +58,7 @@ namespace Windows.UI.Xaml.Media
 		//
 		// Returns:
 		//     A value of the enumeration. The default is System.Windows.Media.FillRule.EvenOdd.
+        [OpenSilver.NotImplemented]
 		public FillRule FillRule
 		{
 			get { return (FillRule)GetValue(FillRuleProperty); }
@@ -67,6 +72,7 @@ namespace Windows.UI.Xaml.Media
 		//     A collection of System.Windows.Point structures that describes the vertex points
 		//     of the polygon. The default is null. The value can be expressed as a string as
 		//     described in "pointSet Grammar" below.
+        [OpenSilver.NotImplemented]
 		public PointCollection Points
 		{
 			get { return (PointCollection)GetValue(PointsProperty); }

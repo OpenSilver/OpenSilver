@@ -26,6 +26,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a collection of collapsed and expanded AccordionItem controls.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class Accordion : ItemsControl, IUpdateVisualState
     {
         /// <summary>
@@ -49,6 +50,7 @@ namespace Windows.UI.Xaml.Controls
         /// OneOrMode  than all items would be Unselected and selected. Only the
         /// first AccordionItem would still be selected.
         /// </remarks>
+        [OpenSilver.NotImplemented]
         public void UnselectAll()
         {
             UpdateAccordionItemsSelection(false);
@@ -74,6 +76,7 @@ namespace Windows.UI.Xaml.Controls
         /// Gets or sets the AccordionSelectionMode used to determine the minimum
         /// and maximum selected AccordionItems allowed in the Accordion.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public AccordionSelectionMode SelectionMode
         {
             get => (AccordionSelectionMode)GetValue(SelectionModeProperty);
@@ -83,6 +86,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the SelectionMode dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectionModeProperty =
             DependencyProperty.Register(
                 "SelectionMode",
@@ -111,6 +115,7 @@ namespace Windows.UI.Xaml.Controls
         /// When multiple items are allowed (IsMaximumOneSelected false),
         /// return the first of the selectedItems.
         /// </remarks>
+        [OpenSilver.NotImplemented]
         public object SelectedItem
         {
             get => GetValue(SelectedItemProperty);
@@ -120,6 +125,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the SelectedItem dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register(
                 "SelectedItem",
@@ -145,6 +151,7 @@ namespace Windows.UI.Xaml.Controls
         /// Gets or sets the SelectionSequence used to determine
         /// the order of AccordionItem selection.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public SelectionSequence SelectionSequence
         {
             get => (SelectionSequence)GetValue(SelectionSequenceProperty);
@@ -154,6 +161,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the SelectionSequence dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectionSequenceProperty =
             DependencyProperty.Register(
                 "SelectionSequence",
@@ -178,6 +186,7 @@ namespace Windows.UI.Xaml.Controls
         /// Gets or sets the Style that is applied to AccordionButton elements
         /// in the AccordionItems.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public Style AccordionButtonStyle
         {
             get => GetValue(AccordionButtonStyleProperty) as Style;
@@ -192,6 +201,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the AccordionButtonStyle dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty AccordionButtonStyleProperty =
             DependencyProperty.Register(
                 AccordionButtonStyleName,
@@ -216,6 +226,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <remarks>Either ContentTemplate or ItemTemplate is used.
         /// Setting both will result in an exception.</remarks>
+        [OpenSilver.NotImplemented]
         public DataTemplate ContentTemplate
         {
             get => (DataTemplate)GetValue(ContentTemplateProperty);
@@ -225,6 +236,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the ContentTemplate dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ContentTemplateProperty =
             DependencyProperty.Register(
                 "ContentTemplate",

@@ -415,6 +415,7 @@ namespace Windows.UI.Xaml.Controls
         /// Creates AutomationPeer (<see cref="UIElement.OnCreateAutomationPeer"/>)
         /// </summary>
         /// <returns>The AutomationPeer associated with this DescriptionViewer.</returns>
+        [OpenSilver.NotImplemented]
         protected override AutomationPeer OnCreateAutomationPeer()
         {
             return new DescriptionViewerAutomationPeer(this);

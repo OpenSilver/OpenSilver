@@ -1599,16 +1599,19 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         /// <summary>
         /// Gets the underlying System.ServiceModel.IClientChannel implementation.
         /// </summary>
+		[OpenSilver.NotImplemented]
         public IClientChannel InnerChannel
         {
             get { return null; }
         }
 
+		[OpenSilver.NotImplemented]
         public void Abort()
         {
 
         }
 
+		[OpenSilver.NotImplemented]
         public CommunicationState State
         {
             get { return CommunicationState.Created; }
@@ -1619,6 +1622,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         //    /// Returns a new channel to the service.
         //    /// </summary>
         //    /// <returns>A channel of the type of the service contract.</returns>
+		[OpenSilver.NotImplemented]
         protected virtual TChannel CreateChannel()
         {
             return null;
@@ -1629,6 +1633,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         //    /// </summary>
         //    /// <typeparam name="T">The type that is identified as reference or numeric by the keyword.</typeparam>
         //    /// <returns>Returns null if T is a reference type and zero if T is a numeric value type.</returns>
+		[OpenSilver.NotImplemented]
         protected T GetDefaultValueForInitialization<T>()
         {
             return default(T);
@@ -1639,6 +1644,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         /// </summary>
         /// <typeparam name="T"></typeparam>
         //protected class ChannelBase<T> : IOutputChannel, IRequestChannel, IClientChannel, IDisposable, IContextChannel, IChannel, ICommunicationObject, IExtensibleObject<IContextChannel> where T : class
+		[OpenSilver.NotImplemented]
         protected class ChannelBase<T> where T : class
         {
             /// <summary>
@@ -1646,6 +1652,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             /// class from an existing instance of the class.
             /// </summary>
             /// <param name="client">The object used to initialize the new instance of the class.</param>
+		    [OpenSilver.NotImplemented]
             protected ChannelBase(CSHTML5_ClientBase<T> client)
             {
 
@@ -1660,6 +1667,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             /// <param name="state">The state object.</param>
             /// <returns>The System.IAsyncResult that references the asynchronous method invoked.</returns>
             //[SecuritySafeCritical]
+		    [OpenSilver.NotImplemented]
             protected IAsyncResult BeginInvoke(string methodName, object[] args, AsyncCallback callback, object state)
             {
                 return null;
@@ -1673,6 +1681,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             /// <param name="result">The result returned by a call.</param>
             /// <returns>The System.Object output by the method invoked.</returns>
             //[SecuritySafeCritical]
+		    [OpenSilver.NotImplemented]
             protected object EndInvoke(string methodName, object[] args, IAsyncResult result)
             {
                 return null;
@@ -1686,91 +1695,108 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 #if WORKINPROGRESS && !CSHTML5BLAZOR
         #region ICommunicationObject methods
 
+		[OpenSilver.NotImplemented]
         CommunicationState ICommunicationObject.State
         {
             get { return CommunicationState.Created; }
         }
 
+		[OpenSilver.NotImplemented]
         event EventHandler ICommunicationObject.Closed
         {
             add { }
             remove { }
         }
 
+		[OpenSilver.NotImplemented]
         event EventHandler ICommunicationObject.Closing
         {
             add { }
             remove { }
         }
 
+		[OpenSilver.NotImplemented]
         event EventHandler ICommunicationObject.Faulted
         {
             add { }
             remove { }
         }
 
+		[OpenSilver.NotImplemented]
         event EventHandler ICommunicationObject.Opened
         {
             add { }
             remove { }
         }
 
+		[OpenSilver.NotImplemented]
         event EventHandler ICommunicationObject.Opening
         {
             add { }
             remove { }
         }
 
+		[OpenSilver.NotImplemented]
         void ICommunicationObject.Abort()
         {
 
         }
 
+		[OpenSilver.NotImplemented]
         void ICommunicationObject.Close()
         {
 
         }
 
+		[OpenSilver.NotImplemented]
         void ICommunicationObject.Close(TimeSpan timeout)
         {
 
         }
 
+		[OpenSilver.NotImplemented]
         IAsyncResult ICommunicationObject.BeginClose(AsyncCallback callback, object state)
         {
             return null;
         }
 
+		[OpenSilver.NotImplemented]
         IAsyncResult ICommunicationObject.BeginClose(TimeSpan timeout, AsyncCallback callback, object state)
         {
             return null;
         }
 
+		[OpenSilver.NotImplemented]
         void ICommunicationObject.EndClose(IAsyncResult result)
         {
 
         }
 
+		[OpenSilver.NotImplemented]
         void ICommunicationObject.Open()
         {
 
         }
 
+		[OpenSilver.NotImplemented]
         void ICommunicationObject.Open(TimeSpan timeout)
         {
 
         }
 
+		[OpenSilver.NotImplemented]
         IAsyncResult ICommunicationObject.BeginOpen(AsyncCallback callback, object state)
         {
             return null;
         }
 
+		[OpenSilver.NotImplemented]
         IAsyncResult ICommunicationObject.BeginOpen(TimeSpan timeout, AsyncCallback callback, object state)
         {
             return null;
         }
 
+		[OpenSilver.NotImplemented]
         void ICommunicationObject.EndOpen(IAsyncResult result)
         {
 

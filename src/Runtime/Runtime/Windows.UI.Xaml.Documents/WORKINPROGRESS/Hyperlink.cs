@@ -8,6 +8,7 @@ namespace Windows.UI.Xaml.Documents
 {
 	public sealed partial class Hyperlink
 	{
+        [OpenSilver.NotImplemented]
 		public string TargetName { get; set; }
 	}
 }

@@ -27,6 +27,7 @@ namespace Windows.UI.Xaml.Media
 {
 #if WORKINPROGRESS
     [SupportsDirectContentViaTypeFromStringConverters]
+    [OpenSilver.NotImplemented]
     public abstract partial class CacheMode : DependencyObject
     {
         static CacheMode()

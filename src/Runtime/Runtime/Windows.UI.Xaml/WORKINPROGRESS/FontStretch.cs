@@ -27,8 +27,10 @@ namespace Windows.UI.Xaml
 #if WORKINPROGRESS
     #region Not supported yet
     [SupportsDirectContentViaTypeFromStringConverters]
+	[OpenSilver.NotImplemented]
     public partial struct FontStretch : IFormattable
     {
+		[OpenSilver.NotImplemented]
         public string ToString(string format, IFormatProvider formatProvider)
         {
             throw new NotImplementedException();

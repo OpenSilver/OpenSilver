@@ -265,8 +265,10 @@ namespace Windows.UI.Xaml.Controls
 #if WORKINPROGRESS
 #region Not supported yet
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ShowsPreviewProperty = DependencyProperty.Register("ShowsPreview", typeof(bool), typeof(GridSplitter), null);
 
+        [OpenSilver.NotImplemented]
         public bool ShowsPreview
         {
             get { return (bool)this.GetValue(GridSplitter.ShowsPreviewProperty); }

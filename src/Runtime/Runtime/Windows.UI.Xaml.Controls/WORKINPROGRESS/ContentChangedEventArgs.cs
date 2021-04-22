@@ -9,6 +9,7 @@ namespace Windows.UI.Xaml.Controls
 	//
 	// Summary:
 	//     Provides data for the System.Windows.Controls.RichTextBox.ContentChanged event.
+    [OpenSilver.NotImplemented]
 	public sealed class ContentChangedEventArgs : RoutedEventArgs
 	{
 	}

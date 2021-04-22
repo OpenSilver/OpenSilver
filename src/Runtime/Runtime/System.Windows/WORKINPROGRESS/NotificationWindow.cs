@@ -11,6 +11,7 @@ namespace System.Windows
 	//     Represents a notification area that is displayed in the system area. Notifications
 	//     can only be enabled for an out-of-browser application; browser-hosted applications
 	//     cannot access this notification area.
+	[OpenSilver.NotImplemented]
 	public sealed class NotificationWindow : DependencyObject
 	{
 		//
@@ -19,6 +20,7 @@ namespace System.Windows
 		//
 		// Returns:
 		//     The identifier for the System.Windows.NotificationWindow.Content dependency property.
+		[OpenSilver.NotImplemented]
 		public static readonly DependencyProperty ContentProperty =
 			DependencyProperty.Register("Content",
 										typeof(FrameworkElement),
@@ -30,6 +32,7 @@ namespace System.Windows
 		//
 		// Returns:
 		//     The identifier for the System.Windows.NotificationWindow.Height dependency property.
+		[OpenSilver.NotImplemented]
 		public static readonly DependencyProperty HeightProperty =
 			DependencyProperty.Register("Height",
 										typeof(double),
@@ -41,6 +44,7 @@ namespace System.Windows
 		//
 		// Returns:
 		//     The identifier for the System.Windows.NotificationWindow.Width dependency property.
+		[OpenSilver.NotImplemented]
 		public static readonly DependencyProperty WidthProperty =
 			DependencyProperty.Register("Width",
 										typeof(double),
@@ -50,6 +54,7 @@ namespace System.Windows
 		//
 		// Summary:
 		//     Initializes a new instance of the System.Windows.NotificationWindow class.
+		[OpenSilver.NotImplemented]
 		public NotificationWindow()
 		{
 			
@@ -62,6 +67,7 @@ namespace System.Windows
 		// Returns:
 		//     A single System.Windows.FrameworkElement that includes the root of a visual tree.
 		//     The visual tree defines the visual look of the notification.
+		[OpenSilver.NotImplemented]
 		public FrameworkElement Content
 		{
 			get { return (FrameworkElement)GetValue(ContentProperty); }
@@ -80,6 +86,7 @@ namespace System.Windows
 		//
 		//   T:System.InvalidOperationException:
 		//     Attempted to set value while notification window is visible.
+		[OpenSilver.NotImplemented]
 		public double Height
 		{
 			get { return (double)GetValue(HeightProperty); }
@@ -91,6 +98,7 @@ namespace System.Windows
 		//
 		// Returns:
 		//     true if the notification is currently displayed; otherwise, false.
+		[OpenSilver.NotImplemented]
 		public Visibility Visibility { get; }
 		//
 		// Summary:
@@ -105,6 +113,7 @@ namespace System.Windows
 		//
 		//   T:System.InvalidOperationException:
 		//     Attempted to set value while notification window is visible.
+		[OpenSilver.NotImplemented]
 		public double Width
 		{
 			get { return (double)GetValue(WidthProperty); }
@@ -115,11 +124,13 @@ namespace System.Windows
 		// Summary:
 		//     Occurs when System.Windows.NotificationWindow.Close is called, or when the notification
 		//     window times out and has finished its fadeout animation.
+		[OpenSilver.NotImplemented]
 		public event EventHandler Closed;
 
 		//
 		// Summary:
 		//     Immediately closes the notification window.
+		[OpenSilver.NotImplemented]
 		public void Close()
 		{
 			
@@ -138,6 +149,7 @@ namespace System.Windows
 		//   T:System.InvalidOperationException:
 		//     A different notification window instance is still visible.
 		[SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
 		public void Show(int durationInMilliseconds)
 		{
 			

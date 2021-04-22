@@ -31,12 +31,14 @@ namespace Windows.UI.Xaml.Controls
     /// This non generic base class is used to specify default template,
     /// and simulate covariance among sub classes of UpDownBase&lt;T&gt;.
     /// </remarks>
+    [OpenSilver.NotImplemented]
     public class UpDownBase : Control
     {
         #region public Style SpinnerStyle
         /// <summary>
         /// Gets or sets the Style that is applied to the spinner.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public Style SpinnerStyle
         {
             get => (Style)GetValue(SpinnerStyleProperty);
@@ -46,6 +48,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the SpinnerStyle dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SpinnerStyleProperty =
             DependencyProperty.Register(
                 "SpinnerStyle",

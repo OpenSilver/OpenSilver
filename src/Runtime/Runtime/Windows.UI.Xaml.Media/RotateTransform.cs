@@ -133,12 +133,14 @@ namespace Windows.UI.Xaml.Media
         /// Gets or sets the x-coordinate of the rotation center point.
         /// The default is 0.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double CenterX
         {
             get => (double)GetValue(CenterXProperty);
             set => SetValue(CenterXProperty, value);
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CenterXProperty = 
             DependencyProperty.Register(
                 nameof(CenterX), 
@@ -150,12 +152,14 @@ namespace Windows.UI.Xaml.Media
         /// Gets or sets the y-coordinate of the rotation center point.
         /// The default is 0.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double CenterY
         {
             get => (double)GetValue(CenterYProperty);
             set => SetValue(CenterYProperty, value);
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CenterYProperty = 
             DependencyProperty.Register(
                 nameof(CenterY), 

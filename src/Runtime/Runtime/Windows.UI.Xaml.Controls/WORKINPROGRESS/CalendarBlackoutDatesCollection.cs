@@ -27,11 +27,13 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a collection of non-selectable dates in a <see cref="T:System.Windows.Controls.Calendar" />.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public sealed class CalendarBlackoutDatesCollection : ObservableCollection<CalendarDateRange>
     {
         /// <summary>
         /// Adds all dates before <see cref="P:System.DateTime.Today" /> to the collection.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public void AddDatesInPast() => Add(new CalendarDateRange(DateTime.MinValue, DateTime.Today.AddDays(-1)));
     }
 }

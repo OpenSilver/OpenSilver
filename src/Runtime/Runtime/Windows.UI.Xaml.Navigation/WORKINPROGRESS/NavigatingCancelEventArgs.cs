@@ -30,6 +30,7 @@ namespace Windows.UI.Xaml.Navigation
     //     Provides data for the System.Windows.Controls.Page.OnNavigatingFrom(System.Windows.Navigation.NavigatingCancelEventArgs)
     //     method and the System.Windows.Navigation.NavigationService.Navigating event.
     //[TypeForwardedFrom("System.Windows.Controls.Navigation, Version=2.0.5.0, Culture=Neutral, PublicKeyToken=31bf3856ad364e35")]
+    [OpenSilver.NotImplemented]
     public sealed partial class NavigatingCancelEventArgs : CancelEventArgs
     {
         //
@@ -44,6 +45,7 @@ namespace Windows.UI.Xaml.Navigation
         //
         //   mode:
         //     A value that indicates the type of navigation that is occurring.
+        [OpenSilver.NotImplemented]
         public NavigatingCancelEventArgs(Uri uri, NavigationMode mode)
         {
 
@@ -61,6 +63,7 @@ namespace Windows.UI.Xaml.Navigation
         //   mode:
         //     A value that indicates the type of navigation that is occurring.
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [OpenSilver.NotImplemented]
         public NavigatingCancelEventArgs(Uri uri, NavigationMode mode, bool IsCancelable, bool IsNavigationInitiator)
         {
 
@@ -73,6 +76,7 @@ namespace Windows.UI.Xaml.Navigation
         // Returns:
         //     true if you can cancel the navigation; otherwise, false.
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [OpenSilver.NotImplemented]
         public bool IsCancelable { get; private set; }
         //
         // Summary:
@@ -83,6 +87,7 @@ namespace Windows.UI.Xaml.Navigation
         //     true if the navigation starts and ends within the current application; false
         //     if the navigation starts or ends at an external location.
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [OpenSilver.NotImplemented]
         public bool IsNavigationInitiator { get; private set; }
         //
         // Summary:
@@ -92,6 +97,7 @@ namespace Windows.UI.Xaml.Navigation
         //     A value that indicates the type of navigation (System.Windows.Navigation.NavigationMode.Back,
         //     System.Windows.Navigation.NavigationMode.Forward, or System.Windows.Navigation.NavigationMode.New)
         //     that is occurring.
+        [OpenSilver.NotImplemented]
         public NavigationMode NavigationMode { get; private set; }
         //
         // Summary:
@@ -100,6 +106,7 @@ namespace Windows.UI.Xaml.Navigation
         //
         // Returns:
         //     A value that represents the URI for the content.
+        [OpenSilver.NotImplemented]
         public Uri Uri { get; private set; }
     }
 }

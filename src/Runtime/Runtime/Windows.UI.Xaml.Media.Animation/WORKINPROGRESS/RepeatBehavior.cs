@@ -17,6 +17,7 @@ namespace Windows.UI.Xaml.Media.Animation
 		/// </summary>
 		/// <param name="duration">The total length of time that the System.Windows.Media.Animation.Timeline should play (its active duration).</param>
 		/// <exception cref="ArgumentOutOfRangeException">duration evaluates to a negative number.</exception>
+        [OpenSilver.NotImplemented]
 		public RepeatBehavior(TimeSpan duration)
 		{
 			_type = RepeatBehaviorType.Count;
@@ -34,12 +35,14 @@ namespace Windows.UI.Xaml.Media.Animation
 		/// This System.Windows.Media.Animation.RepeatBehavior describes an iteration count,
 		/// not a repeat duration.
 		/// </exception>
+        [OpenSilver.NotImplemented]
 		public TimeSpan Duration { get; }
 		
 		/// <summary>
 		/// Gets a value that indicates whether the repeat behavior has a specified repeat duration.
 		/// </summary>
 		/// <returns>true if the instance represents a repeat duration; otherwise, false.</returns>
+        [OpenSilver.NotImplemented]
 		public bool HasDuration { get; }
 	}
 }

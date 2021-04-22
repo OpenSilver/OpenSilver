@@ -146,21 +146,25 @@ namespace Windows.UI.Xaml.Media
         #region Transform, RelativeTransform (Not supported yet)
         /// <summary>Identifies the <see cref="P:System.Windows.Media.Brush.RelativeTransform" /> dependency property. </summary>
         /// <returns>The <see cref="P:System.Windows.Media.Brush.RelativeTransform" /> dependency property identifier.</returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RelativeTransformProperty = DependencyProperty.Register("RelativeTransform", typeof(Transform), typeof(Brush), null);
 
         /// <summary>Gets or sets the transformation that is applied to the brush using relative coordinates. </summary>
         /// <returns>The transformation that is applied to the brush using relative coordinates. The default value is null.</returns>
+        [OpenSilver.NotImplemented]
         public Transform RelativeTransform
         {
             get { return (Transform)this.GetValue(Brush.RelativeTransformProperty); }
             set { this.SetValue(Brush.RelativeTransformProperty, (DependencyObject)value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TransformProperty = DependencyProperty.Register("Transform", typeof(Transform), typeof(Brush), null);
 
         /// <summary>
         ///     Transform - Transform.  Default value is Transform.Identity.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public Transform Transform
         {
             get { return (Transform)GetValue(TransformProperty); }

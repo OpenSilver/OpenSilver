@@ -9,6 +9,7 @@ namespace Windows.UI.Xaml.Automation
 	// Summary:
 	//     Contains values used as automation property identifiers specifically for properties
 	//     of the System.Windows.Automation.Provider.IExpandCollapseProvider pattern.
+    [OpenSilver.NotImplemented]
 	public static partial class ExpandCollapsePatternIdentifiers
 	{
 		//
@@ -18,6 +19,7 @@ namespace Windows.UI.Xaml.Automation
 		//
 		// Returns:
 		//     The automation property identifier.
+        [OpenSilver.NotImplemented]
 		public static readonly AutomationProperty ExpandCollapseStateProperty;
 	}
 }

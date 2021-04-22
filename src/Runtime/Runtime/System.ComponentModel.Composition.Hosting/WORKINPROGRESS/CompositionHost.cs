@@ -6,6 +6,7 @@ namespace System.ComponentModel.Composition.Hosting
     //
     // Summary:
     //     Provides static methods to control the container used by System.ComponentModel.Composition.CompositionInitializer.
+	[OpenSilver.NotImplemented]
     public static class CompositionHost
     {
         //
@@ -23,6 +24,7 @@ namespace System.ComponentModel.Composition.Hosting
         //
         //   T:System.InvalidOperationException:
         //     This method has already been called.
+		[OpenSilver.NotImplemented]
         public static void Initialize(CompositionContainer container)
         {
 
@@ -38,6 +40,7 @@ namespace System.ComponentModel.Composition.Hosting
         //
         // Returns:
         //     The new container.
+		[OpenSilver.NotImplemented]
         public static CompositionContainer Initialize(params ComposablePartCatalog[] catalogs)
         {
             return null;

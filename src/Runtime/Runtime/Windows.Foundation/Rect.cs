@@ -508,6 +508,7 @@ namespace Windows.Foundation
         /// the specified format provider.
         /// </summary>
         /// <param name="provider">Culture-specific formatting information.</param>
+		[OpenSilver.NotImplemented]
         public string ToString(IFormatProvider provider)
         {
             return default(string);

@@ -25,6 +25,7 @@ namespace Windows.UI.Xaml.Controls
 {    //
     // Summary:
     //     Provides data for the System.Windows.Controls.DataGrid.CellEditEnding event.
+    [OpenSilver.NotImplemented]
     public class DataGridCellEditEndingEventArgs : CancelEventArgs
     {
         //
@@ -45,6 +46,7 @@ namespace Windows.UI.Xaml.Controls
         //   editAction:
         //     The System.Windows.Controls.DataGridEditAction that indicates whether the edit
         //     will be committed or canceled.
+        [OpenSilver.NotImplemented]
         public DataGridCellEditEndingEventArgs(DataGridColumn column, DataGridRow row, FrameworkElement editingElement, DataGridEditAction editAction)
         { }
 
@@ -54,6 +56,7 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The column that contains the cell that is about to exit edit mode.
+        [OpenSilver.NotImplemented]
         public DataGridColumn Column { get; }
         //
         // Summary:
@@ -63,6 +66,7 @@ namespace Windows.UI.Xaml.Controls
         // Returns:
         //     An enumeration value that indicates whether this edit event will be committed
         //     or canceled.
+        [OpenSilver.NotImplemented]
         public DataGridEditAction EditAction { get; }
         //
         // Summary:
@@ -70,6 +74,7 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The element displayed when the cell is in edit mode.
+        [OpenSilver.NotImplemented]
         public FrameworkElement EditingElement { get; }
         //
         // Summary:
@@ -77,6 +82,7 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The row that contains the cell that is about to exit edit mode.
+        [OpenSilver.NotImplemented]
         public DataGridRow Row { get; }
     }
 }

@@ -10,6 +10,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
+	[OpenSilver.NotImplemented]
 	public partial class DurationConverter : TypeConverter
 	{
 	}

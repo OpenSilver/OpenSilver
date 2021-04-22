@@ -18,6 +18,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 	//
 	// Summary:
 	//     Exposes System.Windows.Controls.Button types to UI automation.
+    [OpenSilver.NotImplemented]
 	public partial class ButtonAutomationPeer : ButtonBaseAutomationPeer, IInvokeProvider
 	{
 		//
@@ -28,7 +29,8 @@ namespace Windows.UI.Xaml.Automation.Peers
 		// Parameters:
 		//   owner:
 		//     The element associated with this automation peer.
-		public ButtonAutomationPeer(Button owner): base(owner)
+        [OpenSilver.NotImplemented]
+		public ButtonAutomationPeer(Button owner) : base(owner)
 		{
 		}
 
@@ -44,6 +46,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 		// Returns:
 		//     The object that implements the pattern interface, or null if the specified pattern
 		//     interface is not implemented by this peer.
+        [OpenSilver.NotImplemented]
 		public override object GetPattern(PatternInterface patternInterface)
 		{
 			return null;
@@ -56,6 +59,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 		//
 		// Returns:
 		//     A value of the enumeration.
+        [OpenSilver.NotImplemented]
 		protected override AutomationControlType GetAutomationControlTypeCore()
 		{
 			return AutomationControlType.Button;
@@ -67,6 +71,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 		//
 		// Returns:
 		//     The class name.
+        [OpenSilver.NotImplemented]
 		protected override string GetClassNameCore()
 		{
 			return null;

@@ -11,6 +11,7 @@ namespace Windows.UI.Xaml
 	// Summary:
 	//     Contains system colors, system brushes, and system resource keys that correspond
 	//     to system display elements.
+	[OpenSilver.NotImplemented]
 	public static partial class SystemColors
 	{
 		//
@@ -20,6 +21,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The color of the active window's border.
+		[OpenSilver.NotImplemented]
 		public static Color ActiveBorderColor
 		{
 			get;
@@ -33,6 +35,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The background color of the active window's title bar.
+		[OpenSilver.NotImplemented]
 		public static Color ActiveCaptionColor
 		{
 			get;
@@ -46,6 +49,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The color of the active window's title bar.
+		[OpenSilver.NotImplemented]
 		public static Color ActiveCaptionTextColor
 		{
 			get;
@@ -59,6 +63,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The color of the application workspace.
+		[OpenSilver.NotImplemented]
 		public static Color AppWorkspaceColor
 		{
 			get;
@@ -72,6 +77,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The face color of a three-dimensional display element.
+		[OpenSilver.NotImplemented]
 		public static Color ControlColor
 		{
 			get;
@@ -85,6 +91,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The shadow color of a three-dimensional display element.
+		[OpenSilver.NotImplemented]
 		public static Color ControlDarkColor
 		{
 			get;
@@ -98,6 +105,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The dark shadow color of a three-dimensional display element.
+		[OpenSilver.NotImplemented]
 		public static Color ControlDarkDarkColor
 		{
 			get;
@@ -111,6 +119,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The light color of a three-dimensional display element.
+		[OpenSilver.NotImplemented]
 		public static Color ControlLightColor
 		{
 			get;
@@ -124,6 +133,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The highlight color of a three-dimensional display element.
+		[OpenSilver.NotImplemented]
 		public static Color ControlLightLightColor
 		{
 			get;
@@ -137,6 +147,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The color of text in a three-dimensional display element.
+		[OpenSilver.NotImplemented]
 		public static Color ControlTextColor
 		{
 			get;
@@ -149,6 +160,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The color of the desktop.
+		[OpenSilver.NotImplemented]
 		public static Color DesktopColor
 		{
 			get;
@@ -161,6 +173,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The color of disabled text.
+		[OpenSilver.NotImplemented]
 		public static Color GrayTextColor
 		{
 			get;
@@ -174,6 +187,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The background color of selected items.
+		[OpenSilver.NotImplemented]
 		public static Color HighlightColor
 		{
 			get;
@@ -187,6 +201,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The color of the text of selected items.
+		[OpenSilver.NotImplemented]
 		public static Color HighlightTextColor
 		{
 			get;
@@ -200,6 +215,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The color of an inactive window's border.
+		[OpenSilver.NotImplemented]
 		public static Color InactiveBorderColor
 		{
 			get;
@@ -213,6 +229,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The background color of an inactive window's title bar.
+		[OpenSilver.NotImplemented]
 		public static Color InactiveCaptionColor
 		{
 			get;
@@ -226,6 +243,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The color of the text of an inactive window's title bar.
+		[OpenSilver.NotImplemented]
 		public static Color InactiveCaptionTextColor
 		{
 			get;
@@ -239,6 +257,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The background color for the System.Windows.Controls.ToolTip control.
+		[OpenSilver.NotImplemented]
 		public static Color InfoColor
 		{
 			get;
@@ -252,6 +271,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The text color for the System.Windows.Controls.ToolTip control.
+		[OpenSilver.NotImplemented]
 		public static Color InfoTextColor
 		{
 			get;
@@ -264,6 +284,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The color of a menu's background.
+		[OpenSilver.NotImplemented]
 		public static Color MenuColor
 		{
 			get;
@@ -276,6 +297,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The color of a menu's text.
+		[OpenSilver.NotImplemented]
 		public static Color MenuTextColor
 		{
 			get;
@@ -289,6 +311,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The background color of a scroll bar.
+		[OpenSilver.NotImplemented]
 		public static Color ScrollBarColor
 		{
 			get;
@@ -302,6 +325,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The background color in the client area of a window.
+		[OpenSilver.NotImplemented]
 		public static Color WindowColor
 		{
 			get;
@@ -314,6 +338,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The color of a window frame.
+		[OpenSilver.NotImplemented]
 		public static Color WindowFrameColor
 		{
 			get;
@@ -327,6 +352,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The color of the text in the client area of a window.
+		[OpenSilver.NotImplemented]
 		public static Color WindowTextColor
 		{
 			get;

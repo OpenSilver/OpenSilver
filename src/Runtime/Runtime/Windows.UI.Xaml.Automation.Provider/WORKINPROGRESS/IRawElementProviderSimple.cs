@@ -9,6 +9,7 @@ namespace System.Windows.Automation.Provider
 namespace Windows.UI.Xaml.Automation.Provider
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public sealed partial class IRawElementProviderSimple
 	{
 	}

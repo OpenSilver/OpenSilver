@@ -70,11 +70,13 @@ namespace System.Windows
         }
 
 #if WORKINPROGRESS
+		[OpenSilver.NotImplemented]
         public static string GetText()
         {
             return string.Empty;
         }
 
+		[OpenSilver.NotImplemented]
         public static bool ContainsText()
         {
             return false;
