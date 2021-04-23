@@ -167,16 +167,9 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             var m = GetSingularMatrix(2, 6);
             m.HasInverse.Should().BeFalse();
-            InvalidOperationException ex = null;
-            try
-            {
-                m.Invert();
-            }
-            catch (InvalidOperationException e)
-            {
-                ex = e;
-            }
-            ex.Should().NotBeNull();
+
+            Assert.ThrowsException<InvalidOperationException>(() => m.Invert());
+            
             m.Should().Be(GetSingularMatrix(2, 6));
         }
 
