@@ -453,6 +453,12 @@ namespace DotNetForHtml5.Compiler
                                                 List<string> markupExtensionsAdditionalCode = GetListThatContainsAdditionalCodeFromDictionary(
                                                     elementThatIsRootOfTheCurrentNamescope, namescopeRootToMarkupExtensionsAdditionalCode);
 
+                                                bool isDependencyProperty =
+                                                    reflectionOnSeparateAppDomain.GetField(
+                                                        propertyName + "Property", 
+                                                        isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
+                                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName) != null;
+
                                                 string propertyDeclaringTypeName;
                                                 string propertyTypeNamespace;
                                                 string propertyTypeName;
@@ -497,7 +503,7 @@ namespace DotNetForHtml5.Compiler
                                                     || (!isSLMigration && propertyTypeFullName == "Windows.UI.Xaml.Data.BindingBase")
                                                     || (isSLMigration && propertyTypeFullName == "System.Windows.Data.Binding")
                                                     || (isSLMigration && propertyTypeFullName == "System.Windows.Data.BindingBase"));
-                                                if (isPropertyOfTypeBinding)
+                                                if (isPropertyOfTypeBinding || !isDependencyProperty)
                                                 {
                                                     stringBuilder.AppendLine(string.Format("{0}.{1} = {2};", parentElementUniqueNameOrThisKeyword, propertyName, GetUniqueName(child)));
                                                 }

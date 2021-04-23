@@ -170,7 +170,7 @@ namespace Windows.UI.Xaml
 #endif
         }
 
-        private static bool IsValueTypeValid(object value, Type type)
+        internal static bool IsValueTypeValid(object value, Type type)
         {
             if (object.ReferenceEquals(value, DependencyProperty.UnsetValue))
             {
