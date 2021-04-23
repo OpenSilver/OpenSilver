@@ -21,6 +21,7 @@ using System.Text;
 using System.Threading.Tasks;
 #if MIGRATION
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
@@ -38,6 +39,75 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public partial class ComboBoxItem : SelectorItem
     {
-        
+        public ComboBoxItem()
+        {
+            base.Loaded += (sender, e) =>
+            {
+                UpdateVisualStates();
+            };
+
+            base.DefaultStyleKey = typeof(ComboBoxItem);
+        }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            this.UpdateVisualStates();
+        }
+
+        protected internal override void HandleIsSelectedChanged(bool oldValue, bool newValue)
+        {
+            UpdateVisualStates();
+        }
+
+        protected override void OnMouseEnter(MouseEventArgs eventArgs)
+        {
+            base.OnMouseEnter(eventArgs);
+            this.INTERNAL_ParentSelectorControl.NotifyItemMouseEnter(this);
+            this.IsMouseOver = true;
+            this.UpdateVisualStates();
+        }
+
+        protected internal override void OnMouseLeave(MouseEventArgs eventArgs)
+        {
+            base.OnMouseLeave(eventArgs);
+            this.IsMouseOver = false;
+            this.UpdateVisualStates();
+        }
+
+        internal override void UpdateVisualStates()
+        {
+            if (!IsEnabled)
+            {
+                GoToState(VisualStates.StateDisabled);
+            }
+            else if (IsMouseOver)
+            {
+                GoToState(VisualStates.StateMouseOver);
+            }
+            else
+            {
+                GoToState(VisualStates.StateNormal);
+            }
+
+            if (IsSelected)
+            {
+                GoToState(VisualStates.StateSelected);
+            }
+            else
+            {
+                GoToState(VisualStates.StateUnselected);
+            }
+#if WORKINPROGRESS
+            if (IsFocused)
+            {
+                GoToState(VisualStates.StateFocused);
+            }
+            else
+            {
+                GoToState(VisualStates.StateUnfocused);
+            }
+#endif
+        }
     }
 }

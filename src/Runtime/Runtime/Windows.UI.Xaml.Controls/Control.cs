@@ -1105,7 +1105,7 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
             UpdateVisualStates();
         }
 
-        void UpdateVisualStates()
+        internal virtual void UpdateVisualStates()
         {
             if (!DisableBaseControlHandlingOfVisualStates)
             {
@@ -1176,6 +1176,11 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
             {
                 return Template != null && INTERNAL_DoNotApplyControlTemplate == false;
             }
+        }
+
+        internal void GoToState(string state)
+        {
+            VisualStateManager.GoToState(this, state, true);
         }
 
 #if WORKINPROGRESS

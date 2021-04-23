@@ -116,6 +116,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                         // we use SetCurrentValue to preserve any potential bindings.
                         s.SetCurrentValue(Selector.SelectedValueProperty, PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(newValue, s.SelectedValuePath));
                         s.SetCurrentValue(Selector.SelectedIndexProperty, s.Items.IndexOf(newValue));
+                        s.OnSelectedItemChanged(newValue);
                     }
                 }
                 finally
@@ -554,6 +555,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         }
 
+        protected virtual void OnSelectedItemChanged(object selectedItem)
+        {
+
+        }
+
+        public virtual void NotifyItemMouseEnter(SelectorItem item)
+        {
+
+        }
         #endregion Public/Protected Methods
 
         #region Private Methods

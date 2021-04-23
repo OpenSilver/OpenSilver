@@ -166,16 +166,9 @@ namespace Windows.UI.Xaml.Controls
         {
             if (isLoaded)
             {
-                string c = "transparent";
-                if (isTodayHighlighted)
-                {
-                    c = "";
-                }
-                var todaySpan = CSHTML5.Interop.ExecuteJavaScript(@"$0.calendarContainer.querySelector('span.today')", this._flatpickrInstance);
-                if (todaySpan != null)
-                {
-                    CSHTML5.Interop.ExecuteJavaScript(@"$0.style.borderColor = $1", todaySpan, c);
-                }
+                string borderColor = isTodayHighlighted ? "transparent" : "";
+                CSHTML5.Interop.ExecuteJavaScript(@"var todaySpan = $0.calendarContainer.querySelector('span.today'); 
+                            if(todaySpan) todaySpan.style.borderColor = $1", _flatpickrInstance, borderColor);
             }
         }
 

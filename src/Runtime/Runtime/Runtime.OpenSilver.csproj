@@ -7,15 +7,16 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-    <Configurations>SL;SL.WorkInProgress;UWP;UWP.WorkInProgress</Configurations>
+		<Configurations>SL;SL.WorkInProgress;UWP;UWP.WorkInProgress</Configurations>
 		<Platforms>AnyCPU</Platforms>
-    <AssemblyName>OpenSilver</AssemblyName>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<AssemblyName>OpenSilver</AssemblyName>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
 		<NoWarn>1591</NoWarn>
 		<DebugSymbols>true</DebugSymbols>
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
-		<EnableDefaultItems>false</EnableDefaultItems> <!-- This emluates the behavior of NET Framework, which excludes every files by default -->
+		<EnableDefaultItems>false</EnableDefaultItems>
+		<!-- This emluates the behavior of NET Framework, which excludes every files by default -->
 		<BlazorVersion>3.1.0-preview1.19508.20</BlazorVersion>
 		<OpenSilverVersion>1.0.0-alpha-008</OpenSilverVersion>
 	</PropertyGroup>
@@ -62,9 +63,9 @@
 		<Compile Include="PagedCollectionView\IPagedCollectionView.cs" />
 		<Compile Include="PagedCollectionView\PageChangingEventArgs.cs" />
 		<Compile Include="PagedCollectionView\PagedCollectionView.cs" />
-    <Compile Include="PagedCollectionView\PagedCollectionViewResources.Designer.cs">
-      <DependentUpon>PagedCollectionViewResources.resx</DependentUpon>
-    </Compile>
+		<Compile Include="PagedCollectionView\PagedCollectionViewResources.Designer.cs">
+			<DependentUpon>PagedCollectionViewResources.resx</DependentUpon>
+		</Compile>
 		<Compile Include="PagedCollectionView\TypeHelper.cs" />
 		<Compile Include="PublicAPI\Internal\KnownTypesHelper.cs" />
 		<Compile Include="PublicAPI\Internal\WebRequestsHelper.cs" />
@@ -282,8 +283,8 @@
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\ExportProvider.cs" />
 		<Compile Include="System.Reflection\ICustomTypeProvider.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\AssemblyBuilder.cs" />
-    <Compile Include="System.Reflection.Emit\WORKINPROGRESS\AssemblyBuilderAccess.cs" />
-    <Compile Include="System.Reflection.Emit\WORKINPROGRESS\FieldBuilder.cs" />
+		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\AssemblyBuilderAccess.cs" />
+		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\FieldBuilder.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\ILGenerator.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\Label.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\LocalBuilder.cs" />
@@ -1177,40 +1178,43 @@
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultTileViewStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultTileViewItemStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultItemsControlStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultRepeatButtonStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultHeaderedContentControlStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultValidationControlsStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultDataGridStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultTileViewStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultTileViewItemStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultItemsControlStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultRepeatButtonStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultHeaderedContentControlStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultDatePickerTextBoxStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultValidationControlsStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultDataGridStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
 	</ItemGroup>
 	<ItemGroup>
-	  <EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />
+		<EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Include="Runtime.licenseheader" />
+		<None Include="Runtime.licenseheader" />
 	</ItemGroup>
-  
+
 	<!-- See ths comment on the first <Import> -->
 	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 

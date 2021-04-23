@@ -87,9 +87,6 @@ namespace Windows.UI.Xaml.Controls
             set => SetValue(DisplayDateStartProperty, value);
         }
 
-        [OpenSilver.NotImplemented]
-        public DatePickerFormat SelectedDateFormat { get; set; }
-
         //
         // Summary:
         //     Occurs when the drop-down System.Windows.Controls.Calendar is closed.
