@@ -35,6 +35,7 @@ namespace Windows.UI.Xaml.Controls
     /// Represents a control that displays read-only rich text.
     /// </summary>
     [ContentProperty("Blocks")]
+    [OpenSilver.NotImplemented]
     public sealed class RichTextBlock : FrameworkElement
     {
         #region Public Properties
@@ -42,6 +43,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Gets the contents of the <see cref="RichTextBlock"/>.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public BlockCollection Blocks { get; }
 
         #region Dependency Properties
@@ -49,6 +51,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the <see cref="RichTextBlock.FontSize"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FontSizeProperty =
             DependencyProperty.Register(
                 "FontSize",
@@ -60,6 +63,7 @@ namespace Windows.UI.Xaml.Controls
         /// Gets or sets the size of the text in this control.
         /// The default is 11 (in pixels).
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double FontSize
         {
             get { return (double)this.GetValue(FontSizeProperty); }
@@ -69,6 +73,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the <see cref="RichTextBlock.FontWeight"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FontWeightProperty =
             DependencyProperty.Register(
                 "FontWeight",
@@ -80,6 +85,7 @@ namespace Windows.UI.Xaml.Controls
         /// Gets or sets the thickness of the specified font.
         /// The default is <see cref="FontWeights.Normal"/>.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public FontWeight FontWeight
         {
             get { return (FontWeight)this.GetValue(FontWeightProperty); }
@@ -89,6 +95,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the <see cref="RichTextBlock.FontFamily"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FontFamilyProperty =
             DependencyProperty.Register(
                 "FontFamily",
@@ -100,12 +107,14 @@ namespace Windows.UI.Xaml.Controls
         /// Gets or sets the font used to display text in the control.
         /// The default is the "Portable User Interface".
         /// </summary>
+        [OpenSilver.NotImplemented]
         public FontFamily FontFamily
         {
             get { return (FontFamily)this.GetValue(FontFamilyProperty); }
             set { this.SetValue(FontFamilyProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty OverflowContentTargetProperty =
             DependencyProperty.Register(
                 "OverflowContentTarget",
@@ -117,6 +126,7 @@ namespace Windows.UI.Xaml.Controls
         /// Gets or sets the <see cref="RichTextBlockOverflow"/> that will consume
         /// the overflow content of this <see cref="RichTextBlock"/>.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public RichTextBlockOverflow OverflowContentTarget
         {
             get { return (RichTextBlockOverflow)this.GetValue(OverflowContentTargetProperty); }
@@ -126,6 +136,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the <see cref="RichTextBlock.TextWrapping"/> dependency
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TextWrappingProperty =
             DependencyProperty.Register(
                 "TextWrapping",
@@ -138,6 +149,7 @@ namespace Windows.UI.Xaml.Controls
         /// width of the <see cref="RichTextBlock"/>.
         /// The default is <see cref="TextWrapping.Wrap"/>.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public TextWrapping TextWrapping
         {
             get { return (TextWrapping)this.GetValue(TextWrappingProperty); }
@@ -147,6 +159,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the <see cref="RichTextBlock.LineHeight"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LineHeightProperty =
             DependencyProperty.Register(
                 "LineHeight",
@@ -162,6 +175,7 @@ namespace Windows.UI.Xaml.Controls
         /// is determined automatically from the current font characteristics. The default
         /// is 0.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public double LineHeight
         {
             get { return (double)this.GetValue(LineHeightProperty); }

@@ -15,14 +15,17 @@ namespace Microsoft.Expression.Interactivity.Core
 	//     For action authors, this class provides a standard way to target a Storyboard.
 	//     Design tools may choose to provide a special editing experience for classes that
 	//     inherit from this action, thereby improving the designer experience.
+	[OpenSilver.NotImplemented]
 	public abstract partial class StoryboardAction : TriggerAction<DependencyObject>
 	{
+		[OpenSilver.NotImplemented]
 		public static readonly DependencyProperty StoryboardProperty =
 			DependencyProperty.Register("Storyboard",
 										typeof(Storyboard),
 										typeof(StoryboardAction),
 										null);
 
+		[OpenSilver.NotImplemented]
 		protected StoryboardAction()
 		{
 			
@@ -31,6 +34,7 @@ namespace Microsoft.Expression.Interactivity.Core
 		//
 		// Summary:
 		//     The targeted Storyboard. This is a dependency property.
+		[OpenSilver.NotImplemented]
 		public Storyboard Storyboard
 		{
 			get { return (Storyboard)GetValue(StoryboardProperty); }
@@ -43,6 +47,7 @@ namespace Microsoft.Expression.Interactivity.Core
 		//
 		// Parameters:
 		//   args:
+		[OpenSilver.NotImplemented]
 		protected virtual void OnStoryboardChanged(DependencyPropertyChangedEventArgs args)
 		{
 			

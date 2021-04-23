@@ -19,6 +19,7 @@ using System.Collections.Generic;
 namespace System.Windows.Browser
 {
 #if WORKINPROGRESS
+	[OpenSilver.NotImplemented]
     public sealed partial class ScriptObjectCollection : ScriptObject, IEnumerable<ScriptObject>, IEnumerable
     {
         #region Fields
@@ -27,11 +28,13 @@ namespace System.Windows.Browser
         #endregion
 
         #region Properties
+		[OpenSilver.NotImplemented]
         public int Count
         {
             get { return _count; }
         }
 
+		[OpenSilver.NotImplemented]
         public ScriptObject this[int index]
         {
             get { return _item; }

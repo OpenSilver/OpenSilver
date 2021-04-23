@@ -33,10 +33,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Include="App.xaml.cs" />
+		<Compile Include="App.xaml.cs">
+			<DependentUpon>App.xaml</DependentUpon>
+		</Compile>
+		<Compile Include="MainPage.xaml.cs">
+			<DependentUpon>MainPage.xaml</DependentUpon>
+		</Compile>
 		<Compile Include="HintBehavior.cs" />
 		<Compile Include="LinqSamples.cs" />
-		<Compile Include="MainPage.xaml.cs" />
 		<Compile Include="MyCustomImageControl.cs" />
 		<Compile Include="SampleHeaderedContainer.xaml.cs" />
 		<Compile Include="TestingChildWindow\LoginWindow.xaml.cs" />
@@ -44,10 +48,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="Images\arrow_left.png" />
-		<Content Include="Images\arrow_right.png" />
-		<Content Include="Images\arrow_right_and_left.png" />
-		<Content Include="Images\Logo1.png" />
 		<Content Include="App.xaml">
 			<SubType>Designer</SubType>
 			<Generator>MSBuild:Compile</Generator>
@@ -56,17 +56,21 @@
 			<SubType>Designer</SubType>
 			<Generator>MSBuild:Compile</Generator>
 		</Content>
+		<Content Include="SampleHeaderedContainer.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Content>
+		<Content Include="TestingChildWindow\LoginWindow.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
-		<Page Include="SampleHeaderedContainer.xaml">
-			<Generator>MSBuild:Compile</Generator>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Include="TestingChildWindow\LoginWindow.xaml">
-			<Generator>MSBuild:Compile</Generator>
-			<SubType>Designer</SubType>
-		</Page>
+		<Content Include="Images\arrow_left.png" />
+		<Content Include="Images\arrow_right.png" />
+		<Content Include="Images\arrow_right_and_left.png" />
+		<Content Include="Images\Logo1.png" />
 	</ItemGroup>
 
 </Project>

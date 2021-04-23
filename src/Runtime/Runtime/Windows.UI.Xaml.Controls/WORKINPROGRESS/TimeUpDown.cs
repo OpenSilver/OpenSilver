@@ -28,6 +28,7 @@ namespace Windows.UI.Xaml.Controls
     /// Represents a control that uses a spinner and textbox to allow a user to
     /// input time.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class TimeUpDown : UpDownBase, IUpdateVisualState
     {
         /// <summary>
@@ -50,6 +51,7 @@ namespace Windows.UI.Xaml.Controls
         /// <remarks>Setting the minimum property is applicable for the following
         /// features: Parsing a new value from the textbox, spinning a new value
         /// and programmatically specifying a value.</remarks>
+        [OpenSilver.NotImplemented]
         public DateTime? Minimum
         {
             get => (DateTime?)GetValue(MinimumProperty);
@@ -59,6 +61,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Minimum dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty MinimumProperty =
             DependencyProperty.Register(
                 "Minimum",
@@ -81,6 +84,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="oldValue">Old value of the Minimum property.</param>
         /// <param name="newValue">New value of the Minimum property.</param>
+        [OpenSilver.NotImplemented]
         protected virtual void OnMinimumChanged(DateTime? oldValue, DateTime? newValue)
         {
         }
@@ -93,6 +97,7 @@ namespace Windows.UI.Xaml.Controls
         /// <remarks>Setting the Maximum property is applicable for the following
         /// features: Parsing a new value from the textbox, spinning a new value
         /// and programmatically specifying a value. </remarks>
+        [OpenSilver.NotImplemented]
         public DateTime? Maximum
         {
             get => (DateTime?)GetValue(MaximumProperty);
@@ -102,6 +107,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Maximum dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty MaximumProperty =
             DependencyProperty.Register(
                 "Maximum",
@@ -124,6 +130,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="oldValue">Old value of the Maximum property.</param>
         /// <param name="newValue">New value of the Maximum property.</param>
+        [OpenSilver.NotImplemented]
         protected virtual void OnMaximumChanged(DateTime? oldValue, DateTime? newValue)
         {
         }
@@ -134,6 +141,7 @@ namespace Windows.UI.Xaml.Controls
         /// Gets or sets a collection of TimeParsers that are used when parsing
         /// text to time.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public TimeParserCollection TimeParsers
         {
             get => GetValue(TimeParsersProperty) as TimeParserCollection;
@@ -143,6 +151,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the TimeParsers dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TimeParsersProperty =
             DependencyProperty.Register(
                 "TimeParsers",
@@ -167,6 +176,7 @@ namespace Windows.UI.Xaml.Controls
         /// Custom formats can only contain "H", "h", "m", "s" or "t".
         /// For example: use 'hh:mm:ss' is used to format time as "13:45:30".
         /// </summary>
+        [OpenSilver.NotImplemented]
         public ITimeFormat Format
         {
             get => GetValue(FormatProperty) as ITimeFormat;
@@ -176,6 +186,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Format dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FormatProperty =
             DependencyProperty.Register(
                 "Format",
@@ -200,6 +211,7 @@ namespace Windows.UI.Xaml.Controls
         /// Gets or sets the culture that will be used by the control for
         /// parsing and formatting.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public CultureInfo Culture
         {
             get => (CultureInfo)GetValue(CultureProperty);
@@ -209,6 +221,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Culture dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CultureProperty =
             DependencyProperty.Register(
                 "Culture",
@@ -233,6 +246,7 @@ namespace Windows.UI.Xaml.Controls
         /// Gets or sets the strategy object that determines how the control
         /// interacts with DateTime and CultureInfo.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public TimeGlobalizationInfo TimeGlobalizationInfo
         {
             get => (TimeGlobalizationInfo)GetValue(TimeGlobalizationInfoProperty);
@@ -242,6 +256,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the TimeGlobalizationInfo dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TimeGlobalizationInfoProperty =
             DependencyProperty.Register(
                 "TimeGlobalizationInfo",
@@ -270,6 +285,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <remarks>If TimeGlobalizationInfo is not set, will return
         /// default TimeGlobalizationInfo instance.</remarks>
+        [OpenSilver.NotImplemented]
         public TimeGlobalizationInfo ActualTimeGlobalizationInfo
         {
             get

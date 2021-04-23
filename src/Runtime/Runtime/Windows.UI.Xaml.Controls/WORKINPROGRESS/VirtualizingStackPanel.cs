@@ -13,11 +13,16 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public partial class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 	{
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty VirtualizationModeProperty = DependencyProperty.Register("VirtualizationMode", typeof(VirtualizationMode), typeof(VirtualizingStackPanel), null);
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty IsVirtualizingProperty = DependencyProperty.Register("IsVirtualizing", typeof(bool), typeof(VirtualizingStackPanel), null);
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register(nameof(Orientation), typeof(Orientation), typeof(VirtualizingStackPanel), new PropertyMetadata());
+        [OpenSilver.NotImplemented]
 		public Orientation Orientation
 		{
 			get
@@ -31,16 +36,19 @@ namespace Windows.UI.Xaml.Controls
 			}
 		}
 
+        [OpenSilver.NotImplemented]
 		public ScrollViewer ScrollOwner
 		{
 			get;
 			set;
 		}
 
+        [OpenSilver.NotImplemented]
 		public VirtualizingStackPanel()
 		{
 		}
 
+        [OpenSilver.NotImplemented]
 		public Rect MakeVisible(UIElement visual, Rect rectangle)
 		{
 			throw new NotImplementedException();
@@ -60,6 +68,7 @@ namespace Windows.UI.Xaml.Controls
 		// Exceptions:
 		//   T:System.ArgumentNullException:
 		//     element is null.
+        [OpenSilver.NotImplemented]
 		public static VirtualizationMode GetVirtualizationMode(DependencyObject element)
 		{
 			return (VirtualizationMode)element.GetValue(VirtualizationModeProperty);
@@ -79,6 +88,7 @@ namespace Windows.UI.Xaml.Controls
 		// Exceptions:
 		//   T:System.ArgumentNullException:
 		//     element is null.
+        [OpenSilver.NotImplemented]
 		public static void SetVirtualizationMode(DependencyObject element, VirtualizationMode value)
 		{
 			element.SetValue(VirtualizationModeProperty, value);

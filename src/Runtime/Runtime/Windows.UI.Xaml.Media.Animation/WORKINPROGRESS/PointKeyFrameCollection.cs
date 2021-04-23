@@ -6,6 +6,7 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
+    [OpenSilver.NotImplemented]
     public class PointKeyFrameCollection : PresentationFrameworkCollection<PointKeyFrame>
     {
         internal override void AddOverride(PointKeyFrame value)

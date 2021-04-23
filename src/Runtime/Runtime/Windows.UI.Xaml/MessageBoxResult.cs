@@ -43,11 +43,13 @@ namespace Windows.UI.Xaml
         /// The dialog box return value is
         /// Yes (usually sent from a button labeled Yes).
         /// </summary>
+        [OpenSilver.NotImplemented]
         Yes,
         /// <summary>
         /// The dialog box return value is
         /// No (usually sent from a button labeled No).
         /// </summary>
+        [OpenSilver.NotImplemented]
         No,
 #endif
     }

@@ -2,7 +2,8 @@
 
 namespace System.Windows.Messaging
 {
-    public class ListenFailedException :Exception
+	[OpenSilver.NotImplemented]
+    public class ListenFailedException : Exception
     {
     }
 }

@@ -9,11 +9,13 @@ namespace System.Windows.Messaging
 	// Summary:
 	//     Represents the receiving end of a local messaging channel between two Silverlight-based
 	//     applications.
+	[OpenSilver.NotImplemented]
 	public sealed class LocalMessageReceiver : IDisposable
 	{
 		//
 		// Summary:
 		//     A value that represents any domain.
+		[OpenSilver.NotImplemented]
 		public static readonly IEnumerable<string> AnyDomain;
 
 		//
@@ -31,6 +33,7 @@ namespace System.Windows.Messaging
 		//
 		//   T:System.ArgumentException:
 		//     receiverName is longer than 256 characters.
+		[OpenSilver.NotImplemented]
 		public LocalMessageReceiver(string receiverName)
 		{
 			
@@ -63,6 +66,7 @@ namespace System.Windows.Messaging
 		//     receiverName is longer than 256 characters.-or-allowedSenderDomains contains
 		//     one or more entries longer than 256 characters.-or-allowedSenderDomains contains
 		//     one or more entries with invalid characters ("," and ":").
+		[OpenSilver.NotImplemented]
 		public LocalMessageReceiver(string receiverName, ReceiverNameScope nameScope, IEnumerable<string> allowedSenderDomains)
 		{
 			
@@ -75,6 +79,7 @@ namespace System.Windows.Messaging
 		// Returns:
 		//     The domains that the receiver can receive messages from, or System.Windows.Messaging.LocalMessageReceiver.AnyDomain
 		//     if the receiver can receive messages from any domain.
+		[OpenSilver.NotImplemented]
 		public IEnumerable<string> AllowedSenderDomains { get; }
 		//
 		// Summary:
@@ -93,6 +98,7 @@ namespace System.Windows.Messaging
 		//   T:System.ObjectDisposedException:
 		//     When setting this property, the System.Windows.Messaging.LocalMessageReceiver.Dispose
 		//     method has already been called.
+		[OpenSilver.NotImplemented]
 		public bool DisableSenderTrustCheck { get; set; }
 		//
 		// Summary:
@@ -102,6 +108,7 @@ namespace System.Windows.Messaging
 		// Returns:
 		//     A value that indicates whether the System.Windows.Messaging.LocalMessageReceiver.ReceiverName
 		//     is scoped to the global namescope or to the receiver's specific domain.
+		[OpenSilver.NotImplemented]
 		public ReceiverNameScope NameScope { get; }
 		//
 		// Summary:
@@ -109,11 +116,13 @@ namespace System.Windows.Messaging
 		//
 		// Returns:
 		//     The name of the receiver.
+		[OpenSilver.NotImplemented]
 		public string ReceiverName { get; }
 
 		//
 		// Summary:
 		//     Occurs when a message is received from a System.Windows.Messaging.LocalMessageSender.
+		[OpenSilver.NotImplemented]
 		public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
 		//
@@ -121,6 +130,7 @@ namespace System.Windows.Messaging
 		//     Stops the receiver from receiving messages and releases all resources used by
 		//     the receiver.
 		[SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
 		public void Dispose()
 		{
 			
@@ -141,6 +151,7 @@ namespace System.Windows.Messaging
 		//   T:System.Windows.Messaging.ListenFailedException:
 		//     There is already a receiver registered with the same name and name scope.
 		[SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
 		public void Listen()
 		{
 			

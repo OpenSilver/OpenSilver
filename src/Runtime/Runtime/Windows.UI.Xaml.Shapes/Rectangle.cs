@@ -195,6 +195,7 @@ namespace Windows.UI.Xaml.Shapes
         // Returns:
         //     The x-axis radius of the ellipse that is used to round the corners of the
         //     rectangle.
+		[OpenSilver.NotImplemented]
         public double RadiusX
         {
             get { return (double)GetValue(RadiusXProperty); }
@@ -205,6 +206,7 @@ namespace Windows.UI.Xaml.Shapes
         //
         // Returns:
         //     The identifier for the RadiusX dependency property.
+		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty RadiusXProperty = DependencyProperty.Register("RadiusX", typeof(double), typeof(Rectangle), new PropertyMetadata(0d));
         //
         // Summary:
@@ -214,6 +216,7 @@ namespace Windows.UI.Xaml.Shapes
         // Returns:
         //     The y-axis radius of the ellipse that is used to round the corners of the
         //     rectangle. The default is 0.
+		[OpenSilver.NotImplemented]
         public double RadiusY
         {
             get { return (double)GetValue(RadiusYProperty); }
@@ -225,6 +228,7 @@ namespace Windows.UI.Xaml.Shapes
         //
         // Returns:
         //     The identifier for the RadiusY dependency property.
+		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty RadiusYProperty = DependencyProperty.Register("RadiusY", typeof(double), typeof(Rectangle), new PropertyMetadata(0d));
         #endregion
 #endif

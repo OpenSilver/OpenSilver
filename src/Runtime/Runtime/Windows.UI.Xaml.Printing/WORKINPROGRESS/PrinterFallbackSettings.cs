@@ -5,6 +5,7 @@ namespace System.Windows.Printing
 namespace Windows.UI.Xaml.Printing
 #endif
 {
+	[OpenSilver.NotImplemented]
 	public partial class PrinterFallbackSettings
 	{
 		//
@@ -14,6 +15,7 @@ namespace Windows.UI.Xaml.Printing
 		// Returns:
 		//     true to indicate all printing is forced to print in vector format; otherwise
 		//     false. The default is true.
+		[OpenSilver.NotImplemented]
 		public bool ForceVector
 		{
 			get;
@@ -29,6 +31,7 @@ namespace Windows.UI.Xaml.Printing
 		//     The opacity value of visual elements at which Silverlight rounds the opacity
 		//     to 1.0 to support vector printing on Postscript printers or drivers. The default
 		//     is 0.
+		[OpenSilver.NotImplemented]
 		public double OpacityThreshold
 		{
 			get;

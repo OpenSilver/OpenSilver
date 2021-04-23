@@ -39,6 +39,7 @@ namespace Windows.UI.Xaml.Controls
     public partial class WebView : FrameworkElement
 #endif
     {
+        [OpenSilver.NotImplemented]
         public event LoadCompletedEventHandler LoadCompleted;
     }
 }

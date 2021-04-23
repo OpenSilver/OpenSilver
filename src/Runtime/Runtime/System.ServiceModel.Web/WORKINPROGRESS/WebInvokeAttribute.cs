@@ -9,11 +9,13 @@ namespace System.ServiceModel.Web
     //     Indicates an operation is logically an invoke operation and that it can be called
     //     by the Web HTTP programming.
     [AttributeUsage(AttributeTargets.Method)]
+	[OpenSilver.NotImplemented]
     public sealed class WebInvokeAttribute : Attribute, IOperationBehavior
     {
         //
         // Summary:
         //     Initializes a new instance of the System.ServiceModel.Web.WebGetAttribute class.
+		[OpenSilver.NotImplemented]
         public WebInvokeAttribute()
         {
 
@@ -25,6 +27,7 @@ namespace System.ServiceModel.Web
         //
         // Returns:
         //     One of the System.ServiceModel.Web.WebMessageBodyStyle enumeration values.
+		[OpenSilver.NotImplemented]
         public WebMessageBodyStyle BodyStyle { get; set; }
         //
         // Summary:
@@ -34,6 +37,7 @@ namespace System.ServiceModel.Web
         // Returns:
         //     A value that specifies whether the System.ServiceModel.Web.WebGetAttribute.BodyStyle
         //     property was set explicitly.
+		[OpenSilver.NotImplemented]
         public bool IsBodyStyleSetExplicitly { get; }
         //
         // Summary:
@@ -43,6 +47,7 @@ namespace System.ServiceModel.Web
         // Returns:
         //     A value that specifies whether the System.ServiceModel.Web.WebGetAttribute.RequestFormat
         //     property was set.
+		[OpenSilver.NotImplemented]
         public bool IsRequestFormatSetExplicitly { get; }
         //
         // Summary:
@@ -52,6 +57,7 @@ namespace System.ServiceModel.Web
         // Returns:
         //     A value that specifies whether the System.ServiceModel.Web.WebGetAttribute.ResponseFormat
         //     property was set.
+		[OpenSilver.NotImplemented]
         public bool IsResponseFormatSetExplicitly { get; }
         //
         // Summary:
@@ -59,6 +65,7 @@ namespace System.ServiceModel.Web
         //
         // Returns:
         //     The protocol method associated with the operation.
+		[OpenSilver.NotImplemented]
         public string Method { get; set; }
         //
         // Summary:
@@ -66,6 +73,7 @@ namespace System.ServiceModel.Web
         //
         // Returns:
         //     One of the System.ServiceModel.Web.WebMessageFormat enumeration values.
+		[OpenSilver.NotImplemented]
         public WebMessageFormat RequestFormat { get; set; }
         //
         // Summary:
@@ -73,6 +81,7 @@ namespace System.ServiceModel.Web
         //
         // Returns:
         //     One of the System.ServiceModel.Web.WebMessageFormat enumeration values.
+		[OpenSilver.NotImplemented]
         public WebMessageFormat ResponseFormat { get; set; }
         //
         // Summary:
@@ -80,6 +89,7 @@ namespace System.ServiceModel.Web
         //
         // Returns:
         //     The URI template for t operation.
+		[OpenSilver.NotImplemented]
         public string UriTemplate { get; set; }
 
         void IOperationBehavior.AddBindingParameters(OperationDescription operationDescription, BindingParameterCollection bindingParameters)

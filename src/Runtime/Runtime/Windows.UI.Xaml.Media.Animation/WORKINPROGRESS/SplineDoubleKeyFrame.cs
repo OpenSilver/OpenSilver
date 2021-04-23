@@ -30,10 +30,13 @@ namespace Windows.UI.Xaml.Media.Animation
     /// This ByteKeyFrame interpolates between the Byte Value of
     /// the previous key frame and its own Value to produce its output value.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public sealed partial class SplineDoubleKeyFrame : DoubleKeyFrame
     {
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty KeySplineProperty = DependencyProperty.Register("KeySpline", typeof(KeySpline), typeof(SplineDoubleKeyFrame), new PropertyMetadata(new KeySpline()));
 
+        [OpenSilver.NotImplemented]
         public KeySpline KeySpline
         {
             get { return (KeySpline)GetValue(KeySplineProperty); }

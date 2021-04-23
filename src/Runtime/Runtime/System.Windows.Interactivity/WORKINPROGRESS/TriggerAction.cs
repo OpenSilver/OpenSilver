@@ -19,13 +19,16 @@ namespace System.Windows.Interactivity
 {
     public abstract partial class TriggerAction
     {
+		[OpenSilver.NotImplemented]
         protected virtual Type AssociatedObjectTypeConstraint { get; }
         
+		[OpenSilver.NotImplemented]
         protected virtual void OnAttached()
         {
 
         }
 
+		[OpenSilver.NotImplemented]
         protected virtual void OnDetaching()
         {
             

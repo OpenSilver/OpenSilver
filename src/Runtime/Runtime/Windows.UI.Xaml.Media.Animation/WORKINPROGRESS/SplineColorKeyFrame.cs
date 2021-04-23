@@ -30,10 +30,12 @@ namespace Windows.UI.Xaml.Media.Animation
     /// This ColorKeyFrame interpolates between the Color Value of
     /// the previous key frame and its own Value to produce its output value.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public sealed partial class SplineColorKeyFrame : ColorKeyFrame
     {
         /// <summary>Identifies the <see cref="P:System.Windows.Media.Animation.SplineColorKeyFrame.KeySpline" /> dependency property.</summary>
         /// <returns>The identifier for the <see cref="P:System.Windows.Media.Animation.SplineColorKeyFrame.KeySpline" /> dependency property.</returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty KeySplineProperty = DependencyProperty.Register("KeySpline", typeof(KeySpline), typeof(SplineColorKeyFrame), new PropertyMetadata(new KeySpline()));
 
         /// <summary>
@@ -42,6 +44,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <returns>
         /// The two control points that specify the cubic Bezier curve which defines the progress of the key frame.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public KeySpline KeySpline
         {
             get => (KeySpline)GetValue(KeySplineProperty);

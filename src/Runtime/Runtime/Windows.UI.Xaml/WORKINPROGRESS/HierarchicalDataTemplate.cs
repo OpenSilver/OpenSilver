@@ -30,8 +30,10 @@ namespace Windows.UI.Xaml
 {
 #if WORKINPROGRESS
     #region Not implemented yet
+	[OpenSilver.NotImplemented]
     public partial class HierarchicalDataTemplate : DataTemplate
     {
+		[OpenSilver.NotImplemented]
         public HierarchicalDataTemplate()
         {
             // Workaround to avoid NullReferenceException since the compiler does not handle HierarchicalDataTemplate yet.
@@ -49,6 +51,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Gets or sets the binding that is used to generate content for the next sublevel in the data hierarchy.
         /// </summary>
+		[OpenSilver.NotImplemented]
         public Binding ItemsSource { get; set; }
 
         /// <summary>
@@ -56,6 +59,7 @@ namespace Windows.UI.Xaml
         /// on a generated System.Windows.Controls.HeaderedItemsControl, such as a System.Windows.Controls.TreeViewItem, to indicate
         /// how to display items in the next sublevel in the data hierarchy.
         /// </summary>
+		[OpenSilver.NotImplemented]
         public DataTemplate ItemTemplate { set; get; }
     }
     #endregion

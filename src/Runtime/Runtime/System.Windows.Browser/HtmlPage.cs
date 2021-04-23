@@ -61,6 +61,7 @@ namespace System.Windows.Browser
 
 #if WORKINPROGRESS
 
+		[OpenSilver.NotImplemented]
         public static HtmlWindow PopupWindow(Uri navigateToUri, string target, HtmlPopupWindowOptions options)
         {
             return null;
@@ -73,6 +74,7 @@ namespace System.Windows.Browser
         //
         // Returns:
         //     The Silverlight plug-in in the Document Object Model (DOM).
+		[OpenSilver.NotImplemented]
         public static HtmlElement Plugin
         {
             get
@@ -85,8 +87,10 @@ namespace System.Windows.Browser
             }
         }
 
+		[OpenSilver.NotImplemented]
         public static bool IsEnabled { get; private set; }
 
+		[OpenSilver.NotImplemented]
         public static BrowserInformation BrowserInformation { get; private set; }
 
         /// <summary>
@@ -101,6 +105,7 @@ namespace System.Windows.Browser
         /// <exception cref="T:System.ArgumentNullException">
         /// <paramref name="scriptKey" /> or <paramref name="instance" /> is null.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public static void RegisterScriptableObject(string scriptKey, object instance)
         {
         }

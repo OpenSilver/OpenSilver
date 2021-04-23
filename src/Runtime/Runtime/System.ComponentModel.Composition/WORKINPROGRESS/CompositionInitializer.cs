@@ -6,6 +6,7 @@ namespace System.ComponentModel.Composition
     //
     // Summary:
     //     Provides static access to methods for parts to satisfy imports.
+	[OpenSilver.NotImplemented]
     public static class CompositionInitializer
     {
         //
@@ -28,6 +29,7 @@ namespace System.ComponentModel.Composition
         //
         //   T:System.ComponentModel.Composition.CompositionException:
         //     One or more of the imports of attributedPart caused a composition error.
+		[OpenSilver.NotImplemented]
         public static void SatisfyImports(object attributedPart)
         {
 
@@ -52,6 +54,7 @@ namespace System.ComponentModel.Composition
         //
         //   T:System.ComponentModel.Composition.CompositionException:
         //     One or more of the imports of attributedPart caused a composition error.
+		[OpenSilver.NotImplemented]
         public static void SatisfyImports(ComposablePart part)
         {
 

@@ -1,18 +1,21 @@
-﻿<Page
+﻿<UserControl
     x:Class="TestApplication.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:TestApplication"
+    xmlns:local="clr-namespace:TestApplication"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:interaction="using:System.Windows.Interactivity"
+    xmlns:interaction="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+    xmlns:sdk = "http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" 
+    xmlns:tk="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
     mc:Ignorable="d"
     Foreground="Black">
-    <Page.Resources>
+    <UserControl.Resources>
         <local:MyColor x:Key="MyColor"/>
 
         <Style x:Key="StyleTestForBinding" TargetType="TextBlock">
-            <Setter Property="Background" Value="Red"/>
+            <!--SLDISABLED-->
+            <!--<Setter Property="Background" Value="Red"/>-->
             <!--<Setter Property="Background" Value="{Binding Path=BackgroundColor, Source={StaticResource MyColor}}"/>-->
         </Style>
 
@@ -544,7 +547,7 @@
             </Setter>
         </Style>
 
-    </Page.Resources>
+    </UserControl.Resources>
     <!--xmlns:test="clr-namespace:ToDoCalendarControl.Html;assembly=ToDoCalendarControl.Html"-->
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Orientation="Vertical" Background="White">
@@ -601,7 +604,8 @@
                 <TextBlock Text="Right-click to display msg box."/>
             </Border>
             <TextBlock Text="Testing CONTEXT MENU:" Margin="0,10,0,0"/>
-            <Border CornerRadius="5" Background="LightGray" Padding="10" HorizontalAlignment="Center">
+            <!--SLDISABLED-->
+            <!--<Border CornerRadius="5" Background="LightGray" Padding="10" HorizontalAlignment="Center">
                 <Border.ContextMenu>
                     <ContextMenu>
                         <MenuItem Content="Menu Item 1" Click="MenuItem1_Click"/>
@@ -632,7 +636,8 @@
                     </ContextMenu>
                 </Border.ContextMenu>
                 <TextBlock Text="Right-click to display menu with icons."/>
-            </Border>
+            </Border>-->
+            
             <TextBlock Text="Testing DateTime:" Margin="0,10,0,0"/>
             <Button Content="Click to test with date 01/02/2014 at 15:16:17 (Unspecified kind)" Click="ButtonTestDateTime1_Click" HorizontalAlignment="Center"/>
             <Button Content="Click to test with date 01/02/2014 at 15:16:17 (Local)" Click="ButtonTestDateTime2_Click" HorizontalAlignment="Center"/>
@@ -640,9 +645,9 @@
             <Button Content="Click to test with current date" Click="ButtonTestDateTime4_Click" HorizontalAlignment="Center"/>
             <Button Content="Click to test with current date UTC" Click="ButtonTestDateTime5_Click" HorizontalAlignment="Center"/>
             <TextBlock Text="Testing ComboBox, ListBox, AutoCompleteBox:" Margin="0,10,0,0"/>
-            <TabControl>
-                <TabItem Header="Click me to see the tests">
-                    <TabItem.Content>
+            <sdk:TabControl>
+                <sdk:TabItem Header="Click me to see the tests">
+                    <sdk:TabItem.Content>
                         <StackPanel Orientation="Vertical" Margin="0,10,0,0">
                             <TextBlock Text="ITEMSCONTROL:"/>
                             <ItemsControl x:Name="ItemsControl1" Width="100"/>
@@ -708,7 +713,8 @@
                                 <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=ComboBox1, Path=SelectedItem}"/>
                             </StackPanel>
                             <TextBlock Text="COMBOBOX NON NATIVE:"/>
-                            <ComboBox x:Name="ComboBoxNonNative" Width="250" UseNativeComboBox="False"/>
+                            <!--SLDISABLED-->
+                            <!--<ComboBox x:Name="ComboBoxNonNative" Width="250" UseNativeComboBox="False"/>
                             <Button Content="Items.Add UI element" Click="ButtonTestComboBoxNonNative_ItemsAddUIElement_Click"/>
                             <Button Content="Items.Add string" Click="ButtonTestComboBoxNonNative_ItemsAddString_Click"/>
                             <Button Content="Items.Add" Click="ButtonTestComboBoxNonNative_ItemsAdd_Click"/>
@@ -730,9 +736,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="SelectedItem:"/>
                                 <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=ComboBoxNonNative, Path=SelectedItem}"/>
-                            </StackPanel>
+                            </StackPanel>-->
+                            
                             <TextBlock Text="AUTOCOMPLETEBOX:"/>
-                            <AutoCompleteBox x:Name="AutoCompleteBox1" Width="250"/>
+                            <!--SLDISABLED-->
+                            <!--<AutoCompleteBox x:Name="AutoCompleteBox1" Width="250"/>
                             <Button Content="Items.Add UI element" Click="ButtonTestAutoCompleteBox1_ItemsAddUIElement_Click"/>
                             <Button Content="Items.Add string" Click="ButtonTestAutoCompleteBox1_ItemsAddString_Click"/>
                             <Button Content="Items.Add" Click="ButtonTestAutoCompleteBox1_ItemsAdd_Click"/>
@@ -754,7 +762,8 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="SelectedItem:"/>
                                 <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=AutoCompleteBox1, Path=SelectedItem}"/>
-                            </StackPanel>
+                            </StackPanel>-->
+                            
                             <!--<TextBlock Text="DATAGRID:"/>
                             <DataGrid x:Name="DataGrid1" Width="150"/>
                             <Button Content="Items.Add" Click="ButtonTestDataGrid_ItemsAdd_Click"/>
@@ -779,12 +788,12 @@
                                 <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=DataGrid1, Path=SelectedItem}"/>
                             </StackPanel>-->
                         </StackPanel>
-                    </TabItem.Content>
-                </TabItem>
-                <TabItem Header="Second Tab">
+                    </sdk:TabItem.Content>
+                </sdk:TabItem>
+                <sdk:TabItem Header="Second Tab">
                     <TextBlock Text="Tab 2"/>
-                </TabItem>
-            </TabControl>
+                </sdk:TabItem>
+            </sdk:TabControl>
             <!-- Testing negative margins -->
             <TextBlock Text="Testing NEGATIVE MARGINS:" Margin="0,10,0,0"/>
             <TextBlock Text="Margin='-11,12,13,14'"/>
@@ -819,7 +828,9 @@
 
             <!-- Testing IsHitTestVisible and Opacity -->
             <TextBlock Text="Testing IsHitTestVisible:" Margin="0,10,0,0"/>
-            <Grid Width="200" Height="80" ClipToBounds="True">
+            <!--SLDISABLED-->
+            <!--<Grid Width="200" Height="80" ClipToBounds="True">-->
+            <Grid Width="200" Height="80">
                 <Button Content="This button is under an overlay" Click="TestButtonUnderOverlay_Click"/>
                 <Rectangle Fill="Red" Opacity="0.3" IsHitTestVisible="False"/>
             </Grid>
@@ -875,8 +886,8 @@
                             <Button Background="#DDDDDD" Click="Frame1_p2_Clicked" Margin="0,0,1,0" Content="p2"/>
                             <Button Background="#DDDDDD" Click="Frame1_GoForward_Clicked" Content="--&gt;"/>
                         </StackPanel>
-                        <Frame x:Name="MyFrame" JournalOwnership="UsesParentJournal">
-                            <Frame.Template>
+                        <sdk:Frame x:Name="MyFrame" JournalOwnership="UsesParentJournal">
+                            <sdk:Frame.Template>
                                 <ControlTemplate>
                                     <Border>
                                         <StackPanel Orientation="Vertical">
@@ -888,34 +899,34 @@
                                                 <Button DataContext="{Binding ElementName=MyInnerFrame}" Background="#DDDDDD" Click="InnerFrame_p2_Clicked" Margin="0,0,1,0" Content="p2"/>
                                                 <Button DataContext="{Binding ElementName=MyInnerFrame}" Background="#DDDDDD" Click="InnerFrame_GoForward_Clicked" Content="--&gt;"/>
                                             </StackPanel>
-                                            <Frame x:Name="MyInnerFrame" JournalOwnership="Automatic">
-                                                <Frame.Template>
+                                            <sdk:Frame x:Name="MyInnerFrame" JournalOwnership="Automatic">
+                                                <sdk:Frame.Template>
                                                     <ControlTemplate>
                                                         <Border>
                                                             <ContentPresenter/>
                                                         </Border>
                                                     </ControlTemplate>
-                                                </Frame.Template>
-                                                <Frame.UriMapper>
-                                                    <UriMapper>
-                                                        <UriMapping
+                                                </sdk:Frame.Template>
+                                                <sdk:Frame.UriMapper>
+                                                    <sdk:UriMapper>
+                                                        <sdk:UriMapping
                             Uri="/{pageName}"
                             MappedUri="/FrameSubPages/{pageName}.xaml"/>
-                                                    </UriMapper>
-                                                </Frame.UriMapper>
-                                            </Frame>
+                                                    </sdk:UriMapper>
+                                                </sdk:Frame.UriMapper>
+                                            </sdk:Frame>
                                         </StackPanel>
                                     </Border>
                                 </ControlTemplate>
-                            </Frame.Template>
-                            <Frame.UriMapper>
-                                <UriMapper>
-                                    <UriMapping
+                            </sdk:Frame.Template>
+                            <sdk:Frame.UriMapper>
+                                <sdk:UriMapper>
+                                    <sdk:UriMapping
                             Uri="/{pageName}"
                             MappedUri="/FrameSubPages/{pageName}.xaml"/>
-                                </UriMapper>
-                            </Frame.UriMapper>
-                        </Frame>
+                                </sdk:UriMapper>
+                            </sdk:Frame.UriMapper>
+                        </sdk:Frame>
                     </StackPanel>
                 </Border>
                 <Border BorderBrush="DarkGray" BorderThickness="2" Padding="3" Grid.Column="1">
@@ -927,22 +938,22 @@
                             <Button Background="#DDDDDD" Click="Frame2_p2_Clicked" Margin="0,0,1,0" Content="p2"/>
                             <Button Background="#DDDDDD" Click="Frame2_GoForward_Clicked" Content="--&gt;"/>
                         </StackPanel>
-                        <Frame x:Name="MyFrame2" JournalOwnership="OwnsJournal">
-                            <Frame.Template>
+                        <sdk:Frame x:Name="MyFrame2" JournalOwnership="OwnsJournal">
+                            <sdk:Frame.Template>
                                 <ControlTemplate>
                                     <Border>
                                         <ContentPresenter/>
                                     </Border>
                                 </ControlTemplate>
-                            </Frame.Template>
-                            <Frame.UriMapper>
-                                <UriMapper>
-                                    <UriMapping
+                            </sdk:Frame.Template>
+                            <sdk:Frame.UriMapper>
+                                <sdk:UriMapper>
+                                    <sdk:UriMapping
                             Uri="/{pageName}"
                             MappedUri="/FrameSubPages/{pageName}.xaml"/>
-                                </UriMapper>
-                            </Frame.UriMapper>
-                        </Frame>
+                                </sdk:UriMapper>
+                            </sdk:Frame.UriMapper>
+                        </sdk:Frame>
                     </StackPanel>
                 </Border>
                 <Border BorderBrush="DarkGray" BorderThickness="2" Padding="3" Grid.Column="2">
@@ -954,22 +965,22 @@
                             <Button Background="#DDDDDD" Click="Frame3_p2_Clicked" Margin="0,0,1,0" Content="p2"/>
                             <Button Background="#DDDDDD" Click="Frame3_GoForward_Clicked" Content="--&gt;"/>
                         </StackPanel>
-                        <Frame x:Name="MyFrame3" JournalOwnership="Automatic">
-                            <Frame.Template>
+                        <sdk:Frame x:Name="MyFrame3" JournalOwnership="Automatic">
+                            <sdk:Frame.Template>
                                 <ControlTemplate>
                                     <Border>
                                         <ContentPresenter/>
                                     </Border>
                                 </ControlTemplate>
-                            </Frame.Template>
-                            <Frame.UriMapper>
-                                <UriMapper>
-                                    <UriMapping
+                            </sdk:Frame.Template>
+                            <sdk:Frame.UriMapper>
+                                <sdk:UriMapper>
+                                    <sdk:UriMapping
                             Uri="/{pageName}"
                             MappedUri="/FrameSubPages/{pageName}.xaml"/>
-                                </UriMapper>
-                            </Frame.UriMapper>
-                        </Frame>
+                                </sdk:UriMapper>
+                            </sdk:Frame.UriMapper>
+                        </sdk:Frame>
                     </StackPanel>
                 </Border>
             </Grid>
@@ -1020,8 +1031,12 @@
                     <TextBlock Text="Testing TEXTCHANGED event:"/>
                     <TextBlock TextWrapping="Wrap">At every TextChange the pink counter should increase by one, and the yellow TextBlock should contain the same text as the one you type.</TextBlock>
                     <TextBox x:Name="TestTextChanged_TextBox" TextChanged="TestTextChanged_TextBox_TextChanged"/>
-                    <TextBlock x:Name="TestTextChanged_Count" Text="0"  Background="Pink"/>
-                    <TextBlock x:Name="TestTextChanged_TextBlock" Text="{Binding ElementName=TestTextChanged_TextBox, Path=Text}" Background="Yellow"/>
+                    <!--SLDISABLED-->
+                    <!--<TextBlock x:Name="TestTextChanged_Count" Text="0"  Background="Pink"/>-->
+                    <TextBlock x:Name="TestTextChanged_Count" Text="0" />
+                    <!--SLDISABLED-->
+                    <!--<TextBlock x:Name="TestTextChanged_TextBlock" Text="{Binding ElementName=TestTextChanged_TextBox, Path=Text}" Background="Yellow"/>-->
+                    <TextBlock x:Name="TestTextChanged_TextBlock" Text="{Binding ElementName=TestTextChanged_TextBox, Path=Text}" />
                 </StackPanel>
             </Border>
 
@@ -1273,33 +1288,38 @@
                     <RowDefinition/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <Border Background="Beige" Cursor="AppStarting" Margin="1,2" Grid.Row="0" Grid.Column="0">
+                <!--SLDISABLED-->
+                <!--<Border Background="Beige" Cursor="AppStarting" Margin="1,2" Grid.Row="0" Grid.Column="0">
                     <TextBlock Text="AppStarting"/>
-                </Border>
+                </Border>-->
                 <Border Background="Beige" Cursor="Arrow" Margin="1,2" Grid.Row="0" Grid.Column="1">
                     <TextBlock Text="Arrow"/>
                 </Border>
-                <Border Background="Beige" Cursor="Cross" Margin="1,2" Grid.Row="0" Grid.Column="2">
+                <!--SLDISABLED-->
+                <!--<Border Background="Beige" Cursor="Cross" Margin="1,2" Grid.Row="0" Grid.Column="2">
                     <TextBlock Text="Cross"/>
-                </Border>
+                </Border>-->
                 <Border Background="Beige" Cursor="Hand" Margin="1,2" Grid.Row="0" Grid.Column="3">
                     <TextBlock Text="Hand"/>
                 </Border>
-                <Border Background="Beige" Cursor="Help" Margin="1,2" Grid.Row="1" Grid.Column="0">
+                <!--SLDISABLED-->
+                <!--<Border Background="Beige" Cursor="Help" Margin="1,2" Grid.Row="1" Grid.Column="0">
                     <TextBlock Text="Help"/>
-                </Border>
+                </Border>-->
                 <Border Background="Beige" Cursor="IBeam" Margin="1,2" Grid.Row="1" Grid.Column="1">
                     <TextBlock Text="IBeam"/>
                 </Border>
-                <Border Background="Beige" Cursor="No" Margin="1,2" Grid.Row="1" Grid.Column="2">
+                <!--SLDISABLED-->
+                <!--<Border Background="Beige" Cursor="No" Margin="1,2" Grid.Row="1" Grid.Column="2">
                     <TextBlock Text="No"/>
-                </Border>
+                </Border>-->
                 <Border Background="Beige" Cursor="None" Margin="1,2" Grid.Row="1" Grid.Column="3">
                     <TextBlock Text="None"/>
                 </Border>
-                <Border Background="Beige" Cursor="SizeAll" Margin="1,2" Grid.Row="2" Grid.Column="0">
+                <!--SLDISABLED-->
+                <!--<Border Background="Beige" Cursor="SizeAll" Margin="1,2" Grid.Row="2" Grid.Column="0">
                     <TextBlock Text="SizeAll"/>
-                </Border>
+                </Border>-->
                 <Border Background="Beige" Cursor="SizeNESW" Margin="1,2" Grid.Row="2" Grid.Column="1">
                     <TextBlock Text="SizeNESW"/>
                 </Border>
@@ -1351,7 +1371,9 @@
 
             <!-- Testing the GRID -->
             <TextBlock Text="Testing the GRID:"/>
-            <Grid Width="200" Height="200" Background="#DDDDDD" ClipToBounds="True">
+            <!--SLDISABLED-->
+            <!--<Grid Width="200" Height="200" Background="#DDDDDD" ClipToBounds="True">-->
+            <Grid Width="200" Height="200" Background="#DDDDDD">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="70"/>
                     <ColumnDefinition Width="3*"/>
@@ -1560,7 +1582,7 @@
                 <Border Background="Blue" CornerRadius="2" Margin="2">
                     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="White">Left side</TextBlock>
                 </Border>
-                <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
+                <sdk:GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
                 <Border Grid.Column="2" Background="Red" CornerRadius="2" Margin="2">
                     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="White">Right side</TextBlock>
                 </Border>
@@ -1572,33 +1594,33 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <TextBox Grid.Row="0" Text="Up text"/>
-                <GridSplitter Grid.Row="1" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Azure"/>
+                <sdk:GridSplitter Grid.Row="1" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Azure"/>
                 <TextBox Grid.Row="2" Text="Down text"/>
             </Grid>
 
             <TextBlock Text="Testing the DOCKPANEL:"/>
-            <DockPanel Width="200" Height="180"  Background="#DDDDDD">
-                <Border DockPanel.Dock="Left" Width="50" Background="Blue" CornerRadius="2" Margin="2"/>
-                <Border DockPanel.Dock="Top" Height="50" Background="Red" CornerRadius="2" Margin="2"/>
-                <Border DockPanel.Dock="Right" Width="50" Background="Green" CornerRadius="2" Margin="2"/>
-                <Border DockPanel.Dock="Bottom" Height="50" Background="Orange" CornerRadius="2" Margin="2"/>
-                <Border DockPanel.Dock="Left" Width="50" Background="Purple" CornerRadius="2" Margin="2"/>
+            <tk:DockPanel Width="200" Height="180"  Background="#DDDDDD">
+                <Border tk:DockPanel.Dock="Left" Width="50" Background="Blue" CornerRadius="2" Margin="2"/>
+                <Border tk:DockPanel.Dock="Top" Height="50" Background="Red" CornerRadius="2" Margin="2"/>
+                <Border tk:DockPanel.Dock="Right" Width="50" Background="Green" CornerRadius="2" Margin="2"/>
+                <Border tk:DockPanel.Dock="Bottom" Height="50" Background="Orange" CornerRadius="2" Margin="2"/>
+                <Border tk:DockPanel.Dock="Left" Width="50" Background="Purple" CornerRadius="2" Margin="2"/>
                 <Border Background="Pink" CornerRadius="2" Margin="2"/>
-            </DockPanel>
+            </tk:DockPanel>
             <Border Width="300" Padding="10" Background="#DDDDDD" Margin="0,20,0,0">
                 <StackPanel>
-                    <DockPanel>
+                    <tk:DockPanel>
                         <TextBlock Text="First name:"/>
-                        <TextBox DockPanel.Dock="Right" Margin="5,0,0,0"/>
-                    </DockPanel>
-                    <DockPanel Margin="0,5,0,0">
+                        <TextBox tk:DockPanel.Dock="Right" Margin="5,0,0,0"/>
+                    </tk:DockPanel>
+                    <tk:DockPanel Margin="0,5,0,0">
                         <TextBlock Text="Age:"/>
-                        <TextBox DockPanel.Dock="Right" Margin="5,0,0,0"/>
-                    </DockPanel>
-                    <DockPanel Margin="0,5,0,0">
+                        <TextBox tk:DockPanel.Dock="Right" Margin="5,0,0,0"/>
+                    </tk:DockPanel>
+                    <tk:DockPanel Margin="0,5,0,0">
                         <TextBlock Text="Address:"/>
-                        <TextBox DockPanel.Dock="Right" Margin="5,0,0,0"/>
-                    </DockPanel>
+                        <TextBox tk:DockPanel.Dock="Right" Margin="5,0,0,0"/>
+                    </tk:DockPanel>
                 </StackPanel>
             </Border>
 
@@ -2368,36 +2390,37 @@
                     Data="M 10,100 L 10,300 300,-200 300,100">
                         </Path>
                     </Canvas>
-                    <Button Content="Redraw" Click="RedrawPath_Click"/>
-                    <WrapPanel Orientation="Horizontal">
+                    <!--SLDISABLED-->
+                    <!--<Button Content="Redraw" Click="RedrawPath_Click"/>-->
+                    <tk:WrapPanel Orientation="Horizontal">
                         <Button Content="Width" Click="TestChangePathWidth_Click" Margin="2"/>
                         <Button Content="Height" Click="TestChangePathHeight_Click" Margin="2"/>
                         <Button Content="Fill" Click="TestChangePathFill_Click" Margin="2"/>
                         <Button Content="Stretch" Click="TestChangePathStretch_Click" Margin="2"/>
                         <Button Content="Stroke" Click="TestChangePathStroke_Click" Margin="2"/>
                         <Button Content="StrokeThickness" Click="TestChangePathStrokeThickness_Click" Margin="2"/>
-                    </WrapPanel>
+                    </tk:WrapPanel>
                     <StackPanel Orientation="Horizontal">
                         <Button Content="EllipseGeometry" Click="TestEllipseGeometry_Click" Margin="2"/>
                         <Button Content="LineGeometry" Click="TestLineGeometry_Click" Margin="2"/>
                         <Button Content="PathGeometry" Click="TestPathGeometry_Click" Margin="2"/>
                     </StackPanel>
-                    <WrapPanel x:Name="EllipseGeometryButtons" Visibility="Collapsed">
+                    <tk:WrapPanel x:Name="EllipseGeometryButtons" Visibility="Collapsed">
                         <Button Content="Center" Click="TestEllipseCenter_Click" Margin="2"/>
                         <Button Content="RadiusX" Click="TestEllipseRadiusX_Click" Margin="2"/>
                         <Button Content="RadiusY" Click="TestEllipseRadiusY_Click" Margin="2"/>
-                    </WrapPanel>
-                    <WrapPanel x:Name="LineGeometryButtons" Visibility="Collapsed">
+                    </tk:WrapPanel>
+                    <tk:WrapPanel x:Name="LineGeometryButtons" Visibility="Collapsed">
                         <Button Content="StartPoint" Click="TestLineStartPoint_Click" Margin="2"/>
                         <Button Content="EndPoint" Click="TestLineEndPoint_Click" Margin="2"/>
-                    </WrapPanel>
-                    <WrapPanel x:Name="PathGeometryButtons" Visibility="Collapsed">
+                    </tk:WrapPanel>
+                    <tk:WrapPanel x:Name="PathGeometryButtons" Visibility="Collapsed">
                         <Button Content="FillRule" Click="TestPathFillRule_Click" Margin="2"/>
                         <Button Content="IsClosed" Click="TestPathIsClosed_Click" Margin="2"/>
                         <Button Content="IsFilled" Click="TestPathIsFilled_Click" Margin="2"/>
                         <Button Content="StartPoint" Click="TestPathStartPoint_Click" Margin="2"/>
-                    </WrapPanel>
-                    <WrapPanel x:Name="PathGeometrySegmentTypeButtons" Visibility="Collapsed">
+                    </tk:WrapPanel>
+                    <tk:WrapPanel x:Name="PathGeometrySegmentTypeButtons" Visibility="Collapsed">
                         <Button Content="Arc" Click="TestPathArc_Click" Margin="2"/>
                         <Button Content="Line" Click="TestPathLine_Click" Margin="2"/>
                         <Button Content="Bezier" Click="TestPathBezier_Click" Margin="2"/>
@@ -2405,35 +2428,35 @@
                         <Button Content="PolyLine" Click="TestPathPolyLine_Click" Margin="2"/>
                         <Button Content="PolyBezier" Click="TestPathPolyBezier_Click" Margin="2"/>
                         <Button Content="PolyQuadraticBezier" Click="TestPathPolyQuadratic_Click" Margin="2"/>
-                    </WrapPanel>
-                    <WrapPanel x:Name="PathArcButtons" Visibility="Collapsed">
+                    </tk:WrapPanel>
+                    <tk:WrapPanel x:Name="PathArcButtons" Visibility="Collapsed">
                         <Button Content="Arc IsLargeArc" Click="TestArcSegmentIsLargeArc_Click" Margin="2"/>
                         <Button Content="Arc Point" Click="TestArcSegmentPoint_Click" Margin="2"/>
                         <Button Content="Arc RotationAngle" Click="TestArcSegmentRotationAngle_Click" Margin="2"/>
                         <Button Content="Arc Size" Click="TestArcSegmentSize_Click" Margin="2"/>
                         <Button Content="Arc SweepDirection" Click="TestArcSegmentSweepDirection_Click" Margin="2"/>
-                    </WrapPanel>
-                    <WrapPanel x:Name="PathBezierButtons" Visibility="Collapsed">
+                    </tk:WrapPanel>
+                    <tk:WrapPanel x:Name="PathBezierButtons" Visibility="Collapsed">
                         <Button Content="Bezier Point1" Click="TestBezierPoint1_Click" Margin="2"/>
                         <Button Content="Bezier Point2" Click="TestBezierPoint2_Click" Margin="2"/>
                         <Button Content="Bezier Point3" Click="TestBezierPoint3_Click" Margin="2"/>
-                    </WrapPanel>
-                    <WrapPanel x:Name="PathLineButtons" Visibility="Collapsed">
+                    </tk:WrapPanel>
+                    <tk:WrapPanel x:Name="PathLineButtons" Visibility="Collapsed">
                         <Button Content="line Point" Click="TestLinePoint_Click" Margin="2"/>
-                    </WrapPanel>
-                    <WrapPanel x:Name="PathPolyBezierButtons" Visibility="Collapsed">
+                    </tk:WrapPanel>
+                    <tk:WrapPanel x:Name="PathPolyBezierButtons" Visibility="Collapsed">
                         <Button Content="PolyBezierSegment Points" Click="TestPolyBezierSegmentPoints_Click" Margin="2"/>
-                    </WrapPanel>
-                    <WrapPanel x:Name="PathPolyLineButtons" Visibility="Collapsed">
+                    </tk:WrapPanel>
+                    <tk:WrapPanel x:Name="PathPolyLineButtons" Visibility="Collapsed">
                         <Button Content="PolyLineSegment Points" Click="TestPolyLineSegmentPoints_Click" Margin="2"/>
-                    </WrapPanel>
-                    <WrapPanel x:Name="PathPolyQuadraticButtons" Visibility="Collapsed">
+                    </tk:WrapPanel>
+                    <tk:WrapPanel x:Name="PathPolyQuadraticButtons" Visibility="Collapsed">
                         <Button Content="PolyQuadraticBezierSegment Points" Click="TestPolyQuadraticBezierSegmentPoints_Click" Margin="2"/>
-                    </WrapPanel>
-                    <WrapPanel x:Name="PathQuadraticButtons" Visibility="Collapsed">
+                    </tk:WrapPanel>
+                    <tk:WrapPanel x:Name="PathQuadraticButtons" Visibility="Collapsed">
                         <Button Content="QuadraticBezier Point1" Click="TestQuadraticBezierPoint1_Click" Margin="2"/>
                         <Button Content="QuadraticBezier Point2" Click="TestQuadraticBezierPoint2_Click" Margin="2"/>
-                    </WrapPanel>
+                    </tk:WrapPanel>
                 </StackPanel>
             </Border>
 
@@ -2444,8 +2467,12 @@
                     <TextBlock x:Name="MyTextBlockForStyle1" Text="This TextBlock has a style that defines Fontsize, Background and Foreground." TextWrapping="Wrap"/>
                     <TextBlock x:Name="MyTextBlockForStyle2" Text="This TextBlock has a style based on the first one, with a different Foreground." TextWrapping="Wrap"/>
                     <TextBlock Text="This TextBlock has a Style with a Binding on Background." Style="{StaticResource StyleTestForBinding}" TextWrapping="Wrap"/>
-                    <TextBlock x:Name="MyTextBlockForStyle3" Text="This TextBlock has the same style as the first TextBlock, with a local value for the Background" Background="Black" TextWrapping="Wrap"/>
-                    <TextBlock Text="This TextBlock has the same style as the third TextBlock, with a local value for the Background" Style="{StaticResource StyleTestForBinding}" Background="Yellow" TextWrapping="Wrap"/>
+                    <!--SLDISABLED-->
+                    <!--<TextBlock x:Name="MyTextBlockForStyle3" Text="This TextBlock has the same style as the first TextBlock, with a local value for the Background" Background="Black" TextWrapping="Wrap"/>-->
+                    <TextBlock x:Name="MyTextBlockForStyle3" Text="This TextBlock has the same style as the first TextBlock, with a local value for the Background" TextWrapping="Wrap"/>
+                    <!--SLDISABLED-->
+                    <!--<TextBlock Text="This TextBlock has the same style as the third TextBlock, with a local value for the Background" Style="{StaticResource StyleTestForBinding}" Background="Yellow" TextWrapping="Wrap"/>-->
+                    <TextBlock Text="This TextBlock has the same style as the third TextBlock, with a local value for the Background" Style="{StaticResource StyleTestForBinding}" TextWrapping="Wrap"/>
                     <Button Background="LightGray" BorderBrush="Gray" BorderThickness="1" Click="ButtonTestChangeInStyles_Click">
                         <TextBlock Text="Click here to change the value in the setters for the first two styles and the value in the ViewModel for the third." TextWrapping="Wrap"/>
                     </Button>
@@ -2611,7 +2638,8 @@
 
             <!-- Testing DataGrid -->
             <TextBlock Text="Testing DataGrid:" Margin="0,10,0,0"/>
-            <StackPanel Orientation="Horizontal">
+            <!--SLDISABLED-->
+            <!--<StackPanel Orientation="Horizontal">
                 <Button Content="Test DataGrid" Click="ButtonTestDataGrid_Click" BorderBrush="Gray" BorderThickness="1" HorizontalAlignment="Left" Margin="2"/>
                 <Button Content="Clear DataGrids" Click="ButtonClearDataGrid_Click" BorderBrush="Gray" BorderThickness="1" HorizontalAlignment="Left" Margin="2"/>
             </StackPanel>
@@ -2666,11 +2694,12 @@
                         </StackPanel>
                     </Border>
                 </StackPanel>
-            </Border>
+            </Border>-->
 
             <!-- Testing DataGridColumn.Visibility -->
             <TextBlock Text="Testing DataGridColumn.Visibility:" Margin="0,10,0,0"/>
-            <StackPanel Orientation="Horizontal">
+            <!--SLDISABLED-->
+            <!--<StackPanel Orientation="Horizontal">
                 <Button Content="Test" Click="ButtonTestDataGridColumnVisibility_Click" BorderBrush="Gray" BorderThickness="1" HorizontalAlignment="Left" Margin="2"/>
             </StackPanel>
             <Border Background="LightGray" BorderBrush="Gray" BorderThickness="2" Margin="10" Padding="5">
@@ -2692,7 +2721,7 @@
                         </StackPanel>
                     </Border>
                 </StackPanel>
-            </Border>
+            </Border>-->
 
             <!-- Testing ICommand -->
             <TextBlock Text="Testing ICommand:" Margin="0,10,0,0"/>
@@ -2725,18 +2754,21 @@
 
 
             <!-- Testing MediaElement -->
-            <MediaElement Source="http://www.w3schools.com/html/mov_bbb.mp4" AutoPlay="False"/>
+            <TextBlock Text="Testing MediaElement:"/>
+            <MediaElement Source="https://www.w3schools.com/html/mov_bbb.mp4" AutoPlay="False"/>
 
             <!-- Testing Video Player -->
-            <local:VideoPlayerControl Source="http://www.w3schools.com/html/mov_bbb.mp4"/>
+            <!--SLDISABLED-->
+            <!--<local:VideoPlayerControl Source="https://www.w3schools.com/html/mov_bbb.mp4"/>-->
 
             <!-- Testing composite controls -->
             <TextBlock Text="Testing COMPOSITE CONTROLS:"/>
-            <local:SampleHeaderedContainer Header="This is the Header">
+            <!--SLDISABLED-->
+            <!--<local:SampleHeaderedContainer Header="This is the Header">
                 <local:SampleHeaderedContainer.Body>
                     <TextBlock Text="This is the Body"/>
                 </local:SampleHeaderedContainer.Body>
-            </local:SampleHeaderedContainer>
+            </local:SampleHeaderedContainer>-->
 
             <!-- Testing NESTED ELEMENTS -->
             <TextBlock Text="Testing NESTED ELEMENTS:"/>
@@ -2768,7 +2800,8 @@
             </Border>
             <!--Testing Printing-->
             <TextBlock Text="Testing Printing" FontSize="16"/>
-            <Border Width="200" Height="200" Background="LightGray">
+            <!--SLDISABLED-->
+            <!--<Border Width="200" Height="200" Background="LightGray">
                 <DockPanel x:Name="ElementToPrint">
                     <Border DockPanel.Dock="Left" Width="50" Background="Blue" CornerRadius="2" Margin="2"/>
                     <Border DockPanel.Dock="Top" Height="50" Background="Red" CornerRadius="2" Margin="2"/>
@@ -2782,7 +2815,8 @@
             <Button Content="Show the print dialog" Click="ButtonPrint_ShowDialog_Click"/>
             <Button Content="Set the print area to be the DockPanel above" Click="ButtonPrint_SetPrintArea_Click"/>
             <Button Content="Reset the print area to the default one" Click="ButtonPrint_ResetPrintArea_Click"/>
-            <Button Content="Print an element that is not in the Visual Tree" Click="ButtonPrint_InMemoryElement_Click"/>
+            <Button Content="Print an element that is not in the Visual Tree" Click="ButtonPrint_InMemoryElement_Click"/>-->
+            
             <!--Testing Text properties-->
             <TextBlock Text="Testing Text properties: (FontFamily is Segoe UI)" FontSize="16"/>
             <StackPanel Orientation="Vertical" Background="White">
@@ -2822,11 +2856,12 @@
             </StackPanel>
             <!--Testing Async/Await-->
             <TextBlock Text="Testing Async/Await:"/>
-            <StackPanel Orientation="Vertical" Background="White">
+            <!--SLDISABLED-->
+            <!--<StackPanel Orientation="Vertical" Background="White">
                 <Button Content="Normal call of async method" BorderThickness="5" BorderBrush="Red" FontWeight="600"  Background="White" Click="Button_Click"/>
                 <Button Content="Awaited call of async method" BorderThickness="5" BorderBrush="Red" FontWeight="600"  Background="White" Click="Button2_Click"/>
                 <TextBlock x:Name="TextBlock2" Text="Results here" Margin="20,30, 0,0"/>
-            </StackPanel>
+            </StackPanel>-->
             <!-- Testing IMAGE -->
             <TextBlock Text="Testing IMAGE CONTROL:"/>
             <ScrollViewer Width="300" Height="400" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
@@ -2933,4 +2968,4 @@
             <TextBlock Text="At the time of writing, for a better user experience (because result is unfortunately not perfectly identical) the TextBox in CSHTML5 has the following difference compared to that of WPF: TextWrapping is Wrap by default." TextWrapping="Wrap" Width="400" Margin="0,10,0,0"/>
         </StackPanel>
     </ScrollViewer>
-</Page>
+</UserControl>

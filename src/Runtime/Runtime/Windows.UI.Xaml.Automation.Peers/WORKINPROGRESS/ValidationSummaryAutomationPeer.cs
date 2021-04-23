@@ -28,6 +28,7 @@ namespace Windows.UI.Xaml.Automation.Peers
     /// <summary>
     /// Exposes <see cref="ValidationSummary" /> types to UI Automation.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class ValidationSummaryAutomationPeer : FrameworkElementAutomationPeer, IInvokeProvider
     {
         /// <summary>

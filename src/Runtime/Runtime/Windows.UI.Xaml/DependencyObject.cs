@@ -564,6 +564,7 @@ namespace Windows.UI.Xaml
         }
 
 #if WORKINPROGRESS
+        [OpenSilver.NotImplemented]
         public bool CheckAccess()
         {
             bool accessAllowed = true;

@@ -26,6 +26,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a time picker popup that allows choosing time from a ListBox.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class ListTimePickerPopup : TimePickerPopup
     {
     }

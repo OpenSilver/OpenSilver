@@ -33,27 +33,33 @@ namespace Windows.UI.Xaml
     /// Defines a transition between VisualStates.
     /// </summary>
     [ContentProperty("Storyboard")]
+    [OpenSilver.NotImplemented]
     public partial class VisualTransition : DependencyObject
     {
         /// <summary>Gets or sets the <see cref="T:System.Windows.Media.Animation.Storyboard" /> that occurs when the transition occurs.</summary>
         /// <returns>The <see cref="T:System.Windows.Media.Animation.Storyboard" /> that occurs when the transition occurs.</returns>
+        [OpenSilver.NotImplemented]
         public Storyboard Storyboard { get; set; }
 
         /// <summary>Gets or sets the amount of time it takes to move from one state to another.</summary>
         /// <returns>The amount of time it takes to move from one state to another.</returns>
+        [OpenSilver.NotImplemented]
         public Duration GeneratedDuration { get; set; }
 
         /// <summary>
         /// Easing Function for the transition
         /// </summary>
+        [OpenSilver.NotImplemented]
         public IEasingFunction GeneratedEasingFunction { get; set; }
 
         /// <summary>Gets or sets the name of the <see cref="T:System.Windows.VisualState" /> to transition to.</summary>
         /// <returns>The name of the <see cref="T:System.Windows.VisualState" /> to transition to.</returns>
+        [OpenSilver.NotImplemented]
         public string To { get; set; }
 
         /// <summary>Gets or sets the name of the <see cref="T:System.Windows.VisualState" /> to transition from.</summary>
         /// <returns>The name of the <see cref="T:System.Windows.VisualState" /> to transition from.</returns>
+        [OpenSilver.NotImplemented]
         public string From { get; set; }
     }
     #endregion

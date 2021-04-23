@@ -8,11 +8,16 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public abstract partial class TileBrush : Brush
 	{
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty AlignmentXProperty = DependencyProperty.Register(nameof(AlignmentX), typeof(AlignmentX), typeof(TileBrush), new PropertyMetadata());
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty AlignmentYProperty = DependencyProperty.Register(nameof(AlignmentY), typeof(AlignmentY), typeof(TileBrush), new PropertyMetadata());
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty StretchProperty = DependencyProperty.Register(nameof(Stretch), typeof(Stretch), typeof(TileBrush), new PropertyMetadata());
+        [OpenSilver.NotImplemented]
 		public AlignmentX AlignmentX
 		{
 			get
@@ -26,6 +31,7 @@ namespace Windows.UI.Xaml.Media
 			}
 		}
 
+        [OpenSilver.NotImplemented]
 		public AlignmentY AlignmentY
 		{
 			get
@@ -39,6 +45,7 @@ namespace Windows.UI.Xaml.Media
 			}
 		}
 
+        [OpenSilver.NotImplemented]
 		public Stretch Stretch
 		{
 			get
@@ -52,6 +59,7 @@ namespace Windows.UI.Xaml.Media
 			}
 		}
 
+        [OpenSilver.NotImplemented]
 		protected TileBrush()
 		{
 		}

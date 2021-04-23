@@ -17,9 +17,11 @@ namespace System.Windows.Automation.Peers
 namespace Windows.UI.Xaml.Automation.Peers
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public partial class ToggleButtonAutomationPeer : ButtonBaseAutomationPeer, IToggleProvider
 	{
-		public ToggleButtonAutomationPeer(ToggleButton owner): base(owner)
+        [OpenSilver.NotImplemented]
+		public ToggleButtonAutomationPeer(ToggleButton owner) : base(owner)
 		{
 		}
 

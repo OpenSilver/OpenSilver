@@ -24,6 +24,7 @@ namespace Windows.UI.Xaml.Automation.Peers
     /// <summary>
     /// Exposes <see cref="DescriptionViewer" /> types to UI Automation.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class DescriptionViewerAutomationPeer : FrameworkElementAutomationPeer
     {
         /// <summary>

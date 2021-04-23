@@ -113,7 +113,9 @@ namespace System
         }
 
 #if WORKINPROGRESS
+        [OpenSilver.NotImplemented]
         public bool EnableAutoZoom { get; set; }
+        [OpenSilver.NotImplemented]
         public bool Windowless { get; private set; }
 #endif
     }

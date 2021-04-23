@@ -37,6 +37,7 @@ namespace Windows.UI.Xaml
 
         /// <summary>Gets the collection of <see cref="T:System.Windows.Media.Animation.BeginStoryboard" /> objects that this <see cref="T:System.Windows.EventTrigger" /> maintains.</summary>
         /// <returns>The existing <see cref="T:System.Windows.TriggerActionCollection" />.</returns>
+		[OpenSilver.NotImplemented]
         public TriggerActionCollection Actions
         {
             get { return (TriggerActionCollection)this.GetValue(EventTrigger.ActionsProperty); }
@@ -44,6 +45,7 @@ namespace Windows.UI.Xaml
 
         /// <summary>Gets or sets the name of the event that initiates the trigger.</summary>
         /// <returns>The name or identifier of the event. See Remarks.</returns>
+		[OpenSilver.NotImplemented]
         public RoutedEvent RoutedEvent
         {
             get { return (RoutedEvent)this.GetValue(EventTrigger.RoutedEventProperty); }

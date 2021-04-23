@@ -926,12 +926,14 @@ namespace System.Net
         // Summary:
         //     Occurs when an asynchronous operation to open a stream containing a resource
         //     completes.
+		[OpenSilver.NotImplemented]
         public event OpenReadCompletedEventHandler OpenReadCompleted;
 
 
         // Summary:
         //     Occurs when an asynchronous operation to open a stream to write data to a
         //     resource completes.
+		[OpenSilver.NotImplemented]
         public event OpenWriteCompletedEventHandler OpenWriteCompleted;
 #endif
         ////
@@ -1372,6 +1374,7 @@ namespace System.Net
         //     The URI formed by combining System.Net.WebClient.BaseAddress and address
         //     is invalid.-or- An error occurred while downloading the resource. -or- An
         //     error occurred while opening the stream.
+		[OpenSilver.NotImplemented]
         public void OpenReadAsync(Uri address, object userToken)
         {
 
@@ -1486,6 +1489,7 @@ namespace System.Net
         // Exceptions:
         //   System.ArgumentNullException:
         //     The address parameter is null.
+		[OpenSilver.NotImplemented]
         public void OpenWriteAsync(Uri address)
         {
 

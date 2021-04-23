@@ -88,12 +88,14 @@ namespace Windows.UI.Xaml.Media
         /// The x-radius of the ellipse used to round the corners of the rectangle geometry.
         /// The default is 0.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public double RadiusX
         {
             get { return (double)this.GetValue(RadiusXProperty); }
             set { this.SetValue(RadiusXProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RadiusXProperty =
             DependencyProperty.Register(
                 "RadiusX",
@@ -109,12 +111,14 @@ namespace Windows.UI.Xaml.Media
         /// The y-radius of the ellipse used to round the corners of the rectangle geometry.
         /// The default is 0.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public double RadiusY
         {
             get { return (double)this.GetValue(RadiusYProperty); }
             set { this.SetValue(RadiusYProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RadiusYProperty =
             DependencyProperty.Register(
                 "RadiusY",

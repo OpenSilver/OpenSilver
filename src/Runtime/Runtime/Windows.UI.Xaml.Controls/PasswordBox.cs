@@ -402,22 +402,26 @@ $0.focus()
 #if WORKINPROGRESS
         #region Not supported yet
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CaretBrushProperty = DependencyProperty.Register("CaretBrush", typeof(Brush), typeof(PasswordBox), null);
 
         /// <summary>
         /// Gets or sets the brush that is used to render the vertical bar that indicates the insertion point.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public Brush CaretBrush
         {
             get { return (Brush)this.GetValue(PasswordBox.CaretBrushProperty); }
             set { this.SetValue(PasswordBox.CaretBrushProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register("SelectionBackground", typeof(Brush), typeof(PasswordBox), null);
 
         /// <summary>
         /// Gets or sets the brush used to render the background for the selected text.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public Brush SelectionBackground
         {
             get { return (Brush)this.GetValue(PasswordBox.SelectionBackgroundProperty); }

@@ -47,9 +47,10 @@ using System.Windows.Interactivity;
 
 namespace TestApplication
 {
-    public sealed partial class MainPage : Page
+    public sealed partial class MainPage : UserControl
     {
-        Setter _setterForMyStyle1Background;
+        // SLDISABLED
+        //Setter _setterForMyStyle1Background;
         Setter _setterForMyStyle2Foreground;
         MyColor _myColor;
 
@@ -116,9 +117,10 @@ namespace TestApplication
             //TestGroupBy();
 
             //for testing the DataGrid:
-            _cats.Add(new Cat("Tom", 10));
-            _cats.Add(new Cat("Blacky", 20));
-            _cats.Add(new Cat("Pasha", 4));
+            // SLDISABLED
+            //_cats.Add(new Cat("Tom", 10));
+            //_cats.Add(new Cat("Blacky", 20));
+            //_cats.Add(new Cat("Pasha", 4));
 
             // Initial list box and combo box items:
             ItemsControl1.Items.Add("Initial item 1");
@@ -129,19 +131,22 @@ namespace TestApplication
             ComboBox1.Items.Add("Initial item 1");
             ComboBox1.Items.Add("Initial item 2");
             ComboBox1.SelectedIndex = 1;
-            ComboBoxNonNative.Items.Add("Initial item 1");
-            ComboBoxNonNative.Items.Add("Initial item 2");
-            ComboBoxNonNative.SelectedIndex = 1;
-            AutoCompleteBox1.Items.Add("Initial item 1");
-            AutoCompleteBox1.Items.Add("Initial item 2");
-            AutoCompleteBox1.SelectedIndex = 1;
+            // SLDISABLED
+            //ComboBoxNonNative.Items.Add("Initial item 1");
+            //ComboBoxNonNative.Items.Add("Initial item 2");
+            //ComboBoxNonNative.SelectedIndex = 1;
+            // SLDISABLED
+            //AutoCompleteBox1.Items.Add("Initial item 1");
+            //AutoCompleteBox1.Items.Add("Initial item 2");
+            //AutoCompleteBox1.SelectedIndex = 1;
             //DataGrid1.Items.Add(new Cat("Tom", 10));
             //DataGrid1.Items.Add(new Cat("Blacky", 20));
 
             // Window size:
-            WindowWidthTextBlock.Text = Window.Current.Bounds.Width.ToString();
-            WindowHeightTextBlock.Text = Window.Current.Bounds.Height.ToString();
-            Window.Current.SizeChanged += Window_SizeChanged;
+            // SLDISABLED
+            //WindowWidthTextBlock.Text = Window.Current.Bounds.Width.ToString();
+            //WindowHeightTextBlock.Text = Window.Current.Bounds.Height.ToString();
+            //Window.Current.SizeChanged += Window_SizeChanged;
 
             PrepareICommandTest();
             PrepareStyleTest();
@@ -157,7 +162,7 @@ namespace TestApplication
             //Validation.MarkInvalid(bindingExpression, new ValidationError(bindingExpression) { ErrorContent = "Age cannot be lower than 0.", Exception = new Exception("Age cannot be lower than 0.") });
 
             //Adding the Behavior to a TextBox through c#:
-            Interaction.GetBehaviors(TestBehaviorTextBox).Add(new HintBehavior("Pls type something.", new SolidColorBrush(Colors.Gold)));
+            Interaction.GetBehaviors(TestBehaviorTextBox).Add(new HintBehavior("Pls type something.", new SolidColorBrush(Color.FromArgb(0xFF, 0xFF, 0xD7, 0x00))));
 
         }
 
@@ -208,7 +213,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
 
                 StackPanel stackPanel = new StackPanel();
                 stackPanel.Orientation = Orientation.Vertical;
-                stackPanel.Background = new SolidColorBrush(Colors.LightBlue);
+                stackPanel.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0xAD, 0xD8, 0xE6));
                 stackPanel.Margin = new Thickness(2);
                 TextBlock t = new TextBlock();
                 t.Text = w.ToString();
@@ -228,12 +233,12 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
             }
         }
 
-
-        void Window_SizeChanged(object sender, WindowSizeChangedEventArgs e)
-        {
-            WindowWidthTextBlock.Text = (double.IsNaN(e.Size.Width) ? "NaN" : e.Size.Width.ToString());
-            WindowHeightTextBlock.Text = (double.IsNaN(e.Size.Height) ? "NaN" : e.Size.Height.ToString());
-        }
+        // SLDISABLED
+        //void Window_SizeChanged(object sender, WindowSizeChangedEventArgs e)
+        //{
+        //    WindowWidthTextBlock.Text = (double.IsNaN(e.Size.Width) ? "NaN" : e.Size.Width.ToString());
+        //    WindowHeightTextBlock.Text = (double.IsNaN(e.Size.Height) ? "NaN" : e.Size.Height.ToString());
+        //}
 
         void ButtonSerialize_Click(object sender, RoutedEventArgs e)
         {
@@ -311,7 +316,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
         }
 
 #if SLMIGRATION
-        void TestButton2_Click(object sender, MouseEventArgs e)
+        void TestButton2_Click(object sender, MouseButtonEventArgs e)
 #else
         void TestButton2_Click(object sender, PointerRoutedEventArgs e)
 #endif
@@ -340,6 +345,8 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
 
 #region Testing Printing
 
+        // SLDISABLED
+        /*
         void ButtonPrint_SpecificElement_Click(object sender, RoutedEventArgs e)
         {
             CSHTML5.Native.Html.Printing.PrintManager.Print(ElementToPrint);
@@ -368,7 +375,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
 
             // Print it:
             CSHTML5.Native.Html.Printing.PrintManager.Print(pageBackground);
-        }
+        }*/
 
 #endregion
 
@@ -504,12 +511,14 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
 
         private void CheckBoxForWrapping_Checked(object sender, RoutedEventArgs e)
         {
-            TextBoxForWrapping.TextWrapping = TextWrapping.Wrap;
+            if (TextBoxForWrapping != null)
+                TextBoxForWrapping.TextWrapping = TextWrapping.Wrap;
         }
 
         private void CheckBoxForWrapping_Unchecked(object sender, RoutedEventArgs e)
         {
-            TextBoxForWrapping.TextWrapping = TextWrapping.NoWrap;
+            if (TextBoxForWrapping != null)
+                TextBoxForWrapping.TextWrapping = TextWrapping.NoWrap;
         }
 
 #endregion
@@ -580,9 +589,9 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
             }
         }
 
-#endregion
+        #endregion
 
-#region testing Frame
+        #region testing Frame
 
         private void ButtonGoBack_Click(object sender, RoutedEventArgs e)
         {
@@ -816,7 +825,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
         private void TextBlock_GotFocus(object sender, RoutedEventArgs e)
         {
             Control s = (Control)sender;
-            s.Background = new SolidColorBrush(Colors.Azure);
+            s.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0xF0, 0xFF, 0xFF));
         }
 
         private void TextBlock_LostFocus(object sender, RoutedEventArgs e)
@@ -990,14 +999,14 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
                         Grid.SetRow(border, 2);
                         break;
                     case 3:
-                        border.Background = new SolidColorBrush(Colors.LightGreen);
+                        border.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x90, 0xEE, 0x90));
                         border.Opacity = 0.5;
                         Grid.SetColumn(border, 1);
                         Grid.SetRow(border, 0);
                         Grid.SetRowSpan(border, 2);
                         break;
                     case 4:
-                        border.Background = new SolidColorBrush(Colors.Lime);
+                        border.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0xFF, 0x00));
                         border.Margin = new Thickness(5);
                         Grid.SetColumn(border, 1);
                         Grid.SetRow(border, 1);
@@ -1009,7 +1018,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
                         Grid.SetRow(border, 2);
                         break;
                     case 6:
-                        border.Background = new SolidColorBrush(Colors.LightBlue);
+                        border.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0xAD, 0xD8, 0xE6));
                         border.Margin = new Thickness(10);
                         border.Opacity = 0.5;
                         Grid.SetColumn(border, 2);
@@ -1023,7 +1032,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
                         Grid.SetRow(border, 1);
                         break;
                     case 8:
-                        border.Background = new SolidColorBrush(Colors.DarkBlue);
+                        border.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0x00, 0x8B));
                         Grid.SetColumn(border, 2);
                         Grid.SetRow(border, 2);
                         break;
@@ -1135,7 +1144,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
             if (border01 == null)
             {
                 border01 = new Border() { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
-                border01.Background = new SolidColorBrush(Colors.LightGreen);
+                border01.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x90, 0xEE, 0x90));
                 border01.Opacity = 0.5;
                 Grid.SetColumn(border01, 1);
                 Grid.SetRow(border01, 0);
@@ -1164,7 +1173,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
             if (border11 == null)
             {
                 border11 = new Border() { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
-                border11.Background = new SolidColorBrush(Colors.Lime);
+                border11.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0xFF, 0x00));
                 border11.Margin = new Thickness(5);
                 Grid.SetColumn(border11, 1);
                 Grid.SetRow(border11, 1);
@@ -1220,7 +1229,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
             if (border02 == null)
             {
                 border02 = new Border() { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
-                border02.Background = new SolidColorBrush(Colors.LightBlue);
+                border02.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0xAD, 0xD8, 0xE6));
                 border02.Margin = new Thickness(10);
                 border02.Opacity = 0.5;
                 Grid.SetColumn(border02, 2);
@@ -1278,7 +1287,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
             if (border22 == null)
             {
                 border22 = new Border() { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
-                border22.Background = new SolidColorBrush(Colors.DarkBlue);
+                border22.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0x00, 0x8B));
                 Grid.SetColumn(border22, 2);
                 Grid.SetRow(border22, 2);
                 AddRemoveChildrenGrid.Children.Add(border22);
@@ -1414,10 +1423,11 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
             path1.StrokeThickness = rd.Next(7);
         }
 
-        private void RedrawPath_Click(object sender, RoutedEventArgs e)
-        {
-            path1.Refresh();
-        }
+        // SLDISABLED
+        //private void RedrawPath_Click(object sender, RoutedEventArgs e)
+        //{
+        //    path1.Refresh();
+        //}
 
 #region EllipseGeometry
         private void TestEllipseGeometry_Click(object sender, RoutedEventArgs e)
@@ -1936,7 +1946,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
         {
             public static void WriteTextToFile(string fileName, string fileContent)
             {
-                using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForAssembly())
+                using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
                 {
                     IsolatedStorageFileStream fs = null;
                     using (fs = storage.CreateFile(fileName))
@@ -1958,7 +1968,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
 
             public static void DeleteFile(string fileName)
             {
-                using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForAssembly())
+                using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
                 {
                     storage.DeleteFile(fileName);
                 }
@@ -1966,7 +1976,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
 
             public static string ReadTextFromFile(string fileName)
             {
-                using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForAssembly())
+                using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
                 {
                     if (storage.FileExists(fileName))
                     {
@@ -2101,6 +2111,8 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
 
 #region DataGrid
 
+        // SLDISABLED
+        /*
         ObservableCollection<Cat> _cats = new ObservableCollection<Cat>();
         ObservableCollection<Cat> _catsForFirstDataGrid = new ObservableCollection<Cat>();
         ObservableCollection<Cat> _catsForSecondDataGrid = new ObservableCollection<Cat>();
@@ -2288,7 +2300,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
             public int Age { get; set; }
 
         }
-
+        */
 #endregion
 
 #region ICommand
@@ -2458,8 +2470,9 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
             MyStyle1.Setters.Add(setter);
             setter = new Setter(TextBlock.FontSizeProperty, 21d);
             MyStyle1.Setters.Add(setter);
-            _setterForMyStyle1Background = new Setter(TextBlock.BackgroundProperty, new SolidColorBrush(Colors.Black));
-            MyStyle1.Setters.Add(_setterForMyStyle1Background);
+            // SLDISABLED
+            //_setterForMyStyle1Background = new Setter(TextBlock.BackgroundProperty, new SolidColorBrush(Colors.Black));
+            //MyStyle1.Setters.Add(_setterForMyStyle1Background);
 
             Style MyStyle2 = new Style(typeof(TextBlock));
             MyStyle2.BasedOn = MyStyle1;
@@ -2474,7 +2487,8 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
         private void ButtonTestChangeInStyles_Click(object sender, RoutedEventArgs e)
         {
             Random rand = new Random();
-            _setterForMyStyle1Background.Value = new SolidColorBrush(Color.FromArgb((byte)255, (byte)rand.Next(256), (byte)rand.Next(256), (byte)rand.Next(256)));
+            // SLDISABLED
+            //_setterForMyStyle1Background.Value = new SolidColorBrush(Color.FromArgb((byte)255, (byte)rand.Next(256), (byte)rand.Next(256), (byte)rand.Next(256)));
             _setterForMyStyle2Foreground.Value = new SolidColorBrush(Color.FromArgb((byte)255, (byte)rand.Next(256), (byte)rand.Next(256), (byte)rand.Next(256)));
             _myColor.BackgroundColor = new SolidColorBrush(Color.FromArgb((byte)255, (byte)rand.Next(256), (byte)rand.Next(256), (byte)rand.Next(256)));
         }
@@ -2483,55 +2497,56 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
 
 #region Async/Await tests
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            TextBlock2.Text = "Before call to Async.";
-            test();
-            TextBlock2.Text = "After call to Async.";
+        // SLDISABLED
+        //private void Button_Click(object sender, RoutedEventArgs e)
+        //{
+        //    TextBlock2.Text = "Before call to Async.";
+        //    test();
+        //    TextBlock2.Text = "After call to Async.";
 
-        }
+        //}
 
-        private async void Button2_Click(object sender, RoutedEventArgs e)
-        {
-            TextBlock2.Text = "Before call to Async.";
-            await test();
-            TextBlock2.Text = "After call to Async.";
+        //private async void Button2_Click(object sender, RoutedEventArgs e)
+        //{
+        //    TextBlock2.Text = "Before call to Async.";
+        //    await test();
+        //    TextBlock2.Text = "After call to Async.";
 
-        }
+        //}
 
-        public async Task test()
-        {
-            TextBlock2.Text = await TestAsync();
-        }
+        //public async Task test()
+        //{
+        //    TextBlock2.Text = await TestAsync();
+        //}
 
-        public static Task<string> TestAsync()
-        {
-            var taskCompletionSource = new TaskCompletionSource<string>();
-            var cameraCaptureTask = new Bidon();
-            cameraCaptureTask.Completed += (sender, result) => taskCompletionSource.SetResult("Result obtained.");
-            cameraCaptureTask.Start();
-            return taskCompletionSource.Task;
-        }
+        //public static Task<string> TestAsync()
+        //{
+        //    var taskCompletionSource = new TaskCompletionSource<string>();
+        //    var cameraCaptureTask = new Bidon();
+        //    cameraCaptureTask.Completed += (sender, result) => taskCompletionSource.SetResult("Result obtained.");
+        //    cameraCaptureTask.Start();
+        //    return taskCompletionSource.Task;
+        //}
 
-        class Bidon
-        {
-            public event EventHandler Completed;
-            DispatcherTimer t = new DispatcherTimer();
-            public void Start()
-            {
-                t.Interval = new TimeSpan(0, 0, 5);
-                t.Tick += t_Tick;
-                t.Start();
-            }
+        //class Bidon
+        //{
+        //    public event EventHandler Completed;
+        //    DispatcherTimer t = new DispatcherTimer();
+        //    public void Start()
+        //    {
+        //        t.Interval = new TimeSpan(0, 0, 5);
+        //        t.Tick += t_Tick;
+        //        t.Start();
+        //    }
 
-            void t_Tick(object sender, object e)
-            {
-                t.Stop();
-                Completed(sender, new EventArgs());
-            }
+        //    void t_Tick(object sender, object e)
+        //    {
+        //        t.Stop();
+        //        Completed(sender, new EventArgs());
+        //    }
+        //}
+
 #endregion
-
-        }
 
 #region Pointer events + pointer capture tests
 
@@ -2800,6 +2815,8 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
 
 #region ComboBox NON-NATIVE tests
 
+        // SLDISABLED
+        /*
         private void ButtonTestComboBoxNonNative_ItemsAddUIElement_Click(object sender, RoutedEventArgs e)
         {
             ComboBoxNonNative.Items.Add(new TextBlock() { Text = "This is a UI element", Foreground = new SolidColorBrush(Colors.Red) });
@@ -2871,12 +2888,14 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
         private void ButtonTestComboBoxNonNative_SelectedIndexMinusOne_Click(object sender, RoutedEventArgs e)
         {
             ComboBoxNonNative.SelectedIndex = -1;
-        }
+        }*/
 
 #endregion
 
 #region AutoCompleteBox tests
 
+        // SLDISABLED
+        /*
         private void ButtonTestAutoCompleteBox1_ItemsAddUIElement_Click(object sender, RoutedEventArgs e)
         {
             AutoCompleteBox1.Items.Add(new TextBlock() { Text = "This is a UI element", Foreground = new SolidColorBrush(Colors.Red) });
@@ -2948,7 +2967,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
         private void ButtonTestAutoCompleteBox1_SelectedIndexMinusOne_Click(object sender, RoutedEventArgs e)
         {
             AutoCompleteBox1.SelectedIndex = -1;
-        }
+        }*/
 
         #endregion
 
@@ -3159,7 +3178,7 @@ Second TextBox text: {1}", firstTextBoxText, secondTextBoxText);
 #region Testing Double Click
 
 #if SLMIGRATION
-        private void TestDoubleClick_PointerPressed(object sender, MouseEventArgs e)
+        private void TestDoubleClick_PointerPressed(object sender, MouseButtonEventArgs e)
 #else
         private void TestDoubleClick_PointerPressed(object sender, PointerRoutedEventArgs e)
 #endif

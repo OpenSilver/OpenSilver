@@ -190,6 +190,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Identifies the <see cref="ScaleTransform.CenterX"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CenterXProperty = 
             DependencyProperty.Register(
                 nameof(CenterX), 
@@ -201,6 +202,7 @@ namespace Windows.UI.Xaml.Media
         /// Gets or sets the x-coordinate of the center point of this <see cref="ScaleTransform"/>.
         /// The default is 0.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double CenterX
         {
             get { return (double)this.GetValue(CenterXProperty); }
@@ -210,6 +212,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Identifies the <see cref="ScaleTransform.CenterY"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CenterYProperty = 
             DependencyProperty.Register(
                 nameof(CenterY), 
@@ -221,6 +224,7 @@ namespace Windows.UI.Xaml.Media
         /// Gets or sets the y-coordinate of the center point of this <see cref="ScaleTransform"/>.
         /// The default is 0.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double CenterY
         {
             get { return (double)this.GetValue(CenterYProperty); }

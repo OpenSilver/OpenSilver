@@ -21,6 +21,7 @@ namespace System.Windows.Browser
     /// <summary>
     /// Represents an HTML element in the Document Object Model (DOM) of a Web page.
     /// </summary>
+	[OpenSilver.NotImplemented]
     public sealed partial class HtmlElement : HtmlObject
     {
         /// <summary>
@@ -31,6 +32,7 @@ namespace System.Windows.Browser
         /// A collection of HTML elements. If the current HTML element has no children, the
         /// returned collection is empty.
         /// </returns>
+		[OpenSilver.NotImplemented]
         public ScriptObjectCollection Children
         {
             get;
@@ -49,6 +51,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// The property is set to null.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public string Id { get; set; }
 
         /// <summary>
@@ -57,6 +60,7 @@ namespace System.Windows.Browser
         /// <returns>
         /// An HTML element reference if the element has a parent; otherwise, null.
         /// </returns>
+		[OpenSilver.NotImplemented]
         public HtmlElement Parent
         {
             get;
@@ -68,7 +72,8 @@ namespace System.Windows.Browser
         /// <returns>
         /// An HTML element tag name, such as div or span.
         /// </returns>
-        public string TagName 
+		[OpenSilver.NotImplemented]
+        public string TagName
         { 
             get;
         }
@@ -81,6 +86,7 @@ namespace System.Windows.Browser
         /// A CSS class string if the element is associated with a CSS class; otherwise,
         /// an empty string.
         /// </returns>
+		[OpenSilver.NotImplemented]
         public string CssClass { get; set; }
 
         /// <summary>
@@ -90,6 +96,7 @@ namespace System.Windows.Browser
         /// All errors.
         /// </exception>
         [SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
         public void Focus()
         {
 
@@ -111,6 +118,7 @@ namespace System.Windows.Browser
         /// <exception cref="InvalidOperationException">
         /// element is a reference to this <see cref="HtmlElement"/>.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public void AppendChild(HtmlElement element)
         {
         }
@@ -132,6 +140,7 @@ namespace System.Windows.Browser
         /// element is null.
         /// </exception>
         [SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
         public void AppendChild(HtmlElement element, HtmlElement referenceElement)
         {
         }
@@ -150,6 +159,7 @@ namespace System.Windows.Browser
         /// All other errors.
         /// </exception>
         [SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
         public void RemoveChild(HtmlElement element)
         {
         }
@@ -169,6 +179,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// name is null.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public void SetAttribute(string name, string value)
         {
         }
@@ -188,6 +199,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// name is null.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public string GetAttribute(string name)
         {
             return string.Empty;
@@ -208,6 +220,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// name is null.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public string GetStyleAttribute(string name)
         {
             return string.Empty;
@@ -228,6 +241,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// name is null.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public void SetStyleAttribute(string name, string value)
         {
         }
@@ -244,6 +258,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// name is null.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public void RemoveStyleAttribute(string name)
         {
 
@@ -261,6 +276,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// name is null.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public void RemoveAttribute(string name)
         {
 

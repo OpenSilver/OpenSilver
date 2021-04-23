@@ -651,6 +651,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 #if WORKINPROGRESS
+        [OpenSilver.NotImplemented]
         public void SetWindow(Window associatedWindow)
         {
 

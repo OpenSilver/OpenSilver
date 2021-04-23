@@ -1187,6 +1187,7 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         // Parameters:
         //   e:
         //     A System.Windows.Input.MouseButtonEventArgs that contains the event data.
+        [OpenSilver.NotImplemented]
         protected virtual void OnMouseRightButtonDown(MouseButtonEventArgs e)
         {
 
@@ -1195,23 +1196,27 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
 
         /// <summary>Called before the <see cref="E:System.Windows.UIElement.MouseWheel" /> event occurs to provide handling for the event in a derived class without attaching a delegate. </summary>
         /// <param name="e">A <see cref="T:System.Windows.Input.MouseWheelEventArgs" /> that contains the event data.</param>
+        [OpenSilver.NotImplemented]
         protected virtual void OnMouseWheel(MouseWheelEventArgs e)
         {
 
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TabNavigationProperty = 
             DependencyProperty.Register("TabNavigation", 
                                         typeof(KeyboardNavigationMode), 
                                         typeof(Control), 
                                         new PropertyMetadata(KeyboardNavigationMode.Local));
 
+        [OpenSilver.NotImplemented]
         public KeyboardNavigationMode TabNavigation
         {
             get { return (KeyboardNavigationMode)this.GetValue(Control.TabNavigationProperty); }
             set { this.SetValue(Control.TabNavigationProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FontStretchProperty = 
             DependencyProperty.Register("FontStretch", 
                                         typeof(FontStretch), 
@@ -1223,6 +1228,7 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         ///     This will only affect controls whose template uses the property
         ///     as a parameter. On other controls, the property will do nothing.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public FontStretch FontStretch
         {
             get { return (FontStretch)GetValue(FontStretchProperty); }
@@ -1236,31 +1242,37 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         // Parameters:
         //   e:
         //     A System.Windows.Input.TextCompositionEventArgs that contains the event data.
+        [OpenSilver.NotImplemented]
         protected virtual void OnTextInput(TextCompositionEventArgs e)
         {
 
         }
 
+        [OpenSilver.NotImplemented]
         protected virtual void OnDrop(DragEventArgs e)
         {
 
         }
 
+        [OpenSilver.NotImplemented]
         protected virtual void OnDragEnter(DragEventArgs e)
         {
 
         }
 
+        [OpenSilver.NotImplemented]
         protected virtual void OnDragLeave(DragEventArgs e)
         {
 
         }
 
+        [OpenSilver.NotImplemented]
         protected virtual void OnTextInputStart(TextCompositionEventArgs e)
         {
 
         }
 
+        [OpenSilver.NotImplemented]
         protected virtual void OnTextInputUpdate(TextCompositionEventArgs e)
         {
 

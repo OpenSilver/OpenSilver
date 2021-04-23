@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 namespace System.Windows.Browser
 {
 #if WORKINPROGRESS
+	[OpenSilver.NotImplemented]
     public partial class HtmlEventArgs : EventArgs
     {
         #region Fields
@@ -31,22 +32,30 @@ namespace System.Windows.Browser
         #endregion
 
         #region Properties
+		[OpenSilver.NotImplemented]
         public int OffsetX
         {
             get { return _offsetX; }
         }
+		[OpenSilver.NotImplemented]
         public int OffsetY
         {
             get { return _offsetY; }
         }
+		[OpenSilver.NotImplemented]
         public ScriptObject EventObject
         {
             get { return _eventObject; }
         }
+		[OpenSilver.NotImplemented]
         public bool AltKey { get; }
+		[OpenSilver.NotImplemented]
         public bool CtrlKey { get; }
+		[OpenSilver.NotImplemented]
         public int ClientX { get; }
+		[OpenSilver.NotImplemented]
         public int ClientY { get; }
+		[OpenSilver.NotImplemented]
         public bool ShiftKey { get; }
 
         #endregion
@@ -58,6 +67,7 @@ namespace System.Windows.Browser
             _offsetY = 0;
             _eventObject = null;
         }
+		[OpenSilver.NotImplemented]
         public void PreventDefault()
         {
         }

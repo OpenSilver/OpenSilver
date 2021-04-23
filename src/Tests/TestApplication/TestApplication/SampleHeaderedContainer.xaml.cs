@@ -9,6 +9,8 @@ using Windows.UI.Xaml.Controls;
 
 namespace TestApplication
 {
+    // SLDISABLED
+    /*
     public sealed partial class SampleHeaderedContainer : UserControl
     {
         public SampleHeaderedContainer()
@@ -53,4 +55,5 @@ namespace TestApplication
             }
         }
     }
+    */
 }

@@ -213,6 +213,7 @@ if (requestMethod) { // Native exit full screen.
         /// <summary>
         /// Occurs when the zoom setting in the host browser window changes or is initialized.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public event EventHandler Zoomed;
 #endif
     }

@@ -30,6 +30,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents a perspective transform (a 3-D-like effect) on an object.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public sealed partial class PlaneProjection : Projection
     {
         #region Constructor
@@ -37,6 +38,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Initializes a new instance of the <see cref="PlaneProjection"/> class.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public PlaneProjection()
         {
         }
@@ -50,6 +52,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Identifies the <see cref="PlaneProjection.RotationX" /> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RotationXProperty =
            DependencyProperty.Register(
                "RotationX",
@@ -63,6 +66,7 @@ namespace Windows.UI.Xaml.Media
         /// <returns>
         /// The number of degrees to rotate the object around the x-axis of rotation. The default is 0.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public double RotationX
         {
             get { return (double)GetValue(RotationXProperty); }
@@ -72,6 +76,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Identifies the <see cref="PlaneProjection.RotationY" /> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RotationYProperty =
             DependencyProperty.Register(
                 "RotationY",
@@ -85,6 +90,7 @@ namespace Windows.UI.Xaml.Media
         /// <returns>
         /// The number of degrees to rotate the object around the y-axis of rotation. The default is 0.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public double RotationY
         {
             get { return (double)GetValue(RotationYProperty); }
@@ -94,6 +100,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Identifies the <see cref="PlaneProjection.RotationZ" /> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RotationZProperty =
             DependencyProperty.Register(
                 "RotationZ",
@@ -107,6 +114,7 @@ namespace Windows.UI.Xaml.Media
         /// <returns>
         /// The number of degrees to rotate the object around the z-axis of rotation. The default is 0.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public double RotationZ
         {
             get { return (double)GetValue(RotationZProperty); }
@@ -120,6 +128,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Identifies the <see cref="PlaneProjection.CenterOfRotationX" /> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CenterOfRotationXProperty =
             DependencyProperty.Register(
                 "CenterOfRotationX",
@@ -137,6 +146,7 @@ namespace Windows.UI.Xaml.Media
         /// rotation accordingly. 
         /// The default is 0.5 (the center of object). 
         /// </returns>
+        [OpenSilver.NotImplemented]
         public double CenterOfRotationX
         {
             get { return (double)this.GetValue(CenterOfRotationXProperty); }
@@ -147,6 +157,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Identifies the <see cref="PlaneProjection.CenterOfRotationY" /> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CenterOfRotationYProperty =
             DependencyProperty.Register(
                 "CenterOfRotationY",
@@ -164,6 +175,7 @@ namespace Windows.UI.Xaml.Media
         /// rotation accordingly. 
         /// The default is 0.5 (the center of object).
         /// </returns>
+        [OpenSilver.NotImplemented]
         public double CenterOfRotationY
         {
             get { return (double)this.GetValue(CenterOfRotationYProperty); }
@@ -174,6 +186,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Identifies the <see cref="PlaneProjection.CenterOfRotationZ" /> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CenterOfRotationZProperty =
             DependencyProperty.Register(
                 "CenterOfRotationZ",
@@ -190,6 +203,7 @@ namespace Windows.UI.Xaml.Media
         /// of the object, and negative values correspond to coordinates behind the plane of the 
         /// object.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public double CenterOfRotationZ
         {
             get { return (double)this.GetValue(CenterOfRotationZProperty); }
@@ -203,6 +217,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Identifies the <see cref="PlaneProjection.LocalOffsetX" /> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LocalOffsetXProperty =
             DependencyProperty.Register(
                 "LocalOffsetX",
@@ -213,6 +228,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Gets or sets the distance the object is translated along the x-axis of the plane of the object. 
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double LocalOffsetX
         {
             get { return (double)GetValue(LocalOffsetXProperty); }
@@ -222,6 +238,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Identifies the <see cref="PlaneProjection.LocalOffsetY" /> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LocalOffsetYProperty =
              DependencyProperty.Register(
                 "LocalOffsetY",
@@ -232,6 +249,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Gets or sets the distance the object is translated along the y-axis of the plane of the object.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double LocalOffsetY
         {
             get { return (double)GetValue(LocalOffsetYProperty); }
@@ -241,6 +259,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Identifies the <see cref="PlaneProjection.LocalOffsetZ" /> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LocalOffsetZProperty =
              DependencyProperty.Register(
                 "LocalOffsetZ",
@@ -251,6 +270,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Gets or sets the distance the object is translated along the z-axis of the plane of the object.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double LocalOffsetZ
         {
             get { return (double)GetValue(LocalOffsetZProperty); }
@@ -264,6 +284,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Identifies the <see cref="PlaneProjection.GlobalOffsetX" /> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty GlobalOffsetXProperty =
             DependencyProperty.Register(
                 "GlobalOffsetX",
@@ -274,6 +295,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Gets or sets the distance the object is translated along the x-axis of the screen. 
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double GlobalOffsetX
         {
             get { return (double)GetValue(GlobalOffsetXProperty); }
@@ -283,6 +305,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Identifies the <see cref="PlaneProjection.GlobalOffsetY" /> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty GlobalOffsetYProperty =
             DependencyProperty.Register(
                 "GlobalOffsetY",
@@ -293,6 +316,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Gets or sets the distance the object is translated along the y-axis of the screen. 
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double GlobalOffsetY
         {
             get { return (double)GetValue(GlobalOffsetYProperty); }
@@ -302,6 +326,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Identifies the <see cref="PlaneProjection.GlobalOffsetZ" /> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty GlobalOffsetZProperty =
             DependencyProperty.Register(
                 "GlobalOffsetZ",
@@ -312,6 +337,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         /// Gets or sets the distance the object is translated along the z-axis of the screen.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double GlobalOffsetZ
         {
             get { return (double)GetValue(GlobalOffsetZProperty); }
@@ -325,6 +351,7 @@ namespace Windows.UI.Xaml.Media
         /// <summary>
         ///  Identifies the <see cref="PlaneProjection.ProjectionMatrix" /> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ProjectionMatrixProperty =
             DependencyProperty.Register(
                 "ProjectionMatrix",
@@ -336,6 +363,7 @@ namespace Windows.UI.Xaml.Media
         /// Gets the projection matrix on the <see cref="PlaneProjection" />.
         /// The default value is <see cref="Matrix3D.Identity"/>.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public Matrix3D ProjectionMatrix
         {
             get { return (Matrix3D)this.GetValue(ProjectionMatrixProperty); }

@@ -5,7 +5,8 @@ namespace System.Windows.Messaging
     // Summary:
     //     Provides data for the System.Windows.Messaging.LocalMessageSender.SendCompleted
     //     event.
-    public sealed class SendCompletedEventArgs 
+	[OpenSilver.NotImplemented]
+    public sealed class SendCompletedEventArgs
     {
         // Summary:
         //     Gets the message sent from a System.Windows.Messaging.LocalMessageSender
@@ -13,6 +14,7 @@ namespace System.Windows.Messaging
         //
         // Returns:
         //     The message that was sent.
+		[OpenSilver.NotImplemented]
         public string Message { get; }
         //
         // Summary:
@@ -22,6 +24,7 @@ namespace System.Windows.Messaging
         // Returns:
         //     The domain of the System.Windows.Messaging.LocalMessageReceiver that received
         //     the message.
+		[OpenSilver.NotImplemented]
         public string ReceiverDomain { get; }
         //
         // Summary:
@@ -30,6 +33,7 @@ namespace System.Windows.Messaging
         //
         // Returns:
         //     The name of the message receiver.
+		[OpenSilver.NotImplemented]
         public string ReceiverName { get; }
         //
         // Summary:
@@ -39,8 +43,10 @@ namespace System.Windows.Messaging
         //
         // Returns:
         //     The response message sent to the sender of the original message.
+		[OpenSilver.NotImplemented]
         public string Response { get; }
 
+		[OpenSilver.NotImplemented]
         public Exception Error { get; }
     }
 }

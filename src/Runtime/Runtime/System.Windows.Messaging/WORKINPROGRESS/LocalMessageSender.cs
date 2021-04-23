@@ -2,10 +2,12 @@
 
 namespace System.Windows.Messaging
 {
+	[OpenSilver.NotImplemented]
     public sealed class LocalMessageSender
     {
         private string indexedName;
 
+		[OpenSilver.NotImplemented]
         public LocalMessageSender(string indexedName)
         {
             this.indexedName = indexedName;
@@ -13,6 +15,7 @@ namespace System.Windows.Messaging
 
         // Summary:
         //     Occurs when the message has been successfully sent.
+		[OpenSilver.NotImplemented]
         public event EventHandler<SendCompletedEventArgs> SendCompleted;
 
         // Summary:
@@ -28,6 +31,7 @@ namespace System.Windows.Messaging
         //
         //   System.ArgumentException:
         //     message is longer than 40,960 characters.
+		[OpenSilver.NotImplemented]
         public void SendAsync(string message)
         {
 

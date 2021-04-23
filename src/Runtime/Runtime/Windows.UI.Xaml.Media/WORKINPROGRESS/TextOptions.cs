@@ -4,9 +4,11 @@
 
 namespace System.Windows.Media
 {
+    [OpenSilver.NotImplemented]
 	public static partial class TextOptions
-	{
+    {
         /// <summary> Text formatting mode Property </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TextFormattingModeProperty = 
             DependencyProperty.RegisterAttached("TextFormattingMode", 
                                                 typeof(TextFormattingMode), 
@@ -14,6 +16,7 @@ namespace System.Windows.Media
                                                 null);
 
         /// <summary> Text hinting property </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TextHintingModeProperty =
             DependencyProperty.RegisterAttached("TextHintingMode",
                                                 typeof(TextHintingMode),
@@ -21,6 +24,7 @@ namespace System.Windows.Media
                                                 null);
 
         /// <summary> Text rendering Property </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TextRenderingModeProperty =
             DependencyProperty.RegisterAttached("TextRenderingMode",
                                                 typeof(TextRenderingMode),
@@ -33,6 +37,7 @@ namespace System.Windows.Media
         /// <exception cref="ArgumentNullException">
         /// The element is null.
         /// </exception>
+        [OpenSilver.NotImplemented]
         public static TextFormattingMode GetTextFormattingMode(FrameworkElement element)
         {
             if (element == null)
@@ -49,6 +54,7 @@ namespace System.Windows.Media
         /// <exception cref="ArgumentNullException">
         /// The element is null.
         /// </exception>
+        [OpenSilver.NotImplemented]
         public static TextHintingMode GetTextHintingMode(FrameworkElement element)
         {
             if (element == null)
@@ -65,6 +71,7 @@ namespace System.Windows.Media
         /// <exception cref="ArgumentNullException">
         /// The element is null.
         /// </exception>
+        [OpenSilver.NotImplemented]
         public static TextRenderingMode GetTextRenderingMode(FrameworkElement element)
         {
             if (element == null)
@@ -81,6 +88,7 @@ namespace System.Windows.Media
         /// <exception cref="ArgumentNullException">
         /// The element is null.
         /// </exception>
+        [OpenSilver.NotImplemented]
         public static void SetTextFormattingMode(FrameworkElement element, TextFormattingMode value)
         {
             if (element == null)
@@ -97,6 +105,7 @@ namespace System.Windows.Media
         /// <exception cref="ArgumentNullException">
         /// The element is null.
         /// </exception>
+        [OpenSilver.NotImplemented]
         public static void SetTextHintingMode(FrameworkElement element, TextHintingMode value)
         {
             if (element == null)
@@ -113,6 +122,7 @@ namespace System.Windows.Media
         /// <exception cref="ArgumentNullException">
         /// The element is null.
         /// </exception>
+        [OpenSilver.NotImplemented]
         public static void SetTextRenderingMode(FrameworkElement element, TextRenderingMode value)
         {
             if (element == null)

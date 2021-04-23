@@ -17,8 +17,10 @@ namespace System.Windows.Automation.Peers
 namespace Windows.UI.Xaml.Automation.Peers
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public partial class RadioButtonAutomationPeer : ToggleButtonAutomationPeer, ISelectionItemProvider
 	{
+        [OpenSilver.NotImplemented]
 		public RadioButtonAutomationPeer(RadioButton owner): base(owner)
 		{
 		}

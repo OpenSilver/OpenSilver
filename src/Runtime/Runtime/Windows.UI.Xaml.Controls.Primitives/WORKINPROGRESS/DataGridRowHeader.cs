@@ -24,6 +24,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Represents an individual <see cref="T:System.Windows.Controls.DataGrid" /> row header.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class DataGridRowHeader : ContentControl
     {
     }

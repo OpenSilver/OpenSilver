@@ -27,6 +27,7 @@ namespace Windows.UI.Xaml.Controls
     /// Represents a control that displays a header and has a collapsible
     /// content window.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class AccordionItem : HeaderedContentControl, IUpdateVisualState
     {
         /// <summary>
@@ -44,6 +45,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Occurs when the accordionItem is selected.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public event RoutedEventHandler Selected;
     }
 }

@@ -34,6 +34,7 @@ namespace Windows.UI.Xaml.Media.Animation
 		//
 		// Returns:
 		//     A double that represents the transformed progress.
+        [OpenSilver.NotImplemented]
 		protected abstract double EaseInCore(double normalizedTime);
 #endif
 		
@@ -47,6 +48,7 @@ namespace Windows.UI.Xaml.Media.Animation
 		//
 		// Returns:
 		//     A double that represents the transformed progress.
+        [OpenSilver.NotImplemented]
 		public double Ease(double normalizedTime)
 		{
 			return default(double);

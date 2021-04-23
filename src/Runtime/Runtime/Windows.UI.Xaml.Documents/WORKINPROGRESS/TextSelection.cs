@@ -10,6 +10,7 @@ namespace Windows.UI.Xaml.Documents
 	// Summary:
 	//     Encapsulates the selection state for the System.Windows.Controls.RichTextBox
 	//     control.
+    [OpenSilver.NotImplemented]
 	public sealed class TextSelection
 	{
 		//
@@ -20,6 +21,7 @@ namespace Windows.UI.Xaml.Documents
 		// Returns:
 		//     A System.Windows.Documents.TextPointer that represents the end of the current
 		//     selection.
+        [OpenSilver.NotImplemented]
 		public TextPointer End { get; }
 		//
 		// Summary:
@@ -29,6 +31,7 @@ namespace Windows.UI.Xaml.Documents
 		// Returns:
 		//     A System.Windows.Documents.TextPointer that represents the beginning of the current
 		//     selection.
+        [OpenSilver.NotImplemented]
 		public TextPointer Start { get; }
 		//
 		// Summary:
@@ -36,6 +39,7 @@ namespace Windows.UI.Xaml.Documents
 		//
 		// Returns:
 		//     A string that contains the plain text contents of the current selection.
+        [OpenSilver.NotImplemented]
 		public string Text { get; set; }
 		//
 		// Summary:
@@ -45,6 +49,7 @@ namespace Windows.UI.Xaml.Documents
 		//     A System.String that is a XAML representation of the current selection. This
 		//     XAML representation is the same XAML that is applied to the clipboard for a copy
 		//     operation.
+        [OpenSilver.NotImplemented]
 		public string Xaml { get; set; }
 
 		//
@@ -57,6 +62,7 @@ namespace Windows.UI.Xaml.Documents
 		//
 		//   value:
 		//     The value for the formatting property.
+        [OpenSilver.NotImplemented]
 		public void ApplyPropertyValue(DependencyProperty formattingProperty, object value)
 		{
 			
@@ -73,6 +79,7 @@ namespace Windows.UI.Xaml.Documents
 		// Returns:
 		//     An object that indicates the value of the specified formatting property on the
 		//     current selection.
+        [OpenSilver.NotImplemented]
 		public object GetPropertyValue(DependencyProperty formattingProperty)
 		{
 			return default(object);
@@ -85,6 +92,7 @@ namespace Windows.UI.Xaml.Documents
 		// Parameters:
 		//   element:
 		//     The System.Windows.Documents.TextElement to be inserted.
+        [OpenSilver.NotImplemented]
 		public void Insert(TextElement element)
 		{
 			
@@ -106,6 +114,7 @@ namespace Windows.UI.Xaml.Documents
 		//   T:System.ArgumentException:
 		//     Position specifies a position from a different System.Windows.Controls.RichTextBox
 		//     associated with the current position.
+        [OpenSilver.NotImplemented]
 		public void Select(TextPointer anchorPosition, TextPointer movingPosition)
 		{
 			

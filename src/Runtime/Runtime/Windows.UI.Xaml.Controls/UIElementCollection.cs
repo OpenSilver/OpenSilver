@@ -36,6 +36,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
 #if WORKINPROGRESS
+        [OpenSilver.NotImplemented]
         public object SyncRoot
         {
             get

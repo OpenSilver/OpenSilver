@@ -15,6 +15,7 @@ namespace Windows.UI.Xaml.Shapes
 	//
 	// Summary:
 	//     Draws a series of connected straight lines.
+	[OpenSilver.NotImplemented]
 	public sealed partial class Polyline : Shape
 	{
 		//
@@ -23,6 +24,7 @@ namespace Windows.UI.Xaml.Shapes
 		//
 		// Returns:
 		//     The identifier for the System.Windows.Shapes.Polyline.FillRule dependency property.
+		[OpenSilver.NotImplemented]
 		public static readonly DependencyProperty FillRuleProperty = DependencyProperty.Register("FillRule", typeof(FillRule), typeof(Polyline), null);
 		//
 		// Summary:
@@ -30,10 +32,12 @@ namespace Windows.UI.Xaml.Shapes
 		//
 		// Returns:
 		//     The identifier for the System.Windows.Shapes.Polyline.Points dependency property.
+		[OpenSilver.NotImplemented]
 		public static readonly DependencyProperty PointsProperty = DependencyProperty.Register("Points", typeof(PointCollection), typeof(Polyline), null);
 		//
 		// Summary:
 		//     Initializes a new instance of the System.Windows.Shapes.Polyline class.
+		[OpenSilver.NotImplemented]
 		public Polyline()
 		{
 		}
@@ -44,6 +48,7 @@ namespace Windows.UI.Xaml.Shapes
 		//
 		// Returns:
 		//     A value of the enumeration that specifies the fill behavior. The default is System.Windows.Media.FillRule.EvenOdd.
+		[OpenSilver.NotImplemented]
 		public FillRule FillRule
 		{
 			get
@@ -64,6 +69,7 @@ namespace Windows.UI.Xaml.Shapes
 		// Returns:
 		//     A collection of System.Windows.Point structures that describe the vertex points
 		//     of the System.Windows.Shapes.Polyline. The default is null.
+		[OpenSilver.NotImplemented]
 		public PointCollection Points
 		{
 			get

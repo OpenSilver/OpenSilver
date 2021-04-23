@@ -6,6 +6,7 @@ namespace System.Windows.Controls
 	//
 	// Summary:
 	//     This class holds the properties for each sub-image within the System.Windows.Controls.MultiScaleImage.
+    [OpenSilver.NotImplemented]
 	public sealed class MultiScaleSubImage : DependencyObject
 	{
 		//
@@ -16,6 +17,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleSubImage.AspectRatio
 		//     dependency property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty AspectRatioProperty =
 			DependencyProperty.Register("AspectRatio",
 										typeof(double),
@@ -28,6 +30,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleSubImage.Id dependency
 		//     property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty IdProperty =
 			DependencyProperty.Register("Id",
 										typeof(int),
@@ -41,6 +44,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleSubImage.Opacity dependency
 		//     property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty OpacityProperty =
 			DependencyProperty.Register("Opacity",
 										typeof(double),
@@ -54,6 +58,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleSubImage.OriginalPixelHeight
 		//     dependency property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty OriginalPixelHeightProperty =
 			DependencyProperty.Register("OriginalPixelHeight",
 										typeof(int),
@@ -67,6 +72,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleSubImage.OriginalPixelWidth
 		//     dependency property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty OriginalPixelWidthProperty =
 			DependencyProperty.Register("OriginalPixelWidth",
 										typeof(int),
@@ -80,6 +86,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleSubImage.ViewportOrigin
 		//     dependency property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty ViewportOriginProperty =
 			DependencyProperty.Register("ViewportOrigin",
 										typeof(Point),
@@ -93,6 +100,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleSubImage.ViewportWidth
 		//     dependency property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty ViewportWidthProperty =
 			DependencyProperty.Register("ViewportWidth",
 										typeof(double),
@@ -105,6 +113,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleSubImage.ZIndex dependency
 		//     property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty ZIndexProperty =
 			DependencyProperty.Register("ZIndex",
 										typeof(int),
@@ -115,6 +124,7 @@ namespace System.Windows.Controls
 		// Summary:
 		//     Initializes a new instance of the System.Windows.Controls.MultiScaleSubImage
 		//     class.
+        [OpenSilver.NotImplemented]
 		public MultiScaleSubImage()
 		{
 			
@@ -128,6 +138,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The aspect ratio of the image used as the source of the System.Windows.Controls.MultiScaleSubImage.
 		//     The aspect ratio is the width of the image divided by its height.
+        [OpenSilver.NotImplemented]
 		public double AspectRatio
 		{
 			get { return (double)GetValue(AspectRatioProperty); }
@@ -138,6 +149,7 @@ namespace System.Windows.Controls
 		//
 		// Returns:
 		//     The Id of the image used as the source of the System.Windows.Controls.MultiScaleSubImage.
+        [OpenSilver.NotImplemented]
 		public int Id
 		{
 			get { return (int)GetValue(IdProperty); }
@@ -149,6 +161,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     A value between 0 and 1.0 that declares the opacity, with 1.0 meaning full opacity
 		//     and 0 meaning transparent. The default value is 1.0.
+        [OpenSilver.NotImplemented]
 		public double Opacity
 		{
 			get { return (double)GetValue(OpacityProperty); }
@@ -160,6 +173,7 @@ namespace System.Windows.Controls
 		//
 		// Returns:
 		//     The original height of the image to be displayed.
+        [OpenSilver.NotImplemented]
 		public int OriginalPixelHeight
 		{
 			get { return (int)GetValue(OriginalPixelHeightProperty); }
@@ -170,6 +184,7 @@ namespace System.Windows.Controls
 		//
 		// Returns:
 		//     The original width of the image to be displayed.
+        [OpenSilver.NotImplemented]
 		public int OriginalPixelWidth
 		{
 			get { return (int)GetValue(OriginalPixelWidthProperty); }
@@ -180,6 +195,7 @@ namespace System.Windows.Controls
 		//
 		// Returns:
 		//     The point of the top-left corner of the rectangular area of the image to be displayed.
+        [OpenSilver.NotImplemented]
 		public Point ViewportOrigin
 		{
 			get { return (Point)GetValue(ViewportOriginProperty); }
@@ -191,6 +207,7 @@ namespace System.Windows.Controls
 		//
 		// Returns:
 		//     The width of the area of the image displayed.
+        [OpenSilver.NotImplemented]
 		public double ViewportWidth
 		{
 			get { return (double)GetValue(ViewportWidthProperty); }
@@ -205,6 +222,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The value that represents the z-order rendering behavior of the System.Windows.Controls.MultiScaleSubImage.
 		//     The default value is 0.
+        [OpenSilver.NotImplemented]
 		public int ZIndex
 		{
 			get { return (int)GetValue(ZIndexProperty); }
