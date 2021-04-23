@@ -735,8 +735,10 @@ namespace Windows.UI.Xaml
                 // we don't unset the value directly to prevent from potientially
                 // firing the DependencyPropertyChanged callback twice.                
                 Dictionary<DependencyProperty, object> oldStylePropertyValues = oldStyle.EffectiveValues;
-                IEnumerable<DependencyProperty> removedProperties = oldStylePropertyValues.Where(kp => newStylePropertyValues == null || !newStylePropertyValues.ContainsKey(kp.Key))
-                                                                                          .Select(kp => kp.Key);
+                IEnumerable<DependencyProperty> removedProperties = 
+                    oldStylePropertyValues
+                        .Where(kp => newStylePropertyValues == null || !newStylePropertyValues.ContainsKey(kp.Key))
+                        .Select(kp => kp.Key);
                 foreach (var property in removedProperties)
                 {
                     fe.SetLocalStyleValue(property, DependencyProperty.UnsetValue);
@@ -748,10 +750,9 @@ namespace Windows.UI.Xaml
                 foreach (var propertyValue in newStylePropertyValues)
                 {
                     object value;
-                    BindingExpression expr = propertyValue.Value as BindingExpression;
-                    if (expr != null)
+                    if (propertyValue.Value is Binding binding)
                     {
-                        value = new BindingExpression(expr.ParentBinding.Clone(), propertyValue.Key);
+                        value = new BindingExpression(binding.Clone(), propertyValue.Key);
                     }
                     else
                     {
@@ -980,7 +981,7 @@ namespace Windows.UI.Xaml
                 Type typeKey = themeStyleKey as Type;
                 if (typeKey != null)
                 {
-                    styleLookup = Application.Current.XamlResourcesHandler.TryFindResourceInGenericXaml(typeKey.Assembly, themeStyleKey);
+                    styleLookup = Application.Current?.XamlResourcesHandler?.TryFindResourceInGenericXaml(typeKey.Assembly, themeStyleKey);
                 }
                 else
                 {
@@ -1063,8 +1064,10 @@ namespace Windows.UI.Xaml
                 // we don't unset the value directly to prevent from potientially
                 // firing the DependencyPropertyChanged callback twice.
                 Dictionary<DependencyProperty, object> oldStylePropertyValues = oldThemeStyle.EffectiveValues;
-                IEnumerable<DependencyProperty> removedProperties = oldStylePropertyValues.Where(kp => newStylePropertyValues == null || !newStylePropertyValues.ContainsKey(kp.Key))
-                                                                                          .Select(kp => kp.Key);
+                IEnumerable<DependencyProperty> removedProperties = 
+                    oldStylePropertyValues
+                        .Where(kp => newStylePropertyValues == null || !newStylePropertyValues.ContainsKey(kp.Key))
+                        .Select(kp => kp.Key);
                 foreach (var property in removedProperties)
                 {
                     fe.SetThemeStyleValue(property, DependencyProperty.UnsetValue);
@@ -1076,10 +1079,9 @@ namespace Windows.UI.Xaml
                 foreach (var propertyValue in newStylePropertyValues)
                 {
                     object value;
-                    BindingExpression expr = propertyValue.Value as BindingExpression;
-                    if (expr != null)
+                    if (propertyValue.Value is Binding binding)
                     {
-                        value = new BindingExpression(expr.ParentBinding.Clone(), propertyValue.Key);
+                        value = new BindingExpression(binding.Clone(), propertyValue.Key);
                     }
                     else
                     {

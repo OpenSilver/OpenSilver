@@ -17,6 +17,12 @@
 using System;
 
 #if MIGRATION
+using System.Windows.Data;
+#else
+using Windows.UI.Xaml.Data;
+#endif
+
+#if MIGRATION
 namespace System.Windows
 #else
 namespace Windows.UI.Xaml
@@ -27,14 +33,14 @@ namespace Windows.UI.Xaml
     /// </summary>
     public sealed partial class Setter : SetterBase
     {
-        #region Data
+#region Data
 
         private DependencyProperty _property;
-        private bool _throwOnNextValueChange; // used to validate setter value
+        private object _value;
 
-        #endregion
+#endregion
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Initializes a new instance of the Setter class with no initial Property or
@@ -52,22 +58,19 @@ namespace Windows.UI.Xaml
         /// <param name="value">The value to assign to the value when the Setter applies.</param>
         public Setter(DependencyProperty property, object value)
         {
-            if (value == DependencyProperty.UnsetValue)
-            {
-                throw new ArgumentException("Cannot unset a Setter value.");
-            }
             CheckValidProperty(property);
 
-            Property = property;
-            Value = value;
+            _property = property;
+            _value = value == DependencyProperty.UnsetValue ? null : value;
         }
 
-        #endregion
+#endregion
 
-        #region Public Properties
+#region Public Properties
 
         /// <summary>
-        /// Gets or sets the property to apply the Value to. The default is null.
+        /// Gets or sets the property to apply the <see cref="Setter.Value"/> to.
+        /// The default is null.
         /// </summary>
         public DependencyProperty Property
         {
@@ -84,44 +87,40 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Gets or sets the value to apply to the property that is specified by the
-        /// Setter.
+        /// Gets or sets the value to apply to the property that is specified 
+        /// by the <see cref="Setter"/>.
         /// </summary>
         public object Value
         {
-            get { return (object)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, value); }
-        }
-
-        public static readonly DependencyProperty ValueProperty =
-           DependencyProperty.Register("Value", typeof(object), typeof(Setter), new PropertyMetadata(null, OnValueChanged));
-
-        private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            // Note: This callback only purpose is to validate the value change.
-            // The value change is not acceptable if one the the two conditions
-            // below is met :
-            // 1 - the new value is DependencyProperty.UnsetValue.
-            // 2 - the setter is sealed.
-            // We reset the value to the old value and throw an exception if one
-            // of these conditions is verified.
-            Setter setter = (Setter)d;
-            if (setter._throwOnNextValueChange)
+            get
             {
-                setter._throwOnNextValueChange = false;
-                setter.CheckSealed();
-                throw new InvalidOperationException("Cannot unset a Setter value.");
+                return _value;
             }
-            if (setter.IsSealed || e.NewValue == DependencyProperty.UnsetValue)
+            set
             {
-                setter._throwOnNextValueChange = true;
-                setter.Value = e.OldValue;
+                CheckSealed();
+
+                if (value == DependencyProperty.UnsetValue)
+                {
+                    // Silverlight uses a DependencyProperty for Setter.Value,
+                    // so in case of DependencyProperty.UnsetValue, we emulate
+                    // a call to DependencyObject.ClearValue(...).
+                    _value = null;
+                    return;
+                }
+
+                if (value is BindingExpression)
+                {
+                    throw new ArgumentException("BindingExpression type is not a valid Style value.");
+                }
+
+                _value = value;
             }
         }
 
-        #endregion
+#endregion
 
-        #region Internal Methods
+#region Internal Methods
 
         /// <summary>
         ///     Seals this setter
@@ -139,19 +138,25 @@ namespace Windows.UI.Xaml
                 throw new ArgumentException(string.Format("Must have non-null value for '{0}'.", "Setter.Property"));
             }
 
-            //todo: add the following when refactoring of DependencyProperty/PropertyMetadata is done.
-            //if (!dp.IsValidValue(value))
-            //{
-            //    // The only markup extensions supported by styles is resources and bindings.
-            //    if (value is MarkupExtension)
-            //    {
-            //        if (!(value is DynamicResourceExtension) && !(value is System.Windows.Data.BindingBase))
-            //        {
-            //            throw new ArgumentException(SR.Get(SRID.SetterValueOfMarkupExtensionNotSupported,
-            //                                               value.GetType().Name));
-            //        }
-            //    }
-            //}
+            bool isObjectType = dp.PropertyType == typeof(object);
+
+            if (isObjectType || !DependencyProperty.IsValueTypeValid(value, dp.PropertyType))
+            {
+                Binding binding = value as Binding;
+                if (binding == null)
+                {
+                    if (!isObjectType)
+                    {
+                        throw new ArgumentException(
+                            string.Format("'{0}' is not a valid value for the '{1}.{2}' property on a Setter.",
+                                          value, dp.OwnerType, dp.Name));
+                    }                    
+                }
+                else
+                {
+                    binding._isInStyle = true;
+                }
+            }
 
             base.Seal();
         }
@@ -165,10 +170,14 @@ namespace Windows.UI.Xaml
 
             if (property == FrameworkElement.NameProperty)
             {
-                throw new InvalidOperationException(string.Format("'{0}' property cannot be set in the current element's Style.", FrameworkElement.NameProperty.Name));
+                // Note: Silverlight allows this, but will crash as soon as
+                // the style is used 2 times in the visual tree.
+                throw new InvalidOperationException(
+                    string.Format("'{0}' property cannot be set in the current element's Style.", 
+                                  FrameworkElement.NameProperty.Name));
             }
         }
 
-        #endregion
+#endregion
     }
 }

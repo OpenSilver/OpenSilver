@@ -228,6 +228,7 @@ namespace Windows.UI.Xaml.Data
             b.Source = Source;
             b.UpdateSourceTrigger = UpdateSourceTrigger;
             b.StringFormat = StringFormat;
+            b._isInStyle = _isInStyle;
             return b;
 #endif
         }
