@@ -256,7 +256,7 @@ namespace Windows.UI.Xaml.Controls
                 "PopupMinutesInterval",
                 typeof(int),
                 typeof(TimePicker),
-                new PropertyMetadata(OnPopupMinutesIntervalPropertyChanged));
+                new PropertyMetadata(5, OnPopupMinutesIntervalPropertyChanged));
 
         /// <summary>
         /// PopupMinutesIntervalProperty property changed handler.
@@ -269,6 +269,11 @@ namespace Windows.UI.Xaml.Controls
         /// </param>
         private static void OnPopupMinutesIntervalPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            if (e.NewValue != e.OldValue)
+            {
+                var timePicker = d as TimePicker;
+                ((Clock)timePicker._calendarOrClock).MinuteInterval = (int)e.NewValue;
+            }
         }
 
         #endregion public int PopupMinutesInterval

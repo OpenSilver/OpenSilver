@@ -425,6 +425,8 @@ formerOuterDiv.firstChild.firstChild.setAttribute('contenteditable', 'false');
                 //stylePreviouslyModified.height = "100%";
             }
             outerDivStyle.backgroundColor = backgroundColor;
+            outerDivStyle.height = "100%";
+
             object middleDiv;
             var middleDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out middleDiv);
             middleDivStyle.width = "100%";
@@ -438,6 +440,8 @@ formerOuterDiv.firstChild.firstChild.setAttribute('contenteditable', 'false');
                 //set the class to remove margins on <p> inside the contentEditableDiv
                 CSHTML5.Interop.ExecuteJavaScript(@"$0.classList.add(""ie_set_p_margins_to_zero"")", contentEditableDiv);
             }
+
+            CSHTML5.Interop.ExecuteJavaScript(@"$0.classList.add(""single-line-input"")", contentEditableDiv);
 
             contentEditableDivStyle.width = "100%";
             contentEditableDivStyle.height = "100%";
@@ -1484,7 +1488,6 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             }
         }
 
-
         #region TextDecorations
 #if MIGRATION
         /// <summary>
@@ -1579,7 +1582,6 @@ element.setAttribute(""data-maxlength"", ""{1}"");
 #endif
         #endregion
 
-
         protected override void OnAfterApplyHorizontalAlignmentAndWidth()
         {
             // It is important that the "ContentEditable" div has the same CSS size properties as the outer div, so that the overflow and scrolling work properly:
@@ -1640,8 +1642,6 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             }
         }
 
-
-
         public bool IsReadOnly
         {
             get { return (bool)GetValue(IsReadOnlyProperty); }
@@ -1663,28 +1663,29 @@ element.setAttribute(""data-maxlength"", ""{1}"");
                     bool isReadOnly = (bool)e.NewValue;
                     bool canChangeBackground = textBox.Template == null;
                     CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.setAttribute(""contentEditable"", $1);
-if($2)
-    $0.style.backgroundColor=$2;
-", textBox._contentEditableDiv, (!isReadOnly).ToString().ToLower(), canChangeBackground.ToString().ToLower(), isReadOnly ? "#DDDDDD" : "#FFFFFF");
+                        $0.setAttribute(""contentEditable"", $1);
+                        if($2) $0.style.backgroundColor=$3;", 
+                        textBox._contentEditableDiv, (!isReadOnly).ToString().ToLower(), canChangeBackground.ToString().ToLower(), isReadOnly ? "#686868" : "#FFFFFF");
 
                     if (!IsRunningInJavaScript())
                     {
                         //--- SIMULATOR ONLY: ---
                         INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element = document.getElementById(""{0}"");
-element.setAttribute(""data-isreadonly"",""{1}"");
-", ((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier, isReadOnly.ToString().ToLower()));
+                            var element = document.getElementById(""{0}"");
+                            element.setAttribute(""data-isreadonly"",""{1}"");", 
+                            ((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier, isReadOnly.ToString().ToLower()));
                     }
                 }
             }
+
+            textBox.UpdateVisualStates();
         }
 
         #region Not implemented yet (should we move this in WORKINPROGRESS ?)
 
         public event RoutedEventHandler SelectionChanged;
 
-        public static readonly DependencyProperty SelectionForegroundProperty = DependencyProperty.Register("SelectiongoreGround", typeof(Brush), typeof(TextBox), null);
+        public static readonly DependencyProperty SelectionForegroundProperty = DependencyProperty.Register(nameof(SelectionForeground), typeof(Brush), typeof(TextBox), null);
 
         public Brush SelectionForeground
         {
@@ -1707,14 +1708,27 @@ element.setAttribute(""data-isreadonly"",""{1}"");
 
         public void Select(int start, int length)
         {
-
         }
 
         public string SelectedText { get; set; }
 
         public double LineHeight { get; set; }
-
 #endif
 
+        internal override void UpdateVisualStates()
+        {
+            if (!IsEnabled)
+            {
+                GoToState(VisualStates.StateDisabled);
+            }
+            else if (IsReadOnly)
+            {
+                GoToState(VisualStates.StateReadOnly);
+            }
+            else
+            {
+                GoToState(VisualStates.StateNormal);
+            }
+        }
     }
 }

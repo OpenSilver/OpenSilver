@@ -46,21 +46,21 @@ namespace Windows.UI.Xaml.Controls
         public TimePicker()
         {
             _defaultText = ""; // the text displayed when no time is selected
-
             // Set default style:
             this.DefaultStyleKey = typeof(TimePicker);
         }
 
         protected override INTERNAL_CalendarOrClockBase GenerateCalendarOrClock()
         {
-            return new Clock();
+            return new Clock() { MinuteInterval = PopupMinutesInterval };
         }
 
-        protected override string SetTextFromDate(string newDate)
+        protected override string SetTextFromDate(DateTime? newDate)
         {
-            string[] split = newDate.Split(' ');
-            string[] time = split[1].Split(':');
-            return time[0] + " : " + time[1];
+            if (newDate == null)
+                return null;
+
+            return newDate.Value.ToString("HH:mm");
         }
 
         protected override void OnSelectionChanged(DateTime? newSelectedDate)

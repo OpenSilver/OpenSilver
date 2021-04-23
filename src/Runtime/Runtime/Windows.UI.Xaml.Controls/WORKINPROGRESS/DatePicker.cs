@@ -82,8 +82,6 @@ namespace Windows.UI.Xaml.Controls
             set => SetValue(DisplayDateStartProperty, value);
         }
 
-        public DatePickerFormat SelectedDateFormat { get; set; }
-
         //
         // Summary:
         //     Occurs when the drop-down System.Windows.Controls.Calendar is closed.
@@ -183,6 +181,25 @@ namespace Windows.UI.Xaml.Controls
         {
         }
         #endregion DisplayDateEnd
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the current date will be highlighted.
+        /// </summary>
+        public bool IsTodayHighlighted
+        {
+            get { return (bool)GetValue(IsTodayHighlightedProperty); }
+            set { SetValue(IsTodayHighlightedProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the IsTodayHighlighted dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsTodayHighlightedProperty =
+            DependencyProperty.Register(
+            "IsTodayHighlighted",
+            typeof(bool),
+            typeof(DatePicker),
+            null);
     }
 }
 #endif

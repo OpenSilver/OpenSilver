@@ -1,8 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="using:Windows.UI.Xaml.Controls">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!--<Style x:Key="DefaultDatePickerStyle" TargetType="DatePicker">-->
     <Style TargetType="DatePicker">
         <Setter Property="BorderBrush"
                 Value="Gray" />
@@ -16,7 +14,7 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBox x:Name="TextBox"
+                        <DatePickerTextBox x:Name="TextBox"
                                  Grid.Column="0"
                                  Background="{TemplateBinding Background}"
                                  BorderBrush="{TemplateBinding BorderBrush}"

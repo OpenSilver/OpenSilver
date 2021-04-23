@@ -69,6 +69,7 @@ namespace Windows.UI.Xaml.Controls
         ToggleButton _dropDownToggle;
         ContentPresenter _contentPresenter;
         UIElement _selectedContent;
+        SelectorItem _selectedItemContainer;
 
         [Obsolete("ComboBox does not support Native ComboBox. Use 'CSHTML5.Native.Html.Controls.NativeComboBox' instead.")]
         public bool UseNativeComboBox
@@ -88,13 +89,25 @@ namespace Windows.UI.Xaml.Controls
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
             base.PrepareContainerForItemOverride(element, item);
-
             ComboBoxItem container = element as ComboBoxItem;
             if (container != null)
             {
                 container.INTERNAL_CorrespondingItem = item;
                 container.INTERNAL_ParentSelectorControl = this;
                 container.Click += ComboBoxItem_Click;
+            }
+
+            int index = base.ItemContainerGenerator.IndexFromContainer(element);
+            if(index != -1)
+            {
+                if(this.SelectedItem == item)
+                {
+                    container.IsSelected = true;
+                }
+                else
+                {
+                    container.IsSelected = false;
+                }
             }
         }
 
@@ -131,6 +144,15 @@ namespace Windows.UI.Xaml.Controls
         {
             var selectedContainer = (SelectorItem)sender;
             _selectedContent = sender as UIElement;
+
+            if (selectedContainer != _selectedItemContainer)
+            {
+                if (_selectedItemContainer != null)
+                    _selectedItemContainer.IsSelected = false;
+
+                selectedContainer.IsSelected = true;
+                _selectedItemContainer = selectedContainer;
+            }
 
             // Select the item:
             this.SelectedItem = selectedContainer.INTERNAL_CorrespondingItem;
@@ -189,6 +211,19 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        protected override void OnSelectedItemChanged(object selectedItem)
+        {
+            var container = base.ItemContainerGenerator.ContainerFromItem(selectedItem) as ComboBoxItem;
+            if (container != null && container != this._selectedItemContainer)
+            {
+                if (this._selectedItemContainer != null)
+                    this._selectedItemContainer.IsSelected = false;
+
+                container.IsSelected = true;
+                this._selectedItemContainer = container;
+            }
+        }
+
 #if MIGRATION
         public override void OnApplyTemplate()
 #else
@@ -219,6 +254,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 _popup.StayOpen = false;
                 _popup.ClosedDueToOutsideClick += Popup_ClosedDueToOutsideClick;
+                _popup.Opened += OnPopupOpened;
             }
 
             ApplySelectedIndex(SelectedIndex);
@@ -228,12 +264,25 @@ namespace Windows.UI.Xaml.Controls
             {
                 // Get the actual content (if it is a ComboBoxItem, we want its content):
                 object content = this._selectedContent;
-                if (content is ComboBoxItem)
+                if (content is ComboBoxItem comboBoxItem)
                 {
-                    content = ((ComboBoxItem)content).Content;
+                    content = comboBoxItem.Content;   
                 }
                 // Display the content (if it is a UIElement, display as it is, otherwise, use the DisplayMemberPath/ItemTemplate).
                 base.PrepareContainerForItemOverride(this._contentPresenter, content);
+            }
+        }
+
+        private void OnPopupOpened(object sender, EventArgs e)
+        {
+            if(SelectedItem != null && _selectedItemContainer == null)
+            {
+                _selectedItemContainer = base.ItemContainerGenerator.ContainerFromItem(SelectedItem) as SelectorItem;
+                if(_selectedItemContainer != null)
+                {
+                    _selectedItemContainer.IsSelected = true;
+                    _selectedItemContainer.UpdateVisualStates();
+                }
             }
         }
 

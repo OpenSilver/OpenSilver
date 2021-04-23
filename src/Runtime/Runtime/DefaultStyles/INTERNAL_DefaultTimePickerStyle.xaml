@@ -15,7 +15,9 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox x:Name="TextBox" Grid.Column="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" />
+                        <TextBox x:Name="TextBox" Grid.Column="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" 
+                                 BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" 
+                                 TextAlignment="Right" VerticalContentAlignment="Center" VerticalAlignment="Stretch"/>
                         <Button x:Name="Button" Grid.Column="1" Content="▼" Width="30" Foreground="{TemplateBinding Foreground}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Margin="2,0,2,0"/>
                         <Popup x:Name="Popup" VerticalAlignment="Bottom"/>
                     </Grid>
