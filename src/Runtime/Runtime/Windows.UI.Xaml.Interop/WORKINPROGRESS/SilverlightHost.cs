@@ -7,11 +7,13 @@ namespace System.Windows.Interop
 namespace Windows.UI.Xaml.Interop
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public partial class SilverlightHost
 	{
 		private Uri _source;
 		private Settings _settings;
 		private Content _content;
+        [OpenSilver.NotImplemented]
 		public Uri Source
 		{
 			get
@@ -20,6 +22,7 @@ namespace Windows.UI.Xaml.Interop
 			}
 		}
 
+        [OpenSilver.NotImplemented]
 		public Settings Settings
 		{
 			get
@@ -28,6 +31,7 @@ namespace Windows.UI.Xaml.Interop
 			}
 		}
 
+        [OpenSilver.NotImplemented]
 		public Content Content
 		{
 			get
@@ -36,6 +40,7 @@ namespace Windows.UI.Xaml.Interop
 			}
 		}
 
+        [OpenSilver.NotImplemented]
 		public SilverlightHost()
 		{
 			_source = null;

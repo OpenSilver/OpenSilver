@@ -15,9 +15,12 @@
 
 namespace System.Windows.Browser
 {
+	[OpenSilver.NotImplemented]
     public sealed class HtmlPopupWindowOptions
     {
+		[OpenSilver.NotImplemented]
         public bool Menubar { get; set; }
+		[OpenSilver.NotImplemented]
         public bool Status { get; set; }
     }
 }

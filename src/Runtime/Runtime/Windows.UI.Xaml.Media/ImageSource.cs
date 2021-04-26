@@ -65,6 +65,7 @@ namespace Windows.UI.Xaml.Media
 #if WORKINPROGRESS
         //todo: the following property is used in conjuction with the [ContentProperty("UriSource")] attribute to allow to compile the following syntax: <ImageSource x:Key="AppointmentItem_Exception">/Telerik.Windows.Controls.ScheduleView;component/Themes/Images/AppointmentRecurrence.png</ImageSource>
         //However, it is currently not functional because a BitmapImage needs to be created instead of an ImageSource.
+        [OpenSilver.NotImplemented]
         public Uri UriSource { get; set; }
 #endif
 

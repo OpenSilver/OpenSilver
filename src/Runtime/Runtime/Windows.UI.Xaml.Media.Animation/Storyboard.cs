@@ -446,21 +446,25 @@ namespace Windows.UI.Xaml.Media.Animation
         }
 
 #if WORKINPROGRESS
+        [OpenSilver.NotImplemented]
         public ClockState GetCurrentState()
         {
             return ClockState.Active;
         }
 
+        [OpenSilver.NotImplemented]
         public void SkipToFill()
         {
 
         }
 
+        [OpenSilver.NotImplemented]
         public void Seek(TimeSpan offset)
         {
 
         }
 
+        [OpenSilver.NotImplemented]
         public void Pause()
         {
 
@@ -469,6 +473,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <summary>
         /// Resumes the animation clock, or run-time state, associated with the storyboard.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public void Resume()
         {
 

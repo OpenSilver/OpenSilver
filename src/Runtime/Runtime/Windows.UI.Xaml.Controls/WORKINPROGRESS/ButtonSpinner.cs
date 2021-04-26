@@ -31,12 +31,14 @@ namespace Windows.UI.Xaml.Controls
     /// It adds two button template parts and a content property.
     /// </remarks>
     [ContentProperty("Content")]
+    [OpenSilver.NotImplemented]
     public class ButtonSpinner : Spinner
     {
         #region public object Content
         /// <summary>
         /// Gets or sets the content that is contained within the button spinner.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public object Content
         {
             get => GetValue(ContentProperty);
@@ -46,6 +48,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Content dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ContentProperty =
             DependencyProperty.Register(
                 "Content",
@@ -70,6 +73,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="oldValue">The old value of the Content property.</param>
         /// <param name="newValue">The new value of the Content property.</param>
+        [OpenSilver.NotImplemented]
         protected virtual void OnContentChanged(object oldValue, object newValue)
         {
         }

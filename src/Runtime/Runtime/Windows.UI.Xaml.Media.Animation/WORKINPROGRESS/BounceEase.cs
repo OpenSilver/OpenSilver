@@ -22,11 +22,13 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// Represents an easing function that creates an animated bouncing effect.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class BounceEase : EasingFunctionBase
     {
         /// <summary>
         /// Identifies the <see cref="BounceEase.Bounces"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty BouncesProperty =
             DependencyProperty.Register(
                 "Bounces",
@@ -38,6 +40,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Identifies the <see cref="BounceEase.Bounciness"/> dependency
         /// property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty BouncinessProperty =
             DependencyProperty.Register(
                 "Bounciness",
@@ -48,6 +51,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <summary>
         /// Initializes a new instance of the <see cref="BounceEase"/> class.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public BounceEase()
         {
         }
@@ -57,6 +61,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// The value must be greater or equal to zero. Negative values will resolve 
         /// to zero. The default is 3.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public int Bounces
         {
             get { return (int)this.GetValue(BouncesProperty); }
@@ -69,6 +74,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// (more bouncy) while high values result in dampened bounces (less bouncy).
         /// This value must be positive. The default value is 2.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double Bounciness
         {
             get { return (double)this.GetValue(BouncinessProperty); }
@@ -86,6 +92,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <returns>
         /// A double that represents the transformed progress.
         /// </returns>
+        [OpenSilver.NotImplemented]
         protected override double EaseInCore(double normalizedTime)
         {
             return 0d;

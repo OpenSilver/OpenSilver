@@ -11,6 +11,7 @@ namespace System.Windows.Controls
 	// Summary:
 	//     Enables users to open a multi-resolution image, which can be zoomed in on and
 	//     panned across.
+    [OpenSilver.NotImplemented]
 	public sealed partial class MultiScaleImage : FrameworkElement
 	{
 		//
@@ -21,6 +22,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.AllowDownloading
 		//     dependency property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty AllowDownloadingProperty =
 			DependencyProperty.Register("AllowDownloading",
 										typeof(bool),
@@ -34,6 +36,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.AspectRatio dependency
 		//     property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty AspectRatioProperty =
 			DependencyProperty.Register("AspectRatio",
 										typeof(double),
@@ -47,6 +50,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.BlurFactor dependency
 		//     property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty BlurFactorProperty =
 			DependencyProperty.Register("BlurFactor",
 										typeof(double),
@@ -60,6 +64,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.IsDownloading
 		//     dependency property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty IsDownloadingProperty =
 			DependencyProperty.Register("IsDownloading",
 										typeof(bool),
@@ -72,6 +77,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.IsIdle dependency
 		//     property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty IsIdleProperty =
 			DependencyProperty.Register("IsIdle",
 										typeof(bool),
@@ -85,6 +91,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.OriginalPixelHeight
 		//     dependency property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty OriginalPixelHeightProperty =
 			DependencyProperty.Register("OriginalPixelHeight",
 										typeof(int),
@@ -98,6 +105,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.OriginalPixelWidth
 		//     dependency property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty OriginalPixelWidthProperty =
 			DependencyProperty.Register("OriginalPixelWidth",
 										typeof(int),
@@ -111,6 +119,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.SkipLevels dependency
 		//     property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty SkipLevelsProperty =
 			DependencyProperty.Register("SkipLevels",
 										typeof(int),
@@ -123,6 +132,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.Source dependency
 		//     property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty SourceProperty =
 			DependencyProperty.Register("Source",
 										typeof(MultiScaleTileSource),
@@ -135,6 +145,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.SubImages dependency
 		//     property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty SubImagesProperty =
 			DependencyProperty.Register("SubImages",
 										typeof(ReadOnlyCollection<MultiScaleSubImage>),
@@ -148,6 +159,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.UseSprings dependency
 		//     property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty UseSpringsProperty =
 			DependencyProperty.Register("UseSprings",
 										typeof(bool),
@@ -161,6 +173,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.ViewportOrigin
 		//     dependency property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty ViewportOriginProperty =
 			DependencyProperty.Register("ViewportOrigin",
 										typeof(Point),
@@ -174,6 +187,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The identifier for the System.Windows.Controls.MultiScaleImage.ViewportWidth
 		//     dependency property.
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty ViewportWidthProperty =
 			DependencyProperty.Register("ViewportWidth",
 										typeof(double),
@@ -183,6 +197,7 @@ namespace System.Windows.Controls
 		//
 		// Summary:
 		//     Initializes a new instance of the System.Windows.Controls.MultiScaleImage class.
+        [OpenSilver.NotImplemented]
 		public MultiScaleImage()
 		{
 			
@@ -196,6 +211,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     true if downloading is permitted by this System.Windows.Controls.MultiScaleImage.
 		//     false if downloading is not permitted by this System.Windows.Controls.MultiScaleImage.
+        [OpenSilver.NotImplemented]
 		public bool AllowDownloading
 		{
 			get { return (bool)GetValue(AllowDownloadingProperty); }
@@ -209,6 +225,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The aspect ratio of the image used as the source of the System.Windows.Controls.MultiScaleImage.
 		//     The aspect ratio is the width of the image divided by its height.
+        [OpenSilver.NotImplemented]
 		public double AspectRatio
 		{
 			get { return (double)GetValue(AspectRatioProperty); }
@@ -221,6 +238,7 @@ namespace System.Windows.Controls
 		//     The extent that data is blurred while rendering. A value of 2 means that data
 		//     is twice as blurry (one level lower), while a value of 0.5 means that data is
 		//     sharper (one level higher). The default is 1.
+        [OpenSilver.NotImplemented]
 		public double BlurFactor
 		{
 			get { return (double)GetValue(BlurFactorProperty); }
@@ -234,6 +252,7 @@ namespace System.Windows.Controls
 		//     true if the image is still downloading. false if all the needed tiles have been
 		//     downloaded. If the image is moved, System.Windows.Controls.MultiScaleImage.IsDownloading
 		//     may become true again.
+        [OpenSilver.NotImplemented]
 		public bool IsDownloading
 		{
 			get { return (bool)GetValue(IsDownloadingProperty); }
@@ -246,6 +265,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     true, if Deep Zoom is done downloading, decoding, blending, and animating (if
 		//     springs are being used) images. Otherwise, false.
+        [OpenSilver.NotImplemented]
 		public bool IsIdle
 		{
 			get { return (bool)GetValue(IsIdleProperty); }
@@ -256,6 +276,7 @@ namespace System.Windows.Controls
 		//
 		// Returns:
 		//     The height of the image used as the source of the System.Windows.Controls.MultiScaleImage.
+        [OpenSilver.NotImplemented]
 		public int OriginalPixelHeight
 		{
 			get { return (int)GetValue(OriginalPixelHeightProperty); }
@@ -266,6 +287,7 @@ namespace System.Windows.Controls
 		//
 		// Returns:
 		//     Returns System.Int32.
+        [OpenSilver.NotImplemented]
 		public int OriginalPixelWidth
 		{
 			get { return (int)GetValue(OriginalPixelWidthProperty); }
@@ -276,6 +298,7 @@ namespace System.Windows.Controls
 		//
 		// Returns:
 		//     An integer that represents the levels that are skipped while loading a System.Windows.Controls.MultiScaleImage.
+        [OpenSilver.NotImplemented]
 		public int SkipLevels
 		{
 			get { return (int)GetValue(SkipLevelsProperty); }
@@ -289,6 +312,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The System.Windows.Media.MultiScaleTileSource object that is used as the source
 		//     for the System.Windows.Controls.MultiScaleImage.
+        [OpenSilver.NotImplemented]
 		public MultiScaleTileSource Source
 		{
 			get { return (MultiScaleTileSource)GetValue(SourceProperty); }
@@ -302,6 +326,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     The collection of System.Windows.Controls.MultiScaleSubImage objects within the
 		//     multiresolution image that is used by the System.Windows.Controls.MultiScaleImage.
+        [OpenSilver.NotImplemented]
 		public ReadOnlyCollection<MultiScaleSubImage> SubImages
 		{
 			get { return (ReadOnlyCollection<MultiScaleSubImage>)GetValue(SubImagesProperty); }
@@ -314,6 +339,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     true if the System.Windows.Controls.MultiScaleImage uses spring animations; otherwise,
 		//     false. The default value is true.
+        [OpenSilver.NotImplemented]
 		public bool UseSprings
 		{
 			get { return (bool)GetValue(UseSpringsProperty); }
@@ -325,6 +351,7 @@ namespace System.Windows.Controls
 		//
 		// Returns:
 		//     The top-left corner of the rectangular area of the image to be displayed.
+        [OpenSilver.NotImplemented]
 		public Point ViewportOrigin
 		{
 			get { return (Point)GetValue(ViewportOriginProperty); }
@@ -336,6 +363,7 @@ namespace System.Windows.Controls
 		//
 		// Returns:
 		//     The width of the area of the image displayed.
+        [OpenSilver.NotImplemented]
 		public double ViewportWidth
 		{
 			get { return (double)GetValue(ViewportWidthProperty); }
@@ -345,36 +373,43 @@ namespace System.Windows.Controls
 		//
 		// Summary:
 		//     Occurs if the download of a tile times out or fails for another reason.
+        [OpenSilver.NotImplemented]
 		public event RoutedEventHandler ImageFailed;
 		//
 		// Summary:
 		//     Occurs if the first piece of metadata used to open the image fails. If this event
 		//     occurs no parts of the image will open successfully.
+        [OpenSilver.NotImplemented]
 		public event EventHandler<ExceptionRoutedEventArgs> ImageOpenFailed;
 		//
 		// Summary:
 		//     Occurs when the first piece of metadata that is needed to load the rest of the
 		//     tiles opens.
+        [OpenSilver.NotImplemented]
 		public event RoutedEventHandler ImageOpenSucceeded;
 		//
 		// Summary:
 		//     Occurs when the zoom or pan animation ends.
+        [OpenSilver.NotImplemented]
 		public event RoutedEventHandler MotionFinished;
 		//
 		// Summary:
 		//     Occurs when the collection of System.Windows.Controls.MultiScaleSubImage objects
 		//     within the multiresolution image that is used by the System.Windows.Controls.MultiScaleImage
 		//     fails to open.
+        [OpenSilver.NotImplemented]
 		public event SubImageEventHandler SubImageOpenFailed;
 		//
 		// Summary:
 		//     Occurs when the collection of System.Windows.Controls.MultiScaleSubImage objects
 		//     within the multiresolution image that is used by the System.Windows.Controls.MultiScaleImage
 		//     opens successfully.
+        [OpenSilver.NotImplemented]
 		public event SubImageEventHandler SubImageOpenSucceeded;
 		//
 		// Summary:
 		//     Occurs when the viewport (the area of the image displayed) changes.
+        [OpenSilver.NotImplemented]
 		public event RoutedEventHandler ViewportChanged;
 
 		//
@@ -389,6 +424,7 @@ namespace System.Windows.Controls
 		//
 		// Returns:
 		//     The logical point translated from the elementPoint.
+        [OpenSilver.NotImplemented]
 		public Point ElementToLogicalPoint(Point elementPoint)
 		{
 			return default(Point);
@@ -405,6 +441,7 @@ namespace System.Windows.Controls
 		// Returns:
 		//     A point with pixel coordinates relative to the System.Windows.Controls.MultiScaleImage
 		//     translated from logicalPoint.
+        [OpenSilver.NotImplemented]
 		public Point LogicalToElementPoint(Point logicalPoint)
 		{
 			return default(Point);
@@ -427,11 +464,13 @@ namespace System.Windows.Controls
 		//   zoomCenterLogicalY:
 		//     Y coordinate for the point on the System.Windows.Controls.MultiScaleImage that
 		//     is zoomed in on. This is a logical point (between 0 and 1).
+        [OpenSilver.NotImplemented]
 		public void ZoomAboutLogicalPoint(double zoomIncrementFactor, double zoomCenterLogicalX, double zoomCenterLogicalY)
 		{
 			
 		}
 
+        [OpenSilver.NotImplemented]
 		protected override AutomationPeer OnCreateAutomationPeer()
 		{
 			return default(AutomationPeer);

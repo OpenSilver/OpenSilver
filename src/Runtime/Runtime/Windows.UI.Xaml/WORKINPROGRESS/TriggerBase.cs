@@ -22,6 +22,7 @@ namespace Windows.UI.Xaml
 #endif
 {
 #if WORKINPROGRESS
+	[OpenSilver.NotImplemented]
     public abstract partial class TriggerBase : DependencyObject
     {
     }

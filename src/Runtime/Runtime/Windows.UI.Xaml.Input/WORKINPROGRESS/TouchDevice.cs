@@ -8,10 +8,14 @@ namespace System.Windows.Input
 namespace Windows.UI.Xaml.Input
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public sealed partial class TouchDevice : DependencyObject
 	{
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty IdProperty = DependencyProperty.Register("IdProperty", typeof(int), typeof(TouchDevice), new PropertyMetadata());
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty DirectlyOverProperty = DependencyProperty.Register("DirectlyOverProperty", typeof(UIElement), typeof(TouchDevice), new PropertyMetadata());
+        [OpenSilver.NotImplemented]
 		public int Id
 		{
 			get
@@ -20,6 +24,7 @@ namespace Windows.UI.Xaml.Input
 			}
 		}
 
+        [OpenSilver.NotImplemented]
 		public UIElement DirectlyOver
 		{
 			get
@@ -28,6 +33,7 @@ namespace Windows.UI.Xaml.Input
 			}
 		}
 
+        [OpenSilver.NotImplemented]
 		public TouchDevice()
 		{
 		}

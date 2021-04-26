@@ -9,6 +9,7 @@ namespace System.Runtime.InteropServices.Automation
 	//
 	// Summary:
 	//     Provides access to registered Automation servers.
+	[OpenSilver.NotImplemented]
 	public static class AutomationFactory
 	{
 		//
@@ -19,6 +20,7 @@ namespace System.Runtime.InteropServices.Automation
 		// Returns:
 		//     true if the Automation feature in Silverlight is available to the application;
 		//     otherwise, false.
+		[OpenSilver.NotImplemented]
 		public static bool IsAvailable { get; }
 
 		//
@@ -36,6 +38,7 @@ namespace System.Runtime.InteropServices.Automation
 		// Exceptions:
 		//   T:System.Exception:
 		//     No object was found registered for the specified progID.
+		[OpenSilver.NotImplemented]
 		public static dynamic CreateObject(string progID)
 		{
 			return default(dynamic);
@@ -52,6 +55,7 @@ namespace System.Runtime.InteropServices.Automation
 		// Returns:
 		//     null.
 		[EditorBrowsable(EditorBrowsableState.Never)]
+		[OpenSilver.NotImplemented]
 		public static T CreateObject<T>()
 		{
 			return default(T);
@@ -71,6 +75,7 @@ namespace System.Runtime.InteropServices.Automation
 		//
 		// Returns:
 		//     An object that represents the specified event.
+		[OpenSilver.NotImplemented]
 		public static AutomationEvent GetEvent(dynamic automationObject, string eventName)
 		{
 			return default(AutomationEvent);
@@ -91,6 +96,7 @@ namespace System.Runtime.InteropServices.Automation
 		// Exceptions:
 		//   T:System.Exception:
 		//     No object was found registered for the specified progID.
+		[OpenSilver.NotImplemented]
 		public static dynamic GetObject(string progID)
 		{
 			return default(dynamic);

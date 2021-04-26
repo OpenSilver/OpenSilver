@@ -6,8 +6,10 @@ namespace System.Windows.Browser
 {
 	public sealed partial class HtmlDocument
 	{
+		[OpenSilver.NotImplemented]
 		public HtmlElement Body { get; private set; }
 
+		[OpenSilver.NotImplemented]
 		public HtmlElement CreateElement(string tagName)
 		{
 			return default(HtmlElement);
@@ -35,6 +37,7 @@ namespace System.Windows.Browser
 		//   T:System.InvalidOperationException:
 		//     An unexpected error occurred.
 		[SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
 		public ScriptObjectCollection GetElementsByTagName(string tagName)
 		{
 			return default(ScriptObjectCollection);

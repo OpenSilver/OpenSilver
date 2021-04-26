@@ -18,6 +18,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 	//
 	// Summary:
 	//     Exposes System.Windows.Controls.TextBox types to UI automation.
+    [OpenSilver.NotImplemented]
 	public partial class TextBoxAutomationPeer : FrameworkElementAutomationPeer, IValueProvider
 	{
 		//
@@ -28,6 +29,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 		// Parameters:
 		//   owner:
 		//     The System.Windows.Controls.TextBox that is associated with this System.Windows.Automation.Peers.TextBoxAutomationPeer.
+        [OpenSilver.NotImplemented]
 		public TextBoxAutomationPeer(TextBox owner): base(owner)
 		{
 		}
@@ -46,6 +48,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 		// Returns:
 		//     The object that implements the pattern interface, or null if the specified pattern
 		//     interface is not implemented by this peer.
+        [OpenSilver.NotImplemented]
 		public override object GetPattern(PatternInterface patternInterface)
 		{
 			return null;
@@ -58,6 +61,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 		//
 		// Returns:
 		//     A value of the enumeration.
+        [OpenSilver.NotImplemented]
 		protected override AutomationControlType GetAutomationControlTypeCore()
 		{
 			return AutomationControlType.Text;
@@ -70,6 +74,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 		//
 		// Returns:
 		//     The class name.
+        [OpenSilver.NotImplemented]
 		protected override string GetClassNameCore()
 		{
 			return null;
@@ -83,6 +88,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 		// Returns:
 		//     The UI Automation Name of the element that is associated with this automation
 		//     peer.
+        [OpenSilver.NotImplemented]
 		protected override string GetNameCore()
 		{
 			return null;

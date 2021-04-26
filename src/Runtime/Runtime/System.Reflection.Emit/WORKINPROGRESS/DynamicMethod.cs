@@ -10,6 +10,7 @@ namespace System.Reflection.Emit
 	//     Defines and represents a dynamic method that can be compiled, executed, and discarded.
 	//     Discarded methods are available for garbage collection.
 	[ComVisible(true)]
+	[OpenSilver.NotImplemented]
 	public sealed partial class DynamicMethod : MethodInfo
 	{
 		//
@@ -40,6 +41,7 @@ namespace System.Reflection.Emit
 		//   T:System.NotSupportedException:
 		//     returnType is a type for which System.Type.IsByRef returns true.
 		[SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
 		public DynamicMethod(string name, Type returnType, Type[] parameterTypes)
 		{
 			
@@ -52,6 +54,7 @@ namespace System.Reflection.Emit
 		// Returns:
 		//     A bitwise combination of the System.Reflection.MethodAttributes values representing
 		//     the attributes for the method.
+		[OpenSilver.NotImplemented]
 		public override MethodAttributes Attributes { get; }
 		//
 		// Summary:
@@ -60,6 +63,7 @@ namespace System.Reflection.Emit
 		// Returns:
 		//     One of the System.Reflection.CallingConventions values that indicates the calling
 		//     convention of the method.
+		[OpenSilver.NotImplemented]
 		public override CallingConventions CallingConvention { get; }
 		//
 		// Summary:
@@ -67,6 +71,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     Always null.
+		[OpenSilver.NotImplemented]
 		public override Type DeclaringType { get; }
 		//
 		// Summary:
@@ -76,6 +81,7 @@ namespace System.Reflection.Emit
 		// Returns:
 		//     true if the local variables in the method are zero-initialized; otherwise, false.
 		//     The default is true.
+		[OpenSilver.NotImplemented]
 		public bool InitLocals { get; set; }
 		//
 		// Summary:
@@ -87,6 +93,7 @@ namespace System.Reflection.Emit
 		// Exceptions:
 		//   T:System.InvalidOperationException:
 		//     Not allowed for dynamic methods.
+		[OpenSilver.NotImplemented]
 		public override RuntimeMethodHandle MethodHandle { get; }
 		//
 		// Summary:
@@ -94,6 +101,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     The System.Reflection.Module with which the current dynamic method is associated.
+		[OpenSilver.NotImplemented]
 		public override Module Module { get; }
 		//
 		// Summary:
@@ -101,6 +109,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     The simple name of the method.
+		[OpenSilver.NotImplemented]
 		public override string Name { get; }
 		//
 		// Summary:
@@ -108,6 +117,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     Always null.
+		[OpenSilver.NotImplemented]
 		public override Type ReflectedType { get; }
 		//
 		// Summary:
@@ -115,6 +125,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     Always null.
+		[OpenSilver.NotImplemented]
 		public override ParameterInfo ReturnParameter { get; }
 		//
 		// Summary:
@@ -123,6 +134,7 @@ namespace System.Reflection.Emit
 		// Returns:
 		//     A System.Type representing the type of the return value of the current method;
 		//     System.Void if the method has no return type.
+		[OpenSilver.NotImplemented]
 		public override Type ReturnType { get; }
 		//
 		// Summary:
@@ -131,6 +143,7 @@ namespace System.Reflection.Emit
 		// Returns:
 		//     An System.Reflection.ICustomAttributeProvider representing the custom attributes
 		//     of the return type for the dynamic method.
+		[OpenSilver.NotImplemented]
 		public override ICustomAttributeProvider ReturnTypeCustomAttributes { get; }
 
 		//
@@ -153,6 +166,7 @@ namespace System.Reflection.Emit
 		//     delegateType has the wrong number of parameters or the wrong parameter types.
 		[ComVisible(true)]
 		[SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
 		public sealed override Delegate CreateDelegate(Type delegateType)
 		{
 			return default(Delegate);
@@ -185,6 +199,7 @@ namespace System.Reflection.Emit
 		//     or the wrong parameter types.
 		[ComVisible(true)]
 		[SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
 		public sealed override Delegate CreateDelegate(Type delegateType, object target)
 		{
 			return default(Delegate);
@@ -212,6 +227,7 @@ namespace System.Reflection.Emit
 		//   T:System.ArgumentOutOfRangeException:
 		//     The method has no parameters.-or- position is less than 0.-or- position is greater
 		//     than the number of the method's parameters.
+		[OpenSilver.NotImplemented]
 		public ParameterBuilder DefineParameter(int position, ParameterAttributes attributes, string parameterName)
 		{
 			return default(ParameterBuilder);
@@ -222,6 +238,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     The base implementation of the method.
+		[OpenSilver.NotImplemented]
 		public override MethodInfo GetBaseDefinition()
 		{
 			return default(MethodInfo);
@@ -237,6 +254,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     An array of objects representing all the custom attributes of the method.
+		[OpenSilver.NotImplemented]
 		public override object[] GetCustomAttributes(bool inherit)
 		{
 			return default(object[]);
@@ -261,6 +279,7 @@ namespace System.Reflection.Emit
 		// Exceptions:
 		//   T:System.ArgumentNullException:
 		//     attributeType is null.
+		[OpenSilver.NotImplemented]
 		public override object[] GetCustomAttributes(Type attributeType, bool inherit)
 		{
 			return default(object[]);
@@ -272,6 +291,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     An System.Reflection.Emit.ILGenerator object for the method.
+		[OpenSilver.NotImplemented]
 		public ILGenerator GetILGenerator()
 		{
 			return default(ILGenerator);
@@ -289,6 +309,7 @@ namespace System.Reflection.Emit
 		//     An System.Reflection.Emit.ILGenerator object for the method, with the specified
 		//     MSIL stream size.
 		[SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
 		public ILGenerator GetILGenerator(int streamSize)
 		{
 			return default(ILGenerator);
@@ -300,6 +321,7 @@ namespace System.Reflection.Emit
 		// Returns:
 		//     A bitwise combination of System.Reflection.MethodImplAttributes values representing
 		//     the implementation flags for the method.
+		[OpenSilver.NotImplemented]
 		public override MethodImplAttributes GetMethodImplementationFlags()
 		{
 			return default(MethodImplAttributes);
@@ -311,6 +333,7 @@ namespace System.Reflection.Emit
 		// Returns:
 		//     An array of System.Reflection.ParameterInfo objects that represent the parameters
 		//     of the dynamic method.
+		[OpenSilver.NotImplemented]
 		public override ParameterInfo[] GetParameters()
 		{
 			return default(ParameterInfo[]);
@@ -368,6 +391,7 @@ namespace System.Reflection.Emit
 		//     method is anonymously hosted and was constructed with skipVisibility set to false,
 		//     but it accesses members that are not public.
 		[SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
 		public override object Invoke(object obj, BindingFlags invokeAttr, Binder binder, object[] parameters, CultureInfo culture)
 		{
 			return default(object);
@@ -386,6 +410,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     true if the specified custom attribute type is defined; otherwise, false.
+		[OpenSilver.NotImplemented]
 		public override bool IsDefined(Type attributeType, bool inherit)
 		{
 			return default(bool);
@@ -396,6 +421,7 @@ namespace System.Reflection.Emit
 		//
 		// Returns:
 		//     A string representing the method signature.
+		[OpenSilver.NotImplemented]
 		public override string ToString()
 		{
 			return default(string);

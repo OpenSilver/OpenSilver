@@ -22,6 +22,7 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+    [OpenSilver.NotImplemented]
     public abstract partial class Projection : DependencyObject
     {
     }

@@ -26,6 +26,7 @@ namespace Windows.UI.Xaml.Controls
     //
     // Summary:
     //     Provides data for the System.Windows.Controls.DataGrid.BeginningEdit event.
+    [OpenSilver.NotImplemented]
     public class DataGridBeginningEditEventArgs : CancelEventArgs
     {
         //
@@ -42,6 +43,7 @@ namespace Windows.UI.Xaml.Controls
         //
         //   editingEventArgs:
         //     Information about the user gesture that caused the cell to enter edit mode.
+        [OpenSilver.NotImplemented]
         public DataGridBeginningEditEventArgs(DataGridColumn column, DataGridRow row, RoutedEventArgs editingEventArgs)
         { }
 
@@ -51,6 +53,7 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The column that contains the cell to be edited.
+        [OpenSilver.NotImplemented]
         public DataGridColumn Column { get; }
         //
         // Summary:
@@ -58,6 +61,7 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     Information about the user gesture that caused the cell to enter edit mode.
+        [OpenSilver.NotImplemented]
         public RoutedEventArgs EditingEventArgs { get; }
         //
         // Summary:
@@ -65,6 +69,7 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The row that contains the cell to be edited.
+        [OpenSilver.NotImplemented]
         public DataGridRow Row { get; }
     }
 }

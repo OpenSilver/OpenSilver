@@ -36,26 +36,33 @@ namespace Windows.UI.Xaml
     [ContentProperty("Setters")]
     public partial class Style : DependencyObject //was sealed but we unsealed it because telerik has xaml files with styles as their roots (and the file we generate from xaml files create a type that inherits the type of the root of the xaml).
     {
-#region Data
+        #region Data
 
         private bool _sealed;
         private SetterBaseCollection _setters;
-        private Type _targetType; //= DefaultTargetType; //Note: In silverlight, TargetType is by default null, while in WPF it is typeof(IFrameworkInputElement)
+        private Type _targetType;
         private Style _basedOn;
         private int _modified = 0;
         private const int TargetTypeID = 0x01;
         internal const int BasedOnID = 0x02;
-        internal static readonly Type DefaultTargetType = typeof(FrameworkElement);
 
         // Original Style data (not including based-on data)
-        internal List<PropertyValue> PropertyValues = null;
+        internal List<PropertyValue> PropertyValues
+        {
+            get;
+            private set;
+        }
 
         // Style tables (includes based-on data)
-        internal Dictionary<DependencyProperty, object> EffectiveValues = new Dictionary<DependencyProperty, object>();
+        internal Dictionary<DependencyProperty, object> EffectiveValues
+        {
+            get;
+            private set;
+        }
 
-#endregion Data
+        #endregion Data
 
-#region Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the Style class, with no initial TargetType and an empty Setters collection.
@@ -78,9 +85,9 @@ namespace Windows.UI.Xaml
             TargetType = targetType;
         }
 
-#endregion Constructors
+        #endregion Constructors
 
-#region Public Properties
+        #region Public Properties
 
         /// <summary>
         ///     Style mutability state
@@ -117,12 +124,6 @@ namespace Windows.UI.Xaml
                 if (value == null)
                 {
                     throw new ArgumentNullException("value");
-                }
-
-                if (!typeof(FrameworkElement).IsAssignableFrom(value) &&
-                    !(DefaultTargetType == value))
-                {
-                    throw new ArgumentException(string.Format("'{0}' type must derive from FrameworkElement", value.Name));
                 }
 
                 _targetType = value;
@@ -184,9 +185,9 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion Public Properties
+        #endregion Public Properties
 
-#region Public Methods
+        #region Public Methods
 
         /// <summary>
         /// This Style is now immutable
@@ -208,7 +209,7 @@ namespace Windows.UI.Xaml
 
             if (_basedOn != null)
             {
-                if (DefaultTargetType != _basedOn.TargetType &&
+                if (_basedOn.TargetType == null ||
                     !_basedOn.TargetType.IsAssignableFrom(_targetType))
                 {
                     throw new InvalidOperationException(string.Format("Can only base on a Style with target type that is base type '{0}'.", _targetType.Name));
@@ -244,15 +245,16 @@ namespace Windows.UI.Xaml
 
             // Process all PropertyValues (all are "Self") in the Style
             // chain (base added first)
+            EffectiveValues = new Dictionary<DependencyProperty, object>();
             ProcessSelfStyles(this);
 
             // All done, seal self and call it a day.
             _sealed = true;
         }
 
-#endregion Public Methods
+        #endregion Public Methods
 
-#region Internal Methods
+        #region Internal Methods
 
         /// <summary>
         ///     Given a set of values for the PropertyValue struct, put that in
@@ -260,7 +262,6 @@ namespace Windows.UI.Xaml
         /// </summary>
         private void UpdatePropertyValueList(DependencyProperty dp, object value)
         {
-            // Check for existing value on dp
             // Check for existing value on dp
             int existingIndex = -1;
             for (int i = 0; i < PropertyValues.Count; i++)
@@ -293,12 +294,13 @@ namespace Windows.UI.Xaml
 
         internal void CheckTargetType(object element)
         {
-#if OPENSILVER // Note: we do not do this verification in CSHTML5 in order to remain compatible with old applications created with prior versions of CSHTML5 (eg. Client_FB).
-
-            // In the most common case TargetType is Default
-            // and we can avoid a call to IsAssignableFrom() who's performance is unknown.
-            if (DefaultTargetType == TargetType)
-                return;
+            // Note: we do not do this verification in CSHTML5 in order to remain compatible
+            // with old applications created with prior versions of CSHTML5 (eg. Client_FB).
+#if OPENSILVER
+            if (TargetType == null)
+            {
+                throw new InvalidOperationException("Must have non-null value for TargetType.");
+            }
 
             Type elementType = element.GetType();
             if (!TargetType.IsAssignableFrom(elementType))
@@ -362,38 +364,29 @@ namespace Windows.UI.Xaml
 
             style.Setters.Seal(); // Does not mark individual setters as sealed, that's up to the loop below.
 
-            // On-demand create the PropertyValues list, so that we can specify the right size.
-
-            if (PropertyValues == null || PropertyValues.Count == 0)
+            if (style == this)
             {
-                PropertyValues = new List<PropertyValue>(style.Setters.Count);
-            }
-
-            for (int i = 0; i < style.Setters.Count; i++)
-            {
-                SetterBase setterBase = style.Setters[i];
-                Debug.Assert(setterBase != null, "Setter collection must contain non-null instances of SetterBase");
-
-                // Setters are folded into the PropertyValues table only for the current style. The
-                // processing of BasedOn Style properties will occur in subsequent call to ProcessSelfStyle
-                Setter setter = setterBase as Setter;
-                if (setter != null)
+                // On-demand create the PropertyValues list, so that we can specify the right size.
+                if (PropertyValues == null || PropertyValues.Count == 0)
                 {
-                    if (style == this)
+                    PropertyValues = new List<PropertyValue>(style.Setters.Count);
+                }
+
+                for (int i = 0; i < style.Setters.Count; i++)
+                {
+                    SetterBase setterBase = style.Setters[i];
+                    Debug.Assert(setterBase != null, "Setter collection must contain non-null instances of SetterBase");
+
+                    // Setters are folded into the PropertyValues table only for the current style. The
+                    // processing of BasedOn Style properties will occur in subsequent call to ProcessSelfStyle
+                    Setter setter = setterBase as Setter;
+                    if (setter != null)
                     {
-                        BindingExpression expr = BindingOperations.GetBindingExpression(setter, Setter.ValueProperty);
-                        if (expr != null)
-                        {
-                            UpdatePropertyValueList(setter.Property, expr);
-                        }
-                        else
-                        {
-                            UpdatePropertyValueList(setter.Property, setter.Value);
-                        }
+                        UpdatePropertyValueList(setter.Property, setter.Value);
                     }
                 }
             }
-
+            
             ProcessSetters(style._basedOn);
         }
 
@@ -419,7 +412,7 @@ namespace Windows.UI.Xaml
         private void SetModified(int id) { _modified |= id; }
         internal bool IsModified(int id) { return (id & _modified) != 0; }
 
-#endregion Internal Methods
+        #endregion Internal Methods
     }
 
     internal struct PropertyValue

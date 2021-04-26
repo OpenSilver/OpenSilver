@@ -30,11 +30,13 @@ namespace Windows.UI.Xaml.Controls
     /// Spinner abstract class defines and implements common and focused visual state groups.
     /// Spinner abstract class defines and implements Spin event and OnSpin method.
     /// </remarks>
+    [OpenSilver.NotImplemented]
     public abstract partial class Spinner : Control, IUpdateVisualState
     {
         /// <summary>
         /// Occurs when spinning is initiated by the end-user.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public event EventHandler<SpinEventArgs> Spin;
 
         /// <summary>

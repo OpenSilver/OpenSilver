@@ -8,7 +8,9 @@ namespace Windows.UI.Xaml
 {
 	public partial class DataTemplate
 	{
+		[OpenSilver.NotImplemented]
 		public object DataTemplateKey { get; }
+		[OpenSilver.NotImplemented]
 		public object DataType { get; set; }
 	}
 }

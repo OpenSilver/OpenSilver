@@ -9,6 +9,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// This class implements an easing function that backs up before going to the destination.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public partial class BackEase : EasingFunctionBase
     {
         //
@@ -18,6 +19,7 @@ namespace Windows.UI.Xaml.Media.Animation
         // Returns:
         //     The identifier for the System.Windows.Media.Animation.BackEase.Amplitude dependency
         //     property.
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty AmplitudeProperty =
             DependencyProperty.Register("Amplitude",
                                         typeof(double),
@@ -32,6 +34,7 @@ namespace Windows.UI.Xaml.Media.Animation
         // Returns:
         //     The amplitude of retraction associated with a System.Windows.Media.Animation.BackEase
         //     animation. This value must be greater than or equal to 0. The default is 1.
+        [OpenSilver.NotImplemented]
         public double Amplitude
         {
             get { return (double)GetValue(AmplitudeProperty); }
@@ -41,6 +44,7 @@ namespace Windows.UI.Xaml.Media.Animation
         //
         // Summary:
         //     Initializes a new instance of the System.Windows.Media.Animation.BackEase class.
+        [OpenSilver.NotImplemented]
         public BackEase()
         {
 
@@ -59,6 +63,7 @@ namespace Windows.UI.Xaml.Media.Animation
         //
         // Returns:
         //     A double that represents the transformed progress.
+        [OpenSilver.NotImplemented]
         protected override double EaseInCore(double normalizedTime)
         {
             return default(double);

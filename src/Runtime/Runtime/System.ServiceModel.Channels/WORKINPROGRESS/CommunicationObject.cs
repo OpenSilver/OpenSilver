@@ -6,12 +6,14 @@ namespace System.ServiceModel.Channels
     //     Provides a common base implementation for the basic state machine common to all
     //     communication-oriented objects in the system, including channels and the channel
     //     factories.
+	[OpenSilver.NotImplemented]
     public abstract partial class CommunicationObject : ICommunicationObject
     {
         //
         // Summary:
         //     Initializes a new instance of the System.ServiceModel.Channels.CommunicationObject
         //     class.
+		[OpenSilver.NotImplemented]
         protected CommunicationObject()
         {
 
@@ -24,6 +26,7 @@ namespace System.ServiceModel.Channels
         // Parameters:
         //   mutex:
         //     The mutually exclusive lock that protects the class instance during a state transition.
+		[OpenSilver.NotImplemented]
         protected CommunicationObject(object mutex)
         {
 
@@ -36,6 +39,7 @@ namespace System.ServiceModel.Channels
         // Returns:
         //     A value from the System.ServiceModel.CommunicationState enumeration that indicates
         //     the current state of the object.
+		[OpenSilver.NotImplemented]
         public CommunicationState State { get; }
         //
         // Summary:
@@ -45,6 +49,7 @@ namespace System.ServiceModel.Channels
         // Returns:
         //     The default System.Timespan that specifies how long the close operation has to
         //     complete before timing out.
+		[OpenSilver.NotImplemented]
         protected abstract TimeSpan DefaultCloseTimeout { get; }
         //
         // Summary:
@@ -54,6 +59,7 @@ namespace System.ServiceModel.Channels
         // Returns:
         //     The default System.Timespan that specifies how long the open operation has to
         //     complete before timing out.
+		[OpenSilver.NotImplemented]
         protected abstract TimeSpan DefaultOpenTimeout { get; }
         //
         // Summary:
@@ -61,6 +67,7 @@ namespace System.ServiceModel.Channels
         //
         // Returns:
         //     true if the communication object is in a closed state; otherwise, false.
+		[OpenSilver.NotImplemented]
         protected bool IsDisposed { get; }
         //
         // Summary:
@@ -69,27 +76,33 @@ namespace System.ServiceModel.Channels
         //
         // Returns:
         //     The mutually exclusive lock that protects the class instance during a state transition.
+		[OpenSilver.NotImplemented]
         protected object ThisLock { get; }
 
         //
         // Summary:
         //     Occurs when a communication object transitions into the closed state.
+		[OpenSilver.NotImplemented]
         public event EventHandler Closed;
         //
         // Summary:
         //     Occurs when a communication object transitions into the closing state.
+		[OpenSilver.NotImplemented]
         public event EventHandler Closing;
         //
         // Summary:
         //     Occurs when a communication object transitions into the faulted state.
+		[OpenSilver.NotImplemented]
         public event EventHandler Faulted;
         //
         // Summary:
         //     Occurs when a communication object transitions into the opened state.
+		[OpenSilver.NotImplemented]
         public event EventHandler Opened;
         //
         // Summary:
         //     Occurs when a communication object transitions into the opening state.
+		[OpenSilver.NotImplemented]
         public event EventHandler Opening;
 
         //
@@ -102,6 +115,7 @@ namespace System.ServiceModel.Channels
         //     Either the base class System.ServiceModel.Channels.CommunicationObject.OnClosing
         //     method or the base class System.ServiceModel.Channels.CommunicationObject.OnClosed
         //     method is not called.
+		[OpenSilver.NotImplemented]
         public void Abort()
         {
 
@@ -130,6 +144,7 @@ namespace System.ServiceModel.Channels
         //   T:System.TimeoutException:
         //     The default interval of time that was allotted for the operation was exceeded
         //     before the operation was completed.
+		[OpenSilver.NotImplemented]
         public IAsyncResult BeginClose(AsyncCallback callback, object state)
         {
             return null;
@@ -166,6 +181,7 @@ namespace System.ServiceModel.Channels
         //   T:System.TimeoutException:
         //     The interval of time specified by timeout that was allotted for the operation
         //     was exceeded before the operation was completed.
+		[OpenSilver.NotImplemented]
         public IAsyncResult BeginClose(TimeSpan timeout, AsyncCallback callback, object state)
         {
             return null;
@@ -202,6 +218,7 @@ namespace System.ServiceModel.Channels
         //   T:System.TimeoutException:
         //     The default interval of time that was allotted for the operation was exceeded
         //     before the operation was completed.
+		[OpenSilver.NotImplemented]
         public IAsyncResult BeginOpen(AsyncCallback callback, object state)
         {
             return null;
@@ -246,6 +263,7 @@ namespace System.ServiceModel.Channels
         //   T:System.TimeoutException:
         //     The interval of time specified by timeout that was allotted for the operation
         //     was exceeded before the operation was completed.
+		[OpenSilver.NotImplemented]
         public IAsyncResult BeginOpen(TimeSpan timeout, AsyncCallback callback, object state)
         {
             return null;
@@ -263,6 +281,7 @@ namespace System.ServiceModel.Channels
         //   T:System.TimeoutException:
         //     The default interval of time that was allotted for the operation was exceeded
         //     before the operation was completed.
+		[OpenSilver.NotImplemented]
         public void Close()
         {
 
@@ -288,6 +307,7 @@ namespace System.ServiceModel.Channels
         //   T:System.TimeoutException:
         //     The interval of time specified by timeout that was allotted for the operation
         //     was exceeded before the operation was completed.
+		[OpenSilver.NotImplemented]
         public void Close(TimeSpan timeout)
         {
 
@@ -300,6 +320,7 @@ namespace System.ServiceModel.Channels
         //   result:
         //     The System.IAsyncResult that is returned by a call to the Overload:System.ServiceModel.Channels.CommunicationObject.BeginClose
         //     method.
+		[OpenSilver.NotImplemented]
         public void EndClose(IAsyncResult result)
         {
 
@@ -312,6 +333,7 @@ namespace System.ServiceModel.Channels
         //   result:
         //     The System.IAsyncResult that is returned by a call to the Overload:System.ServiceModel.Channels.CommunicationObject.BeginClose
         //     method.
+		[OpenSilver.NotImplemented]
         public void EndOpen(IAsyncResult result)
         {
 
@@ -337,6 +359,7 @@ namespace System.ServiceModel.Channels
         //   T:System.TimeoutException:
         //     The default interval of time that was allotted for the operation was exceeded
         //     before the operation was completed.
+		[OpenSilver.NotImplemented]
         public void Open()
         {
 
@@ -370,6 +393,7 @@ namespace System.ServiceModel.Channels
         //   T:System.TimeoutException:
         //     The interval of time specified by timeout that was allotted for the operation
         //     was exceeded before the operation was completed.
+		[OpenSilver.NotImplemented]
         public void Open(TimeSpan timeout)
         {
 
@@ -378,6 +402,7 @@ namespace System.ServiceModel.Channels
         // Summary:
         //     Causes a communication object to transition from its current state into the faulted
         //     state.
+		[OpenSilver.NotImplemented]
         protected void Fault()
         {
 
@@ -388,6 +413,7 @@ namespace System.ServiceModel.Channels
         //
         // Returns:
         //     The type of communication object.
+		[OpenSilver.NotImplemented]
         protected virtual Type GetCommunicationObjectType()
         {
             return null;
@@ -397,6 +423,7 @@ namespace System.ServiceModel.Channels
         //     When implemented in a derived class, inserts processing on a communication object
         //     after it transitions to the closing state due to the invocation of a synchronous
         //     abort operation.
+		[OpenSilver.NotImplemented]
         protected abstract void OnAbort();
         //
         // Summary:
@@ -423,6 +450,7 @@ namespace System.ServiceModel.Channels
         // Exceptions:
         //   T:System.ArgumentOutOfRangeException:
         //     timeout is less than zero.
+		[OpenSilver.NotImplemented]
         protected abstract IAsyncResult OnBeginClose(TimeSpan timeout, AsyncCallback callback, object state);
         //
         // Summary:
@@ -449,6 +477,7 @@ namespace System.ServiceModel.Channels
         // Exceptions:
         //   T:System.ArgumentOutOfRangeException:
         //     timeout is less than zero.
+		[OpenSilver.NotImplemented]
         protected abstract IAsyncResult OnBeginOpen(TimeSpan timeout, AsyncCallback callback, object state);
         //
         // Summary:
@@ -464,10 +493,12 @@ namespace System.ServiceModel.Channels
         // Exceptions:
         //   T:System.ArgumentOutOfRangeException:
         //     timeout is less than zero.
+		[OpenSilver.NotImplemented]
         protected abstract void OnClose(TimeSpan timeout);
         //
         // Summary:
         //     Invoked during the transition of a communication object into the closing state.
+		[OpenSilver.NotImplemented]
         protected virtual void OnClosed()
         {
 
@@ -475,6 +506,7 @@ namespace System.ServiceModel.Channels
         //
         // Summary:
         //     Invoked during the transition of a communication object into the closing state.
+		[OpenSilver.NotImplemented]
         protected virtual void OnClosing()
         {
 
@@ -494,6 +526,7 @@ namespace System.ServiceModel.Channels
         //   T:System.TimeoutException:
         //     The interval of time specified by timeout that was allotted for the operation
         //     was exceeded before the operation was completed.
+		[OpenSilver.NotImplemented]
         protected abstract void OnEndClose(IAsyncResult result);
         //
         // Summary:
@@ -509,11 +542,13 @@ namespace System.ServiceModel.Channels
         //   T:System.TimeoutException:
         //     The interval of time specified by timeout that was allotted for the operation
         //     was exceeded before the operation was completed.
+		[OpenSilver.NotImplemented]
         protected abstract void OnEndOpen(IAsyncResult result);
         //
         // Summary:
         //     Inserts processing on a communication object after it transitions to the faulted
         //     state due to the invocation of a synchronous fault operation.
+		[OpenSilver.NotImplemented]
         protected virtual void OnFaulted()
         {
 
@@ -536,10 +571,12 @@ namespace System.ServiceModel.Channels
         //   T:System.TimeoutException:
         //     The interval of time specified by timeout that was allotted for the operation
         //     was exceeded before the operation was completed.
+		[OpenSilver.NotImplemented]
         protected abstract void OnOpen(TimeSpan timeout);
         //
         // Summary:
         //     Invoked during the transition of a communication object into the opened state.
+		[OpenSilver.NotImplemented]
         protected virtual void OnOpened()
         {
 
@@ -547,6 +584,7 @@ namespace System.ServiceModel.Channels
         //
         // Summary:
         //     Invoked during the transition of a communication object into the opening state.
+		[OpenSilver.NotImplemented]
         protected virtual void OnOpening()
         {
 
@@ -563,6 +601,7 @@ namespace System.ServiceModel.Channels
         //   T:System.ServiceModel.CommunicationObjectFaultedException:
         //     The communication object is in a System.ServiceModel.CommunicationState.Faulted
         //     state.
+		[OpenSilver.NotImplemented]
         protected internal void ThrowIfDisposed()
         {
 
@@ -584,6 +623,7 @@ namespace System.ServiceModel.Channels
         //   T:System.ServiceModel.CommunicationObjectFaultedException:
         //     The communication object is in a System.ServiceModel.CommunicationState.Faulted
         //     state.
+		[OpenSilver.NotImplemented]
         protected internal void ThrowIfDisposedOrImmutable()
         {
 
@@ -605,6 +645,7 @@ namespace System.ServiceModel.Channels
         //   T:System.ServiceModel.CommunicationObjectFaultedException:
         //     The communication object is in a System.ServiceModel.CommunicationState.Faulted
         //     state and cannot be modified.
+		[OpenSilver.NotImplemented]
         protected internal void ThrowIfDisposedOrNotOpen()
         {
 

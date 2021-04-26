@@ -28,6 +28,7 @@ namespace Windows.UI.Xaml
 	//
 	// Summary:
 	//     Represents a collection of System.Windows.Window instances.
+    [OpenSilver.NotImplemented]
 	public sealed partial class WindowCollection : ICollection, IEnumerable
 	{
 		//
@@ -36,6 +37,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The number of windows in the collection.
+        [OpenSilver.NotImplemented]
 		public int Count { get; }
 		//
 		// Summary:
@@ -44,6 +46,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     Always returns false.
+        [OpenSilver.NotImplemented]
 		public bool IsSynchronized { get; }
 		//
 		// Summary:
@@ -51,8 +54,10 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     An object that can be used to synchronize access to the System.Windows.WindowCollection.
+        [OpenSilver.NotImplemented]
 		public object SyncRoot { get; }
 
+        [OpenSilver.NotImplemented]
 		public void CopyTo(Array array, int arrayIndex)
 		{
 			
@@ -71,6 +76,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     An enumerator for the collection.
+        [OpenSilver.NotImplemented]
 		public IEnumerator GetEnumerator()
 		{
 			return default(IEnumerator);

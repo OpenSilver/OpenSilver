@@ -17,6 +17,7 @@ namespace System.Windows.Controls.Primitives
 namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
+    [OpenSilver.NotImplemented]
 	public static partial class LayoutInformation
 	{
 		//
@@ -34,6 +35,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 		// Exceptions:
 		//   T:System.ArgumentNullException:
 		//     element is null.
+        [OpenSilver.NotImplemented]
 		public static Geometry GetLayoutClip(FrameworkElement element)
 		{
 			return default(Geometry);
@@ -51,6 +53,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 		//
 		// Returns:
 		//     The element being processed at the time of an unhandled exception.
+        [OpenSilver.NotImplemented]
 #if MIGRATION
 		public static UIElement GetLayoutExceptionElement(Dispatcher dispatcher)
 #else
@@ -70,6 +73,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 		//
 		// Returns:
 		//     The area assigned to the element for layout.
+        [OpenSilver.NotImplemented]
 		public static Rect GetLayoutSlot(FrameworkElement element)
 		{
 			return default(Rect);

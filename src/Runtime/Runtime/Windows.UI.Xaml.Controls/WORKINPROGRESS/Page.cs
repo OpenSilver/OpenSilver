@@ -29,6 +29,7 @@ namespace Windows.UI.Xaml.Controls
 {
     public partial class Page : UserControl
     {
+        [OpenSilver.NotImplemented]
         public NavigationService NavigationService { get; }
 
         private string _title;
@@ -36,12 +37,14 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Gets or sets the name for the page.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public string Title
         {
             get { return _title; }
             set { _title = value; }
         }
 
+        [OpenSilver.NotImplemented]
         public NavigationContext NavigationContext { get; }
 
         /// <summary>
@@ -50,6 +53,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">
         /// An object that contains the event data.
         /// </param>
+        [OpenSilver.NotImplemented]
         protected virtual void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
         }
@@ -60,6 +64,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">
         /// An object that contains the event data.
         /// </param>
+        [OpenSilver.NotImplemented]
         protected virtual void OnNavigatedFrom(NavigationEventArgs e)
         {
         }

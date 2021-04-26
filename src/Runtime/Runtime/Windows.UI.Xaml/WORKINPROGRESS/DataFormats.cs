@@ -10,6 +10,7 @@ namespace Windows.UI.Xaml
 	//     Provides static, predefined format names for data objects. Use the named constants
 	//     to identify the format of the data that you request from an System.Windows.IDataObject
 	//     object.
+	[OpenSilver.NotImplemented]
 	public static partial class DataFormats
 	{
 		//
@@ -18,6 +19,7 @@ namespace Windows.UI.Xaml
 		//
 		// Returns:
 		//     The string specifying the Microsoft Windows file drop format.
+		[OpenSilver.NotImplemented]
 		public static readonly string FileDrop;
 	}
 }

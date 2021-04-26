@@ -32,6 +32,7 @@ namespace Windows.UI.Xaml.Media
 {
 #if WORKINPROGRESS
     [ContentProperty("Children")]
+    [OpenSilver.NotImplemented]
     public sealed partial class GeometryGroup : Geometry
     {
         internal protected override void DefineInCanvas(

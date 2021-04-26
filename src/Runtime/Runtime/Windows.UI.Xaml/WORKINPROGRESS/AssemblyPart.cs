@@ -25,6 +25,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
+	[OpenSilver.NotImplemented]
     public sealed partial class AssemblyPart : DependencyObject
     {
         //
@@ -33,11 +34,13 @@ namespace Windows.UI.Xaml
         //
         // Returns:
         //     The identifier for the System.Windows.AssemblyPart.Source dependency property.
+		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register("Source", typeof(string), typeof(AssemblyPart), null);
 
         //
         // Summary:
         //     Initializes a new instance of the System.Windows.AssemblyPart class.
+		[OpenSilver.NotImplemented]
         public AssemblyPart()
         {
 
@@ -49,6 +52,7 @@ namespace Windows.UI.Xaml
         //
         // Returns:
         //     A System.String that is the assembly, which is identified as an assembly part.
+		[OpenSilver.NotImplemented]
         public string Source
         {
             get { return (string)this.GetValue(SourceProperty); }
@@ -68,6 +72,7 @@ namespace Windows.UI.Xaml
         //     The System.Reflection.Assembly that is subsequently loaded into the current application
         //     domain.
         [SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
         public Assembly Load(Stream assemblyStream)
         {
             return null;

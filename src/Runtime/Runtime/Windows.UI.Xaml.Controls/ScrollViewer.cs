@@ -761,6 +761,7 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The value of the property, as obtained from the property store.
+        [OpenSilver.NotImplemented]
         public static ScrollBarVisibility GetHorizontalScrollBarVisibility(DependencyObject element)
         {
             return (ScrollBarVisibility)element.GetValue(HorizontalScrollBarVisibilityProperty);
@@ -777,6 +778,7 @@ namespace Windows.UI.Xaml.Controls
         //
         //   horizontalScrollBarVisibility:
         //     The value to set.
+        [OpenSilver.NotImplemented]
         public static void SetHorizontalScrollBarVisibility(DependencyObject element, ScrollBarVisibility horizontalScrollBarVisibility)
         {
             element.SetValue(HorizontalScrollBarVisibilityProperty, horizontalScrollBarVisibility);
@@ -792,6 +794,7 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The value of the property, as obtained from the property store.
+        [OpenSilver.NotImplemented]
         public static ScrollBarVisibility GetVerticalScrollBarVisibility(DependencyObject element)
         {
             return (ScrollBarVisibility)element.GetValue(VerticalScrollBarVisibilityProperty);
@@ -807,6 +810,7 @@ namespace Windows.UI.Xaml.Controls
         //
         //   verticalScrollBarVisibility:
         //     The value to set.
+        [OpenSilver.NotImplemented]
         public static void SetVerticalScrollBarVisibility(DependencyObject element, ScrollBarVisibility verticalScrollBarVisibility)
         {
             element.SetValue(VerticalScrollBarVisibilityProperty, verticalScrollBarVisibility);
@@ -1229,70 +1233,87 @@ namespace Windows.UI.Xaml.Controls
         */
 
 #if WORKINPROGRESS
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ScrollableHeightProperty = DependencyProperty.Register("ScrollableHeight", typeof(double), typeof(ScrollViewer), null);
 
+        [OpenSilver.NotImplemented]
         public double ScrollableHeight
         {
             get { return (double)this.GetValue(ScrollableHeightProperty); }
             private set { this.SetValue(ScrollableHeightProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ScrollableWidthProperty = DependencyProperty.Register("ScrollableWidth", typeof(double), typeof(ScrollViewer), null);
 
+        [OpenSilver.NotImplemented]
         public double ScrollableWidth
         {
             get { return (double)this.GetValue(ScrollableWidthProperty); }
             private set { this.SetValue(ScrollableWidthProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ViewportHeightProperty = DependencyProperty.Register("ViewportHeight", typeof(double), typeof(ScrollViewer), null);
 
+        [OpenSilver.NotImplemented]
         public double ViewportHeight
         {
             get { return (double)this.GetValue(ViewportHeightProperty); }
             private set { this.SetValue(ViewportHeightProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ViewportWidthProperty = DependencyProperty.Register("ViewportWidth", typeof(double), typeof(ScrollViewer), null);
 
+        [OpenSilver.NotImplemented]
         public double ViewportWidth
         {
             get { return (double)this.GetValue(ViewportWidthProperty); }
             private set { this.SetValue(ViewportWidthProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ComputedHorizontalScrollBarVisibilityProperty = DependencyProperty.Register("ComputedHorizontalScrollBarVisibility", typeof(Visibility), typeof(ScrollViewer), null);
 
+        [OpenSilver.NotImplemented]
         public Visibility ComputedHorizontalScrollBarVisibility
         {
             get { return (Visibility)this.GetValue(ComputedHorizontalScrollBarVisibilityProperty); }
             private set { this.SetValue(ComputedHorizontalScrollBarVisibilityProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ComputedVerticalScrollBarVisibilityProperty = DependencyProperty.Register("ComputedVerticalScrollBarVisibility", typeof(Visibility), typeof(ScrollViewer), null);
 
+        [OpenSilver.NotImplemented]
         public Visibility ComputedVerticalScrollBarVisibility
         {
             get { return (Visibility)this.GetValue(ComputedVerticalScrollBarVisibilityProperty); }
             private set { this.SetValue(ComputedVerticalScrollBarVisibilityProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ExtentHeightProperty = DependencyProperty.Register("ExtentHeight", typeof(double), typeof(ScrollViewer), null);
 
+        [OpenSilver.NotImplemented]
         public double ExtentHeight
         {
             get { return (double)this.GetValue(ExtentHeightProperty); }
             private set { this.SetValue(ExtentHeightProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ExtentWidthProperty = DependencyProperty.Register("ExtentWidth", typeof(double), typeof(ScrollViewer), null);
 
+        [OpenSilver.NotImplemented]
         public double ExtentWidth
         {
             get { return (double)this.GetValue(ExtentWidthProperty); }
             private set { this.SetValue(ExtentWidthProperty, value); }
         }
 
+        [OpenSilver.NotImplemented]
         public void InvalidateScrollInfo()
         {
 

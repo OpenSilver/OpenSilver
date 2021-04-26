@@ -32,6 +32,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Occurs when Value property has changed.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public event RoutedPropertyChangedEventHandler<DateTime?> ValueChanged;
 #endif
 
@@ -42,6 +43,7 @@ namespace Windows.UI.Xaml.Controls
         /// <remarks>Setting the minimum property is applicable for the following
         /// features: Selecting a value through a popup, Parsing a new value from
         /// the textbox, spinning a new value and programmatically specifying a value.</remarks>
+        [OpenSilver.NotImplemented]
         public DateTime? Minimum
         {
             get => (DateTime?)GetValue(MinimumProperty);
@@ -51,6 +53,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Minimum dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty MinimumProperty =
             DependencyProperty.Register(
                 "Minimum",
@@ -73,6 +76,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="oldValue">Old value of the Minimum property.</param>
         /// <param name="newValue">New value of the Minimum property.</param>
+        [OpenSilver.NotImplemented]
         protected virtual void OnMinimumChanged(DateTime? oldValue, DateTime? newValue)
         {
         }
@@ -86,6 +90,7 @@ namespace Windows.UI.Xaml.Controls
         /// features: Selecting a value through a popup, Parsing a new value
         /// from the textbox, spinning a new value and programmatically specifying
         /// a value. </remarks>
+        [OpenSilver.NotImplemented]
         public DateTime? Maximum
         {
             get => (DateTime?)GetValue(MaximumProperty);
@@ -95,6 +100,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Maximum dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty MaximumProperty =
             DependencyProperty.Register(
                 "Maximum",
@@ -117,6 +123,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="oldValue">Old value of the Maximum property.</param>
         /// <param name="newValue">New value of the Maximum property.</param>
+        [OpenSilver.NotImplemented]
         protected virtual void OnMaximumChanged(DateTime? oldValue, DateTime? newValue)
         {
         }
@@ -129,6 +136,7 @@ namespace Windows.UI.Xaml.Controls
         /// Custom formats can only contain "H", "h", "m", "s" or "t".
         /// For example: use 'hh:mm:ss' is used to format time as "13:45:30".
         /// </summary>
+        [OpenSilver.NotImplemented]
         public ITimeFormat Format
         {
             get => GetValue(FormatProperty) as ITimeFormat;
@@ -138,6 +146,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Format dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FormatProperty =
             DependencyProperty.Register(
                 "Format",
@@ -171,6 +180,7 @@ namespace Windows.UI.Xaml.Controls
         /// <remark>
         /// This property might be null, since a template can be used.
         /// </remark>
+        [OpenSilver.NotImplemented]
         public TimePickerPopup Popup
         {
             get => GetValue(PopupProperty) as TimePickerPopup;
@@ -180,6 +190,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Popup dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PopupProperty =
             DependencyProperty.Register(
                 "Popup",
@@ -207,6 +218,7 @@ namespace Windows.UI.Xaml.Controls
         /// directly on the Popup property. When both PopupTemplate and Popup
         /// are set, Popup will be used. 
         /// </summary>
+        [OpenSilver.NotImplemented]
         public TimePickerPopupTemplate PopupTemplate
         {
             get { return GetValue(PopupTemplateProperty) as TimePickerPopupTemplate; }
@@ -216,6 +228,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the PopupTemplate dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PopupTemplateProperty =
             DependencyProperty.Register(
                 "PopupTemplate",
@@ -242,6 +255,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Gets or sets the minutes interval between time values allowed by the TimePickerPopup.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public int PopupMinutesInterval
         {
             get => (int)GetValue(PopupMinutesIntervalProperty);
@@ -251,6 +265,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the PopupMinutesInterval dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PopupMinutesIntervalProperty =
             DependencyProperty.Register(
                 "PopupMinutesInterval",
@@ -283,6 +298,7 @@ namespace Windows.UI.Xaml.Controls
         /// Gets or sets the whether the TimePickerPopup supports selecting
         /// designators and/or seconds.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public PopupTimeSelectionMode PopupTimeSelectionMode
         {
             get => (PopupTimeSelectionMode)GetValue(PopupTimeSelectionModeProperty);
@@ -292,6 +308,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the PopupTimeSelectionMode dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PopupTimeSelectionModeProperty =
             DependencyProperty.Register(
                 "PopupTimeSelectionMode",
@@ -315,6 +332,7 @@ namespace Windows.UI.Xaml.Controls
         /// Gets or sets the button event that causes the popup portion of the
         /// Picker control to open.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public ClickMode PopupButtonMode
         {
             get => (ClickMode)GetValue(PopupButtonModeProperty);
@@ -324,6 +342,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the PopupButtonMode dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PopupButtonModeProperty =
             DependencyProperty.Register(
                 "PopupButtonMode",

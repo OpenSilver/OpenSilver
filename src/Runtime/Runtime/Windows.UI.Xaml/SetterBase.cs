@@ -57,7 +57,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         ///  Subclasses need to call this method before any changes to their state.
         /// </summary>
-        protected void CheckSealed()
+        private protected void CheckSealed()
         {
             if (_sealed)
             {

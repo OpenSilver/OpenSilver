@@ -19,13 +19,16 @@ namespace System.Windows.Automation.Peers
 namespace Windows.UI.Xaml.Automation.Peers
 #endif
 {
+    [OpenSilver.NotImplemented]
     public partial class RangeBaseAutomationPeer : FrameworkElementAutomationPeer, IRangeValueProvider
     {
+        [OpenSilver.NotImplemented]
         public RangeBaseAutomationPeer(RangeBase owner)
           : base((FrameworkElement)owner)
         {
         }
 
+        [OpenSilver.NotImplemented]
         public override object GetPattern(PatternInterface patternInterface) => patternInterface == PatternInterface.RangeValue ? (object)this : (object)null;
 
         double IRangeValueProvider.Value => ((RangeBase)this.Owner).Value;
@@ -40,6 +43,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 
         double IRangeValueProvider.SmallChange => ((RangeBase)this.Owner).SmallChange;
 
+        [OpenSilver.NotImplemented]
         public void SetValue(double val)
         {
             if (!this.IsEnabled())

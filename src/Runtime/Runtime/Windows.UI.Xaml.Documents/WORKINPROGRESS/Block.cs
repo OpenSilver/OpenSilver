@@ -22,11 +22,13 @@ namespace Windows.UI.Xaml.Documents
 	/// <summary>
 	/// An abstract class that provides a base for all block-level content elements.
 	/// </summary>
+    [OpenSilver.NotImplemented]
 	public abstract partial class Block : TextElement
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Block" /> class. 
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		protected Block()
 		{
 		}
@@ -34,6 +36,7 @@ namespace Windows.UI.Xaml.Documents
 		/// <summary>
 		/// Identifies the <see cref="Block.LineHeight" /> dependency property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty LineHeightProperty =
 			DependencyProperty.Register(
 				"LineHeight",
@@ -49,6 +52,7 @@ namespace Windows.UI.Xaml.Documents
 		/// height is determined automatically from the current font characteristics. 
 		/// The default is 0.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public double LineHeight
 		{
 			get { return (double)this.GetValue(LineHeightProperty); }
@@ -58,6 +62,7 @@ namespace Windows.UI.Xaml.Documents
 		/// <summary>
 		/// Identifies the <see cref="Block.LineStackingStrategy" /> dependency property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty LineStackingStrategyProperty =
 			DependencyProperty.Register(
 				"LineStackingStrategy",
@@ -70,6 +75,7 @@ namespace Windows.UI.Xaml.Documents
 		/// line of text in a <see cref="Block" />.
 		/// The default is <see cref="LineStackingStrategy.MaxHeight" />.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public LineStackingStrategy LineStackingStrategy
 		{
 			get { return (LineStackingStrategy)this.GetValue(LineStackingStrategyProperty); }
@@ -79,6 +85,7 @@ namespace Windows.UI.Xaml.Documents
 		/// <summary>
 		/// Identifies the <see cref="Block.TextAlignment" /> dependency property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty TextAlignmentProperty =
 			DependencyProperty.Register(
 				"TextAlignment",
@@ -90,6 +97,7 @@ namespace Windows.UI.Xaml.Documents
 		/// Gets or sets the horizontal alignment of the text content. 
 		/// The default is <see cref="TextAlignment.Left" />.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public TextAlignment TextAlignment
 		{
 			get { return (TextAlignment)this.GetValue(TextAlignmentProperty); }

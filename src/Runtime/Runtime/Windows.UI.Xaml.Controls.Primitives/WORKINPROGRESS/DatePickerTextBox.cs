@@ -25,6 +25,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Represents the text input of a <see cref="T:System.Windows.Controls.DatePicker" />.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public sealed class DatePickerTextBox : TextBox
     {
         #region Constants

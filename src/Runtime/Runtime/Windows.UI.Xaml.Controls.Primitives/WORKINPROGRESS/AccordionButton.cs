@@ -24,6 +24,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Represents the header for an accordion item.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class AccordionButton : ToggleButton
     {
     }

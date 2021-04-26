@@ -26,6 +26,7 @@ namespace Windows.UI.Xaml.Navigation
     //
     // Summary:
     //     Represents the state of a navigation operation.
+    [OpenSilver.NotImplemented]
     public sealed class NavigationContext
     {
         //
@@ -34,6 +35,7 @@ namespace Windows.UI.Xaml.Navigation
         //
         // Returns:
         //     A collection that contains the query string values.
+        [OpenSilver.NotImplemented]
         public IDictionary<string, string> QueryString { get; }
     }
 }

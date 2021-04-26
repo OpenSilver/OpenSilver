@@ -290,6 +290,11 @@ namespace DotNetForHtml5.Compiler
             return _marshalledObject.IsAssignableFrom(namespaceName, typeName, fromNamespaceName, fromTypeName);
         }
 
+        public string GetField(string fieldName, string namespaceName, string typeName)
+        {
+            return _marshalledObject.GetField(fieldName, namespaceName, typeName);
+        }
+
         public class MarshalledObject : MarshalByRefObject, IMarshalledObject
         {
             const string ASSEMBLY_NOT_IN_LIST_OF_LOADED_ASSEMBLIES = "The specified assembly is not in the list of loaded assemblies.";
@@ -1844,6 +1849,22 @@ namespace DotNetForHtml5.Compiler
                 Type fromType = this.FindType(fromNamespaceName, fromTypeName);
 
                 return type.IsAssignableFrom(fromType);
+            }
+
+            public string GetField(string fieldName, string namespaceName, string typeName)
+            {
+                Type type = this.FindType(namespaceName, typeName, null, true);
+
+                FieldInfo field;
+                for (; type != null; type = type.BaseType)
+                {
+                    if ((field = type.GetField(fieldName)) != null)
+                    {
+                        return field.Name;
+                    }
+                }
+
+                return null;
             }
         }
 

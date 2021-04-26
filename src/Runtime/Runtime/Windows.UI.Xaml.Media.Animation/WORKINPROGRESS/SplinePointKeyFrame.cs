@@ -28,6 +28,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// along a set of key frames.
     ///
     /// </summary>
+    [OpenSilver.NotImplemented]
     public sealed partial class SplinePointKeyFrame : PointKeyFrame
     {
         /// <summary>
@@ -36,6 +37,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <returns>
         /// The identifier for the <see cref="P:System.Windows.Media.Animation.SplinePointKeyFrame.KeySpline" /> dependency property.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty KeySplineProperty = DependencyProperty.Register("KeySpline", typeof(KeySpline), typeof(SplinePointKeyFrame), new PropertyMetadata(new KeySpline()));
 
 
@@ -45,6 +47,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <returns>
         /// The two control points that specify the cubic Bezier curve that defines the progress of the key frame.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public KeySpline KeySpline
         {
             get => (KeySpline)GetValue(KeySplineProperty);

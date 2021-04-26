@@ -72,6 +72,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Gets the collection of VisualTransition objects.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public IList<VisualTransition> Transitions
         {
             get

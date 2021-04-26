@@ -539,6 +539,7 @@ namespace Windows.UI.Xaml
 #if WORKINPROGRESS
         #region Triggers
 
+        [OpenSilver.NotImplemented]
         public TriggerCollection Triggers
         {
             get
@@ -547,6 +548,7 @@ namespace Windows.UI.Xaml
             }
         }
 
+        [OpenSilver.NotImplemented]
         public static DependencyProperty TriggersProperty =
             DependencyProperty.Register("Triggers",
                                         typeof(TriggerCollection),
@@ -555,8 +557,10 @@ namespace Windows.UI.Xaml
 
         #endregion
 
+        [OpenSilver.NotImplemented]
         public event EventHandler LayoutUpdated;
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FlowDirectionProperty =
             DependencyProperty.Register("FlowDirection",
                                         typeof(FlowDirection),
@@ -572,6 +576,7 @@ namespace Windows.UI.Xaml
         /// parent element, as a value of the enumeration. The default value 
         /// is <see cref="FlowDirection.LeftToRight" />.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public FlowDirection FlowDirection
         {
             get
@@ -584,12 +589,14 @@ namespace Windows.UI.Xaml
             }
         }
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LanguageProperty =
             DependencyProperty.Register("Language",
                                         typeof(XmlLanguage),
                                         typeof(FrameworkElement),
                                         null);
 
+        [OpenSilver.NotImplemented]
         public XmlLanguage Language
         {
             get { return (XmlLanguage)this.GetValue(LanguageProperty); }
@@ -608,6 +615,7 @@ namespace Windows.UI.Xaml
         //
         // Returns:
         //     The actual size that is used after the element is arranged in layout.
+        [OpenSilver.NotImplemented]
         protected virtual Size ArrangeOverride(Size finalSize)
         {
             return new Size();
@@ -627,6 +635,7 @@ namespace Windows.UI.Xaml
         //     The size that this object determines it needs during layout, based on its calculations
         //     of the allocated sizes for child objects; or based on other considerations, such
         //     as a fixed container size.
+        [OpenSilver.NotImplemented]
         protected virtual Size MeasureOverride(Size availableSize)
         {
             return new Size();
@@ -726,8 +735,10 @@ namespace Windows.UI.Xaml
                 // we don't unset the value directly to prevent from potientially
                 // firing the DependencyPropertyChanged callback twice.                
                 Dictionary<DependencyProperty, object> oldStylePropertyValues = oldStyle.EffectiveValues;
-                IEnumerable<DependencyProperty> removedProperties = oldStylePropertyValues.Where(kp => newStylePropertyValues == null || !newStylePropertyValues.ContainsKey(kp.Key))
-                                                                                          .Select(kp => kp.Key);
+                IEnumerable<DependencyProperty> removedProperties = 
+                    oldStylePropertyValues
+                        .Where(kp => newStylePropertyValues == null || !newStylePropertyValues.ContainsKey(kp.Key))
+                        .Select(kp => kp.Key);
                 foreach (var property in removedProperties)
                 {
                     fe.SetLocalStyleValue(property, DependencyProperty.UnsetValue);
@@ -739,10 +750,9 @@ namespace Windows.UI.Xaml
                 foreach (var propertyValue in newStylePropertyValues)
                 {
                     object value;
-                    BindingExpression expr = propertyValue.Value as BindingExpression;
-                    if (expr != null)
+                    if (propertyValue.Value is Binding binding)
                     {
-                        value = new BindingExpression(expr.ParentBinding.Clone(), propertyValue.Key);
+                        value = new BindingExpression(binding.Clone(), propertyValue.Key);
                     }
                     else
                     {
@@ -971,7 +981,7 @@ namespace Windows.UI.Xaml
                 Type typeKey = themeStyleKey as Type;
                 if (typeKey != null)
                 {
-                    styleLookup = Application.Current.XamlResourcesHandler.TryFindResourceInGenericXaml(typeKey.Assembly, themeStyleKey);
+                    styleLookup = Application.Current?.XamlResourcesHandler?.TryFindResourceInGenericXaml(typeKey.Assembly, themeStyleKey);
                 }
                 else
                 {
@@ -1054,8 +1064,10 @@ namespace Windows.UI.Xaml
                 // we don't unset the value directly to prevent from potientially
                 // firing the DependencyPropertyChanged callback twice.
                 Dictionary<DependencyProperty, object> oldStylePropertyValues = oldThemeStyle.EffectiveValues;
-                IEnumerable<DependencyProperty> removedProperties = oldStylePropertyValues.Where(kp => newStylePropertyValues == null || !newStylePropertyValues.ContainsKey(kp.Key))
-                                                                                          .Select(kp => kp.Key);
+                IEnumerable<DependencyProperty> removedProperties = 
+                    oldStylePropertyValues
+                        .Where(kp => newStylePropertyValues == null || !newStylePropertyValues.ContainsKey(kp.Key))
+                        .Select(kp => kp.Key);
                 foreach (var property in removedProperties)
                 {
                     fe.SetThemeStyleValue(property, DependencyProperty.UnsetValue);
@@ -1067,10 +1079,9 @@ namespace Windows.UI.Xaml
                 foreach (var propertyValue in newStylePropertyValues)
                 {
                     object value;
-                    BindingExpression expr = propertyValue.Value as BindingExpression;
-                    if (expr != null)
+                    if (propertyValue.Value is Binding binding)
                     {
-                        value = new BindingExpression(expr.ParentBinding.Clone(), propertyValue.Key);
+                        value = new BindingExpression(binding.Clone(), propertyValue.Key);
                     }
                     else
                     {

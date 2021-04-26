@@ -36,6 +36,7 @@ namespace Windows.UI.Xaml.Controls
         ///     This method performs a linear search.
         /// </remarks>
         /// <returns>The index, if found, -1 otherwise.</returns>
+        [OpenSilver.NotImplemented]
         public int GetIndex()
         {
             //DataGrid dataGridOwner = DataGridOwner;
@@ -56,6 +57,7 @@ namespace Windows.UI.Xaml.Controls
         ///     The first ancestor DataGridRow of the element parameter.
         ///     Returns null of none is found.
         /// </returns>
+        [OpenSilver.NotImplemented]
         public static DataGridRow GetRowContainingElement(FrameworkElement element)
         {
             //return DataGridHelper.FindVisualParent<DataGridRow>(element);

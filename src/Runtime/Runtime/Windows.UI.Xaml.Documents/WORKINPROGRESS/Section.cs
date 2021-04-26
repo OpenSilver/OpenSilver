@@ -26,6 +26,7 @@ namespace Windows.UI.Xaml.Documents
 	/// elements.
 	/// </summary>
 	[ContentProperty("Blocks")]
+    [OpenSilver.NotImplemented]
 	public sealed partial class Section : Block
 	{
 		/// <summary>
@@ -33,6 +34,7 @@ namespace Windows.UI.Xaml.Documents
 		/// elements that comprise the contents of the <see cref="Section"/>.
 		/// This property has no default value.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public BlockCollection Blocks { get; private set; }
 
 		/// <summary>
@@ -43,6 +45,7 @@ namespace Windows.UI.Xaml.Documents
 		/// <returns>
 		/// true if a trailing paragraph break should be included; otherwise false.
 		/// </returns>
+        [OpenSilver.NotImplemented]
 		public bool HasTrailingParagraphBreakOnPaste { get; set; }
 	}
 }

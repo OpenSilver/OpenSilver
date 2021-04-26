@@ -51,17 +51,7 @@ namespace Windows.UI.Xaml.Data
             }
 
             // Create the BindingExpression from the Binding
-            BindingExpression expr;
-
-            if (dp == Setter.ValueProperty)
-            {
-                binding._isInStyle = true;
-                expr = new BindingExpression(binding, ((Setter)target).Property);
-            }
-            else
-            {
-                expr = new BindingExpression(binding, dp);
-            }
+            BindingExpression expr = new BindingExpression(binding, dp);
             target.SetValue(dp, expr);
 
             // Return the newly created BindingExpression

@@ -110,5 +110,7 @@ namespace DotNetForHtml5.Compiler.Common
         bool TryGenerateCodeForInstantiatingAttributeValue(string xamlValue, out string generatedCSharpCode, string valueNamespaceName, string valueLocalTypeName, string valueAssemblyNameIfAny);
 
         bool IsAssignableFrom(string namespaceName, string typeName, string fromNamespaceName, string fromTypeName);
+
+        string GetField(string fieldName, string namespaceName, string typeName);
     }
 }

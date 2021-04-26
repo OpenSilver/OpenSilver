@@ -23,6 +23,7 @@ namespace Windows.UI.Xaml.Media
 		/// <summary>
 		/// Identifies the <see cref="CompositeTransform.CenterX"/> dependency property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty CenterXProperty =
 			DependencyProperty.Register(
 				nameof(CenterX),
@@ -34,8 +35,9 @@ namespace Windows.UI.Xaml.Media
 		/// Gets or sets the x-coordinate of the center point for all transforms specified
 		/// by the <see cref="CompositeTransform"/>.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public double CenterX
-        {
+		{
 			get => (double)GetValue(CenterXProperty);
 			set => SetValue(CenterXProperty, value);
         }
@@ -43,6 +45,7 @@ namespace Windows.UI.Xaml.Media
 		/// <summary>
 		/// Identifies the <see cref="CompositeTransform.CenterY"/> dependency property.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty CenterYProperty =
 			DependencyProperty.Register(
 				nameof(CenterY),
@@ -54,8 +57,9 @@ namespace Windows.UI.Xaml.Media
 		/// Gets or sets the y-coordinate of the center point for all transforms specified
 		/// by the <see cref="CompositeTransform"/>.
 		/// </summary>
+        [OpenSilver.NotImplemented]
 		public double CenterY
-        {
+		{
 			get => (double)GetValue(CenterYProperty);
 			set => SetValue(CenterYProperty, value);
         }

@@ -529,6 +529,7 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The item displayed in the selection box.
+        [OpenSilver.NotImplemented]
         public object SelectionBoxItem
         {
             get { return null; }

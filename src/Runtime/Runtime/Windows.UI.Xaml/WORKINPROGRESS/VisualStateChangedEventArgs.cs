@@ -9,7 +9,9 @@ namespace Windows.UI.Xaml
 {
 	public sealed partial class VisualStateChangedEventArgs : EventArgs
 	{
+		[OpenSilver.NotImplemented]
 		public static readonly DependencyProperty NewStateProperty = DependencyProperty.Register("NewStateProperty", typeof(VisualState), typeof(VisualStateChangedEventArgs), new PropertyMetadata());
+		[OpenSilver.NotImplemented]
 		public VisualState NewState
 		{
 			get
@@ -23,6 +25,7 @@ namespace Windows.UI.Xaml
 			}
 		}
 
+		[OpenSilver.NotImplemented]
 		public VisualStateChangedEventArgs()
 		{
 		}

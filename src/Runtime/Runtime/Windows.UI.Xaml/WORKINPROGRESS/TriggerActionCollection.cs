@@ -23,6 +23,7 @@ namespace Windows.UI.Xaml
 #endif
 {
 #if WORKINPROGRESS
+	[OpenSilver.NotImplemented]
     public sealed partial class TriggerActionCollection : PresentationFrameworkCollection<TriggerAction>
     {
         internal override void AddOverride(TriggerAction value)

@@ -26,10 +26,13 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
+    [OpenSilver.NotImplemented]
     public sealed partial class WindowSettings : DependencyObject
     {
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty WindowStyleProperty = DependencyProperty.Register("WindowStyle", typeof(WindowStyle), typeof(WindowSettings), null);
 
+        [OpenSilver.NotImplemented]
         public WindowStyle WindowStyle
         {
             get { return (WindowStyle)this.GetValue(WindowStyleProperty); }

@@ -39,6 +39,9 @@
     <file src="../../src/Compiler/Compiler.ProgressDialog/bin/OpenSilver/$Configuration$/OpenSilver.Compiler.ProgressDialog.dll" target="tools/OpenSilver.Compiler.ProgressDialog.dll" />
     <file src="../../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/OpenSilver/$Configuration$/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" target="tools/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" />
 
+	<!-- OpenSilver analyzers -->
+	<file src="../../src/Analyzers/NotImplemented/bin/Release/netstandard2.0/OpenSilver.Analyzers.dll" target="analyzers/dotnet/cs/OpenSilver.Analyzers.dll" />
+	
     <!-- DotNetBrowser -->
     <!--<file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/DotNetBrowser.dll" target="lib/netstandard2.0/DotNetBrowser.dll"/>-->
 

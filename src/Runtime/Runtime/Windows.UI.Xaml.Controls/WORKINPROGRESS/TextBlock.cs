@@ -22,6 +22,7 @@ namespace Windows.UI.Xaml.Controls
 		// Exceptions:
 		//   T:System.ArgumentException:
 		//     System.Windows.Controls.TextBlock.LineHeight is set to a non-positive value.
+        [OpenSilver.NotImplemented]
 		public double LineHeight { get; set; }
 		
 		//
@@ -32,10 +33,13 @@ namespace Windows.UI.Xaml.Controls
 		// Returns:
 		//     A value that indicates how a line box is determined for each line of text in
 		//     the System.Windows.Controls.TextBlock. The default is System.Windows.LineStackingStrategy.MaxHeight.
+        [OpenSilver.NotImplemented]
 		public LineStackingStrategy LineStackingStrategy { get; set; }
 
+        [OpenSilver.NotImplemented]
 		public double BaselineOffset { get; private set; }
 
+        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty CharacterSpacingProperty =
 			DependencyProperty.Register(
 				"CharacterSpacing",
@@ -43,6 +47,7 @@ namespace Windows.UI.Xaml.Controls
 				typeof(TextBlock),
 				new PropertyMetadata(0));
 
+        [OpenSilver.NotImplemented]
 		public int CharacterSpacing
 		{
 			get { return (int)this.GetValue(CharacterSpacingProperty); }

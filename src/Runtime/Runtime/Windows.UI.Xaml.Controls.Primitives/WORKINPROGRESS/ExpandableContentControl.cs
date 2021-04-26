@@ -27,6 +27,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// Represents a control with a single piece of content that expands or
     /// collapses in a sliding motion to a specified desired size.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public class ExpandableContentControl : ContentControl
     {
         #region public ExpandDirection RevealMode
@@ -34,6 +35,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Gets or sets the direction in which the ExpandableContentControl
         /// content window opens.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public ExpandDirection RevealMode
         {
             get => (ExpandDirection)GetValue(RevealModeProperty);
@@ -43,6 +45,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Identifies the RevealMode dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RevealModeProperty =
             DependencyProperty.Register(
                 "RevealMode",
@@ -68,6 +71,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// currently visible. A percentage of 1 corresponds to the complete
         /// TargetSize.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public double Percentage
         {
             get => (double)GetValue(PercentageProperty);
@@ -77,6 +81,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Identifies the Percentage dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PercentageProperty =
             DependencyProperty.Register(
                 "Percentage",

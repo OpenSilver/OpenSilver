@@ -15,8 +15,10 @@ namespace System.Windows.Automation.Peers
 namespace Windows.UI.Xaml.Automation.Peers
 #endif
 {
+	[OpenSilver.NotImplemented]
 	public partial class TextBlockAutomationPeer : FrameworkElementAutomationPeer
 	{
+        [OpenSilver.NotImplemented]
 		public TextBlockAutomationPeer(TextBlock owner): base(owner)
 		{
 		}

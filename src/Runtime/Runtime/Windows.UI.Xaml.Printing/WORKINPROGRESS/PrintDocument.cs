@@ -9,19 +9,23 @@ namespace System.Windows.Printing
 namespace Windows.UI.Xaml.Printing
 #endif
 {
+	[OpenSilver.NotImplemented]
 	public partial class PrintDocument : DependencyObject
 	{
 		// Summary:
 		//     Occurs after the System.Windows.Printing.PrintDocument.Print(System.String) method
 		//     is called and the print dialog box successfully returns, but before the System.Windows.Printing.PrintDocument.PrintPage
 		//     event is raised.
+		[OpenSilver.NotImplemented]
 		public event EventHandler<BeginPrintEventArgs> BeginPrint;
 		// Summary:
 		//     Occurs when the printing operation is passed to the print spooler or when the
 		//     print operation is cancelled by the application author.
+		[OpenSilver.NotImplemented]
 		public event EventHandler<EndPrintEventArgs> EndPrint;
 		// Summary:
 		//     Occurs when each page is printing.
+		[OpenSilver.NotImplemented]
 		public event EventHandler<PrintPageEventArgs> PrintPage;
 		// Summary:
 		//     Starts the printing process for the specified document by opening the print dialog
@@ -34,6 +38,7 @@ namespace Windows.UI.Xaml.Printing
 		// Exceptions:
 		//   T:System.Security.SecurityException:
 		//     The print operation is not user-initiated.
+		[OpenSilver.NotImplemented]
 		public void Print(string documentName)
 		{
 		}
@@ -59,6 +64,7 @@ namespace Windows.UI.Xaml.Printing
 		//   T:System.Security.SecurityException:
 		//     The print operation is not user-initiated.-or-useDefaultPrinter is set to true
 		//     and the application is not a trusted application.
+		[OpenSilver.NotImplemented]
 		public void Print(string documentName, PrinterFallbackSettings printerFallbackSettings, bool useDefaultPrinter = false)
 		{
 		}

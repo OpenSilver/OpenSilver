@@ -1683,10 +1683,13 @@ element.setAttribute(""data-maxlength"", ""{1}"");
 
         #region Not implemented yet (should we move this in WORKINPROGRESS ?)
 
+        [OpenSilver.NotImplemented]
         public event RoutedEventHandler SelectionChanged;
 
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectionForegroundProperty = DependencyProperty.Register(nameof(SelectionForeground), typeof(Brush), typeof(TextBox), null);
 
+        [OpenSilver.NotImplemented]
         public Brush SelectionForeground
         {
             get { return (Brush)this.GetValue(TextBox.SelectionForegroundProperty); }
@@ -1697,8 +1700,10 @@ element.setAttribute(""data-maxlength"", ""{1}"");
 
 #if WORKINPROGRESS
         #region SelectionBackground
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register("SelectionBackground", typeof(Brush), typeof(TextBox), null);
 
+        [OpenSilver.NotImplemented]
         public Brush SelectionBackground
         {
             get { return (Brush)GetValue(SelectionBackgroundProperty); }
@@ -1706,12 +1711,15 @@ element.setAttribute(""data-maxlength"", ""{1}"");
         }
         #endregion
 
+        [OpenSilver.NotImplemented]
         public void Select(int start, int length)
         {
         }
 
+        [OpenSilver.NotImplemented]
         public string SelectedText { get; set; }
 
+        [OpenSilver.NotImplemented]
         public double LineHeight { get; set; }
 #endif
 

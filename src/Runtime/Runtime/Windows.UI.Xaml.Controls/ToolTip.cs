@@ -215,6 +215,7 @@ namespace Windows.UI.Xaml.Controls
 #region Not supported yet
         /// <summary>Gets or sets the visual element or control that the tool tip should be positioned in relation to when opened by the <see cref="T:System.Windows.Controls.ToolTipService" />.</summary>
         /// <returns>The visual element or control that the tool tip should be positioned in relation to when opened by the <see cref="T:System.Windows.Controls.ToolTipService" />. The default is null.</returns>
+        [OpenSilver.NotImplemented]
         public UIElement PlacementTarget
         {
             get
@@ -230,10 +231,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the PlacementTarget dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PlacementTargetProperty = DependencyProperty.Register("PlacementTarget", typeof(UIElement), typeof(ToolTip), null);
 
         /// <summary>Gets or sets how the <see cref="T:System.Windows.Controls.ToolTip" /> should be positioned in relation to the <see cref="P:System.Windows.Controls.ToolTip.PlacementTarget" />.</summary>
         /// <returns>One of the <see cref="T:System.Windows.Controls.Primitives.PlacementMode" /> values. The default is <see cref="F:System.Windows.Controls.Primitives.PlacementMode.Mouse" />. </returns>
+        [OpenSilver.NotImplemented]
         public PlacementMode Placement
         {
             get
@@ -248,6 +251,7 @@ namespace Windows.UI.Xaml.Controls
 
         /// <summary>Identifies the <see cref="P:System.Windows.Controls.ToolTip.Placement" /> dependency property.</summary>
         /// <returns>The identifier for the <see cref="P:System.Windows.Controls.ToolTip.Placement" />dependency property.</returns>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PlacementProperty = DependencyProperty.Register("Placement", typeof(PlacementMode), typeof(ToolTip), null);
 #endregion
 #endif

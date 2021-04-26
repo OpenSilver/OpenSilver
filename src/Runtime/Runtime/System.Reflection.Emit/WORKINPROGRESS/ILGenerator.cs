@@ -7,6 +7,7 @@ namespace System.Reflection.Emit
     /// <summary>
     /// Generates Microsoft intermediate language (MSIL) instructions.
     /// </summary>
+	[OpenSilver.NotImplemented]
     public partial class ILGenerator
     {
         /// <summary>
@@ -15,6 +16,7 @@ namespace System.Reflection.Emit
         /// <param name="opcode">
         /// The Microsoft Intermediate Language (MSIL) instruction to be put onto the stream.
         /// </param>
+		[OpenSilver.NotImplemented]
         public virtual void Emit(OpCode opcode)
         {
         }
@@ -28,6 +30,7 @@ namespace System.Reflection.Emit
         /// <param name="field">
         /// A field that is the target of opcode.
         /// </param>
+		[OpenSilver.NotImplemented]
         public virtual void Emit(OpCode opcode, FieldInfo field)
         {
         }
@@ -43,6 +46,7 @@ namespace System.Reflection.Emit
         /// The Single argument pushed onto the stream immediately after the instruction.
         /// </param>
         [SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
         public virtual void Emit(OpCode opcode, float arg)
         {
         }
@@ -57,6 +61,7 @@ namespace System.Reflection.Emit
         /// <param name="arg">
         /// The character argument pushed onto the stream immediately after the instruction.
         /// </param>
+		[OpenSilver.NotImplemented]
         public virtual void Emit(OpCode opcode, byte arg)
         {
         }
@@ -72,6 +77,7 @@ namespace System.Reflection.Emit
         /// The character argument pushed onto the stream immediately after the instruction.
         /// </param>
         [CLSCompliant(false)]
+		[OpenSilver.NotImplemented]
         public void Emit(OpCode opcode, sbyte arg)
         {
         }
@@ -86,6 +92,7 @@ namespace System.Reflection.Emit
         /// <param name="arg">
         /// The Int argument pushed onto the stream immediately after the instruction.
         /// </param>
+		[OpenSilver.NotImplemented]
         public virtual void Emit(OpCode opcode, short arg)
         {
         }
@@ -108,6 +115,7 @@ namespace System.Reflection.Emit
         /// property is false.
         /// </exception>
         [SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
         public virtual void Emit(OpCode opcode, MethodInfo meth)
         {
         }
@@ -126,6 +134,7 @@ namespace System.Reflection.Emit
         /// cls is null.
         /// </exception>
         [SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
         public virtual void Emit(OpCode opcode, Type cls)
         {
         }
@@ -151,6 +160,7 @@ namespace System.Reflection.Emit
         /// opcode is a single-byte instruction, and local represents a local variable with
         /// an index greater than <see cref="Byte.MaxValue"/>.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public virtual void Emit(OpCode opcode, LocalBuilder local)
         {
         }
@@ -165,6 +175,7 @@ namespace System.Reflection.Emit
         /// <param name="label">
         /// The label to branch to.
         /// </param>
+		[OpenSilver.NotImplemented]
         public virtual void Emit(OpCode opcode, Label label)
         {
         }
@@ -185,6 +196,7 @@ namespace System.Reflection.Emit
         /// The containing type has been created by the <see cref="TypeBuilder.CreateType"/>
         /// method.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public virtual LocalBuilder DeclareLocal(Type localType)
         {
             return null;
@@ -196,6 +208,7 @@ namespace System.Reflection.Emit
         /// <returns>
         /// A new label that can be used as a token for branching.
         /// </returns>
+		[OpenSilver.NotImplemented]
         public virtual Label DefineLabel()
         {
             return new Label();
@@ -212,6 +225,7 @@ namespace System.Reflection.Emit
         /// loc represents an invalid index into the label array.-or- An index for loc has
         /// already been defined.
         /// </exception>
+		[OpenSilver.NotImplemented]
         public virtual void MarkLabel(Label loc)
         {
         }
@@ -238,6 +252,7 @@ namespace System.Reflection.Emit
         /// methodInfo is null.
         /// </exception>
         [SecuritySafeCritical]
+		[OpenSilver.NotImplemented]
         public virtual void EmitCall(OpCode opcode, MethodInfo methodInfo, Type[] optionalParameterTypes)
         {
         }
@@ -251,6 +266,7 @@ namespace System.Reflection.Emit
         /// <param name="str">
         /// The string that is the target of opcode.
         /// </param>
+		[OpenSilver.NotImplemented]
         public virtual void Emit(OpCode opcode, string str)
         {
         }

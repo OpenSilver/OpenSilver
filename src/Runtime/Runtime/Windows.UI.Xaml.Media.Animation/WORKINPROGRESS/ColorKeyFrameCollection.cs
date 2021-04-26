@@ -24,6 +24,7 @@ namespace Windows.UI.Xaml.Media.Animation
 {
 #if WORKINPROGRESS
     /// <summary>Represents a collection of <see cref="T:System.Windows.Media.Animation.ColorKeyFrame" /> objects that can be individually accessed by index. </summary>
+    [OpenSilver.NotImplemented]
     public sealed partial class ColorKeyFrameCollection : PresentationFrameworkCollection<ColorKeyFrame>
     {
         internal override void AddOverride(ColorKeyFrame keyFrame)

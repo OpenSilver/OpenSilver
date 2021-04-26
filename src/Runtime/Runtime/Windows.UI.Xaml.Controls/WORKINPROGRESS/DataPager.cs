@@ -23,6 +23,7 @@ namespace Windows.UI.Xaml.Controls
     internal partial class DataPager : Control
 #endif
     {
+        [OpenSilver.NotImplemented]
         public bool AutoEllipsis { get; set; }
     }
 }

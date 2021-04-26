@@ -8,6 +8,7 @@ namespace Windows.UI.Xaml.Media
 	//
 	// Summary:
 	//     Specifies a physical font face that corresponds to a font file on the disk.
+    [OpenSilver.NotImplemented]
 	public sealed partial class GlyphTypeface
 	{
 		//
@@ -16,6 +17,7 @@ namespace Windows.UI.Xaml.Media
 		//
 		// Returns:
 		//     The font file name for the System.Windows.Media.GlyphTypeface object.
+        [OpenSilver.NotImplemented]
 		public string FontFileName
 		{
 			get;
@@ -28,6 +30,7 @@ namespace Windows.UI.Xaml.Media
 		//
 		// Returns:
 		//     A System.Double value that represents the version.
+        [OpenSilver.NotImplemented]
 		public double Version
 		{
 			get;

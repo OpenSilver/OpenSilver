@@ -1088,6 +1088,7 @@ context.restore();
         /// <returns>
         /// One of the enumeration values for PenLineCap. The default is Flat.
         /// </returns>
+		[OpenSilver.NotImplemented]
         public PenLineCap StrokeDashCap
         {
             get { return (PenLineCap)GetValue(StrokeDashCapProperty); }
@@ -1100,6 +1101,7 @@ context.restore();
         /// <returns>
         /// The identifier for the StrokeDashCap dependency property.
         /// </returns>
+		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty StrokeDashCapProperty =
             DependencyProperty.Register(nameof(StrokeDashCap), typeof(PenLineCap), typeof(Shape), new PropertyMetadata(PenLineCap.Flat));
 

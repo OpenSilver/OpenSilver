@@ -27,8 +27,10 @@ namespace System.Windows.Input
 namespace Windows.UI.Xaml.Input
 #endif
 {
+    [OpenSilver.NotImplemented]
     public sealed partial class StylusDevice
     {
+        [OpenSilver.NotImplemented]
         public TabletDeviceType DeviceType { get; private set; }
     }
 }

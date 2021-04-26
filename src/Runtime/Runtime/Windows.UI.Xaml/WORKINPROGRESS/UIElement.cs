@@ -26,10 +26,13 @@ namespace Windows.UI.Xaml
 {
     public abstract partial class UIElement
     {
+		[OpenSilver.NotImplemented]
         public event DragEventHandler DragEnter;
 		
+		[OpenSilver.NotImplemented]
 		public event DragEventHandler DragLeave;
 		
+		[OpenSilver.NotImplemented]
 		public event DragEventHandler Drop;
 
         /// <summary>
@@ -40,6 +43,7 @@ namespace Windows.UI.Xaml
         /// A brush that describes the opacity applied to this 
         /// object. The default is null.
         /// </returns>
+		[OpenSilver.NotImplemented]
         public Brush OpacityMask
         {
             get { return (Brush)GetValue(OpacityMaskProperty); }
@@ -49,6 +53,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Identifies the OpacityMask dependency property.
         /// </summary>
+		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty OpacityMaskProperty = 
             DependencyProperty.Register("OpacityMask", 
                                         typeof(Brush), 
@@ -68,6 +73,7 @@ namespace Windows.UI.Xaml
         /// processing unit (GPU), if available. The default is null, 
         /// which does not enable a cached composition mode. 
         /// </returns>
+		[OpenSilver.NotImplemented]
         public CacheMode CacheMode
         {
             get { return (CacheMode)this.GetValue(UIElement.CacheModeProperty); }
@@ -76,18 +82,21 @@ namespace Windows.UI.Xaml
 
         /// <summary>Identifies the <see cref="UIElement.CacheMode" /> dependency property.</summary>
         /// <returns>The identifier for the <see cref="UIElement.CacheMode" /> dependency property.</returns>
+		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty CacheModeProperty =
             DependencyProperty.Register("CacheMode", 
                                         typeof(CacheMode), 
                                         typeof(UIElement), 
                                         null);
 
+		[OpenSilver.NotImplemented]
         public Projection Projection
         {
             get { return (Projection)this.GetValue(UIElement.ProjectionProperty); }
             set { this.SetValue(UIElement.ProjectionProperty, value); }
         }
 
+		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty ProjectionProperty =
             DependencyProperty.Register("Projection", 
                                         typeof(Projection), 
@@ -96,41 +105,50 @@ namespace Windows.UI.Xaml
 
 
 
+		[OpenSilver.NotImplemented]
         public Geometry Clip
         {
             get { return (Geometry)GetValue(ClipProperty); }
             set { SetValue(ClipProperty, value); }
         }
 
+		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty ClipProperty = 
             DependencyProperty.Register("Clip", 
                                         typeof(Geometry), 
                                         typeof(UIElement), 
                                         null);
 
+		[OpenSilver.NotImplemented]
         public Size DesiredSize { get; private set; }
+		[OpenSilver.NotImplemented]
         public Size RenderSize { get; private set; }
 
+		[OpenSilver.NotImplemented]
         public void Arrange(Rect finalRect)
         {
 
         }
 
+		[OpenSilver.NotImplemented]
         public void Measure(Size availableSize)
         {
 
         }
 
+		[OpenSilver.NotImplemented]
         public void InvalidateArrange()
         {
 
         }
 
+		[OpenSilver.NotImplemented]
         public void InvalidateMeasure()
         {
 
         }
 
+		[OpenSilver.NotImplemented]
         public void UpdateLayout()
         {
 
@@ -145,6 +163,7 @@ namespace Windows.UI.Xaml
 		// Returns:
 		//     The class-specific System.Windows.Automation.Peers.AutomationPeer subclass to
 		//     return.
+		[OpenSilver.NotImplemented]
 		protected virtual AutomationPeer OnCreateAutomationPeer()
 		{
 			return default(AutomationPeer);
