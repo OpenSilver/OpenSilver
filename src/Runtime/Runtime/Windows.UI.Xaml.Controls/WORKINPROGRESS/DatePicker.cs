@@ -91,7 +91,6 @@ namespace Windows.UI.Xaml.Controls
         //
         // Summary:
         //     Occurs when the drop-down System.Windows.Controls.Calendar is closed.
-        [OpenSilver.NotImplemented]
         public event RoutedEventHandler CalendarClosed;
         
 
