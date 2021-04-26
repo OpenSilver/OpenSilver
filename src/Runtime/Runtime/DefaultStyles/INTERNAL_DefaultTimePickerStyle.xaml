@@ -18,7 +18,7 @@
                         <TextBox x:Name="TextBox" Grid.Column="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" 
                                  BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" 
                                  TextAlignment="Right" VerticalContentAlignment="Center" VerticalAlignment="Stretch"/>
-                        <ToggleButton x:Name="Button" Template="{StaticResource PopupButtonTemplate}" Grid.Column="1" Margin="3,0,0,0" 
+                        <Button x:Name="Button" Template="{StaticResource PopupButtonTemplate}" Grid.Column="1" Margin="3,0,0,0" 
                                       VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         <Popup x:Name="Popup" VerticalAlignment="Bottom"/>
                     </Grid>
