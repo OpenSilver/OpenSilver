@@ -167,7 +167,12 @@ if (requestMethod) { // Native exit full screen.
             {
                 if (this._resizeHandler == null)
                 {
-                    CSHTML5.Interop.ExecuteJavaScript(@"window.addEventListener(""resize"", $0)", new Action(WindowResizeCallback));
+                    CSHTML5.Interop.ExecuteJavaScript($@"
+
+var contentResizeObserver = new ResizeObserver($0);
+const rootElement = document.getElementById({CSHTML5.Internal.INTERNAL_HtmlDomManager.IdOfApplicationRootDomElement});
+contentResizeObserver.observe(rootElement);
+", new Action(WindowResizeCallback));
                 }
 
                 this._resizeHandler += value;
@@ -178,7 +183,10 @@ if (requestMethod) { // Native exit full screen.
 
                 if (this._resizeHandler == null)
                 {
-                    CSHTML5.Interop.ExecuteJavaScript(@"window.removeEventListener(""resize"", $0)", new Action(WindowResizeCallback));
+                    CSHTML5.Interop.ExecuteJavaScript($@"
+
+const rootElement = document.getElementById({CSHTML5.Internal.INTERNAL_HtmlDomManager.IdOfApplicationRootDomElement});
+contentResizeObserver.unobserve(rootElement);");
                 }
             }
         }
@@ -189,7 +197,7 @@ if (requestMethod) { // Native exit full screen.
         /// </summary>
         private void FullScreenChangedCallback()
         {
-            this._resizeHandler?.Invoke(Window.Current, EventArgs.Empty);
+            this._fullScreenChangedHandler?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -198,7 +206,7 @@ if (requestMethod) { // Native exit full screen.
         /// </summary>
         private void WindowResizeCallback()
         {
-            this._resizeHandler?.Invoke(Window.Current, EventArgs.Empty);
+            this._resizeHandler?.Invoke(this, EventArgs.Empty);
         }
 
 #if WORKINPROGRESS

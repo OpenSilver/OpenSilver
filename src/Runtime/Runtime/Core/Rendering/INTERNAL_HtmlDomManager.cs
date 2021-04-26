@@ -53,7 +53,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 #endif
         internal static Dictionary<string, UIElement> INTERNAL_idsToUIElements;
 
-        const string IdOfApplicationRootDomElement = "cshtml5-root";
+        internal const string IdOfApplicationRootDomElement = "cshtml5-root";
 
         static INTERNAL_HtmlDomManager()
         {
