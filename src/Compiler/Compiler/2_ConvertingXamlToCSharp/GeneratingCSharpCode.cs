@@ -584,34 +584,17 @@ namespace DotNetForHtml5.Compiler
                                                     string propertyDeclaringTypeName;
                                                     string propertyTypeNamespace;
                                                     string propertyTypeName;
-                                                    if (!isAttachedProperty)
-                                                    {
-                                                        reflectionOnSeparateAppDomain.GetPropertyOrFieldInfo(propertyName,
-                                                                                                             parent.Name.Namespace.NamespaceName,
-                                                                                                             parent.Name.LocalName,
-                                                                                                             out propertyDeclaringTypeName,
-                                                                                                             out propertyTypeNamespace,
-                                                                                                             out propertyTypeName,
-                                                                                                             out isTypeString,
-                                                                                                             out isTypeEnum,
-                                                                                                             assemblyNameIfAny,
-                                                                                                             false);
-                                                    }
-                                                    else
-                                                    {
-                                                        reflectionOnSeparateAppDomain.GetMethodInfo("Get" + propertyName,
-                                                                                                    elementName.Namespace.NamespaceName,
-                                                                                                    elementName.LocalName,
-                                                                                                    out propertyDeclaringTypeName,
-                                                                                                    out propertyTypeNamespace,
-                                                                                                    out propertyTypeName,
-                                                                                                    out isTypeString,
-                                                                                                    out isTypeEnum,
-                                                                                                    assemblyNameIfAny);
-                                                    }
-
-                                                    //-------------------------------To here.
-
+                                                    reflectionOnSeparateAppDomain.GetPropertyOrFieldInfo(propertyName,
+                                                                                                         parent.Name.Namespace.NamespaceName,
+                                                                                                         parent.Name.LocalName,
+                                                                                                         out propertyDeclaringTypeName,
+                                                                                                         out propertyTypeNamespace,
+                                                                                                         out propertyTypeName,
+                                                                                                         out isTypeString,
+                                                                                                         out isTypeEnum,
+                                                                                                         assemblyNameIfAny,
+                                                                                                         false);
+                                    
                                                     reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
                                                         propertyName,
                                                         parent.Name.Namespace.NamespaceName,
@@ -624,11 +607,19 @@ namespace DotNetForHtml5.Compiler
 
 
                                                     string customMarkupValueName = "customMarkupValue_" + Guid.NewGuid().ToString("N");
-                                                    string bindingBaseTypeString = isSLMigration ? "System.Windows.Data.Binding" : "Windows.UI.Xaml.Data.Binding";
 
-                                                    //todo: make this more readable by cutting it into parts ?
-                                                    stringBuilder.AppendLine(
-                                                        string.Format(@"var {0} = {1}.ProvideValue(new global::System.ServiceProvider({2}, {3}));
+                                                    bool isDependencyProperty = reflectionOnSeparateAppDomain.GetField(
+                                                        propertyName + "Property",
+                                                        isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
+                                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName) != null;
+
+                                                    if (isDependencyProperty)
+                                                    {
+                                                        string bindingBaseTypeString = isSLMigration ? "System.Windows.Data.Binding" : "Windows.UI.Xaml.Data.Binding";
+
+                                                        //todo: make this more readable by cutting it into parts ?
+                                                        stringBuilder.AppendLine(
+                                                            string.Format(@"var {0} = {1}.ProvideValue(new global::System.ServiceProvider({2}, {3}));
 if({0} is {4})
 {{
     {9}.BindingOperations.SetBinding({7}, {8}, ({4}){0});
@@ -637,17 +628,30 @@ else
 {{
     {2}.{5} = ({6}){0};
 }}",
-                                                                      customMarkupValueName, //0
-                                                                      childUniqueName,//1
-                                                                      GetUniqueName(parent),//2
-                                                                      propertyKeyString,//3
-                                                                      bindingBaseTypeString,//4
-                                                                      propertyName,//5
-                                                                      "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,//6
-                                                                      parentElementUniqueNameOrThisKeyword,//7
-                                                                      propertyDeclaringTypeName + "." + propertyName + "Property", //8
-                                                                      namespaceSystemWindowsData//9
-                                                                      ));
+                                                                          customMarkupValueName, //0
+                                                                          childUniqueName,//1
+                                                                          GetUniqueName(parent),//2
+                                                                          propertyKeyString,//3
+                                                                          bindingBaseTypeString,//4
+                                                                          propertyName,//5
+                                                                          "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,//6
+                                                                          parentElementUniqueNameOrThisKeyword,//7
+                                                                          propertyDeclaringTypeName + "." + propertyName + "Property", //8
+                                                                          namespaceSystemWindowsData//9
+                                                                          ));
+                                                    }
+                                                    else
+                                                    {
+                                                        stringBuilder.AppendLine(
+                                                           string.Format(@"var {0} = {1}.ProvideValue(new global::System.ServiceProvider({2}, {3})); {2}.{4} = ({5}){0};",
+                                                                    customMarkupValueName, //0
+                                                                    childUniqueName,//1
+                                                                    GetUniqueName(parent),//2
+                                                                    propertyKeyString,//3
+                                                                    propertyName,//4
+                                                                    "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName//5
+                                                           ));
+                                                    }
                                                 }
                                             }
                                         }
