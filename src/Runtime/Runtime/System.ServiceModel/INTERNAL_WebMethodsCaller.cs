@@ -84,6 +84,7 @@ namespace System.ServiceModel
             string endpointAddress,
             string webMethodName,
             IDictionary<string, object> requestParameters,
+            IDictionary<string, string> customHeaders,
             string soapVersion) where INTERFACE_TYPE : class
         {
             var webMethodsCaller = new CSHTML5_ClientBase<INTERFACE_TYPE>.WebMethodsCaller(endpointAddress);
@@ -93,6 +94,7 @@ namespace System.ServiceModel
                 typeof(INTERFACE_TYPE),
                 typeof(RETURN_TYPE),
                 requestParameters,
+                customHeaders,
                 soapVersion);
         }
 
@@ -238,12 +240,14 @@ namespace System.ServiceModel
             string endpointAddress,
             string webMethodName,
             IDictionary<string, object> requestParameters,
+            IDictionary<string, string> customHeaders,
             string soapVersion) where INTERFACE_TYPE : class
         {
             CallWebMethod<object, INTERFACE_TYPE>(
                 endpointAddress,
                 webMethodName,
                 requestParameters,
+                customHeaders,
                 soapVersion);
         }
 

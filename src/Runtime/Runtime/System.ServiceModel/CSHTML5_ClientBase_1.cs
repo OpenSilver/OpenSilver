@@ -746,6 +746,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             /// <param name="interfaceType">The Type of the interface</param>
             /// <param name="methodReturnType"></param>
             /// <param name="originalRequestObject"></param>
+            /// <param name="customHeaders"></param>
             /// <param name="soapVersion"></param>
             /// <returns>The result of the call of the method.</returns>
             public object CallWebMethod(
@@ -753,6 +754,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 Type interfaceType,
                 Type methodReturnType,
                 IDictionary<string, object> originalRequestObject,
+                IDictionary<string, string> customHeaders,
                 string soapVersion) // Note: we don't arrive here using c#.
             {
                 //**************************************
@@ -806,6 +808,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     isXmlSerializer,
                     out headers,
                     out request);
+
+                foreach (var header in customHeaders.Keys)
+                {
+                    headers.Add(header, customHeaders[header]);
+                }
 
                 string response = _webRequestHelper_JSVersion.MakeRequest(
                         new Uri(_addressOfService),
