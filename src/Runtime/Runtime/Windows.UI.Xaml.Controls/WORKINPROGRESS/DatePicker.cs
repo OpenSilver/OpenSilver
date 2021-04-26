@@ -88,9 +88,12 @@ namespace Windows.UI.Xaml.Controls
         }
 
         [OpenSilver.NotImplemented]
-        //
-        // Summary:
-        //     Occurs when the drop-down System.Windows.Controls.Calendar is closed.
+        public DatePickerFormat SelectedDateFormat { get; set; }
+
+        
+        /// Summary:
+        /// Occurs when the drop-down System.Windows.Controls.Calendar is closed.
+        [OpenSilver.NotImplemented]
         public event RoutedEventHandler CalendarClosed;
         
 
