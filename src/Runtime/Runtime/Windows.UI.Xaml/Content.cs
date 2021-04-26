@@ -168,10 +168,8 @@ if (requestMethod) { // Native exit full screen.
                 if (this._resizeHandler == null)
                 {
                     CSHTML5.Interop.ExecuteJavaScript($@"
-
-var contentResizeObserver = new ResizeObserver($0);
-const rootElement = document.getElementById({CSHTML5.Internal.INTERNAL_HtmlDomManager.IdOfApplicationRootDomElement});
-contentResizeObserver.observe(rootElement);
+const rootElement = document.getElementById(""{Application.ApplicationRootDomElementId}"");
+var contentResizeSensor = new ResizeSensor(rootElement, $0);
 ", new Action(WindowResizeCallback));
                 }
 
@@ -184,9 +182,9 @@ contentResizeObserver.observe(rootElement);
                 if (this._resizeHandler == null)
                 {
                     CSHTML5.Interop.ExecuteJavaScript($@"
-
-const rootElement = document.getElementById({CSHTML5.Internal.INTERNAL_HtmlDomManager.IdOfApplicationRootDomElement});
-contentResizeObserver.unobserve(rootElement);");
+const rootElement = document.getElementById(""{Application.ApplicationRootDomElementId}"");
+contentResizeSensor.detach(rootElement);"
+                    );
                 }
             }
         }
