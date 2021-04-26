@@ -141,6 +141,21 @@ namespace Windows.UI.Xaml.Controls
         public const string StateValid = "Valid";
 
         /// <summary>
+        /// VSM STate for Invalid
+        /// </summary>
+        public const string StateInvalid = "Invalid";
+
+        /// <summary>
+        /// VSM State for Valid and Focused (DescriptionViewer specific)
+        /// </summary>
+        public const string StateValidFocused = "ValidFocused";
+
+        /// <summary>
+        /// VSM State for Valid and Unfocused (DescriptionViewer specific)
+        /// </summary>
+        public const string StateValidUnfocused = "ValidUnfocused";
+
+        /// <summary>
         /// Invalid, focused state for the ValidationStates group.
         /// </summary>
         public const string StateInvalidFocused = "InvalidFocused";
@@ -347,6 +362,25 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public const string GroupVisibility = "VisibilityStates";
         #endregion
+
+        #region GroupDescription
+
+        /// <summary>
+        /// VSM group for description states
+        /// </summary>
+        public const string GroupDescription = "DescriptionStates";
+
+        /// <summary>
+        /// VSM state for no description defined
+        /// </summary>
+        public const string StateNoDescription = "NoDescription";
+
+        /// <summary>
+        /// VSM state for having a description defined
+        /// </summary>
+        public const string StateHasDescription = "HasDescription";
+
+        #endregion GroupDescription
 
         /// <summary>
         /// Use VisualStateManager to change the visual state of the control.

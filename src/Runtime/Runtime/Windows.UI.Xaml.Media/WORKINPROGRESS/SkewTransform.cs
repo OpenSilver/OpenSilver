@@ -1,3 +1,15 @@
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
 #if WORKINPROGRESS
 
 #if !MIGRATION
@@ -13,16 +25,44 @@ namespace Windows.UI.Xaml.Media
 	public sealed partial class SkewTransform : Transform
 	{
 		/// <summary>
-		/// Gets or sets the x-coordinate of the center point for all transforms specified by the System.Windows.Media.SkewTransform.
+		/// Identifies the <see cref="SkewTransform.CenterX"/> dependency property.
 		/// </summary>
-		/// <returns>The x-coordinate of the center point for all transforms specified by the System.Windows.Media.SkewTransform.</returns>
-		public double CenterX { get; set; }
-		
+		public static readonly DependencyProperty CenterXProperty =
+			DependencyProperty.Register(
+				nameof(CenterX),
+				typeof(double),
+				typeof(SkewTransform),
+				new PropertyMetadata(0.0));
+
 		/// <summary>
-		/// Gets or sets the y-coordinate of the center point for all transforms specified by the System.Windows.Media.SkewTransform.
+		/// Gets or sets the x-coordinate of the transform center.
+		/// The default is 0.
 		/// </summary>
-		/// <returns>The y-coordinate of the center point for all transforms specified by the System.Windows.Media.SkewTransform.</returns>
-		public double CenterY { get; set; }
+		public double CenterX
+        {
+			get => (double)GetValue(CenterXProperty);
+			set => SetValue(CenterXProperty, value);
+        }
+
+		/// <summary>
+		/// Identifies the <see cref="SkewTransform.CenterY"/> dependency property.
+		/// </summary>
+		public static readonly DependencyProperty CenterYProperty =
+			DependencyProperty.Register(
+				nameof(CenterY),
+				typeof(double),
+				typeof(SkewTransform),
+				new PropertyMetadata(0.0));
+
+		/// <summary>
+		/// Gets or sets the y-coordinate of the transform center.
+		/// The default is 0.
+		/// </summary>
+		public double CenterY
+        {
+			get => (double)GetValue(CenterYProperty);
+			set => SetValue(CenterYProperty, value);
+        }
 	}
 }
 #endif

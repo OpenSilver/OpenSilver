@@ -12,7 +12,7 @@ namespace Microsoft.Expression.Interactivity.Core
 	public partial class ControlStoryboardAction : StoryboardAction
 	{
 		public static readonly DependencyProperty ControlStoryboardProperty =
-			DependencyProperty.Register("ControlStoryboard",
+			DependencyProperty.Register(nameof(ControlStoryboardOption),
 										typeof(ControlStoryboardOption),
 										typeof(ControlStoryboardAction),
 										null);

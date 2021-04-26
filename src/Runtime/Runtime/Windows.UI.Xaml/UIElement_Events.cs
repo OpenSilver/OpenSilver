@@ -129,6 +129,8 @@ namespace Windows.UI.Xaml
         protected virtual void OnPointerMoved(PointerRoutedEventArgs eventArgs)
 #endif
         {
+            if (_pointerMovedEventManager == null)
+                return;
 #if MIGRATION
             foreach (MouseEventHandler handler in _pointerMovedEventManager.Handlers.ToList<MouseEventHandler>())
 #else
@@ -147,6 +149,8 @@ namespace Windows.UI.Xaml
         void OnPointerMoved_ForHandledEventsToo(PointerRoutedEventArgs eventArgs)
 #endif
         {
+            if (_pointerMovedEventManager == null)
+                return;
 #if MIGRATION
             foreach (MouseEventHandler handler in _pointerMovedEventManager.HandlersForHandledEventsToo.ToList<MouseEventHandler>())
 #else
@@ -239,6 +243,8 @@ namespace Windows.UI.Xaml
         protected virtual void OnPointerPressed(PointerRoutedEventArgs eventArgs)
 #endif
         {
+            if (_pointerPressedEventManager == null)
+                return;
 #if MIGRATION
             foreach (MouseButtonEventHandler handler in _pointerPressedEventManager.Handlers.ToList<MouseButtonEventHandler>())
 #else
@@ -270,6 +276,8 @@ namespace Windows.UI.Xaml
         void OnPointerPressed_ForHandledEventsToo(PointerRoutedEventArgs eventArgs)
 #endif
         {
+            if (_pointerPressedEventManager == null)
+                return;
 #if MIGRATION
             foreach (MouseButtonEventHandler handler in _pointerPressedEventManager.HandlersForHandledEventsToo.ToList<MouseButtonEventHandler>())
 #else
@@ -352,6 +360,8 @@ namespace Windows.UI.Xaml
         protected virtual void OnPointerReleased(PointerRoutedEventArgs eventArgs)
 #endif
         {
+            if (_pointerReleasedEventManager == null)
+                return;
             //todo-perf: make sure that this is efficient (we need to use a copy because the list might be changed by the handlers.
 #if MIGRATION
             foreach (MouseButtonEventHandler handler in _pointerReleasedEventManager.Handlers.ToList<MouseButtonEventHandler>())
@@ -371,6 +381,8 @@ namespace Windows.UI.Xaml
         void OnPointerReleased_ForHandledEventsToo(PointerRoutedEventArgs eventArgs)
 #endif
         {
+            if (_pointerReleasedEventManager == null)
+                return;
             //todo-perf: make sure that this is efficient (we need to use a copy because the list might be changed by the handlers.
 #if MIGRATION
             foreach (MouseButtonEventHandler handler in _pointerReleasedEventManager.HandlersForHandledEventsToo.ToList<MouseButtonEventHandler>())
@@ -466,6 +478,8 @@ namespace Windows.UI.Xaml
         protected virtual void OnPointerEntered(PointerRoutedEventArgs eventArgs)
 #endif
         {
+            if (_pointerEnteredEventManager == null)
+                return;
             //todo-perf: make sure that this is efficient (we need to use a copy because the list might be changed by the handlers.
 #if MIGRATION
             foreach (MouseEventHandler handler in _pointerEnteredEventManager.Handlers.ToList<MouseEventHandler>())
@@ -485,6 +499,8 @@ namespace Windows.UI.Xaml
         void OnPointerEntered_ForHandledEventsToo(PointerRoutedEventArgs eventArgs)
 #endif
         {
+            if (_pointerEnteredEventManager == null)
+                return;
             //todo-perf: make sure that this is efficient (we need to use a copy because the list might be changed by the handlers.
 #if MIGRATION
             foreach (MouseEventHandler handler in _pointerEnteredEventManager.HandlersForHandledEventsToo.ToList<MouseEventHandler>())
@@ -619,6 +635,8 @@ namespace Windows.UI.Xaml
         protected internal virtual void OnPointerExited(PointerRoutedEventArgs eventArgs)
 #endif
         {
+            if (_pointerExitedEventManager == null)
+                return;
             this.INTERNAL_isPointerInside = false;
             //todo-perf: make sure that this is efficient (we need to use a copy because the list might be changed by the handlers.
 #if MIGRATION
@@ -639,6 +657,8 @@ namespace Windows.UI.Xaml
         internal void OnPointerExited_ForHandledEventsToo(PointerRoutedEventArgs eventArgs)
 #endif
         {
+            if (_pointerExitedEventManager == null)
+                return;
             this.INTERNAL_isPointerInside = false;
             //todo-perf: make sure that this is efficient (we need to use a copy because the list might be changed by the handlers.
 #if MIGRATION
@@ -767,6 +787,8 @@ namespace Windows.UI.Xaml
         /// <param name="eventArgs">The arguments for the event.</param>
         protected virtual void OnTapped(TappedRoutedEventArgs eventArgs)
         {
+            if (_tappedEventManager == null)
+                return;
             foreach (TappedEventHandler handler in _tappedEventManager.Handlers.ToList<TappedEventHandler>())
             {
                 if (eventArgs.Handled)
@@ -777,6 +799,8 @@ namespace Windows.UI.Xaml
 
         void OnTapped_ForHandledEventsToo(TappedRoutedEventArgs eventArgs)
         {
+            if (_tappedEventManager == null)
+                return;
             foreach (TappedEventHandler handler in _tappedEventManager.HandlersForHandledEventsToo.ToList<TappedEventHandler>())
             {
                 handler(this, eventArgs);
@@ -897,6 +921,8 @@ namespace Windows.UI.Xaml
         protected virtual void OnRightTapped(RightTappedRoutedEventArgs eventArgs)
 #endif
         {
+            if (_rightTappedEventManager == null)
+                return;
 #if MIGRATION
             foreach (MouseButtonEventHandler handler in _rightTappedEventManager.Handlers.ToList<MouseButtonEventHandler>())
 #else
@@ -915,6 +941,8 @@ namespace Windows.UI.Xaml
         void OnRightTapped_ForHandledEventsToo(RightTappedRoutedEventArgs eventArgs)
 #endif
         {
+            if (_rightTappedEventManager == null)
+                return;
 #if MIGRATION
             foreach (MouseButtonEventHandler handler in _rightTappedEventManager.Handlers.ToList<MouseButtonEventHandler>())
 #else
@@ -1016,6 +1044,8 @@ namespace Windows.UI.Xaml
         protected virtual void OnKeyDown(KeyRoutedEventArgs eventArgs)
 #endif
         {
+            if (_keyDownEventManager == null)
+                return;
             foreach (KeyEventHandler handler in _keyDownEventManager.Handlers.ToList<KeyEventHandler>())
             {
                 if (eventArgs.Handled)
@@ -1030,6 +1060,8 @@ namespace Windows.UI.Xaml
         void OnKeyDown_ForHandledEventsToo(KeyRoutedEventArgs eventArgs)
 #endif
         {
+            if (_keyDownEventManager == null)
+                return;
             foreach (KeyEventHandler handler in _keyDownEventManager.HandlersForHandledEventsToo.ToList<KeyEventHandler>())
             {
                 handler(this, eventArgs);
@@ -1126,6 +1158,8 @@ namespace Windows.UI.Xaml
         protected virtual void OnKeyUp(KeyRoutedEventArgs eventArgs)
 #endif
         {
+            if (_keyUpEventManager == null)
+                return;
             foreach (KeyEventHandler handler in _keyUpEventManager.Handlers.ToList<KeyEventHandler>())
             {
                 if (eventArgs.Handled)
@@ -1140,6 +1174,8 @@ namespace Windows.UI.Xaml
         void OnKeyUp_ForHandledEventsToo(KeyRoutedEventArgs eventArgs)
 #endif
         {
+            if (_keyUpEventManager == null)
+                return;
             foreach (KeyEventHandler handler in _keyUpEventManager.HandlersForHandledEventsToo.ToList<KeyEventHandler>())
             {
                 handler(this, eventArgs);
@@ -1201,6 +1237,8 @@ namespace Windows.UI.Xaml
         /// <param name="eventArgs">The arguments for the event.</param>
         protected virtual void OnGotFocus(RoutedEventArgs eventArgs)
         {
+            if (_gotFocusEventManager == null)
+                return;
             foreach (RoutedEventHandler handler in _gotFocusEventManager.Handlers.ToList<RoutedEventHandler>())
             {
                 handler(this, eventArgs);
@@ -1260,6 +1298,8 @@ namespace Windows.UI.Xaml
         /// <param name="eventArgs">The arguments for the event.</param>
         protected virtual void OnLostFocus(RoutedEventArgs eventArgs)
         {
+            if (_lostFocusEventManager == null)
+                return;
             foreach (RoutedEventHandler handler in _lostFocusEventManager.Handlers.ToList<RoutedEventHandler>())
             {
                 handler(this, eventArgs);
@@ -1369,6 +1409,8 @@ namespace Windows.UI.Xaml
         /// <param name="eventArgs">The arguments for the event.</param>
         private void OnGotFocusForIsTabStop(RoutedEventArgs eventArgs)
         {
+            if (_gotFocusForIsTabStopEventManager == null)
+                return;
             foreach (RoutedEventHandler handler in _gotFocusForIsTabStopEventManager.Handlers.ToList<RoutedEventHandler>())
             {
                 handler(this, eventArgs);
@@ -1601,7 +1643,7 @@ namespace Windows.UI.Xaml
 
 #if MIGRATION
             Type[] methodParameters = new Type[] { typeof(MouseEventArgs) };
-            ///
+            //
             if (_pointerMovedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseMove", methodParameters))
             {
                 var v = PointerMovedEventManager; //forces the creation of the event manager.
@@ -1610,7 +1652,7 @@ namespace Windows.UI.Xaml
             {
                 _pointerMovedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseMove", methodParameters);
             }
-            ///
+            //
             if (_pointerEnteredEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseEnter", methodParameters))
             {
                 var v = PointerEnteredEventManager; //forces the creation of the event manager.
@@ -1619,7 +1661,7 @@ namespace Windows.UI.Xaml
             {
                 _pointerEnteredEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseEnter", methodParameters);
             }
-            ///
+            //
             if (_pointerExitedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseLeave", methodParameters))
             {
                 var v = PointerExitedEventManager; //forces the creation of the event manager.
@@ -1628,7 +1670,7 @@ namespace Windows.UI.Xaml
             {
                 _pointerExitedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseLeave", methodParameters);
             }
-            ///
+            //
             methodParameters = new Type[] { typeof(TappedRoutedEventArgs) };
             if (_tappedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnTapped", methodParameters))
             {
@@ -1638,7 +1680,7 @@ namespace Windows.UI.Xaml
             {
                 _tappedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnTapped", methodParameters);
             }
-            ///
+            //
             methodParameters = new Type[] { typeof(MouseButtonEventArgs) };
             if (_pointerPressedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseLeftButtonDown", methodParameters))
             {
@@ -1648,7 +1690,7 @@ namespace Windows.UI.Xaml
             {
                 _pointerPressedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseLeftButtonDown", methodParameters);
             }
-            ///
+            //
             if (_pointerReleasedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseLeftButtonUp", methodParameters))
             {
                 var v = PointerReleasedEventManager; //forces the creation of the event manager.
@@ -1657,7 +1699,7 @@ namespace Windows.UI.Xaml
             {
                 _pointerReleasedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseLeftButtonUp", methodParameters);
             }
-            ///
+            //
             if (_rightTappedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseRightButtonUp", methodParameters))
             {
                 var v = RightTappedEventManager; //forces the creation of the event manager.
@@ -1666,7 +1708,7 @@ namespace Windows.UI.Xaml
             {
                 _rightTappedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseRightButtonUp", methodParameters);
             }
-            ///
+            //
             methodParameters = new Type[] { typeof(KeyEventArgs) };
             if (_keyDownEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnKeyDown", methodParameters))
             {
@@ -1676,7 +1718,7 @@ namespace Windows.UI.Xaml
             {
                 _keyDownEventManager.AttachToDomEvents(this, typeof(UIElement), "OnKeyDown", methodParameters);
             }
-            ///
+            //
             if (_keyUpEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnKeyUp", methodParameters))
             {
                 var v = KeyUpEventManager; //forces the creation of the event manager.
@@ -1685,7 +1727,7 @@ namespace Windows.UI.Xaml
             {
                 _keyUpEventManager.AttachToDomEvents(this, typeof(UIElement), "OnKeyUp", methodParameters);
             }
-            ///
+            //
             methodParameters = new Type[] { typeof(RoutedEventArgs) };
             if (_gotFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnGotFocus", methodParameters))
             {
@@ -1695,7 +1737,7 @@ namespace Windows.UI.Xaml
             {
                 _gotFocusEventManager.AttachToDomEvents(this, typeof(UIElement), "OnGotFocus", methodParameters);
             }
-            ///
+            //
             if (_lostFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnLostFocus", methodParameters))
             {
                 var v = LostFocusEventManager; //forces the creation of the event manager.

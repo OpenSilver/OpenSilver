@@ -7,7 +7,7 @@ namespace System.Windows.Media.Effects
 {
     public sealed partial class PixelShader : DependencyObject
     {
-        public static readonly DependencyProperty UriSourceProperty = DependencyProperty.Register("UriSourceProperty", typeof(Uri), typeof(PixelShader), new PropertyMetadata());
+        public static readonly DependencyProperty UriSourceProperty = DependencyProperty.Register(nameof(UriSource), typeof(Uri), typeof(PixelShader), new PropertyMetadata());
         
 
         public Uri UriSource

@@ -16,6 +16,7 @@
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
+
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -31,7 +32,6 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public sealed partial class CompositeTransform : Transform
     {
-
         /// <summary>
         /// Gets or sets the x-axis scale factor. You can use this property to stretch
         /// or shrink an object horizontally. The default is 1.
@@ -46,35 +46,33 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the ScaleX dependency property.
         /// </summary>
         public static readonly DependencyProperty ScaleXProperty =
-            DependencyProperty.Register("ScaleX", typeof(double), typeof(CompositeTransform), new PropertyMetadata(1d)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(ScaleX), 
+                typeof(double), 
+                typeof(CompositeTransform), 
+                new PropertyMetadata(1d)
                 {
-                    if (((CompositeTransform)instance).INTERNAL_parent != null)
+                    GetCSSEquivalent = (instance) =>
                     {
-                        return new CSSEquivalent()
+                        var target = ((CompositeTransform)instance).INTERNAL_parent;
+                        if (target != null)
                         {
-                            DomElement = ((CompositeTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
-                            Value = (inst, value) =>
+                            return new CSSEquivalent()
                             {
-                                return value;
-                            },
-                            Name = new List<string> { "scaleX" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                            UIElement = ((CompositeTransform)instance).INTERNAL_parent,
-                            ApplyAlsoWhenThereIsAControlTemplate = true,
-                            OnlyUseVelocity = true
-                        };
+                                DomElement = target.INTERNAL_OuterDomElement,
+                                Value = (inst, value) =>
+                                {
+                                    return value;
+                                },
+                                Name = new List<string> { "scaleX" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
+                                UIElement = target,
+                                ApplyAlsoWhenThereIsAControlTemplate = true,
+                                OnlyUseVelocity = true
+                            };
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            });
-
-        private static void ScaleX_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var compositeTransform = (CompositeTransform)d;
-            compositeTransform.INTERNAL_ApplyTransform();
-        }
-
+                });
 
         /// <summary>
         /// Gets or sets the y-axis scale factor. You can use this property to stretch
@@ -90,36 +88,33 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the ScaleY dependency property.
         /// </summary>
         public static readonly DependencyProperty ScaleYProperty =
-            DependencyProperty.Register("ScaleY", typeof(double), typeof(CompositeTransform), new PropertyMetadata(1d)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(ScaleY), 
+                typeof(double), 
+                typeof(CompositeTransform), 
+                new PropertyMetadata(1d)
                 {
-                    if (((CompositeTransform)instance).INTERNAL_parent != null)
+                    GetCSSEquivalent = (instance) =>
                     {
-                        return new CSSEquivalent()
+                        var target = ((CompositeTransform)instance).INTERNAL_parent;
+                        if (target != null)
                         {
-                            DomElement = ((CompositeTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
-                            Value = (inst, value) =>
+                            return new CSSEquivalent()
                             {
-                                return value;
-                            },
-                            Name = new List<string> { "scaleY" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                            UIElement = ((CompositeTransform)instance).INTERNAL_parent,
-                            ApplyAlsoWhenThereIsAControlTemplate = true,
-                            OnlyUseVelocity = true
-                        };
+                                DomElement = target.INTERNAL_OuterDomElement,
+                                Value = (inst, value) =>
+                                {
+                                    return value;
+                                },
+                                Name = new List<string> { "scaleY" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
+                                UIElement = target,
+                                ApplyAlsoWhenThereIsAControlTemplate = true,
+                                OnlyUseVelocity = true
+                            };
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            });
-
-        private static void ScaleY_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var compositeTransform = (CompositeTransform)d;
-            compositeTransform.INTERNAL_ApplyTransform();
-        }
-
-
+                });
 
         /// <summary>
         /// Gets or sets the x-axis skew angle, which is measured in degrees counterclockwise
@@ -136,34 +131,33 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the SkewX dependency property.
         /// </summary>
         public static readonly DependencyProperty SkewXProperty =
-            DependencyProperty.Register("SkewX", typeof(double), typeof(CompositeTransform), new PropertyMetadata(0d)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(SkewX), 
+                typeof(double), 
+                typeof(CompositeTransform), 
+                new PropertyMetadata(0d)
                 {
-                    if (((CompositeTransform)instance).INTERNAL_parent != null)
+                    GetCSSEquivalent = (instance) =>
                     {
-                        return new CSSEquivalent()
+                        var target = ((CompositeTransform)instance).INTERNAL_parent;
+                        if (target != null)
                         {
-                            DomElement = ((CompositeTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
-                            Value = (inst, value) =>
+                            return new CSSEquivalent()
                             {
-                                return value + "deg";
-                            },
-                            Name = new List<string> { "skewX" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                            UIElement = ((CompositeTransform)instance).INTERNAL_parent,
-                            ApplyAlsoWhenThereIsAControlTemplate = true,
-                            OnlyUseVelocity = true
-                        };
+                                DomElement = target.INTERNAL_OuterDomElement,
+                                Value = (inst, value) =>
+                                {
+                                    return value + "deg";
+                                },
+                                Name = new List<string> { "skewX" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
+                                UIElement = target,
+                                ApplyAlsoWhenThereIsAControlTemplate = true,
+                                OnlyUseVelocity = true
+                            };
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            });
-
-        private static void SkewX_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var compositeTransform = (CompositeTransform)d;
-            compositeTransform.INTERNAL_ApplyTransform();
-        }
+                });
 
         /// <summary>
         /// Gets or sets the y-axis skew angle, which is measured in degrees counterclockwise
@@ -180,34 +174,33 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the SkewY dependency property.
         /// </summary>
         public static readonly DependencyProperty SkewYProperty =
-            DependencyProperty.Register("SkewY", typeof(double), typeof(CompositeTransform), new PropertyMetadata(0d)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(SkewY), 
+                typeof(double), 
+                typeof(CompositeTransform), 
+                new PropertyMetadata(0d)
                 {
-                    if (((CompositeTransform)instance).INTERNAL_parent != null)
+                    GetCSSEquivalent = (instance) =>
                     {
-                        return new CSSEquivalent()
+                        var target = ((CompositeTransform)instance).INTERNAL_parent;
+                        if (target != null)
                         {
-                            DomElement = ((CompositeTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
-                            Value = (inst, value) =>
+                            return new CSSEquivalent()
                             {
-                                return value + "deg";
-                            },
-                            Name = new List<string> { "skewY" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                            UIElement = ((CompositeTransform)instance).INTERNAL_parent,
-                            ApplyAlsoWhenThereIsAControlTemplate = true,
-                            OnlyUseVelocity = true
-                        };
+                                DomElement = target.INTERNAL_OuterDomElement,
+                                Value = (inst, value) =>
+                                {
+                                    return value + "deg";
+                                },
+                                Name = new List<string> { "skewY" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
+                                UIElement = target,
+                                ApplyAlsoWhenThereIsAControlTemplate = true,
+                                OnlyUseVelocity = true
+                            };
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            });
-
-        private static void SkewY_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var compositeTransform = (CompositeTransform)d;
-            compositeTransform.INTERNAL_ApplyTransform();
-        }
+                });
 
         /// <summary>
         /// Gets or sets the angle, in degrees, of clockwise rotation. The default is 0.
@@ -221,34 +214,33 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the Rotation dependency property.
         /// </summary>
         public static readonly DependencyProperty RotationProperty =
-            DependencyProperty.Register("Rotation", typeof(double), typeof(CompositeTransform), new PropertyMetadata(0d)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(Rotation), 
+                typeof(double), 
+                typeof(CompositeTransform), 
+                new PropertyMetadata(0d)
                 {
-                    if (((CompositeTransform)instance).INTERNAL_parent != null)
+                    GetCSSEquivalent = (instance) =>
                     {
-                        return new CSSEquivalent()
+                        var target = ((CompositeTransform)instance).INTERNAL_parent;
+                        if (target != null)
                         {
-                            DomElement = ((CompositeTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
-                            Value = (inst, value) =>
+                            return new CSSEquivalent()
                             {
-                                return value + "deg";
-                            },
-                            Name = new List<string> { "rotateZ" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                            UIElement = ((CompositeTransform)instance).INTERNAL_parent,
-                            ApplyAlsoWhenThereIsAControlTemplate = true,
-                            OnlyUseVelocity = true
-                        };
+                                DomElement = target.INTERNAL_OuterDomElement,
+                                Value = (inst, value) =>
+                                {
+                                    return value + "deg";
+                                },
+                                Name = new List<string> { "rotateZ" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
+                                UIElement = target,
+                                ApplyAlsoWhenThereIsAControlTemplate = true,
+                                OnlyUseVelocity = true
+                            };
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            });
-        private static void Rotation_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var compositeTransform = (CompositeTransform)d;
-            compositeTransform.INTERNAL_ApplyTransform();
-        }
-
+                });
 
         /// <summary>
         /// Gets or sets the distance to translate along the x-axis.
@@ -258,39 +250,38 @@ namespace Windows.UI.Xaml.Media
             get { return (double)GetValue(TranslateXProperty); }
             set { SetValue(TranslateXProperty, value); }
         }
+
         /// <summary>
         /// Identifies the TranslateX dependency property. The default is 0.
         /// </summary>
         public static readonly DependencyProperty TranslateXProperty =
-            DependencyProperty.Register("TranslateX", typeof(double), typeof(CompositeTransform), new PropertyMetadata(0d)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(TranslateX), 
+                typeof(double), 
+                typeof(CompositeTransform), 
+                new PropertyMetadata(0d)
                 {
-                    if (((CompositeTransform)instance).INTERNAL_parent != null)
+                    GetCSSEquivalent = (instance) =>
                     {
-                        return new CSSEquivalent()
+                        var target = ((CompositeTransform)instance).INTERNAL_parent;
+                        if (target != null)
                         {
-                            DomElement = ((CompositeTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
-                            Value = (inst, value) =>
+                            return new CSSEquivalent()
                             {
-                                return value + "px";
-                            },
-                            Name = new List<string> { "translateX" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                            UIElement = ((CompositeTransform)instance).INTERNAL_parent,
-                            ApplyAlsoWhenThereIsAControlTemplate = true,
-                            OnlyUseVelocity = true
-                        };
+                                DomElement = target.INTERNAL_OuterDomElement,
+                                Value = (inst, value) =>
+                                {
+                                    return value + "px";
+                                },
+                                Name = new List<string> { "translateX" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
+                                UIElement = target,
+                                ApplyAlsoWhenThereIsAControlTemplate = true,
+                                OnlyUseVelocity = true
+                            };
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            });
-
-        private static void TranslateX_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var compositeTransform = (CompositeTransform)d;
-            compositeTransform.INTERNAL_ApplyTransform();
-        }
-
+                });
 
         /// <summary>
         /// Gets or sets the distance to translate (move) an object along the y-axis. The default is 0.
@@ -304,35 +295,35 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the TranslateY dependency property
         /// </summary>
         public static readonly DependencyProperty TranslateYProperty =
-            DependencyProperty.Register("TranslateY", typeof(double), typeof(CompositeTransform), new PropertyMetadata(0d)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(TranslateY), 
+                typeof(double), 
+                typeof(CompositeTransform), 
+                new PropertyMetadata(0d)
                 {
-                    if (((CompositeTransform)instance).INTERNAL_parent != null)
+                    GetCSSEquivalent = (instance) =>
                     {
-                        return new CSSEquivalent()
+                        var target = ((CompositeTransform)instance).INTERNAL_parent;
+                        if (target != null)
                         {
-                            DomElement = ((CompositeTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
-                            Value = (inst, value) =>
+                            return new CSSEquivalent()
                             {
-                                return value + "px";
-                            },
-                            Name = new List<string> { "translateY" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                            UIElement = ((CompositeTransform)instance).INTERNAL_parent,
-                            ApplyAlsoWhenThereIsAControlTemplate = true,
-                            OnlyUseVelocity = true
-                        };
+                                DomElement = target.INTERNAL_OuterDomElement,
+                                Value = (inst, value) =>
+                                {
+                                    return value + "px";
+                                },
+                                Name = new List<string> { "translateY" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
+                                UIElement = target,
+                                ApplyAlsoWhenThereIsAControlTemplate = true,
+                                OnlyUseVelocity = true
+                            };
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            });
-        private static void TranslateY_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var compositeTransform = (CompositeTransform)d;
-            compositeTransform.INTERNAL_ApplyTransform();
-        }
+                });
 
-        private void ApplyCSSChanges(CompositeTransform compositeTransform, double scaleX, double scaleY, double skewX, double skewY, double rotation, double translateX, double translateY)
+        private void ApplyCSSChanges(double scaleX, double scaleY, double skewX, double skewY, double rotation, double translateX, double translateY)
         {
             //-------------
             // In XAML, order is always:
@@ -345,113 +336,130 @@ namespace Windows.UI.Xaml.Media
             //-------------
 
             //TranslateX:
-            CSSEquivalent translateXcssEquivalent = TranslateXProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(compositeTransform);
+            CSSEquivalent translateXcssEquivalent = TranslateXProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
             if (translateXcssEquivalent != null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(translateXcssEquivalent.DomElement, translateXcssEquivalent.Name, translateXcssEquivalent.Value(compositeTransform, translateX));
+                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
+                    translateXcssEquivalent.DomElement, 
+                    translateXcssEquivalent.Name, 
+                    translateXcssEquivalent.Value(this, translateX));
             }
 
             //TranslateY:
-            CSSEquivalent translateYcssEquivalent = TranslateYProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(compositeTransform);
+            CSSEquivalent translateYcssEquivalent = TranslateYProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
             if (translateYcssEquivalent != null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(translateYcssEquivalent.DomElement, translateYcssEquivalent.Name, translateYcssEquivalent.Value(compositeTransform, translateY)); 
+                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
+                    translateYcssEquivalent.DomElement, 
+                    translateYcssEquivalent.Name, 
+                    translateYcssEquivalent.Value(this, translateY)); 
             }
 
             //Rotation:
-            CSSEquivalent rotationcssEquivalent = RotationProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(compositeTransform);
+            CSSEquivalent rotationcssEquivalent = RotationProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
             if (rotationcssEquivalent != null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(rotationcssEquivalent.DomElement, rotationcssEquivalent.Name, rotationcssEquivalent.Value(compositeTransform, rotation)); 
+                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
+                    rotationcssEquivalent.DomElement, 
+                    rotationcssEquivalent.Name, 
+                    rotationcssEquivalent.Value(this, rotation)); 
             }
 
             //SkewX:
-            CSSEquivalent skewXcssEquivalent = SkewXProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(compositeTransform);
+            CSSEquivalent skewXcssEquivalent = SkewXProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
             if (skewXcssEquivalent != null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(skewXcssEquivalent.DomElement, skewXcssEquivalent.Name, skewXcssEquivalent.Value(compositeTransform, skewX)); 
+                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
+                    skewXcssEquivalent.DomElement, 
+                    skewXcssEquivalent.Name, 
+                    skewXcssEquivalent.Value(this, skewX)); 
             }
 
             //SkewY:
-            CSSEquivalent skewYcssEquivalent = SkewYProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(compositeTransform);
+            CSSEquivalent skewYcssEquivalent = SkewYProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
             if (skewYcssEquivalent != null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(skewYcssEquivalent.DomElement, skewYcssEquivalent.Name, skewYcssEquivalent.Value(compositeTransform, skewY)); 
+                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
+                    skewYcssEquivalent.DomElement, 
+                    skewYcssEquivalent.Name, 
+                    skewYcssEquivalent.Value(this, skewY)); 
             }
 
             //ScaleX:
-            CSSEquivalent scaleXcssEquivalent = ScaleXProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(compositeTransform);
+            CSSEquivalent scaleXcssEquivalent = ScaleXProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
             if (scaleXcssEquivalent != null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleXcssEquivalent.DomElement, scaleXcssEquivalent.Name, scaleXcssEquivalent.Value(compositeTransform, scaleX)); 
+                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
+                    scaleXcssEquivalent.DomElement, 
+                    scaleXcssEquivalent.Name, 
+                    scaleXcssEquivalent.Value(this, scaleX)); 
             }
 
             //ScaleY:
-            CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(compositeTransform);
+            CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
             if (scaleYcssEquivalent != null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(scaleYcssEquivalent.DomElement, scaleYcssEquivalent.Name, scaleYcssEquivalent.Value(compositeTransform, scaleY)); 
-            }
-
-        }
-
-        internal override void INTERNAL_ApplyCSSChanges()
-        {
-            ApplyCSSChanges(this, this.ScaleX, this.ScaleY, this.SkewX, this.SkewY, this.Rotation, this.TranslateX, this.TranslateY);
-        }
-
-        internal override void INTERNAL_UnapplyCSSChanges()
-        {
-            ApplyCSSChanges(this, 1, 1, 0, 0, 0, 0, 0);
-        }
-
-        internal void ApplyCompositeTransform(double scaleX, double scaleY, double skewX, double skewY, double rotation, double translateX, double translateY)
-        {
-            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
-            {
-                ApplyCSSChanges(this, scaleX, scaleY, skewX, skewY, rotation, translateX, translateY);
+                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
+                    scaleYcssEquivalent.DomElement, 
+                    scaleYcssEquivalent.Name, 
+                    scaleYcssEquivalent.Value(this, scaleY)); 
             }
         }
-
-
-        // NOTE: CenterX and CenterY are currently not supported because in CSS there is only the "transformOrigin" property, which is used for the "UIElement.RenderTransformOrigin" property.
-        // However, they are still present as stubs in the WorkInProgress version or CompositeTransform
-
 
         internal override void INTERNAL_ApplyTransform()
         {
-            this.ApplyCompositeTransform(this.ScaleX, this.ScaleY, this.SkewX, this.SkewY, this.Rotation, this.TranslateX, this.TranslateY);
+            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
+            {
+                ApplyCSSChanges(this.ScaleX, this.ScaleY, this.SkewX, this.SkewY, this.Rotation, this.TranslateX, this.TranslateY);
+            }
         }
 
         internal override void INTERNAL_UnapplyTransform()
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-                INTERNAL_UnapplyCSSChanges();
+                ApplyCSSChanges(1, 1, 0, 0, 0, 0, 0);
             }
         }
 
-        protected override Point INTERNAL_TransformPoint(Point point)
+        internal override Matrix Value
         {
-            throw new NotImplementedException("Please contact support@cshtml5.com");
-        }
-
+            get
+            {
 #if WORKINPROGRESS
-        public override GeneralTransform Inverse
-        {
-            get { return null; }
-        }
-
-        public override Rect TransformBounds(Rect rect)
-        {
-            return new Rect();
-        }
-
-        public override bool TryTransform(Point inPoint, out Point outPoint)
-        {
-            outPoint = new Point();
-            return false;
-        }
+                double centerX = this.CenterX;
+                double centerY = this.CenterY;
+#else
+                double centerX = 0.0;
+                double centerY = 0.0;
 #endif
+                bool hasCenter = centerX != 0 || centerY != 0;
+
+                // 1. Scale
+                Matrix transform = new Matrix();
+                transform.ScaleAt(ScaleX, ScaleY, centerX, centerY);
+
+                // 2. Skew
+                if (hasCenter)
+                {
+                    transform.Translate(-centerX, -centerY);
+                }
+
+                transform.Skew(SkewX, SkewY);
+
+                if (hasCenter)
+                {
+                    transform.Translate(centerX, centerY);
+                }
+
+                // 3. Rotate
+                transform.RotateAt(Rotation, centerX, centerY);
+
+                // 4. Translate
+                transform.Translate(TranslateX, TranslateY);
+
+                return transform;
+            }
+        }
     }
 }

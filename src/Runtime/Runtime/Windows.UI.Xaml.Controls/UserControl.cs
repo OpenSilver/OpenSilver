@@ -77,11 +77,7 @@ namespace Windows.UI.Xaml.Controls
             UIElement oldChild = (UIElement)e.OldValue;
             UIElement newChild = (UIElement)e.NewValue;
             INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, parent);
-#if REWORKLOADED
-            parent.AddVisualChild(newChild);
-#else
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, parent);
-#endif
         }
 
         //protected virtual void InitializeComponent()

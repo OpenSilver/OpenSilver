@@ -372,7 +372,7 @@ namespace Windows.UI.Xaml.Controls
         /// (like in Silverlight) rather than one. 'True' means that the user must first select
         /// a cell and then click again to enter Edit Mode. 'False' means that the DataGrid
         /// enters Edit Mode immediately when a cell is clicked, even if the cell is not
-        /// selected yet (it will get selected too). Default is false.
+        /// selected yet (it will get selected too). Default is true.
         /// </summary>
         public bool EnableTwoStepsEditMode
         {
@@ -381,7 +381,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty EnableTwoStepsEditModeProperty =
-            DependencyProperty.Register("EnableTwoStepsEditMode", typeof(bool), typeof(DataGrid), new PropertyMetadata(false));
+            DependencyProperty.Register("EnableTwoStepsEditMode", typeof(bool), typeof(DataGrid), new PropertyMetadata(true));
 
 
 
@@ -1285,7 +1285,8 @@ namespace Windows.UI.Xaml.Controls
 
                     Grid.SetRow(editableVersionOfCell, Grid.GetRow(cell));
                     Grid.SetColumn(editableVersionOfCell, cellColumn);
-                    editableVersionOfCell.LostFocus += CurrentEditionElement_LostFocus;
+                    if (!(column is DataGridTemplateColumn) && !(column is DataGridComboBoxColumn))
+                        editableVersionOfCell.LostFocus += CurrentEditionElement_LostFocus;
 
                     _grid.Children.Add(editableVersionOfCell);
                     if (column is DataGridTextColumn)
@@ -1566,20 +1567,12 @@ namespace Windows.UI.Xaml.Controls
         {
             if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(_grid))
             {
-#if REWORKLOADED
-                this.ItemsHost.AddVisualChild(this._grid);
-#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_grid, this);
-#endif
 
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_pagerUI))
                     throw new Exception("The DataPager is already attached and cannot be attached twice.");
 
-#if REWORKLOADED
-                this.ItemsHost.AddVisualChild(this._pagerUI);
-#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_pagerUI, this);
-#endif
             }
 
             // Work around a vertical alignment issue due to the fact that we attach both the DataGrid and the DataPager (cf. ticket #1290):

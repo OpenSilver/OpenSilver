@@ -139,11 +139,7 @@ namespace Windows.UI.Xaml.Controls
 
             base.INTERNAL_OnAttachedToVisualTree();
 
-#if REWORKLOADED
-            this.AddVisualChild(this._contentGrid, 0);
-#else
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this._contentGrid, this, 0);
-#endif
         }
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()

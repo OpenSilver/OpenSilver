@@ -978,7 +978,7 @@ namespace Windows.UI.Xaml.Data
         }
 
         /// <summary>
-        /// Returns true if an </seealso cref="AddNew"> transaction is in progress.
+        /// Returns true if an <seealso cref="AddNew"/> transaction is in progress.
         /// </summary>
         public bool IsAddingNew
         {
@@ -986,7 +986,7 @@ namespace Windows.UI.Xaml.Data
         }
 
         /// <summary>
-        /// When an </seealso cref="AddNew"> transaction is in progress, this property
+        /// When an <seealso cref="AddNew"/> transaction is in progress, this property
         /// returns the new item.  Otherwise it returns null.
         /// </summary>
         public object CurrentAddItem
@@ -1309,7 +1309,7 @@ namespace Windows.UI.Xaml.Data
         }
 
         /// <summary>
-        /// Returns true if an </seealso cref="EditItem"> transaction is in progress.
+        /// Returns true if an <seealso cref="EditItem"/> transaction is in progress.
         /// </summary>
         public bool IsEditingItem
         {
@@ -1317,7 +1317,7 @@ namespace Windows.UI.Xaml.Data
         }
 
         /// <summary>
-        /// When an </seealso cref="EditItem"> transaction is in progress, this property
+        /// When an <seealso cref="EditItem"/> transaction is in progress, this property
         /// returns the affected item.  Otherwise it returns null.
         /// </summary>
         public object CurrentEditItem
@@ -2565,7 +2565,6 @@ namespace Windows.UI.Xaml.Data
         /// Create, filter and sort the local index array.
         /// called from Refresh(), override in derived classes as needed.
         /// </summary>
-        /// <param name="list">new ILIst to associate this view with</param>
         /// <returns>new local array to use for this view</returns>
         private void PrepareLocalArray()
         {

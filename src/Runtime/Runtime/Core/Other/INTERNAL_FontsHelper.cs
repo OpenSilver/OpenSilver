@@ -31,6 +31,7 @@ namespace CSHTML5.Internal
     {
         static Dictionary<string, string> _loadedFonts = new Dictionary<string, string>();
         static int _suffixesUsed = 0; //this counts the amount of fonts we added (the name comes from the fact that this is what we use as a suffix for the names to use for the fonts).
+        static public string DefaultCssFontFamily;
 
         /// <summary>
         /// Creates a css style with @font-face for the given font, then returns the name to use as the font-family. This name is actually the relative path to the file containing the font.
@@ -47,6 +48,8 @@ namespace CSHTML5.Internal
             fontPath = fontPath.Trim(); //Todo-perf: this is probably negligible in most cases but ensuring that the _source of the FontFamily the fontPath comes from is trimmed will allow us to only call Trim() once per FontFamily instead of every time we add a Control to the Visual tree.
             if(!fontPath.Contains('.')) //Note: if the path does not contain the character '.', then it means that there is no specified file. It is therefore a default font or thet path to a folder containing fonts, which we cannot handle so we simply return the font as is.
             {
+                if (fontPath == "Portable User Interface")
+                    return INTERNAL_FontsHelper.DefaultCssFontFamily;
                 return fontPath;
             }
             string fontPathWithoutCustomName = fontPath;

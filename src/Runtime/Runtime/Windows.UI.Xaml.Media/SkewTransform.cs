@@ -16,6 +16,7 @@
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
+
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -50,29 +51,33 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the AngleX dependency property.
         /// </summary>
         public static readonly DependencyProperty AngleXProperty =
-            DependencyProperty.Register("AngleX", typeof(double), typeof(SkewTransform), new PropertyMetadata(0d)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(AngleX), 
+                typeof(double), 
+                typeof(SkewTransform), 
+                new PropertyMetadata(0d)
                 {
-                    if (((SkewTransform)instance).INTERNAL_parent != null)
+                    GetCSSEquivalent = (instance) =>
                     {
-                        return new CSSEquivalent()
+                        var target = ((SkewTransform)instance).INTERNAL_parent;
+                        if (target != null)
                         {
-                            DomElement = ((SkewTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
-                            Value = (inst, value) =>
+                            return new CSSEquivalent()
                             {
-                                return value + "deg";
-                            },
-                            Name = new List<string> { "skewX" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                            UIElement = ((SkewTransform)instance).INTERNAL_parent,
-                            ApplyAlsoWhenThereIsAControlTemplate = true,
-                            OnlyUseVelocity = true
-                        };
+                                DomElement = target.INTERNAL_OuterDomElement,
+                                Value = (inst, value) =>
+                                {
+                                    return value + "deg";
+                                },
+                                Name = new List<string> { "skewX" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
+                                UIElement = target,
+                                ApplyAlsoWhenThereIsAControlTemplate = true,
+                                OnlyUseVelocity = true
+                            };
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            });
-
+                });
 
         /// <summary>
         /// Gets or sets the y-axis skew angle, which is measured in degrees counterclockwise
@@ -88,138 +93,117 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the AngleY dependency property.
         /// </summary>
         public static readonly DependencyProperty AngleYProperty =
-            DependencyProperty.Register("AngleY", typeof(double), typeof(SkewTransform), new PropertyMetadata(0d)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(AngleY), 
+                typeof(double), 
+                typeof(SkewTransform), 
+                new PropertyMetadata(0d)
                 {
-                    if (((SkewTransform)instance).INTERNAL_parent != null)
+                    GetCSSEquivalent = (instance) =>
                     {
-                        return new CSSEquivalent()
+                        var target = ((SkewTransform)instance).INTERNAL_parent;
+                        if (target != null)
                         {
-                            DomElement = ((SkewTransform)instance).INTERNAL_parent.INTERNAL_OuterDomElement,
-                            Value = (inst, value) =>
+                            return new CSSEquivalent()
                             {
-                                return value + "deg";
-                            },
-                            Name = new List<string> { "skewY" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                            UIElement = ((SkewTransform)instance).INTERNAL_parent,
-                            ApplyAlsoWhenThereIsAControlTemplate = true,
-                            OnlyUseVelocity = true
-                        };
+                                DomElement = target.INTERNAL_OuterDomElement,
+                                Value = (inst, value) =>
+                                {
+                                    return value + "deg";
+                                },
+                                Name = new List<string> { "skewY" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
+                                UIElement = target,
+                                ApplyAlsoWhenThereIsAControlTemplate = true,
+                                OnlyUseVelocity = true
+                            };
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            });
+                });
 
-        private void ApplyCSSChanges(SkewTransform skewTransform, double angleX, double angleY)
+        private void ApplyCSSChanges(double angleX, double angleY)
         {
-            CSSEquivalent angleXcssEquivalent = AngleXProperty.GetTypeMetaData(typeof(SkewTransform)).GetCSSEquivalent(skewTransform);
+            CSSEquivalent angleXcssEquivalent = AngleXProperty.GetTypeMetaData(typeof(SkewTransform)).GetCSSEquivalent(this);
             if (angleXcssEquivalent != null)
             {
                 object domElementX = angleXcssEquivalent.DomElement;
-                if (angleX != _appliedCssAngleX || (_domElementToWhichTheCssAngleXWasApplied != null && domElementX != _domElementToWhichTheCssAngleXWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
+                if ((angleX != _appliedCssAngleX) || 
+                    (_domElementToWhichTheCssAngleXWasApplied != null && domElementX != _domElementToWhichTheCssAngleXWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(angleXcssEquivalent.DomElement, angleXcssEquivalent.Name, angleXcssEquivalent.Value(skewTransform, angleX));
+                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
+                        angleXcssEquivalent.DomElement, 
+                        angleXcssEquivalent.Name, 
+                        angleXcssEquivalent.Value(this, angleX));
                     _appliedCssAngleX = angleX;
                     _domElementToWhichTheCssAngleXWasApplied = domElementX;
                 }
             }
 
-            CSSEquivalent angleYcssEquivalent = AngleYProperty.GetTypeMetaData(typeof(SkewTransform)).GetCSSEquivalent(skewTransform);
+            CSSEquivalent angleYcssEquivalent = AngleYProperty.GetTypeMetaData(typeof(SkewTransform)).GetCSSEquivalent(this);
             if (angleYcssEquivalent != null)
             {
                 object domElementY = angleYcssEquivalent.DomElement;
-                if (angleY != _appliedCssAngleY || (_domElementToWhichTheCssAngleYWasApplied != null && domElementY != _domElementToWhichTheCssAngleYWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
+                if ((angleY != _appliedCssAngleY) || 
+                    (_domElementToWhichTheCssAngleYWasApplied != null && domElementY != _domElementToWhichTheCssAngleYWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(angleYcssEquivalent.DomElement, angleYcssEquivalent.Name, angleYcssEquivalent.Value(skewTransform, angleY));
+                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
+                        angleYcssEquivalent.DomElement, 
+                        angleYcssEquivalent.Name, 
+                        angleYcssEquivalent.Value(this, angleY));
                     _appliedCssAngleY = angleY;
                     _domElementToWhichTheCssAngleYWasApplied = domElementY;
                 }
             }
         }
 
-        internal override void INTERNAL_ApplyCSSChanges()
-        {
-            ApplyCSSChanges(this, this.AngleX, this.AngleY);
-        }
-
-        internal override void INTERNAL_UnapplyCSSChanges()
-        {
-            ApplyCSSChanges(this, 0, 0);
-        }
-
-        internal void ApplySkewTransform(double angleX, double angleY)
+        internal override void INTERNAL_ApplyTransform()
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-                ApplyCSSChanges(this, angleX, angleY);
-
-                //dynamic domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this.INTERNAL_parent);
-
-                //string value = "skew(" + angleX + "deg, " + angleY + "deg)"; //todo: make sure that the conversion from double to string is culture-invariant so that it uses dots instead of commas for the decimal separator.
-                //try
-                //{
-                //    domStyle.transform = value;
-                //}
-                //catch
-                //{
-                //}
-                //try
-                //{
-                //    domStyle.msTransform = value;
-                //}
-                //catch
-                //{
-                //}
-                //try // Prevents crash in the simulator that uses IE.
-                //{
-                //    domStyle.WebkitTransform = value;
-                //}
-                //catch
-                //{
-                //}
+                ApplyCSSChanges(this.AngleX, this.AngleY);
             }
-        }
-
-
-        // NOTE: CenterX and CenterY are currently not supported because in CSS there is only the "transformOrigin" property, which is used for the "UIElement.RenderTransformOrigin" property.
-        // However, they are still present as stubs in the WorkInProgress version or SkewTransform
-
-
-        internal override void INTERNAL_ApplyTransform()
-        {
-            this.ApplySkewTransform(this.AngleX, this.AngleY);
         }
 
         internal override void INTERNAL_UnapplyTransform()
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-                INTERNAL_UnapplyCSSChanges();
+                ApplyCSSChanges(0, 0);
             }
         }
 
-        protected override Point INTERNAL_TransformPoint(Point point)
+        internal override Matrix Value
         {
-            throw new NotImplementedException("Please contact support@cshtml5.com");
-        }
+            get
+            {
+                Matrix matrix = new Matrix();
 
+                double angleX = AngleX;
+                double angleY = AngleY;
 #if WORKINPROGRESS
-        public override GeneralTransform Inverse
-        {
-            get { return null; }
-        }
-
-        public override Rect TransformBounds(Rect rect)
-        {
-            return new Rect();
-        }
-
-        public override bool TryTransform(Point inPoint, out Point outPoint)
-        {
-            outPoint = new Point();
-            return false;
-        }
+                double centerX = CenterX;
+                double centerY = CenterY;
+#else
+                double centerX = 0.0;
+                double centerY = 0.0;
 #endif
+
+                bool hasCenter = centerX != 0 || centerY != 0;
+
+                if (hasCenter)
+                {
+                    matrix.Translate(-centerX, -centerY);
+                }
+
+                matrix.Skew(angleX, angleY);
+
+                if (hasCenter)
+                {
+                    matrix.Translate(centerX, centerY);
+                }
+
+                return matrix;
+            }
+        }
     }
 }

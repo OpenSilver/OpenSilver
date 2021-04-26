@@ -42,6 +42,27 @@ namespace Windows.UI.Xaml.Controls
             set { _title = value; }
         }
 
+        public NavigationContext NavigationContext { get; }
+
+        /// <summary>
+        /// Called just before a page is no longer the active page in a frame.
+        /// </summary>
+        /// <param name="e">
+        /// An object that contains the event data.
+        /// </param>
+        protected virtual void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+        }
+
+        /// <summary>
+        /// Called when a page is no longer the active page in a frame. 
+        /// </summary>
+        /// <param name="e">
+        /// An object that contains the event data.
+        /// </param>
+        protected virtual void OnNavigatedFrom(NavigationEventArgs e)
+        {
+        }
     }
 }
 

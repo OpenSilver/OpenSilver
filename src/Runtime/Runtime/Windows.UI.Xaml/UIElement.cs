@@ -1279,22 +1279,6 @@ namespace Windows.UI.Xaml
         //internal virtual void INTERNAL_Render()
         //{
         //}
-#if REWORKLOADED
-        internal virtual void INTERNAL_FinalizeAttachToParent()
-        {
-
-        }
-
-        internal void AddVisualChild(UIElement child, int index = -1)
-        {
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this, index);
-
-            if (object.ReferenceEquals(INTERNAL_VisualTreeOperation.Current.Root, this))
-            {
-                INTERNAL_VisualTreeOperation.Current.Complete();
-            }
-        }
-#endif
 
         #region ForceInherit property support
 

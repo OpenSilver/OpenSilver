@@ -83,11 +83,7 @@ namespace Windows.UI.Xaml.Documents
         {
             if(INTERNAL_VisualTreeManager.IsElementInVisualTree(this.Span))
             {
-#if REWORKLOADED
-                this.Span.AddVisualChild(textElement);
-#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(textElement, this.Span);
-#endif
             }
         }
 

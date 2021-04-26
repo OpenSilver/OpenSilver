@@ -143,13 +143,26 @@ namespace Windows.UI.Xaml.Navigation
         /// <returns>The URI that has been converted or null if the URI cannot be converted.</returns>
         public Uri MapUri(Uri uri)
         {
-            if (Uri == null || string.IsNullOrWhiteSpace(Uri.OriginalString))
+            if (uri == null)
+            {
+                throw new ArgumentNullException("uri");
+            }
+            if (Uri == null)
             {
                 throw new InvalidOperationException("this UriMapping's Uri is null");
             }
             if (MappedUri == null || string.IsNullOrWhiteSpace(MappedUri.OriginalString))
             {
                 throw new InvalidOperationException("this UriMapping's MappedUri is null");
+            }
+
+            if (string.IsNullOrWhiteSpace(Uri.OriginalString))
+            {
+                if (string.IsNullOrWhiteSpace(uri.OriginalString))
+                {
+                    return MappedUri;
+                }
+                return null;
             }
 
 #if BRIDGE

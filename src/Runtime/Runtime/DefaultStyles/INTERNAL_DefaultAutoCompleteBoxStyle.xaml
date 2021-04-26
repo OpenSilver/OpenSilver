@@ -45,7 +45,7 @@
                                           Stretch="Fill"
                                           Data="M 1,1.5 L 4.5,5 L 8,1.5" />
                                 </ToggleButton>
-                                <TextBox x:Name="PART_TextBox"
+                                <TextBox x:Name="Text"
                                          TextWrapping="NoWrap"
                                          Text="{TemplateBinding Text, Mode=TwoWay}" />
 

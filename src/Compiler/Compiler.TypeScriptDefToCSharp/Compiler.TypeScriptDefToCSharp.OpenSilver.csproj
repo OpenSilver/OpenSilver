@@ -7,6 +7,7 @@
     <ProjectGuid>{4D0CA743-4F06-40DA-92D7-F31D8F395E2A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
+    <AssemblyName>OpenSilver.Compiler.TypeScriptDefToCSharp</AssemblyName>
     <RootNamespace>DotNetForHtml5.Compiler.TypeScriptDefToCSharp</RootNamespace>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -16,16 +17,12 @@
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-    <AssemblyName>OpenSilver.Compiler.TypeScriptDefToCSharp</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU'">
-    <AssemblyName>OpenSilver.Compiler.TypeScriptDefToCSharp</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP|AnyCPU'">
-    <AssemblyName>OpenSilver.UWPCompatible.Compiler.TypeScriptDefToCSharp</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU'">
-    <AssemblyName>OpenSilver.UWPCompatible.Compiler.TypeScriptDefToCSharp</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build.Framework" />

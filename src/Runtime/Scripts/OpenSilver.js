@@ -62,18 +62,10 @@ document.getElementsByTagName('head')[0].appendChild(velocityScript);
 
 window.onCallBack = {}
 window.onCallBack.OnCallbackFromJavaScript = function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject) {
-    try {
-        DotNet.invokeMethod("OpenSilver", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, callbackArgsObject);
-    } catch (e) {
-        DotNet.invokeMethod("OpenSilver.UWPCompatible", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, "");
-    }
+    DotNet.invokeMethod("OpenSilver", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, callbackArgsObject);
 };
 window.onCallBack.OnCallbackFromJavaScriptError = function (idWhereCallbackArgsAreStored) {
-    try {
-        DotNet.invokeMethod("OpenSilver", "OnCallbackFromJavaScriptError", idWhereCallbackArgsAreStored);
-    } catch (e) {
-        DotNet.invokeMethod("OpenSilver.UWPCompatible", "OnCallbackFromJavaScriptError", idWhereCallbackArgsAreStored);
-    }
+    DotNet.invokeMethod("OpenSilver", "OnCallbackFromJavaScriptError", idWhereCallbackArgsAreStored);
 };
 
 window.callJS = function (javaScriptToExecute) {

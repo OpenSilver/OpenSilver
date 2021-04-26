@@ -59,7 +59,7 @@ namespace System.Windows.Markup
 #if BRIDGE
         public override object ProvideValue(ServiceProvider serviceProvider)
 #else
-        public override object ProvideValue(IServiceProvider serviceProvider) 
+        public override object ProvideValue(IServiceProvider serviceProvider)
 #endif
         {
             ServiceProvider serviceProviderAsServiceProvider = (ServiceProvider)serviceProvider;
@@ -72,35 +72,26 @@ namespace System.Windows.Markup
             {
                 targetType = null;
             }
-            bool isFirst = true;
             object elementItself = null;
             foreach (object parentElement in serviceProviderAsServiceProvider.Parents)
             {
-                if (isFirst)
+                ResourceDictionary resourceDictionary = null;
+                if ((resourceDictionary = parentElement as ResourceDictionary) == null)
                 {
-                    elementItself = parentElement;
-                }
-                else
-                {
-                    ResourceDictionary resourceDictionary = null;
-                    if ((resourceDictionary = parentElement as ResourceDictionary) == null)
+                    if (parentElement is FrameworkElement parentFE)
                     {
-                        if (parentElement is FrameworkElement parentFE)
-                        {
-                            resourceDictionary = parentFE.HasResources ? parentFE.Resources
-                                                                       : null;
-                        }
-                    }
-                    if (resourceDictionary != null && resourceDictionary.Contains(ResourceKey))
-                    {
-                        object returnElement = resourceDictionary[ResourceKey];
-                        if (!object.Equals(returnElement, elementItself))
-                        {
-                            return this.EnsurePropertyType(returnElement, targetType);
-                        }
+                        resourceDictionary = parentFE.HasResources ? parentFE.Resources
+                                                                   : null;
                     }
                 }
-                isFirst = false;
+                if (resourceDictionary != null && resourceDictionary.Contains(ResourceKey))
+                {
+                    object returnElement = resourceDictionary[ResourceKey];
+                    if (!object.Equals(returnElement, elementItself))
+                    {
+                        return this.EnsurePropertyType(returnElement, targetType);
+                    }
+                }
             }
             if (Application.Current.Resources.Contains(ResourceKey))
             {

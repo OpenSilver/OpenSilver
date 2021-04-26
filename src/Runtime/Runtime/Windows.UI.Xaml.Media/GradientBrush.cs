@@ -80,12 +80,14 @@ namespace Windows.UI.Xaml.Media
         /// Identifies the GradientStops dependency property.
         /// </summary>
         public static readonly DependencyProperty GradientStopsProperty =
-            DependencyProperty.Register("GradientStops", typeof(GradientStopCollection), typeof(GradientBrush), new PropertyMetadata(null, OnGradientStopsChanged)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                "GradientStops",
+                typeof(GradientStopCollection),
+                typeof(GradientBrush),
+                new PropertyMetadata(null, OnGradientStopsChanged));
 
         private static void OnGradientStopsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-#if WORKINPROGRESS
             GradientBrush gradientBrush = (GradientBrush)d;
             if (null != e.OldValue)
             {
@@ -95,7 +97,6 @@ namespace Windows.UI.Xaml.Media
             {
                 ((GradientStopCollection)e.NewValue).SetParentBrush(gradientBrush);
             }
-#endif
         }
 
         /// <summary>

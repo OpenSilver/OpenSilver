@@ -5,12 +5,12 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultButtonStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultChildWindowStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultComboBoxStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDataGridStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDataPagerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultExpanderStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultGridSplitterStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultHyperlinkButtonStyle.xaml" />
-        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultLabelStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultMenuItemStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultNumericUpDownStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultSliderStyle.xaml" />
@@ -29,5 +29,6 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultHeaderedContentControlStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultBusyIndicatorStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerTextBoxStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultValidationControlsStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

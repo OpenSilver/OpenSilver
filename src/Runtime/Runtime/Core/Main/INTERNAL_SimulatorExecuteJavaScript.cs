@@ -274,7 +274,7 @@ namespace CSHTML5.Internal
         /// pending aysnc JavaScript calls that were made during that action will
         /// get flushed (ie. they get executed).
         /// The goal is to greatly improve performance by reducing the number of
-        /// C# <-> JS interop calls, by aggregating the async JS calls and
+        /// C# &lt;-&gt; JS interop calls, by aggregating the async JS calls and
         /// executing them all at once at the end of the current thread execution.
         /// </summary>
         /// <param name="action">The action to execute before flushing the pending JS code.</param>

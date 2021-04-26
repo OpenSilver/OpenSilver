@@ -32,6 +32,7 @@ namespace CSHTML5.Internal
 {
     internal class INTERNAL_XamlResourcesHandler
     {
+        [ThreadStatic]
         private static int _parsing;
         internal static bool IsSystemResourcesParsing
         {
@@ -77,38 +78,14 @@ namespace CSHTML5.Internal
             }
             else
             {
-#if !BRIDGE
+#if NETSTANDARD
                 string assemblyName = assemblyWhereGenericXamlIsLocated.GetName().Name;
-                // todo: instead of the following if, make it so that the Core project can generate the .g.cs files by itself (JSIL version, Bridge works fine) instead of relying on an external project (called DotNetForHtml5.Core.Styles). Note: given what the name of the assembly is, it should still be shortened to remove everything after the first comma.
-                //Fixing the assemblyName so that the default styles can be found (the generic.xaml file that contains the default styles is located in a different project with a different namespace):
-                if (assemblyName == "SLMigration.CSharpXamlForHtml5" || assemblyName == "CSharpXamlForHtml5"
-                    || assemblyName == "SLMigration.CSharpXamlForHtml5, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" || assemblyName == "CSharpXamlForHtml5, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null")
-                {
-                    assemblyName = "DotNetForHtml5.Core.Styles"; //Note: this is the name of the assembly where the default styles are defined (project DotNetForHtml5.Core.Styles in the DotNetForHtml5 solution).
-                }
-#else
+#else // BRIDGE
                 string assemblyName = INTERNAL_BridgeWorkarounds.GetAssemblyNameWithoutCallingGetNameMethod(assemblyWhereGenericXamlIsLocated);
 #endif
                 assemblyName = assemblyName.Replace(" ", "ǀǀ").Replace(".", "ǀǀ");
                 string factoryTypeName = MakeTitleCase("ǀǀ" + assemblyName + "ǀǀComponentǀǀThemesǀǀGenericǀǀXamlǀǀFactory");
                 Type resourceDictionaryFactoryType = assemblyWhereGenericXamlIsLocated.GetType(factoryTypeName);
-#if CSHTML5BLAZOR
-                if (resourceDictionaryFactoryType == null)
-                {
-                    if (assemblyName == "OpenSilver") //We do this part because OpenSilver uses the generic.xaml.g.cs of the CSHTML5 Migration edition which in consequence has a different namespace than it would have if it was directly defined as xaml in OpenSilver.
-                    {
-                        assemblyName = "Cshtml5ǀǀMigration";
-                        factoryTypeName = MakeTitleCase("ǀǀ" + assemblyName + "ǀǀComponentǀǀThemesǀǀGenericǀǀXamlǀǀFactory");
-                        resourceDictionaryFactoryType = assemblyWhereGenericXamlIsLocated.GetType(factoryTypeName);
-                    }
-                    else if (assemblyName == "OpenSilverǀǀUwpCompatible") //We do this part because OpenSilver uses the generic.xaml.g.cs of the CSHTML5 Migration edition which in consequence has a different namespace than it would have if it was directly defined as xaml in OpenSilver.
-                    {
-                        assemblyName = "Cshtml5";
-                        factoryTypeName = MakeTitleCase("ǀǀ" + assemblyName + "ǀǀComponentǀǀThemesǀǀGenericǀǀXamlǀǀFactory");
-                        resourceDictionaryFactoryType = assemblyWhereGenericXamlIsLocated.GetType(factoryTypeName);
-                    }
-                }
-#endif
 
                 if (resourceDictionaryFactoryType != null)
                 {

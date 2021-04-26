@@ -260,13 +260,6 @@ namespace Windows.UI.Xaml.Data
 
 #region Validation
 
-#if WORKINPROGRESS
-
-        /// <summary>Gets or sets a value that indicates whether the binding engine will report validation errors from an <see cref="T:System.ComponentModel.IDataErrorInfo" /> implementation on the bound data entity.</summary>
-        /// <returns>true if the binding engine will report <see cref="T:System.ComponentModel.IDataErrorInfo" /> validation errors; otherwise, false. The default is false.</returns>
-        public bool ValidatesOnDataErrors { get; set; }
-#endif
-
         /// <summary>
         /// Gets or sets a value that indicates whether the binding engine will report
         /// exception validation errors.

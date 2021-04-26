@@ -30,6 +30,20 @@ namespace Windows.UI.Xaml
     /// </summary>
     public partial class ExceptionRoutedEventArgs : RoutedEventArgs
     {
+#if MIGRATION
+        /// <summary>
+        /// The exception that describes the media failure.
+        /// </summary>
+        public Exception ErrorException
+        {
+            get
+            {
+                return _errorException;
+            }
+        }
+
+        private Exception _errorException;
+#else
         private string _errorMessage = "";
 
         /// <summary>
@@ -51,6 +65,7 @@ namespace Windows.UI.Xaml
         {
             _errorMessage = errorMessage;
         }
+#endif
 
         /// <summary>
         /// Initializes a new instance of Windows.UI.Xaml.ExceptionRoutedEventArgs.

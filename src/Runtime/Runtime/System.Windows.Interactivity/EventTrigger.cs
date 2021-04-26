@@ -152,19 +152,19 @@ namespace System.Windows.Interactivity
 
                 if(eventHandlerType == typeof(EventHandler)) //todo: find a better way to do this.
                 {
-                        EventHandler eventHandler = OnEventImpl; //Note: Bridge doesn't care about the type of the Delegate so we can do this. In the Simulator, it causes an exception on the lines below.
+                        EventHandler eventHandler = OnEventImpl;
                         eventInfo.RemoveEventHandler(associatedObject, eventHandler);
                         eventInfo.AddEventHandler(associatedObject, eventHandler);
                 }
                 else if(eventHandlerType == typeof(RoutedEventHandler))
                 {
-                    RoutedEventHandler eventHandler = OnEventImpl; //Note: Bridge doesn't care about the type of the Delegate so we can do this. In the Simulator, it causes an exception on the lines below.
+                    RoutedEventHandler eventHandler = OnEventImpl;
                     eventInfo.RemoveEventHandler(associatedObject, eventHandler);
                     eventInfo.AddEventHandler(associatedObject, eventHandler);
                 }
                 else if (eventHandlerType == typeof(DragEventHandler))
                 {
-                    DragEventHandler eventHandler = OnEventImpl; //Note: Bridge doesn't care about the type of the Delegate so we can do this. In the Simulator, it causes an exception on the lines below.
+                    DragEventHandler eventHandler = OnEventImpl;
                     eventInfo.RemoveEventHandler(associatedObject, eventHandler);
                     eventInfo.AddEventHandler(associatedObject, eventHandler);
                 }
@@ -174,7 +174,11 @@ namespace System.Windows.Interactivity
                 else if (eventHandlerType == typeof(PointerEventHandler))
 #endif
                 {
-                    RoutedEventHandler eventHandler = OnEventImpl; //Note: Bridge doesn't care about the type of the Delegate so we can do this. In the Simulator, it causes an exception on the lines below.
+#if MIGRATION
+                    MouseEventHandler eventHandler = OnEventImpl;
+#else
+                    PointerEventHandler eventHandler = OnEventImpl;
+#endif
                     eventInfo.RemoveEventHandler(associatedObject, eventHandler);
                     eventInfo.AddEventHandler(associatedObject, eventHandler);
                 }

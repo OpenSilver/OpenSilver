@@ -33,7 +33,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' ">
     <AssemblyName>CSHTML5</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;BRIDGE;WORKINPROGRESS;REWORKLOADED</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;WORKINPROGRESS</DefineConstants>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>$(BinFolder)\Debug.WorkInProgress\CSHTML5.xml</DocumentationFile>
   </PropertyGroup>
@@ -45,7 +45,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">
     <AssemblyName>CSHTML5.Migration</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS;REWORKLOADED</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION;WORKINPROGRESS;REVAMPPOINTEREVENTS</DefineConstants>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>$(BinFolder)\Migration.WorkInProgress\CSHTML5.Migration.xml</DocumentationFile>
   </PropertyGroup>
@@ -101,10 +101,12 @@
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction.cs" />
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
+    <Compile Include="System.Windows.Markup\XmlnsPrefixAttribute.cs" />
     <Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
     <Compile Include="System.Xaml\IMarkupExtension.cs" />
     <Compile Include="System.Xml\WORKINPROGRESS\XmlSerializer.cs" />
     <Compile Include="System\TypeExtensions.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls.Primitives\TabPanel.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\CalendarDayButton.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridCellsPresenter.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridDetailsPresenter.cs" />
@@ -117,14 +119,22 @@
     <Compile Include="Windows.UI.Xaml.Controls\DataGridEditAction.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridHeadersVisibility.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridRowDetailsVisibilityMode.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\DescriptionViewer.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\FocusingInvalidControlEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\PopulatingEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\RangeObservableCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TileView.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TileViewItem.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ValidationHelper.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ValidationItemCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ValidationMetadata.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummary.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryFilters.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItem.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItemSource.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItemType.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\BusyIndicator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Calendar.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CalendarBlackoutDatesCollection.cs" />
@@ -141,7 +151,6 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRow.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRowEditEndedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTextColumn.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DescriptionViewer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Frame.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
@@ -172,6 +181,8 @@
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\EasingFunctionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\RepeatBehavior.cs" />
     <Compile Include="Windows.UI.Xaml.Media\RectangleGeometry.cs" />
+    <Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\CompositeTransform.cs" />
+    <Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\SkewTransform.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\LoadCompletedEventHandler.cs" />
     <Compile Include="System.Xml.Linq\XObject.cs" />
     <Compile Include="ToBeReviewed\GroupedEnumerable_3.cs" />
@@ -631,7 +642,6 @@
     <Compile Include="Windows.UI.Xaml.Controls\StretchDirection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TabControl.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TabItem.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\TabPanel.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TextBlock.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TextBox.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TextChangedEventArgs.cs" />
@@ -816,6 +826,7 @@
     <Compile Include="Windows.UI.Xaml.Navigation\NavigationFailedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigatingCancelEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigatingCancelEventHandler.cs" />
+    <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationContext.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationMode.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationService.cs" />
     <Compile Include="Windows.UI.Xaml.Navigation\WORKINPROGRESS\NavigationStoppedEventHandler.cs" />
@@ -880,6 +891,7 @@
     <Compile Include="Windows.UI.Xaml\StartupEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\StartupEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml\Style.cs" />
+    <Compile Include="Windows.UI.Xaml\StyleTypedPropertyAttribute.cs" />
     <Compile Include="Windows.UI.Xaml\TemplateInstance.cs" />
     <Compile Include="Windows.UI.Xaml\TemplatePartAttribute.cs" />
     <Compile Include="Windows.UI.Xaml\TemplateVisualStateAttribute.cs" />
@@ -1011,6 +1023,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Content Include="DefaultStyles\INTERNAL_DefaultDataGridStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
     <Page Include="DefaultStyles\INTERNAL_DefaultDataPagerStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1032,10 +1048,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Page Include="DefaultStyles\INTERNAL_DefaultHeaderedContentControlStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="DefaultStyles\INTERNAL_DefaultLabelStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -1088,6 +1100,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultToolTipStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DefaultStyles\INTERNAL_DefaultValidationControlsStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

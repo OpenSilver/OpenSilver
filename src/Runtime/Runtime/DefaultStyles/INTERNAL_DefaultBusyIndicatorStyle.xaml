@@ -141,7 +141,7 @@
                         <ContentPresenter x:Name="busycontent">
                         -->
                         <!-- #endif -->
-                        <Border x:Name="busyContent">
+                        <Border x:Name="busycontent">
                             <Grid HorizontalAlignment="Center"
                                   VerticalAlignment="Center">
                                 <Border Background="White"

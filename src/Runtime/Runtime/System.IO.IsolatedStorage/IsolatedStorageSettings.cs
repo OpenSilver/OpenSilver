@@ -39,12 +39,13 @@ using Windows.UI.Xaml;
 namespace System.IO.IsolatedStorage
 {
     //Note: we remove the interfaces because they are useless for now.
-    ///
+    //
     // Exceptions:
     //   System.ArgumentNullException:
     //     key is null. This exception is thrown when you attempt to reference an instance
     //     of the class by using an indexer and the variable you pass in for the key
     //     value is null.
+
     /// <summary>
     /// Provides a System.Collections.Generic.Dictionary&lt;TKey,TValue&gt; that stores
     /// key-value pairs in isolated storage.

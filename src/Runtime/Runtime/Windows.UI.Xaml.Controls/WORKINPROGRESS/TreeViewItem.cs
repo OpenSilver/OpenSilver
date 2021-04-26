@@ -39,6 +39,46 @@ namespace Windows.UI.Xaml.Controls
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        ///     The DependencyProperty for the <see cref="IsSelected"/> property.
+        ///     Default Value: false
+        /// </summary>
+        public static readonly DependencyProperty IsSelectedProperty =
+            DependencyProperty.Register(
+                    "IsSelected",
+                    typeof(bool),
+                    typeof(TreeViewItem),
+                    new PropertyMetadata(false));
+
+        /// <summary>
+        ///     Specifies whether this item is selected or not.
+        /// </summary>
+        public bool IsSelected
+        {
+            get { return (bool)GetValue(IsSelectedProperty); }
+            set { SetValue(IsSelectedProperty, value); }
+        }
+
+        /// <summary>
+        ///     The DependencyProperty for the <see cref="IsExpanded"/> property.
+        ///     Default Value: false
+        /// </summary>
+        public static readonly DependencyProperty IsExpandedProperty =
+            DependencyProperty.Register(
+                    "IsExpanded",
+                    typeof(bool),
+                    typeof(TreeViewItem),
+                    new PropertyMetadata(false));
+
+        /// <summary>
+        ///     Specifies whether this item has expanded its children or not.
+        /// </summary>
+        public bool IsExpanded
+        {
+            get { return (bool)GetValue(IsExpandedProperty); }
+            set { SetValue(IsExpandedProperty, value); }
+        }
     }
 }
 #endif

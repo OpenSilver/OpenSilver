@@ -40,10 +40,11 @@ namespace Windows.UI.Xaml.Media.Animation
     {
 
         //for details on how the animations are supposed to behave depending on RepeatBehavior, see: https://msdn.microsoft.com/en-us/library/system.windows.media.animation.timeline.repeatbehavior(v=vs.100).aspx
-        ///
+        //
         // Exceptions:
         //   System.ArgumentOutOfRangeException:
         //     count evaluates to infinity, a value that is not a number, or is negative.
+
         /// <summary>
         /// Initializes a new instance of the Windows.UI.Xaml.Media.Animation.RepeatBehavior
         /// structure with the specified iteration count.
@@ -329,7 +330,7 @@ namespace Windows.UI.Xaml.Media.Animation
         }
 
         //todo: the following
-        ///
+
         ///// <summary>
         ///// Returns the hash code of this instance.
         ///// </summary>

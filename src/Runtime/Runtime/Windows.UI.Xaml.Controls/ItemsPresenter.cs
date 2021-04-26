@@ -107,11 +107,7 @@ namespace Windows.UI.Xaml.Controls
                 }
 
                 // attach the panel.
-#if REWORKLOADED
-                this.AddVisualChild(panel);
-#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(panel, this);
-#endif
 
                 // Attach children to panel
                 if (this.Owner != null)
@@ -151,11 +147,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (this.ItemsHost != null)
             {
-#if REWORKLOADED
-                this.AddVisualChild(this.ItemsHost);
-#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.ItemsHost, this);
-#endif
             }
         }
     }

@@ -88,7 +88,7 @@ namespace CSHTML5.Native.Html.Controls
                 {
                     if (!IsNullOrUndefined(_jsDiv))
                     {
-                        if (Convert.ToBoolean(Interop.ExecuteJavaScript("$0.hasChildNodes()", _jsDiv)))
+                        if (Convert.ToBoolean(Interop.ExecuteJavaScript( "$0 && $0.hasChildNodes()", _jsDiv)))
                         {
                             return Interop.ExecuteJavaScriptAsync("$0.firstChild", _jsDiv);
                         }

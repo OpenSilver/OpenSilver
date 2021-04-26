@@ -25,18 +25,19 @@
   </metadata>
   <files>
     <!-- OpenSilver runtime -->
-    <file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/$AssembliesPrefix$.dll" target="lib/netstandard2.0/$AssembliesPrefix$.dll" />
+    <file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.dll" target="lib/netstandard2.0/OpenSilver.dll" />
+	<file src="../../src/Runtime/DataForm.Toolkit/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.dll" />
 
     <!-- OpenSilver targets -->
-    <file src="../../src/Targets/$AssembliesPrefix$.targets" target="build/$PackageId$.targets" />
+    <file src="../../src/Targets/$Target$.targets" target="build/$PackageId$.targets" />
     <!-- Note: the main targets file must have the same name as the package in order to be automatically imported into the end-user project. -->
     <file src="../../src/Targets/OpenSilver.Common.targets" target="build/OpenSilver.Common.targets" />
 
     <!-- OpenSilver compiler -->
-    <file src="../../src/Compiler/Compiler/bin/OpenSilver/$Configuration$/$AssembliesPrefix$.Compiler.dll" target="tools/$AssembliesPrefix$.Compiler.dll" />
-    <file src="../../src/Compiler/Compiler.Common/bin/OpenSilver/$Configuration$/$AssembliesPrefix$.Compiler.Common.dll" target="tools/$AssembliesPrefix$.Compiler.Common.dll" />
-    <file src="../../src/Compiler/Compiler.ProgressDialog/bin/OpenSilver/$Configuration$/$AssembliesPrefix$.Compiler.ProgressDialog.dll" target="tools/$AssembliesPrefix$.Compiler.ProgressDialog.dll" />
-    <file src="../../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/OpenSilver/$Configuration$/$AssembliesPrefix$.Compiler.TypeScriptDefToCSharp.dll" target="tools/$AssembliesPrefix$.Compiler.TypeScriptDefToCSharp.dll" />
+    <file src="../../src/Compiler/Compiler/bin/OpenSilver/$Configuration$/OpenSilver.Compiler.dll" target="tools/OpenSilver.Compiler.dll" />
+    <file src="../../src/Compiler/Compiler.Common/bin/OpenSilver/$Configuration$/OpenSilver.Compiler.Common.dll" target="tools/OpenSilver.Compiler.Common.dll" />
+    <file src="../../src/Compiler/Compiler.ProgressDialog/bin/OpenSilver/$Configuration$/OpenSilver.Compiler.ProgressDialog.dll" target="tools/OpenSilver.Compiler.ProgressDialog.dll" />
+    <file src="../../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/OpenSilver/$Configuration$/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" target="tools/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" />
 
     <!-- DotNetBrowser -->
     <!--<file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/DotNetBrowser.dll" target="lib/netstandard2.0/DotNetBrowser.dll"/>-->
@@ -59,7 +60,7 @@
     <file src="../../src/Simulator/Simulator/bin/OpenSilver/$Configuration$/System.Windows.Interactivity.dll" target="tools/simulator/System.Windows.Interactivity.dll" />
     <file src="../../src/Simulator/Simulator/bin/OpenSilver/$Configuration$/simulator_root.html" target="tools/simulator/simulator_root.html" />
     <file src="../../src/Simulator/Simulator/bin/OpenSilver/$Configuration$/interop_debug_root.html" target="tools/simulator/interop_debug_root.html" />
-    <file src="../../src/Compiler/Compiler.Common/bin/OpenSilver/$Configuration$/$AssembliesPrefix$.Compiler.Common.dll" target="tools/simulator/$AssembliesPrefix$.Compiler.Common.dll" />
+    <file src="../../src/Compiler/Compiler.Common/bin/OpenSilver/$Configuration$/OpenSilver.Compiler.Common.dll" target="tools/simulator/OpenSilver.Compiler.Common.dll" />
 
     <!-- OpenSilver install script -->
     <file src="init_OpenSilver.ps1" target="tools/init.ps1" />

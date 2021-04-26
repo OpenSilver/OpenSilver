@@ -520,11 +520,7 @@ namespace Windows.UI.Xaml.Controls
                 this._itemsPresenter = new ItemsPresenter();
                 this._itemsPresenter.AttachToOwner(this);
 
-#if REWORKLOADED
-                this.AddVisualChild(this._itemsPresenter);
-#else
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this._itemsPresenter, this);
-#endif
 
                 // we need to set this variable so that if we move from no
                 // template to a template, the "manually generated" template

@@ -836,18 +836,14 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
 
-#if REWORKLOADED
-            this.AddVisualChild(visualChild);
-#else
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(visualChild, this);
-#endif
 
             if (visualsCreated)
             {
+                this._renderedControlTemplate = visualChild;
+             
                 // Raise the OnApplyTemplate method
                 this.OnApplyTemplate();
-
-                this._renderedControlTemplate = visualChild;
             }
 
             return visualsCreated;
@@ -1186,14 +1182,6 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         {
             VisualStateManager.GoToState(this, state, true);
         }
-
-#if REWORKLOADED
-        internal override void INTERNAL_FinalizeAttachToParent()
-        {
-            this.UpdateTabIndex(this.IsTabStop, this.TabIndex);
-            base.INTERNAL_FinalizeAttachToParent();
-        }
-#endif
 
 #if WORKINPROGRESS
 #if MIGRATION

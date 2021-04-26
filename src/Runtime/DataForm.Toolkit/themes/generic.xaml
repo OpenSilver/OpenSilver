@@ -1,0 +1,738 @@
+﻿<!--
+// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+-->
+
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit">
+
+    <!--DataForm-->
+    <Style TargetType="sdk:DataForm">
+        <Setter Property="AutoCommit"
+                Value="True" />
+        <Setter Property="AutoGenerateFields"
+                Value="True" />
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0.5,0"
+                                     EndPoint="0.5,1">
+                    <GradientStop Color="#FFF3F7FA"
+                                  Offset="0" />
+                    <GradientStop Color="#FFFFFFFF"
+                                  Offset="0.1" />
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="BorderThickness"
+                Value="1" />
+        <Setter Property="BorderBrush">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0"
+                                     EndPoint="0,1">
+                    <GradientStop Color="#FFA3AEB9"
+                                  Offset="0" />
+                    <GradientStop Color="#FF8399A9"
+                                  Offset="0.375" />
+                    <GradientStop Color="#FF718597"
+                                  Offset="0.375" />
+                    <GradientStop Color="#FF617584"
+                                  Offset="1" />
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="DescriptionViewerPosition"
+                Value="Auto" />
+        <Setter Property="LabelPosition"
+                Value="Auto" />
+        <Setter Property="HeaderVisibility"
+                Value="Visible" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="sdk:DataForm">
+                    <Grid sdk:DataField.IsFieldGroup="True">
+                        <Grid.Resources>
+                            <Style x:Key="ButtonGeneric"
+                                   TargetType="Button">
+                                <Setter Property="Background"
+                                        Value="#00000000" />
+                                <Setter Property="Foreground"
+                                        Value="#FF000000" />
+                                <Setter Property="BorderBrush"
+                                        Value="#FFFFFFFF" />
+                                <Setter Property="BorderThickness"
+                                        Value="1" />
+                                <Setter Property="Padding"
+                                        Value="1" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Grid>
+                                                <VisualStateManager.VisualStateGroups>
+                                                    <VisualStateGroup x:Name="CommonStates">
+                                                        <VisualState x:Name="Normal" />
+                                                        <VisualState x:Name="MouseOver">
+                                                            <Storyboard>
+                                                                <ColorAnimation Duration="0"
+                                                                                Storyboard.TargetName="OuterBtnBorder"
+                                                                                Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                                                                To="#FFFFFFFF" />
+                                                                <ColorAnimation Duration="0"
+                                                                                Storyboard.TargetName="InnerBtnBorder"
+                                                                                Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                                                                To="#7FA9A9A9" />
+                                                            </Storyboard>
+                                                        </VisualState>
+                                                        <VisualState x:Name="Pressed">
+                                                            <Storyboard>
+                                                                <ColorAnimation Duration="0"
+                                                                                Storyboard.TargetName="InnerBtnBorder"
+                                                                                Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                                                                To="#7FA9A9A9" />
+                                                                <ColorAnimation Duration="0"
+                                                                                Storyboard.TargetName="InnerBtnBorder"
+                                                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                                To="#7FA9A9A9" />
+                                                            </Storyboard>
+                                                        </VisualState>
+                                                        <VisualState x:Name="Disabled">
+                                                            <Storyboard>
+                                                                <DoubleAnimation Duration="0"
+                                                                                 Storyboard.TargetName="contentPresenter"
+                                                                                 Storyboard.TargetProperty="Opacity"
+                                                                                 To="0.3" />
+                                                            </Storyboard>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                    <VisualStateGroup x:Name="FocusStates">
+                                                        <VisualState x:Name="Focused">
+                                                            <Storyboard>
+                                                                <DoubleAnimation Duration="0"
+                                                                                 Storyboard.TargetName="FocusVisualElement"
+                                                                                 Storyboard.TargetProperty="Opacity"
+                                                                                 To="1" />
+                                                            </Storyboard>
+                                                        </VisualState>
+                                                        <VisualState x:Name="Unfocused" />
+                                                    </VisualStateGroup>
+                                                </VisualStateManager.VisualStateGroups>
+                                                <Border x:Name="OuterBtnBorder"
+                                                        BorderBrush="#00FFFFFF"
+                                                        Background="{TemplateBinding Background}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        CornerRadius="3">
+                                                    <Border x:Name="InnerBtnBorder"
+                                                            BorderBrush="#00A9A9A9"
+                                                            Background="#00A9A9A9"
+                                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                                            CornerRadius="2">
+                                                        <ContentPresenter x:Name="contentPresenter"
+                                                                          Content="{TemplateBinding Content}"
+                                                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                          Height="Auto"
+                                                                          Width="Auto"
+                                                                          HorizontalAlignment="Center"
+                                                                          VerticalAlignment="Center" />
+                                                    </Border>
+                                                </Border>
+                                                <Border x:Name="FocusVisualElement"
+                                                        BorderBrush="#FF6DBDD1"
+                                                        Background="{TemplateBinding Background}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        CornerRadius="2"
+                                                        Margin="1"
+                                                        Opacity="0" />
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                            <Style x:Key="CustomScrollViewerStyle"
+                                   TargetType="ScrollViewer">
+                                <Setter Property="HorizontalContentAlignment"
+                                        Value="Left" />
+                                <Setter Property="VerticalContentAlignment"
+                                        Value="Top" />
+                                <Setter Property="BorderThickness"
+                                        Value="0,1" />
+                                <Setter Property="BorderBrush">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0.5,0"
+                                                             EndPoint="0.5,1">
+                                            <GradientStop Color="#FFA3AEB9"
+                                                          Offset="0" />
+                                            <GradientStop Color="#FF8399A9"
+                                                          Offset="0.375" />
+                                            <GradientStop Color="#FF718597"
+                                                          Offset="0.375" />
+                                            <GradientStop Color="#FF617584"
+                                                          Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <!--
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ScrollViewer">
+                                            <Grid>
+                                                <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        Margin="0,-1"
+                                                        Opacity="0.2"
+                                                        Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}">
+                                                    <Border.OpacityMask>
+                                                        <LinearGradientBrush StartPoint="-0.07,0.5"
+                                                                             EndPoint="1.07,0.5">
+                                                            <GradientStop Color="#FF000000" />
+                                                            <GradientStop Color="#7FFFFFFF"
+                                                                          Offset="0.5" />
+                                                            <GradientStop Color="#FF000000"
+                                                                          Offset="1" />
+                                                        </LinearGradientBrush>
+                                                    </Border.OpacityMask>
+                                                </Border>
+
+                                                <Grid Background="{TemplateBinding Background}">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*" />
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+													<ScrollContentPresenter x:Name="ScrollContentPresenter" Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                                                    <Rectangle Fill="#FFE9EEF4"
+                                                               Grid.Column="1"
+                                                               Grid.Row="1" />
+                                                    <ScrollBar x:Name="VerticalScrollBar"
+                                                               Margin="0,-1"
+                                                               Width="18"
+                                                               Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                                                               IsTabStop="False"
+                                                               Grid.Column="1"
+                                                               Grid.Row="0"
+                                                               Maximum="{TemplateBinding ScrollableHeight}"
+                                                               Minimum="0"
+                                                               Value="{TemplateBinding VerticalOffset}"
+                                                               Orientation="Vertical"
+                                                               ViewportSize="{TemplateBinding ViewportHeight}" />
+                                                    <ScrollBar x:Name="HorizontalScrollBar"
+                                                               Height="18"
+                                                               Margin="-1,0,-1,-1"
+                                                               Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
+                                                               IsTabStop="False"
+                                                               Grid.Column="0"
+                                                               Grid.Row="1"
+                                                               Maximum="{TemplateBinding ScrollableWidth}"
+                                                               Minimum="0"
+                                                               Value="{TemplateBinding HorizontalOffset}"
+                                                               Orientation="Horizontal"
+                                                               ViewportSize="{TemplateBinding ViewportWidth}" />
+                                                </Grid>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                -->
+                            </Style>
+                        </Grid.Resources>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="DisabledVisual"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1"
+                                                         Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="ModeStates">
+                                <VisualState x:Name="ReadOnly" />
+                                <VisualState x:Name="Empty">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
+                                                                       Storyboard.TargetProperty="IsHitTestVisible"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="False" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <DoubleAnimation Duration="0"
+                                                         Storyboard.TargetName="ContentPresenter"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Edit">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="EditButton"
+                                                                       Storyboard.TargetProperty="IsEnabled"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="false" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CommitButton"
+                                                                       Storyboard.TargetProperty="Visibility"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="Visible" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CancelButton"
+                                                                       Storyboard.TargetProperty="Visibility"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="Visible" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="ValidationStates">
+                                <VisualState x:Name="Valid" />
+                                <VisualState x:Name="Invalid" />
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="CommittedStates">
+                                <VisualState x:Name="Committed" />
+                                <VisualState x:Name="Uncommitted">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="ChangeIndicator"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0.9"
+                                                         Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="ScopeStates">
+                                <VisualState x:Name="Entity" />
+                                <VisualState x:Name="Collection" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border x:Name="DataFormBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="2">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid MinHeight="27"
+                                      Visibility="{TemplateBinding HeaderVisibility}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="8" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal">
+                                        <ContentControl x:Name="HeaderElement"
+                                                        Content="{TemplateBinding Header}"
+                                                        ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                                        FontWeight="Bold"
+                                                        Foreground="{TemplateBinding Foreground}"
+                                                        Margin="10,0,0,0"
+                                                        VerticalAlignment="Center" />
+                                        <TextBlock x:Name="ChangeIndicator"
+                                                   FontWeight="Bold"
+                                                   Foreground="{TemplateBinding Foreground}"
+                                                   Margin="3,-2,8,2"
+                                                   Opacity="0"
+                                                   Text="*"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2"
+                                                Orientation="Horizontal"
+                                                Margin="0,3,0,2">
+                                        <Button x:Name="FirstItemButton"
+                                                Style="{StaticResource ButtonGeneric}">
+                                            <Grid Height="9"
+                                                  Margin="6,5,5,5"
+                                                  Width="8"
+                                                  Opacity="1">
+                                                <!-- #if WORKINPROGRESS -->
+                                                <!--
+                                                <Grid.OpacityMask>
+                                                    <LinearGradientBrush StartPoint="0.4,0"
+                                                                         EndPoint="0.6,1">
+                                                        <GradientStop Color="#7FFFFFFF"
+                                                                      Offset="0" />
+                                                        <GradientStop Color="#BF000000"
+                                                                      Offset="0.25" />
+                                                        <GradientStop Color="#FF000000"
+                                                                      Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </Grid.OpacityMask>
+                                                -->
+                                                <!-- #endif -->
+                                                <Grid.Effect>
+                                                    <DropShadowEffect Color="#FFFFFFFF"
+                                                                      ShadowDepth="0"
+                                                                      BlurRadius="8"
+                                                                      Opacity="1"
+                                                                      Direction="100" />
+                                                </Grid.Effect>
+                                                <Path Stretch="Fill"
+                                                      Height="9"
+                                                      HorizontalAlignment="Right"
+                                                      Margin="0"
+                                                      Width="5"
+                                                      Data="M1,0 L1,2 L0,1 Z"
+                                                      Fill="{TemplateBinding Foreground}"
+                                                      Opacity="0.85" />
+                                                <Rectangle HorizontalAlignment="Left"
+                                                           Width="2"
+                                                           Fill="{TemplateBinding Foreground}"
+                                                           Opacity="0.85" />
+                                            </Grid>
+                                        </Button>
+                                        <Button x:Name="PreviousItemButton"
+                                                Style="{StaticResource ButtonGeneric}">
+                                            <Path Stretch="Fill"
+                                                  Height="9"
+                                                  Margin="6,5,8,5"
+                                                  Width="5"
+                                                  Data="M1,0 L1,2 L0,1 Z"
+                                                  Opacity="0.85"
+                                                  Fill="{TemplateBinding Foreground}">
+                                                <!-- #if WORKINPROGRESS -->
+                                                <!--
+                                                <Path.OpacityMask>
+                                                    <LinearGradientBrush StartPoint="0.4,0"
+                                                                         EndPoint="0.6,1">
+                                                        <GradientStop Color="#7F000000"
+                                                                      Offset="0" />
+                                                        <GradientStop Color="#BF000000"
+                                                                      Offset="0.25" />
+                                                        <GradientStop Color="#FF000000"
+                                                                      Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </Path.OpacityMask>
+                                                -->
+                                                <!-- #endif -->
+                                                <Path.Effect>
+                                                    <DropShadowEffect BlurRadius="8"
+                                                                      Direction="100"
+                                                                      ShadowDepth="0"
+                                                                      Color="#FFFFFFFF" />
+                                                </Path.Effect>
+                                            </Path>
+                                        </Button>
+                                        <Button x:Name="NextItemButton"
+                                                Style="{StaticResource ButtonGeneric}">
+                                            <Path Stretch="Fill"
+                                                  Height="9"
+                                                  Margin="8,5,6,5"
+                                                  Width="5"
+                                                  Data="M0,0 L1,1 L0,2 Z"
+                                                  Opacity="0.85"
+                                                  Fill="{TemplateBinding Foreground}">
+                                                <!-- #if WORKINPROGRESS -->
+                                                <!--
+                                                <Path.OpacityMask>
+                                                    <LinearGradientBrush StartPoint="0.4,0"
+                                                                         EndPoint="0.6,1">
+                                                        <GradientStop Color="#7F000000"
+                                                                      Offset="0" />
+                                                        <GradientStop Color="#BF000000"
+                                                                      Offset="0.25" />
+                                                        <GradientStop Color="#FF000000"
+                                                                      Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </Path.OpacityMask>
+                                                -->
+                                                <!-- #endif -->
+                                                <Path.Effect>
+                                                    <DropShadowEffect BlurRadius="8"
+                                                                      Direction="100"
+                                                                      ShadowDepth="0"
+                                                                      Color="#FFFFFFFF" />
+                                                </Path.Effect>
+                                            </Path>
+                                        </Button>
+                                        <Button x:Name="LastItemButton"
+                                                Style="{StaticResource ButtonGeneric}">
+                                            <Grid Height="9"
+                                                  Margin="6,5,5,5"
+                                                  Width="8"
+                                                  Opacity="1">
+                                                <!-- #if WORKINPROGRESS -->
+                                                <!--
+                                                <Grid.OpacityMask>
+                                                    <LinearGradientBrush StartPoint="0.4,0"
+                                                                         EndPoint="0.6,1">
+                                                        <GradientStop Color="#7F000000"
+                                                                      Offset="0" />
+                                                        <GradientStop Color="#BF000000"
+                                                                      Offset="0.25" />
+                                                        <GradientStop Color="#FF000000"
+                                                                      Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </Grid.OpacityMask>
+                                                -->
+                                                <!-- #endif -->
+                                                <Grid.Effect>
+                                                    <DropShadowEffect BlurRadius="8"
+                                                                      Direction="100"
+                                                                      ShadowDepth="0"
+                                                                      Color="#FFFFFFFF" />
+                                                </Grid.Effect>
+                                                <Path Stretch="Fill"
+                                                      Height="9"
+                                                      HorizontalAlignment="Left"
+                                                      Width="5"
+                                                      Data="M0,0 L1,1 L0,2 Z"
+                                                      Fill="{TemplateBinding Foreground}"
+                                                      Opacity="0.85" />
+                                                <Rectangle HorizontalAlignment="Right"
+                                                           Width="2"
+                                                           Fill="{TemplateBinding Foreground}"
+                                                           Opacity="0.85" />
+                                            </Grid>
+                                        </Button>
+                                        <Border x:Name="ButtonSeparator"
+                                                Background="{TemplateBinding BorderBrush}"
+                                                BorderBrush="#59FFFFFF"
+                                                BorderThickness="1,0,1,0"
+                                                Margin="2,4,2,4"
+                                                Width="3"
+                                                Opacity="0.2" />
+                                        <Button x:Name="EditButton"
+                                                Style="{StaticResource ButtonGeneric}"
+                                                ToolTipService.ToolTip="Edit">
+                                            <!-- #if WORKINPROGRESS -->
+                                            <!--
+                                            <Button.OpacityMask>
+                                                <LinearGradientBrush StartPoint="0.42,0.01"
+                                                                     EndPoint="0.57,0.76">
+                                                    <GradientStop Color="#7F000000"
+                                                                  Offset="0" />
+                                                    <GradientStop Color="#BF000000"
+                                                                  Offset="0.442" />
+                                                    <GradientStop Color="#FF000000"
+                                                                  Offset="1" />
+                                                </LinearGradientBrush>
+                                            </Button.OpacityMask>
+                                            -->
+                                            <!-- #endif -->
+                                            <Grid Height="19"
+                                                  Width="19"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center">
+                                                <Canvas HorizontalAlignment="Stretch"
+                                                        VerticalAlignment="Stretch"
+                                                        Margin="2,2,0,0">
+                                                    <Path Width="10.56"
+                                                          Height="10.5"
+                                                          Canvas.Left="2.53"
+                                                          Canvas.Top="3.01"
+                                                          Stretch="Fill"
+                                                          Data="F1 M 2.53,9.96L 4.96,11.1L 6.08,13.50L 13.09,6.50L 9.6,3L 2.53,9.96 Z "
+                                                          Fill="{TemplateBinding Foreground}">
+                                                        <!-- #if WORKINPROGRESS -->
+                                                        <!--
+                                                        <Path.OpacityMask>
+                                                            <LinearGradientBrush StartPoint="0.21,0.18"
+                                                                                 EndPoint="0.76,0.77">
+                                                                <GradientStop Color="#7F000000"
+                                                                              Offset="0" />
+                                                                <GradientStop Color="#59000000"
+                                                                              Offset="0.106" />
+                                                                <GradientStop Color="#3F000000"
+                                                                              Offset="0.387" />
+                                                                <GradientStop Color="#99000000"
+                                                                              Offset="0.703" />
+                                                                <GradientStop Color="#CC000000"
+                                                                              Offset="1" />
+                                                            </LinearGradientBrush>
+                                                        </Path.OpacityMask>
+                                                        -->
+                                                        <!-- #endif -->
+                                                    </Path>
+                                                    <Path Fill="{TemplateBinding Foreground}"
+                                                          Stretch="Fill"
+                                                          Height="6.74"
+                                                          Width="6.81"
+                                                          Canvas.Left="7.47"
+                                                          Canvas.Top="1.89"
+                                                          Data="M1.41,1.83 L0.71,2.54 L4.20,6.03 L4.91,5.33 z M3.24,0 L6.81,3.42 L3.5,6.74 L0,3.24 z" />
+                                                    <Path Width="12.43"
+                                                          Height="12.5"
+                                                          Canvas.Left="2.03"
+                                                          Canvas.Top="1.50"
+                                                          Stretch="Fill"
+                                                          Data="F1 M 13.77,4.22L 11.73,2.18C 11.12,1.78 10.46,2.15 10,2.5L 3.04,9.45C 2.65,9.86 2.53,10.47 2.53,10.73L 2.53,13.5L 5.32,13.5C 5.57,13.5 6.33,13.36 6.64,12.93L 13.54,6.03C 13.86,5.72 14.17,4.74 13.77,4.22 Z"
+                                                          StrokeLineJoin="Round"
+                                                          Stroke="{TemplateBinding Foreground}" />
+                                                    <Path Width="2.33"
+                                                          Height="2.29"
+                                                          Canvas.Left="2.58"
+                                                          Canvas.Top="11.18"
+                                                          Stretch="Fill"
+                                                          Fill="{TemplateBinding Foreground}"
+                                                          Data="F1 M 2.033,11.71L 4.33,14L 2.62,14C 2.17,13.93 2.09,13.79 2,13.31L 2.03,11.71 Z" />
+                                                </Canvas>
+                                            </Grid>
+                                        </Button>
+                                        <Button x:Name="NewItemButton"
+                                                Style="{StaticResource ButtonGeneric}"
+                                                ToolTipService.ToolTip="Add">
+                                            <Path Stretch="Fill"
+                                                  Height="9"
+                                                  Margin="5"
+                                                  Width="9"
+                                                  Data="F1 M18.41,61.67 L19.56,60.52 L21.92,62.88 L24.22,60.57 L25.36,61.72 L23.06,64.03 L25.43,66.4 L24.22,67.60 L21.87,65.25 L19.56,67.56 L18.41,66.41 L20.73,64.08 L18.41,61.67 z"
+                                                  Fill="{TemplateBinding Foreground}"
+                                                  Opacity="0.85"
+                                                  RenderTransformOrigin="0.5,0.5"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center">
+                                                <!-- #if WORKINPROGRESS -->
+                                                <!--
+                                                <Path.OpacityMask>
+                                                    <LinearGradientBrush StartPoint="-0.27,0.05"
+                                                                         EndPoint="0.35,0.5">
+                                                        <GradientStop Color="#7F000000"
+                                                                      Offset="0" />
+                                                        <GradientStop Color="#BF000000"
+                                                                      Offset="0.25" />
+                                                        <GradientStop Color="#FF000000"
+                                                                      Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </Path.OpacityMask>
+                                                -->
+                                                <!-- #endif -->
+                                                <Path.Effect>
+                                                    <DropShadowEffect BlurRadius="8"
+                                                                      Direction="100"
+                                                                      ShadowDepth="0"
+                                                                      Color="#FFFFFFFF" />
+                                                </Path.Effect>
+                                                <Path.RenderTransform>
+                                                    <TransformGroup>
+                                                        <ScaleTransform />
+                                                        <SkewTransform />
+                                                        <RotateTransform Angle="45" />
+                                                        <TranslateTransform X="0.18"
+                                                                            Y="-0.07" />
+                                                    </TransformGroup>
+                                                </Path.RenderTransform>
+                                            </Path>
+                                        </Button>
+                                        <Button x:Name="DeleteItemButton"
+                                                Style="{StaticResource ButtonGeneric}"
+                                                ToolTipService.ToolTip="Delete">
+                                            <Path Stretch="Fill"
+                                                  Height="9"
+                                                  Margin="5,5,5,5"
+                                                  Width="9"
+                                                  Data="F1 M24.32,60.48 L25.60,61.76 L19.65,67.75 L18.37,66.46 z"
+                                                  Fill="{TemplateBinding Foreground}"
+                                                  Opacity="0.85"
+                                                  RenderTransformOrigin="0.5,0.5"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center">
+                                                <!-- #if WORKINPROGRESS -->
+                                                <!--
+                                                <Path.OpacityMask>
+                                                    <LinearGradientBrush StartPoint="-0.44,-0.11"
+                                                                         EndPoint="0.74,0.66">
+                                                        <GradientStop Color="#7F000000"
+                                                                      Offset="0" />
+                                                        <GradientStop Color="#BF000000"
+                                                                      Offset="0.25" />
+                                                        <GradientStop Color="#FF000000"
+                                                                      Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </Path.OpacityMask>
+                                                -->
+                                                <!-- #endif -->
+                                                <Path.Effect>
+                                                    <DropShadowEffect BlurRadius="8"
+                                                                      Direction="100"
+                                                                      ShadowDepth="0"
+                                                                      Color="#FFFFFFFF" />
+                                                </Path.Effect>
+                                                <Path.RenderTransform>
+                                                    <TransformGroup>
+                                                        <RotateTransform Angle="45" />
+                                                        <TranslateTransform X="0.06"
+                                                                            Y="-0.01" />
+                                                    </TransformGroup>
+                                                </Path.RenderTransform>
+                                            </Path>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                                <ScrollViewer Background="{x:Null}"
+                                              Grid.Row="1"
+                                              IsTabStop="False"
+                                              Padding="{TemplateBinding Padding}"
+                                              Style="{StaticResource CustomScrollViewerStyle}"
+                                              VerticalScrollBarVisibility="Auto">
+                                    <ContentPresenter x:Name="ContentPresenter"
+                                                      Margin="12,12,6,12" />
+                                </ScrollViewer>
+                                <ValidationSummary x:Name="ValidationSummary"
+                                                   Grid.Row="2"
+                                                   MaxHeight="100"
+                                                   BorderThickness="0" />
+                                <StackPanel Grid.Row="3"
+                                            Orientation="Horizontal"
+                                            HorizontalAlignment="Right">
+                                    <Button x:Name="CommitButton"
+                                            Content="OK"
+                                            MinWidth="71"
+                                            MinHeight="17"
+                                            Margin="0,5,8,5"
+                                            HorizontalContentAlignment="Center"
+                                            VerticalContentAlignment="Center"
+                                            Visibility="Collapsed" />
+                                    <Button x:Name="CancelButton"
+                                            Content="Cancel"
+                                            MinWidth="71"
+                                            MinHeight="17"
+                                            Margin="0,5,8,5"
+                                            HorizontalContentAlignment="Center"
+                                            VerticalContentAlignment="Center"
+                                            Visibility="Collapsed" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <Border x:Name="DisabledVisual"
+                                IsHitTestVisible="False"
+                                CornerRadius="2"
+                                Background="#8CFFFFFF"
+                                Opacity="0" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--DataField-->
+    <Style TargetType="sdk:DataField">
+        <Setter Property="IsTabStop"
+                Value="False" />
+        <Setter Property="Margin"
+                Value="3" />
+        <Setter Property="MinHeight"
+                Value="24" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="sdk:DataField">
+                    <ContentControl x:Name="ContentControl"
+                                    Foreground="{TemplateBinding Foreground}"
+                                    IsTabStop="False"
+                                    VerticalAlignment="Center"
+                                    HorizontalContentAlignment="Stretch" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

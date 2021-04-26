@@ -264,17 +264,43 @@ namespace DotNetForHtml5.Compiler
         internal static void FixNamespaceForCompatibility(ref string assemblyName, ref string namespaceName)
         {
 #if SILVERLIGHTCOMPATIBLEVERSION
-            if (assemblyName != null && (assemblyName == "System" || assemblyName.StartsWith("System.")))
+            if (assemblyName != null)
             {
 #if CSHTML5BLAZOR
-                assemblyName = Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR;
-#elif BRIDGE
-                assemblyName = Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE;
-#else
-                assemblyName = Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION;
+                switch (assemblyName)
+                {
+                    case "System.Windows.Controls.Data.DataForm.Toolkit":
+                        assemblyName = "OpenSilver.Controls.Data.DataForm.Toolkit";
+                        return;
+                    default:
+                        if (assemblyName == "System" || assemblyName.StartsWith("System."))
+                        {
+                            assemblyName = Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR;
+                        }
+                        return;
+                }
+#elif BRIDE
+                switch (assemblyName)
+                {
+                    default:
+                        if (assemblyName == "System" || assemblyName.StartsWith("System."))
+                        {
+                            assemblyName = Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE;
+                        }
+                        return;
+                }                    
+#else // JSIL, Obsolete, remove this
+                switch (assemblyName)
+                {
+                    default:
+                        if (assemblyName == "System" || assemblyName.StartsWith("System."))
+                        {
+                            assemblyName = Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION;
+                        }
+                        return;
+                }
 #endif
             }
-#else
 #endif
         }
 

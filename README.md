@@ -52,7 +52,7 @@ Then, rebuild your test project and launch it.
 2. Execute the .BAT file "restore-packages-opensilver.bat" or "restore-packages-cshtml5.bat" (depending on whether you are using OpenSilver or CSHTML5)
 3. Launch the "Developer Command Prompt for VS 2019" (or newer) from your Start Menu
 4. Navigate with the command prompt to the folder "build" that is located inside the cloned repository
-5. Launch the .BAT file "build-nuget-package-OpenSilver.bat" or "build-nuget-package-CSHTML5.bat" (depending on whether you are using OpenSilver or CSHTML5)
+5. Launch the .BAT file "build-nuget-package-OpenSilver-alpha.bat" or "build-nuget-package-CSHTML5-alpha.bat" (depending on whether you are using OpenSilver or CSHTML5)
 6. When asked, enter a version number (if you are unsure about which version number to enter, look at the latest version number in the "Version History" [here](https://www.nuget.org/packages/OpenSilver) and [here](https://www.nuget.org/packages/cshtml5), and increment by 1, or just enter any number)
 
 Wait for the compilation to finish. The generated NuGet packages are created inside the "build\output\XXXXX" directory.

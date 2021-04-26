@@ -1,87 +1,111 @@
-#if WORKINPROGRESS
+//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+#if WORKINPROGRESS && OPENSILVER
+
+using System;
+
 #if MIGRATION
-using System.Windows.Automation.Provider;
 using System.Windows.Controls;
+using System.Windows.Automation.Provider;
+#else
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Automation.Provider;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Automation.Peers
+#else
+namespace Windows.UI.Xaml.Automation.Peers
+#endif
 {
-	//
-	// Summary:
-	//     Exposes System.Windows.Controls.ValidationSummary types to UI automation.
-	public partial class ValidationSummaryAutomationPeer : FrameworkElementAutomationPeer, IInvokeProvider
-	{
-		//
-		// Summary:
-		//     Initializes a new instance of the System.Windows.Automation.Peers.ValidationSummaryAutomationPeer
-		//     class.
-		//
-		// Parameters:
-		//   owner:
-		//     The System.Windows.Controls.ValidationSummary to associate with this System.Windows.Automation.Peers.ValidationSummaryAutomationPeer.
-		public ValidationSummaryAutomationPeer(ValidationSummary owner): base(owner)
-		{
-		}
+    /// <summary>
+    /// Exposes <see cref="ValidationSummary" /> types to UI Automation.
+    /// </summary>
+    public class ValidationSummaryAutomationPeer : FrameworkElementAutomationPeer, IInvokeProvider
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValidationSummaryAutomationPeer" /> class.
+        /// </summary>
+        /// <param name="owner">
+        /// The <see cref="ValidationSummary" /> that is associated with this <see cref="ValidationSummaryAutomationPeer" />.
+        /// </param>
+        public ValidationSummaryAutomationPeer(ValidationSummary owner) : base(owner) { }
 
-		//
-		// Summary:
-		//     Gets an object that supports the requested pattern, based on the patterns supported
-		//     by this System.Windows.Automation.Peers.ValidationSummaryAutomationPeer.
-		//
-		// Parameters:
-		//   patternInterface:
-		//     One of the enumeration values.
-		//
-		// Returns:
-		//     The object that implements the pattern interface, or null if the specified pattern
-		//     interface is not implemented by this peer.
-		public override object GetPattern(PatternInterface patternInterface)
-		{
-			return null;
-		}
+        /// <summary>
+        /// Called by GetClassName that gets a human readable name that, in addition to AutomationControlType, 
+        /// differentiates the control represented by this AutomationPeer.
+        /// </summary>
+        /// <returns>The string that contains the name.</returns>
+        protected override string GetClassNameCore()
+        {
+            return typeof(ValidationSummary).Name;
+        }
 
-		//
-		// Summary:
-		//     Gets the System.Windows.Automation.Peers.AutomationControlType for the element
-		//     associated with this System.Windows.Automation.Peers.ValidationSummaryAutomationPeer.
-		//     Called by System.Windows.Automation.Peers.AutomationPeer.GetAutomationControlType.
-		//
-		// Returns:
-		//     A value of the enumeration.
-		protected override AutomationControlType GetAutomationControlTypeCore()
-		{
-			return AutomationControlType.Custom;
-		}
+        /// <summary>
+        /// Called by GetName that gets a human readable name that, in addition to AutomationControlType, 
+        /// differentiates the control represented by this AutomationPeer.
+        /// </summary>
+        /// <returns>The string that contains the name.</returns>
+        protected override string GetNameCore()
+        {
+            ValidationSummary vs = Owner as ValidationSummary;
+            if (vs != null && vs.HeaderContentControlInternal != null)
+            {
+                string stringContent = vs.HeaderContentControlInternal.Content as String;
+                if (stringContent != null)
+                {
+                    return stringContent;
+                }
+            }
+            return base.GetNameCore();
+        }
 
-		//
-		// Summary:
-		//     Gets the name of the class associated with this System.Windows.Automation.Peers.ValidationSummaryAutomationPeer.
-		//     Called by System.Windows.Automation.Peers.AutomationPeer.GetClassName.
-		//
-		// Returns:
-		//     The class name.
-		protected override string GetClassNameCore()
-		{
-			return null;
-		}
+        /// <summary>
+        /// Gets the control pattern that is associated with the specified System.Windows.Automation.Peers.PatternInterface.
+        /// </summary>
+        /// <param name="patternInterface">A value from the System.Windows.Automation.Peers.PatternInterface enumeration.</param>
+        /// <returns>The object that supports the specified pattern, or null if unsupported.</returns>
+        public override object GetPattern(PatternInterface patternInterface)
+        {
+            if (patternInterface == PatternInterface.Invoke)
+            {
+                return this;
+            }
+            return base.GetPattern(patternInterface);
+        }
 
-		//
-		// Summary:
-		//     Gets the UI Automation Name of the System.Windows.Controls.ValidationSummary
-		//     that is associated with this System.Windows.Automation.Peers.ValidationSummaryAutomationPeer.
-		//     Called by System.Windows.Automation.Peers.AutomationPeer.GetName.
-		//
-		// Returns:
-		//     The UI Automation Name
-		protected override string GetNameCore()
-		{
-			return null;
-		}
+        /// <summary>
+        /// Gets the control type for the element that is associated with the UI Automation peer.
+        /// </summary>
+        /// <returns>The control type.</returns>
+        protected override AutomationControlType GetAutomationControlTypeCore()
+        {
+            return AutomationControlType.Group;
+        }
 
-		void IInvokeProvider.Invoke()
-		{
-			throw new NotImplementedException();
-		}
-	}
+        #region IInvokeProvider Members
+
+        /// <summary>
+        /// Invoke a selection on the current item, simulating a click.
+        /// </summary>
+        void IInvokeProvider.Invoke()
+        {
+            ValidationSummary vs = Owner as ValidationSummary;
+            if (vs != null)
+            {
+                vs.ExecuteClickInternal();
+            }
+        }
+
+        #endregion
+    }
 }
-#endif
-#endif
+
+#endif // WORKINPROGRESS && OPENSILVER

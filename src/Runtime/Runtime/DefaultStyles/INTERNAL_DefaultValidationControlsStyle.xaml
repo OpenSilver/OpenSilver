@@ -1,0 +1,465 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--ValidationSummary-->
+    <Style TargetType="ValidationSummary">
+        <Setter Property="IsTabStop"
+                Value="False" />
+        <Setter Property="Background"
+                Value="#FFEFEFEA" />
+        <Setter Property="BorderBrush"
+                Value="#FFCECEC7" />
+        <Setter Property="BorderThickness"
+                Value="1" />
+        <Setter Property="Padding"
+                Value="0" />
+        <Setter Property="HeaderTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <Border Background="#FFDC020D"
+                            CornerRadius="2"
+                            x:Name="Header"
+                            Margin="-1,-1,-1,0">
+                        <StackPanel Margin="6,2,6,4"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Top">
+                            <Grid Height="13"
+                                  Width="13">
+                                <Ellipse Margin="0"
+                                         RenderTransformOrigin="0.5,0.5">
+                                    <Ellipse.Stroke>
+                                        <LinearGradientBrush StartPoint="0.505,0.65"
+                                                             EndPoint="0.5,0.058">
+                                            <GradientStop Color="#FFCA000C"
+                                                          Offset="0" />
+                                            <GradientStop Color="#FFFF9298"
+                                                          Offset="0.991" />
+                                        </LinearGradientBrush>
+                                    </Ellipse.Stroke>
+                                    <Ellipse.Fill>
+                                        <LinearGradientBrush StartPoint="0.5,0"
+                                                             EndPoint="0.5,1">
+                                            <GradientStop Color="#FFFFFFFF"
+                                                          Offset="0" />
+                                            <GradientStop Color="#FFFDC8C8"
+                                                          Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                                <Path Fill="#DDD43940"
+                                      Data="M5.5,2.5 L7.5,2.5 L7.5,8 L5.5,8 M5.5,9.5 L7.5,9.5 L7.5,10.5 L5.5,10.5" />
+                            </Grid>
+                            <TextBlock Padding="4,1,0,0"
+                                       Text="{Binding}"
+                                       Foreground="#FFFFFFFF"
+                                       FontWeight="Bold" />
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ErrorStyle">
+            <Setter.Value>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Grid Background="{TemplateBinding Background}">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                            <VisualState x:Name="Normal" />
+                                            <VisualState x:Name="MouseOver">
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetName="FillColor"
+                                                                     Storyboard.TargetProperty="Opacity"
+                                                                     Duration="0"
+                                                                     To=".35" />
+                                                </Storyboard>
+                                            </VisualState>
+                                            <VisualState x:Name="Disabled">
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetName="ContentPresenter"
+                                                                     Storyboard.TargetProperty="Opacity"
+                                                                     Duration="0"
+                                                                     To=".55" />
+                                                </Storyboard>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                        <VisualStateGroup x:Name="SelectionStates">
+                                            <VisualState x:Name="Unselected" />
+                                            <VisualState x:Name="Selected">
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetName="FillColor2"
+                                                                     Storyboard.TargetProperty="Opacity"
+                                                                     Duration="0"
+                                                                     To=".75" />
+                                                </Storyboard>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                        <VisualStateGroup x:Name="FocusStates">
+                                            <VisualState x:Name="Focused">
+                                                <Storyboard>
+                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="FocusVisualElement"
+                                                                                   Storyboard.TargetProperty="Visibility"
+                                                                                   Duration="0">
+                                                        <DiscreteObjectKeyFrame KeyTime="0"
+                                                                                Value="Visible" />
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </VisualState>
+                                            <VisualState x:Name="Unfocused" />
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                                    <Rectangle x:Name="FillColor"
+                                               Opacity="0"
+                                               Fill="#59F7D8DB"
+                                               IsHitTestVisible="False" />
+                                    <!-- #if WORKINPROGRESS -->
+                                    <!-- RadiusX="1"
+                                         RadiusY="1" -->
+                                    <!-- #endif -->
+                                    <Rectangle x:Name="FillColor2"
+                                               Opacity="0"
+                                               Fill="#FFF7D8DB"
+                                               IsHitTestVisible="False" />
+                                    <!-- #if WORKINPROGRESS -->
+                                    <!-- RadiusX="1"
+                                         RadiusY="1" -->
+                                    <!-- #endif -->
+                                    <ContentPresenter x:Name="ContentPresenter"
+                                                      Content="{TemplateBinding Content}"
+                                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                      HorizontalAlignment="Left"
+                                                      Margin="{TemplateBinding Padding}" />
+                                    <Rectangle x:Name="FocusVisualElement"
+                                               Stroke="#FFF7D8DB"
+                                               StrokeThickness="1"
+                                               Visibility="Collapsed" />
+                                    <!-- #if WORKINPROGRESS -->
+                                    <!-- RadiusX="1"
+                                         RadiusY="1" -->
+                                    <!-- #endif -->
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ValidationSummary">
+                    <Grid x:Name="ValidationSummary">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DisabledVisual"
+                                                                       Storyboard.TargetProperty="Visibility"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="Visible" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="ValidationStates">
+                                <VisualState x:Name="Empty">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Content"
+                                                                       Storyboard.TargetProperty="Visibility"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="Collapsed" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="HasErrors" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border x:Name="Content"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="0,0,2,2">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <ListBox x:Name="SummaryListBox"
+                                         Grid.Row="1"
+                                         Background="{x:Null}"
+                                         BorderThickness="0"
+                                         Height="Auto"
+                                         ItemContainerStyle="{TemplateBinding ErrorStyle}"
+                                         Style="{TemplateBinding SummaryListBoxStyle}"
+                                         Padding="{TemplateBinding Padding}"
+                                         Foreground="{TemplateBinding Foreground}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding MessageHeader}"
+                                                           FontWeight="Bold"
+                                                           Margin="4,0,0,0" />
+                                                <TextBlock Text="{Binding Message}"
+                                                           Margin="4,0,0,0" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <Border x:Name="DisabledVisual"
+                                        Visibility="Collapsed"
+                                        Background="#80FFFFFF"
+                                        Grid.RowSpan="2"
+                                        IsHitTestVisible="True" />
+                                <ContentControl x:Name="HeaderContentControl"
+                                                ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                                Content="{TemplateBinding Header}"
+                                                IsTabStop="False"
+                                                HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Center" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--Label-->
+    <Style TargetType="Label">
+        <Setter Property="IsTabStop"
+                Value="False" />
+        <Setter Property="HorizontalContentAlignment"
+                Value="Left" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Label">
+                    <Grid>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="Disabled" />
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="ValidationStates">
+                                <VisualState x:Name="Valid" />
+                                <VisualState x:Name="Invalid">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentControl"
+                                                                       Storyboard.TargetProperty="Foreground"
+                                                                       Duration="0:0:1.5">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <SolidColorBrush Color="Red" />
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="RequiredStates">
+                                <VisualState x:Name="NotRequired" />
+                                <VisualState x:Name="Required">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentControl"
+                                                                       Storyboard.TargetProperty="FontWeight"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="SemiBold" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}"
+                                CornerRadius="2">
+                            <ContentControl x:Name="ContentControl"
+                                            Foreground="{TemplateBinding Foreground}"
+                                            Content="{TemplateBinding Content}"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                                            FontWeight="{TemplateBinding FontWeight}"
+                                            Cursor="{TemplateBinding Cursor}"
+                                            HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            FontFamily="{TemplateBinding FontFamily}"
+                                            FontSize="{TemplateBinding FontSize}"
+                                            VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                            IsTabStop="False" />
+                            <!--#if WORKINPROGRESS-->
+                            <!--FontStretch="{TemplateBinding FontStretch}"-->
+                            <!--#endif-->
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--DescriptionViewer-->
+    <Style TargetType="DescriptionViewer">
+        <Setter Property="IsTabStop"
+                Value="False" />
+        <Setter Property="GlyphTemplate">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid Width="15"
+                          Height="15">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Icon"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1"
+                                                         Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Icon"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1"
+                                                         Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Grid x:Name="Icon"
+                              Opacity="0.6"
+                              Width="13"
+                              Height="13"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center">
+                            <Ellipse>
+                                <Ellipse.Stroke>
+                                    <LinearGradientBrush EndPoint="0.298,0.3"
+                                                         StartPoint="0.505,0.65">
+                                        <GradientStop Color="#FF485E6F" />
+                                        <GradientStop Color="#4C485E6F"
+                                                      Offset="1" />
+                                    </LinearGradientBrush>
+                                </Ellipse.Stroke>
+                                <Ellipse.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1"
+                                                         StartPoint="0.5,0">
+                                        <GradientStop Color="#FFCED4D9"
+                                                      Offset="1" />
+                                        <GradientStop Color="#FFFDFDFD"
+                                                      Offset="0" />
+                                    </LinearGradientBrush>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <StackPanel Height="Auto"
+                                        Width="3"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                <Path Height="9"
+                                      HorizontalAlignment="Center"
+                                      Margin="0,0,0,1"
+                                      VerticalAlignment="Top"
+                                      Width="3"
+                                      Data="M0.5,0.60000002 C0.5,0.54477155 0.54477155,0.5 0.60000002,0.5 L2.4000001,0.5 C2.4552286,0.5 2.5,0.54477155 2.5,0.60000002 L2.5,1.6215254 C2.5,1.6767539 2.4552286,1.7215254 2.4000001,1.7215254 L0.60000002,1.7215254 C0.54477155,1.7215254 0.5,1.6767539 0.5,1.6215254 z M0.50000548,3.3151906 C0.50000548,3.2599623 0.54477704,3.2151906 0.60000551,3.2151906 L2.4000056,3.2151906 C2.4552341,3.2151906 2.5000055,3.2599623 2.5000055,3.3151906 L2.5000055,8.4000092 C2.5000055,8.4552374 2.4552341,8.5000095 2.4000056,8.5000095 L0.60000551,8.5000095 C0.54477704,8.5000095 0.50000548,8.4552374 0.50000548,8.4000092 z"
+                                      Stretch="Fill"
+                                      Stroke="#00000000">
+                                    <Path.Fill>
+                                        <LinearGradientBrush EndPoint="0.39,0.297"
+                                                             StartPoint="0.413,0.653">
+                                            <GradientStop Color="#FF485E6F" />
+                                            <GradientStop Color="#4C485E6F"
+                                                          Offset="0.781" />
+                                            <GradientStop Color="#FF485E6F"
+                                                          Offset="0.982" />
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                </Path>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ToolTipStyle">
+            <Setter.Value>
+                <Style TargetType="ToolTip">
+                    <!-- #if WORKINPROGRESS -->
+                    <!--
+                    <Setter Property="Placement"
+                            Value="Right" />
+                    -->
+                    <!-- #endif -->
+                    <Setter Property="IsHitTestVisible"
+                            Value="True" />
+                    <Setter Property="MaxWidth"
+                            Value="250" />
+                    <Setter Property="Margin"
+                            Value="5,-3,5,0" />
+                    <Setter Property="ContentTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <TextBlock TextWrapping="Wrap"
+                                           Text="{Binding}" />
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DescriptionViewer">
+                    <StackPanel Orientation="Horizontal">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="DescriptionStates">
+                                <VisualState x:Name="NoDescription" />
+                                <VisualState x:Name="HasDescription">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DescriptionContent"
+                                                                       Storyboard.TargetProperty="Visibility"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="Visible" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border Background="{TemplateBinding Background}"
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <Button x:Name="DescriptionContent"
+                                    Visibility="Collapsed"
+                                    IsTabStop="False"
+                                    Template="{TemplateBinding GlyphTemplate}"
+                                    Background="#00000000"
+                                    BorderBrush="#FFFFFFFF"
+                                    BorderThickness="1"
+                                    Padding="1"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                <ToolTipService.ToolTip>
+                                    <ToolTip Style="{TemplateBinding ToolTipStyle}"
+                                             Content="{TemplateBinding Description}" />
+                                    <!-- #if WORKINPROGRESS -->
+                                    <!-- PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}" -->
+                                    <!-- #endif -->
+                                </ToolTipService.ToolTip>
+                            </Button>
+                        </Border>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

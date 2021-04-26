@@ -49,8 +49,8 @@ namespace DotNetForHtml5.Compiler
                 {
                     string value = targetPropertyAttr.Value;
                     if (!string.IsNullOrWhiteSpace(value)
-                        && !(value.EndsWith(".Color")
-                            || value.EndsWith(".Color)")))
+                        && !(value.TrimStart('(').TrimEnd(')') == "Color")
+                        && !value.TrimEnd(')').EndsWith(".Color"))
                     {
                         value += ".Color";
                         currentElement.Attribute("Storyboard.TargetProperty").SetValue(value);

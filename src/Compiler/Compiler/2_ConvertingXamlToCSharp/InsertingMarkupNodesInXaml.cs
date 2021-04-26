@@ -44,7 +44,11 @@ namespace DotNetForHtml5.Compiler
             }
 
             List<XAttribute> attributesToRemove = new List<XAttribute>();
-            var attributes = currentElement.Attributes().ToList<XAttribute>(); //we use a secondary list so that when we remove an element from the XAttributes, we don't skip the next element.
+            // We use a secondary list so that when we remove an element from the XAttributes, we don't skip the next element.
+            // We reverse the list because we want to preserve the order in which we set the object properties. Since XContainer
+            // only allow to add a child at the start or the end, we need call XContainer.AddFirst(element) while iterating on the 
+            // reverse list of attributes to do so.
+            var attributes = currentElement.Attributes().Reverse().ToList(); 
             foreach (XAttribute currentAttribute in attributes)
             {
                 if (IsMarkupExtension(currentAttribute))
@@ -76,11 +80,11 @@ namespace DotNetForHtml5.Compiler
                         }
                         if (currentElementNamespaceName == currentAttributeNamespaceName && currentElementTypeName == currentAttributeTypeName) // currentAttribute is a property defined in the type of currentElement (or one of his parents)
                         {
-                            currentElement.Add(GenerateNodeForAttribute(currentElement.Name + ("." + currentAttributeName), currentAttributeValueEscaped, currentDefaultNamespace, reflectionOnSeparateAppDomain, currentElement.GetNamespaceOfPrefix));
+                            currentElement.AddFirst(GenerateNodeForAttribute(currentElement.Name + ("." + currentAttributeName), currentAttributeValueEscaped, currentDefaultNamespace, reflectionOnSeparateAppDomain, currentElement.GetNamespaceOfPrefix));
                         }
                         else // currentAttribute is an attached property
                         {
-                            currentElement.Add(GenerateNodeForAttribute("{" + currentAttributeNamespaceName + "}" + currentAttributeTypeName + "." + currentAttributeName, currentAttributeValueEscaped, currentDefaultNamespace, reflectionOnSeparateAppDomain, currentElement.GetNamespaceOfPrefix));
+                            currentElement.AddFirst(GenerateNodeForAttribute("{" + currentAttributeNamespaceName + "}" + currentAttributeTypeName + "." + currentAttributeName, currentAttributeValueEscaped, currentDefaultNamespace, reflectionOnSeparateAppDomain, currentElement.GetNamespaceOfPrefix));
                         }
                         currentAttribute.Remove();
                     }
