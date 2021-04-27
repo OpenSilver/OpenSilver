@@ -612,13 +612,13 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
             style.height = "inherit";
             style.objectPosition = "center top";
 
-            CSHTML5.Interop.ExecuteJavaScriptAsync($@"
-$0.addEventListener('mousedown', function(e) {{
+            CSHTML5.Interop.ExecuteJavaScriptAsync(@"
+$0.addEventListener('mousedown', function(e) {
     e.preventDefault();
-}}, false);
-$0.addEventListener('error', function(e) {{
-    this.src = '{TransparentGifOnePixel}';
-}});
+}, false);
+$0.addEventListener('error', function(e) {
+    this.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+});
 ", img);
 
             _imageDiv = img;
