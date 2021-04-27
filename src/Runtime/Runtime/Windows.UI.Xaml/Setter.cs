@@ -12,14 +12,14 @@
 *  
 \*====================================================================================*/
 
-
-
 using System;
 
 #if MIGRATION
 using System.Windows.Data;
+using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -145,12 +145,28 @@ namespace Windows.UI.Xaml
                 Binding binding = value as Binding;
                 if (binding == null)
                 {
-                    if (!isObjectType)
+                    // Special case :
+                    // In xaml, setting a color via StaticResource to the value of a
+                    // style setter converts the color to a SolidColorBrush as shown in
+                    // the following code.
+                    //   <Color x:Key="color">#FFFF0000</Color>
+                    //   <Style x:Key="style" TargetType="Control">
+                    //      <Setter Property="Foreground" Value="{StaticResource color}" />
+                    //   </Style>
+                    // Note: this behavior is not reproduced when a style is constructed
+                    // directly in C# (Silverlight), but it will work anyway with this
+                    // workaround.
+                    if (dp.PropertyType == typeof(Brush) && value is Color color)
+                    {
+                        // do not use Value to avoid unecessary checks.
+                        _value = new SolidColorBrush(color);
+                    }
+                    else if (!isObjectType)
                     {
                         throw new ArgumentException(
                             string.Format("'{0}' is not a valid value for the '{1}.{2}' property on a Setter.",
                                           value, dp.OwnerType, dp.Name));
-                    }                    
+                    }
                 }
                 else
                 {

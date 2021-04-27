@@ -757,29 +757,6 @@ namespace Windows.UI.Xaml
                     else
                     {
                         value = propertyValue.Value;
-#if OPENSILVER //todo: should apply to CSHTML5 as well?
-                        //---------------------------------------------------------
-                        // The block of code below fixes an issue where if a Color was used instead of a Brush in the Foreground of an implicit TextBox style, the text would be transparent in the browser (not in the Simulator).
-                        // To reproduce the issue:
-                        // <Application.Resources>
-                        //  <ResourceDictionary>
-                        //    <Color x:Key="Color1" A="255" R="0" G="255" B="0"/>
-                        //      <Style TargetType="TextBox">
-                        //        <Style.Setters>
-                        //          <Setter Property="Foreground" Value="{StaticResource Color1}"/>
-                        //          <Setter Property="FontSize" Value="30"/>
-                        //        </Style.Setters>
-                        //      </Style>
-                        //    </ResourceDictionary>
-                        //  </Application.Resources>
-                        // <TextBox x:Name ="TextBox1" />
-                        //todo: find a more generic way to handle such issues.
-                        //---------------------------------------------------------
-                        if (value is Color && propertyValue.Key.PropertyType == typeof(Brush))
-                        {
-                            value = new SolidColorBrush((Color)value);
-                        }
-#endif
                     }
                     fe.SetLocalStyleValue(propertyValue.Key, value);
                 }
