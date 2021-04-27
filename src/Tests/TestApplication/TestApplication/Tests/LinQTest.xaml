@@ -1,13 +1,13 @@
-﻿<navigation:Page x:Class="TestApplication.Tests.LinQTest" 
+﻿<sdk:Page x:Class="TestApplication.Tests.LinQTest" 
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            mc:Ignorable="d"
-           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <StackPanel Orientation="Vertical">
         <Button Background="#DDDDDD" Click="TestButtonLinq_Click" Content="Click to test Linq (look at output pane or console output)" HorizontalAlignment="Left"/>
         <TextBlock Text="Below is an example of GroupBy with a list of elements from 2 to 6 grouped with a test checking whether they are above 3 or not:" Margin="0,10,0,0"/>
         <StackPanel x:Name="GroupByStackPanel" Orientation="Horizontal" Margin="5"/>
     </StackPanel>
-</navigation:Page>
+</sdk:Page>

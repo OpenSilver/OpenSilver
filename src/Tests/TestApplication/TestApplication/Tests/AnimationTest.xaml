@@ -1,12 +1,12 @@
-﻿<navigation:Page x:Class="TestApplication.Tests.AnimationTest" 
+﻿<sdk:Page x:Class="TestApplication.Tests.AnimationTest" 
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            mc:Ignorable="d"
-           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
 
-    <navigation:Page.Resources>
+    <sdk:Page.Resources>
         <Storyboard x:Key="TestStoryboard" Duration="0:0:1">
             <ColorAnimation Duration="0:0:1" Storyboard.TargetName="TestBorder" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"/>
         </Storyboard>
@@ -490,7 +490,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-    </navigation:Page.Resources>
+    </sdk:Page.Resources>
     <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Horizontal">
             <StackPanel Background="LightYellow" HorizontalAlignment="Left">
@@ -551,4 +551,4 @@
             </StackPanel>
         </StackPanel>
     </StackPanel>
-</navigation:Page>
+</sdk:Page>

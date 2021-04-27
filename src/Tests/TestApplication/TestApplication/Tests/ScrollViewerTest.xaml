@@ -1,10 +1,10 @@
-﻿<navigation:Page x:Class="TestApplication.Tests.ScrollViewerTest" 
+﻿<sdk:Page x:Class="TestApplication.Tests.ScrollViewerTest" 
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            mc:Ignorable="d"
-           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <StackPanel Orientation="Vertical">
         <TextBlock TextWrapping="Wrap" Margin="30,0,0,0" Text="The ellipse is smaller so it should be centered:"/>
         <Border BorderThickness="2" BorderBrush="Black" Width="100" Height="100">
@@ -40,4 +40,4 @@
             </Grid>
         </Border>
     </StackPanel>
-</navigation:Page>
+</sdk:Page>

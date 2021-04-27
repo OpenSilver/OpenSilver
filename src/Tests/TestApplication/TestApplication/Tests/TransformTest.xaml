@@ -1,10 +1,10 @@
-﻿<navigation:Page x:Class="TestApplication.Tests.TransformTest" 
+﻿<sdk:Page x:Class="TestApplication.Tests.TransformTest" 
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            mc:Ignorable="d"
-           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Horizontal">
             <Button Width="100" Height="30" Content="Translate"  Click="ButtonTranslate_Click"/>
@@ -51,4 +51,4 @@
             </TextBox>
         </Canvas>
     </StackPanel>
-</navigation:Page>
+</sdk:Page>

@@ -1,10 +1,10 @@
-﻿<navigation:Page x:Class="TestApplication.Tests.ImageTest" 
+﻿<sdk:Page x:Class="TestApplication.Tests.ImageTest" 
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            mc:Ignorable="d"
-           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Vertical">
             <TextBlock Text="Testing IMAGE with size contraint:"/>
@@ -33,4 +33,4 @@
             <Image Source="http://cshtml5.com/images/CSharpXamlForHtml5_logo_100x100.png" Width="200" Height="200" Stretch="Fill"/>
         </StackPanel>
     </StackPanel>
-</navigation:Page>
+</sdk:Page>

@@ -3,8 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:sdk = "http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" 
-    xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" 
     mc:Ignorable="d"
     d:DesignHeight="300" d:DesignWidth="400">
 
@@ -20,13 +19,13 @@
 
         <Border Grid.Column="1" BorderThickness="2" BorderBrush="Black">
             <ScrollViewer x:Name="ScrollViewer1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <navigation:Frame x:Name="ContentContainer" JournalOwnership="Automatic">
-                    <navigation:Frame.UriMapper>
+                <sdk:Frame x:Name="ContentContainer" JournalOwnership="Automatic">
+                    <sdk:Frame.UriMapper>
                         <sdk:UriMapper>
                             <sdk:UriMapping Uri="/{page_name}" MappedUri="/Tests/{page_name}.xaml"/>
                         </sdk:UriMapper>
-                    </navigation:Frame.UriMapper>
-                </navigation:Frame>
+                    </sdk:Frame.UriMapper>
+                </sdk:Frame>
             </ScrollViewer>
         </Border>
     </Grid>

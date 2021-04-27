@@ -1,12 +1,12 @@
-﻿<navigation:Page x:Class="TestApplication.Tests.BehaviorTest" 
+﻿<sdk:Page x:Class="TestApplication.Tests.BehaviorTest" 
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            xmlns:local="clr-namespace:TestApplication"
-           xmlns:interaction="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+           xmlns:interaction="http://schemas.microsoft.com/expression/2010/interactivity"
            mc:Ignorable="d"
-           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <StackPanel Orientation="Vertical">
         <Border BorderBrush="Gray" BorderThickness="2" Margin="3" HorizontalAlignment="Left">
             <StackPanel Width="250">
@@ -22,4 +22,4 @@
             </StackPanel>
         </Border>
     </StackPanel>
-</navigation:Page>
+</sdk:Page>

@@ -1,10 +1,10 @@
-﻿<navigation:Page x:Class="TestApplication.Tests.Alignments.BottomRightTest" 
+﻿<sdk:Page x:Class="TestApplication.Tests.Alignments.BottomRightTest" 
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            mc:Ignorable="d"
-           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <StackPanel Orientation="Vertical">
         <Border Width="100" Height="100" Background="#DDDDDD">
             <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="#FFAAFFAA">
@@ -12,4 +12,4 @@
             </Border>
         </Border>
     </StackPanel>
-</navigation:Page>
+</sdk:Page>

@@ -1,10 +1,10 @@
-﻿<navigation:Page x:Class="TestApplication.Tests.DateTimeTest" 
+﻿<sdk:Page x:Class="TestApplication.Tests.DateTimeTest" 
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            mc:Ignorable="d"
-           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <StackPanel Orientation="Vertical">
         <Button Content="Click to test with date 01/02/2014 at 15:16:17 (Unspecified kind)" Click="ButtonTestDateTime1_Click" HorizontalAlignment="Center"/>
         <Button Content="Click to test with date 01/02/2014 at 15:16:17 (Local)" Click="ButtonTestDateTime2_Click" HorizontalAlignment="Center"/>
@@ -12,4 +12,4 @@
         <Button Content="Click to test with current date" Click="ButtonTestDateTime4_Click" HorizontalAlignment="Center"/>
         <Button Content="Click to test with current date UTC" Click="ButtonTestDateTime5_Click" HorizontalAlignment="Center"/>
     </StackPanel>
-</navigation:Page>
+</sdk:Page>
