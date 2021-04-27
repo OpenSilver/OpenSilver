@@ -284,326 +284,326 @@
     <Content Include="Images\arrow_right.png" />
     <Content Include="Images\arrow_right_and_left.png" />
     <Content Include="Images\Logo1.png" />
-    <ApplicationDefinition Include="App.xaml">
+    <Content Include="App.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </ApplicationDefinition>
-    <Page Include="MainPage.xaml">
+    </Content>
+    <Content Include="MainPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Alignments\BottomRightTest.xaml">
+    </Content>
+    <Content Include="Tests\Alignments\BottomRightTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Alignments\CenterTest.xaml">
+    </Content>
+    <Content Include="Tests\Alignments\CenterTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Alignments\StretchTest.xaml">
+    </Content>
+    <Content Include="Tests\Alignments\StretchTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Alignments\TopLeftTest.xaml">
+    </Content>
+    <Content Include="Tests\Alignments\TopLeftTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\AnimationTest.xaml">
+    </Content>
+    <Content Include="Tests\AnimationTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\AsyncAwaitTest.xaml">
+    </Content>
+    <Content Include="Tests\AsyncAwaitTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\AutoCompleteBoxTest.xaml">
+    </Content>
+    <Content Include="Tests\AutoCompleteBoxTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\BehaviorTest.xaml">
+    </Content>
+    <Content Include="Tests\BehaviorTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\BindingTest.xaml">
+    </Content>
+    <Content Include="Tests\BindingTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\CanvasTest.xaml">
+    </Content>
+    <Content Include="Tests\CanvasTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\CheckBox indeterminateTest.xaml">
+    </Content>
+    <Content Include="Tests\CheckBox indeterminateTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\ChildWindowTest.xaml">
+    </Content>
+    <Content Include="Tests\ChildWindowTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\ComboBoxTest.xaml">
+    </Content>
+    <Content Include="Tests\ComboBoxTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\CompositeControlsTest.xaml">
+    </Content>
+    <Content Include="Tests\CompositeControlsTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\ContextMenuTest.xaml">
+    </Content>
+    <Content Include="Tests\ContextMenuTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\CursorTest.xaml">
+    </Content>
+    <Content Include="Tests\CursorTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\CustomControlTest.xaml">
+    </Content>
+    <Content Include="Tests\CustomControlTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\DataGrids\DataGrid1Test.xaml">
+    </Content>
+    <Content Include="Tests\DataGrids\DataGrid1Test.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\DataGrids\DataGrid2Test.xaml">
+    </Content>
+    <Content Include="Tests\DataGrids\DataGrid2Test.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\DataGrids\DataGridColumn_VisibilityTest.xaml">
+    </Content>
+    <Content Include="Tests\DataGrids\DataGridColumn_VisibilityTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\DateTimeTest.xaml">
+    </Content>
+    <Content Include="Tests\DateTimeTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\DeSerializationTest.xaml">
+    </Content>
+    <Content Include="Tests\DeSerializationTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\DockPanelTest.xaml">
+    </Content>
+    <Content Include="Tests\DockPanelTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Double ClickTest.xaml">
+    </Content>
+    <Content Include="Tests\Double ClickTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Encoding_GetDecoderTest.xaml">
+    </Content>
+    <Content Include="Tests\Encoding_GetDecoderTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Events\AttachDetachTest.xaml">
+    </Content>
+    <Content Include="Tests\Events\AttachDetachTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Events\Event1Test.xaml">
+    </Content>
+    <Content Include="Tests\Events\Event1Test.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Events\Event2Test.xaml">
+    </Content>
+    <Content Include="Tests\Events\Event2Test.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Events\FocusTest.xaml">
+    </Content>
+    <Content Include="Tests\Events\FocusTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Events\GridWithMultipleElementsTest.xaml">
+    </Content>
+    <Content Include="Tests\Events\GridWithMultipleElementsTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Events\TextChangedTest.xaml">
+    </Content>
+    <Content Include="Tests\Events\TextChangedTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\FileInfoTest.xaml">
+    </Content>
+    <Content Include="Tests\FileInfoTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\FontPrecedenceTest.xaml">
+    </Content>
+    <Content Include="Tests\FontPrecedenceTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\FrameTest.xaml">
+    </Content>
+    <Content Include="Tests\FrameTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\GradientBrushes\RadialGradientBrushTest.xaml">
+    </Content>
+    <Content Include="Tests\GradientBrushes\RadialGradientBrushTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Grids\AlignmentTest.xaml">
+    </Content>
+    <Content Include="Tests\Grids\AlignmentTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Grids\GridSplitterTest.xaml">
+    </Content>
+    <Content Include="Tests\Grids\GridSplitterTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Grids\GridTest.xaml">
+    </Content>
+    <Content Include="Tests\Grids\GridTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Grids\GridWithoutColumnsRowsTest.xaml">
+    </Content>
+    <Content Include="Tests\Grids\GridWithoutColumnsRowsTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Grids\Grid_canvas_overlapping_bugTest.xaml">
+    </Content>
+    <Content Include="Tests\Grids\Grid_canvas_overlapping_bugTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Grids\Grid_SpanTest.xaml">
+    </Content>
+    <Content Include="Tests\Grids\Grid_SpanTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\ICommandTest.xaml">
+    </Content>
+    <Content Include="Tests\ICommandTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\ImageTest.xaml">
+    </Content>
+    <Content Include="Tests\ImageTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\IsHitTestVisible OpacityTest.xaml">
+    </Content>
+    <Content Include="Tests\IsHitTestVisible OpacityTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\IsolatedStorageTest.xaml">
+    </Content>
+    <Content Include="Tests\IsolatedStorageTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\ItemsControlTest.xaml">
+    </Content>
+    <Content Include="Tests\ItemsControlTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\GradientBrushes\LinearGradientBrushTest.xaml">
+    </Content>
+    <Content Include="Tests\GradientBrushes\LinearGradientBrushTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\LinQTest.xaml">
+    </Content>
+    <Content Include="Tests\LinQTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\ListBoxes\ListBox1Test.xaml">
+    </Content>
+    <Content Include="Tests\ListBoxes\ListBox1Test.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\ListBoxes\ListBox2Test.xaml">
+    </Content>
+    <Content Include="Tests\ListBoxes\ListBox2Test.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\MediaElementTest.xaml">
+    </Content>
+    <Content Include="Tests\MediaElementTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\MouseMove_MouseCaptureTest.xaml">
+    </Content>
+    <Content Include="Tests\MouseMove_MouseCaptureTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Negative MarginTest.xaml">
+    </Content>
+    <Content Include="Tests\Negative MarginTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\NestedElementsTest.xaml">
+    </Content>
+    <Content Include="Tests\NestedElementsTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Paths\PathChangeTest.xaml">
+    </Content>
+    <Content Include="Tests\Paths\PathChangeTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Paths\PathTest.xaml">
+    </Content>
+    <Content Include="Tests\Paths\PathTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\PrintingTest.xaml">
+    </Content>
+    <Content Include="Tests\PrintingTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\RadioButtonTest.xaml">
+    </Content>
+    <Content Include="Tests\RadioButtonTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\Right ClickTest.xaml">
+    </Content>
+    <Content Include="Tests\Right ClickTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\SandboxTest.xaml">
+    </Content>
+    <Content Include="Tests\SandboxTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\ScrollViewerTest.xaml">
+    </Content>
+    <Content Include="Tests\ScrollViewerTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\ShadowDropEffectTest.xaml">
+    </Content>
+    <Content Include="Tests\ShadowDropEffectTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\StackPanels\HorizontalTest.xaml">
+    </Content>
+    <Content Include="Tests\StackPanels\HorizontalTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\StackPanels\VerticalTest.xaml">
+    </Content>
+    <Content Include="Tests\StackPanels\VerticalTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\StyleTest.xaml">
+    </Content>
+    <Content Include="Tests\StyleTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\TemplatedTextBoxTest.xaml">
+    </Content>
+    <Content Include="Tests\TemplatedTextBoxTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\TextBoxPropertiesTest.xaml">
+    </Content>
+    <Content Include="Tests\TextBoxPropertiesTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\TextPropertiesTest.xaml">
+    </Content>
+    <Content Include="Tests\TextPropertiesTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\ToolTipTest.xaml">
+    </Content>
+    <Content Include="Tests\ToolTipTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\TransformTest.xaml">
+    </Content>
+    <Content Include="Tests\TransformTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\TwoTextBoxesHorizontallyTest.xaml">
+    </Content>
+    <Content Include="Tests\TwoTextBoxesHorizontallyTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\ValidationTest.xaml">
+    </Content>
+    <Content Include="Tests\ValidationTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\VideoPlayerTest.xaml">
+    </Content>
+    <Content Include="Tests\VideoPlayerTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\ViewboxTest.xaml">
+    </Content>
+    <Content Include="Tests\ViewboxTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\VisibilityTest.xaml">
+    </Content>
+    <Content Include="Tests\VisibilityTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tests\WrapPanelTest.xaml">
+    </Content>
+    <Content Include="Tests\WrapPanelTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="SampleHeaderedContainer.xaml">
+    </Content>
+    <Content Include="SampleHeaderedContainer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="TestingChildWindow\LoginWindow.xaml">
+    </Content>
+    <Content Include="TestingChildWindow\LoginWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
+    </Content>
   </ItemGroup>
 
 </Project>
