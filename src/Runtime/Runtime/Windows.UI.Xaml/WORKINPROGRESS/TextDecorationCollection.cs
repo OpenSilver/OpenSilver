@@ -96,12 +96,12 @@ namespace System.Windows
 
         public static bool operator ==(TextDecorationCollection left, TextDecorationCollection right)
         {
-            return TextDecoration.Equals(left.Decoration, right.Decoration);
+            return TextDecoration.Equals(left?.Decoration, right?.Decoration);
         }
 
         public static bool operator !=(TextDecorationCollection left, TextDecorationCollection right)
         {
-            return !TextDecoration.Equals(left.Decoration, right.Decoration);
+            return !TextDecoration.Equals(left?.Decoration, right?.Decoration);
         }
     }
 #if no
