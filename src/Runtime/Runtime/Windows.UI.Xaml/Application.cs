@@ -51,6 +51,9 @@ namespace Windows.UI.Xaml
     /// </summary>
     public partial class Application
     {
+        // Id of the application root html div.
+        public const string ApplicationRootDomElementId = "cshtml5-root";
+
         static Dictionary<string, string> _resourcesCache = null;
         INTERNAL_XamlResourcesHandler _xamlResourcesHandler = new INTERNAL_XamlResourcesHandler();
 

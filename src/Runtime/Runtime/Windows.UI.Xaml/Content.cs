@@ -28,6 +28,12 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
 {
     public partial class Content
     {
+        // Handles the window resize event.
+        private EventHandler _resizeHandler;
+
+        // Handles the full screen changed event.
+        private EventHandler _fullScreenChangedHandler;
+
         /// <summary>
         /// Gets the browser-determined height of the content area.
         /// </summary>
@@ -118,7 +124,91 @@ if (requestMethod) { // Native exit full screen.
             }
         }
 
+        /// <summary>
+        /// Gets the factor by which the current browser window resizes its contents.
+        /// </summary>
+        /// <returns> 
+        /// The zoom setting for the current browser window.
+        /// </returns>
+        public double ZoomFactor => Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("window.devicePixelRatio"));
+
+
+        /// <summary>
+        /// Occurs when the browser enters or exits full-screen mode.
+        /// </summary>
+        public event EventHandler FullScreenChanged
+        {
+            add
+            {
+                if (this._fullScreenChangedHandler == null)
+                {
+                    CSHTML5.Interop.ExecuteJavaScript(@"document.addEventListener(""fullscreenchange"", $0)", new Action(FullScreenChangedCallback));
+                }
+
+                this._fullScreenChangedHandler += value;
+            }
+            remove
+            {
+                this._fullScreenChangedHandler -= value;
+
+                if (this._fullScreenChangedHandler == null)
+                {
+                    CSHTML5.Interop.ExecuteJavaScript(@"document.removeEventListener(""fullscreenchange"", $0)", new Action(FullScreenChangedCallback));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Occurs when the <see cref="Window"/> gets resized.
+        /// </summary>
+        public event EventHandler Resized
+        {
+            add
+            {
+                if (this._resizeHandler == null)
+                {
+                    CSHTML5.Interop.ExecuteJavaScript($@"
+const rootElement = document.getElementById(""{Application.ApplicationRootDomElementId}"");
+var contentResizeSensor = new ResizeSensor(rootElement, $0);
+", new Action(WindowResizeCallback));
+                }
+
+                this._resizeHandler += value;
+            }
+            remove
+            {
+                this._resizeHandler -= value;
+
+                if (this._resizeHandler == null)
+                {
+                    CSHTML5.Interop.ExecuteJavaScript($@"
+const rootElement = document.getElementById(""{Application.ApplicationRootDomElementId}"");
+contentResizeSensor.detach(rootElement);"
+                    );
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when the full screen mode changes.
+        /// Fires the <see cref="FullScreenChanged"/> event.
+        /// </summary>
+        private void FullScreenChangedCallback()
+        {
+            this._fullScreenChangedHandler?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Called when the window gets resized.
+        /// Fires the <see cref="Resized"/> event.
+        /// </summary>
+        private void WindowResizeCallback()
+        {
+            this._resizeHandler?.Invoke(this, EventArgs.Empty);
+        }
+
 #if WORKINPROGRESS
+
         // Summary:
         //     Gets or sets a value that indicates the behavior of full-screen mode.
         //
@@ -127,37 +217,10 @@ if (requestMethod) { // Native exit full screen.
         //public FullScreenOptions FullScreenOptions { get; set; }
 
         /// <summary>
-        /// Gets the factor by which the current browser window resizes its contents.
-        /// </summary>
-        /// <returns> 
-        /// The zoom setting for the current browser window.
-        /// </returns>
-        [OpenSilver.NotImplemented]
-        public double ZoomFactor
-        {
-            get { return 0; }
-        }
-
-        // Summary:
-        //     Occurs when the hosted Silverlight plug-in either enters or exits full-screen
-        //     mode.
-        //public event EventHandler FullScreenChanged;
-
-        /// <summary>
-        /// Occurs when the System.Windows.Interop.Content.ActualHeight or the System.Windows.Interop.Content.ActualWidth 
-        /// of the Silverlight plug-in change.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public event EventHandler Resized;
-
-        /// <summary>
         /// Occurs when the zoom setting in the host browser window changes or is initialized.
         /// </summary>
         [OpenSilver.NotImplemented]
         public event EventHandler Zoomed;
-
-        [OpenSilver.NotImplemented]
-        public event EventHandler FullScreenChanged;
 #endif
     }
 }

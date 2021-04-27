@@ -53,8 +53,6 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 #endif
         internal static Dictionary<string, UIElement> INTERNAL_idsToUIElements;
 
-        const string IdOfApplicationRootDomElement = "cshtml5-root";
-
         static INTERNAL_HtmlDomManager()
         {
             if (!IsRunningInJavaScript())
@@ -78,10 +76,10 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
         public static object GetApplicationRootDomElement()
         {
-            var rootDomElement = Interop.ExecuteJavaScriptAsync("document.getElementById($0)", IdOfApplicationRootDomElement);
+            var rootDomElement = Interop.ExecuteJavaScriptAsync("document.getElementById($0)", Application.ApplicationRootDomElementId);
 
             if (rootDomElement == null)
-                throw new Exception("The application root DOM element was not found. To fix this issue, please add a DIV with the ID '" + IdOfApplicationRootDomElement + "' to the HTML page.");
+                throw new Exception("The application root DOM element was not found. To fix this issue, please add a DIV with the ID '" + Application.ApplicationRootDomElementId + "' to the HTML page.");
 
             return rootDomElement;
         }
