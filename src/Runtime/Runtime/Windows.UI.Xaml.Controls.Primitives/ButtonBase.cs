@@ -103,6 +103,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
+        private static void OnIsPressedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ButtonBase)d).OnIsPressedChanged(e);
+        }
+
         static void ExecuteCommand(object sender, RoutedEventArgs e)
         {
             ButtonBase buttonBase = (ButtonBase)sender;
@@ -188,9 +193,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 StopPointerCapture();
 
-                if (ClickMode == ClickMode.Release
-                    //&& IsPointerOverThisControl(eventArgs) //todo: uncomment this line!!!
-                    )
+                if (ClickMode == ClickMode.Release && this.IsMouseOver)
                     OnClick();
             }
 
@@ -212,28 +215,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             StopPointerCapture();
         }
 
-#if MIGRATION
-        private bool IsPointerOverThisControl(MouseButtonEventArgs e)
-#else
-        private bool IsPointerOverThisControl(PointerRoutedEventArgs e)
-#endif
-        {
-            Size actualSize = this.INTERNAL_GetActualWidthAndHeight();
-            var actualWidth = actualSize.Width;
-            var actualHeight = actualSize.Height;
-            if (!double.IsNaN(actualWidth) && !double.IsNaN(actualHeight))
-            {
-#if MIGRATION
-                var position = e.GetPosition(this);
-#else
-                var position = e.GetCurrentPoint(this).Position;
-#endif
-                return (position.X > 0 && position.Y > 0 && position.X < actualWidth && position.Y < actualHeight);
-            }
-            else
-                return false;
-        }
-
         #endregion
 
         /// <summary>
@@ -250,9 +231,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the IsPressed dependency property.
         /// </summary>
         public static readonly DependencyProperty IsPressedProperty =
-            DependencyProperty.Register("IsPressed", typeof(bool), typeof(ButtonBase), new PropertyMetadata(false));
-
-
+            DependencyProperty.Register("IsPressed", typeof(bool), typeof(ButtonBase), new PropertyMetadata(new PropertyChangedCallback(OnIsPressedPropertyChanged)));
 
         /// <summary>
         /// Gets or sets when the Click event occurs. The default value is ClickMode.Release.
@@ -374,12 +353,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
 #endif
 
-#if WORKINPROGRESS
-
         /// <summary>
         /// Identifies the <see cref="ButtonBase.IsFocused"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty IsFocusedProperty =
             DependencyProperty.Register("IsFocused",
                                         typeof(bool),
@@ -387,33 +363,75 @@ namespace Windows.UI.Xaml.Controls.Primitives
                                         new PropertyMetadata(false));
 
         /// <summary>
-        /// Identifies the <see cref="ButtonBase.IsMouseOver"/> dependency property.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty IsMouseOverProperty =
-            DependencyProperty.Register("IsMouseOver",
-                                        typeof(bool),
-                                        typeof(ButtonBase),
-                                        new PropertyMetadata(false));
-
-        /// <summary>
         /// Gets a value that determines whether the button has focus.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public bool IsFocused
         {
-            get { return (bool)GetValue(IsFocusedProperty); }
+            get => (bool)GetValue(IsFocusedProperty);
+            private set => SetValue(IsFocusedProperty, value);
         }
+
+
+        /// <summary>
+        /// Identifies the <see cref="ButtonBase.IsMouseOver"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsMouseOverProperty =
+            DependencyProperty.Register("IsMouseOver",
+                typeof(bool),
+                typeof(ButtonBase),
+                new PropertyMetadata(false));
 
         /// <summary>
         /// Gets a value indicating whether the mouse pointer is located over this button control.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public bool IsMouseOver
         {
-            get { return (bool)GetValue(IsMouseOverProperty); }
+            get => (bool)GetValue(IsMouseOverProperty);
+            private set => SetValue(IsMouseOverProperty, value);
         }
 
+        /// <inheritdoc />
+        protected override void OnMouseEnter(MouseEventArgs e)
+        {
+            base.OnMouseEnter(e);
+            this.IsMouseOver = true;
+
+            if (this.ClickMode != ClickMode.Hover || !this.IsEnabled) return;
+
+            this.IsPressed = true;
+            this.OnClick();
+        }
+
+        /// <inheritdoc />
+        protected internal override void OnMouseLeave(MouseEventArgs e)
+        {
+            base.OnMouseLeave(e);
+            this.IsMouseOver = false;
+
+            if (this.ClickMode != ClickMode.Hover || !this.IsEnabled) return;
+
+            this.IsPressed = false;
+        }
+
+        /// <inheritdoc />
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            base.OnGotFocus(e);
+            this.IsFocused = true;
+        }
+
+        /// <inheritdoc />
+        protected override void OnLostFocus(RoutedEventArgs e)
+        {
+            base.OnLostFocus(e);
+            this.IsFocused = false;
+
+            if (this.ClickMode == ClickMode.Hover) return;
+
+            this.IsPressed = false;
+        }
+
+#if WORKINPROGRESS
 #if MIGRATION
         /// <summary>
         /// Called when the value of the <see cref="ButtonBase.IsPressed"/> property changes.
@@ -422,10 +440,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         [OpenSilver.NotImplemented]
         protected virtual void OnIsPressedChanged(DependencyPropertyChangedEventArgs e)
         {
-
+            
         }
 #endif
-
 #endif
     }
 }
