@@ -6,8 +6,6 @@ OpenSilver is an open source project and we love to receive contributions from o
 
 Any contribution is welcome, being it a big one or a small one, including fixing spelling/grammar errors, correcting typos, cleaning up the code, etc.
 
-We usually merge Pull Requests within 48 hours.
-
 ## How to make a pull request
 
 1. Fork the repository
