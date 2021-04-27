@@ -1,0 +1,33 @@
+﻿<navigation:Page x:Class="TestApplication.Tests.DataGrids.DataGrid1Test" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           xmlns:sdk = "http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+           mc:Ignorable="d"
+           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+    <StackPanel Orientation="Vertical">
+        <!--<sdk:DataGrid x:Name="DataGrid1" Width="150"/>
+        <Button Content="Items.Add" Click="ButtonTestDataGrid_ItemsAdd_Click"/>
+        <Button Content="Items.Add String" Click="ButtonTestDataGrid_ItemsAddString_Click"/>
+        <Button Content="Items.Clear" Click="ButtonTestDataGrid_ItemsClear_Click"/>
+        <Button Content="Items.Remove First" Click="ButtonTestDataGrid_ItemsRemoveFirst_Click"/>
+        <Button Content="Set new ItemsSource" Click="ButtonTestDataGrid_SetNewItemsSource_Click"/>
+        <Button Content="ItemsSource.Add" Click="ButtonTestDataGrid_ItemsSourceAdd_Click"/>
+        <Button Content="ItemsSource.Clear" Click="ButtonTestDataGrid_ItemsSourceClear_Click"/>
+        <Button Content="ItemsSource.Remove first" Click="ButtonTestDataGrid_ItemsSourceRemove_Click"/>
+        <Button Content="Set ItemsSource to null" Click="ButtonTestDataGrid_SetItemsSourceToNull_Click"/>
+        <Button Content="Select second item" Click="ButtonTestDataGrid_SelectSecondItem_Click"/>
+        <Button Content="Select second index" Click="ButtonTestDataGrid_SelectSecondIndex_Click"/>
+        <Button Content="SelectedItem=null" Click="ButtonTestDataGrid_SelectItemNull_Click"/>
+        <Button Content="SelectedIndex=-1" Click="ButtonTestDataGrid_SelectedIndexMinusOne_Click"/>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="SelectedIndex:"/>
+            <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=DataGrid1, Path=SelectedIndex}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="SelectedItem:"/>
+            <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=DataGrid1, Path=SelectedItem}"/>
+        </StackPanel>-->
+    </StackPanel>
+</navigation:Page>

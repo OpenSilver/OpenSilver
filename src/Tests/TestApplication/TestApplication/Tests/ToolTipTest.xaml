@@ -1,0 +1,41 @@
+﻿<navigation:Page x:Class="TestApplication.Tests.ToolTipTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+    <StackPanel Orientation="Vertical">
+        <Button Content="Button with text ToolTip inline" HorizontalAlignment="Center" 
+                    ToolTipService.ToolTip="This is the ToolTip" />
+        <Button Content="Button with image ToolTip as direct child" HorizontalAlignment="Center" >
+            <ToolTipService.ToolTip>
+                <Image Source="/Images/Logo1.png" Width="100" Height="100" Stretch="Fill"/>
+            </ToolTipService.ToolTip>
+        </Button>
+        <Button Content="Button with image ToolTip normal" HorizontalAlignment="Center" >
+            <ToolTipService.ToolTip>
+                <ToolTip>
+                    <Image Source="/Images/Logo1.png" Width="100" Height="100" Stretch="Fill"/>
+                </ToolTip>
+            </ToolTipService.ToolTip>
+        </Button>
+        <!--<ListBox Width="100">
+                <ListBoxItem Content="Left" 
+                    ToolTipService.ToolTip="ToolTip to the left." 
+                    ToolTipService.Placement="Left" />
+                <ListBoxItem Content="Right" 
+                    ToolTipService.ToolTip="ToolTip to the right." 
+                    ToolTipService.Placement="Right" />
+                <ListBoxItem Content="Top" 
+                    ToolTipService.ToolTip="ToolTip at the top." 
+                    ToolTipService.Placement="Top" />
+                <ListBoxItem Content="Bottom" 
+                    ToolTipService.ToolTip="ToolTip at the bottom." 
+                    ToolTipService.Placement="Bottom" />
+                <ListBoxItem Content="Mouse" 
+                    ToolTipService.ToolTip="ToolTip based on the cursor position." 
+                    ToolTipService.Placement="Mouse" />
+            </ListBox>-->
+    </StackPanel>
+</navigation:Page>

@@ -1,0 +1,21 @@
+﻿<navigation:Page x:Class="TestApplication.Tests.RadioButtonTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+    <StackPanel Orientation="Vertical">
+        <TextBlock FontSize="14" TextWrapping="Wrap" Text="The red RadioButtons belong to the group &quot;Group1&quot; while the blue ones do not belong to any group."/>
+
+        <StackPanel Background="LightGray">
+            <RadioButton GroupName="Group1" Content="Peanuts" Foreground="Red"/>
+            <RadioButton Content="Yay!" Foreground="Blue"/>
+            <RadioButton Content="Meh" Foreground="Blue"/>
+        </StackPanel>
+        <RadioButton GroupName="Group1" Content="3Ds" Foreground="Red"/>
+        <RadioButton GroupName="Group1" Content="Tuc" Foreground="Red"/>
+        <RadioButton Content="Skittles" Foreground="Blue"/>
+        <RadioButton Content="m&amp;m's" Foreground="Blue"/>
+    </StackPanel>
+</navigation:Page>

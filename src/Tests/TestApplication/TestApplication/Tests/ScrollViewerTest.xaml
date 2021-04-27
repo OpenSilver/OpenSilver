@@ -1,0 +1,43 @@
+﻿<navigation:Page x:Class="TestApplication.Tests.ScrollViewerTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+    <StackPanel Orientation="Vertical">
+        <TextBlock TextWrapping="Wrap" Margin="30,0,0,0" Text="The ellipse is smaller so it should be centered:"/>
+        <Border BorderThickness="2" BorderBrush="Black" Width="100" Height="100">
+            <ScrollViewer Background="Yellow" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Ellipse Width="50" Height="50" Fill="Red"/>
+            </ScrollViewer>
+        </Border>
+        <TextBlock TextWrapping="Wrap" Margin="30,0,0,0" Text="The ellipse is bigger and the ScrollViewer has a fixed size:"/>
+        <Border BorderThickness="2" BorderBrush="Black" Width="100" Height="100">
+            <ScrollViewer Background="Yellow" Width="100" Height="100" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Ellipse Width="120" Height="120" Fill="Red"/>
+            </ScrollViewer>
+        </Border>
+        <TextBlock TextWrapping="Wrap" Margin="30,0,0,0" Text="The ellipse is bigger and the the ScrollViewer does not have a fixed size but its Border container does:"/>
+        <Border BorderThickness="2" BorderBrush="Black" Width="100" Height="100">
+            <ScrollViewer Background="Yellow" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Ellipse Width="120" Height="120" Fill="Red"/>
+            </ScrollViewer>
+        </Border>
+        <TextBlock TextWrapping="Wrap" Margin="30,0,0,0" Text="The ellipse is bigger and the ScrollViewer does not have a fixed size but the outer container does. The Grid contains 2 rows: one star for the ScrollViewer, and one Auto for the footer:"/>
+        <Border BorderThickness="2" BorderBrush="Black" Width="100" Height="100">
+            <Grid Background="Pink">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <ScrollViewer Grid.Row="0" Background="Yellow" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <Ellipse Width="120" Height="120" Fill="Red"/>
+                </ScrollViewer>
+                <Border Grid.Row="1" Height="30" Background="Cyan" Opacity="0.5">
+                    <TextBlock Text="Footer"/>
+                </Border>
+            </Grid>
+        </Border>
+    </StackPanel>
+</navigation:Page>

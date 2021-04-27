@@ -1,0 +1,34 @@
+﻿<navigation:Page x:Class="TestApplication.Tests.DataGrids.DataGridColumn_VisibilityTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+    <StackPanel Orientation="Vertical">
+        <!--SLDISABLED-->
+        <!--<StackPanel Orientation="Horizontal">
+                <Button Content="Test" Click="ButtonTestDataGridColumnVisibility_Click" BorderBrush="Gray" BorderThickness="1" HorizontalAlignment="Left" Margin="2"/>
+            </StackPanel>
+            <Border Background="LightGray" BorderBrush="Gray" BorderThickness="2" Margin="10" Padding="5">
+                <StackPanel Orientation="Vertical">
+                    <Border Background="White" BorderBrush="Black" BorderThickness="2" Padding="5" Margin="2">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="DataGrid:" TextWrapping="Wrap"/>
+                            <DataGrid x:Name="DataGridForColumnVisibility" AutoGenerateColumns="False">
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Foreground" Value="Orange"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Name" x:Name="NameDataGridColumn" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="Age" x:Name="AgeDataGridColumn" Binding="{Binding Age}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>-->
+    </StackPanel>
+</navigation:Page>

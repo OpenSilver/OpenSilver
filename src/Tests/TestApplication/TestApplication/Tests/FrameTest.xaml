@@ -1,0 +1,124 @@
+﻿<navigation:Page x:Class="TestApplication.Tests.FrameTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           xmlns:sdk = "http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+           mc:Ignorable="d"
+           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+    <StackPanel Orientation="Vertical">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border BorderBrush="DarkGray" BorderThickness="2" Padding="3">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="JournalOwnership = UsesParentJournal" Foreground="Black" FontSize="14"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Background="#DDDDDD" Click="Frame1_GoBack_Clicked" Margin="0,0,1,0" Content="&lt;--"/>
+                        <Button Background="#DDDDDD" Click="Frame1_p1_Clicked" Margin="0,0,1,0" Content="p1"/>
+                        <Button Background="#DDDDDD" Click="Frame1_p2_Clicked" Margin="0,0,1,0" Content="p2"/>
+                        <Button Background="#DDDDDD" Click="Frame1_GoForward_Clicked" Content="--&gt;"/>
+                    </StackPanel>
+                    <sdk:Frame x:Name="MyFrame" JournalOwnership="UsesParentJournal">
+                        <sdk:Frame.Template>
+                            <ControlTemplate>
+                                <Border>
+                                    <StackPanel Orientation="Vertical">
+                                        <ContentPresenter/>
+                                        <TextBlock Text="InnerFrame.JournalOwnership = Automatic" Foreground="Black" FontSize="14"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button DataContext="{Binding ElementName=MyInnerFrame}" Background="#DDDDDD" Click="InnerFrame_GoBack_Clicked" Margin="0,0,1,0" Content="&lt;--"/>
+                                            <Button DataContext="{Binding ElementName=MyInnerFrame}" Background="#DDDDDD" Click="InnerFrame_p1_Clicked" Margin="0,0,1,0" Content="p1"/>
+                                            <Button DataContext="{Binding ElementName=MyInnerFrame}" Background="#DDDDDD" Click="InnerFrame_p2_Clicked" Margin="0,0,1,0" Content="p2"/>
+                                            <Button DataContext="{Binding ElementName=MyInnerFrame}" Background="#DDDDDD" Click="InnerFrame_GoForward_Clicked" Content="--&gt;"/>
+                                        </StackPanel>
+                                        <sdk:Frame x:Name="MyInnerFrame" JournalOwnership="Automatic">
+                                            <sdk:Frame.Template>
+                                                <ControlTemplate>
+                                                    <Border>
+                                                        <ContentPresenter/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </sdk:Frame.Template>
+                                            <sdk:Frame.UriMapper>
+                                                <sdk:UriMapper>
+                                                    <sdk:UriMapping
+                            Uri="/{pageName}"
+                            MappedUri="/FrameSubPages/{pageName}.xaml"/>
+                                                </sdk:UriMapper>
+                                            </sdk:Frame.UriMapper>
+                                        </sdk:Frame>
+                                    </StackPanel>
+                                </Border>
+                            </ControlTemplate>
+                        </sdk:Frame.Template>
+                        <sdk:Frame.UriMapper>
+                            <sdk:UriMapper>
+                                <sdk:UriMapping
+                            Uri="/{pageName}"
+                            MappedUri="/FrameSubPages/{pageName}.xaml"/>
+                            </sdk:UriMapper>
+                        </sdk:Frame.UriMapper>
+                    </sdk:Frame>
+                </StackPanel>
+            </Border>
+            <Border BorderBrush="DarkGray" BorderThickness="2" Padding="3" Grid.Column="1">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="JournalOwnership = OwnsJournal" Foreground="Black" FontSize="14"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Background="#DDDDDD" Click="Frame2_GoBack_Clicked" Margin="0,0,1,0" Content="&lt;--"/>
+                        <Button Background="#DDDDDD" Click="Frame2_p1_Clicked" Margin="0,0,1,0" Content="p1"/>
+                        <Button Background="#DDDDDD" Click="Frame2_p2_Clicked" Margin="0,0,1,0" Content="p2"/>
+                        <Button Background="#DDDDDD" Click="Frame2_GoForward_Clicked" Content="--&gt;"/>
+                    </StackPanel>
+                    <sdk:Frame x:Name="MyFrame2" JournalOwnership="OwnsJournal">
+                        <sdk:Frame.Template>
+                            <ControlTemplate>
+                                <Border>
+                                    <ContentPresenter/>
+                                </Border>
+                            </ControlTemplate>
+                        </sdk:Frame.Template>
+                        <sdk:Frame.UriMapper>
+                            <sdk:UriMapper>
+                                <sdk:UriMapping
+                            Uri="/{pageName}"
+                            MappedUri="/FrameSubPages/{pageName}.xaml"/>
+                            </sdk:UriMapper>
+                        </sdk:Frame.UriMapper>
+                    </sdk:Frame>
+                </StackPanel>
+            </Border>
+            <Border BorderBrush="DarkGray" BorderThickness="2" Padding="3" Grid.Column="2">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="JournalOwnership = Automatic" Foreground="Black" FontSize="14"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Background="#DDDDDD" Click="Frame3_GoBack_Clicked" Margin="0,0,1,0" Content="&lt;--"/>
+                        <Button Background="#DDDDDD" Click="Frame3_p1_Clicked" Margin="0,0,1,0" Content="p1"/>
+                        <Button Background="#DDDDDD" Click="Frame3_p2_Clicked" Margin="0,0,1,0" Content="p2"/>
+                        <Button Background="#DDDDDD" Click="Frame3_GoForward_Clicked" Content="--&gt;"/>
+                    </StackPanel>
+                    <sdk:Frame x:Name="MyFrame3" JournalOwnership="Automatic">
+                        <sdk:Frame.Template>
+                            <ControlTemplate>
+                                <Border>
+                                    <ContentPresenter/>
+                                </Border>
+                            </ControlTemplate>
+                        </sdk:Frame.Template>
+                        <sdk:Frame.UriMapper>
+                            <sdk:UriMapper>
+                                <sdk:UriMapping
+                            Uri="/{pageName}"
+                            MappedUri="/FrameSubPages/{pageName}.xaml"/>
+                            </sdk:UriMapper>
+                        </sdk:Frame.UriMapper>
+                    </sdk:Frame>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </StackPanel>
+</navigation:Page>

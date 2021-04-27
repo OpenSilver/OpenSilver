@@ -1,0 +1,21 @@
+﻿<navigation:Page x:Class="TestApplication.Tests.MouseMove_MouseCaptureTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+    <StackPanel Orientation="Vertical">
+        <TextBlock Text="Clicking then dragging the yellow border makes it move."
+                       TextWrapping="Wrap" FontSize="14"/>
+        <TextBlock Text="The Background Border changes color when the pointer moves on it."
+                       TextWrapping="Wrap" FontSize="14"/>
+        <TextBlock Text="Dragging the yellow Border also changes the Background Boder's color because it is a parent of the yellow one."
+                       TextWrapping="Wrap" FontSize="14"/>
+        <Border Background="Red" Width="200" Height="200" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" MouseMove="ContainerBorderForPointerEvents_PointerMoved">
+            <Border Background="Yellow" Width="50" Height="50" HorizontalAlignment="Left" VerticalAlignment="Top" MouseLeftButtonDown="InnerBorderForPointerEvents_PointerPressed_1" MouseLeftButtonUp="InnerBorderForPointerEvents_PointerReleased_1" MouseMove="InnerBorderForPointerEvents_PointerMoved">
+                <TextBlock x:Name="PointerCaptureTextBlock" FontSize="11" TextWrapping="Wrap"/>
+            </Border>
+        </Border>
+    </StackPanel>
+</navigation:Page>

@@ -1,0 +1,42 @@
+﻿<navigation:Page x:Class="TestApplication.Tests.StackPanels.HorizontalTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal" Background="#DDDDDD">
+            <Border Background="#FFFFFFAA" Height="100" VerticalAlignment="Stretch" Margin="2">
+                <TextBlock Text="Longest"/>
+            </Border>
+            <Border Background="#FFAAFFAA" VerticalAlignment="Center" Margin="2">
+                <TextBlock Text="Vert.Centered 1"/>
+            </Border>
+            <Border Background="#FFFFAAAA" VerticalAlignment="Top" Margin="2">
+                <TextBlock Text="Top 1"/>
+            </Border>
+            <Border Background="#FFFFAAFF" VerticalAlignment="Bottom" Margin="2">
+                <TextBlock Text="Bottom 1"/>
+            </Border>
+            <Border Background="#FFAAFFFF" VerticalAlignment="Stretch" Margin="2">
+                <TextBlock Text="Stretch 1"/>
+            </Border>
+            <Border Background="#FFFFAAAA" VerticalAlignment="Top" Margin="2">
+                <TextBlock Text="Top 2"/>
+            </Border>
+            <Border Background="#FFAAFFFF" VerticalAlignment="Stretch" Margin="2">
+                <TextBlock Text="Stretch 2"/>
+            </Border>
+            <Border Background="#FFAAFFFF" VerticalAlignment="Stretch" Margin="2">
+                <TextBlock Text="Stretch 3"/>
+            </Border>
+            <Border Background="#FFFFAAFF" VerticalAlignment="Bottom" Margin="2">
+                <TextBlock Text="Bottom 2"/>
+            </Border>
+            <Border Background="#FFAAFFAA" VerticalAlignment="Center" Margin="2">
+                <TextBlock Text="Vert.Centered 2"/>
+            </Border>
+        </StackPanel>
+    </StackPanel>
+</navigation:Page>

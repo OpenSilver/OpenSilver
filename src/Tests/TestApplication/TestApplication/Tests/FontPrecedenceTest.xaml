@@ -1,0 +1,23 @@
+﻿<navigation:Page x:Class="TestApplication.Tests.FontPrecedenceTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+    <StackPanel Orientation="Vertical">
+        <StackPanel>
+            <TextBlock Text="Hello World! (default)" FontSize="40"/>
+            <TextBlock Text="Hello World! (Segoe UI)" FontFamily="Segoe UI" FontSize="40"/>
+            <TextBlock Text="Hello World! (DejaVu Sans)" FontFamily="DejaVu Sans" FontSize="40"/>
+            <TextBlock Text="Hello World! (Verdana)" FontFamily="Verdana"  FontSize="37"/>
+            <TextBlock Text="Hello World! (Lucida)" FontFamily="Lucida"  FontSize="41"/>
+            <TextBlock Text="Hello World! (MS Sans Serif)" FontFamily="MS Sans Serif"  FontSize="41"/>
+            <TextBlock Text="Hello World! (sans-serif)" FontFamily="sans-serif"  FontSize="41"/>
+            <TextBlock Text="EXCLUDED:" FontFamily="Lucida Grande" FontSize="14" FontWeight="Bold"/>
+            <TextBlock Text="Hello World! (Lucida Grande)" FontFamily="Lucida Grande"/>
+            <TextBlock Text="Hello World! (Helvetica)" FontFamily="Helvetica"/>
+            <TextBlock Text="Hello World! (Helvetica Neue)" FontFamily="Helvetica Neue"/>
+        </StackPanel>
+    </StackPanel>
+</navigation:Page>

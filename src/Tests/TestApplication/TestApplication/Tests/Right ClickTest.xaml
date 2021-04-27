@@ -1,0 +1,13 @@
+﻿<navigation:Page x:Class="TestApplication.Tests.Right_ClickTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation">
+    <StackPanel Orientation="Vertical">
+        <Border CornerRadius="5" Background="LightGray" Padding="10" HorizontalAlignment="Center" MouseRightButtonUp="BorderToTestRightClick_RightTapped">
+            <TextBlock Text="Right-click to display msg box."/>
+        </Border>
+    </StackPanel>
+</navigation:Page>
