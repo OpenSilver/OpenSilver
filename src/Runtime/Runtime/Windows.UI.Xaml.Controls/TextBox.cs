@@ -194,8 +194,13 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
         /// <summary>
         /// Identifies the Text dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty TextProperty =
+            DependencyProperty.Register("Text", typeof(string), typeof(TextBox), new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, Text_Changed, CoerceText) { MethodToUpdateDom = UpdateDomText });
+#else
         public static readonly DependencyProperty TextProperty =
             DependencyProperty.Register("Text", typeof(string), typeof(TextBox), new PropertyMetadata(string.Empty, Text_Changed, CoerceText) { MethodToUpdateDom = UpdateDomText });
+#endif
         static void Text_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var textBox = (TextBox)d;
@@ -217,7 +222,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             var textBox = (TextBox)d;
 #if WORKINPROGRESS
             if (textBox.INTERNAL_OuterDomElement != null &&
-                ((INTERNAL_HtmlDomElementReference)textBox.INTERNAL_OuterDomElement).UniqueIdentifier == Application.Current.TextMeasurementService.GetTextMeasureDivID())
+                Application.Current.TextMeasurementService.IsTextMeasureDivID(((INTERNAL_HtmlDomElementReference)textBox.INTERNAL_OuterDomElement).UniqueIdentifier))
             {
                 string text = textBox.Text ?? string.Empty;
                 if (textBox._contentEditableDiv != null || textBox.Template == null)
@@ -1319,9 +1324,15 @@ return globalIndexes;
         /// <summary>
         /// Identifies the TextWrapping dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty TextWrappingProperty =
+            DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBox), new FrameworkPropertyMetadata(
+                TextWrapping.Wrap, FrameworkPropertyMetadataOptions.AffectsMeasure) // Note: we have made "Wrap" the default value because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
+#else
         public static readonly DependencyProperty TextWrappingProperty =
             DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBox), new PropertyMetadata(
                 TextWrapping.Wrap) // Note: we have made "Wrap" the default value because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
+#endif
             {
                 MethodToUpdateDom = TextWrapping_MethodToUpdateDom
             });
@@ -1764,8 +1775,8 @@ element.setAttribute(""data-isreadonly"",""{1}"");
             {
                 return noWrapSize;
             }*/
-            
-            return Application.Current.TextMeasurementService.Measure(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, Padding, availableSize.Width);
+
+            return Application.Current.TextMeasurementService.Measure(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, TextWrapping, Padding, availableSize.Width);
         }
 #endif
 

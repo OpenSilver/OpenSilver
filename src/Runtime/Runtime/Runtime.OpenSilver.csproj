@@ -284,6 +284,7 @@
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextMeasurementService.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\LineStackingStrategy.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\RoutedEventArgs.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FrameworkPropertyMetadata.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\UIElement.cs" />
 		<Compile Include="Windows.UI\WORKINPROGRESS\Color.cs" />
 		<Compile Include="Empty Namespaces\WORKINPROGRESS\SystemXaml.cs" />

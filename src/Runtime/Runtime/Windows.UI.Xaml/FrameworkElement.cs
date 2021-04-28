@@ -606,14 +606,38 @@ namespace Windows.UI.Xaml
 
         public override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
-            base.OnPropertyChanged(e);
-            
             // Skip when loading or changed on TextMeasurement Div.
-            if (this.INTERNAL_OuterDomElement == null || ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier == Application.Current.TextMeasurementService.GetTextMeasureDivID())
+            if (this.INTERNAL_OuterDomElement == null || Application.Current.TextMeasurementService.IsTextMeasureDivID(((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier))
                 return;
 
-            //Console.WriteLine($"FrameworkElement OnPropertyChanged {e.Property.Name} {e.OldValue}=>{e.NewValue}");
-            // TODO Invalidate
+            FrameworkPropertyMetadata metadata = e.Property.GetMetadata(GetType()) as FrameworkPropertyMetadata;
+            
+            if (metadata != null)
+            {
+                if (metadata.AffectsMeasure)
+                {
+                    Console.WriteLine($"AffectsMeasure {this} {e.Property}");
+                    InvalidateMeasure();
+                }
+
+                if (metadata.AffectsArrange)
+                {
+                    Console.WriteLine($"AffectsArrange {this} {e.Property}");
+                    InvalidateArrange();
+                }
+
+                if (metadata.AffectsRender)
+                {
+                    Console.WriteLine($"AffectsRender {this} {e.Property}");
+                    //InvalidateVisual();
+                }
+
+                if (metadata.AffectsParentMeasure)
+                {
+                    Console.WriteLine($"AffectsParentMeasure {this} {e.Property}");
+                    InvalidateParentMeasure();
+                }
+            }
         }
         protected sealed override void ArrangeCore(Rect finalRect)
         {
@@ -721,7 +745,7 @@ namespace Windows.UI.Xaml
 
         protected sealed override Size MeasureCore(Size availableSize)
         {
-            INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
+            //INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
             //Console.WriteLine();
             //Console.WriteLine($"MeasureOverride {this} availableSize {availableSize.Width}, {availableSize.Height} (MeasureCore)");
             //Console.WriteLine($"MeasureOverride {domElementReference.UniqueIdentifier} Margin left {Margin.Left}, top {Margin.Top}, right {Margin.Right}, bottom {Margin.Bottom} (MeasureCore)");
@@ -772,9 +796,17 @@ namespace Windows.UI.Xaml
 
             if (childElements.Count() == 0)
             {
-                return new Size(ActualWidth, ActualHeight);
+                if (Double.IsNaN(Width))
+                    Console.WriteLine($"FrameworkElement MeasureOverride {domElementReference.UniqueIdentifier} {this} get ActualWidth");
+                if (Double.IsNaN(Height))
+                    Console.WriteLine($"FrameworkElement MeasureOverride {domElementReference.UniqueIdentifier} {this} get ActualHeight");
+
+                Size size = new Size(Double.IsNaN(Width) ? ActualWidth : Width, Double.IsNaN(Height) ? ActualHeight : Height);
+                return size;
             }
 
+
+            //Console.WriteLine($"FrameworkElement MeasureOverride {this}");
             Size extent = new Size(0.0, 0.0);
             
             foreach (DependencyObject child in childElements)
@@ -842,11 +874,19 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Identifies the Style dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty StyleProperty =
+            DependencyProperty.Register("Style", 
+                                        typeof(Style), 
+                                        typeof(FrameworkElement), 
+                                        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnStyleChanged));
+#else
         public static readonly DependencyProperty StyleProperty =
             DependencyProperty.Register("Style", 
                                         typeof(Style), 
                                         typeof(FrameworkElement), 
                                         new PropertyMetadata(null, OnStyleChanged));
+#endif
 
         private static void OnStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

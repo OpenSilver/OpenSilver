@@ -91,8 +91,11 @@ namespace Windows.UI.Xaml.Controls
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.RowStyle" /> dependency property.
         /// </returns>
         [OpenSilver.NotImplemented]
+#if WORKINPROGRESS
+        public static readonly DependencyProperty RowStyleProperty = DependencyProperty.Register(nameof(RowStyle), typeof(Style), typeof(DataGrid), new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure, new PropertyChangedCallback(DataGrid.OnRowStylePropertyChanged)));
+#else
         public static readonly DependencyProperty RowStyleProperty = DependencyProperty.Register(nameof(RowStyle), typeof(Style), typeof(DataGrid), new PropertyMetadata(new PropertyChangedCallback(DataGrid.OnRowStylePropertyChanged)));
-
+#endif
         /// <summary>
         /// Gets or sets the style that is used when rendering the rows.
         /// </summary>
@@ -120,7 +123,11 @@ namespace Windows.UI.Xaml.Controls
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.GridLinesVisibility" /> dependency property.
         /// </returns>
         [OpenSilver.NotImplemented]
+#if WORKINPROGRESS
+        public static readonly DependencyProperty GridLinesVisibilityProperty = DependencyProperty.Register(nameof(GridLinesVisibility), typeof(DataGridGridLinesVisibility), typeof(DataGrid), new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure, new PropertyChangedCallback(DataGrid.OnGridLinesVisibilityPropertyChanged)));
+#else
         public static readonly DependencyProperty GridLinesVisibilityProperty = DependencyProperty.Register(nameof(GridLinesVisibility), typeof(DataGridGridLinesVisibility), typeof(DataGrid), new PropertyMetadata(new PropertyChangedCallback(DataGrid.OnGridLinesVisibilityPropertyChanged)));
+#endif
 
         /// <summary>
         /// Gets or sets a value that indicates which grid lines separating inner cells are shown.
@@ -149,7 +156,11 @@ namespace Windows.UI.Xaml.Controls
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.RowDetailsVisibilityMode" /> dependency property.
         /// </returns>
         [OpenSilver.NotImplemented]
+#if WORKINPROGRESS
+        public static readonly DependencyProperty RowDetailsVisibilityModeProperty = DependencyProperty.Register(nameof(RowDetailsVisibilityMode), typeof(DataGridRowDetailsVisibilityMode), typeof(DataGrid), new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure, OnRowDetailsVisibilityModePropertyChanged));
+#else
         public static readonly DependencyProperty RowDetailsVisibilityModeProperty = DependencyProperty.Register(nameof(RowDetailsVisibilityMode), typeof(DataGridRowDetailsVisibilityMode), typeof(DataGrid), new PropertyMetadata(OnRowDetailsVisibilityModePropertyChanged));
+#endif
 
         /// <summary>
         /// Gets or sets a value that indicates when the details sections of rows are displayed.
@@ -258,7 +269,11 @@ namespace Windows.UI.Xaml.Controls
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.HeadersVisibility" /> dependency property.
         /// </returns>
         [OpenSilver.NotImplemented]
+#if WORKINPROGRESS
+        public static readonly DependencyProperty HeadersVisibilityProperty = DependencyProperty.Register(nameof(HeadersVisibility), typeof(DataGridHeadersVisibility), typeof(DataGrid), new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsParentMeasure, new PropertyChangedCallback(DataGrid.OnHeadersVisibilityPropertyChanged)));
+#else
         public static readonly DependencyProperty HeadersVisibilityProperty = DependencyProperty.Register(nameof(HeadersVisibility), typeof(DataGridHeadersVisibility), typeof(DataGrid), new PropertyMetadata(new PropertyChangedCallback(DataGrid.OnHeadersVisibilityPropertyChanged)));
+#endif
 
         /// <summary>
         /// Gets or sets a value that indicates the visibility of row and column headers.
@@ -344,7 +359,11 @@ namespace Windows.UI.Xaml.Controls
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.ColumnWidth" /> dependency property.
         /// </returns>
         [OpenSilver.NotImplemented]
+#if WORKINPROGRESS
+        public static readonly DependencyProperty ColumnWidthProperty = DependencyProperty.Register(nameof(ColumnWidth), typeof(DataGridLength), typeof(DataGrid), new FrameworkPropertyMetadata((object)DataGridLength.Auto, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, DataGrid.OnColumnWidthPropertyChanged));
+#else
         public static readonly DependencyProperty ColumnWidthProperty = DependencyProperty.Register(nameof(ColumnWidth), typeof(DataGridLength), typeof(DataGrid), new PropertyMetadata((object)DataGridLength.Auto, DataGrid.OnColumnWidthPropertyChanged));
+#endif
 
         /// <summary>
         /// Gets or sets the standard width or automatic sizing mode of columns in the control.
@@ -403,7 +422,11 @@ namespace Windows.UI.Xaml.Controls
         /// The identifier for the <see cref="P:System.Windows.Controls.DataGrid.MinColumnWidth" /> dependency property.
         /// </returns>
         [OpenSilver.NotImplemented]
+#if WORKINPROGRESS
+        public static readonly DependencyProperty MinColumnWidthProperty = DependencyProperty.Register(nameof(MinColumnWidth), typeof(double), typeof(DataGrid), new FrameworkPropertyMetadata((object)20.0, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, new PropertyChangedCallback(DataGrid.OnMinColumnWidthPropertyChanged)));
+#else
         public static readonly DependencyProperty MinColumnWidthProperty = DependencyProperty.Register(nameof(MinColumnWidth), typeof(double), typeof(DataGrid), new PropertyMetadata((object)20.0, new PropertyChangedCallback(DataGrid.OnMinColumnWidthPropertyChanged)));
+#endif
 
         /// <summary>
         /// Gets or sets the minimum width of columns in the <see cref="T:System.Windows.Controls.DataGrid" />.
@@ -442,7 +465,11 @@ namespace Windows.UI.Xaml.Controls
         ///     The DependencyProperty for RowHeight.
         /// </summary>
         [OpenSilver.NotImplemented]
+#if WORKINPROGRESS
+        public static readonly DependencyProperty RowHeightProperty = DependencyProperty.Register(nameof(RowHeight), typeof(double), typeof(DataGrid), new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, new PropertyChangedCallback(DataGrid.OnNotifyCellsPresenterPropertyChanged)));
+#else
         public static readonly DependencyProperty RowHeightProperty = DependencyProperty.Register(nameof(RowHeight), typeof(double), typeof(DataGrid), new PropertyMetadata(double.NaN, new PropertyChangedCallback(DataGrid.OnNotifyCellsPresenterPropertyChanged)));
+#endif
 
         /// <summary>
         ///     The default minimum height of a row.
@@ -458,7 +485,11 @@ namespace Windows.UI.Xaml.Controls
         ///     The DependencyProperty for MinRowHeight.
         /// </summary>
         [OpenSilver.NotImplemented]
+#if WORKINPROGRESS
+        public static readonly DependencyProperty MinRowHeightProperty = DependencyProperty.Register(nameof(MinRowHeight), typeof(double), typeof(DataGrid), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, new PropertyChangedCallback(DataGrid.OnNotifyCellsPresenterPropertyChanged)));
+#else
         public static readonly DependencyProperty MinRowHeightProperty = DependencyProperty.Register(nameof(MinRowHeight), typeof(double), typeof(DataGrid), new PropertyMetadata(0.0, new PropertyChangedCallback(DataGrid.OnNotifyCellsPresenterPropertyChanged)));
+#endif
 
         /// <summary>
         ///     Notifies each CellsPresenter about property changes.

@@ -85,8 +85,13 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the System.Windows.Controls.DataGridColumn.HeaderStyle dependency
         /// property.</summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty HeaderStyleProperty =
+            DependencyProperty.Register("HeaderStyle", typeof(Style), typeof(DataGridColumn), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, HeaderStyle_Changed)
+#else
         public static readonly DependencyProperty HeaderStyleProperty =
             DependencyProperty.Register("HeaderStyle", typeof(Style), typeof(DataGridColumn), new PropertyMetadata(null, HeaderStyle_Changed)
+#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void HeaderStyle_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -140,8 +145,13 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.DataGridColumn.CellStyle dependency
         /// property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty CellStyleProperty =
+            DependencyProperty.Register("CellStyle", typeof(Style), typeof(DataGridColumn), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, CellStyle_Changed)
+#else
         public static readonly DependencyProperty CellStyleProperty =
             DependencyProperty.Register("CellStyle", typeof(Style), typeof(DataGridColumn), new PropertyMetadata(null, CellStyle_Changed)
+#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void CellStyle_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -198,8 +208,13 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the System.Windows.Controls.DataGridColumn.Width dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty WidthProperty =
+            DependencyProperty.Register("Width", typeof(DataGridLength), typeof(DataGridColumn), new FrameworkPropertyMetadata(DataGridLength.Auto, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Width_Changed)
+#else
         public static readonly DependencyProperty WidthProperty =
             DependencyProperty.Register("Width", typeof(DataGridLength), typeof(DataGridColumn), new PropertyMetadata(DataGridLength.Auto, Width_Changed)
+#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void Width_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -252,8 +267,13 @@ namespace Windows.UI.Xaml.Controls
         }
 
         // Using a DependencyProperty as the backing store for Visibility.  This enables animation, styling, binding, etc...
+#if WORKINPROGRESS
+        public static readonly DependencyProperty VisibilityProperty =
+            DependencyProperty.Register("Visibility", typeof(Visibility), typeof(DataGridColumn), new FrameworkPropertyMetadata(Visibility.Visible, FrameworkPropertyMetadataOptions.AffectsParentMeasure, Visibility_Changed)
+#else
         public static readonly DependencyProperty VisibilityProperty =
             DependencyProperty.Register("Visibility", typeof(Visibility), typeof(DataGridColumn), new PropertyMetadata(Visibility.Visible, Visibility_Changed)
+#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void Visibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)

@@ -220,8 +220,13 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.DataGrid.ColumnHeaderStyle dependency
         /// property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty ColumnHeaderStyleProperty =
+            DependencyProperty.Register("ColumnHeaderStyle", typeof(Style), typeof(DataGrid), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, ColumnHeaderStyle_Changed)
+#else
         public static readonly DependencyProperty ColumnHeaderStyleProperty =
             DependencyProperty.Register("ColumnHeaderStyle", typeof(Style), typeof(DataGrid), new PropertyMetadata(null, ColumnHeaderStyle_Changed)
+#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void ColumnHeaderStyle_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -245,9 +250,13 @@ namespace Windows.UI.Xaml.Controls
             set { SetValue(ColumnHeaderHeightProperty, value); }
         }
 
+#if WORKINPROGRESS
+        public static readonly DependencyProperty ColumnHeaderHeightProperty =
+        DependencyProperty.Register("ColumnHeaderHeight", typeof(double), typeof(DataGrid), new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
         public static readonly DependencyProperty ColumnHeaderHeightProperty =
             DependencyProperty.Register("ColumnHeaderHeight", typeof(double), typeof(DataGrid), new PropertyMetadata(double.NaN));
-
+#endif
         /// <summary>
         /// Gets or sets the style applied to all cells in the System.Windows.Controls.DataGrid.
         /// </summary>
@@ -303,8 +312,13 @@ namespace Windows.UI.Xaml.Controls
         }
         /// <summary>
         /// Identifies the System.Windows.Controls.DataGrid.Columns dependency property.</summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty ColumnsProperty =
+            DependencyProperty.Register("Columns", typeof(ObservableCollection<DataGridColumn>), typeof(DataGrid), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Columns_Changed)
+#else
         public static readonly DependencyProperty ColumnsProperty =
             DependencyProperty.Register("Columns", typeof(ObservableCollection<DataGridColumn>), typeof(DataGrid), new PropertyMetadata(null, Columns_Changed)
+#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void Columns_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)

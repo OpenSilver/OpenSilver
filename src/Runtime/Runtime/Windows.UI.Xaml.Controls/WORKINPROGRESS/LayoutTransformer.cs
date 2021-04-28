@@ -32,12 +32,19 @@ namespace System.Windows.Controls
         // Summary:
         //     Identifies the LayoutTransform DependencyProperty.
         [OpenSilver.NotImplemented]
+#if WORKINPROGRESS
+        public static readonly DependencyProperty LayoutTransformProperty =
+            DependencyProperty.Register("LayoutTransform",
+                                        typeof(Transform),
+                                        typeof(LayoutTransformer),
+                                        new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
         public static readonly DependencyProperty LayoutTransformProperty =
             DependencyProperty.Register("LayoutTransform",
                                         typeof(Transform),
                                         typeof(LayoutTransformer),
                                         null);
-
+#endif
         //
         // Summary:
         //     Initializes a new instance of the LayoutTransformer class.

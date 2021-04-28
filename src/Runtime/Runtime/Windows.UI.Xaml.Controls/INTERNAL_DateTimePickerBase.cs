@@ -239,12 +239,21 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the dependency property.
         /// </summary>
+#if WORKINPROGRESS
         public static readonly DependencyProperty TextProperty =
             DependencyProperty.Register(
             "Text",
             typeof(string),
             typeof(INTERNAL_DateTimePickerBase),
+            new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextChanged)
+#else
+    public static readonly DependencyProperty TextProperty =
+            DependencyProperty.Register(
+            "Text",
+            typeof(string),
+            typeof(INTERNAL_DateTimePickerBase),
             new PropertyMetadata(string.Empty, OnTextChanged)
+#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
