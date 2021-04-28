@@ -409,8 +409,13 @@ namespace Windows.UI.Xaml
 
         public virtual void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
-            //
-            //Console.WriteLine($"DependencyObject OnPropertyChanged {e.Property.Name} {e.OldValue}=>{e.NewValue}");
+#if WORKINPROGRESS
+            if (this.InheritedParent != null)
+            {
+                this.InheritedParent.OnPropertyChanged(e);
+                return;
+            }
+#endif
         }
 
         internal void SetLocalStyleValue(DependencyProperty dp, object value)

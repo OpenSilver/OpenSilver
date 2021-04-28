@@ -101,7 +101,6 @@ namespace Windows.UI.Xaml.Controls
                         return null;
                     }
                 }
-            }
             );
 #if WORKINPROGRESS
         /// <summary>

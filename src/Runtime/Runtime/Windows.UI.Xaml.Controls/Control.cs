@@ -226,8 +226,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(FontWeight), 
                 typeof(FontWeight), 
-                typeof(Control), 
+                typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
                 new PropertyMetadata(FontWeights.Normal)
+#endif
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
@@ -254,11 +258,18 @@ namespace Windows.UI.Xaml.Controls
                 nameof(FontStyle),
                 typeof(FontStyle),
                 typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(
+#else
                 new PropertyMetadata(
+#endif
 #if MIGRATION
                     FontStyles.Normal
 #else
                     FontStyle.Normal
+#endif
+#if WORKINPROGRESS
+                    , FrameworkPropertyMetadataOptions.AffectsMeasure
 #endif
                     )
                 {
@@ -320,8 +331,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(FontFamily), 
                 typeof(FontFamily), 
-                typeof(Control), 
+                typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
                 new PropertyMetadata((object)null)
+#endif
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
@@ -353,8 +368,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(FontSize), 
                 typeof(double), 
-                typeof(Control), 
+                typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(11d, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
                 new PropertyMetadata(11d)
+#endif
                 {
                     MethodToUpdateDom = (instance, newValue) =>
                         INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification((UIElement)instance).lineHeight = "125%",
@@ -404,7 +423,11 @@ namespace Windows.UI.Xaml.Controls
                 nameof(TextDecorations),
                 typeof(TextDecorationCollection),
                 typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata((object)null, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
                 new PropertyMetadata((object)null)
+#endif
                 {
                     GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations,
                 });
@@ -508,8 +531,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(Padding), 
                 typeof(Thickness), 
-                typeof(Control), 
-                new PropertyMetadata(new Thickness()) 
+                typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
+                new PropertyMetadata(new Thickness())
+#endif
                 { 
                     MethodToUpdateDom = Padding_MethodToUpdateDom,
                 });
@@ -1173,8 +1200,12 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
             DependencyProperty.Register(
                 nameof(FontStretch), 
                 typeof(FontStretch), 
-                typeof(Control), 
+                typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(new FontStretch(), FrameworkPropertyMetadataOptions.AffectsMeasure));
+#else
                 new PropertyMetadata(new FontStretch()));
+#endif
 
         /// <summary>
         ///     The stretch of the desired font.

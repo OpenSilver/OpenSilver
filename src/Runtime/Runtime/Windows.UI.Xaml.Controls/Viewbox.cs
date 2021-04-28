@@ -117,7 +117,11 @@ namespace Windows.UI.Xaml.Controls
                 "Stretch",
                 typeof(Stretch),
                 typeof(Viewbox),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(Stretch.Uniform, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
                 new PropertyMetadata(Stretch.Uniform));
+#endif
 
         /// <summary>
         /// Gets or sets the StretchDirection, which determines how scaling
@@ -145,7 +149,11 @@ namespace Windows.UI.Xaml.Controls
                 "StretchDirection",
                 typeof(StretchDirection),
                 typeof(Viewbox),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(StretchDirection.Both, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, OnStretchDirectionPropertyChanged));
+#else
                 new PropertyMetadata(StretchDirection.Both, OnStretchDirectionPropertyChanged));
+#endif
 
         /// <summary>
         /// StretchDirectionProperty property changed handler.

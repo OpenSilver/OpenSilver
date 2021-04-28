@@ -201,8 +201,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(BorderThickness), 
                 typeof(Thickness), 
-                typeof(Border), 
-                new PropertyMetadata(new Thickness()) 
+                typeof(Border),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
+                new PropertyMetadata(new Thickness())
+#endif
                 { 
                     MethodToUpdateDom = BorderThickness_MethodToUpdateDom
                 });
@@ -267,8 +271,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(Padding), 
                 typeof(Thickness), 
-                typeof(Border), 
-                new PropertyMetadata(new Thickness()) 
+                typeof(Border),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
+                new PropertyMetadata(new Thickness())
+#endif
                 { 
                     MethodToUpdateDom = Padding_MethodToUpdateDom
                 });
@@ -290,9 +298,15 @@ namespace Windows.UI.Xaml.Controls
 #if WORKINPROGRESS
         protected override Size MeasureOverride(Size availableSize)
         {
+            if (Child == null)
+            {
+                return Size.Zero;
+            }
+
             Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
             Size PaddingSize = new Size(Padding.Left + Padding.Right, Padding.Top + Padding.Bottom);
-            return base.MeasureOverride((availableSize - BorderThicknessSize - PaddingSize).Max(Size.Zero)) + BorderThicknessSize + PaddingSize;
+            Child.Measure((availableSize - BorderThicknessSize - PaddingSize).Max(Size.Zero));
+            return Child.DesiredSize + BorderThicknessSize + PaddingSize;
         }
 
         protected override Size ArrangeOverride(Size finalSize)
