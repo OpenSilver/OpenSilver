@@ -21,11 +21,19 @@ namespace System.Windows
 		// Returns:
 		//     The identifier for the System.Windows.NotificationWindow.Content dependency property.
 		[OpenSilver.NotImplemented]
+#if WORKINPROGRESS
+		public static readonly DependencyProperty ContentProperty =
+			DependencyProperty.Register("Content",
+										typeof(FrameworkElement),
+										typeof(NotificationWindow),
+										new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
 		public static readonly DependencyProperty ContentProperty =
 			DependencyProperty.Register("Content",
 										typeof(FrameworkElement),
 										typeof(NotificationWindow),
 										null);
+#endif
 		//
 		// Summary:
 		//     Identifies the System.Windows.NotificationWindow.Height dependency property.
@@ -33,11 +41,19 @@ namespace System.Windows
 		// Returns:
 		//     The identifier for the System.Windows.NotificationWindow.Height dependency property.
 		[OpenSilver.NotImplemented]
+#if WORKINPROGRESS
+		public static readonly DependencyProperty HeightProperty =
+			DependencyProperty.Register("Height",
+										typeof(double),
+										typeof(NotificationWindow),
+										new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
 		public static readonly DependencyProperty HeightProperty =
 			DependencyProperty.Register("Height",
 										typeof(double),
 										typeof(NotificationWindow),
 										null);
+#endif
 		//
 		// Summary:
 		//     Identifies the System.Windows.NotificationWindow.Width dependency property.
@@ -45,12 +61,19 @@ namespace System.Windows
 		// Returns:
 		//     The identifier for the System.Windows.NotificationWindow.Width dependency property.
 		[OpenSilver.NotImplemented]
+#if WORKINPROGRESS
+		public static readonly DependencyProperty WidthProperty =
+			DependencyProperty.Register("Width",
+										typeof(double),
+										typeof(NotificationWindow),
+										new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
 		public static readonly DependencyProperty WidthProperty =
 			DependencyProperty.Register("Width",
 										typeof(double),
 										typeof(NotificationWindow),
 										null);
-
+#endif
 		//
 		// Summary:
 		//     Initializes a new instance of the System.Windows.NotificationWindow class.

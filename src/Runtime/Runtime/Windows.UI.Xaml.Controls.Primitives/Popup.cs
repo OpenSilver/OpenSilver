@@ -131,8 +131,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
             DependencyProperty.Register(
                 nameof(Placement), 
                 typeof(PlacementMode), 
-                typeof(Popup), 
+                typeof(Popup),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(PlacementMode.Right, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
                 new PropertyMetadata(PlacementMode.Right));
+#endif
 
         /// <summary>
         /// This boolean determines whether the popup can force its content to catch clicks.
@@ -377,8 +381,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
             DependencyProperty.Register(
                 nameof(HorizontalOffset), 
                 typeof(double), 
-                typeof(Popup), 
+                typeof(Popup),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure, HorizontalOffset_Changed)
+#else
                 new PropertyMetadata(0d, HorizontalOffset_Changed)
+#endif
                 { 
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
                 });
@@ -409,8 +417,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
             DependencyProperty.Register(
                 nameof(VerticalOffset), 
                 typeof(double), 
-                typeof(Popup), 
+                typeof(Popup),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure, VerticalOffset_Changed)
+#else
                 new PropertyMetadata(0d, VerticalOffset_Changed)
+#endif
                 { 
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
                 });

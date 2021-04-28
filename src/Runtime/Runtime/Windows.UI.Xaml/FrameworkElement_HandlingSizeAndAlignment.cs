@@ -103,7 +103,11 @@ namespace Windows.UI.Xaml
                 nameof(Height),
                 typeof(double),
                 typeof(FrameworkElement),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange)
+#else
                 new PropertyMetadata(double.NaN)
+#endif
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
@@ -191,7 +195,11 @@ namespace Windows.UI.Xaml
                 nameof(Width),
                 typeof(double),
                 typeof(FrameworkElement),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange)
+#else
                 new PropertyMetadata(double.NaN)
+#endif
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
@@ -281,7 +289,11 @@ namespace Windows.UI.Xaml
                 nameof(HorizontalAlignment),
                 typeof(HorizontalAlignment),
                 typeof(FrameworkElement),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(HorizontalAlignment.Stretch, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, HorizontalAlignment_Changed)
+#else
                 new PropertyMetadata(HorizontalAlignment.Stretch, HorizontalAlignment_Changed)
+#endif
                 {
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
@@ -683,7 +695,11 @@ if ($0.tagName.toLowerCase() != 'span')
                 nameof(VerticalAlignment),
                 typeof(VerticalAlignment),
                 typeof(FrameworkElement),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(VerticalAlignment.Stretch, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, VerticalAlignment_Changed)
+#else
                 new PropertyMetadata(VerticalAlignment.Stretch, VerticalAlignment_Changed)
+#endif
                 {
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
@@ -1104,7 +1120,11 @@ if ($0.tagName.toLowerCase() != 'span')
                 nameof(Margin),
                 typeof(Thickness),
                 typeof(FrameworkElement),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange)
+#else
                 new PropertyMetadata(new Thickness())
+#endif
                 {
                     MethodToUpdateDom = Margin_MethodToUpdateDom,
                 });
@@ -1260,7 +1280,11 @@ if ($0.tagName.toLowerCase() != 'span')
                 nameof(MinHeight),
                 typeof(double),
                 typeof(FrameworkElement),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, MinHeight_Changed)
+#else
                 new PropertyMetadata(0d, MinHeight_Changed)
+#endif
                 {
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
@@ -1304,7 +1328,11 @@ if ($0.tagName.toLowerCase() != 'span')
                 nameof(MinWidth),
                 typeof(double),
                 typeof(FrameworkElement),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, MinWidth_Changed)
+#else
                 new PropertyMetadata(0d, MinWidth_Changed)
+#endif
                 {
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
@@ -1345,7 +1373,11 @@ if ($0.tagName.toLowerCase() != 'span')
                 nameof(MaxHeight),
                 typeof(double),
                 typeof(FrameworkElement),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, MaxHeight_Changed)
+#else
                 new PropertyMetadata(double.PositiveInfinity, MaxHeight_Changed)
+#endif
                 {
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
@@ -1389,7 +1421,11 @@ if ($0.tagName.toLowerCase() != 'span')
                 nameof(MaxWidth),
                 typeof(double),
                 typeof(FrameworkElement),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, MaxWidth_Changed)
+#else
                 new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed)
+#endif
                 {
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
@@ -1505,9 +1541,9 @@ if ($0.tagName.toLowerCase() != 'span')
 #endif
                     try
                     {
-                        // Hack to improve the Simulator performance by making only one interop call rather than two:
-                        string concatenated = CSHTML5.Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null) ? '0|0' : $0['offsetWidth'].toFixed(3) + '|' + $0['offsetHeight'].toFixed(3)", this.INTERNAL_OuterDomElement).ToString();
-                        int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
+                    // Hack to improve the Simulator performance by making only one interop call rather than two:
+                    string concatenated = CSHTML5.Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null) ? '0|0' : $0['offsetWidth'].toFixed(3) + '|' + $0['offsetHeight'].toFixed(3)", this.INTERNAL_OuterDomElement).ToString();
+                    int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
                         if (sepIndex > -1)
                         {
                             string actualWidthAsString = concatenated.Substring(0, sepIndex);

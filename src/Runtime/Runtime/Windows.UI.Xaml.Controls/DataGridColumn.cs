@@ -1,4 +1,4 @@
-﻿
+
 
 /*===================================================================================
 * 
@@ -98,8 +98,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(HeaderStyle), 
                 typeof(Style), 
-                typeof(DataGridColumn), 
+                typeof(DataGridColumn),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnHeaderStyleChanged));
+#else
                 new PropertyMetadata(null, OnHeaderStyleChanged));
+#endif
 
         private static void OnHeaderStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -152,10 +156,14 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty CellStyleProperty =
             DependencyProperty.Register(
-                nameof(CellStyle), 
-                typeof(Style), 
-                typeof(DataGridColumn), 
+                nameof(CellStyle),
+                typeof(Style),
+                typeof(DataGridColumn),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnCellStyleChanged));
+#else
                 new PropertyMetadata(null, OnCellStyleChanged));
+#endif
 
         private static void OnCellStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -217,8 +225,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(Width), 
                 typeof(DataGridLength), 
-                typeof(DataGridColumn), 
+                typeof(DataGridColumn),
+#if WORKINPROGRESS
                 new PropertyMetadata(DataGridLength.Auto, OnWidthChanged));
+#else
+                new PropertyMetadata(DataGridLength.Auto, OnWidthChanged));
+#endif
 
         private static void OnWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -270,8 +282,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(Visibility), 
                 typeof(Visibility), 
-                typeof(DataGridColumn), 
+                typeof(DataGridColumn),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(Visibility.Visible, FrameworkPropertyMetadataOptions.AffectsParentMeasure, OnVisibilityChanged));
+#else
                 new PropertyMetadata(Visibility.Visible, OnVisibilityChanged));
+#endif
 
         private static void OnVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

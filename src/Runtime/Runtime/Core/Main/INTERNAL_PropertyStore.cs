@@ -509,6 +509,10 @@ namespace CSHTML5.Internal
                 currentExpr.SetValue(storage.Owner, storage.Property, computedValue);
             }
 
+#if WORKINPROGRESS
+			// Raise the InvalidateMeasure or InvalidateArrange
+            storage.Owner.OnPropertyChanged(new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
+#endif
             return valueChanged;
         }
 
@@ -625,7 +629,6 @@ namespace CSHTML5.Internal
                     listener.OnPropertyChanged(sender, new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
                 }
             }
-            storage.Owner.OnPropertyChanged(new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
         }
 
         private static bool ArePropertiesEqual(object obj1, object obj2, Type type)
