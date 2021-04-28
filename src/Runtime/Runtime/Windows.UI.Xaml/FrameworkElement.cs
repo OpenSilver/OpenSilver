@@ -614,27 +614,28 @@ namespace Windows.UI.Xaml
             
             if (metadata != null)
             {
+                //INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
                 if (metadata.AffectsMeasure)
                 {
-                    Console.WriteLine($"AffectsMeasure {this} {e.Property}");
+                    //Console.WriteLine($"AffectsMeasure {domElementReference.UniqueIdentifier} {this} {e.Property}");
                     InvalidateMeasure();
                 }
 
                 if (metadata.AffectsArrange)
                 {
-                    Console.WriteLine($"AffectsArrange {this} {e.Property}");
+                    //Console.WriteLine($"AffectsArrange {domElementReference.UniqueIdentifier} {this} {e.Property}");
                     InvalidateArrange();
                 }
 
                 if (metadata.AffectsRender)
                 {
-                    Console.WriteLine($"AffectsRender {this} {e.Property}");
+                    //Console.WriteLine($"AffectsRender {domElementReference.UniqueIdentifier} {this} {e.Property}");
                     //InvalidateVisual();
                 }
 
                 if (metadata.AffectsParentMeasure)
                 {
-                    Console.WriteLine($"AffectsParentMeasure {this} {e.Property}");
+                    //Console.WriteLine($"AffectsParentMeasure {domElementReference.UniqueIdentifier} {this} {e.Property}");
                     InvalidateParentMeasure();
                 }
             }
@@ -797,9 +798,13 @@ namespace Windows.UI.Xaml
             if (childElements.Count() == 0)
             {
                 if (Double.IsNaN(Width))
-                    Console.WriteLine($"FrameworkElement MeasureOverride {domElementReference.UniqueIdentifier} {this} get ActualWidth");
+                {
+                    //Console.WriteLine($"FrameworkElement MeasureOverride {domElementReference.UniqueIdentifier} {this} get ActualWidth");
+                }
                 if (Double.IsNaN(Height))
-                    Console.WriteLine($"FrameworkElement MeasureOverride {domElementReference.UniqueIdentifier} {this} get ActualHeight");
+                {
+                    //Console.WriteLine($"FrameworkElement MeasureOverride {domElementReference.UniqueIdentifier} {this} get ActualHeight");
+                }
 
                 Size size = new Size(Double.IsNaN(Width) ? ActualWidth : Width, Double.IsNaN(Height) ? ActualHeight : Height);
                 return size;
