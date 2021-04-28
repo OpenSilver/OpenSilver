@@ -207,7 +207,7 @@ namespace Windows.UI.Xaml
 
         private void Render()
         {
-            if (this as Window == null)
+            if (this as Window == null && this as PopupRoot == null)
             {
                 INTERNAL_HtmlDomStyleReference uiStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement);
                 uiStyle.position = "absolute";
