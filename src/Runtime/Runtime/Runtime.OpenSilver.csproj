@@ -69,6 +69,7 @@
 		<Compile Include="PublicAPI\Internal\KnownTypesHelper.cs" />
 		<Compile Include="PublicAPI\Internal\WebRequestsHelper.cs" />
 		<Compile Include="PublicAPI\Native.Html.Controls\NativeComboBox.cs" />
+		<Compile Include="System.Collections.Generic\WORKINPROGRESS\PriorityQueue.cs" />
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\CompositionHost.cs" />
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\DeploymentCatalog.cs" />
 		<Compile Include="System.ComponentModel.Composition\WORKINPROGRESS\CompositionInitializer.cs" />
@@ -122,6 +123,14 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\NotificationWindow.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\WebRequestCreator.cs" />
 		<Compile Include="System.Xaml\IMarkupExtension.cs" />
+		<Compile Include="Windows.Foundation\WORKINPROGRESS\IntExtensions.cs" />
+		<Compile Include="Windows.Foundation\WORKINPROGRESS\LayoutManager.cs" />
+		<Compile Include="Windows.Foundation\WORKINPROGRESS\CollectionExtensions.cs" />
+		<Compile Include="Windows.Foundation\WORKINPROGRESS\EventHandlerExtensions.cs" />
+		<Compile Include="Windows.Foundation\WORKINPROGRESS\Disposable.cs" />
+		<Compile Include="Windows.Foundation\WORKINPROGRESS\RectExtensions.cs" />
+		<Compile Include="Windows.Foundation\WORKINPROGRESS\PointExtensions.cs" />
+		<Compile Include="Windows.Foundation\WORKINPROGRESS\DoubleExtensions.cs" />
 		<Compile Include="Windows.Foundation\WORKINPROGRESS\Point.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\DescriptionViewerAutomationPeer.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\RangeBaseAutomationPeer.cs" />
@@ -192,6 +201,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\GridSplitter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\HeaderedItemsControl.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ITimeFormat.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\IDefinitionBase.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\IUpdateVisualState.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ListTimePickerPopup.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MediaElement.cs" />
@@ -271,6 +281,7 @@
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationLifetimeObjectsCollection.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DataTemplate.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventHandler.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextMeasurementService.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\LineStackingStrategy.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\RoutedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\UIElement.cs" />
@@ -282,8 +293,8 @@
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\ExportProvider.cs" />
 		<Compile Include="System.Reflection\ICustomTypeProvider.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\AssemblyBuilder.cs" />
-    <Compile Include="System.Reflection.Emit\WORKINPROGRESS\AssemblyBuilderAccess.cs" />
-    <Compile Include="System.Reflection.Emit\WORKINPROGRESS\FieldBuilder.cs" />
+		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\AssemblyBuilderAccess.cs" />
+		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\FieldBuilder.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\ILGenerator.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\Label.cs" />
 		<Compile Include="System.Reflection.Emit\WORKINPROGRESS\LocalBuilder.cs" />

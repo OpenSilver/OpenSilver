@@ -181,7 +181,10 @@ namespace CSHTML5.Internal
         public string whiteSpace { set { SetStylePropertyValue("whiteSpace", value); } }
         public string width { set { SetStylePropertyValue("width", value); _width = value; } get { return _width; } }
         public string zIndex { set { SetStylePropertyValue("zIndex", value); } }
-        
+#if WORKINPROGRESS
+        public string gridArea { set { SetStylePropertyValue("gridArea", value); } }
+        public string visibility { set { SetStylePropertyValue("visibility", value); } }
+#endif
         //-----------------------------------------------------------------------
         // Usage stats for To-Do Calendar (number of types each property is set):
         //-----------------------------------------------------------------------

@@ -22,6 +22,7 @@ using Bridge;
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using System;
+using System.Collections.Generic;
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -36,6 +37,24 @@ namespace System.Windows
 namespace Windows.UI.Core
 #endif
 {
+#if WORKINPROGRESS
+    public enum DispatcherPriority
+    {
+        Invalid = -1,
+        Inactive = 0,
+        SystemIdle = 1,
+        ApplicationIdle = 2,
+        ContextIdle = 3,
+        Background = 4,
+        Input = 5,
+        Loaded = 6,
+        Render = 7,
+        DataBind = 8,
+        Normal = 9,
+        Send = 10,
+    }
+#endif
+
     /// <summary>
     /// Provides the core event message dispatcher. Instances of this type are responsible
     /// for processing the window messages and dispatching the events to the client.
@@ -163,6 +182,86 @@ namespace Windows.UI.Core
         }
 
 #if WORKINPROGRESS
+        private PriorityQueue<DispatcherOperation> queue;
+        private int disableProcessingRequests;
+        private IDisposable disableProcessingToken;
+        private bool isProcessQueueScheduled;
+
+        public Dispatcher()
+        {
+            queue = new PriorityQueue<DispatcherOperation>((int)DispatcherPriority.Send + 1);
+            disableProcessingToken = new Disposable(EnableProcessing);
+        }
+        public IDisposable DisableProcessing()
+        {
+            disableProcessingRequests++;
+            return disableProcessingToken;
+        }
+
+        private void EnableProcessing()
+        {
+            disableProcessingRequests--;
+
+            if (disableProcessingRequests == 0)
+            {
+                ProcessQueueAsync();
+            }
+        }
+        public DispatcherOperation InvokeAsync(Action callback, DispatcherPriority priority = DispatcherPriority.Normal)
+        {
+            DispatcherOperation dispatcherOperation = new DispatcherOperation(callback, priority);
+            InvokeAsync(dispatcherOperation);
+            return dispatcherOperation;
+        }
+        private void InvokeAsync(DispatcherOperation operation)
+        {
+            queue.Enqueue((int)operation.Priority, operation);
+            ProcessQueueAsync();
+        }
+        private void ProcessQueueAsync()
+        {
+            if (isProcessQueueScheduled)
+            {
+                return;
+            }
+
+            isProcessQueueScheduled = true;
+            Action action = () =>
+            {
+                isProcessQueueScheduled = false;
+
+                DispatcherOperation operation;
+                if (!TryDequeue(out operation))
+                {
+                    return;
+                }
+
+                if (operation.Status == DispatcherOperationStatus.Pending)
+                {
+                    operation.Invoke();
+                    ProcessQueueAsync();
+                }
+            };
+            action.BeginInvoke(ar => action.EndInvoke(ar), null);
+            //ApplicationHost.Current.TaskScheduler.ScheduleTask(action);
+        }
+        private bool TryDequeue(out DispatcherOperation operation)
+        {
+            while (disableProcessingRequests == 0 && queue.TryPeek(out operation) && operation.Priority != DispatcherPriority.Inactive)
+            {
+                queue.Dequeue();
+
+                if (operation.Status != DispatcherOperationStatus.Pending)
+                {
+                    continue;
+                }
+
+                return true;
+            }
+
+            operation = null;
+            return false;
+        }
 		[OpenSilver.NotImplemented]
         public DispatcherOperation BeginInvoke(Delegate d, params object[] args)
         {

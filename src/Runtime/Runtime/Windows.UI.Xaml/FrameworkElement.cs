@@ -32,6 +32,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Controls.Primitives;
 #else
 using Windows.Foundation;
 using Windows.UI.Core;
@@ -603,6 +604,87 @@ namespace Windows.UI.Xaml
             set { this.SetValue(LanguageProperty, value); }
         }
 
+        public override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            base.OnPropertyChanged(e);
+            //Console.WriteLine($"FrameworkElement OnPropertyChanged {e.Property.Name} {e.OldValue}=>{e.NewValue}");
+            // TODO Invalidate
+        }
+        protected sealed override void ArrangeCore(Rect finalRect)
+        {
+            //INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
+            //Console.WriteLine();
+            //Console.WriteLine($"ArrangeCore {domElementReference.UniqueIdentifier} finalRect ({finalRect.Left},{finalRect.Top}) ({finalRect.Width},{finalRect.Height})");
+
+            bool isDefaultAlignment = HorizontalAlignment == HorizontalAlignment.Stretch && VerticalAlignment == VerticalAlignment.Stretch;
+            Size finalSize = isDefaultAlignment ? finalRect.Size : new Size(
+                HorizontalAlignment != HorizontalAlignment.Stretch ? Math.Min(DesiredSize.Width, finalRect.Width) : finalRect.Width,
+                VerticalAlignment != VerticalAlignment.Stretch ? Math.Min(DesiredSize.Height ,finalRect.Height) : finalRect.Height);
+
+            finalSize.Width = Math.Max(0, finalSize.Width - Margin.Left - Margin.Right);
+            finalSize.Height = Math.Max(0, finalSize.Height - Margin.Top - Margin.Bottom);
+
+            Size MinSize = new Size(MinWidth, MinHeight);
+            Size MaxSize = new Size(MaxWidth, MaxHeight);
+            Size size = new Size(Width, Height);
+
+            finalSize = size.Combine(finalSize).Bounds(MinSize, MaxSize);
+
+            Size arrangedSize = ArrangeOverride(finalSize);
+
+            Rect containingRect = new Rect(arrangedSize);
+
+            //Console.WriteLine($"containingRect (Left {containingRect.Left}, Top {containingRect.Top}, Right {containingRect.Right}, Bottom {containingRect.Bottom})");
+            //Console.WriteLine($"ArrangeCore Margin (Left {Margin.Left}, Top {Margin.Top}, Right {Margin.Right}, Bottom {Margin.Bottom})");
+
+            // Add Margin
+            double newLeft = containingRect.Left - Margin.Left;
+            double newTop = containingRect.Top - Margin.Top;
+            double newWidth = containingRect.Width + Margin.Left + Margin.Right;
+            double newHeight = containingRect.Height + Margin.Top + Margin.Bottom;
+
+            if (newWidth >= 0 && newHeight >= 0)
+                containingRect = new Rect(newLeft, newTop, newWidth, newHeight);
+            else
+                throw new ArgumentException("Width or Height cannot be lower than 0");
+
+            Point alignedOffset = GetAlignmentOffset(finalRect, containingRect.Size, HorizontalAlignment, VerticalAlignment);
+
+            Point visualOffset = new Point(alignedOffset.X - containingRect.Location.X, alignedOffset.Y - containingRect.Location.Y);
+
+            //Console.WriteLine($"ArrangeCore VisualBounds {this} {domElementReference.UniqueIdentifier} ({visualOffset.X},{visualOffset.Y})-({arrangedSize.Width},{arrangedSize.Height})");
+
+            VisualBounds = new Rect(visualOffset, arrangedSize);
+        }
+
+        private static Point GetAlignmentOffset(Rect container, Size alignedRectSize, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment)
+        {
+            double alignedLeft = container.Left;
+            double alignedTop = container.Top;
+
+            if (horizontalAlignment == HorizontalAlignment.Right)
+            {
+                alignedLeft = container.Left + container.Width - alignedRectSize.Width;
+            }
+
+            if (horizontalAlignment == HorizontalAlignment.Center || horizontalAlignment == HorizontalAlignment.Stretch)
+            {
+                alignedLeft = container.Left + (container.Width - alignedRectSize.Width) / 2;
+            }
+
+            if (verticalAlignment == VerticalAlignment.Bottom)
+            {
+                alignedTop = container.Top + container.Height - alignedRectSize.Height;
+            }
+
+            if (verticalAlignment == VerticalAlignment.Center || verticalAlignment == VerticalAlignment.Stretch)
+            {
+                alignedTop = container.Top + (container.Height - alignedRectSize.Height) / 2;
+            }
+
+            return alignedLeft == 0 && alignedTop == 0 ? Point.Zero : new Point(alignedLeft, alignedTop);
+        }
+
         //
         // Summary:
         //     Provides the behavior for the Arrange pass of Silverlight layout. Classes can
@@ -615,11 +697,48 @@ namespace Windows.UI.Xaml
         //
         // Returns:
         //     The actual size that is used after the element is arranged in layout.
-        [OpenSilver.NotImplemented]
         protected virtual Size ArrangeOverride(Size finalSize)
         {
-            return new Size();
+            INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
+            //Console.WriteLine($"FrameworkElement ArrangeOverride {domElementReference.UniqueIdentifier}");
+
+            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
+
+            if (childElements.Count() > 0)
+            {
+                UIElement elementChild = ((UIElement)childElements.ElementAt(0));
+                elementChild.Arrange(new Rect(finalSize));
+                return finalSize;
+            }
+
+            return finalSize;
         }
+
+        protected sealed override Size MeasureCore(Size availableSize)
+        {
+            INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
+            //Console.WriteLine();
+            //Console.WriteLine($"MeasureOverride {this} availableSize {availableSize.Width}, {availableSize.Height} (MeasureCore)");
+            //Console.WriteLine($"MeasureOverride {domElementReference.UniqueIdentifier} Margin left {Margin.Left}, top {Margin.Top}, right {Margin.Right}, bottom {Margin.Bottom} (MeasureCore)");
+            
+            Size MinSize = new Size(MinWidth, MinHeight);
+            Size MaxSize = new Size(MaxWidth, MaxHeight);
+            Size size = new Size(Width, Height);
+
+            availableSize.Width = Math.Max(0, availableSize.Width - Margin.Left - Margin.Right);
+            availableSize.Height = Math.Max(0, availableSize.Height - Margin.Top - Margin.Bottom);
+            
+            availableSize = size.Combine(availableSize).Bounds(MinSize, MaxSize);
+
+            Size measuredSize = MeasureOverride(availableSize);
+            measuredSize = size.Combine(measuredSize).Bounds(MinSize, MaxSize);
+
+            measuredSize.Width = Math.Max(0, measuredSize.Width + Margin.Left + Margin.Right);
+            measuredSize.Height = Math.Max(0, measuredSize.Height + Margin.Top + Margin.Bottom);
+
+            return measuredSize;
+        }
+
         //
         // Summary:
         //     Provides the behavior for the Measure pass of Silverlight layout. Classes can
@@ -635,10 +754,36 @@ namespace Windows.UI.Xaml
         //     The size that this object determines it needs during layout, based on its calculations
         //     of the allocated sizes for child objects; or based on other considerations, such
         //     as a fixed container size.
-        [OpenSilver.NotImplemented]
         protected virtual Size MeasureOverride(Size availableSize)
         {
-            return new Size();
+            INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
+            //Console.WriteLine($"FrmeworkElement MeasureOverride ({this}) {domElementReference.UniqueIdentifier}, ({Width}, {Height})");
+            //return Size.Zero;
+            
+            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
+
+            //Console.WriteLine($"MeasureOverride {this} (FrameworkElement)");
+            //Console.WriteLine($"MeasureOverride {domElementReference.UniqueIdentifier}, Children: {childElements.Count()}, ({Width}, {Height}) (FrameElement)");
+
+            if (childElements.Count() == 0)
+            {
+                return new Size(ActualWidth, ActualHeight);
+            }
+
+            Size extent = new Size(0.0, 0.0);
+            
+            foreach (DependencyObject child in childElements)
+            {
+                if (child as FrameworkElement == null)
+                    continue;
+
+                FrameworkElement childElement = child as FrameworkElement;
+                childElement.Measure(availableSize);
+                extent.Width += childElement.DesiredSize.Width;
+                extent.Height += childElement.DesiredSize.Height;
+            }
+
+            return extent;
         }
 #endif
         #endregion Work in progress
@@ -1090,6 +1235,9 @@ namespace Windows.UI.Xaml
         {
             if (Loaded != null)
                 Loaded(this, new RoutedEventArgs());
+#if WORKINPROGRESS
+            InvalidateMeasure();
+#endif
         }
 
         /// <summary>
