@@ -1721,6 +1721,22 @@ element.setAttribute(""data-maxlength"", ""{1}"");
 
         [OpenSilver.NotImplemented]
         public double LineHeight { get; set; }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            //Console.WriteLine($"TextBox {((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier}");
+            /*if (noWrapSize == Size.Empty)
+            {
+                noWrapSize = Application.Current.TextMeasurementService.Measure(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, Double.PositiveInfinity);
+            }
+
+            if (TextWrapping == TextWrapping.NoWrap || noWrapSize.Width <= availableSize.Width)
+            {
+                return noWrapSize;
+            }*/
+            
+            return Application.Current.TextMeasurementService.Measure(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, Padding, availableSize.Width);
+        }
 #endif
 
         internal override void UpdateVisualStates()

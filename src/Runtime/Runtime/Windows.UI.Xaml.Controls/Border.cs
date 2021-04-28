@@ -286,5 +286,29 @@ namespace Windows.UI.Xaml.Controls
                 "{0}px {1}px {2}px {3}px",
                 newPadding.Top, newPadding.Right, newPadding.Bottom, newPadding.Left);
         }
+
+#if WORKINPROGRESS
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
+            Size PaddingSize = new Size(Padding.Left + Padding.Right, Padding.Top + Padding.Bottom);
+            return base.MeasureOverride((availableSize - BorderThicknessSize - PaddingSize).Max(Size.Zero)) + BorderThicknessSize + PaddingSize;
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            if (Child != null)
+            {
+                Point BorderThicknessLocation = new Point(BorderThickness.Left, BorderThickness.Top);
+                Point PaddingLocation = new Point(Padding.Left, Padding.Top);
+                Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
+                Size PaddingSize = new Size(Padding.Left + Padding.Right, Padding.Top + Padding.Bottom);
+                
+                Child.Arrange(new Rect(BorderThicknessLocation + PaddingLocation, (finalSize - BorderThicknessSize - PaddingSize).Max(Size.Zero)));
+            }
+
+            return finalSize;
+        }
+#endif
     }
 }
