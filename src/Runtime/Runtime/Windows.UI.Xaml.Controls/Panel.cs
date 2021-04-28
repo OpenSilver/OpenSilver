@@ -321,5 +321,10 @@ namespace Windows.UI.Xaml.Controls
             get { return (bool)this.GetValue(IsItemsHostProperty); }
             internal set { this.SetValue(IsItemsHostProperty, value); }
         }
+
+#if WORKINPROGRESS
+        protected abstract override Size MeasureOverride(Size availableSize);
+        protected abstract override Size ArrangeOverride(Size finalSize);
+#endif
     }
 }

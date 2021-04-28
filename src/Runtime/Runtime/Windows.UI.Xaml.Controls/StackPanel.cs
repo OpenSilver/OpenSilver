@@ -256,5 +256,89 @@ namespace Windows.UI.Xaml.Controls
 
         //    return elementToReturn;
         //}
+
+#if WORKINPROGRESS
+        private double GetCrossLength(Size size)
+        {
+            return Orientation == Orientation.Horizontal ? size.Height : size.Width;
+        }
+        private double GetMainLength(Size size)
+        {
+            return Orientation == Orientation.Horizontal ? size.Width : size.Height;
+        }
+        private static Size CreateSize(Orientation orientation, double mainLength, double crossLength)
+        {
+            return orientation == Orientation.Horizontal ?
+                new Size(mainLength, crossLength) :
+                new Size(crossLength, mainLength);
+        }
+        private static Rect CreateRect(Orientation orientation, double mainStart, double crossStart, double mainLength, double crossLength)
+        {
+            return orientation == Orientation.Horizontal ?
+                new Rect(mainStart, crossStart, mainLength, crossLength) :
+                new Rect(crossStart, mainStart, crossLength, mainLength);
+        }
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            double availableCrossLength = GetCrossLength(availableSize);
+            Size measureSize = CreateSize(Orientation, Double.PositiveInfinity, availableCrossLength);
+
+            double mainLength = 0;
+            double crossLength = 0;
+
+            foreach (FrameworkElement child in Children)
+            {
+                child.Measure(measureSize);
+
+                //INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)child.INTERNAL_OuterDomElement;
+                //Console.WriteLine($"MeasureOverride StackPanel Child desired Width {domElementReference.UniqueIdentifier} {child.DesiredSize.Width}, Height {child.DesiredSize.Height}");
+
+                mainLength += GetMainLength(child.DesiredSize);
+                crossLength = Math.Max(crossLength, GetCrossLength(child.DesiredSize));
+            }
+
+            // measuredCrossLength = availableCrossLength;
+
+            return CreateSize(Orientation, mainLength, crossLength);
+        }
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            /*Console.WriteLine($"StackPanel {Orientation}");
+            foreach (FrameworkElement child in Children)
+            {
+                INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)child.INTERNAL_OuterDomElement;
+
+                Console.WriteLine($"{domElementReference.UniqueIdentifier} desiredSize ({child.DesiredSize.Width},{child.DesiredSize.Height})");
+            }*/
+            double panelMainLength = Children.Select(child => GetMainLength(child.DesiredSize)).Sum();
+            double panelCrossLength = GetCrossLength(finalSize);
+
+            //Console.WriteLine($"StackPanel panelMainLength {panelMainLength}, panelCrossLength {panelCrossLength}");
+
+            Size measureSize = CreateSize(Orientation, Double.PositiveInfinity, panelCrossLength);
+            //Console.WriteLine($"StackPanel ArrangeOverride measureSize {measureSize.Width}, {measureSize.Height}");
+
+            foreach (FrameworkElement child in Children)
+            {
+                child.Measure(measureSize);
+            }
+
+            bool isNormalFlow = FlowDirection == FlowDirection.LeftToRight;
+            double childrenMainLength = 0;
+            foreach (UIElement child in Children)
+            {
+                double childMainLength = GetMainLength(child.DesiredSize);
+                double childMainStart = isNormalFlow ? childrenMainLength : panelMainLength - childrenMainLength - childMainLength;
+
+                //Console.WriteLine($"StackPanel ArrangeOverride childMainLength {childMainLength}, childMainStart {childMainStart}");
+
+                child.Arrange(CreateRect(Orientation, childMainStart, 0, childMainLength, panelCrossLength));
+
+                childrenMainLength += childMainLength;
+            }
+
+            return CreateSize(Orientation, GetMainLength(finalSize), panelCrossLength);
+        }
+#endif
     }
 }

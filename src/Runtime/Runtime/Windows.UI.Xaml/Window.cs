@@ -36,6 +36,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Markup;
+using System.Windows.Controls.Primitives;
 #else
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -125,9 +126,20 @@ namespace Windows.UI.Xaml
 
             // Raise the "Loaded" event:
             this.INTERNAL_RaiseLoadedEvent();
+            
+#if WORKINPROGRESS
+            this.SizeChanged += WindowSizeChangedEventHandler;
         }
 
-        #region Bounds and SizeChanged event
+        private void WindowSizeChangedEventHandler(object sender, WindowSizeChangedEventArgs e)
+        {
+
+            InvalidateMeasure();
+            InvalidateArrange();
+#endif
+        }
+
+#region Bounds and SizeChanged event
 
         INTERNAL_EventManager<WindowSizeChangedEventHandler, WindowSizeChangedEventArgs> _windowSizeChangedEventManager;
         /// <summary>
@@ -236,6 +248,11 @@ namespace Windows.UI.Xaml
                         CSHTML5.Native.Html.Printing.PrintManager.ResetPrintArea();
                     }
                 }
+#if WORKINPROGRESS
+                Application.Current.TextMeasurementService.CreateMeasurementText(this);
+                CalculateLayout();
+#endif
+
             }
         }
 
@@ -447,6 +464,37 @@ namespace Windows.UI.Xaml
         public void DragResize(WindowResizeEdge resizeEdge)
         {
 
+        }
+
+        public void CalculateLayout()
+        {
+            Console.WriteLine("Window: start CalculateLayout");
+            if (Current.INTERNAL_VisualChildrenInformation == null)
+            {
+                Console.WriteLine("INTERNAL_VisualChildrenInformation is null");
+                return;
+            }
+
+            double width = Bounds.Width;
+            double height = Bounds.Height;
+            Console.WriteLine($"Current: {Current.INTERNAL_InnerDomElement}, Bounds {Bounds.Left}, {Bounds.Top}, {Bounds.Width}, {Bounds.Height}");
+            Current.Measure(new Size(width, height));
+            Console.WriteLine("---------------------------");
+            Current.Arrange(new Rect(Bounds.Left, Bounds.Top, width, height));
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            availableSize = new Size(Bounds.Width, Bounds.Height);
+            Console.WriteLine("Window MeasureOverride");
+            return base.MeasureOverride(availableSize);
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            finalSize = new Size(Bounds.Width, Bounds.Height);
+            Console.WriteLine("Window ArrangeOverride");
+            return base.ArrangeOverride(finalSize);
         }
 #endif
     }

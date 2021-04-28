@@ -32,9 +32,23 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Defines row-specific properties that apply to Grid elements.
     /// </summary>
+#if WORKINPROGRESS
+    public sealed partial class RowDefinition : DependencyObject, IDefinitionBase
+    {
+        internal Grid Parent;
+        public RowDefinition()
+        {
+            MinHeight = 0;
+        }
+        double IDefinitionBase.MinLength { get { return MinHeight; } }
+        double IDefinitionBase.MaxLength { get { return MaxHeight; } }
+        GridLength IDefinitionBase.Length { get { return Height; } }
+
+#else
     public sealed partial class RowDefinition : DependencyObject
     {
         internal Grid Parent;
+#endif
 
         /// <summary>
         /// Returns a copy of this RowDefinition.
