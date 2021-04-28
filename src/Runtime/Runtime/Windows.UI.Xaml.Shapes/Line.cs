@@ -271,5 +271,12 @@ if ($0.setLineDash)
             }
         }
 
+#if WORKINPROGRESS
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            return new Size(X2.Max(X1), Y2.Max(Y1));
+        }
+#endif
+
     }
 }

@@ -87,12 +87,21 @@ namespace Windows.UI.Xaml.Controls
         /// <see cref="P:System.Windows.Controls.Expander.IsExpanded" />
         /// dependency property.
         /// </value>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty IsExpandedProperty =
+                DependencyProperty.Register(
+                        "IsExpanded",
+                        typeof(bool),
+                        typeof(Expander),
+                        new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsMeasure, OnIsExpandedPropertyChanged)
+#else
         public static readonly DependencyProperty IsExpandedProperty =
                 DependencyProperty.Register(
                         "IsExpanded",
                         typeof(bool),
                         typeof(Expander),
                         new PropertyMetadata(false, OnIsExpandedPropertyChanged)
+#endif
                         { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 

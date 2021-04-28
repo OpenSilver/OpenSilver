@@ -63,7 +63,9 @@ namespace Windows.UI.Xaml.Controls
             dynamic div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
             dynamic divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
             divStyle.whiteSpace = TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap";
+#if !WORKINPROGRESS
             divStyle.overflow = "hidden"; //keeps the text from overflowing despite the TextBlock's size limitations.
+#endif
             divStyle.textAlign = "left"; // this is the default value.
             domElementWhereToPlaceChildren = div;
             return div;
@@ -81,12 +83,21 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Text dependency property.
         /// </summary>
+#if WORKINPROGRESS
         public static readonly DependencyProperty TextProperty = 
             DependencyProperty.Register(
                 "Text",
                 typeof(string),
                 typeof(TextBlock),
+                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextPropertyChanged));
+#else
+        public static readonly DependencyProperty TextProperty =
+            DependencyProperty.Register(
+                "Text",
+                typeof(string),
+                typeof(TextBlock),
                 new PropertyMetadata(string.Empty, OnTextPropertyChanged));
+#endif
 
         private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -168,8 +179,13 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the TextWrapping dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty TextWrappingProperty =
+            DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBlock), new FrameworkPropertyMetadata(TextWrapping.NoWrap, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
         public static readonly DependencyProperty TextWrappingProperty =
             DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBlock), new PropertyMetadata(TextWrapping.NoWrap)
+#endif
             {
                 GetCSSEquivalent = (instance) =>
                 {
@@ -214,12 +230,22 @@ namespace Windows.UI.Xaml.Controls
             return;
         }
 
+#if WORKINPROGRESS
+        public static readonly DependencyProperty TextTrimmingProperty = 
+            DependencyProperty.Register(
+                "TextTrimming",
+                typeof(TextTrimming),
+                typeof(TextBlock),
+                new FrameworkPropertyMetadata(TextTrimming.None, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
         public static readonly DependencyProperty TextTrimmingProperty = 
             DependencyProperty.Register(
                 "TextTrimming",
                 typeof(TextTrimming),
                 typeof(TextBlock),
                 new PropertyMetadata(TextTrimming.None)
+#endif
+
                 {
                     MethodToUpdateDom = OnTextTrimmedChangedUpdateDOM
                 });
