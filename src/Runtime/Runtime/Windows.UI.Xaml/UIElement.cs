@@ -440,11 +440,19 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Identifies the Visibility dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty VisibilityProperty =
+            DependencyProperty.Register("Visibility",
+                                        typeof(Visibility),
+                                        typeof(UIElement),
+                                        new FrameworkPropertyMetadata(Visibility.Visible, FrameworkPropertyMetadataOptions.AffectsParentMeasure, Visibility_Changed));
+#else
         public static readonly DependencyProperty VisibilityProperty =
             DependencyProperty.Register("Visibility",
                                         typeof(Visibility),
                                         typeof(UIElement),
                                         new PropertyMetadata(Visibility.Visible, Visibility_Changed));
+#endif
 
         string _previousValueOfDisplayCssProperty = "block";
 

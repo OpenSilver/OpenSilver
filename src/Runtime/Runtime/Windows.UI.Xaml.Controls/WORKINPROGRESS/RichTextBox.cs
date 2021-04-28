@@ -198,7 +198,11 @@ namespace Windows.UI.Xaml.Controls
 				"LineHeight",
 				typeof(double),
 				typeof(RichTextBox),
+#if WORKINPROGRESS
+				new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
 				new PropertyMetadata(0d));
+#endif
 
 		/// <summary>
 		/// Gets or sets the height of each line of content.

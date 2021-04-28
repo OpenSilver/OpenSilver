@@ -222,8 +222,13 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the FontWeight dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty FontWeightProperty =
+            DependencyProperty.Register("FontWeight", typeof(FontWeight), typeof(Control), new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
         public static readonly DependencyProperty FontWeightProperty =
             DependencyProperty.Register("FontWeight", typeof(FontWeight), typeof(Control), new PropertyMetadata(FontWeights.Normal)
+#endif
             {
                 GetCSSEquivalent = (instance) =>
                 {
@@ -259,10 +264,18 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the FontStyle dependency property.
         /// </summary>
         public static readonly DependencyProperty FontStyleProperty =
+#if WORKINPROGRESS
+#if MIGRATION
+            DependencyProperty.Register("FontStyle", typeof(FontStyle), typeof(Control), new FrameworkPropertyMetadata(FontStyles.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
+            DependencyProperty.Register("FontStyle", typeof(FontStyle), typeof(Control), new FrameworkPropertyMetadata(FontStyle.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#endif
+#else
 #if MIGRATION
             DependencyProperty.Register("FontStyle", typeof(FontStyle), typeof(Control), new PropertyMetadata(FontStyles.Normal)
 #else
             DependencyProperty.Register("FontStyle", typeof(FontStyle), typeof(Control), new PropertyMetadata(FontStyle.Normal)
+#endif
 #endif
             {
                 GetCSSEquivalent = (instance) =>
@@ -333,8 +346,13 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the FontFamily dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty FontFamilyProperty =
+            DependencyProperty.Register("FontFamily", typeof(FontFamily), typeof(Control), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
         public static readonly DependencyProperty FontFamilyProperty =
             DependencyProperty.Register("FontFamily", typeof(FontFamily), typeof(Control), new PropertyMetadata(null)
+#endif
             {
                 GetCSSEquivalent = (instance) =>
                 {
@@ -387,8 +405,13 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the FontSize dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty FontSizeProperty =
+            DependencyProperty.Register("FontSize", typeof(double), typeof(Control), new FrameworkPropertyMetadata(11d, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
         public static readonly DependencyProperty FontSizeProperty =
             DependencyProperty.Register("FontSize", typeof(double), typeof(Control), new PropertyMetadata(11d)
+#endif
             {
                 MethodToUpdateDom = (instance, newValue) =>
                 {
@@ -437,12 +460,21 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the TextDecorations dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty TextDecorationsProperty = 
+            DependencyProperty.Register(
+                nameof(TextDecorations),
+                typeof(TextDecorationCollection),
+                typeof(Control),
+                new FrameworkPropertyMetadata((object)null, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
         public static readonly DependencyProperty TextDecorationsProperty = 
             DependencyProperty.Register(
                 nameof(TextDecorations),
                 typeof(TextDecorationCollection),
                 typeof(Control),
                 new PropertyMetadata((object)null)
+#endif
                 {
                     GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations,
                 });
@@ -540,11 +572,19 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Padding dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty PaddingProperty =
+            DependencyProperty.Register("Padding", 
+                                        typeof(Thickness), 
+                                        typeof(Control), 
+                                        new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
         public static readonly DependencyProperty PaddingProperty =
             DependencyProperty.Register("Padding", 
                                         typeof(Thickness), 
                                         typeof(Control), 
                                         new PropertyMetadata(new Thickness()) 
+#endif
                                         { 
                                             MethodToUpdateDom = Padding_MethodToUpdateDom,
                                         });
@@ -1205,11 +1245,19 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         }
 
         [OpenSilver.NotImplemented]
+#if WORKINPROGRESS
+        public static readonly DependencyProperty FontStretchProperty =
+            DependencyProperty.Register("FontStretch",
+                                        typeof(FontStretch),
+                                        typeof(Control),
+                                        new FrameworkPropertyMetadata(new FontStretch(), FrameworkPropertyMetadataOptions.AffectsMeasure));
+#else
         public static readonly DependencyProperty FontStretchProperty = 
             DependencyProperty.Register("FontStretch", 
                                         typeof(FontStretch), 
                                         typeof(Control), 
                                         new PropertyMetadata(new FontStretch()));
+#endif
 
         /// <summary>
         ///     The stretch of the desired font.

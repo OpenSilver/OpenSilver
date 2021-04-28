@@ -194,7 +194,7 @@ namespace Windows.UI.Xaml.Controls
         
         protected override Size MeasureOverride(Size availableSize)
         {
-            Size actualSize = new Size(ActualWidth, ActualHeight);
+            Size actualSize = new Size(Double.IsNaN(Width) ? ActualWidth : Width, Double.IsNaN(Height) ? ActualHeight : Height);
             
             //INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
             //Console.WriteLine($"MeasureOverride {domElementReference.UniqueIdentifier} ContentControl {Content} Width {Width}, Height {Height}, ActualWidth {actualSize.Width}, ActualHeight {actualSize.Height}");

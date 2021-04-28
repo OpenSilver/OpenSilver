@@ -208,9 +208,13 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the BorderThickness dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty BorderThicknessProperty =
+            DependencyProperty.Register("BorderThickness", typeof(Thickness), typeof(Border), new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure) { MethodToUpdateDom = BorderThickness_MethodToUpdateDom });
+#else
         public static readonly DependencyProperty BorderThicknessProperty =
             DependencyProperty.Register("BorderThickness", typeof(Thickness), typeof(Border), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = BorderThickness_MethodToUpdateDom});
-
+#endif
         static void BorderThickness_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             if (newValue != null)
@@ -270,9 +274,14 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Padding dependency property.
         /// </summary>
+#if WORKINPROGRESS
         public static readonly DependencyProperty PaddingProperty =
-            DependencyProperty.Register("Padding", typeof(Thickness), typeof(Border), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = Padding_MethodToUpdateDom});
-
+            DependencyProperty.Register("Padding", typeof(Thickness), typeof(Border), new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
+        public static readonly DependencyProperty PaddingProperty =
+            DependencyProperty.Register("Padding", typeof(Thickness), typeof(Border), new PropertyMetadata(new Thickness())
+#endif
+            { MethodToUpdateDom = Padding_MethodToUpdateDom });
         private static void Padding_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             var border = (Border)d;
@@ -294,9 +303,15 @@ namespace Windows.UI.Xaml.Controls
 #if WORKINPROGRESS
         protected override Size MeasureOverride(Size availableSize)
         {
+            if (Child == null)
+            {
+                return Size.Zero;
+            }
+
             Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
             Size PaddingSize = new Size(Padding.Left + Padding.Right, Padding.Top + Padding.Bottom);
-            return base.MeasureOverride((availableSize - BorderThicknessSize - PaddingSize).Max(Size.Zero)) + BorderThicknessSize + PaddingSize;
+            Child.Measure((availableSize - BorderThicknessSize - PaddingSize).Max(Size.Zero));
+            return Child.DesiredSize + BorderThicknessSize + PaddingSize;
         }
 
         protected override Size ArrangeOverride(Size finalSize)

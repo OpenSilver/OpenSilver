@@ -217,8 +217,13 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the HorizontalOffset dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty HorizontalOffsetProperty =
+            DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(ContextMenu), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
         public static readonly DependencyProperty HorizontalOffsetProperty =
             DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(ContextMenu), new PropertyMetadata(0d));
+#endif
 
 
         //-----------------------
@@ -236,9 +241,13 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the VerticalOffset dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty VerticalOffsetProperty =
+            DependencyProperty.Register("VerticalOffset", typeof(double), typeof(ContextMenu), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
         public static readonly DependencyProperty VerticalOffsetProperty =
             DependencyProperty.Register("VerticalOffset", typeof(double), typeof(ContextMenu), new PropertyMetadata(0d));
-
+#endif
 
         #region Opened/Closed events-related members
 

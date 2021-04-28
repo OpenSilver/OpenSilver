@@ -490,6 +490,11 @@ namespace CSHTML5.Internal
             {
                 currentExpr.TryUpdateSourceObject(computedValue);
             }
+
+#if WORKINPROGRESS
+			// Raise the InvalidateMeasure or InvalidateArrange
+            storage.Owner.OnPropertyChanged(new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
+#endif
         }
 
         private static void ProcessCoerceValue(INTERNAL_PropertyStorage storage,
@@ -605,7 +610,6 @@ namespace CSHTML5.Internal
                     listener.OnPropertyChanged(sender, new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
                 }
             }
-            storage.Owner.OnPropertyChanged(new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
         }
 
         private static void CascadeInheritedPropertyToChildren(INTERNAL_PropertyStorage storage, object newValue)
