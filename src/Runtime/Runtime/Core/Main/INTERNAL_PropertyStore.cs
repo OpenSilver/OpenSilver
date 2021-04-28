@@ -629,7 +629,6 @@ namespace CSHTML5.Internal
                     listener.OnPropertyChanged(sender, new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
                 }
             }
-            storage.Owner.OnPropertyChanged(new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
         }
 
         private static bool ArePropertiesEqual(object obj1, object obj2, Type type)
