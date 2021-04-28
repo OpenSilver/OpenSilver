@@ -610,7 +610,6 @@ namespace CSHTML5.Internal
                     listener.OnPropertyChanged(sender, new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
                 }
             }
-            storage.Owner.OnPropertyChanged(new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
         }
 
         private static void CascadeInheritedPropertyToChildren(INTERNAL_PropertyStorage storage, object newValue)
