@@ -397,6 +397,10 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                 outerDivStyle.borderWidth = "1px";
                 outerDivStyle.boxSizing = "border-box"; //this is so that the borderWidth we set does not increase the size of the whole thing.
                 backgroundColor = isReadOnly ? "#DDDDDD" : "White";
+
+#if WORKINPROGRESS
+                BorderThickness = new Thickness(1);
+#endif
             }
             else //if the TextBox is templated, we don't want contentEditable div to have a border:
             {
@@ -418,6 +422,10 @@ style.width = '100%';
 style.height = '100%';
 formerOuterDiv.firstChild.firstChild.setAttribute('contenteditable', 'false');
 ", additionalDivForMargins);
+
+#if WORKINPROGRESS
+                BorderThickness = new Thickness(0);
+#endif
                 //dynamic divPreviouslyModified = additionalDivForMargins.firstChild;
                 //dynamic stylePreviouslyModified = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(divPreviouslyModified);
                 //stylePreviouslyModified.borderWidth = "0px";
@@ -425,6 +433,9 @@ formerOuterDiv.firstChild.firstChild.setAttribute('contenteditable', 'false');
                 //stylePreviouslyModified.height = "100%";
             }
             outerDivStyle.backgroundColor = backgroundColor;
+#if WORKINPROGRESS
+            outerDivStyle.lineHeight = "125%";
+#endif
             object middleDiv;
             var middleDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out middleDiv);
             middleDivStyle.width = "100%";
@@ -1604,7 +1615,12 @@ element.setAttribute(""data-maxlength"", ""{1}"");
                     }
                     else
                     {
+#if WORKINPROGRESS
+                        double contentEditableMaxWidth = Math.Max(0, Width - BorderThickness.Left - BorderThickness.Right);
+                        contentEditableStyle.maxWidth = contentEditableMaxWidth + "px";  //note: this might be incorrect as it does not take into consideration any padding, margin, or other elements that happens between outerDomElement and contentEditableDiv.
+#else
                         contentEditableStyle.maxWidth = outerDomStyle.width;  //note: this might be incorrect as it does not take into consideration any padding, margin, or other elements that happens between outerDomElement and contentEditableDiv.
+#endif
                     }
                 }
             }
