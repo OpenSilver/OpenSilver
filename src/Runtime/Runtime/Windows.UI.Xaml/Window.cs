@@ -256,7 +256,7 @@ namespace Windows.UI.Xaml
                 InvalidateArrange();
 
                 // At the first contentChanged, InvaliateMeasure/Arrange does not work because IsArrangeValid and IsMeasureValid is false.
-                CalculateLayout();
+                CalculateWindowLayout();
 #endif
 
             }
@@ -472,9 +472,8 @@ namespace Windows.UI.Xaml
 
         }
 
-        public void CalculateLayout()
+        private void CalculateWindowLayout()
         {
-            Console.WriteLine("Window: start CalculateLayout");
             if (Current.INTERNAL_VisualChildrenInformation == null)
             {
                 Console.WriteLine("INTERNAL_VisualChildrenInformation is null");
@@ -483,23 +482,19 @@ namespace Windows.UI.Xaml
 
             double width = Bounds.Width;
             double height = Bounds.Height;
-            Console.WriteLine($"Current: {Current.INTERNAL_InnerDomElement}, Bounds {Bounds.Left}, {Bounds.Top}, {Bounds.Width}, {Bounds.Height}");
             Current.Measure(new Size(width, height));
-            Console.WriteLine("---------------------------");
             Current.Arrange(new Rect(Bounds.Left, Bounds.Top, width, height));
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
             availableSize = new Size(Bounds.Width, Bounds.Height);
-            Console.WriteLine("Window MeasureOverride");
             return base.MeasureOverride(availableSize);
         }
 
         protected override Size ArrangeOverride(Size finalSize)
         {
             finalSize = new Size(Bounds.Width, Bounds.Height);
-            Console.WriteLine("Window ArrangeOverride");
             return base.ArrangeOverride(finalSize);
         }
 #endif
