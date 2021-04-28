@@ -148,8 +148,13 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the HorizontalScrollBarVisibility dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty HorizontalScrollBarVisibilityProperty =
+            DependencyProperty.Register("HorizontalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer), new FrameworkPropertyMetadata(ScrollBarVisibility.Disabled, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, HorizontalScrollBarVisibility_Changed)
+#else
         public static readonly DependencyProperty HorizontalScrollBarVisibilityProperty =
             DependencyProperty.Register("HorizontalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer), new PropertyMetadata(ScrollBarVisibility.Disabled, HorizontalScrollBarVisibility_Changed)
+#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         static void HorizontalScrollBarVisibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -497,8 +502,13 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the VerticalScrollBarVisibility dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty VerticalScrollBarVisibilityProperty =
+            DependencyProperty.Register("VerticalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer), new FrameworkPropertyMetadata(ScrollBarVisibility.Visible, FrameworkPropertyMetadataOptions.AffectsMeasure, VerticalScrollBarVisibility_Changed)
+#else
         public static readonly DependencyProperty VerticalScrollBarVisibilityProperty =
             DependencyProperty.Register("VerticalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer), new PropertyMetadata(ScrollBarVisibility.Visible, VerticalScrollBarVisibility_Changed)
+#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         
         static void VerticalScrollBarVisibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)

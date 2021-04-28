@@ -9,11 +9,11 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-	public interface ITextMeasurementService
-	{
-		Size Measure(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, FontStretch stretch, Thickness padding, double maxWidth);
+    public interface ITextMeasurementService
+    {
+        Size Measure(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, FontStretch stretch, TextWrapping wrapping, Thickness padding, double maxWidth);
         void CreateMeasurementText(UIElement parent);
-        string GetTextMeasureDivID();
+        bool IsTextMeasureDivID(string id);
     }
 
     //
@@ -26,72 +26,76 @@ namespace Windows.UI.Xaml
 #else
         private dynamic
 #endif
-            textDivStyle;
+            textBoxDivStyle;
 
-        private object textDivReference;
-        private TextBox associatedTextUI;
-        private string textDivUniqueIdentifier;
+        private object textBoxReference;
+
+        private TextBox associatedTextBox;
+
+
+        private string measureTextElementID;
 
         public TextMeasurementService()
         {
-            textDivUniqueIdentifier = "";
+            measureTextElementID = "";
         }
 
         public void CreateMeasurementText(UIElement parent)
         {
-            if (associatedTextUI != null)
+            if (associatedTextBox != null)
             {
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(associatedTextUI, parent);
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(associatedTextBox, parent);
             }
 
-            associatedTextUI = new TextBox();
+            associatedTextBox = new TextBox();
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(associatedTextBox, parent);
+            textBoxReference = (INTERNAL_HtmlDomElementReference)associatedTextBox.INTERNAL_OuterDomElement;
+            textBoxDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBoxReference);
 
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(associatedTextUI, parent);
-            textDivReference = (INTERNAL_HtmlDomElementReference)associatedTextUI.INTERNAL_OuterDomElement;
-            textDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textDivReference);
+            textBoxDivStyle.position = "absolute";
+            textBoxDivStyle.visibility = "hidden";
+            textBoxDivStyle.height = "";
+            textBoxDivStyle.width = "";
+            textBoxDivStyle.top = "0px";
 
-            textDivStyle.position = "absolute";
-            textDivStyle.visibility = "hidden";
-            textDivStyle.height = "";
-            textDivStyle.width = "";
-            textDivStyle.top = "0px";
-
-            textDivUniqueIdentifier = ((INTERNAL_HtmlDomElementReference)textDivReference).UniqueIdentifier;
+            measureTextElementID = ((INTERNAL_HtmlDomElementReference)textBoxReference).UniqueIdentifier;
         }
 
-        public string GetTextMeasureDivID()
+        public bool IsTextMeasureDivID(string id)
         {
-            return textDivUniqueIdentifier;
-        }   
+            if (measureTextElementID == id)
+                return true;
 
-        public Size Measure(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, FontStretch stretch, Thickness padding, double maxWidth)
+            return false;
+        }
+
+        public Size Measure(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, FontStretch stretch, TextWrapping wrapping, Thickness padding, double maxWidth)
         {
-            //Console.WriteLine($"TextMeasurementService maxWidth {maxWidth}");
-
-            if (textDivReference == null)
+            //Console.WriteLine($"MeasureTextBox maxWidth {maxWidth}");
+            if (textBoxReference == null)
             {
                 return Size.Zero;
             }
 
-            associatedTextUI.Text = String.IsNullOrEmpty(text) ? "A" : text;
-            associatedTextUI.FontFamily = fontFamily;
-            associatedTextUI.FontStyle = style;
-            associatedTextUI.FontWeight = weight;
-            associatedTextUI.FontStretch = stretch;
-            associatedTextUI.Padding = padding;
-            associatedTextUI.FontSize = fontSize;
+            associatedTextBox.Text = String.IsNullOrEmpty(text) ? "A" : text;
+            associatedTextBox.FontFamily = fontFamily;
+            associatedTextBox.FontStyle = style;
+            associatedTextBox.FontWeight = weight;
+            associatedTextBox.FontStretch = stretch;
+            associatedTextBox.Padding = padding;
+            associatedTextBox.FontSize = fontSize;
+
+            associatedTextBox.TextWrapping = wrapping;
 
             if (maxWidth.IsNaN() || double.IsInfinity(maxWidth))
             {
-                associatedTextUI.TextWrapping = TextWrapping.NoWrap;
-                textDivStyle.width = "";
-                textDivStyle.maxWidth = "";
+                textBoxDivStyle.width = "";
+                textBoxDivStyle.maxWidth = "";
             }
             else
             {
-                associatedTextUI.TextWrapping = TextWrapping.Wrap;
-                textDivStyle.width = String.Format("{0}px", maxWidth);
-                textDivStyle.maxWidth = String.Format("{0}px", maxWidth);
+                textBoxDivStyle.width = String.Format("{0}px", maxWidth);
+                textBoxDivStyle.maxWidth = String.Format("{0}px", maxWidth);
             }
 
             // On Simulator, it needs time to get actualwidth and actualheight
@@ -100,8 +104,9 @@ namespace Windows.UI.Xaml
                 System.Threading.Thread.Sleep(20);
             }
 
-            return new Size(associatedTextUI.ActualWidth + 1, associatedTextUI.ActualHeight);
+            return new Size(associatedTextBox.ActualWidth + 1, associatedTextBox.ActualHeight);
         }
+
     }
 }
 #endif

@@ -41,7 +41,8 @@ namespace Windows.UI.Xaml.Documents
 
 #if WORKINPROGRESS
         [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty CharacterSpacingProperty = DependencyProperty.Register("CharacterSpacing", typeof(int), typeof(TextElement), null);
+        public static readonly DependencyProperty CharacterSpacingProperty = DependencyProperty.Register("CharacterSpacing", typeof(int), typeof(TextElement), new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure));
+
         [OpenSilver.NotImplemented]
         public int CharacterSpacing
         {
