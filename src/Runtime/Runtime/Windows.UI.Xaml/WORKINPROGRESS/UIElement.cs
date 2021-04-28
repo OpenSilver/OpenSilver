@@ -5,6 +5,8 @@ using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
+using System.Windows.Controls.Primitives;
+using System.Linq;
 #else
 using Windows.UI.Xaml.Media;
 using Windows.Foundation;
@@ -121,37 +123,217 @@ namespace Windows.UI.Xaml
 
 		[OpenSilver.NotImplemented]
         public Size DesiredSize { get; private set; }
-		[OpenSilver.NotImplemented]
-        public Size RenderSize { get; private set; }
+        
+        public Rect VisualBounds { get; protected set; }
 
-		[OpenSilver.NotImplemented]
+        public bool IsMeasureValid { get; private set; }
+        public bool IsArrangeValid { get; private set; }
+
+        public Rect PreviousFinalRect { get; private set; }
+        public Size PreviousAvailableSize { get; private set; }
+        private Size previousDesiredSize;
+        private int disableMeasureInvalidationRequests;
+        private IDisposable disableMeasureInvalidationToken;
+        private int visualLevel;
+        public int VisualLevel
+        {
+            get
+            {
+                if (visualLevel == -1)
+                {
+                    visualLevel = (INTERNAL_VisualParent as UIElement) != null ? (INTERNAL_VisualParent as UIElement).VisualLevel + 1 : 0;
+                }
+
+                return visualLevel;
+            }
+        }
+        public UIElement()
+        {
+            DesiredSize = Size.Zero;
+            PreviousFinalRect = Rect.Empty;
+            PreviousAvailableSize = Size.Infinity;
+            previousDesiredSize = Size.Empty;
+            IsMeasureValid = false;
+            IsArrangeValid = false;
+            visualLevel = -1;
+
+            disableMeasureInvalidationToken = new Disposable(() => disableMeasureInvalidationRequests--);
+        }
+        private IDisposable DisableMeasureInvalidation()
+        {
+            disableMeasureInvalidationRequests++;
+            return disableMeasureInvalidationToken;
+        }
+        internal void RaiseLayoutUpdated()
+        {
+            OnLayoutUpdated();
+        }
+        protected virtual void OnLayoutUpdated()
+        {
+            //
+        }
         public void Arrange(Rect finalRect)
         {
+            using (System.Windows.Threading.Dispatcher.INTERNAL_GetCurrentDispatcher().DisableProcessing())
+            {
+                using (DisableMeasureInvalidation())
+                {
+                    if (Visibility != Visibility.Visible || IsArrangeValid && finalRect.IsClose(PreviousFinalRect))
+                    {
+                        //Console.WriteLine($"Arrange previousFinalRect {this}");
+                        LayoutManager.Current.RemoveArrange(this);
+                        return;
+                    }
+
+                    if (!IsMeasureValid)
+                    {
+                        Measure(finalRect.Size);
+                    }
+
+                    ArrangeCore(finalRect);
+
+                    PreviousFinalRect = finalRect;
+
+                    IsArrangeValid = true;
+
+                    // Render with new size & location
+                    Render();
+
+                    LayoutManager.Current.RemoveArrange(this);
+                    LayoutManager.Current.AddUpdatedElement(this);
+                }
+            }
+        }
+
+        private void Render()
+        {
+            if (this as Window == null)
+            {
+                INTERNAL_HtmlDomStyleReference uiStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement);
+                uiStyle.position = "absolute";
+                uiStyle.left = $"{VisualBounds.Left}px";
+                uiStyle.top = $"{VisualBounds.Top}px";
+                uiStyle.width = $"{VisualBounds.Width}px";
+                uiStyle.height = $"{VisualBounds.Height}px";
+                uiStyle.marginLeft = "0";
+                uiStyle.marginTop = "0";
+                uiStyle.marginRight = "0";
+                uiStyle.marginBottom = "0";
+
+                if (this.INTERNAL_AdditionalOutsideDivForMargins != null && this.INTERNAL_AdditionalOutsideDivForMargins != this.INTERNAL_OuterDomElement)
+                {
+                    //INTERNAL_HtmlDomElementReference domElementForMargin = (INTERNAL_HtmlDomElementReference)this.INTERNAL_AdditionalOutsideDivForMargins;
+                    //Console.WriteLine($"Set {domElementForMargin.UniqueIdentifier} padding&margin 0");
+                    INTERNAL_HtmlDomStyleReference uiMarginStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification((INTERNAL_HtmlDomElementReference)this.INTERNAL_AdditionalOutsideDivForMargins);
+                    uiMarginStyle.padding = "0";
+                    uiMarginStyle.marginLeft = "0";
+                    uiMarginStyle.marginTop = "0";
+                    uiMarginStyle.marginRight = "0";
+                    uiMarginStyle.marginBottom = "0";
+                    uiMarginStyle.position = "";    // FOR Grid
+                    uiMarginStyle.gridArea = "";    // FOR Grid
+                }
+            }
+        }
+
+        protected virtual void ArrangeCore(Rect finalRect)
+        {
 
         }
 
-		[OpenSilver.NotImplemented]
+        protected virtual Size MeasureCore(Size availableSize)
+        {
+            return Size.Empty;
+        }
+
         public void Measure(Size availableSize)
         {
+            using (System.Windows.Threading.Dispatcher.INTERNAL_GetCurrentDispatcher().DisableProcessing())
+            {
+                using (DisableMeasureInvalidation())
+                {
+                    if (Visibility == Visibility.Collapsed)
+                    {
+                        DesiredSize = Size.Zero;
+                    }
+                    else if (IsMeasureValid && PreviousAvailableSize.IsClose(availableSize))
+                    {
+                        //Console.WriteLine($"Measure previousDesiredSize {this}");
+                        DesiredSize = previousDesiredSize;
+                    }
+                    else
+                    {
+                        DesiredSize = MeasureCore(availableSize);
 
+                        PreviousAvailableSize = availableSize;
+                        previousDesiredSize = DesiredSize;
+                    }
+
+                    IsMeasureValid = true;
+                    LayoutManager.Current.RemoveMeasure(this);
+
+                    INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
+                    //Console.WriteLine($"UIElemet {domElementReference.UniqueIdentifier}, DesiredSize: {DesiredSize.Width}, {DesiredSize.Height}");
+                }
+            }
         }
 
-		[OpenSilver.NotImplemented]
+        public void ClearArrangeValid()
+        {
+            IsArrangeValid = false;
+
+            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
+            foreach (DependencyObject children in childElements)
+            {
+                ((UIElement)children).ClearArrangeValid();
+            }
+        }
+
         public void InvalidateArrange()
         {
+            if (!IsArrangeValid)
+            {
+                return;
+            }
 
+            ClearArrangeValid();
+
+            LayoutManager.Current.AddArrange(this);
+        }
+        public void InvalidateParentMeasure()
+        {
+            if (INTERNAL_VisualParent as UIElement != null)
+            {
+                (INTERNAL_VisualParent as UIElement).InvalidateMeasure();
+            }
         }
 
-		[OpenSilver.NotImplemented]
+        public void ClearMeasureValid()
+        {
+            IsMeasureValid = false;
+
+            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
+            foreach (DependencyObject children in childElements)
+            {
+                ((UIElement)children).ClearMeasureValid();
+            }
+        }
+
         public void InvalidateMeasure()
         {
+            if (disableMeasureInvalidationRequests > 0 || !IsMeasureValid)
+            {
+                return;
+            }
 
+            ClearMeasureValid();
+
+            LayoutManager.Current.AddMeasure(this);
         }
 
-		[OpenSilver.NotImplemented]
         public void UpdateLayout()
         {
-
+            
         }
 
 #if OPENSILVER

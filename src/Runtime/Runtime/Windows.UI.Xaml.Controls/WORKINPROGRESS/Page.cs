@@ -68,6 +68,16 @@ namespace Windows.UI.Xaml.Controls
         protected virtual void OnNavigatedFrom(NavigationEventArgs e)
         {
         }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            return base.MeasureOverride(availableSize);
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            return base.ArrangeOverride(finalSize);
+        }
     }
 }
 

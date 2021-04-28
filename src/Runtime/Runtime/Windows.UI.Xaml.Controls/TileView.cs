@@ -260,5 +260,24 @@ namespace Windows.UI.Xaml.Controls
                 this._owner.MaximizeTile((TileViewItem)this.Children[maximizedTileIndex]);
             }
         }
+
+#if WORKINPROGRESS
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (_contentGrid == null)
+                return Size.Zero;
+
+            _contentGrid.Measure(availableSize);
+            return _contentGrid.DesiredSize;
+        }
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            if (_contentGrid == null)
+                return finalSize;
+
+            _contentGrid.Arrange(new Rect(finalSize));
+            return finalSize;
+        }
+#endif
     }
 }
