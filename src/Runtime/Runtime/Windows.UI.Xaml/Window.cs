@@ -250,6 +250,12 @@ namespace Windows.UI.Xaml
                 }
 #if WORKINPROGRESS
                 Application.Current.TextMeasurementService.CreateMeasurementText(this);
+
+                // Invalidate when content changed
+                InvalidateMeasure();
+                InvalidateArrange();
+
+                // At the first contentChanged, InvaliateMeasure/Arrange does not work because IsArrangeValid and IsMeasureValid is false.
                 CalculateLayout();
 #endif
 
