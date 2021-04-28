@@ -115,6 +115,9 @@ namespace Windows.UI.Xaml
             // Get default font-family from css
             INTERNAL_FontsHelper.DefaultCssFontFamily = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("window.getComputedStyle(document.getElementsByTagName('body')[0]).getPropertyValue(\"font-family\")"));
 
+#if WORKINPROGRESS
+            TextMeasurementService = new TextMeasurementService();
+#endif
             // Initialize the window:
             if (_mainWindow == null) // Note: it could be != null if the user clicks "Restart" from the Simulator advanced options.
             {
@@ -157,9 +160,6 @@ namespace Windows.UI.Xaml
                 this.OnLaunched(new LaunchActivatedEventArgs());
             }));
 
-#if WORKINPROGRESS
-            TextMeasurementService = new TextMeasurementService();
-#endif
         }
 
 #region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
