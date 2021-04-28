@@ -20,11 +20,61 @@ namespace System.Windows.Threading
 namespace Windows.UI.Core
 #endif
 {
+    public enum DispatcherOperationStatus
+    {
+        Pending,
+        Aborted,
+        Completed,
+        Executing
+    }
     public sealed partial class DispatcherOperation
     {
+        public event EventHandler Completed;
+        public event EventHandler Aborted;
+
+        public DispatcherPriority Priority { get; private set; }
+        public DispatcherOperationStatus Status { get; private set; }
+        public object Result { get; private set; }
+
+        private Func<object> action;
         internal DispatcherOperation()
         {
 
+        }
+        public DispatcherOperation(Action action, DispatcherPriority priority) :
+            this(() => { action(); return null; }, priority)
+        {
+            //
+        }
+
+        public DispatcherOperation(Func<object> action, DispatcherPriority priority)
+        {
+            this.action = action;
+            this.Priority = priority;
+        }
+
+        public void Abort()
+        {
+            if (Status != DispatcherOperationStatus.Pending)
+            {
+                throw new Exception($"Operation is \"{Status}\" and cannot be aborted");
+            }
+
+            Status = DispatcherOperationStatus.Aborted;
+            Aborted.Raise(this);
+        }
+
+        public void Invoke()
+        {
+            if (Status != DispatcherOperationStatus.Pending)
+            {
+                throw new Exception($"Operation is \"{Status}\" and cannot be invoked");
+            }
+
+            Status = DispatcherOperationStatus.Executing;
+            Result = action();
+            Status = DispatcherOperationStatus.Completed;
+            Completed.Raise(this);
         }
     }
 }

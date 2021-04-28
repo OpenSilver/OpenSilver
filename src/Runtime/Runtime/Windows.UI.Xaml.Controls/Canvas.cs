@@ -100,8 +100,70 @@ namespace Windows.UI.Xaml.Controls
                         }
                         return null;
                     }
-                });
+                }
+            );
+#if WORKINPROGRESS
+        /// <summary>
+        /// Identifies the Canvas.Bottom XAML attached property.
+        /// </summary>
+        public static readonly DependencyProperty BottomProperty =
+            DependencyProperty.RegisterAttached("Bottom", typeof(double), typeof(UIElement), new PropertyMetadata(0d)
+            {
+                GetCSSEquivalent = (instance) =>
+                {
+                    var uielement = instance as UIElement;
+                    if (uielement != null && uielement.INTERNAL_VisualParent is Canvas)
+                    {
+                        return new CSSEquivalent()
+                        {
+                            Value = (inst, value) =>
+                            {
+                                return value.ToString() + "px";
+                            },
+                            Name = new List<string> { "bottom" },
+                            DomElement = uielement.INTERNAL_AdditionalOutsideDivForMargins,
+                            ApplyAlsoWhenThereIsAControlTemplate = true
+                        };
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+            );
 
+        /// <summary>
+        /// Identifies the Canvas.Bottom XAML attached property.
+        /// </summary>
+        public static readonly DependencyProperty RightProperty =
+            DependencyProperty.RegisterAttached("Right", typeof(double), typeof(UIElement), new PropertyMetadata(0d)
+            {
+                GetCSSEquivalent = (instance) =>
+                {
+                    var uielement = instance as UIElement;
+                    if (uielement != null && uielement.INTERNAL_VisualParent is Canvas)
+                    {
+                        return new CSSEquivalent()
+                        {
+                            Value = (inst, value) =>
+                            {
+                                return value.ToString() + "px";
+                            },
+                            Name = new List<string> { "right" },
+                            DomElement = uielement.INTERNAL_AdditionalOutsideDivForMargins,
+                            ApplyAlsoWhenThereIsAControlTemplate = true
+                        };
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+            );
+
+#endif
         /// <summary>
         /// Identifies the Canvas.ZIndex attached property.
         /// </summary>
@@ -214,5 +276,33 @@ namespace Windows.UI.Xaml.Controls
             */
 
         }
+
+#if WORKINPROGRESS
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            foreach (UIElement child in Children)
+            {
+                child.Measure(Size.Infinity);
+            }
+
+            return Size.Zero;
+        }
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            foreach (UIElement child in Children)
+            {
+                // Canvas.Left and Canvas.Top have higher priority
+                //double x = GetLeft(child).DefaultIfNaN(finalSize.Width - child.DesiredSize.Width - GetRight(child)).DefaultIfNaN(0);
+                //double y = GetTop(child).DefaultIfNaN(finalSize.Height - child.DesiredSize.Height - GetBottom(child)).DefaultIfNaN(0);
+                double x = GetLeft(child).DefaultIfNaN(0);
+                double y = GetTop(child).DefaultIfNaN(0);
+
+                child.Arrange(new Rect(new Point(x, y), child.DesiredSize));
+            }
+
+            return finalSize;
+        }
+#endif
+
     }
 }

@@ -70,6 +70,11 @@ namespace Windows.UI.Xaml
             get { return (int)this.GetValue(CountProperty); }
         }
 
+        public T[] ToArray()
+        {
+            return _collection.ToArray();
+        }
+
         public T this[int index]
         {
             get { return this.GetItemOverride(index); }

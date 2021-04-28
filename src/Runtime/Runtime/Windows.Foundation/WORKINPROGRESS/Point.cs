@@ -12,6 +12,9 @@ namespace Windows.Foundation
 {
 	public partial struct Point : IFormattable
 	{
+		public static readonly Point Empty = new Point();
+		public static readonly Point Zero = new Point(0, 0);
+
 		/// <summary>
 		/// Creates a System.String representation of this Windows.Foundation.Point.
 		/// </summary>
@@ -25,6 +28,44 @@ namespace Windows.Foundation
 		{
 			return default(string);
 		}
-	}
+        public static Point operator +(Point point1, Point point2)
+        {
+            if (point1 == Point.Zero)
+            {
+                return point2;
+            }
+
+            if (point2 == Point.Zero)
+            {
+                return point1;
+            }
+
+            return new Point(point1.X + point2.X, point1.Y + point2.Y);
+        }
+
+        public static Point operator -(Point point1, Point point2)
+        {
+            if (point1 == Point.Zero)
+            {
+                return -point2;
+            }
+
+            if (point2 == Point.Zero)
+            {
+                return point1;
+            }
+
+            return new Point(point1.X - point2.X, point1.Y - point2.Y);
+        }
+        public static Point operator -(Point point)
+        {
+            if (point == Point.Zero)
+            {
+                return point;
+            }
+
+            return new Point(-point.X, -point.Y);
+        }
+    }
 }
 #endif

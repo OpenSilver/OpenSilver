@@ -70,6 +70,9 @@ namespace Windows.UI.Xaml
         Window _mainWindow;
         ResourceDictionary _resources;
 
+#if WORKINPROGRESS
+        public ITextMeasurementService TextMeasurementService { get; private set; }
+#endif
         public Application()
         {
             // In case of a redirection from Microsoft AAD, when running in the Simulator, we re-instantiate the application. We need to reload the JavaScript files because they are no longer in the HTML DOM due to the AAD redirection:
@@ -153,6 +156,10 @@ namespace Windows.UI.Xaml
                 // Call the "OnLaunched" method:
                 this.OnLaunched(new LaunchActivatedEventArgs());
             }));
+
+#if WORKINPROGRESS
+            TextMeasurementService = new TextMeasurementService();
+#endif
         }
 
 #region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:

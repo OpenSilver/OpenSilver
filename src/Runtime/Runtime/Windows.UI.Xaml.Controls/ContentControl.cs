@@ -16,7 +16,12 @@
 using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 using System;
+using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Controls.Primitives;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -223,5 +228,41 @@ namespace Windows.UI.Xaml.Controls
                 this.TemplateChild = presenter;
             }
         }
+
+#if WORKINPROGRESS
+        
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            Size actualSize = new Size(ActualWidth, ActualHeight);
+            
+            //INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
+            //Console.WriteLine($"MeasureOverride {domElementReference.UniqueIdentifier} ContentControl {Content} Width {Width}, Height {Height}, ActualWidth {actualSize.Width}, ActualHeight {actualSize.Height}");
+
+            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
+            //Console.WriteLine($"MeasureOverride {domElementReference.UniqueIdentifier} ContentControl MeasureOverride Child {childElements.Count()}");
+            if (childElements.Count() > 0)
+            {
+                UIElement elementChild = ((UIElement)childElements.ElementAt(0));
+                elementChild.Measure(availableSize);
+                return elementChild.DesiredSize;
+            }
+
+            return actualSize;
+        }
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            //INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
+            //Console.WriteLine($"ArrangeOverride {domElementReference.UniqueIdentifier} ContentControl {Content} Width {Width}, Height {Height}, ActualWidth {ActualWidth}, ActualHeight {ActualHeight}");
+
+            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
+            //Console.WriteLine($"ArrangeOverride {domElementReference.UniqueIdentifier} ContentControl ArrangeOverride Child {childElements.Count()}");
+            if (childElements.Count() > 0)
+            {
+                UIElement elementChild = ((UIElement)childElements.ElementAt(0));
+                elementChild.Arrange(new Rect(finalSize));
+            }
+            return finalSize;
+        }
+#endif
     }
 }
