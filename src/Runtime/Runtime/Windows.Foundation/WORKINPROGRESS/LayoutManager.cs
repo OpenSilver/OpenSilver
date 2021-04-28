@@ -73,11 +73,7 @@ namespace Windows.Foundation
         {
             if (updateLayoutOperation == null || updateLayoutOperation.Status == DispatcherOperationStatus.Completed)
             {
-                Console.WriteLine($"BeginUpdateLayout BeginInvoke");
                 updateLayoutOperation = Dispatcher.INTERNAL_GetCurrentDispatcher().InvokeAsync(UpdateLayout, DispatcherPriority.Render);
-            } else
-            {
-                Console.WriteLine($"BeginUpdateLayout skip {updateLayoutOperation.Status}");
             }
         }
 
@@ -90,7 +86,7 @@ namespace Windows.Foundation
                 {
                     UIElement element = GetTopElement(measureQueue);
                     Size previousDesiredSize = element.DesiredSize;
-                    Console.WriteLine($"LayoutManager UpdateLayout/Measure {element}");
+                    //Console.WriteLine($"LayoutManager UpdateLayout/Measure {element}");
                     element.Measure(element.PreviousAvailableSize);
 
                     if (previousDesiredSize != element.DesiredSize)
@@ -103,7 +99,7 @@ namespace Windows.Foundation
                 while (arrangeQueue.Count > 0)
                 {
                     UIElement element = GetTopElement(arrangeQueue);
-                    Console.WriteLine($"LayoutManager UpdateLayout / Arrange {element}");
+                    //Console.WriteLine($"LayoutManager UpdateLayout / Arrange {element}");
                     element.Arrange(element.PreviousFinalRect);
                 }
 

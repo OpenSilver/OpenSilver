@@ -137,11 +137,6 @@ namespace Windows.UI.Xaml.Controls
                 child.Arrange(finalRect);
             }
 
-            // TODO read only
-            //Console.WriteLine($"ActualWidth {finalWidth}, ActualHeight {finalHeight}");
-            //columnDefinition.ActualWidth = finalWidth;
-            //rowDefinition.ActualHeight = finalHeight;
-
             return finalSize;
         }
 
