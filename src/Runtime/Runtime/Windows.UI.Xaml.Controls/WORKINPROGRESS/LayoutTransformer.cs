@@ -104,7 +104,8 @@ namespace System.Windows.Controls
         [OpenSilver.NotImplemented]
         protected override Size ArrangeOverride(Size finalSize)
         {
-            return default(Size);
+            Console.WriteLine($"TODO {this} ArrangeOverride");
+            throw new NotImplementedException("The method or operation is not implemented.");
         }
         //
         // Summary:
@@ -120,7 +121,8 @@ namespace System.Windows.Controls
         [OpenSilver.NotImplemented]
         protected override Size MeasureOverride(Size availableSize)
         {
-			return default(Size);
+            Console.WriteLine($"TODO {this} MeasureOverride");
+            throw new NotImplementedException("The method or operation is not implemented.");
         }
     }
 }

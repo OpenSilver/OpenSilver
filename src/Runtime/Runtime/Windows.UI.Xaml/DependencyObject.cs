@@ -407,6 +407,12 @@ namespace Windows.UI.Xaml
             INTERNAL_PropertyStore.SetValueCommon(storage, value, false);
         }
 
+        public virtual void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            //
+            //Console.WriteLine($"DependencyObject OnPropertyChanged {e.Property.Name} {e.OldValue}=>{e.NewValue}");
+        }
+
         internal void SetLocalStyleValue(DependencyProperty dp, object value)
         {
             INTERNAL_PropertyStorage storage;
