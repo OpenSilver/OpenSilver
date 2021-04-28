@@ -67,12 +67,6 @@ namespace Windows.UI.Xaml
             {
                 return Size.Zero;
             }
-            
-            INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)associatedTextUI.INTERNAL_OuterDomElement;
-            //Console.WriteLine($"TextMeasurementService {domElementReference.UniqueIdentifier} Measure");
-
-            // To avoid keeping previous lineHeight
-            textDivStyle.lineHeight = "";
 
             associatedTextUI.Text = String.IsNullOrEmpty(text) ? "A" : text;
             associatedTextUI.FontFamily = fontFamily;
