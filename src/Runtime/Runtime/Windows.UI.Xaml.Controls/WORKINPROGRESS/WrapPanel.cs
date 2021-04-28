@@ -80,7 +80,7 @@ namespace Windows.UI.Xaml.Controls
 										typeof(double),
 										typeof(WrapPanel),
 										new PropertyMetadata(double.NaN));
-
+#endif
 		private void MeasureChild(UIElement child, double availableMainLength, double availableCrossLength)
 		{
 			child.Measure(Orientation == Orientation.Horizontal ?
