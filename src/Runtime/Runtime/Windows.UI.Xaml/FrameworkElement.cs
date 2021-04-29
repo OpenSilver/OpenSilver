@@ -335,7 +335,7 @@ namespace Windows.UI.Xaml
             }
             else
             {
-                styleOfOuterDomElement.cursor = newCursor._cursorHtmlString;
+                styleOfOuterDomElement.cursor = newCursor.ToHtmlString();
             }
         }
 
