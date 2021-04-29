@@ -121,7 +121,9 @@ namespace Windows.UI.Xaml
                                         typeof(UIElement), 
                                         null);
 
-		[OpenSilver.NotImplemented]
+        public Size RenderSize { get { return VisualBounds.Size; } }
+
+        [OpenSilver.NotImplemented]
         public Size DesiredSize { get; private set; }
         
         public Rect VisualBounds { get; protected set; }
@@ -181,7 +183,8 @@ namespace Windows.UI.Xaml
             {
                 using (DisableMeasureInvalidation())
                 {
-                    if (Visibility != Visibility.Visible || IsArrangeValid && finalRect.IsClose(PreviousFinalRect))
+                    if (Visibility != Visibility.Visible || 
+                        (IsArrangeValid && finalRect.Location.IsClose(PreviousFinalRect.Location) && finalRect.Size.IsClose(PreviousFinalRect.Size)))
                     {
                         //Console.WriteLine($"Arrange previousFinalRect {this}");
                         LayoutManager.Current.RemoveArrange(this);

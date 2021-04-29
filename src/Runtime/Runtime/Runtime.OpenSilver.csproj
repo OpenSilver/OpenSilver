@@ -136,10 +136,8 @@
 		<Compile Include="System.Xaml\IMarkupExtension.cs" />
 		<Compile Include="Windows.Foundation\WORKINPROGRESS\IntExtensions.cs" />
 		<Compile Include="Windows.Foundation\WORKINPROGRESS\LayoutManager.cs" />
-		<Compile Include="Windows.Foundation\WORKINPROGRESS\CollectionExtensions.cs" />
 		<Compile Include="Windows.Foundation\WORKINPROGRESS\EventHandlerExtensions.cs" />
 		<Compile Include="Windows.Foundation\WORKINPROGRESS\Disposable.cs" />
-		<Compile Include="Windows.Foundation\WORKINPROGRESS\RectExtensions.cs" />
 		<Compile Include="Windows.Foundation\WORKINPROGRESS\PointExtensions.cs" />
 		<Compile Include="Windows.Foundation\WORKINPROGRESS\DoubleExtensions.cs" />
 		<Compile Include="Windows.Foundation\WORKINPROGRESS\Point.cs" />

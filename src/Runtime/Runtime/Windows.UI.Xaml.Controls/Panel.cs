@@ -358,8 +358,14 @@ namespace Windows.UI.Xaml.Controls
         }
 
 #if WORKINPROGRESS
-        protected abstract override Size MeasureOverride(Size availableSize);
-        protected abstract override Size ArrangeOverride(Size finalSize);
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            return availableSize;
+        }
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            return finalSize;
+        }
 #endif
     }
 }
