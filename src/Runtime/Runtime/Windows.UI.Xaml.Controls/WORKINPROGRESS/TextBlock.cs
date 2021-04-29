@@ -53,6 +53,11 @@ namespace Windows.UI.Xaml.Controls
 			get { return (int)this.GetValue(CharacterSpacingProperty); }
 			set { this.SetValue(CharacterSpacingProperty, value); }
 		}
+
+		protected override Size MeasureOverride(Size availableSize)
+		{
+			return Application.Current.TextMeasurementService.MeasureTextBlock(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, TextWrapping, Padding, availableSize.Width);
+		}
 	}
 }
 
