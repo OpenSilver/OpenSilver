@@ -12,6 +12,7 @@ namespace Windows.UI.Xaml
     public interface ITextMeasurementService
     {
         Size Measure(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, FontStretch stretch, TextWrapping wrapping, Thickness padding, double maxWidth);
+        Size MeasureTextBlock(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, FontStretch stretch, TextWrapping wrapping, Thickness padding, double maxWidth);
         void CreateMeasurementText(UIElement parent);
         bool IsTextMeasureDivID(string id);
     }
@@ -27,21 +28,32 @@ namespace Windows.UI.Xaml
         private dynamic
 #endif
             textBoxDivStyle;
-
         private object textBoxReference;
-
         private TextBox associatedTextBox;
 
+#if CSHTML5NETSTANDARD
+        private INTERNAL_HtmlDomStyleReference
+#else
+        private dynamic
+#endif
+            textBlockDivStyle;
+        private object textBlockReference;
+        private TextBlock associatedTextBlock;
 
-        private string measureTextElementID;
+
+        private string measureTextBoxElementID;
+        private string measureTextBlockElementID;
+
 
         public TextMeasurementService()
         {
-            measureTextElementID = "";
+            measureTextBoxElementID = "";
+            measureTextBlockElementID = "";
         }
 
         public void CreateMeasurementText(UIElement parent)
         {
+            // For TextBox
             if (associatedTextBox != null)
             {
                 INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(associatedTextBox, parent);
@@ -51,19 +63,34 @@ namespace Windows.UI.Xaml
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(associatedTextBox, parent);
             textBoxReference = (INTERNAL_HtmlDomElementReference)associatedTextBox.INTERNAL_OuterDomElement;
             textBoxDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBoxReference);
-
             textBoxDivStyle.position = "absolute";
             textBoxDivStyle.visibility = "hidden";
             textBoxDivStyle.height = "";
             textBoxDivStyle.width = "";
             textBoxDivStyle.top = "0px";
+            measureTextBoxElementID = ((INTERNAL_HtmlDomElementReference)textBoxReference).UniqueIdentifier;
 
-            measureTextElementID = ((INTERNAL_HtmlDomElementReference)textBoxReference).UniqueIdentifier;
+            // For TextBlock
+            if (associatedTextBlock != null)
+            {
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(associatedTextBlock, parent);
+            }
+
+            associatedTextBlock = new TextBlock();
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(associatedTextBlock, parent);
+            textBlockReference = (INTERNAL_HtmlDomElementReference)associatedTextBlock.INTERNAL_OuterDomElement;
+            textBlockDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBlockReference);
+            textBlockDivStyle.position = "absolute";
+            textBlockDivStyle.visibility = "hidden";
+            textBlockDivStyle.height = "";
+            textBlockDivStyle.width = "";
+            textBlockDivStyle.top = "0px";
+            measureTextBlockElementID = ((INTERNAL_HtmlDomElementReference)textBlockReference).UniqueIdentifier;
         }
 
         public bool IsTextMeasureDivID(string id)
         {
-            if (measureTextElementID == id)
+            if (measureTextBoxElementID == id || measureTextBlockElementID == id)
                 return true;
 
             return false;
@@ -107,6 +134,42 @@ namespace Windows.UI.Xaml
             return new Size(associatedTextBox.ActualWidth + 1, associatedTextBox.ActualHeight);
         }
 
+        public Size MeasureTextBlock(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, FontStretch stretch, TextWrapping wrapping, Thickness padding, double maxWidth)
+        {
+            if (textBlockReference == null)
+            {
+                return Size.Zero;
+            }
+
+            associatedTextBlock.Text = String.IsNullOrEmpty(text) ? "A" : text;
+            associatedTextBlock.FontFamily = fontFamily;
+            associatedTextBlock.FontStyle = style;
+            associatedTextBlock.FontWeight = weight;
+            associatedTextBlock.FontStretch = stretch;
+            associatedTextBlock.Padding = padding;
+            associatedTextBlock.FontSize = fontSize;
+
+            associatedTextBlock.TextWrapping = wrapping;
+
+            if (maxWidth.IsNaN() || double.IsInfinity(maxWidth))
+            {
+                textBlockDivStyle.width = "";
+                textBlockDivStyle.maxWidth = "";
+            }
+            else
+            {
+                textBlockDivStyle.width = String.Format("{0}px", maxWidth);
+                textBlockDivStyle.maxWidth = String.Format("{0}px", maxWidth);
+            }
+
+            // On Simulator, it needs time to get actualwidth and actualheight
+            if (CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
+            {
+                System.Threading.Thread.Sleep(20);
+            }
+
+            return new Size(associatedTextBlock.ActualWidth + 1, associatedTextBlock.ActualHeight);
+        }
     }
 }
 #endif
