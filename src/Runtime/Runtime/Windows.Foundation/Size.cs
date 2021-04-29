@@ -126,7 +126,7 @@ namespace Windows.Foundation
                 return size;
             }
 
-            return new Size(-size.Width, -size.Height);
+            return new Size((-size.Width).Max(0), (-size.Height).Max(0));
         }
 
         public static Size operator -(Size size1, Size size2)
@@ -141,7 +141,7 @@ namespace Windows.Foundation
                 return size1;
             }
 
-            return new Size(size1.Width - size2.Width, size1.Height - size2.Height);
+            return new Size((size1.Width - size2.Width).Max(0), (size1.Height - size2.Height).Max(0));
         }
 
         public static Size operator +(Size size1, Size size2)
