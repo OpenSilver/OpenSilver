@@ -55,9 +55,6 @@
     <Content Include="Logo_32x32.png">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="ProjectTemplates\CSharp\OpenSilver\Empty OpenSilver Application.zip">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="ProjectTemplates\CSharp\OpenSilver\Empty OpenSilver UWP Application.zip">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -109,9 +106,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="ProjectTemplates\CSharp\OpenSilver\OpenSilver Silverlight ClassLibrary.zip">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="ProjectTemplates\CSharp\OpenSilver\OpenSilver UWP ClassLibrary.zip">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -139,6 +133,20 @@
       <Name>DotNetForHtml5.VisualStudioExtension.ShellIntegration</Name>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\Empty OpenSilver Application\EmptyOpenSilverMigrationApplicationTemplate.csproj">
+      <Project>{ED7A89B5-CD09-4697-8CEA-69EC1546D1DF}</Project>
+      <Name>EmptyOpenSilverMigrationApplicationTemplate</Name>
+      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenSilverClassLibraryTemplate\OpenSilverClassLibraryTemplate.csproj">
+      <Project>{2D788498-9178-480A-9DC1-E0953CC7F0E1}</Project>
+      <Name>OpenSilverClassLibraryTemplate</Name>
+      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
