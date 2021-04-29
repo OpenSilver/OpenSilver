@@ -33,6 +33,9 @@ namespace Windows.Foundation
 
         public void AddMeasure(UIElement element)
         {
+            if (element == null)
+                return;
+
             measureQueue.Add(element);
             BeginUpdateLayout();
         }
@@ -44,6 +47,9 @@ namespace Windows.Foundation
 
         public void AddArrange(UIElement element)
         {
+            if (element == null)
+                return;
+
             arrangeQueue.Add(element);
             BeginUpdateLayout();
         }
@@ -66,7 +72,10 @@ namespace Windows.Foundation
                 return;
             }
 
-            updatedElements.AddRange(GetElementPath(element));
+            foreach (UIElement pathElement in GetElementPath(element))
+            {
+                updatedElements.Add(pathElement);
+            }
         }
 
         public void BeginUpdateLayout()
