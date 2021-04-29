@@ -271,6 +271,10 @@ namespace Windows.UI.Xaml.Controls
                 }
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChildren[i], this);
                 INTERNAL_OnChildProgressivelyLoaded();
+#if WORKINPROGRESS
+                InvalidateMeasure();
+                InvalidateArrange();
+#endif
             }
         }
 

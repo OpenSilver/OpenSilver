@@ -305,15 +305,15 @@ namespace Windows.UI.Xaml.Controls
 
             foreach (UIElement child in Children)
             {
-                child.Measure(new Size(remainingWidth, remainingHeight).Max(Size.Zero));
+                child.Measure(new Size(remainingWidth, remainingHeight));
 
                 if (GetDockOrientation(GetDock(child)) == Orientation.Horizontal)
                 {
-                    remainingWidth -= child.DesiredSize.Width;
+                    remainingWidth = (remainingWidth - child.DesiredSize.Width).Max(0);
                 }
                 else
                 {
-                    remainingHeight -= child.DesiredSize.Height;
+                    remainingHeight = (remainingHeight - child.DesiredSize.Height).Max(0);
                 }
             }
 
