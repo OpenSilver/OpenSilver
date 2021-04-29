@@ -174,6 +174,9 @@ namespace Windows.UI.Xaml
         }
         public void Arrange(Rect finalRect)
         {
+            if (this.INTERNAL_OuterDomElement == null)
+                return;
+
             using (System.Windows.Threading.Dispatcher.INTERNAL_GetCurrentDispatcher().DisableProcessing())
             {
                 using (DisableMeasureInvalidation())
@@ -248,6 +251,9 @@ namespace Windows.UI.Xaml
 
         public void Measure(Size availableSize)
         {
+            if (this.INTERNAL_OuterDomElement == null)
+                return;
+
             using (System.Windows.Threading.Dispatcher.INTERNAL_GetCurrentDispatcher().DisableProcessing())
             {
                 using (DisableMeasureInvalidation())
