@@ -1342,6 +1342,57 @@ namespace Windows.UI.Xaml.Controls
         {
 
         }
+
+        private double ScrollBarWidth
+        {
+            get { 
+                return 20;  // Default scrollbar width
+            }
+        }
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (Content as FrameworkElement == null)
+                return Size.Zero;
+
+            double visibleHorizontalScrollBarWidth = 0;
+            double visibleVerticalScrollBarWidth = 0;
+
+            if (HorizontalScrollBarVisibility == ScrollBarVisibility.Visible)
+                visibleHorizontalScrollBarWidth = ScrollBarWidth;
+
+            if (VerticalScrollBarVisibility == ScrollBarVisibility.Visible)
+                visibleVerticalScrollBarWidth = ScrollBarWidth;
+
+            Size size = new Size((availableSize.Width - visibleVerticalScrollBarWidth).Max(0), (availableSize.Height - visibleHorizontalScrollBarWidth).Max(0));
+
+            FrameworkElement childElement = Content as FrameworkElement;
+            childElement.Measure(size);
+
+            Size extent = new Size(childElement.DesiredSize.Width + visibleVerticalScrollBarWidth, childElement.DesiredSize.Height + visibleHorizontalScrollBarWidth);
+            return extent;
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            if (Content as FrameworkElement == null)
+                return finalSize;
+
+            double visibleHorizontalScrollBarWidth = 0;
+            double visibleVerticalScrollBarWidth = 0;
+
+            if (HorizontalScrollBarVisibility == ScrollBarVisibility.Visible)
+                visibleHorizontalScrollBarWidth = ScrollBarWidth;
+
+            if (VerticalScrollBarVisibility == ScrollBarVisibility.Visible)
+                visibleVerticalScrollBarWidth = ScrollBarWidth;
+
+            Size size = new Size((finalSize.Width - visibleVerticalScrollBarWidth).Max(0), (finalSize.Height - visibleHorizontalScrollBarWidth).Max(0));
+
+            FrameworkElement childElement = Content as FrameworkElement;
+            childElement.Arrange(new Rect(size));
+
+            return finalSize;
+        }
 #endif
     }
 }
