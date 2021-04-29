@@ -65,9 +65,6 @@
     <file src="../../src/Simulator/Simulator/bin/OpenSilver/$Configuration$/interop_debug_root.html" target="tools/simulator/interop_debug_root.html" />
     <file src="../../src/Compiler/Compiler.Common/bin/OpenSilver/$Configuration$/OpenSilver.Compiler.Common.dll" target="tools/simulator/OpenSilver.Compiler.Common.dll" />
 
-    <!-- OpenSilver install script -->
-    <file src="init_OpenSilver.ps1" target="tools/init.ps1" />
-
     <!-- OpenSilver icon -->
     <file src="OpenSilver_icon.png" target="images\OpenSilver_icon.png" />
     

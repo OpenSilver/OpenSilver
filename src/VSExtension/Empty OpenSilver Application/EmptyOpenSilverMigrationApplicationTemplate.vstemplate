@@ -13,7 +13,7 @@
     <DefaultName>OpenSilverApplication</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
   </TemplateData>
-  <TemplateContent>   
+  <TemplateContent>
     <ProjectCollection>
       <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$">
         Src\MyTemplate.vstemplate
