@@ -12,23 +12,17 @@
 *  
 \*====================================================================================*/
 
-
-#if BRIDGE
-using Bridge;
-#else
-using JSIL.Meta;
-#endif
-
 using CSHTML5.Types;
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
-#if CSHTML5BLAZOR
-// we need to use JsonValueKind for OpenSilver browser Interops
+
+#if OPENSILVER
 using System.Text.Json;
 #endif
+
 #if MIGRATION
 using System.Windows;
 #else
@@ -39,9 +33,11 @@ namespace CSHTML5
 {
     internal static class INTERNAL_InteropImplementation
     {
-        static bool IsJavaScriptCSharpInteropSetUp;
-        static Dictionary<int, Delegate> CallbacksDictionary = new Dictionary<int, Delegate>();
-        static Random RandomGenerator = new Random();
+        private static bool IsJavaScriptCSharpInteropSetUp;
+        private static Dictionary<int, Delegate> CallbacksDictionary = new Dictionary<int, Delegate>();
+        private static Random RandomGenerator = new Random();
+        private static List<string> UnmodifiedJavascriptCalls = new List<string>();
+        private static int IndexOfNextUnmodifiedJSCallInList = 0;
 
         static INTERNAL_InteropImplementation()
         {
@@ -51,14 +47,11 @@ namespace CSHTML5
             };
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("null")]
-#else
+#if BRIDGE
         [Bridge.Template("null")]
 #endif
         internal static object ExecuteJavaScript_SimulatorImplementation(string javascript, bool runAsynchronously, bool noImpactOnPendingJSCode = false, params object[] variables)
         {
-#if !BUILDINGDOCUMENTATION
             //---------------
             // Due to the fact that it is not possible to pass JavaScript objects between the simulator JavaScript context
             // and the C# context, we store the JavaScript objects in a global dictionary inside the JavaScript context.
@@ -76,14 +69,14 @@ namespace CSHTML5
             // Make sure the JS to C# interop is set up:
             if (!IsJavaScriptCSharpInteropSetUp)
             {
-#if CSHTML5BLAZOR
+#if OPENSILVER
                 if (Interop.IsRunningInTheSimulator_WorkAround)
                 {
 #endif
                     // Adding a property to the JavaScript "window" object:
                     dynamic jsWindow = INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("window");
                     jsWindow.SetProperty("onCallBack", new OnCallBack(CallbacksDictionary));
-#if CSHTML5BLAZOR
+#if OPENSILVER
                 }
                 else
                 {
@@ -95,8 +88,14 @@ namespace CSHTML5
 
             string unmodifiedJavascript = javascript;
 
-            // If the javascript code has references to previously obtained JavaScript objects, we replace those references with calls to the "document.jsSimulatorObjectReferences" dictionary.
-            for (int i = variables.Length - 1; i >= 0; i--) // Note: we iterate in reverse order because, when we replace ""$" + i.ToString()", we need to replace "$10" before replacing "$1", otherwise it thinks that "$10" is "$1" followed by the number "0". To reproduce the issue, call "ExecuteJavaScript" passing 10 arguments and using "$10".
+            // If the javascript code has references to previously obtained JavaScript objects,
+            // we replace those references with calls to the "document.jsSimulatorObjectReferences"
+            // dictionary.
+            // Note: we iterate in reverse order because, when we replace ""$" + i.ToString()", we
+            // need to replace "$10" before replacing "$1", otherwise it thinks that "$10" is "$1"
+            // followed by the number "0". To reproduce the issue, call "ExecuteJavaScript" passing
+            // 10 arguments and using "$10".
+            for (int i = variables.Length - 1; i >= 0; i--)  
             {
                 var variable = variables[i];
                 if (variable is INTERNAL_JSObjectReference)
@@ -109,9 +108,15 @@ namespace CSHTML5
                     string jsCodeForAccessingTheObject;
 
                     if (jsObjectReference.IsArray)
-                        jsCodeForAccessingTheObject = string.Format(@"document.jsSimulatorObjectReferences[""{0}""][{1}]", jsObjectReference.ReferenceId, jsObjectReference.ArrayIndex);
+                    {
+                        jsCodeForAccessingTheObject = string.Format(@"document.jsSimulatorObjectReferences[""{0}""][{1}]", 
+                            jsObjectReference.ReferenceId, jsObjectReference.ArrayIndex);
+                    }
                     else
-                        jsCodeForAccessingTheObject = string.Format(@"document.jsSimulatorObjectReferences[""{0}""]", jsObjectReference.ReferenceId);
+                    {
+                        jsCodeForAccessingTheObject = string.Format(@"document.jsSimulatorObjectReferences[""{0}""]", 
+                            jsObjectReference.ReferenceId);
+                    }
 
                     javascript = javascript.Replace("$" + i.ToString(), jsCodeForAccessingTheObject);
                 }
@@ -145,15 +150,10 @@ namespace CSHTML5
                     int callbackId = ReferenceIDGenerator.GenerateId();
                     CallbacksDictionary.Add(callbackId, callback);
 
-#if CSHTML5NETSTANDARD
-                    //Console.WriteLine("Added ID: " + callbackId.ToString());
-#endif
-
                     // Change the JS code to point to that callback:
-#if BRIDGE
                     javascript = javascript.Replace("$" + i.ToString(), string.Format(
-                    @"(function() {{
-                        var argsArray = Array.prototype.slice.call(arguments);                        
+                                       @"(function() {{
+                        var argsArray = {1};
                         var idWhereCallbackArgsAreStored = ""callback_args_"" + document.callbackCounterForSimulator++;
                         document.jsSimulatorObjectReferences[idWhereCallbackArgsAreStored] = argsArray;
                         setTimeout(
@@ -162,25 +162,24 @@ namespace CSHTML5
                                window.onCallBack.OnCallbackFromJavaScript({0}, idWhereCallbackArgsAreStored, argsArray);
                             }}
                             , 1);
-                      }})", callbackId));
-#else //OpenSilver
-                    javascript = javascript.Replace("$" + i.ToString(), string.Format(
-                                        @"(function() {{
-                        var argsArray = arguments;                        
-                        var idWhereCallbackArgsAreStored = ""callback_args_"" + document.callbackCounterForSimulator++;
-                        document.jsSimulatorObjectReferences[idWhereCallbackArgsAreStored] = argsArray;
-                        setTimeout(
-                            function() 
-                            {{
-                               window.onCallBack.OnCallbackFromJavaScript({0}, idWhereCallbackArgsAreStored, argsArray);
-                            }}
-                            , 1);
-                      }})", callbackId));
+                      }})", callbackId,
+#if OPENSILVER
+                                       Interop.IsRunningInTheSimulator_WorkAround ? "arguments" : "Array.prototype.slice.call(arguments)"
+#elif BRIDGE
+                                       "Array.prototype.slice.call(arguments)"
 #endif
+                                       ));
 
-                    // Note: generating the random number in JS rather than C# is important in order to be able to put this code inside a JavaScript "for" statement (cf. deserialization code of the JsonConvert extension, and also ZenDesk ticket #974) so that the "closure" system of JavaScript ensures that the number is the same before and inside the "setTimeout" call, but different for each iteration of the "for" statement in which this piece of code is put.
-                    // Note: we store the arguments in the jsSimulatorObjectReferences that is inside the JS context, so that the user can access them from the callback.
-                    // Note: "Array.prototype.slice.call" will convert the arguments keyword into an array (cf. http://stackoverflow.com/questions/960866/how-can-i-convert-the-arguments-object-to-an-array-in-javascript )
+                    // Note: generating the random number in JS rather than C# is important in order
+                    // to be able to put this code inside a JavaScript "for" statement (cf.
+                    // deserialization code of the JsonConvert extension, and also ZenDesk ticket #974)
+                    // so that the "closure" system of JavaScript ensures that the number is the same
+                    // before and inside the "setTimeout" call, but different for each iteration of the
+                    // "for" statement in which this piece of code is put.
+                    // Note: we store the arguments in the jsSimulatorObjectReferences that is inside
+                    // the JS context, so that the user can access them from the callback.
+                    // Note: "Array.prototype.slice.call" will convert the arguments keyword into an array
+                    // (cf. http://stackoverflow.com/questions/960866/how-can-i-convert-the-arguments-object-to-an-array-in-javascript)
                     // Note: in the command above, we use "setTimeout" to avoid thread/locks problems.
                 }
                 else if (variable == null)
@@ -194,7 +193,10 @@ namespace CSHTML5
                 else
                 {
                     //--------------------
-                    // Simple value types or other objects (note: this includes objects that override the "ToString" method, such as the class "Uri")
+                    // Simple value types or other objects
+                    // (note: this includes objects that
+                    // override the "ToString" method, such
+                    // as the class "Uri")
                     //--------------------
 
                     javascript = javascript.Replace("$" + i.ToString(), INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(variable));
@@ -203,10 +205,6 @@ namespace CSHTML5
 
             UnmodifiedJavascriptCalls.Add(unmodifiedJavascript);
 
-#if CSHTML5NETSTANDARD
-            //Console.WriteLine("Added ID: " + callbackId.ToString());
-#endif
-            
             // Change the JS code to call ShowErrorMessage in case of error:
             string errorCallBack = string.Format(
             @"var idWhereErrorCallbackArgsAreStored = ""callback_args_"" + document.callbackCounterForSimulator++;
@@ -218,7 +216,9 @@ namespace CSHTML5
                 , IndexOfNextUnmodifiedJSCallInList);
             ++IndexOfNextUnmodifiedJSCallInList;
 
-            // Surround the javascript code with some code that will store the result into the "document.jsSimulatorObjectReferences" for later use in subsequent calls to this method:
+            // Surround the javascript code with some code that will store the
+            // result into the "document.jsSimulatorObjectReferences" for later
+            // use in subsequent calls to this method
             int referenceId = ReferenceIDGenerator.GenerateId();
             javascript = string.Format(
 @"
@@ -251,9 +251,6 @@ result;
             };
 
             return objectReference;
-#else
-            return null;
-#endif
         }
 
         internal static void ResetLoadedFilesDictionaries()
@@ -261,9 +258,6 @@ result;
             _pendingJSFile.Clear();
             _loadedFiles.Clear();
         }
-
-        static List<string> UnmodifiedJavascriptCalls = new List<string>();
-        static int IndexOfNextUnmodifiedJSCallInList = 0;
 
         internal static void ShowErrorMessage(string errorMessage, int indexOfCallInList)
         {
@@ -279,14 +273,12 @@ result;
             MessageBox.Show(message);
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("null")]
-#else
+#if BRIDGE
         [Bridge.Template("null")]
 #endif
         internal static object CastFromJsValue(object obj)
         {
-#if CSHTML5BLAZOR
+#if OPENSILVER
             if (!Interop.IsRunningInTheSimulator_WorkAround)
             {
                 if (obj != null && (obj is string || obj.GetType().IsPrimitive))
@@ -323,9 +315,8 @@ result;
                 return res;
             }
             else
-            {
 #endif
-#if !BUILDINGDOCUMENTATION
+            {
                 dynamic res = obj;
                 int resInt;
 
@@ -341,46 +332,15 @@ result;
                     return null;
                 else
                     return res;
-
-                //JSValue jsValue = (JSValue)obj;
-                //if (jsValu)
-                //{
-                //    return (string)jsValue;
-                //}
-                //else if (jsValue.IsBoolean)
-                //{
-                //    return (bool)jsValue;
-                //}
-                //else if (jsValue.IsDouble || jsValue.IsNumber)
-                //{
-                //    return (double)jsValue;
-                //}
-                //else if (jsValue.IsInteger)
-                //{
-                //    return (int)jsValue;
-                //}
-                //else if (jsValue.IsNaN || jsValue.IsNull || jsValue.IsUndefined)
-                //{
-                //    return null;
-                //}
-                //else
-                //    return jsValue; // Objects cannot be passed between C# and JavaScript, so we return the JSValue just for the sake of returning something, but we also keep a reference to the JS object via the "document.jsSimulatorObjectReferences" dictionary for later use (see comments above).
-#else
-            return obj;
-#endif
-#if CSHTML5BLAZOR
             }
-#endif
         }
 
 
         /// <summary>
         /// This class has a method that generates IDs in sequence (0, 1, 2, 3...)
         /// </summary>
-#if !BRIDGE
-        [JSIL.Meta.JSIgnore]
-#else
-        [External]
+#if BRIDGE
+        [Bridge.External]
 #endif
         internal static class ReferenceIDGenerator
         {
@@ -393,10 +353,14 @@ result;
             }
         }
 
-        static Dictionary<string, List<Tuple<Action, Action>>> _pendingJSFile = new Dictionary<string, List<Tuple<Action, Action>>>(); //This Dictionary is here to:
-                                                                                                                                       //       - know when we are already attempting to load the file so we do not try to load it a second time
-                                                                                                                                       //       - call the correct callback (success or failure) for everything that tried to load said file (so access to the callback) once we receive the event saying that the loading was successful/failed.
-        static HashSet<string> _loadedFiles = new HashSet<string>(); //To know which files have already been successfully loaded so can we simply call the OnSuccess callback.
+        //This Dictionary is here to:
+        // - know when we are already attempting to load the file so we do not try to load it a second time
+        // - call the correct callback (success or failure) for everything that tried to load said file (so
+        // access to the callback) once we receive the event saying that the loading was successful/failed.
+        private static Dictionary<string, List<Tuple<Action, Action>>> _pendingJSFile = new Dictionary<string, List<Tuple<Action, Action>>>();
+
+        // To know which files have already been successfully loaded so can we simply call the OnSuccess callback.
+        private static HashSet<string> _loadedFiles = new HashSet<string>(); 
 
         internal static void LoadJavaScriptFile(string url, string callerAssemblyName, Action callbackOnSuccess, Action callbackOnFailure = null)
         {
@@ -435,7 +399,8 @@ head.appendChild(script);", html5Path, (Action<object>)LoadJavaScriptFileSuccess
 
         private static void LoadJavaScriptFileSuccess(object jsArgument)
         {
-            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument)); //using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
+            // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
+            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument)); 
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item1();
@@ -446,7 +411,8 @@ head.appendChild(script);", html5Path, (Action<object>)LoadJavaScriptFileSuccess
 
         private static void LoadJavaScriptFileFailure(object jsArgument)
         {
-            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument)); //using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
+            // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
+            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument)); 
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item2();
@@ -478,10 +444,13 @@ head.appendChild(script);", html5Path, (Action<object>)LoadJavaScriptFileSuccess
 
         internal static void LoadCssFile(string url, Action callback)
         {
-            // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
-#if !BRIDGE
-            string callerAssemblyName = Interop.IsRunningInTheSimulator ? Assembly.GetCallingAssembly().GetName().Name : INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
-#else
+            // Get the assembly name of the calling method: 
+            // IMPORTANT: the call to the "GetCallingAssembly" method must be done in
+            // the method that is executed immediately after the one where the URI is
+            // defined! Be careful when moving the following line of code.
+#if NETSTANDARD
+            string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
+#elif BRIDGE
             string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
 
@@ -522,9 +491,7 @@ img.src = $0;", html5Path, callback);
             }
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("false")]
-#else
+#if BRIDGE
         [Bridge.Template("false")]
 #endif
         internal static bool IsRunningInTheSimulator()
@@ -532,7 +499,7 @@ img.src = $0;", html5Path, callback);
             return true;
         }
 
-#if CSHTML5BLAZOR
+#if OPENSILVER
         // In the OpenSilver Version
         // This is does not reprensent if we are in the simulator but if we're
         // For This purpose use DotNetForHtml5.Core.IsRunningInTheSimulator_WorkAround

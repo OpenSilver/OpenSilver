@@ -11,13 +11,12 @@
     <script type="application/javascript" src="flatpickr.js"></script>
     <script type="application/javascript" src="ResizeSensor.js"></script>
     <script type="application/javascript">
-        window.onCallBack = {};
-        window.onCallBack.OnCallbackFromJavaScript = function () {
-            // Callbacks are disabled in this mode.
-        };
-        window.onCallBack.OnCallbackFromJavaScriptError = function () {
-            // Callbacks are disabled in this mode.
-        };
+        window.onCallBack = (function() {
+            return {
+                OnCallbackFromJavaScript : function () { },
+                OnCallbackFromJavaScriptError : function () { }
+            };
+        })();
     </script>
 </head>
 
