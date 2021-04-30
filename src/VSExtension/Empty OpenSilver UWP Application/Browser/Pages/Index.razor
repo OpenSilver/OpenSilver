@@ -1,0 +1,14 @@
+﻿@page "/"
+@using $safeprojectname$.Interop;
+@inject IJSRuntime JSRuntime;
+
+@code{
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        Cshtml5Initializer.Initialize(new UnmarshalledJavaScriptExecutionHandler(JSRuntime));
+
+        Program.RunApplication();
+    }
+}
