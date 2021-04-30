@@ -6,7 +6,6 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    [OpenSilver.NotImplemented]
 	public sealed partial class VisualTreeHelper
 	{
 		/// <summary>
