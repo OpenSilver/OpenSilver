@@ -1,5 +1,6 @@
 #if WORKINPROGRESS
 
+using CSHTML5.Internal;
 using System.Windows;
 
 #if MIGRATION
@@ -54,8 +55,37 @@ namespace Windows.UI.Xaml.Controls
 			set { this.SetValue(CharacterSpacingProperty, value); }
 		}
 
+		private Size noWrapSize = Size.Empty;
+
+		public override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			// Skip when loading or changed on TextMeasurement Div.
+			if (this.INTERNAL_OuterDomElement == null || Application.Current.TextMeasurementService.IsTextMeasureDivID(((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier))
+				return;
+
+			FrameworkPropertyMetadata metadata = e.Property.GetMetadata(GetType()) as FrameworkPropertyMetadata;
+
+			if (metadata != null)
+			{
+				if (metadata.AffectsMeasure)
+				{
+					noWrapSize = Size.Empty;
+				}
+			}
+			base.OnPropertyChanged(e);
+		}
 		protected override Size MeasureOverride(Size availableSize)
 		{
+			if (noWrapSize == Size.Empty)
+			{
+				noWrapSize = Application.Current.TextMeasurementService.Measure(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, TextWrapping.NoWrap, Padding, Double.PositiveInfinity);
+			}
+
+			if (TextWrapping == TextWrapping.NoWrap || noWrapSize.Width <= availableSize.Width)
+			{
+				return noWrapSize;
+			}
+
 			return Application.Current.TextMeasurementService.MeasureTextBlock(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, TextWrapping, Padding, availableSize.Width);
 		}
 	}
