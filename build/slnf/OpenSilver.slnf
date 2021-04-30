@@ -1,0 +1,16 @@
+{
+  "solution": {
+    "path": "..\\..\\src\\OpenSilver.sln",
+    "projects": [
+      "Analyzers\\NotImplemented.Tests\\NotImplemented.Analyzer.Tests.csproj",
+      "Analyzers\\NotImplemented\\NotImplemented.Analyzer.csproj",
+      "Compiler\\Compiler.Common\\Compiler.Common.OpenSilver.csproj",
+      "Compiler\\Compiler.ProgressDialog\\Compiler.ProgressDialog.OpenSilver.csproj",
+      "Compiler\\Compiler.TypeScriptDefToCSharp\\Compiler.TypeScriptDefToCSharp.OpenSilver.csproj",
+      "Compiler\\Compiler\\Compiler.OpenSilver.csproj",
+      "Runtime\\DataForm.Toolkit\\DataForm.Toolkit.OpenSilver.csproj",
+      "Runtime\\Controls.Data.Input\\Controls.Data.Input.OpenSilver.csproj",
+      "Runtime\\Runtime\\Runtime.OpenSilver.csproj"
+    ]
+  }
+}

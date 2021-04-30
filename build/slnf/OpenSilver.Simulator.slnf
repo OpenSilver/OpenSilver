@@ -1,0 +1,8 @@
+{
+  "solution": {
+    "path": "..\\..\\src\\OpenSilver.sln",
+    "projects": [
+      "Simulator\\Simulator\\Simulator.OpenSilver.csproj"
+    ]
+  }
+}
