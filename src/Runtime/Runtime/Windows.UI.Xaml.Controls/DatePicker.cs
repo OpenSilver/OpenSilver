@@ -12,29 +12,16 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.Serialization;
 using System.Globalization;
-using System.Windows.Controls.Common;
-
 
 #if MIGRATION
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Threading;
-using System.Windows;
-using System.Windows.Media;
 #else
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
+using Windows.System;
 #endif
 
 #if MIGRATION
@@ -166,7 +153,11 @@ namespace Windows.UI.Xaml.Controls
             IsDropDownOpen = false; // close the popup
         }
 
+#if MIGRATION
         public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
         {
             base.OnApplyTemplate();
 
@@ -183,7 +174,11 @@ namespace Windows.UI.Xaml.Controls
             SetSelectedDate();
         }
 
+#if MIGRATION
         private void OnTextBoxKeyDown(object sender, KeyEventArgs e)
+#else
+        private void OnTextBoxKeyDown(object sender, KeyRoutedEventArgs e)
+#endif
         {
             if (!e.Handled)
             {
@@ -193,10 +188,10 @@ namespace Windows.UI.Xaml.Controls
 
         private void OnTextBoxTextChanged(object sender, TextChangedEventArgs e)
         {
-            this.SetValueNoCallback(TextProperty, _textBox.Text, false);
+            this.SetValueNoCallback(TextProperty, _textBox.Text);
         }
 
-        #region dependency property Selection for DatePicker
+#region dependency property Selection for DatePicker
 
         /// <summary>
         /// Gets or sets the currently selected date.
@@ -251,7 +246,7 @@ namespace Windows.UI.Xaml.Controls
             set => SetValue(SelectedDateFormatProperty, value);
         }
 
-        #endregion
+#endregion
 
         protected override void SetWaterMarkText()
         {
@@ -277,14 +272,14 @@ namespace Windows.UI.Xaml.Controls
 
         private DateTimeFormatInfo GetCurrentDateFormat()
         {
+#if NETSTANDARD
             if (CultureInfo.CurrentCulture.Calendar is GregorianCalendar)
             {
-
                 return CultureInfo.CurrentCulture.DateTimeFormat;
             }
             else
             {
-                foreach (Globalization.Calendar cal in CultureInfo.CurrentCulture.OptionalCalendars)
+                foreach (global::System.Globalization.Calendar cal in CultureInfo.CurrentCulture.OptionalCalendars)
                 {
                     if (cal is GregorianCalendar)
                     {
@@ -300,29 +295,51 @@ namespace Windows.UI.Xaml.Controls
                 dt.Calendar = new GregorianCalendar();
                 return dt;
             }
+#elif BRIDGE
+            return CultureInfo.CurrentCulture.DateTimeFormat;
+#endif
         }
 
+#if MIGRATION
         private bool ProcessDatePickerKey(KeyEventArgs e)
         {
             switch (e.Key)
             {
                 case Key.Enter:
-                    {
-                        SetSelectedDate();
-                        return true;
-                    }
+                    SetSelectedDate();
+                    return true;
+
                 case Key.Down:
+                    if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
                     {
-                        if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
-                        {
-                            HandlePopUp();
-                        }
-                        return true;
+                        HandlePopUp();
                     }
+                    return true;
             }
 
             return false;
         }
+#else
+        private bool ProcessDatePickerKey(KeyRoutedEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case VirtualKey.Enter:
+                    SetSelectedDate();
+                    return true;
+
+                case VirtualKey.Down:
+                    if ((global::System.Windows.Input.Keyboard.Modifiers & VirtualKeyModifiers.Control) == VirtualKeyModifiers.Control)
+                    {
+                        HandlePopUp();
+                    }
+                    return true;
+            }
+
+            return false;
+        }
+#endif
+
 
         private void HandlePopUp()
         {
@@ -330,11 +347,19 @@ namespace Windows.UI.Xaml.Controls
             {
                 this.Focus();
                 this.IsDropDownOpen = false;
+#if MIGRATION
                 _calendarOrClock.ReleaseMouseCapture();
+#else
+                _calendarOrClock.ReleasePointerCapture();
+#endif
             }
             else
             {
+#if MIGRATION
                 _calendarOrClock.CaptureMouse();
+#else
+                _calendarOrClock.CapturePointer();
+#endif
                 ProcessTextBox();
             }
         }

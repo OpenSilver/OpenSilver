@@ -12,34 +12,19 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.Serialization;
 using DotNetForHtml5.Core;
-using System.Windows.Controls.Common;
-
 
 #if MIGRATION
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
-using System.Windows.Media;
 #else
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 #endif
 
 // Credits: https://github.com/MicrosoftArchive/SilverlightToolkit/tree/master/Release/Silverlight4/Source/Controls/DatePicker
 // (c) Copyright Microsoft Corporation.
 // License: Microsoft Public License (Ms-PL)
-
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -257,7 +242,7 @@ namespace Windows.UI.Xaml.Controls
             string newText = (string)e.NewValue;
             if (string.IsNullOrEmpty(newText))
             {
-                dp.SetValueNoCallback(TextProperty, null, false);
+                dp.SetValueNoCallback(TextProperty, null);
             }
             else
             {

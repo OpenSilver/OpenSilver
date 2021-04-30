@@ -14,16 +14,19 @@
 
 #if MIGRATION
 using System.Windows.Input;
+#else
+using Windows.UI.Xaml.Input;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls.Primitives
 #else
 namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
     /// <summary>
-    /// Represents the text input of a <see cref="T:System.Windows.Controls.DatePicker" />.
+    /// Represents the text input of a <see cref="DatePicker" />.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public sealed class DatePickerTextBox : TextBox
     {
         #region Constants
@@ -40,17 +43,22 @@ namespace Windows.UI.Xaml.Controls.Primitives
             DefaultStyleKey = typeof(DatePickerTextBox);
             SetDefaults();
 
+#if MIGRATION
             this.MouseEnter += OnMouseEnter;
             this.MouseLeave += OnMouseLeave;
+#else
+            this.PointerEntered += OnMouseEnter;
+            this.PointerExited += OnMouseLeave;
+#endif
             this.Loaded += OnLoaded;
             this.LostFocus += OnLostFocus;
             this.GotFocus += OnGotFocus;
             this.TextChanged += OnTextChanged;
             this.IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
         }
-        #endregion
+#endregion
 
-        #region Internal
+#region Internal
 
         internal ContentControl elementContent;
         internal bool isHovered;
@@ -61,15 +69,19 @@ namespace Windows.UI.Xaml.Controls.Primitives
             ApplyTemplate();
             UpdateVisualStates();
         }
-      
-        #endregion
 
-        #region Protected
+#endregion
+
+#region Protected
 
         /// <summary>
         /// Called when template is applied to the control.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
         {
             base.OnApplyTemplate();
 
@@ -113,11 +125,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 GoToState(VisualStates.StateUnwatermarked);
             }
         }
-        #endregion
+#endregion
 
-        #region Public
+#region Public
 
-        #region Watermark
+#region Watermark
         /// <summary>
         /// Watermark dependency property
         /// </summary>
@@ -134,11 +146,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
             set { SetValue(WatermarkProperty, value); }
         }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region Private
+#region Private
 
         private T ExtractTemplatePart<T>(string partName) where T : DependencyObject
         {
@@ -185,7 +197,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
             UpdateVisualStates();
         }
 
+#if MIGRATION
         private void OnMouseEnter(object sender, MouseEventArgs e)
+#else
+        private void OnMouseEnter(object sender, PointerRoutedEventArgs e)
+#endif
         {
             isHovered = true;
 
@@ -195,7 +211,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
+#if MIGRATION
         private void OnMouseLeave(object sender, MouseEventArgs e)
+#else
+        private void OnMouseLeave(object sender, PointerRoutedEventArgs e)
+#endif
         {
             isHovered = false;
 
@@ -241,6 +261,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             this.Watermark = DefaultWaterMarkText;
         }
 
-        #endregion
+#endregion
     }
 }

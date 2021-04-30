@@ -15,8 +15,7 @@
 		<NoWarn>1591</NoWarn>
 		<DebugSymbols>true</DebugSymbols>
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
-		<EnableDefaultItems>false</EnableDefaultItems>
-		<!-- This emluates the behavior of NET Framework, which excludes every files by default -->
+		<EnableDefaultItems>false</EnableDefaultItems> <!-- This emluates the behavior of NET Framework, which excludes every files by default -->
 		<BlazorVersion>3.1.0-preview1.19508.20</BlazorVersion>
 		<OpenSilverVersion>1.0.0-alpha-008</OpenSilverVersion>
 	</PropertyGroup>
@@ -117,6 +116,8 @@
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\SendCompletedEventArgs.cs" />
 		<Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\CalendarExtensions.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\DatePickerFormat.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Typography.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontCapitals.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontStretches.cs" />
@@ -144,7 +145,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridFrozenGrid.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridRowHeader.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridRowsPresenter.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DatePickerTextBox.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls.Primitives\DatePickerTextBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\ExpandableContentControl.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\Selector.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
@@ -187,7 +188,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTextColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataPager.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePicker.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePickerFormat.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Expander.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\GridSplitter.cs" />
@@ -1195,18 +1195,18 @@
 		<Content Include="DefaultStyles\INTERNAL_DefaultHeaderedContentControlStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Content>
-		<Content Include="DefaultStyles\INTERNAL_DefaultDatePickerTextBoxStyle.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
 		<Content Include="DefaultStyles\INTERNAL_DefaultValidationControlsStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Content>
 		<Content Include="DefaultStyles\INTERNAL_DefaultDataGridStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Content>
-		<Content Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultDatePickerTextBoxStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />

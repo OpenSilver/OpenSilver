@@ -2,25 +2,32 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="using:TestWinRTApplication">
 
-    <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
-
-    <Style TargetType="ComboBox" >
+    <Style TargetType="ComboBox">
         <Setter Property="Background">
             <Setter.Value>
-                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                <LinearGradientBrush StartPoint="0.5,0"
+                                     EndPoint="0.5,1">
                     <GradientStopCollection>
-                        <GradientStop Color="white" Offset="0"/>
-                        <GradientStop Color="White" Offset="0.3"/>
-                        <GradientStop Color="#FFD0D0D0" Offset="1"/>
+                        <GradientStop Color="white"
+                                      Offset="0" />
+                        <GradientStop Color="White"
+                                      Offset="0.3" />
+                        <GradientStop Color="#FFD0D0D0"
+                                      Offset="1" />
                     </GradientStopCollection>
                 </LinearGradientBrush>
             </Setter.Value>
         </Setter>
-        <Setter Property="Foreground" Value="Black" />
-        <Setter Property="BorderBrush" Value="DarkGray" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="6,2,30,2" />
-        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground"
+                Value="Black" />
+        <Setter Property="BorderBrush"
+                Value="DarkGray" />
+        <Setter Property="BorderThickness"
+                Value="1" />
+        <Setter Property="Padding"
+                Value="6,2,30,2" />
+        <Setter Property="Cursor"
+                Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
@@ -29,14 +36,20 @@
                             <VisualStateGroup Name="CommonStates">
                                 <VisualState Name="Disabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="OuterBorder">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="#FFD0D0D0" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush"
+                                                                       Storyboard.TargetName="OuterBorder">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="#FFD0D0D0" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Fill" Storyboard.TargetName="arrow">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="#FFD0D0D0" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Fill"
+                                                                       Storyboard.TargetName="arrow">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="#FFD0D0D0" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Stroke" Storyboard.TargetName="arrow">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="#FFD0D0D0" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Stroke"
+                                                                       Storyboard.TargetName="arrow">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="#FFD0D0D0" />
                                         </ObjectAnimationUsingKeyFrames>
 
                                     </Storyboard>
@@ -70,7 +83,7 @@
                                 </ToggleButton>
                                 <ContentPresenter x:Name="ContentPresenter"
                                                   IsHitTestVisible="False"
-                                                  Margin="{TemplateBinding Padding}"/>
+                                                  Margin="{TemplateBinding Padding}" />
 
                                 <!-- This empty TextBlock allows to ensure that the minimum vertical size of 
                                 the ComboBox corresponds to the value of the inherited FontSize property -->
@@ -97,63 +110,68 @@
                             </Border>
                         </Popup>
                     </StackPanel>
-
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        
-        <Setter Property="ItemContainerStyle" Value="{StaticResource ComboBoxItem}"/>
     </Style>
 
-    <Style TargetType="ComboBoxItem" x:Key="ComboBoxItem">
-        <Setter Property="Padding" Value="3"/>
-        <Setter Property="HorizontalContentAlignment" Value="Left"/>
-        <Setter Property="VerticalContentAlignment" Value="Top"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="1"/>
+    <Style TargetType="ComboBoxItem">
+        <Setter Property="Padding"
+                Value="3" />
+        <Setter Property="HorizontalContentAlignment"
+                Value="Left" />
+        <Setter Property="VerticalContentAlignment"
+                Value="Top" />
+        <Setter Property="Background"
+                Value="Transparent" />
+        <Setter Property="BorderThickness"
+                Value="1" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBoxItem">
                     <Grid Background="{TemplateBinding Background}">
-                        <Border x:Name="MouseOverVisualElement" Background="#FFBADDE9" Opacity="0" IsHitTestVisible="False" CornerRadius="1"/>
-                        <Border x:Name="SelectedVisualElement" Background="Transparent" Opacity="0.75" IsHitTestVisible="False" CornerRadius="1"
-                                BorderThickness="1" BorderBrush="Transparent"/>
-                        <ContentPresenter x:Name="Content"  Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          Margin="{TemplateBinding Padding}" Opacity="1"/>
-                        <Rectangle x:Name="FocusVisualElement" Stroke="#FF6DBDD1" StrokeThickness="1" Visibility="Collapsed"/>
-
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal">
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="MouseOverVisualElement" Storyboard.TargetProperty="Opacity" Duration="0" To="0"/>
+                                        <DoubleAnimation Storyboard.TargetName="MouseOverVisualElement"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         Duration="0"
+                                                         To="0" />
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="MouseOver">
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="MouseOverVisualElement" Storyboard.TargetProperty="Opacity" Duration="0" To="0.35"/>
+                                        <DoubleAnimation Storyboard.TargetName="MouseOverVisualElement"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         Duration="0"
+                                                         To="0.35" />
                                     </Storyboard>
                                 </VisualState>
 
                                 <VisualState x:Name="Disabled">
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="Content" Storyboard.TargetProperty="Opacity" Duration="0" To=".55" />
+                                        <DoubleAnimation Storyboard.TargetName="Content"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         Duration="0"
+                                                         To=".55" />
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
 
                             <VisualStateGroup x:Name="SelectionStates">
-                                <VisualState x:Name="Unselected"/>
+                                <VisualState x:Name="Unselected" />
                                 <VisualState x:Name="Selected">
                                     <Storyboard>
-                                        <ColorAnimation Storyboard.TargetName="SelectedVisualElement" 
+                                        <ColorAnimation Storyboard.TargetName="SelectedVisualElement"
                                                         Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                                        Duration="0" To="#FFBADDE9">
+                                                        Duration="0"
+                                                        To="#FFBADDE9">
                                         </ColorAnimation>
-                                        <ColorAnimation Storyboard.TargetName="SelectedVisualElement" 
+                                        <ColorAnimation Storyboard.TargetName="SelectedVisualElement"
                                                         Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
-                                                        Duration="0" To="#FF6DBDD1">
+                                                        Duration="0"
+                                                        To="#FF6DBDD1">
                                         </ColorAnimation>
                                     </Storyboard>
                                 </VisualState>
@@ -162,7 +180,9 @@
                             <VisualStateGroup x:Name="FocusStates">
                                 <VisualState x:Name="Focused">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="FocusVisualElement" Storyboard.TargetProperty="Visibility" Duration="0">
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="FocusVisualElement"
+                                                                       Storyboard.TargetProperty="Visibility"
+                                                                       Duration="0">
                                             <DiscreteObjectKeyFrame KeyTime="0">
                                                 <DiscreteObjectKeyFrame.Value>
                                                     <Visibility>Visible</Visibility>
@@ -172,12 +192,35 @@
                                     </Storyboard>
                                 </VisualState>
 
-                                <VisualState x:Name="Unfocused"/>
+                                <VisualState x:Name="Unfocused" />
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
+                        <Border x:Name="MouseOverVisualElement"
+                                Background="#FFBADDE9"
+                                Opacity="0"
+                                IsHitTestVisible="False"
+                                CornerRadius="1" />
+                        <Border x:Name="SelectedVisualElement"
+                                Background="Transparent"
+                                Opacity="0.75"
+                                IsHitTestVisible="False"
+                                CornerRadius="1"
+                                BorderThickness="1"
+                                BorderBrush="Transparent" />
+                        <ContentPresenter x:Name="Content"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          Margin="{TemplateBinding Padding}"
+                                          Opacity="1" />
+                        <Rectangle x:Name="FocusVisualElement"
+                                   Stroke="#FF6DBDD1"
+                                   StrokeThickness="1"
+                                   Visibility="Collapsed" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
+    
 </ResourceDictionary>

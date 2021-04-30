@@ -407,16 +407,32 @@ namespace Windows.UI.Xaml.Controls.Primitives
             internal set { SetValue(IsMouseOverProperty, value); }
         }
 
+#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs eventArgs)
+#else
+        protected override void OnPointerEntered(PointerRoutedEventArgs eventArgs)
+#endif
         {
+#if MIGRATION
             base.OnMouseEnter(eventArgs);
+#else
+            base.OnPointerEntered(eventArgs);
+#endif
             IsMouseOver = true;
             UpdateVisualStates();
         }
 
+#if MIGRATION
         protected internal override void OnMouseLeave(MouseEventArgs eventArgs)
+#else
+        protected internal override void OnPointerExited(PointerRoutedEventArgs eventArgs)
+#endif
         {
+#if MIGRATION
             base.OnMouseLeave(eventArgs);
+#else
+            base.OnPointerExited(eventArgs);
+#endif
             IsMouseOver = false;
             UpdateVisualStates();
         }

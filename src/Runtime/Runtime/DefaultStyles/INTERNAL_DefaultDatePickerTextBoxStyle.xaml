@@ -2,22 +2,29 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style TargetType="DatePickerTextBox">
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="HorizontalContentAlignment" Value="Left"/>
-        
+        <Setter Property="VerticalContentAlignment"
+                Value="Center" />
+        <Setter Property="HorizontalContentAlignment"
+                Value="Left" />
+
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="DatePickerTextBox">
-                    <Grid x:Name="Root" >
+                    <Grid x:Name="Root">
                         <Grid.Resources>
-                            <SolidColorBrush x:Key="WatermarkBrush" Color="#FFAAAAAA"/>
+                            <SolidColorBrush x:Key="WatermarkBrush"
+                                             Color="#FFAAAAAA" />
                         </Grid.Resources>
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
+                                <!-- #if WORKINPROGRESS -->
+                                <!--
                                 <VisualStateGroup.Transitions>
                                     <VisualTransition GeneratedDuration="0" />
                                     <VisualTransition To="MouseOver" GeneratedDuration="0:0:0.1" />
                                 </VisualStateGroup.Transitions>
+                                -->
+                                <!-- #endif -->
                                 <VisualState x:Name="Normal" />
                                 <VisualState x:Name="MouseOver">
                                     <Storyboard>
@@ -31,25 +38,42 @@
                                 </VisualState>
                             </VisualStateGroup>
                             <VisualStateGroup x:Name="WatermarkStates">
+                                <!-- #if WORKINPROGRESS -->
+                                <!--
                                 <VisualStateGroup.Transitions>
                                     <VisualTransition GeneratedDuration="0" />
                                 </VisualStateGroup.Transitions>
+                                -->
+                                <!-- #endif -->
                                 <VisualState x:Name="Unwatermarked" />
                                 <VisualState x:Name="Watermarked">
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="ContentElement" Storyboard.TargetProperty="Opacity" To="0" Duration="0" />
-                                        <DoubleAnimation Storyboard.TargetName="Watermark" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                        <DoubleAnimation Storyboard.TargetName="ContentElement"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0"
+                                                         Duration="0" />
+                                        <DoubleAnimation Storyboard.TargetName="Watermark"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1"
+                                                         Duration="0" />
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
                             <VisualStateGroup x:Name="FocusStates">
+                                <!-- #if WORKINPROGRESS -->
+                                <!--
                                 <VisualStateGroup.Transitions>
                                     <VisualTransition GeneratedDuration="0" />
                                 </VisualStateGroup.Transitions>
+                                -->
+                                <!-- #endif -->
                                 <VisualState x:Name="Unfocused" />
                                 <VisualState x:Name="Focused">
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="FocusVisual" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                        <DoubleAnimation Storyboard.TargetName="FocusVisual"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1"
+                                                         Duration="0" />
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -57,23 +81,48 @@
 
                         <!--Start UI-->
                         <Grid>
-                            <Border x:Name="Border" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" CornerRadius="2" Opacity="1">
+                            <Border x:Name="Border"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="2"
+                                    Opacity="1">
                                 <Grid x:Name="WatermarkContent">
-                                    <Border x:Name="ContentElement" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
-                                        <ScrollViewer x:Name="PART_ContentHost" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Hidden" Margin="0"
-                                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                    <Border x:Name="ContentElement"
+                                            Background="{TemplateBinding Background}"
+                                            Padding="{TemplateBinding Padding}">
+                                        <ScrollViewer x:Name="PART_ContentHost"
+                                                      VerticalScrollBarVisibility="Hidden"
+                                                      HorizontalScrollBarVisibility="Hidden"
+                                                      Margin="0"
+                                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                      HorizontalAlignment="Stretch"
+                                                      VerticalAlignment="Stretch" />
                                     </Border>
                                     <Border x:Name="WatermarkDecorator">
-                                        <ContentControl x:Name="Watermark" Opacity="0" IsTabStop="False" IsHitTestVisible="False" Content="{TemplateBinding Watermark}"
-                                                            Foreground="{StaticResource WatermarkBrush}" FontSize="{TemplateBinding FontSize}" Background="{TemplateBinding Background}"
-                                                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Padding="2"/>
+                                        <ContentControl x:Name="Watermark"
+                                                        Opacity="0"
+                                                        IsTabStop="False"
+                                                        IsHitTestVisible="False"
+                                                        Content="{TemplateBinding Watermark}"
+                                                        Foreground="{StaticResource WatermarkBrush}"
+                                                        FontSize="{TemplateBinding FontSize}"
+                                                        Background="{TemplateBinding Background}"
+                                                        HorizontalAlignment="Stretch"
+                                                        VerticalAlignment="Stretch"
+                                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                        Padding="2" />
                                     </Border>
                                 </Grid>
                             </Border>
 
-                            <Border x:Name="FocusVisual" BorderBrush="#FF6DBDD1" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" Opacity="0" IsHitTestVisible="False"/>
+                            <Border x:Name="FocusVisual"
+                                    BorderBrush="#FF6DBDD1"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="2"
+                                    Opacity="0"
+                                    IsHitTestVisible="False" />
                         </Grid>
                     </Grid>
                 </ControlTemplate>
