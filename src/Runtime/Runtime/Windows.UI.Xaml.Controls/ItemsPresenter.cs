@@ -19,6 +19,12 @@ using System.Collections.Specialized;
 using System.Linq;
 
 #if MIGRATION
+using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Media;
+#endif
+
+#if MIGRATION
 namespace System.Windows.Controls
 #else
 namespace Windows.UI.Xaml.Controls
@@ -47,11 +53,11 @@ namespace Windows.UI.Xaml.Controls
         /// TemplateProperty
         /// </summary>
         internal static readonly DependencyProperty TemplateProperty =
-                DependencyProperty.Register("Template",
-                                            typeof(ItemsPanelTemplate),
-                                            typeof(ItemsPresenter),
-                                            new PropertyMetadata(null, OnTemplateChanged));
-
+            DependencyProperty.Register(
+                nameof(Template),
+                typeof(ItemsPanelTemplate),
+                typeof(ItemsPresenter),
+                new PropertyMetadata(null, OnTemplateChanged));
 
         /// <summary>
         /// Template Property
@@ -91,7 +97,7 @@ namespace Windows.UI.Xaml.Controls
                 if (panel != null)
                 {
                     // Make sure that the panel contains no children
-                    if (panel.Children.Count > 0)
+                    if (panel.HasChildren)
                     {
                         throw new InvalidOperationException("VisualTree of ItemsPanelTemplate must be a single element.");
                     }
@@ -103,7 +109,9 @@ namespace Windows.UI.Xaml.Controls
                 }
                 else
                 {
-                    throw new InvalidOperationException(string.Format("VisualTree of ItemsPanelTemplate must contain a Panel. '{0}' is not a Panel.", visualTree.GetType()));
+                    throw new InvalidOperationException(
+                        string.Format("VisualTree of ItemsPanelTemplate must contain a Panel. '{0}' is not a Panel.", 
+                                      visualTree.GetType()));
                 }
 
                 // attach the panel.
@@ -138,7 +146,7 @@ namespace Windows.UI.Xaml.Controls
             if (panel == null)
                 return null;
 
-            return panel.Parent as ItemsPresenter;
+            return VisualTreeHelper.GetParent(panel) as ItemsPresenter;
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()

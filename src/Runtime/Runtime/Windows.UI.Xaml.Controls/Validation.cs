@@ -173,7 +173,7 @@ namespace Windows.UI.Xaml.Controls
                     //Raise the event saying that we removed a ValidationError
                     if (bindingExpression.ParentBinding.NotifyOnValidationError)
                     {
-                        for (FrameworkElement elt = target as FrameworkElement; elt != null; elt = elt.Parent as FrameworkElement)
+                        for (FrameworkElement elt = target as FrameworkElement; elt != null; elt = (VisualTreeHelper.GetParent(elt) as FrameworkElement))
                         {
                             elt.INTERNAL_RaiseBindingValidationErrorEvent(
                                 new ValidationErrorEventArgs()
@@ -254,7 +254,7 @@ namespace Windows.UI.Xaml.Controls
                 //Raise the event saying that we added a ValidationError
                 if (bindingExpression.ParentBinding.NotifyOnValidationError)
                 {
-                    for (FrameworkElement elt = target as FrameworkElement; elt != null; elt = elt.Parent as FrameworkElement)
+                    for (FrameworkElement elt = target as FrameworkElement; elt != null; elt = (VisualTreeHelper.GetParent(elt) as FrameworkElement))
                     {
                         elt.INTERNAL_RaiseBindingValidationErrorEvent(
                             new ValidationErrorEventArgs()

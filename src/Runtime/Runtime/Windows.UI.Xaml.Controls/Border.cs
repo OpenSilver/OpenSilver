@@ -14,7 +14,9 @@
 
 
 using CSHTML5.Internal;
+using OpenSilver.Internal.Controls;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -62,6 +64,23 @@ namespace Windows.UI.Xaml.Controls
     [ContentProperty("Child")]
     public partial class Border : FrameworkElement
     {
+        /// <summary> 
+        /// Returns enumerator to logical children.
+        /// </summary>
+        /*protected*/ internal override IEnumerator LogicalChildren
+        {
+            get
+            {
+                if (this._child == null)
+                {
+                    return EmptyEnumerator.Instance;
+                }
+
+                // otherwise, its logical children is its visual children
+                return new SingleChildEnumerator(_child);
+            }
+        }
+
         private UIElement _child;
 
 #if REVAMPPOINTEREVENTS
@@ -84,15 +103,16 @@ namespace Windows.UI.Xaml.Controls
             }
             set
             {
-                if (!object.ReferenceEquals(value, _child))
-                {
-                    if (this._isLoaded)
-                    {
-                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
-                        INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
-                    }
-                    _child = value;
-                }
+                if (object.ReferenceEquals(_child, value))
+                    return;
+
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
+
+                this.RemoveLogicalChild(_child);
+                _child = value;
+                this.AddLogicalChild(value);
+
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
             }
         }
 

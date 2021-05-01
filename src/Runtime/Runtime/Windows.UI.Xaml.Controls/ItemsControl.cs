@@ -13,15 +13,13 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using OpenSilver.Internal.Controls;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Windows.Markup;
 using System.Diagnostics;
-using System.Linq;
 using CSHTML5.Internals.Controls;
-using System.Reflection;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
@@ -107,7 +105,7 @@ namespace Windows.UI.Xaml.Controls
 
         private void CreateItemCollectionAndGenerator()
         {
-            this._items = new ItemCollection();
+            this._items = new ItemCollection(this);
 
             // the generator must attach its collection change handler before
             // the control itself, so that the generator is up-to-date by the
@@ -531,6 +529,25 @@ namespace Windows.UI.Xaml.Controls
 
         #region Internal Properties
 
+        /// <summary>
+        /// Returns enumerator to logical children
+        /// </summary>
+        /*protected*/ internal override IEnumerator LogicalChildren
+        {
+            get
+            {
+                if (!HasItems)
+                {
+                    return EmptyEnumerator.Instance;
+                }
+
+                // Items in direct-mode of ItemCollection are the only model children.
+                // note: the enumerator walks the ItemCollection.InnerList as-is,
+                // no flattening of any content on model children level!
+                return this.Items.LogicalChildren;
+            }
+        }
+
         internal ItemsPresenter ItemsPresenter
         {
             get { return this._itemsPresenter; }
@@ -550,7 +567,7 @@ namespace Windows.UI.Xaml.Controls
 
         internal bool HasItems
         {
-            get { return this.Items.Count > 0; }
+            get { return this._items != null && this._items.Count > 0; }
         }
 
         #endregion Internal Properties
@@ -692,13 +709,13 @@ namespace Windows.UI.Xaml.Controls
             ContentControl cc;
             ContentPresenter cp;
 
-            if ((cc = element as ContentControl) != null)
-            {
-                ClearContentControl(cc, item);
-            }
-            else if ((cp = element as ContentPresenter) != null)
+            if ((cp = element as ContentPresenter) != null)
             {
                 ClearContentPresenter(cp, item);
+            }
+            else if ((cc = element as ContentControl) != null)
+            {
+                ClearContentControl(cc, item);
             }
         }
 
@@ -756,15 +773,15 @@ namespace Windows.UI.Xaml.Controls
                 {
                     template = GetDataTemplateForDisplayMemberPath(this.DisplayMemberPath);
                 }
-            }            
-
-            if ((cc = element as ContentControl) != null)
-            {
-                PrepareContentControl(cc, item, template);
             }
-            else if ((cp = element as ContentPresenter) != null)
+
+            if ((cp = element as ContentPresenter) != null)
             {
                 PrepareContentPresenter(cp, item, template);
+            }
+            else if ((cc = element as ContentControl) != null)
+            {
+                PrepareContentControl(cc, item, template);
             }
         }
 
@@ -793,8 +810,15 @@ namespace Windows.UI.Xaml.Controls
         {
             if (item != cc)
             {
+                // don't treat Content as a logical child
+                cc.ContentIsNotLogical = true;
+
                 cc.ContentTemplate = template;
                 cc.Content = item;
+            }
+            else
+            {
+                cc.ContentIsNotLogical = false;
             }
         }
 

@@ -14,13 +14,13 @@
 
 
 using CSHTML5.Internal;
+using OpenSilver.Internal.Controls;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 
@@ -43,6 +43,39 @@ namespace Windows.UI.Xaml.Controls
     [ContentProperty("Children")]
     public abstract partial class Panel : FrameworkElement
     {
+        /// <summary> 
+        /// Returns enumerator to logical children.
+        /// </summary>
+        /*protected*/ internal override IEnumerator LogicalChildren
+        {
+            get
+            {
+                if (this._children == null || this._children.Count == 0 || this.IsItemsHost)
+                {
+                    // empty panel or a panel being used as the items
+                    // host has *no* logical children; give empty enumerator
+                    return EmptyEnumerator.Instance;
+                }
+
+                // otherwise, its logical children is its visual children
+                return this.Children.GetEnumerator();
+            }
+        }
+
+        internal bool HasChildren
+        {
+            get
+            {
+                return this._children != null &&
+                       this._children.Count > 0;
+            }
+        }
+
+        protected virtual UIElementCollection CreateUIElementCollection(FrameworkElement logicalParent)
+        {
+            return new UIElementCollection(this, logicalParent);
+        }
+
 #if REVAMPPOINTEREVENTS
         internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
         {
@@ -52,7 +85,7 @@ namespace Windows.UI.Xaml.Controls
         }
 #endif
 
-        UIElementCollection _children;
+        private UIElementCollection _children;
 
         private bool _enableProgressiveRendering;
         public bool EnableProgressiveRendering
@@ -81,10 +114,8 @@ namespace Windows.UI.Xaml.Controls
                     Debug.Assert(e.OldItems.Count == 1 && e.NewItems.Count == 1);
                     this.OnChildrenReplaced((UIElement)e.OldItems[0], (UIElement)e.NewItems[0], e.OldStartingIndex);
                     break;
-                case NotifyCollectionChangedAction.Move:
-                    Debug.Assert(e.OldItems.Count == 1);
-                    this.OnChildrenMoved((UIElement)e.OldItems[0], e.NewStartingIndex, e.OldStartingIndex);
-                    break;
+                default:
+                    throw new NotSupportedException(string.Format("Unexpected collection change action '{0}'.", e.Action));
             }
         }
 
@@ -98,6 +129,11 @@ namespace Windows.UI.Xaml.Controls
                 {
                     INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(childInfo.INTERNAL_UIElement, this);
                 }
+            }
+
+            if (!this.HasChildren)
+            {
+                return;
             }
 
             if (this._enableProgressiveRendering || this.INTERNAL_EnableProgressiveLoading)
@@ -133,16 +169,6 @@ namespace Windows.UI.Xaml.Controls
             INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
 
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, this, index);
-        }
-
-        internal virtual void OnChildrenMoved(UIElement oldChild, int newIndex, int oldIndex)
-        {
-            if (newIndex == oldIndex)
-            {
-                return;
-            }
-
-            INTERNAL_VisualTreeManager.MoveVisualChildInSameParent(oldChild, this, newIndex, oldIndex);
         }
 
 #endregion Children Management
@@ -193,12 +219,20 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (_children == null)
                 {
-                    _children = new UIElementCollection();
+                    _children = CreateUIElementCollection(IsItemsHost ? null : this);
 
                     if (this._isLoaded)
                         _children.CollectionChanged += OnChildrenCollectionChanged;
                 }
 
+                return _children;
+            }
+        }
+
+        internal UIElementCollection InternalChildren
+        {
+            get
+            {
                 return _children;
             }
         }
@@ -299,23 +333,20 @@ namespace Windows.UI.Xaml.Controls
 
         #endregion
 
-
-
-        //internal override void INTERNAL_Render()
-        //{
-        //    base.INTERNAL_Render();
-
-        //    if (Background is SolidColorBrush)
-        //    {
-        //        INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this).backgroundColor = ((SolidColorBrush)Background).Color.INTERNAL_ToHtmlString();
-        //    }
-        //}
-
+        /// <summary>
+        /// Identifies the <see cref="Panel.IsItemsHost"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty IsItemsHostProperty =
-    DependencyProperty.Register("IsItemsHost",
-                                typeof(bool),
-                                typeof(Panel),
-                                new PropertyMetadata(false));
+            DependencyProperty.Register(
+                nameof(IsItemsHost),
+                typeof(bool),
+                typeof(Panel),
+                new PropertyMetadata(false));
+
+        /// <summary>
+        /// Gets a value that indicates whether this <see cref="Panel"/> is a container
+        /// for UI items that are generated by an <see cref="ItemsControl"/>.
+        /// </summary>
         public bool IsItemsHost
         {
             get { return (bool)this.GetValue(IsItemsHostProperty); }
