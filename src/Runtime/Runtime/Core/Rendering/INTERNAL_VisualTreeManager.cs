@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,6 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,25 +21,92 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
-using System.Windows.Media;
 using System.Windows.Input;
-using System.Windows.Data;
 #else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-using Windows.UI.Core;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Data;
 #endif
 
 namespace CSHTML5.Internal
 {
     public static class INTERNAL_VisualTreeManager
     {
+        static INTERNAL_VisualTreeManager()
+        {
+            LayoutManager = new LayoutManagerInternal();
+        }
+
+        internal static LayoutManagerInternal LayoutManager { get; }
+
+        internal class MeasureQueue
+        {
+            private Queue<UIElement> _queue;
+
+            public MeasureQueue()
+            {
+                this._queue = new Queue<UIElement>();
+            }
+
+            internal bool UpdateInProgress
+            {
+                get;
+                set;
+            }
+
+            public void Add(UIElement uie)
+            {
+                this._queue.Enqueue(uie);
+                if (!this.UpdateInProgress)
+                {
+                    this.UpdateInProgress = true;
+                    try
+                    {
+                        while (this._queue.Count > 0)
+                        {
+                            UIElement e = this._queue.Dequeue();
+                            e.MeasureCore();
+                        }
+                    }
+                    finally
+                    {
+                        this.UpdateInProgress = false;
+                    }
+                }
+            }
+        }
+
+        internal class LayoutManagerInternal
+        {
+            private MeasureQueue _measureQueue;
+
+            internal bool MeasureUpdateInProgress
+            {
+                get
+                {
+                    if (this._measureQueue != null)
+                    {
+                        return this._measureQueue.UpdateInProgress;
+                    }
+                    return false;
+                }
+            }
+
+            internal MeasureQueue MeasureQueue
+            {
+                get
+                {
+                    if (this._measureQueue == null)
+                    {
+                        this._measureQueue = new MeasureQueue();
+                    }
+                    return this._measureQueue;
+                }
+            }
+        }
+
         internal static bool EnablePerformanceLogging;
         internal static bool EnableOptimizationWhereCollapsedControlsAreNotRendered = true;
         internal static bool EnableOptimizationWhereCollapsedControlsAreNotLoaded = false;
@@ -87,8 +146,8 @@ namespace CSHTML5.Internal
                 else
                 {
                     throw new Exception(
-                        string.Format("Cannot detach the element '{0}' because it is not a child of the element '{1}'.", 
-                                      child.GetType().ToString(), 
+                        string.Format("Cannot detach the element '{0}' because it is not a child of the element '{1}'.",
+                                      child.GetType().ToString(),
                                       parent.GetType().ToString()));
                 }
             }
@@ -186,8 +245,8 @@ namespace CSHTML5.Internal
                     object domElementWhereToPlaceChildStuff = (parent.GetDomElementWhereToPlaceChild(child) ?? parent.INTERNAL_InnerDomElement);
 
                     object movedChild = CSHTML5.Interop.ExecuteJavaScript(
-                        "$0.children[$1]", 
-                        domElementWhereToPlaceChildStuff, 
+                        "$0.children[$1]",
+                        domElementWhereToPlaceChildStuff,
                         oldIndex);
 
 
@@ -837,10 +896,8 @@ if(nextSibling != undefined) {
             }
         }
 
-#if !BRIDGE
-        [JSReplacement("true")]
-#else
-        [Template("true")]
+#if BRIDGE
+        [Bridge.Template("true")]
 #endif
         static bool IsRunningInJavaScript()
         {

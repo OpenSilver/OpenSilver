@@ -1,5 +1,4 @@
 
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -47,6 +46,11 @@ namespace Windows.UI.Xaml
     /// </summary>
     public abstract partial class UIElement : DependencyObject
     {
+        internal virtual Size MeasureCore()
+        {
+            return new Size(0, 0);
+        }
+
         internal DependencyObject INTERNAL_VisualParent { get; set; } // This is used to determine if the item is in the Visual Tree: null means that the item is not in the visual tree, not null otherwise.
 
         internal Window INTERNAL_ParentWindow { get; set; } // This is a reference to the window where this control is presented. It is useful for example to know where to display the popups. //todo-perfs: replace all these properties with fields?
@@ -54,7 +58,6 @@ namespace Windows.UI.Xaml
         // This is the main DIV of the HTML representation of the control
 #if CSHTML5NETSTANDARD
         internal object INTERNAL_OuterDomElement { get; set; }
-
 #else
         internal dynamic INTERNAL_OuterDomElement { get; set; }
 #endif
