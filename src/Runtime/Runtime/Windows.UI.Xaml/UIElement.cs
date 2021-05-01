@@ -1,5 +1,4 @@
 
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,13 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-using CSHTML5;
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media.Effects;
+
 #if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -55,6 +46,11 @@ namespace Windows.UI.Xaml
     /// </summary>
     public abstract partial class UIElement : DependencyObject
     {
+        internal virtual Size MeasureCore()
+        {
+            return new Size(0, 0);
+        }
+
         internal DependencyObject INTERNAL_VisualParent { get; set; } // This is used to determine if the item is in the Visual Tree: null means that the item is not in the visual tree, not null otherwise.
 
         internal Window INTERNAL_ParentWindow { get; set; } // This is a reference to the window where this control is presented. It is useful for example to know where to display the popups. //todo-perfs: replace all these properties with fields?
@@ -62,7 +58,6 @@ namespace Windows.UI.Xaml
         // This is the main DIV of the HTML representation of the control
 #if CSHTML5NETSTANDARD
         internal object INTERNAL_OuterDomElement { get; set; }
-
 #else
         internal dynamic INTERNAL_OuterDomElement { get; set; }
 #endif
@@ -793,11 +788,8 @@ namespace Windows.UI.Xaml
             // Used to update the DOM structure (for example, in case of a grid, we need to (re)create the rows and columns where to place the child elements).
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("true")]
-
-#else
-        [Template("true")]
+#if BRIDGE
+        [Bridge.Template("true")]
 #endif
         private static bool IsRunningInJavaScript() //must be static for Bridge "Template" to work properly
         {
@@ -885,7 +877,7 @@ namespace Windows.UI.Xaml
     }
 ", element);
 #else
-                    Script.Write(@"
+                    Bridge.Script.Write(@"
      document.onmouseup = function(e) {
         if(e.doNotReroute == undefined)
         {
@@ -1094,7 +1086,7 @@ namespace Windows.UI.Xaml
  document.ondblclick = null;
 ");
 #else
-                    Script.Write(@"
+                    Bridge.Script.Write(@"
  document.onmousedown = null;
  document.onmouseup = null;
  document.onmouseover = null;

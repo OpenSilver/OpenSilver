@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,7 +10,6 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
-
 
 using CSHTML5.Internal;
 using System;
@@ -31,6 +29,7 @@ using Windows.UI.Text;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
+using Windows.Foundation;
 #endif
 
 #if MIGRATION
@@ -45,6 +44,22 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public partial class Control : FrameworkElement
     {
+        // Note: the returned Size is unused for now.
+        internal override sealed Size MeasureCore()
+        {
+            if (this.HasTemplate)
+            {
+                this.ClearRegisteredNames(); // todo: remove this once namescope is fixed.
+            }
+            if (!this.ApplyTemplate())
+            {
+                if (this.TemplateChild != null)
+                {
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.TemplateChild, this, 0);
+                }
+            }
+            return new Size(0, 0);
+        }
 
         //COMMENT 26.03.2020:
         // ERROR DESCRIPTION:
@@ -216,9 +231,9 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the BorderThickness dependency property.
         /// </summary>
         public static readonly DependencyProperty BorderThicknessProperty =
-            DependencyProperty.Register("BorderThickness", 
-                                        typeof(Thickness), 
-                                        typeof(Control), 
+            DependencyProperty.Register("BorderThickness",
+                                        typeof(Thickness),
+                                        typeof(Control),
                                         new PropertyMetadata(new Thickness())
                                         {
                                             MethodToUpdateDom = BorderThickness_MethodToUpdateDom,
@@ -436,7 +451,7 @@ namespace Windows.UI.Xaml.Controls
                             {
                                 value = binding.Source;
                                 binding.Path.Path.Split('.')
-                                    .ForEach(p => 
+                                    .ForEach(p =>
                                         value = value.GetType().GetProperty(p).GetValue(value)
                                     );
                             }
@@ -570,11 +585,11 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Padding dependency property.
         /// </summary>
         public static readonly DependencyProperty PaddingProperty =
-            DependencyProperty.Register("Padding", 
-                                        typeof(Thickness), 
-                                        typeof(Control), 
-                                        new PropertyMetadata(new Thickness()) 
-                                        { 
+            DependencyProperty.Register("Padding",
+                                        typeof(Thickness),
+                                        typeof(Control),
+                                        new PropertyMetadata(new Thickness())
+                                        {
                                             MethodToUpdateDom = Padding_MethodToUpdateDom,
                                         });
         private static void Padding_MethodToUpdateDom(DependencyObject d, object newValue)
@@ -623,9 +638,9 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the HorizontalContentAlignment dependency property.
         /// </summary>
         public static readonly DependencyProperty HorizontalContentAlignmentProperty =
-            DependencyProperty.Register("HorizontalContentAlignment", 
-                                        typeof(HorizontalAlignment), 
-                                        typeof(Control), 
+            DependencyProperty.Register("HorizontalContentAlignment",
+                                        typeof(HorizontalAlignment),
+                                        typeof(Control),
                                         new PropertyMetadata(HorizontalAlignment.Center));
 
 
@@ -646,9 +661,9 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the VerticalContentAlignment dependency property.
         /// </summary>
         public static readonly DependencyProperty VerticalContentAlignmentProperty =
-            DependencyProperty.Register("VerticalContentAlignment", 
-                                        typeof(VerticalAlignment), 
-                                        typeof(Control), 
+            DependencyProperty.Register("VerticalContentAlignment",
+                                        typeof(VerticalAlignment),
+                                        typeof(Control),
                                         new PropertyMetadata(VerticalAlignment.Center));
 
 
@@ -667,9 +682,9 @@ namespace Windows.UI.Xaml.Controls
             set { SetValue(TabIndexProperty, value); }
         }
         public static readonly DependencyProperty TabIndexProperty =
-            DependencyProperty.Register("TabIndex", 
-                                        typeof(int), 
-                                        typeof(Control), 
+            DependencyProperty.Register("TabIndex",
+                                        typeof(int),
+                                        typeof(Control),
                                         new PropertyMetadata(int.MaxValue)
                                         {
                                             MethodToUpdateDom = TabIndexProperty_MethodToUpdateDom,
@@ -694,7 +709,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 //Note: according to W3C, tabIndex needs to be between 0 and 32767 on browsers: https://www.w3.org/TR/html401/interact/forms.html#adef-tabindex
                 //      also, the behaviour of the different browsers outside of these values can be different and therefore, we have to restrict the values.
-                
+
                 this.AllowFocusEvents();
 
                 //We translate the TabIndexes to have a little margin with negative TabIndexes:
@@ -715,7 +730,7 @@ namespace Windows.UI.Xaml.Controls
 
                 //in the case where the control should not have an outline even when focused or when the control has a template that defines the VisualState "Focused", we remove the default outline that browsers put:
                 IList<VisualStateGroup> groups = this.StateGroupsRoot?.GetValue(VisualStateManager.VisualStateGroupsProperty) as Collection<VisualStateGroup>;
-                if (!this.UseSystemFocusVisuals || 
+                if (!this.UseSystemFocusVisuals ||
                     (groups != null && groups.Any(gr => ((IList<VisualState>)gr.States).Any(state => state.Name == "Focused"))))
                 {
 
@@ -754,9 +769,9 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Control.IsTabStop dependency property.
         /// </summary>
         public static readonly DependencyProperty IsTabStopProperty =
-            DependencyProperty.Register("IsTabStop",    
-                                        typeof(bool), 
-                                        typeof(Control), 
+            DependencyProperty.Register("IsTabStop",
+                                        typeof(bool),
+                                        typeof(Control),
                                         new PropertyMetadata(true)
                                         {
                                             MethodToUpdateDom = TabStopProperty_MethodToUpdateDom,
@@ -781,9 +796,9 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Template dependency property.
         /// </summary>
         public static readonly DependencyProperty TemplateProperty =
-            DependencyProperty.Register("Template", 
-                                        typeof(ControlTemplate), 
-                                        typeof(Control), 
+            DependencyProperty.Register("Template",
+                                        typeof(ControlTemplate),
+                                        typeof(Control),
                                         new PropertyMetadata(null, OnTemplateChanged));
 
         private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -796,11 +811,19 @@ namespace Windows.UI.Xaml.Controls
             control.TemplateChild = null;
             control.ClearRegisteredNames();
 
-            control.ApplyTemplate();
+            if (control.INTERNAL_VisualParent != null)
+            {
+                INTERNAL_VisualTreeManager.LayoutManager.MeasureQueue.Add(control);
+            }
         }
 
         public bool ApplyTemplate()
         {
+            if (this.INTERNAL_VisualParent == null)
+            {
+                return false;
+            }
+
             bool visualsCreated = false;
             FrameworkElement visualChild = null;
 
@@ -818,21 +841,14 @@ namespace Windows.UI.Xaml.Controls
                         visualsCreated = true;
                     }
                 }
-                else
-                {
-                    visualChild = this.TemplateChild;
-                }
             }
 
             if (visualsCreated)
             {
-                // Raise the OnApplyTemplate method
                 this.TemplateChild = visualChild;
 
-                if (visualChild.Parent == this)
-                {
-                    this.OnApplyTemplate();
-                }
+                // Call the OnApplyTemplate method
+                this.OnApplyTemplate();
             }
 
             return visualsCreated;
@@ -842,14 +858,7 @@ namespace Windows.UI.Xaml.Controls
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            // Ensure that the template generated child (if any) is attached to this control.
-            if (this.TemplateChild != null &&
-                this.TemplateChild.Parent == null)
-            {
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.TemplateChild, this, 0);
-
-                this.OnApplyTemplate();
-            }
+            INTERNAL_VisualTreeManager.LayoutManager.MeasureQueue.Add(this);
         }
 
         /// <summary>
@@ -942,7 +951,7 @@ namespace Windows.UI.Xaml.Controls
                             {
                                 hasFocusedState = true;
                             }
-                        }   
+                        }
                     }
                 }
 
@@ -1113,7 +1122,7 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         {
             // I think this method should in most (all?) case return two divs, as if it was a frameworkElement.
 #if !BRIDGE
-                return base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
+            return base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
 #else
             return CreateDomElement_WorkaroundBridgeInheritanceBug(parentRef, out domElementWhereToPlaceChildren);
 #endif
@@ -1160,10 +1169,10 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         }
 
         [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty TabNavigationProperty = 
-            DependencyProperty.Register("TabNavigation", 
-                                        typeof(KeyboardNavigationMode), 
-                                        typeof(Control), 
+        public static readonly DependencyProperty TabNavigationProperty =
+            DependencyProperty.Register("TabNavigation",
+                                        typeof(KeyboardNavigationMode),
+                                        typeof(Control),
                                         new PropertyMetadata(KeyboardNavigationMode.Local));
 
         [OpenSilver.NotImplemented]
@@ -1174,10 +1183,10 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         }
 
         [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty FontStretchProperty = 
-            DependencyProperty.Register("FontStretch", 
-                                        typeof(FontStretch), 
-                                        typeof(Control), 
+        public static readonly DependencyProperty FontStretchProperty =
+            DependencyProperty.Register("FontStretch",
+                                        typeof(FontStretch),
+                                        typeof(Control),
                                         new PropertyMetadata(new FontStretch()));
 
         /// <summary>

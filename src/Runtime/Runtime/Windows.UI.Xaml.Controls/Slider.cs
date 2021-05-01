@@ -146,6 +146,9 @@ namespace Windows.UI.Xaml.Controls
             {
                 _horizontalRoot.Visibility = (this.Orientation == Orientation.Horizontal ? Visibility.Visible : Visibility.Collapsed);
             }
+
+            if (TryUpdateSizeAndPositionOfUIElements())
+                _controlWasProperlyDrawn = true;
         }
 
         private void VerticalThumb_LostFocus(object sender, RoutedEventArgs e)
