@@ -20,10 +20,9 @@ using Bridge;
 #endif
 using CSHTML5.Internal;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Markup;
 
@@ -54,6 +53,141 @@ namespace Windows.UI.Xaml
     /// </summary>
     public abstract partial class FrameworkElement : UIElement
     {
+        #region Logical Parent
+
+        // The parent element in logical tree.
+        private DependencyObject _parent;
+
+        /// <summary>
+        /// Gets the parent object of this FrameworkElement in the object tree.
+        /// </summary>
+        public DependencyObject Parent
+        {
+            get
+            {
+                return this._parent;
+            }
+        }
+
+        internal void AddLogicalChild(object child)
+        {
+            if (child != null)
+            {
+                // It is invalid to modify the children collection that we
+                // might be iterating during a property invalidation tree walk.
+                if (IsLogicalChildrenIterationInProgress)
+                {
+                    throw new InvalidOperationException("Cannot modify the logical children for this node at this time because a tree walk is in progress.");
+                }
+
+                HasLogicalChildren = true;
+
+                FrameworkElement fe = child as FrameworkElement;
+                if (fe != null)
+                {
+                    fe.ChangeLogicalParent(this);
+                }
+            }
+        }
+
+        internal void RemoveLogicalChild(object child)
+        {
+            if (child != null)
+            {
+                // It is invalid to modify the children collection that we
+                // might be iterating during a property invalidation tree walk.
+                if (IsLogicalChildrenIterationInProgress)
+                {
+                    throw new InvalidOperationException("Cannot modify the logical children for this node at this time because a tree walk is in progress.");
+                }
+
+                if (child is FrameworkElement fe && fe.Parent == this)
+                {
+                    fe.ChangeLogicalParent(null);
+                }
+
+                // This could have been the last child, so check if we have any more children
+                IEnumerator children = LogicalChildren;
+
+                // if null, there are no children.
+                if (children == null)
+                {
+                    HasLogicalChildren = false;
+                }
+                else
+                {
+                    // If we can move next, there is at least one child
+                    HasLogicalChildren = children.MoveNext();
+                }
+            }
+        }
+
+        internal void ChangeLogicalParent(DependencyObject newParent)
+        {
+            // Logical Parent must first be dropped before you are attached to a newParent
+            if (_parent != null && newParent != null && _parent != newParent)
+            {
+                throw new InvalidOperationException("Specified element is already the logical child of another element. Disconnect it first.");
+            }
+
+            // Trivial check to avoid loops
+            if (newParent == this)
+            {
+                throw new InvalidOperationException("Element cannot be its own parent.");
+            }
+
+            _parent = newParent;
+
+            OnParentChangedInternal(newParent);
+        }
+
+        private void OnParentChangedInternal(DependencyObject parent)
+        {
+            // For now we only update the value of inherited properties
+
+            InvalidateInheritedProperties(this, parent);
+        }
+
+        internal static void InvalidateInheritedProperties(UIElement uie, DependencyObject newParent)
+        {
+            if (newParent == null)
+            {
+                uie.ResetInheritedProperties();
+            }
+            else
+            {
+                INTERNAL_PropertyStorage[] storages = newParent.INTERNAL_AllInheritedProperties.Values.ToArray();
+                foreach (var storage in storages)
+                {
+                    uie.SetInheritedValue(storage.Property,
+                                          INTERNAL_PropertyStore.GetEffectiveValue(storage),
+                                          true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns enumerator to logical children
+        /// </summary>
+        /*protected*/ internal virtual IEnumerator LogicalChildren
+        {
+            get { return null; }
+        }
+
+        internal bool IsLogicalChildrenIterationInProgress
+        {
+            get { return ReadInternalFlag(InternalFlags.IsLogicalChildrenIterationInProgress); }
+            set { WriteInternalFlag(InternalFlags.IsLogicalChildrenIterationInProgress, value); }
+        }
+
+        internal bool HasLogicalChildren
+        {
+            get { return ReadInternalFlag(InternalFlags.HasLogicalChildren); }
+            set { WriteInternalFlag(InternalFlags.HasLogicalChildren, value); }
+        }
+
+        #endregion Logical Parent
+
         private FrameworkElement _templateChild; // Non-null if this FE has a child that was created as part of a template.
 
         // Note: TemplateChild is an UIElement in WPF.
@@ -224,17 +358,6 @@ namespace Windows.UI.Xaml
 #endregion
 
         /// <summary>
-        /// Gets the parent object of this FrameworkElement in the object tree.
-        /// </summary>
-        public DependencyObject Parent
-        {
-            get
-            {
-                return this.INTERNAL_VisualParent;
-            }
-        }
-
-        /// <summary>
         /// Gets a value that indicates whether this element is in the Visual Tree, that is, if it has been loaded for presentation.
         /// </summary>
         public bool IsLoaded
@@ -311,7 +434,7 @@ namespace Windows.UI.Xaml
         protected virtual void OnApplyTemplate()
 #endif
         {
-
+            
         }
 
         /// <summary>
@@ -866,7 +989,7 @@ namespace Windows.UI.Xaml
             {
                 object implicitStyle;
                 // First, try to find an implicit style in parents' resources.
-                for (FrameworkElement f = fe; f != null; f = (FrameworkElement)f.Parent)
+                for (FrameworkElement f = fe; f != null; f = VisualTreeHelper.GetParent(f) as FrameworkElement)
                 {
                     if (f.HasResources && f.Resources.HasImplicitStyles)
                     {
@@ -1352,11 +1475,11 @@ namespace Windows.UI.Xaml
         //Remove this entry later since it is supposed to be in InternalFlags2
         HasStyleInvalidated = 0x02000000,
 
-        //HasLogicalChildren = 0x04000000,
+        HasLogicalChildren = 0x04000000,
 
         // Are we in the process of iterating the logical children.
         // This flag is set during a descendents walk, for property invalidation.
-        //IsLogicalChildrenIterationInProgress = 0x08000000,
+        IsLogicalChildrenIterationInProgress = 0x08000000,
 
         //Are we creating a new root after system metrics have changed?
         //CreatingRoot = 0x10000000,

@@ -79,7 +79,7 @@ namespace CSHTML5.Native.Html.Controls
             {
                 if (this._items == null)
                 {
-                    this._items = new ItemCollection();
+                    this._items = new ItemCollection(null);
                     this._items.CollectionChanged += this.OnItemCollectionChanged;
                 }
                 return this._items;

@@ -55,18 +55,18 @@ namespace Windows.UI.Xaml
     /// </summary>
     public abstract partial class UIElement : DependencyObject
     {
-        //internal bool INTERNAL_hasCapture = false;
-
         internal DependencyObject INTERNAL_VisualParent { get; set; } // This is used to determine if the item is in the Visual Tree: null means that the item is not in the visual tree, not null otherwise.
+
         internal Window INTERNAL_ParentWindow { get; set; } // This is a reference to the window where this control is presented. It is useful for example to know where to display the popups. //todo-perfs: replace all these properties with fields?
-        internal
-#if CSHTML5NETSTANDARD //todo: after testing with JSIL, make it "object" in all cases.
-            object
+
+        // This is the main DIV of the HTML representation of the control
+#if CSHTML5NETSTANDARD
+        internal object INTERNAL_OuterDomElement { get; set; }
+
 #else
-            dynamic
-# endif
-            INTERNAL_OuterDomElement
-        { get; set; } // This is the main DIV of the HTML representation of the control //todo-perfs: replace all these properties with fields?
+        internal dynamic INTERNAL_OuterDomElement { get; set; }
+#endif
+
         internal object INTERNAL_InnerDomElement { get; set; } // This is used to add visual children to the DOM (optionally wrapped into additional code, c.f. "INTERNAL_VisualChildInformation")
         internal object INTERNAL_AdditionalOutsideDivForMargins { get; set; } // This is used to define the margins and to remove the div used for the margins when we remove this element.
         internal object INTERNAL_InnerDivOfTheChildWrapperOfTheParentIfAny { get; set; } // This is non-null only if the parent has a "ChildWrapper", that is, a DIV that it creates for each of its children. If it is the case, we store the "inner div" of that child wrapper. It is useful for alignment purposes (cf. alignment methods in the FrameworkElement class).
@@ -102,7 +102,7 @@ namespace Windows.UI.Xaml
 
 
 
-        #region Special code for RadioButtons
+#region Special code for RadioButtons
 
         private string _childrenRadioButtonDefaultName = null;
         internal string INTERNAL_ChildrenRadioButtonDefaultName //this is used to define a name for the radio buttons contained inside this UIElement that have their GroupName property not defined. Mandatory because RadioButtons without GroupName inside a same UIElement are considered to be part of a same group.
@@ -128,14 +128,14 @@ namespace Windows.UI.Xaml
             return "RadioButtonDefaultGroupName" + i.ToString();
         }
 
-        #endregion
+#endregion
 
         internal virtual object GetDomElementToSetContentString()
         {
             return INTERNAL_InnerDomElement;
         }
 
-        #region ClipToBounds
+#region ClipToBounds
 
         /// <summary>
         /// Gets or sets a value indicating whether to clip the content of this element
@@ -175,7 +175,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace Windows.UI.Xaml
         }
 
 
-        #region Effect
+#region Effect
 
         // todo: we may add the support for multiple effects on the same 
         // UIElement since it is possible in html (but not in wpf). If we 
@@ -254,10 +254,10 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
 
-        #region RenderTransform and RenderTransformOrigin
+#region RenderTransform and RenderTransformOrigin
 
         /// <summary>
         /// Gets or sets transform information that affects the rendering position of
@@ -392,9 +392,9 @@ namespace Windows.UI.Xaml
             uiElement.INTERNAL_RenderTransformOriginHasBeenApplied = true;
         }
 
-        #endregion
+#endregion
 
-        #region UseLayoutRounding
+#region UseLayoutRounding
 
         /// <summary>
         /// Gets or sets a value that determines whether rendering for the object and
@@ -423,9 +423,9 @@ namespace Windows.UI.Xaml
         // it is not significant.
         //-------------------------------------------------------------------
 
-        #endregion
+#endregion
 
-        #region Visibility
+#region Visibility
 
         /// <summary>
         /// Gets or sets the visibility of a UIElement. A UIElement that is not visible
@@ -516,9 +516,9 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
-        #region IsVisible
+#region IsVisible
 
         public bool IsVisible
         {
@@ -588,9 +588,9 @@ namespace Windows.UI.Xaml
 
         public event DependencyPropertyChangedEventHandler IsVisibleChanged;
 
-        #endregion
+#endregion
 
-        #region Opacity
+#region Opacity
 
         /// <summary>
         /// Gets or sets the degree of the object's opacity.
@@ -620,9 +620,9 @@ namespace Windows.UI.Xaml
                 },
             });
 
-        #endregion
+#endregion
 
-        #region IsHitTestVisible
+#region IsHitTestVisible
 
         /// <summary>
         /// Gets or sets whether the contained area of this UIElement can return true
@@ -710,7 +710,7 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-        #endregion
+#endregion
 
 #if REVAMPPOINTEREVENTS
         internal static void INTERNAL_UpdateCssPointerEvents(UIElement element)
@@ -765,7 +765,7 @@ namespace Windows.UI.Xaml
         }
 
 
-        #region AllowDrop
+#region AllowDrop
 
         /// <summary>
         /// Gets or sets a value that determines whether this UIElement
@@ -786,7 +786,7 @@ namespace Windows.UI.Xaml
                                         typeof(UIElement),
                                         new PropertyMetadata(false));
 
-        #endregion
+#endregion
 
         internal virtual void INTERNAL_UpdateDomStructureIfNecessary()
         {
@@ -805,7 +805,7 @@ namespace Windows.UI.Xaml
         }
 
 
-        #region CapturePointer, ReleasePointerCapture, IsPointerCaptured, and OnLostMouseCapture
+#region CapturePointer, ReleasePointerCapture, IsPointerCaptured, and OnLostMouseCapture
 
         /// <summary>
         /// Sets pointer capture to a UIElement.
@@ -1162,9 +1162,9 @@ namespace Windows.UI.Xaml
         public event PointerEventHandler PointerCaptureLost;
 #endif
 
-        #endregion
+#endregion
 
-        #region AllowScrollOnTouchMove
+#region AllowScrollOnTouchMove
 
         /// <summary>
         /// Gets or sets whether pressing (touchscreen devices) on this UIElement then moving should allow scrolling or not. The default value is True.
@@ -1201,7 +1201,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
@@ -1280,7 +1280,7 @@ namespace Windows.UI.Xaml
         //{
         //}
 
-        #region ForceInherit property support
+#region ForceInherit property support
 
         internal static void SynchronizeForceInheritProperties(UIElement uiE, DependencyObject parent)
         {
@@ -1316,6 +1316,6 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
     }
 }

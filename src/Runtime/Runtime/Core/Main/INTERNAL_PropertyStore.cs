@@ -1,6 +1,11 @@
 ﻿//#define USEASSERT
+using OpenSilver.Internal;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
@@ -305,7 +310,7 @@ namespace CSHTML5.Internal
             }
         }
 
-        private static void UpdateEffectiveValue(INTERNAL_PropertyStorage storage,
+        private static bool UpdateEffectiveValue(INTERNAL_PropertyStorage storage,
                                                  object newValue,
                                                  BaseValueSourceInternal newValueSource,
                                                  bool coerceWithCurrentValue,
@@ -344,7 +349,7 @@ namespace CSHTML5.Internal
                 {
                     // value source remains the same.
                     // Exit if the newly set value is of lower precedence than the effective value.
-                    return;
+                    return false;
                 }
 
                 // Get old value before it gets overriden
@@ -470,7 +475,8 @@ namespace CSHTML5.Internal
                 storage.Owner.ProvideSelfAsInheritanceContext(computedValue, null/*storage.Property*/);
             }
 
-            if (!ArePropertiesEqual(oldValue, computedValue, storage.Property.PropertyType))
+            bool valueChanged;
+            if (valueChanged = !ArePropertiesEqual(oldValue, computedValue, storage.Property.PropertyType))
             {
                 // Raise the PropertyChanged event
                 if (!storage.TypeMetadata.Inherits || ShouldRaisePropertyChanged(storage))
@@ -481,7 +487,14 @@ namespace CSHTML5.Internal
                 // Propagate to children if property is inherited
                 if (storage.TypeMetadata.Inherits && propagateChanges)
                 {
-                    CascadeInheritedPropertyToChildren(storage, computedValue);
+                    if (storage.Owner is FrameworkElement rootElement)
+                    {
+                        InheritablePropertyChangeInfo info = new InheritablePropertyChangeInfo(rootElement,
+                            storage.Property,
+                            oldValue, oldBaseValueSource,
+                            computedValue, newValueSource);
+                        TreeWalkHelper.InvalidateOnInheritablePropertyChange(rootElement, info);
+                    }
                 }
             }
 
@@ -490,6 +503,8 @@ namespace CSHTML5.Internal
             {
                 currentExpr.TryUpdateSourceObject(computedValue);
             }
+
+            return valueChanged;
         }
 
         private static void ProcessCoerceValue(INTERNAL_PropertyStorage storage,
@@ -607,23 +622,6 @@ namespace CSHTML5.Internal
             }
         }
 
-        private static void CascadeInheritedPropertyToChildren(INTERNAL_PropertyStorage storage, object newValue)
-        {
-            DependencyObject dependencyObject = storage.Owner;
-
-            // Set Inherited Value on the children:
-            if (dependencyObject is UIElement parentUIE)
-            {
-                if (parentUIE.INTERNAL_VisualChildrenInformation != null)
-                {
-                    foreach (UIElement child in parentUIE.INTERNAL_VisualChildrenInformation.Keys) //all the children should be in there
-                    {
-                        child.SetInheritedValue(storage.Property, newValue, true);
-                    }
-                }
-            }
-        }
-
         private static bool ArePropertiesEqual(object obj1, object obj2, Type type)
         {
             // Note: In Silverlight (and WPF), a DependencyProperty callback is only called if one of the following condition is met :
@@ -649,17 +647,17 @@ namespace CSHTML5.Internal
 
 #endregion
 
-        internal static void SetInheritedValue(INTERNAL_PropertyStorage storage, object newValue, bool recursively)
+        internal static bool SetInheritedValue(INTERNAL_PropertyStorage storage, object newValue, bool recursively)
         {
             storage.InheritedValue = newValue;
 
-            UpdateEffectiveValue(storage,
-                                 newValue,
-                                 BaseValueSourceInternal.Inherited,
-                                 false, // coerceWithCurrentValue
-                                 false, // coerceValue
-                                 newValue == DependencyProperty.UnsetValue, // clearValue
-                                 recursively); // propagateChanges
+            return UpdateEffectiveValue(storage,
+                                        newValue,
+                                        BaseValueSourceInternal.Inherited,
+                                        false, // coerceWithCurrentValue
+                                        false, // coerceValue
+                                        newValue == DependencyProperty.UnsetValue, // clearValue
+                                        recursively); // propagateChanges
         }
 
         internal static void SetLocalStyleValue(INTERNAL_PropertyStorage storage, object newValue)

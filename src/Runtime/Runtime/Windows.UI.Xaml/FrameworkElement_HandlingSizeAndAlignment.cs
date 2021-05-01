@@ -20,19 +20,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Windows.Media;
 
 #if MIGRATION
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Markup;
+using System.Windows.Media;
 #else
-//using System.Windows;
 using Windows.Foundation;
-using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Markup;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -786,7 +781,7 @@ if ($0.tagName.toLowerCase() != 'span')
                             {
                                 if (isCSSGrid)
                                 {
-                                    if ((frameworkElement.Parent is Grid))
+                                    if ((VisualTreeHelper.GetParent(frameworkElement) is Grid))
                                     {
                                         //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
                                         dynamic boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(frameworkElement);
@@ -810,7 +805,7 @@ if ($0.tagName.toLowerCase() != 'span')
                         case VerticalAlignment.Center:
                             if (!isParentAWrapPanelOrAVerticalStackPanel)
                             {
-                                if (isCSSGrid && (frameworkElement.Parent is Grid))
+                                if (isCSSGrid && (VisualTreeHelper.GetParent(frameworkElement) is Grid))
                                 {
                                     //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
                                     dynamic boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(frameworkElement);
@@ -839,7 +834,7 @@ if ($0.tagName.toLowerCase() != 'span')
                         case VerticalAlignment.Bottom:
                             if (!isParentAWrapPanelOrAVerticalStackPanel)
                             {
-                                if (isCSSGrid && (frameworkElement.Parent is Grid))
+                                if (isCSSGrid && (VisualTreeHelper.GetParent(frameworkElement) is Grid))
                                 {
                                     //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
                                     dynamic boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(frameworkElement);
@@ -868,7 +863,7 @@ if ($0.tagName.toLowerCase() != 'span')
                         case VerticalAlignment.Stretch:
                             if (!isParentAWrapPanelOrAVerticalStackPanel)
                             {
-                                if (!(isCSSGrid && (frameworkElement.Parent is Grid)))
+                                if (!(isCSSGrid && (VisualTreeHelper.GetParent(frameworkElement) is Grid)))
                                 {
                                     styleOfWrapperElement.verticalAlign = "middle"; // This is useful when the parent is a horizontal StackPanel
                                     styleOfOuterDomElement.height = "100%";  // Note: We never have both Stretch and a size in pixels, because of the "if" condition at the beginning of this method.

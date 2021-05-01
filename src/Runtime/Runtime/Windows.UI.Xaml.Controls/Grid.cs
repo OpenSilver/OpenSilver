@@ -14,14 +14,13 @@
 
 
 using CSHTML5.Internal;
+using OpenSilver.Internal.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Collections;
+
 #if BRIDGE
 using Bridge;
 #endif
@@ -837,6 +836,11 @@ namespace Windows.UI.Xaml.Controls
                     }
                 }
 
+                if (!this.HasChildren)
+                {
+                    return;
+                }
+
                 for (int i = 0; i < this.Children.Count; ++i)
                 {
                     this.UpdateStructureWhenAddingChild(this.Children[i]);
@@ -848,7 +852,11 @@ namespace Windows.UI.Xaml.Controls
             else
             {
                 base.OnChildrenReset();
-                this.LocallyManageChildrenChanged();
+
+                if (this.HasChildren)
+                {
+                    this.LocallyManageChildrenChanged();
+                }
             }
         }
 
@@ -952,7 +960,7 @@ namespace Windows.UI.Xaml.Controls
         //}
 
 
-#region ****************** Attached Properties ******************
+        #region ****************** Attached Properties ******************
 
         /// <summary>
         /// Sets the value of the Grid.Row XAML attached property on the specified FrameworkElement.
@@ -1148,7 +1156,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion
+        #endregion
 
         internal double GetColumnActualWidth(ColumnDefinition columnDefinition)
         {
@@ -1236,7 +1244,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     int rowIndex = _rowDefinitionsOrNull.IndexOf(rowDefinition);
                     var rowDomElement = _currentCellsStructure[rowIndex][0].RowDomElement;
-            if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
+                    if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
                     {
                         return rowDomElement.offsetHeight;
                     }
@@ -1281,5 +1289,27 @@ namespace Windows.UI.Xaml.Controls
         //            return double.NaN;
         //    }
         //}
+    }
+
+    internal sealed class GridNotLogical : Grid
+    {
+        protected override UIElementCollection CreateUIElementCollection(FrameworkElement logicalParent)
+        {
+            return base.CreateUIElementCollection(null);
+        }
+
+        /// <summary> 
+        /// Returns enumerator to logical children.
+        /// </summary>
+        /*protected*/ internal override IEnumerator LogicalChildren
+        {
+            get
+            {
+                // Note: Since children are displayed in a grid in our implementation,
+                // this panel's children are not logical children. There are the logical
+                // children of the grid they are displayed in.
+                return EmptyEnumerator.Instance;
+            }
+        }
     }
 }

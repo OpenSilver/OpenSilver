@@ -14,12 +14,12 @@
 
 
 using CSHTML5.Internal;
+using OpenSilver.Internal.Controls;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
+
 #if !FOR_DESIGN_TIME && !MIGRATION
 using Windows.UI.Xaml.Markup;
 #endif
@@ -37,6 +37,23 @@ namespace Windows.UI.Xaml.Controls
     [ContentProperty("Content")]
     public partial class UserControl : Control, INameScope
     {
+        /// <summary> 
+        /// Returns enumerator to logical children.
+        /// </summary>
+        /*protected*/ internal override IEnumerator LogicalChildren
+        {
+            get
+            {
+                if (this.Content == null)
+                {
+                    return EmptyEnumerator.Instance;
+                }
+
+                // otherwise, its logical children is its visual children
+                return new SingleChildEnumerator(this.Content);
+            }
+        }
+
         public UserControl()
         {
             IsTabStop = false; //we want to avoid stopping on this element's div when pressing tab.
@@ -84,11 +101,17 @@ namespace Windows.UI.Xaml.Controls
 
         static void Content_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            UIElement parent = (UIElement)d;
+            UserControl uc = (UserControl)d;
             UIElement oldChild = (UIElement)e.OldValue;
             UIElement newChild = (UIElement)e.NewValue;
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, parent);
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, parent);
+
+            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, uc);
+
+            uc.RemoveLogicalChild(oldChild);
+
+            uc.AddLogicalChild(newChild);
+
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, uc);
         }
 
         //protected virtual void InitializeComponent()

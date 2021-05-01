@@ -440,14 +440,15 @@ namespace Windows.UI.Xaml
         /// <param name="dp">The identifier of the dependency property to set.</param>
         /// <param name="value">The new local value.</param>
         /// <param name="recursively">Specifies if the inherited value must be applied to the children of this DependencyObject.</param>
-        internal void SetInheritedValue(DependencyProperty dp, object value, bool recursively)
+        /// <returns>true if this property's value changed, false otherwise.</returns>
+        internal bool SetInheritedValue(DependencyProperty dp, object value, bool recursively)
         {
             //-----------------------
             // CALL "SET INHERITED VALUE" ON THE STORAGE:
             //-----------------------
             INTERNAL_PropertyStorage storage;
             INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(this, dp, true/*create*/, out storage);
-            INTERNAL_PropertyStore.SetInheritedValue(storage, value, recursively);
+            return INTERNAL_PropertyStore.SetInheritedValue(storage, value, recursively);
         }
 
         /// <summary>

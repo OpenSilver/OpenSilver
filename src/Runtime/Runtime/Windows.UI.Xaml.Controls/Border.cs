@@ -14,12 +14,13 @@
 
 
 using CSHTML5.Internal;
+using OpenSilver.Internal.Controls;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
+
 #if MIGRATION
 using System.Windows.Media;
 #else
@@ -63,6 +64,23 @@ namespace Windows.UI.Xaml.Controls
     [ContentProperty("Child")]
     public partial class Border : FrameworkElement
     {
+        /// <summary> 
+        /// Returns enumerator to logical children.
+        /// </summary>
+        /*protected*/ internal override IEnumerator LogicalChildren
+        {
+            get
+            {
+                if (this._child == null)
+                {
+                    return EmptyEnumerator.Instance;
+                }
+
+                // otherwise, its logical children is its visual children
+                return new SingleChildEnumerator(_child);
+            }
+        }
+
         private UIElement _child;
 
 #if REVAMPPOINTEREVENTS
@@ -85,15 +103,16 @@ namespace Windows.UI.Xaml.Controls
             }
             set
             {
-                if (!object.ReferenceEquals(value, _child))
-                {
-                    if (this._isLoaded)
-                    {
-                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
-                        INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
-                    }
-                    _child = value;
-                }
+                if (object.ReferenceEquals(_child, value))
+                    return;
+
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
+
+                this.RemoveLogicalChild(_child);
+                _child = value;
+                this.AddLogicalChild(value);
+
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
             }
         }
 
@@ -135,33 +154,34 @@ namespace Windows.UI.Xaml.Controls
             get { return (Brush)GetValue(BackgroundProperty); }
             set { SetValue(BackgroundProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Background dependency property.
         /// </summary>
         public static readonly DependencyProperty BackgroundProperty =
-            DependencyProperty.Register("Background", typeof(Brush), typeof(Border), new PropertyMetadata(null
-#if REVAMPPOINTEREVENTS
-                , Background_Changed
-#endif
-                )
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(Background), 
+                typeof(Brush), 
+                typeof(Border), 
+                new PropertyMetadata(null, Background_Changed)
                 {
-                    return new CSSEquivalent()
+                    GetCSSEquivalent = (instance) =>
                     {
-                        Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
-                    };
-                }
-            }
-            );
+                        return new CSSEquivalent
+                        {
+                            Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
+                        };
+                    }
+                });
 
-#if REVAMPPOINTEREVENTS
         private static void Background_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+#if REVAMPPOINTEREVENTS
             UIElement element = (UIElement)d;
             INTERNAL_UpdateCssPointerEvents(element);
-        }
 #endif
+        }
+
         /// <summary>
         /// Gets or sets a brush that describes the border background of a control.
         /// </summary>
@@ -170,32 +190,26 @@ namespace Windows.UI.Xaml.Controls
             get { return (Brush)GetValue(BorderBrushProperty); }
             set { SetValue(BorderBrushProperty, value); }
         }
+
         /// <summary>
         /// Identifies the BorderBrush dependency property.
         /// </summary>
         public static readonly DependencyProperty BorderBrushProperty =
-            DependencyProperty.Register("BorderBrush", typeof(Brush), typeof(Border), new PropertyMetadata(null)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(BorderBrush), 
+                typeof(Brush), 
+                typeof(Border), 
+                new PropertyMetadata((object)null)
                 {
-                    return new CSSEquivalent()
+                    GetCSSEquivalent = (instance) =>
                     {
-                        Value = (inst, value) =>
+                        return new CSSEquivalent()
                         {
-                            if (value == null)
-                            {
-                                return "transparent";
-                            }
-                            else
-                            {
-                                return value;
-                            }
-                        },
-                        Name = new List<string> { "borderColor" },
-                    };
-                }
-            }
-            );
+                            Value = (inst, value) => value ?? "transparent",
+                            Name = new List<string> { "borderColor" },
+                        };
+                    }
+                });
 
         /// <summary>
         /// Gets or sets the thickness of the border.
@@ -205,13 +219,21 @@ namespace Windows.UI.Xaml.Controls
             get { return (Thickness)GetValue(BorderThicknessProperty); }
             set { SetValue(BorderThicknessProperty, value); }
         }
+
         /// <summary>
         /// Identifies the BorderThickness dependency property.
         /// </summary>
         public static readonly DependencyProperty BorderThicknessProperty =
-            DependencyProperty.Register("BorderThickness", typeof(Thickness), typeof(Border), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = BorderThickness_MethodToUpdateDom});
+            DependencyProperty.Register(
+                nameof(BorderThickness), 
+                typeof(Thickness), 
+                typeof(Border), 
+                new PropertyMetadata(new Thickness()) 
+                { 
+                    MethodToUpdateDom = BorderThickness_MethodToUpdateDom 
+                });
 
-        static void BorderThickness_MethodToUpdateDom(DependencyObject d, object newValue)
+        private static void BorderThickness_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             if (newValue != null)
             {
@@ -219,13 +241,8 @@ namespace Windows.UI.Xaml.Controls
                 dynamic domElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(border);
                 var thickness = (Thickness)newValue;
                 domElement.borderStyle = "solid"; //todo: see if we should put this somewhere else
-                domElement.borderWidth = thickness.Top + "px " + thickness.Right + "px " + thickness.Bottom + "px " + thickness.Left + "px ";
+                domElement.borderWidth = $"{thickness.Top}px {thickness.Right}px {thickness.Bottom}px {thickness.Left}px";
                 domElement.boxSizing = "border-box";
-                //domElement.borderWidth = 
-                //      (newValue.Top > 0 ? newValue.Top + 1 : 0).ToString() + "px "
-                //      + (newValue.Right > 0 ? newValue.Right + 1 : 0).ToString() + "px "
-                //      + (newValue.Bottom > 0 ? newValue.Bottom + 1 : 0).ToString() + "px "
-                //      + (newValue.Left > 0 ? newValue.Left + 1 : 0).ToString() + "px ";
             }
         }
 
@@ -237,28 +254,28 @@ namespace Windows.UI.Xaml.Controls
             get { return (CornerRadius)GetValue(CornerRadiusProperty); }
             set { SetValue(CornerRadiusProperty, value); }
         }
+
         /// <summary>
         /// Identifies the CornerRadius dependency property.
         /// </summary>
         public static readonly DependencyProperty CornerRadiusProperty =
-            DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(Border), new PropertyMetadata(new CornerRadius()) { MethodToUpdateDom = CornerRadius_MethodToUpdateDom});
+            DependencyProperty.Register(
+                nameof(CornerRadius), 
+                typeof(CornerRadius), 
+                typeof(Border), 
+                new PropertyMetadata(new CornerRadius()) 
+                { 
+                    MethodToUpdateDom = CornerRadius_MethodToUpdateDom 
+                });
 
-        static void CornerRadius_MethodToUpdateDom(DependencyObject d, object newValue)
+        private static void CornerRadius_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             var border = (Border)d;
             var cornerRadius = (CornerRadius)newValue;
             var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(border);
-            domStyle.borderTopLeftRadius = cornerRadius.TopLeft + "px";
-            domStyle.borderTopRightRadius = cornerRadius.TopRight + "px";
-            domStyle.borderBottomRightRadius = cornerRadius.BottomRight + "px";
-            domStyle.borderBottomLeftRadius = cornerRadius.BottomLeft + "px";
+            domStyle.borderRadius = $"{cornerRadius.TopLeft}px {cornerRadius.TopRight}px {cornerRadius.BottomRight}px {cornerRadius.BottomLeft}px";
         }
 
-
-        // Returns:
-        //     The dimensions of the space between the border and its child as a Thickness
-        //     value. Thickness is a structure that stores dimension values using pixel
-        //     measures.
         /// <summary>
         /// Gets or sets the distance between the border and its child object.
         /// </summary>
@@ -267,11 +284,19 @@ namespace Windows.UI.Xaml.Controls
             get { return (Thickness)GetValue(PaddingProperty); }
             set { SetValue(PaddingProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Padding dependency property.
         /// </summary>
         public static readonly DependencyProperty PaddingProperty =
-            DependencyProperty.Register("Padding", typeof(Thickness), typeof(Border), new PropertyMetadata(new Thickness()) { MethodToUpdateDom = Padding_MethodToUpdateDom});
+            DependencyProperty.Register(
+                nameof(Padding), 
+                typeof(Thickness), 
+                typeof(Border), 
+                new PropertyMetadata(new Thickness()) 
+                { 
+                    MethodToUpdateDom = Padding_MethodToUpdateDom 
+                });
 
         private static void Padding_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -279,16 +304,9 @@ namespace Windows.UI.Xaml.Controls
             var newPadding = (Thickness)newValue;
             var innerDomElement = border.INTERNAL_InnerDomElement;
             var styleOfInnerDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDomElement);
-            if (newPadding == null) //if it is null, we want 0 everywhere
-            {
-                newPadding = new Thickness();
-            }
             //todo: if the container has a padding, add it to the margin
             styleOfInnerDomElement.boxSizing = "border-box";
-            styleOfInnerDomElement.paddingLeft = newPadding.Left + "px";
-            styleOfInnerDomElement.paddingTop = newPadding.Top + "px";
-            styleOfInnerDomElement.paddingRight = newPadding.Right + "px";
-            styleOfInnerDomElement.paddingBottom = newPadding.Bottom + "px";
+            styleOfInnerDomElement.padding = $"{newPadding.Top}px {newPadding.Right}px {newPadding.Bottom}px {newPadding.Left}px";
         }
     }
 }

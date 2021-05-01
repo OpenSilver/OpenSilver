@@ -40,11 +40,25 @@ namespace Windows.UI.Xaml.Controls
         // and "ContentTemplate" properties (those bindings
         // are added at compile-time).
         //--------------------------------------------------
+
+        // Always return false as ContentPresenter is not supposed to be
+        // a ContentControl and is not logical parent of its content child.
+        internal override bool ContentIsNotLogical
+        {
+            get { return false; }
+            set { }
+        }
+
         internal override void UpdateTabIndex(bool isTabStop, int tabIndex)
         {
             // we don't do anything since ContentPresenter is not supposed to be a Control in the first place
             // and it is not supposed to be counted in tabbing
             return;
+        }
+
+        protected sealed override void OnContentChanged(object oldContent, object newContent)
+        {
+            this.OnContentChangedInternal(oldContent, newContent);
         }
     }
 }
