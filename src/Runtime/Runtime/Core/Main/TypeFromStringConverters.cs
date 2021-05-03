@@ -139,6 +139,12 @@ namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is cal
 
         static bool TryGetConverter(Type type, out Func<string, object> converter)
         {
+#if NETSTANDARD
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(type.TypeHandle);
+#elif BRIDGE
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(type);
+#endif
+
             // Register converters for base system types if not already done:
             if (!IsBaseTypesConvertersRegistered)
             {
