@@ -12,33 +12,19 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.Serialization;
 using DotNetForHtml5.Core;
 
-
 #if MIGRATION
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
-using System.Windows.Media;
 #else
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 #endif
 
 // Credits: https://github.com/MicrosoftArchive/SilverlightToolkit/tree/master/Release/Silverlight4/Source/Controls/DatePicker
 // (c) Copyright Microsoft Corporation.
 // License: Microsoft Public License (Ms-PL)
-
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -50,7 +36,7 @@ namespace Windows.UI.Xaml.Controls
     {
         protected FrameworkElement _root;
         protected TextBox _textBox;
-        protected Button _dropDownButton;
+        protected ToggleButton _dropDownButton;
         protected Popup _popup;
 
         protected string _defaultText = "Select Date...";
@@ -81,7 +67,7 @@ namespace Windows.UI.Xaml.Controls
 
             _root = this.GetTemplateChild(ElementRoot) as FrameworkElement;
             _textBox = GetTemplateChild(ElementTextBox) as TextBox;
-            _dropDownButton = GetTemplateChild(ElementButton) as Button;
+            _dropDownButton = GetTemplateChild(ElementButton) as ToggleButton;
             _popup = this.GetTemplateChild(ElementPopup) as Popup;
 
             if (_dropDownButton != null)
@@ -95,12 +81,7 @@ namespace Windows.UI.Xaml.Controls
                 _popup.ClosedDueToOutsideClick += Popup_ClosedDueToOutsideClick;
             }
 
-            if (_textBox != null)
-            {
-                _textBox.IsReadOnly = true;
-                //_textBox.WaterMark = _defaultText;
-            }
-
+            SetWaterMarkText();
             RefreshTextBox();
         }
 
@@ -255,17 +236,24 @@ namespace Windows.UI.Xaml.Controls
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             INTERNAL_DateTimePickerBase dp = (INTERNAL_DateTimePickerBase)d;
+            if (dp.IsHandlerSuspended(TextProperty))
+                return;
 
             string newText = (string)e.NewValue;
-
-            if (dp._textBox != null)
+            if (string.IsNullOrEmpty(newText))
             {
-                //if (newText == dp._defaultText)
-                //    dp._textBox.Foreground = new SolidColorBrush(Colors.Gray);
-                //else
-                //    dp._textBox.Foreground = new SolidColorBrush(Colors.Black);
-
-                dp._textBox.Text = newText;
+                dp.SetValueNoCallback(TextProperty, null);
+            }
+            else
+            {
+                if (dp._textBox != null)
+                {
+                    dp._textBox.Text = newText;
+                }
+                else
+                {
+                    dp._defaultText = newText;
+                }
             }
 
             dp.OnTextChanged();
@@ -282,7 +270,7 @@ namespace Windows.UI.Xaml.Controls
                 DateTime? selectedDate = this.INTERNAL_SelectedDate;
                 if (selectedDate != null)
                 {
-                    Text = SetTextFromDate(selectedDate.ToString());
+                    Text = SetTextFromDate(selectedDate);
                 }
                 else
                 {
@@ -291,9 +279,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        protected abstract string SetTextFromDate(string newDate);
+        protected abstract string SetTextFromDate(DateTime? newDate);
 
-        protected void SetWaterMarkText()
+        protected virtual void SetWaterMarkText()
         {
             if (this._textBox != null)
             {

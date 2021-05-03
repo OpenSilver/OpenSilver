@@ -251,43 +251,6 @@ namespace Windows.UI.Xaml.Controls
         private TimePickerPopup _instantiatedPopupFromTemplate;
         #endregion public TimePickerPopupTemplate PopupTemplate
 
-        #region public int PopupMinutesInterval
-        /// <summary>
-        /// Gets or sets the minutes interval between time values allowed by the TimePickerPopup.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public int PopupMinutesInterval
-        {
-            get => (int)GetValue(PopupMinutesIntervalProperty);
-            set => SetValue(PopupMinutesIntervalProperty, value);
-        }
-
-        /// <summary>
-        /// Identifies the PopupMinutesInterval dependency property.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty PopupMinutesIntervalProperty =
-            DependencyProperty.Register(
-                "PopupMinutesInterval",
-                typeof(int),
-                typeof(TimePicker),
-                new PropertyMetadata(OnPopupMinutesIntervalPropertyChanged));
-
-        /// <summary>
-        /// PopupMinutesIntervalProperty property changed handler.
-        /// </summary>
-        /// <param name="d">
-        /// TimePicker that changed its PopupMinutesInterval.
-        /// </param>
-        /// <param name="e">
-        /// Event arguments.
-        /// </param>
-        private static void OnPopupMinutesIntervalPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-        }
-
-        #endregion public int PopupMinutesInterval
-
         #region public PopupTimeSelectionMode PopupTimeSelectionMode
         /// <summary>
         /// Gets or sets the whether the TimePickerPopup supports selecting

@@ -48,7 +48,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
             _timerToReleaseCaptureAutomaticallyIfNoMouseUpEvent.Interval = new TimeSpan(0, 0, 5); // See comment where this variable is defined.
             _timerToReleaseCaptureAutomaticallyIfNoMouseUpEvent.Tick += TimerToReleaseCaptureAutomaticallyIfNoMouseUpEvent_Tick;
-
+            IsEnabledChanged += OnIsEnabledChanged;
 #if MIGRATION
             base.MouseLeftButtonDown += (s, e) => { }; // cf. note below
             base.MouseLeftButtonUp += (s, e) => { }; // cf. note below
@@ -56,6 +56,22 @@ namespace Windows.UI.Xaml.Controls.Primitives
             base.PointerPressed += (s, e) => { }; // Note: even though the logic for PointerPressed is located in the overridden method "OnPointerPressed" (below), we still need to register this event so that the underlying UIElement can listen to the HTML DOM "mousedown" event (cf. see the "Add" accessor of the "PointerPressed" event definition).
             base.PointerReleased += (s, e) => { }; // Note: even though the logic for PointerReleased is located in the overridden method "OnPointerPressed" (below), we still need to register this event so that the underlying UIElement can listen to the HTML DOM "mouseup" event (cf. see the "Add" accessor of the "PointerReleased" event definition).
 #endif
+        }
+
+        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            try
+            {
+                if (!IsEnabled)
+                {
+                    IsPressed = false;
+                    IsMouseOver = false;
+                }
+            }
+            finally
+            {
+                UpdateVisualStates();
+            }
         }
 
         /// <summary>
@@ -374,6 +390,53 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
 #endif
 
+        /// <summary>
+        /// Identifies the <see cref="ButtonBase.IsMouseOver"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsMouseOverProperty =
+            DependencyProperty.Register("IsMouseOver",
+                                        typeof(bool),
+                                        typeof(ButtonBase),
+                                        new PropertyMetadata(false));
+        /// <summary>
+        /// Gets a value indicating whether the mouse pointer is located over this button control.
+        /// </summary>
+        public bool IsMouseOver
+        {
+            get { return (bool)GetValue(IsMouseOverProperty); }
+            internal set { SetValue(IsMouseOverProperty, value); }
+        }
+
+#if MIGRATION
+        protected override void OnMouseEnter(MouseEventArgs eventArgs)
+#else
+        protected override void OnPointerEntered(PointerRoutedEventArgs eventArgs)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseEnter(eventArgs);
+#else
+            base.OnPointerEntered(eventArgs);
+#endif
+            IsMouseOver = true;
+            UpdateVisualStates();
+        }
+
+#if MIGRATION
+        protected internal override void OnMouseLeave(MouseEventArgs eventArgs)
+#else
+        protected internal override void OnPointerExited(PointerRoutedEventArgs eventArgs)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeave(eventArgs);
+#else
+            base.OnPointerExited(eventArgs);
+#endif
+            IsMouseOver = false;
+            UpdateVisualStates();
+        }
+
 #if WORKINPROGRESS
 
         /// <summary>
@@ -386,15 +449,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                                         typeof(ButtonBase),
                                         new PropertyMetadata(false));
 
-        /// <summary>
-        /// Identifies the <see cref="ButtonBase.IsMouseOver"/> dependency property.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty IsMouseOverProperty =
-            DependencyProperty.Register("IsMouseOver",
-                                        typeof(bool),
-                                        typeof(ButtonBase),
-                                        new PropertyMetadata(false));
+       
 
         /// <summary>
         /// Gets a value that determines whether the button has focus.
@@ -405,14 +460,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
             get { return (bool)GetValue(IsFocusedProperty); }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the mouse pointer is located over this button control.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public bool IsMouseOver
-        {
-            get { return (bool)GetValue(IsMouseOverProperty); }
-        }
+        
+
+       
 
 #if MIGRATION
         /// <summary>
@@ -427,5 +477,25 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 
 #endif
+
+        internal override void UpdateVisualStates()
+        {
+            if (!IsEnabled)
+            {
+                GoToState(VisualStates.StateDisabled);
+            }
+            else if (IsPressed)
+            {
+                GoToState(VisualStates.StatePressed);
+            }
+            else if (IsMouseOver)
+            {
+                GoToState(VisualStates.StateMouseOver);
+            }
+            else
+            {
+                GoToState(VisualStates.StateNormal);
+            }
+        }
     }
 }

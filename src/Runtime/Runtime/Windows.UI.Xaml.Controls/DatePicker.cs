@@ -12,27 +12,16 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.Serialization;
-
+using System.Globalization;
 
 #if MIGRATION
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Threading;
-using System.Windows;
-using System.Windows.Media;
 #else
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
+using Windows.System;
 #endif
 
 #if MIGRATION
@@ -42,13 +31,26 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     public partial class DatePicker : INTERNAL_DateTimePickerBase
-    {   
+    {
         public DatePicker()
         {
             _defaultText = ""; // the text displayed when no date is selected
-
+            
             // Set default style:
             this.DefaultStyleKey = typeof(DatePicker);
+            this.GotFocus += OnGotFocus;
+            this.LostFocus += OnLostFocus;
+        }
+
+        private void OnLostFocus(object sender, RoutedEventArgs e)
+        {
+            SetSelectedDate();
+        }
+
+        private void OnGotFocus(object sender, RoutedEventArgs e)
+        {
+            if (IsEnabled && _textBox != null)
+                _textBox.Focus();
         }
 
         private static DateTime? ParseText(string text)
@@ -66,45 +68,36 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void SetSelectedDate()
         {
-            var text = GetValue(TextProperty)?.ToString();
-            if (text != null)
+            if (_textBox == null)
             {
-                if (!string.IsNullOrEmpty(text))
+                var date = SetTextBoxValue(_defaultText);
+                if (!this.SelectedDate.Equals(date))
                 {
-                    if (SelectedDate.HasValue &&
-                        SetTextFromDate(SelectedDate.Value.ToString()) == text)
-                    {
-                        return;
-                    }
-
-                    var dt = ParseText(text);
-                    if (SelectedDate.Equals(dt))
-                    {
-                        return;
-                    }
-
-                    SetCurrentValue(SelectedDateProperty, dt);
-                }
-                else
-                {
-                    if (!SelectedDate.HasValue)
-                    {
-                        return;
-                    }
-
-                    //Behavior of Silverlight component
-                    SetCurrentValue(SelectedDateProperty, new DateTime());
+                    this.SelectedDate = date;
                 }
             }
             else
             {
-                var dt = ParseText(_defaultText);
-                if (SelectedDate.Equals(dt))
+                if (string.IsNullOrEmpty(_textBox.Text))
                 {
-                    return;
+                    this.SelectedDate = null;
+                    SetWaterMarkText();
                 }
+                else
+                {
+                    if(this.SelectedDate != null)
+                    {
+                        string selectedDate = SetTextFromDate(this.SelectedDate);
+                        if (selectedDate == _textBox.Text)
+                            return;
+                    }
 
-                SetCurrentValue(SelectedDateProperty, dt);
+                    var date = SetTextBoxValue(_textBox.Text);
+                    if (!this.SelectedDate.Equals(date))
+                    {
+                        this.SelectedDate = date;
+                    }
+                }
             }
         }
 
@@ -118,10 +111,26 @@ namespace Windows.UI.Xaml.Controls
             return new Calendar();
         }
 
-        protected override string SetTextFromDate(string newDate)
+        protected override string SetTextFromDate(DateTime? newDate)
         {
-            var split = newDate.Split(' ');
-            return split[0];
+            if (newDate == null)
+                return null;
+
+            DateTimeFormatInfo dtfi = GetCurrentDateFormat();
+
+            switch (this.SelectedDateFormat)
+            {
+                case DatePickerFormat.Short:
+                    {
+                        return string.Format(CultureInfo.CurrentCulture, newDate.Value.ToString(dtfi.ShortDatePattern, dtfi));
+                    }
+                case DatePickerFormat.Long:
+                    {
+                        return string.Format(CultureInfo.CurrentCulture, newDate.Value.ToString(dtfi.LongDatePattern, dtfi));
+                    }
+            }
+
+            return null;
         }
 
         protected override void OnSelectionChanged(DateTime? newSelectedDate)
@@ -144,6 +153,44 @@ namespace Windows.UI.Xaml.Controls
             IsDropDownOpen = false; // close the popup
         }
 
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
+        {
+            base.OnApplyTemplate();
+
+            if (_textBox != null)
+            {
+                _textBox.TextChanged += OnTextBoxTextChanged;
+                _textBox.KeyDown += OnTextBoxKeyDown;
+                _textBox.LostFocus += OnTextBoxLostFocus;
+            }
+        }
+
+        private void OnTextBoxLostFocus(object sender, RoutedEventArgs e)
+        {
+            SetSelectedDate();
+        }
+
+#if MIGRATION
+        private void OnTextBoxKeyDown(object sender, KeyEventArgs e)
+#else
+        private void OnTextBoxKeyDown(object sender, KeyRoutedEventArgs e)
+#endif
+        {
+            if (!e.Handled)
+            {
+                e.Handled = ProcessDatePickerKey(e);
+            }
+        }
+
+        private void OnTextBoxTextChanged(object sender, TextChangedEventArgs e)
+        {
+            this.SetValueNoCallback(TextProperty, _textBox.Text);
+        }
+
 #region dependency property Selection for DatePicker
 
         /// <summary>
@@ -152,8 +199,8 @@ namespace Windows.UI.Xaml.Controls
         public DateTime? SelectedDate
         {
             get { return (DateTime?)GetValue(SelectedDateProperty); }
-            set 
-            { 
+            set
+            {
                 SetValue(SelectedDateProperty, value);
             }
         }
@@ -176,11 +223,183 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">The DependencyPropertyChangedEventArgs.</param>
         private static void OnSelectedDateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((DatePicker)d).INTERNAL_SelectedDate = (DateTime?)e.NewValue;
+            var datePicker = d as DatePicker;
+            if (datePicker != null)
+            {
+                var newDate = e.NewValue as DateTime?;
+                datePicker.INTERNAL_SelectedDate = newDate;
+
+                if (newDate == null)
+                    datePicker.SetWaterMarkText();
+            }
+        }
+
+        public static readonly DependencyProperty SelectedDateFormatProperty = DependencyProperty.Register(
+            "SelectedDateFormat",
+            typeof(DatePickerFormat),
+            typeof(DatePicker),
+            new PropertyMetadata(DatePickerFormat.Short));
+
+        public DatePickerFormat SelectedDateFormat 
+        {
+            get => (DatePickerFormat) GetValue(SelectedDateFormatProperty);
+            set => SetValue(SelectedDateFormatProperty, value);
         }
 
 #endregion
 
+        protected override void SetWaterMarkText()
+        {
+            var textBox = _textBox as DatePickerTextBox;
+            if (textBox == null)
+                return;
 
+            DateTimeFormatInfo dtfi = GetCurrentDateFormat();
+            switch (this.SelectedDateFormat)
+            {
+                case DatePickerFormat.Long:
+                    {
+                        textBox.Watermark = string.Format(CultureInfo.CurrentCulture, "<{0}>", dtfi.LongDatePattern.ToString());
+                        break;
+                    }
+                case DatePickerFormat.Short:
+                    {
+                        textBox.Watermark = string.Format(CultureInfo.CurrentCulture, "<{0}>", dtfi.ShortDatePattern.ToString());
+                        break;
+                    }
+            }
+        }
+
+        private DateTimeFormatInfo GetCurrentDateFormat()
+        {
+#if NETSTANDARD
+            if (CultureInfo.CurrentCulture.Calendar is GregorianCalendar)
+            {
+                return CultureInfo.CurrentCulture.DateTimeFormat;
+            }
+            else
+            {
+                foreach (global::System.Globalization.Calendar cal in CultureInfo.CurrentCulture.OptionalCalendars)
+                {
+                    if (cal is GregorianCalendar)
+                    {
+                        //if the default calendar is not Gregorian, return the first supported GregorianCalendar dtfi
+                        DateTimeFormatInfo dtfi = new CultureInfo(CultureInfo.CurrentCulture.Name).DateTimeFormat;
+                        dtfi.Calendar = cal;
+                        return dtfi;
+                    }
+                }
+
+                //if there are no GregorianCalendars in the OptionalCalendars list, use the invariant dtfi
+                DateTimeFormatInfo dt = new CultureInfo(CultureInfo.InvariantCulture.Name).DateTimeFormat;
+                dt.Calendar = new GregorianCalendar();
+                return dt;
+            }
+#elif BRIDGE
+            return CultureInfo.CurrentCulture.DateTimeFormat;
+#endif
+        }
+
+#if MIGRATION
+        private bool ProcessDatePickerKey(KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Enter:
+                    SetSelectedDate();
+                    return true;
+
+                case Key.Down:
+                    if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                    {
+                        HandlePopUp();
+                    }
+                    return true;
+            }
+
+            return false;
+        }
+#else
+        private bool ProcessDatePickerKey(KeyRoutedEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case VirtualKey.Enter:
+                    SetSelectedDate();
+                    return true;
+
+                case VirtualKey.Down:
+                    if ((global::System.Windows.Input.Keyboard.Modifiers & VirtualKeyModifiers.Control) == VirtualKeyModifiers.Control)
+                    {
+                        HandlePopUp();
+                    }
+                    return true;
+            }
+
+            return false;
+        }
+#endif
+
+
+        private void HandlePopUp()
+        {
+            if (this.IsDropDownOpen)
+            {
+                this.Focus();
+                this.IsDropDownOpen = false;
+#if MIGRATION
+                _calendarOrClock.ReleaseMouseCapture();
+#else
+                _calendarOrClock.ReleasePointerCapture();
+#endif
+            }
+            else
+            {
+#if MIGRATION
+                _calendarOrClock.CaptureMouse();
+#else
+                _calendarOrClock.CapturePointer();
+#endif
+                ProcessTextBox();
+            }
+        }
+
+        private void ProcessTextBox()
+        {
+            SetSelectedDate();
+            this.IsDropDownOpen = true;
+        }
+
+        private DateTime? SetTextBoxValue(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                SetValue(TextProperty, text);
+                return this.SelectedDate;
+            }
+            else
+            {
+                DateTime? date = ParseText(text);
+                if(date != null)
+                {
+                    SetValue(TextProperty, text);
+                    return date;
+                }
+                else
+                {
+                    if(this.SelectedDate != null)
+                    {
+                        string newText = SetTextFromDate(this.SelectedDate);
+                        SetValue(TextProperty, newText);
+                        return this.SelectedDate;
+                    }
+                    else
+                    {
+                        SetWaterMarkText();
+                        return null;
+                    }
+                }
+            }
+        }
     }
 }

@@ -119,3 +119,17 @@ body {
       width: 100%;
     }
 }
+
+.single-line-input{
+    white-space: nowrap !important;
+    overflow: hidden !important;
+}
+
+.single-line-input br {
+    display: none;
+}
+
+.single-line-input * {
+    display: inline;
+    white-space: nowrap;
+}

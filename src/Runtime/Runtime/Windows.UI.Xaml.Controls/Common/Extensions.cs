@@ -45,7 +45,7 @@ namespace Windows.UI.Xaml.Controls.Common
     /// </summary>
     internal static class Extensions
     {
-#region Static Methods
+        #region Static Methods
 
         public static void SetValueNoCallback(this DependencyObject obj, DependencyProperty property, object value)
         {
@@ -65,6 +65,6 @@ namespace Windows.UI.Xaml.Controls.Common
             return ExtensionProperties.GetAreHandlersSuspended(obj);
         }
 
-#endregion Static Methods
+        #endregion Static Methods
     }
 }
