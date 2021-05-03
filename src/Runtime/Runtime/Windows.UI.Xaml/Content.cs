@@ -28,11 +28,25 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
 {
     public partial class Content
     {
-        // Handles the window resize event.
-        private EventHandler _resizeHandler;
+        public Content() : this(false)
+        {
+        }
 
-        // Handles the full screen changed event.
-        private EventHandler _fullScreenChangedHandler;
+        internal Content(bool hookupEvents)
+        {
+            if (hookupEvents)
+            {
+                // Hooks the FullScreenChanged event
+                CSHTML5.Interop.ExecuteJavaScript(@"document.addEventListener('fullscreenchange', $0)", new Action(FullScreenChangedCallback));
+
+                // Hooks the Resized event
+                CSHTML5.Interop.ExecuteJavaScript($"new ResizeSensor(document.getElementById('{Application.ApplicationRootDomElementId}'), $0);",
+                        new Action(WindowResizeCallback));
+
+                // WORKINPROGRESS
+                // Add Zoomed event
+            }
+        }
 
         /// <summary>
         /// Gets the browser-determined height of the content area.
@@ -136,58 +150,12 @@ if (requestMethod) { // Native exit full screen.
         /// <summary>
         /// Occurs when the browser enters or exits full-screen mode.
         /// </summary>
-        public event EventHandler FullScreenChanged
-        {
-            add
-            {
-                if (this._fullScreenChangedHandler == null)
-                {
-                    CSHTML5.Interop.ExecuteJavaScript(@"document.addEventListener(""fullscreenchange"", $0)", new Action(FullScreenChangedCallback));
-                }
-
-                this._fullScreenChangedHandler += value;
-            }
-            remove
-            {
-                this._fullScreenChangedHandler -= value;
-
-                if (this._fullScreenChangedHandler == null)
-                {
-                    CSHTML5.Interop.ExecuteJavaScript(@"document.removeEventListener(""fullscreenchange"", $0)", new Action(FullScreenChangedCallback));
-                }
-            }
-        }
+        public event EventHandler FullScreenChanged;
 
         /// <summary>
         /// Occurs when the <see cref="Window"/> gets resized.
         /// </summary>
-        public event EventHandler Resized
-        {
-            add
-            {
-                if (this._resizeHandler == null)
-                {
-                    CSHTML5.Interop.ExecuteJavaScript($@"
-const rootElement = document.getElementById(""{Application.ApplicationRootDomElementId}"");
-var contentResizeSensor = new ResizeSensor(rootElement, $0);
-", new Action(WindowResizeCallback));
-                }
-
-                this._resizeHandler += value;
-            }
-            remove
-            {
-                this._resizeHandler -= value;
-
-                if (this._resizeHandler == null)
-                {
-                    CSHTML5.Interop.ExecuteJavaScript($@"
-const rootElement = document.getElementById(""{Application.ApplicationRootDomElementId}"");
-contentResizeSensor.detach(rootElement);"
-                    );
-                }
-            }
-        }
+        public event EventHandler Resized;
 
         /// <summary>
         /// Called when the full screen mode changes.
@@ -195,7 +163,7 @@ contentResizeSensor.detach(rootElement);"
         /// </summary>
         private void FullScreenChangedCallback()
         {
-            this._fullScreenChangedHandler?.Invoke(this, EventArgs.Empty);
+            this.FullScreenChanged?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -204,7 +172,7 @@ contentResizeSensor.detach(rootElement);"
         /// </summary>
         private void WindowResizeCallback()
         {
-            this._resizeHandler?.Invoke(this, EventArgs.Empty);
+            this.Resized?.Invoke(this, EventArgs.Empty);
         }
 
 #if WORKINPROGRESS

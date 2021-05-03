@@ -554,7 +554,7 @@ namespace Windows.UI.Xaml
             get
             {
                 if (_host == null)
-                    _host = new Host();
+                    _host = new Host(true);
                 return _host;
             }
         }
