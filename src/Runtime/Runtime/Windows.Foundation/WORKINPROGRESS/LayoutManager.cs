@@ -2,6 +2,9 @@
 
 #if !MIGRATION
 using System;
+using System.Collections.Generic;
+using Windows.UI.Core;
+using Windows.UI.Xaml;
 #endif
 
 #if MIGRATION
@@ -126,7 +129,8 @@ namespace Windows.Foundation
         {
             UIElement topElement = null;
 
-            foreach (UIElement element in measureQueue)
+            UIElement[] measureElements = measureQueue.ToArray();
+            foreach (UIElement element in measureElements)
             {
                 if (topElement == null || topElement.VisualLevel > element.VisualLevel)
                 {
