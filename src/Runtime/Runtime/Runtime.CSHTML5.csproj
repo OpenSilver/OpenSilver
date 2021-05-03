@@ -881,6 +881,7 @@
     <Compile Include="Windows.UI.Xaml\ResourceDictionary.cs" />
     <Compile Include="Windows.UI.Xaml\ResourceDictionaryCollection.cs" />
     <Compile Include="Windows.UI.Xaml\ResourcesChangeInfo.cs" />
+    <Compile Include="Windows.UI.Xaml\TextDecorationCollection.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEvent.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEventHandler.cs" />
@@ -935,8 +936,6 @@
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TabletDeviceType.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\RoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TemplateBindingExpression.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextDecoration.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextDecorationCollection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerAction.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerActionCollection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerBase.cs" />

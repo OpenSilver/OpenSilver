@@ -48,16 +48,19 @@ namespace Windows.UI.Xaml.Documents
             get { return (TextDecorationCollection)GetValue(TextDecorationsProperty); }
             set { SetValue(TextDecorationsProperty, value); }
         }
+
         /// <summary>
         /// Identifies the TextDecorations dependency property.
         /// </summary>
-        public new static readonly DependencyProperty TextDecorationsProperty = DependencyProperty.Register("TextDecorations", 
-                                                                                                            typeof(TextDecorationCollection), 
-                                                                                                            typeof(Inline), 
-                                                                                                            new PropertyMetadata(System.Windows.TextDecorations.None) 
-                                                                                                            {
-                                                                                                                GetCSSEquivalent = Control.INTERNAL_GetCSSEquivalentForTextDecorations
-                                                                                                            });
+        public new static readonly DependencyProperty TextDecorationsProperty = 
+            DependencyProperty.Register(
+                nameof(TextDecorations), 
+                typeof(TextDecorationCollection), 
+                typeof(Inline), 
+                new PropertyMetadata((object)null) 
+                {
+                    GetCSSEquivalent = Control.INTERNAL_GetCSSEquivalentForTextDecorations
+                });
 #else
                 /// <summary>
         /// Gets or sets the text decorations (underline, strikethrough...).

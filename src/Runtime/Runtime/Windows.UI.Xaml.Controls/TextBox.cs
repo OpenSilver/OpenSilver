@@ -1498,40 +1498,24 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             get { return (TextDecorationCollection)GetValue(TextDecorationsProperty); }
             set { SetValue(TextDecorationsProperty, value); }
         }
+
         /// <summary>
         /// Identifies the TextDecorations dependency property.
         /// </summary>
-        public new static readonly DependencyProperty TextDecorationsProperty = DependencyProperty.Register("TextDecorations",
-                                                                                                        typeof(TextDecorationCollection),
-                                                                                                        typeof(TextBox),
-                                                                                                        new PropertyMetadata(null) 
-                                                                                                        { 
-                                                                                                            MethodToUpdateDom = TextDecorations_MethodToUpdateDom
-                                                                                                        });
+        public new static readonly DependencyProperty TextDecorationsProperty = 
+            DependencyProperty.Register(
+                nameof(TextDecorations),
+                typeof(TextDecorationCollection),
+                typeof(TextBox),
+                new PropertyMetadata((object)null) 
+                { 
+                    MethodToUpdateDom = TextDecorations_MethodToUpdateDom
+                });
 
         static void TextDecorations_MethodToUpdateDom(DependencyObject d, object newValue)
         {
-            var textBox = (TextBox)d;
-            TextDecorationCollection newTextDecorations = (TextDecorationCollection)newValue;
-
-            string cssValue;
-            if (newTextDecorations == System.Windows.TextDecorations.OverLine)
-            {
-                cssValue = "overline";
-            }
-            else if (newTextDecorations == System.Windows.TextDecorations.Strikethrough)
-            {
-                cssValue = "line-through";
-            }
-            else if (newTextDecorations == System.Windows.TextDecorations.Underline)
-            {
-                cssValue = "underline";
-            }
-            else
-            {
-                cssValue = string.Empty; // Note: this will reset the value.
-            }
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBox.INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
+            string cssValue = ((TextDecorationCollection)newValue)?.ToHtmlString() ?? string.Empty;
+            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(((TextBox)d).INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
         }
 #else
         /// <summary>
