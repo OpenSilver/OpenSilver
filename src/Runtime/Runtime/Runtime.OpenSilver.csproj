@@ -298,7 +298,7 @@
 		<Compile Include="System.ServiceModel.Security\WORKINPROGRESS\UserNamePasswordClientCredential.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationServiceContext.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DataFormats.cs" />
-		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DependencyObjectCollection_1.cs" />
+		<Compile Include="Windows.UI.Xaml\DependencyObjectCollection_1.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DurationConverter.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\IApplicationLifetimeAware.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\IApplicationService.cs" />
@@ -1063,7 +1063,7 @@
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FlowDirection.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontStretch.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\HierarchicalDataTemplate.cs" />
-		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\PresentationFrameworkCollection_1.cs" />
+		<Compile Include="Windows.UI.Xaml\PresentationFrameworkCollection_1.cs" />
 		<Compile Include="Windows.UI.Xaml\TextDecorationCollection.cs" />
 		<Compile Include="Windows.UI.Xaml\TextTrimming.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerAction.cs" />

@@ -846,6 +846,7 @@
     <Compile Include="Windows.UI.Xaml\CSSEquivalent.cs" />
     <Compile Include="Windows.UI.Xaml\DataTemplate.cs" />
     <Compile Include="Windows.UI.Xaml\DependencyObject.cs" />
+    <Compile Include="Windows.UI.Xaml\DependencyObjectCollection_1.cs" />
     <Compile Include="Windows.UI.Xaml\DependencyProperty.cs" />
     <Compile Include="Windows.UI.Xaml\DependencyPropertyChangedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\DependencyPropertyChangedEventHandler.cs" />
@@ -873,6 +874,7 @@
     <Compile Include="Windows.UI.Xaml\MessageBoxButton.cs" />
     <Compile Include="Windows.UI.Xaml\MessageBoxResult.cs" />
     <Compile Include="Windows.UI.Xaml\PositionsWatcher.cs" />
+    <Compile Include="Windows.UI.Xaml\PresentationFrameworkCollection_1.cs" />
     <Compile Include="Windows.UI.Xaml\PropertyChangedCallback.cs" />
     <Compile Include="Windows.UI.Xaml\PropertyMetadata.cs" />
     <Compile Include="Windows.UI.Xaml\PropertyPath.cs" />
@@ -922,7 +924,6 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationUnhandledExceptionEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\AssemblyPart.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\AssemblyPartCollection.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DependencyObjectCollection_1.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\EventTrigger.cs" />
@@ -932,7 +933,6 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\IDataObject.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\LineStackingStrategy.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\OutOfBrowserSettings.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\PresentationFrameworkCollection_1.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TabletDeviceType.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\RoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TemplateBindingExpression.cs" />
