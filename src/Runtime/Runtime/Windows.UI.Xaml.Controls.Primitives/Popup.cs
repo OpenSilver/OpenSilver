@@ -671,6 +671,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
 
         }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            return Size.Zero;
+        }
 #endif
     }
 }
