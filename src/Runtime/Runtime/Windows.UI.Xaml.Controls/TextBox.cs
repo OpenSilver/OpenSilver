@@ -54,7 +54,7 @@ namespace Windows.UI.Xaml.Controls
     public partial class TextBox : Control
     {
         object _contentEditableDiv;
-        Control TextAreaContainer = null;
+        FrameworkElement TextAreaContainer = null;
 
         /// <summary>
         /// The name of the ExpanderButton template part.
@@ -92,6 +92,7 @@ namespace Windows.UI.Xaml.Controls
         ///
         public TextBox()
         {
+            this.DefaultStyleKey = typeof(TextBox);
             UseSystemFocusVisuals = true;
         }
 
@@ -410,14 +411,14 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                 //outerDivStyle.width = "100%";
                 //outerDivStyle.height = "100%";
                 //Note2: We also reset the contentEditable value of the former contentEditable to false. Otherwise, the whole control will be considered editable.
-                dynamic additionalDivForMargins = INTERNAL_AdditionalOutsideDivForMargins;
-                CSHTML5.Interop.ExecuteJavaScript(@"var formerOuterDiv = $0.firstChild;
-var style = formerOuterDiv.style;
-style.borderWidth = '0px';
-style.width = '100%';
-style.height = '100%';
-formerOuterDiv.firstChild.firstChild.setAttribute('contenteditable', 'false');
-", additionalDivForMargins);
+//                dynamic additionalDivForMargins = INTERNAL_AdditionalOutsideDivForMargins;
+//                CSHTML5.Interop.ExecuteJavaScript(@"var formerOuterDiv = $0.firstChild;
+//var style = formerOuterDiv.style;
+//style.borderWidth = '0px';
+//style.width = '100%';
+//style.height = '100%';
+//formerOuterDiv.firstChild.firstChild.setAttribute('contenteditable', 'false');
+//", additionalDivForMargins);
                 //dynamic divPreviouslyModified = additionalDivForMargins.firstChild;
                 //dynamic stylePreviouslyModified = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(divPreviouslyModified);
                 //stylePreviouslyModified.borderWidth = "0px";
@@ -1099,7 +1100,7 @@ var range,selection;
             int i = 0;
             while (TextAreaContainer == null && i < TextAreaContainerNames.Length)
             {
-                TextAreaContainer = GetTemplateChild(TextAreaContainerNames[i]) as Control;
+                TextAreaContainer = GetTemplateChild(TextAreaContainerNames[i]) as FrameworkElement;
                 ++i;
             }
             if (TextAreaContainer != null)
