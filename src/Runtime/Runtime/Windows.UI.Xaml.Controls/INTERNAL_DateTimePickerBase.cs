@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Controls
     {
         protected FrameworkElement _root;
         protected TextBox _textBox;
-        protected ToggleButton _dropDownButton;
+        protected Button _dropDownButton;
         protected Popup _popup;
 
         protected string _defaultText = "Select Date...";
@@ -67,7 +67,7 @@ namespace Windows.UI.Xaml.Controls
 
             _root = this.GetTemplateChild(ElementRoot) as FrameworkElement;
             _textBox = GetTemplateChild(ElementTextBox) as TextBox;
-            _dropDownButton = GetTemplateChild(ElementButton) as ToggleButton;
+            _dropDownButton = GetTemplateChild(ElementButton) as Button;
             _popup = this.GetTemplateChild(ElementPopup) as Popup;
 
             if (_dropDownButton != null)
