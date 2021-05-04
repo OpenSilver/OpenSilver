@@ -25,6 +25,8 @@ namespace Windows.Foundation
         private HashSet<UIElement> arrangeQueue;
         private HashSet<UIElement> updatedElements;
 
+        private object queueLock = new object();
+
         private DispatcherOperation updateLayoutOperation;
 
         private LayoutManager()
@@ -39,13 +41,19 @@ namespace Windows.Foundation
             if (element == null)
                 return;
 
-            measureQueue.Add(element);
+            lock (queueLock)
+            {
+                measureQueue.Add(element);
+            }
             BeginUpdateLayout();
         }
 
         public void RemoveMeasure(UIElement element)
         {
-            measureQueue.Remove(element);
+            lock (queueLock)
+            {
+                measureQueue.Remove(element);
+            }
         }
 
         public void AddArrange(UIElement element)
@@ -53,13 +61,19 @@ namespace Windows.Foundation
             if (element == null)
                 return;
 
-            arrangeQueue.Add(element);
+            lock (queueLock)
+            {
+                arrangeQueue.Add(element);
+            }
             BeginUpdateLayout();
         }
 
         public void RemoveArrange(UIElement element)
         {
-            arrangeQueue.Remove(element);
+            lock (queueLock)
+            {
+                arrangeQueue.Remove(element);
+            }
         }
 
         public void AddUpdatedElement(UIElement element)
@@ -129,15 +143,16 @@ namespace Windows.Foundation
         {
             UIElement topElement = null;
 
-            UIElement[] measureElements = measureQueue.ToArray();
-            foreach (UIElement element in measureElements)
+            lock (queueLock)
             {
-                if (topElement == null || topElement.VisualLevel > element.VisualLevel)
+                foreach (UIElement element in measureQueue)
                 {
-                    topElement = element;
+                    if (topElement == null || topElement.VisualLevel > element.VisualLevel)
+                    {
+                        topElement = element;
+                    }
                 }
             }
-
             return topElement;
         }
 
