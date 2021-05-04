@@ -455,6 +455,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             outerDivStyle.lineHeight = "125%";
 #endif
             outerDivStyle.height = "100%";
+
             object middleDiv;
             var middleDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out middleDiv);
             middleDivStyle.width = "100%";
