@@ -461,7 +461,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the TextDecorations dependency property.
         /// </summary>
 #if WORKINPROGRESS
-        public static readonly DependencyProperty TextDecorationsProperty =
+        public static readonly DependencyProperty TextDecorationsProperty = 
             DependencyProperty.Register(
                 nameof(TextDecorations),
                 typeof(TextDecorationCollection),
