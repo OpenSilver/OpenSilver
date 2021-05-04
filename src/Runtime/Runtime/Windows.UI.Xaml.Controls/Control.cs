@@ -461,46 +461,30 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the TextDecorations dependency property.
         /// </summary>
 #if WORKINPROGRESS
-        public static readonly DependencyProperty TextDecorationsProperty = 
-            DependencyProperty.Register("TextDecorations",
-                                        typeof(TextDecorationCollection),
-                                        typeof(Control),
-                                        new FrameworkPropertyMetadata(System.Windows.TextDecorations.None, FrameworkPropertyMetadataOptions.AffectsMeasure)
+        public static readonly DependencyProperty TextDecorationsProperty =
+            DependencyProperty.Register(
+                nameof(TextDecorations),
+                typeof(TextDecorationCollection),
+                typeof(Control),
+                new FrameworkPropertyMetadata((object)null, FrameworkPropertyMetadataOptions.AffectsMeasure)
 #else
         public static readonly DependencyProperty TextDecorationsProperty = 
-            DependencyProperty.Register("TextDecorations",
-                                        typeof(TextDecorationCollection),
-                                        typeof(Control),
-                                        new PropertyMetadata(System.Windows.TextDecorations.None)
+            DependencyProperty.Register(
+                nameof(TextDecorations),
+                typeof(TextDecorationCollection),
+                typeof(Control),
+                new PropertyMetadata((object)null)
 #endif
-                                        {
-                                            GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations,
-                                        });
+                {
+                    GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations,
+                });
+
         internal static CSSEquivalent INTERNAL_GetCSSEquivalentForTextDecorations(DependencyObject instance)
         {
-            return new CSSEquivalent()
+            return new CSSEquivalent
             {
-                Value = (inst, value) =>
-                {
-                    TextDecorationCollection newTextDecoration = (TextDecorationCollection)value;
-                    if (newTextDecoration == System.Windows.TextDecorations.OverLine)
-                    {
-                        return "overline";
-                    }
-                    else if (newTextDecoration == System.Windows.TextDecorations.Strikethrough)
-                    {
-                        return "line-through";
-                    }
-                    else if (newTextDecoration == System.Windows.TextDecorations.Underline)
-                    {
-                        return "underline";
-                    }
-                    else
-                    {
-                        return string.Empty;
-                    }
-                },
-                Name = new List<string> { "textDecoration" },
+                Value = (inst, value) => ((TextDecorationCollection)value)?.ToHtmlString() ?? string.Empty,
+                Name = new List<string>(1) { "textDecoration" },
             };
         }
 #else
