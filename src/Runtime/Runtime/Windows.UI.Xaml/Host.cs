@@ -37,6 +37,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         internal Host(bool hookupEvents)
         {
             this._hookupEvents = hookupEvents;
+            this._content = new Content(this._hookupEvents);
         }
 
         /// <summary>
