@@ -28,9 +28,9 @@
         <!--<Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="File" Path="ProjectTemplates" d:TargetPath="ProjectTemplates\CSharp\OpenSilver\Empty OpenSilver WIP Application.zip" />-->
         <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="File" Path="ItemTemplates" d:TargetPath="ItemTemplates\CSharp" />
         <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="File" Path="CSharpXamlForHtml5.XamlDesigner.dll" AssemblyName="CSharpXamlForHtml5.XamlDesigner.dll" />
-        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="EmptyOpenSilverApplicationTemplate" d:TargetPath="|EmptyOpenSilverApplicationTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
+        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="OpenSilverApplicationTemplate" d:TargetPath="|OpenSilverApplicationTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
         <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="OpenSilverClassLibraryTemplate" d:TargetPath="|OpenSilverClassLibraryTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
-        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="EmptyOpenSilverUwpApplicationTemplate" d:TargetPath="|EmptyOpenSilverUwpApplicationTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
+        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="OpenSilverUwpApplicationTemplate" d:TargetPath="|OpenSilverUwpApplicationTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
         <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="OpenSilverUwpClassLibraryTemplate" d:TargetPath="|OpenSilverUwpClassLibraryTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
     </Assets>
 </PackageManifest>

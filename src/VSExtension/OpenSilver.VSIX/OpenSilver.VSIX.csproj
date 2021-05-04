@@ -128,16 +128,16 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
-    <ProjectReference Include="..\Empty OpenSilver Application\EmptyOpenSilverApplicationTemplate.csproj">
+    <ProjectReference Include="..\OpenSilverApplicationTemplate\OpenSilverApplicationTemplate.csproj">
       <Project>{ED7A89B5-CD09-4697-8CEA-69EC1546D1DF}</Project>
-      <Name>EmptyOpenSilverApplicationTemplate</Name>
+      <Name>OpenSilverApplicationTemplate</Name>
       <VSIXSubPath>ProjectTemplates</VSIXSubPath>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
     </ProjectReference>
-    <ProjectReference Include="..\Empty OpenSilver UWP Application\EmptyOpenSilverUwpApplicationTemplate.csproj">
+    <ProjectReference Include="..\OpenSilverUwpApplicationTemplate\OpenSilverUwpApplicationTemplate.csproj">
       <Project>{EA54D27B-8FFC-47DC-A7C1-7F6CB316BDBC}</Project>
-      <Name>EmptyOpenSilverUwpApplicationTemplate</Name>
+      <Name>OpenSilverUwpApplicationTemplate</Name>
       <VSIXSubPath>ProjectTemplates</VSIXSubPath>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>

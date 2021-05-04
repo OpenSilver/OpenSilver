@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <RazorLangVersion>3.0</RazorLangVersion>
     <EnableDefaultItems>false</EnableDefaultItems>
   </PropertyGroup>
 
@@ -18,11 +19,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenSilver.UWPCompatible" Version="1.0.0-alpha-018" />
+    <PackageReference Include="OpenSilver" Version="1.0.0-alpha-018" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Content Include="MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+	<Content Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainPage.xaml.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   
 </Project>
