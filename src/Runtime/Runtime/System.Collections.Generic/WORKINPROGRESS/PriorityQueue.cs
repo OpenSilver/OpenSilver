@@ -92,6 +92,14 @@ namespace System.Collections.Generic
             }
 
             value = queues[topPriority].Peek();
+
+            if (value == null)
+            {
+                // process when unexpected null entry exists
+                value = Dequeue();
+                return TryPeek(out value);
+            }
+
             return true;
         }
     }
