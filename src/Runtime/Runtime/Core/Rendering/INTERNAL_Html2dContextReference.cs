@@ -73,7 +73,7 @@ namespace CSHTML5.Internal
 
         void SetPropertyValue(string propertyName, string propertyValue)
         {
-            string javaScriptCodeToExecute = "var element = document.getElementById(\"" + _domElementUniqueIdentifier + "\");if (element) { element.getContext('2d')." + propertyName + " = \"" + propertyValue + "\"; } ";
+            string javaScriptCodeToExecute = "var element = document.getElementByIdSafe(\"" + _domElementUniqueIdentifier + "\");if (element) { element.getContext('2d')." + propertyName + " = \"" + propertyValue + "\"; } ";
             //INTERNAL_SimulatorPerformanceOptimizer.QueueJavaScriptCode(javaScriptCodeToExecute);
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
@@ -83,7 +83,7 @@ namespace CSHTML5.Internal
             string methodArgumentsFormattedForJavaScript = string.Join(", ", args.Select(x => INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(x)));
             string javaScriptCodeToExecute =
                 string.Format(@"
-var element = document.getElementById(""{0}"");
+var element = document.getElementByIdSafe(""{0}"");
 var returnValue;
 if (element) {{
     returnValue = element.getContext('2d')[""{1}""]({2});

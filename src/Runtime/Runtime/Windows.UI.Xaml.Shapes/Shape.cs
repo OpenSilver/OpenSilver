@@ -1012,7 +1012,7 @@ context.translate($6, 0);
         {
             string str = string.Format(@"
 {0}
-var cvas = document.getElementById(""{1}"");
+var cvas = document.getElementByIdSafe(""{1}"");
 if(cvas != undefined && cvas != null) {{
 var context = cvas.getContext('2d');
 context.save();

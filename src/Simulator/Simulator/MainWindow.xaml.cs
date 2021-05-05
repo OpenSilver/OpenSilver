@@ -456,7 +456,7 @@ ends with "".Browser"" in your solution.";
                             //if (_javaScriptExecutionHandler == null)
                             //    _javaScriptExecutionHandler = new JavaScriptExecutionHandler(MainWebBrowser);
 
-                            //dynamic rootElement = _javaScriptExecutionHandler.ExecuteJavaScriptWithResult(@"document.getElementById(""cshtml5-root"");");
+                            //dynamic rootElement = _javaScriptExecutionHandler.ExecuteJavaScriptWithResult(@"document.getElementByIdSafe(""cshtml5-root"");");
 
                             //MessageBox.Show(rootElement.ToString());
 
@@ -1578,7 +1578,7 @@ Click OK to continue.";
             if (_javaScriptExecutionHandler == null)
                 _javaScriptExecutionHandler = new JavaScriptExecutionHandler(MainWebBrowser);
 
-            dynamic rootElement = _javaScriptExecutionHandler.ExecuteJavaScriptWithResult(@"document.getElementById(""cshtml5-root"");");
+            dynamic rootElement = _javaScriptExecutionHandler.ExecuteJavaScriptWithResult(@"document.getElementByIdSafe(""cshtml5-root"");");
         }
 
         void GoToAppropriateCompilationState()

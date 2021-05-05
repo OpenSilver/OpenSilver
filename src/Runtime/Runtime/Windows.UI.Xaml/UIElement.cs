@@ -939,56 +939,56 @@ namespace Windows.UI.Xaml
      document.onmouseup = function(e) {{
         if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }}
      document.onmouseover = function(e) {{
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }} 
     document.onmousedown = function(e) {{
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }}                       
      document.onmouseout = function(e) {{   
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }}                            
      document.onmousemove = function(e) {{
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }}                                    
      document.onclick = function(e) {{   
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }}                                     
      document.oncontextmenu = function(e) {{
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }}                                      
      document.ondblclick = function(e) {{   
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }}

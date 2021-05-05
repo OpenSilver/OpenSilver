@@ -69,7 +69,7 @@ namespace CSHTML5.Internal
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
             //            string javaScriptCodeToExecute = string.Format(@"
-            //                    var element = document.getElementById(""{0}"");
+            //                    var element = document.getElementByIdSafe(""{0}"");
             //                    element.style.{1} = ""{2}"";
             //                ", _domElementUniqueIdentifier, binder.Name, value);
 
@@ -85,7 +85,7 @@ namespace CSHTML5.Internal
 #endif
 
 #if CHECK_THAT_ID_EXISTS
-            var domElement = INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("document.getElementById(\"" + _domElementUniqueIdentifier + "\")");
+            var domElement = INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("document.getElementByIdSafe(\"" + _domElementUniqueIdentifier + "\")");
             if (domElement == null)
                 throw new Exception("DOM element ID not found: " + _domElementUniqueIdentifier);
 #endif
@@ -95,7 +95,7 @@ namespace CSHTML5.Internal
 
         void SetStylePropertyValue(string propertyName, string propertyValue)
         {
-            string javaScriptCodeToExecute = "var element = document.getElementById(\"" + _domElementUniqueIdentifier + "\");if (element) { element.style." + propertyName + " = \"" + propertyValue + "\"; } ";
+            string javaScriptCodeToExecute = "var element = document.getElementByIdSafe(\"" + _domElementUniqueIdentifier + "\");if (element) { element.style." + propertyName + " = \"" + propertyValue + "\"; } ";
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
 
@@ -103,7 +103,7 @@ namespace CSHTML5.Internal
         //        {
         //            return ExecuteJavaScriptWithResult(
         //                    string.Format(@"
-        //var element = document.getElementById(""{0}"");
+        //var element = document.getElementByIdSafe(""{0}"");
         //if (element)
         //    return element.style.{1};
         //else

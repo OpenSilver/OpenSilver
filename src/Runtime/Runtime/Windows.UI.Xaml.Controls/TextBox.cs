@@ -133,7 +133,7 @@ namespace Windows.UI.Xaml.Controls
                         //--- SIMULATOR ONLY: ---
                         // Set the "data-accepts-return" property (that we have invented) so that the "keydown" JavaScript event can retrieve this value:
                         INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element = document.getElementById(""{0}"");
+var element = document.getElementByIdSafe(""{0}"");
 element.setAttribute(""data-acceptsreturn"", ""{1}"");
 ", ((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier, acceptsReturn.ToString().ToLower()));
                     }
@@ -731,7 +731,7 @@ $0.addEventListener('keydown', function(e) {
                 // Set the "data-accepts-return" property (that we have invented) so that the "KeyDown" and "Paste" JavaScript events can retrieve this value:
                 // also set the "data-maxlength" and the "data-isreadonly" 
                 INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element = document.getElementById(""{0}"");
+var element = document.getElementByIdSafe(""{0}"");
 element.setAttribute(""data-acceptsreturn"", ""{1}"");
 element.setAttribute(""data-maxlength"", ""{2}"");
 element.setAttribute(""data-isreadonly"",""{3}"");
@@ -740,10 +740,10 @@ element.setAttribute(""data-acceptstab"", ""{4}"");
 
                 // Register the "keydown" javascript event:
                 INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element_OutsideEventHandler = document.getElementById(""{0}"");
+var element_OutsideEventHandler = document.getElementByIdSafe(""{0}"");
 element_OutsideEventHandler.addEventListener('keydown', function(e) {{
 
-    var element_InsideEventHandler = document.getElementById(""{0}""); // For some reason we need to get again the reference to the element.
+    var element_InsideEventHandler = document.getElementByIdSafe(""{0}""); // For some reason we need to get again the reference to the element.
     var acceptsReturn = element_InsideEventHandler.getAttribute(""data-acceptsreturn"");
     var maxLength = element_InsideEventHandler.getAttribute(""data-maxlength"");
     var acceptsTab = element_InsideEventHandler.getAttribute(""data-acceptstab"");
@@ -966,9 +966,9 @@ $0.addEventListener('paste', function(e) {
                 // The simulator uses Chrome, so we can set "ContentEditable" to plain-text only:
                 // We still need to prevent prevent line breaks in the pasted text if "AcceptsReturn" is false:
                 INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element_OutsideEventHandler = document.getElementById(""{0}"");
+var element_OutsideEventHandler = document.getElementByIdSafe(""{0}"");
 element_OutsideEventHandler.addEventListener('paste', function(e) {{
-    var element_InsideEventHandler = document.getElementById(""{0}""); // For some reason we need to get again the reference to the element.
+    var element_InsideEventHandler = document.getElementByIdSafe(""{0}""); // For some reason we need to get again the reference to the element.
     var isReadOnly= element_InsideEventHandler.getAttribute(""data-isreadonly"");
     if(isReadOnly !=""true"")
     {{
@@ -1496,7 +1496,7 @@ return globalIndexes;
                         //--- SIMULATOR ONLY: ---
                         // Set the "data-maxlength" property (that we have made up) so that the "keydown" JavaScript event can retrieve this value:
                         INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element = document.getElementById(""{0}"");
+var element = document.getElementByIdSafe(""{0}"");
 element.setAttribute(""data-maxlength"", ""{1}"");
 ", ((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier, maxlength));
                     }
@@ -1671,7 +1671,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
                     {
                         //--- SIMULATOR ONLY: ---
                         INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-                            var element = document.getElementById(""{0}"");
+                            var element = document.getElementByIdSafe(""{0}"");
                             element.setAttribute(""data-isreadonly"",""{1}"");", 
                             ((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier, isReadOnly.ToString().ToLower()));
                     }
