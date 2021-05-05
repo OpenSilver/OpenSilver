@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
                 CSHTML5.Interop.ExecuteJavaScript(@"document.addEventListener('fullscreenchange', $0)", new Action(FullScreenChangedCallback));
 
                 // Hooks the Resized event
-                CSHTML5.Interop.ExecuteJavaScript($"new ResizeSensor(document.getElementById('{Application.ApplicationRootDomElementId}'), $0);",
+                CSHTML5.Interop.ExecuteJavaScript($"new ResizeSensor(document.getElementByIdSafe('{Application.ApplicationRootDomElementId}'), $0);",
                         new Action(WindowResizeCallback));
 
                 // WORKINPROGRESS

@@ -134,7 +134,7 @@ $1.appendChild(popupRoot);
             if (Interop.IsRunningInTheSimulator)
                 popupRootDiv = new INTERNAL_HtmlDomElementReference(uniquePopupRootIdentifier, null);
             else
-                popupRootDiv = Interop.ExecuteJavaScriptAsync("document.getElementById($0)", uniquePopupRootIdentifier);
+                popupRootDiv = Interop.ExecuteJavaScriptAsync("document.getElementByIdSafe($0)", uniquePopupRootIdentifier);
 
             //--------------------------------------
             // Create the C# class that points to the PopupRoot DIV:
@@ -187,7 +187,7 @@ $1.appendChild(popupRoot);
 
                 CSHTML5.Interop.ExecuteJavaScriptAsync(
 @"
-var popupRoot = document.getElementById($0);
+var popupRoot = document.getElementByIdSafe($0);
 $1.removeChild(popupRoot);
 ", uniquePopupRootIdentifier, parentWindow.INTERNAL_RootDomElement);
 

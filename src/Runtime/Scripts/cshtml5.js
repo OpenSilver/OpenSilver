@@ -157,6 +157,17 @@ document.addToPerformanceCounters = function (name, initialTime) {
     counter.count += 1;
 }
 
+document.getElementByIdSafe = function(id)
+{
+    let element = document.getElementById(id);
+    if (element == null)
+    {
+        console.error("Cannot find element with id '" + id + "'.");
+        element = document.createElement("div");
+    }
+    return element;
+}
+
 window.ViewProfilerResults = function () {
     if (Object.keys(document.performanceCounters).length > 0) {
         var sortedPerformanceCountersNames = [];

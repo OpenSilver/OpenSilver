@@ -279,7 +279,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                     if (uniqueIdentifier != null)
                     {
                         string coordinates = browser.ExecuteJavaScriptAndReturnValue(string.Format(
-    @"var div = document.getElementById('{0}');
+    @"var div = document.getElementByIdSafe('{0}');
                               var rect = div.getBoundingClientRect();
                               var result = rect.top + ';' + rect.right + ';' + rect.bottom + ';' + rect.left;
                               result;
