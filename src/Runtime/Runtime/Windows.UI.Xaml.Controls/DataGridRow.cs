@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,23 +11,16 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if MIGRATION
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Input;
 #else
 using Windows.UI;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
@@ -41,7 +33,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Represents a System.Windows.Controls.DataGrid row.
+    /// Represents a <see cref="DataGrid"/> row.
     /// </summary>
     public partial class DataGridRow : Control
     {
@@ -114,9 +106,13 @@ namespace Windows.UI.Xaml.Controls
             get { return (DataTemplate)GetValue(HeaderTemplateProperty); }
             set { SetValue(HeaderTemplateProperty, value); }
         }
+
         public static readonly DependencyProperty HeaderTemplateProperty =
-            DependencyProperty.Register("HeaderTemplate", typeof(DataTemplate), typeof(DataGridRow), new PropertyMetadata(null, HeaderTemplate_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(HeaderTemplate), 
+                typeof(DataTemplate), 
+                typeof(DataGridRow), 
+                new PropertyMetadata(null, HeaderTemplate_Changed));
 
         private static void HeaderTemplate_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -125,40 +121,37 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(dataGridRow._datagrid))
                 {
-                    if (e.NewValue != e.OldValue)
+                    if (dataGridRow._headerUIElement != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(dataGridRow._headerUIElement))
                     {
-                        if (dataGridRow._headerUIElement != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(dataGridRow._headerUIElement))
+                        //we remove the header that was there before the new one:
+                        dataGridRow._datagrid.RemoveElementFromGrid(dataGridRow._headerUIElement);
+                    }
+                    //we add the new header
+                    DataTemplate template = (DataTemplate)e.NewValue;
+                    if (template != null)
+                    {
+                        dataGridRow._headerUIElement = template.INTERNAL_InstantiateFrameworkTemplate();
+                        Grid.SetRow(dataGridRow._headerUIElement, dataGridRow._rowIndex);
+                        Grid.SetColumn(dataGridRow._headerUIElement, 0);
+                        if (dataGridRow._headerUIElement is FrameworkElement)
                         {
-                            //we remove the header that was there before the new one:
-                            dataGridRow._datagrid.RemoveElementFromGrid(dataGridRow._headerUIElement);
+                            ((FrameworkElement)dataGridRow._headerUIElement).DataContext = dataGridRow;
                         }
-                        //we add the new header
-                        DataTemplate template = (DataTemplate)e.NewValue;
-                        if (template != null)
+                        bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
+                        if (isCSSGrid)
                         {
-                            dataGridRow._headerUIElement = template.INTERNAL_InstantiateFrameworkTemplate();
-                            Grid.SetRow(dataGridRow._headerUIElement, dataGridRow._rowIndex);
-                            Grid.SetColumn(dataGridRow._headerUIElement, 0);
-                            if (dataGridRow._headerUIElement is FrameworkElement)
+                            if (dataGridRow._headerUIElement is Control)
                             {
-                                ((FrameworkElement)dataGridRow._headerUIElement).DataContext = dataGridRow;
+                                ((Control)dataGridRow._headerUIElement).BorderBrush = dataGridRow._datagrid.HorizontalGridLinesBrush;
+                                ((Control)dataGridRow._headerUIElement).BorderThickness = new Thickness(1, 0, 1, 1);
                             }
-                            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-                            if (isCSSGrid)
+                            else if (dataGridRow._headerUIElement is Border)
                             {
-                                if (dataGridRow._headerUIElement is Control)
-                                {
-                                    ((Control)dataGridRow._headerUIElement).BorderBrush = dataGridRow._datagrid.HorizontalGridLinesBrush;
-                                    ((Control)dataGridRow._headerUIElement).BorderThickness = new Thickness(1, 0, 1, 1);
-                                }
-                                else if (dataGridRow._headerUIElement is Border)
-                                {
-                                    ((Border)dataGridRow._headerUIElement).BorderBrush = dataGridRow._datagrid.HorizontalGridLinesBrush;
-                                    ((Border)dataGridRow._headerUIElement).BorderThickness = new Thickness(1, 0, 1, 1);
-                                }
+                                ((Border)dataGridRow._headerUIElement).BorderBrush = dataGridRow._datagrid.HorizontalGridLinesBrush;
+                                ((Border)dataGridRow._headerUIElement).BorderThickness = new Thickness(1, 0, 1, 1);
                             }
-                            dataGridRow._datagrid.AddElementToGrid(dataGridRow._headerUIElement);
                         }
+                        dataGridRow._datagrid.AddElementToGrid(dataGridRow._headerUIElement);
                     }
                 }
             }
@@ -191,10 +184,12 @@ namespace Windows.UI.Xaml.Controls
             set { SetValue(IsSelectedProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for IsSelected.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsSelectedProperty =
-            DependencyProperty.Register("IsSelected", typeof(bool), typeof(DataGridRow), new PropertyMetadata(false, IsSelected_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(IsSelected), 
+                typeof(bool), 
+                typeof(DataGridRow), 
+                new PropertyMetadata(false, IsSelected_Changed));
 
         private static void IsSelected_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -204,20 +199,16 @@ namespace Windows.UI.Xaml.Controls
             if (row._representationInRow != null && row._representationInRow.ElementsInRow != null && row._representationInRow.ElementsInRow.Count > 0)
             {
                 bool newValue = (bool)e.NewValue;
-                if (newValue != (bool)e.OldValue)
+                if (newValue)
                 {
-                    if (newValue)
-                    {
-                        row._datagrid.SelectItem(row._representationInRow.ElementsInRow[0].Item);
-                    }
-                    else
-                    {
-                        row._datagrid.UnselectItem(row._representationInRow.ElementsInRow[0].Item);
-                    }
+                    row._datagrid.SelectItem(row._representationInRow.ElementsInRow[0].Item);
+                }
+                else
+                {
+                    row._datagrid.UnselectItem(row._representationInRow.ElementsInRow[0].Item);
                 }
             }
         }
-
 
         internal void INTERNAL_SetRowIndex(int rowIndex)
         {
@@ -247,7 +238,6 @@ namespace Windows.UI.Xaml.Controls
 #endif
             }
         }
-
 
         internal partial class ObjectRepresentationInRow
         {
@@ -287,21 +277,6 @@ namespace Windows.UI.Xaml.Controls
             if (_representationInRow.ElementsInRow.Count > 0)
                 DataContext = _representationInRow.ElementsInRow[0].Item;
         }
-
-        /// <summary>
-        /// Gets or sets the data context for a DataGridRow when it participates
-        /// in data binding.
-        /// </summary>
-        public object DataContext
-        {
-            get { return (object)GetValue(DataContextProperty); }
-            set { SetValue(DataContextProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the DataContext dependency property.
-        /// </summary>
-        public static readonly DependencyProperty DataContextProperty =
-            DependencyProperty.Register("DataContext", typeof(object), typeof(DataGridRow), new PropertyMetadata() { Inherits = true});
 
         #endregion
     }

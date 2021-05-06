@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Represents a System.Windows.Controls.DataGrid column that hosts template-specified
+    /// Represents a <see cref="DataGrid"/> column that hosts template-specified
     /// content in its cells.
     /// </summary>
     public partial class DataGridTemplateColumn : DataGridBoundColumn
@@ -47,15 +47,19 @@ namespace Windows.UI.Xaml.Controls
             get { return (DataTemplate)GetValue(CellTemplateProperty); }
             set { SetValue(CellTemplateProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the System.Windows.Controls.DataGridTemplateColumn.CellTemplate
+        /// Identifies the <see cref="DataGridTemplateColumn.CellTemplate"/>
         /// dependency property.
         /// </summary>
         public static readonly DependencyProperty CellTemplateProperty =
-            DependencyProperty.Register("CellTemplate", typeof(DataTemplate), typeof(DataGridTemplateColumn), new PropertyMetadata(null, CellTemplateProperty_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(CellTemplate), 
+                typeof(DataTemplate), 
+                typeof(DataGridTemplateColumn), 
+                new PropertyMetadata(null, OnCellTemplateChanged));
 
-        private static void CellTemplateProperty_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnCellTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             //todo: tell the DataGrid to redraw this column for all the children.
         }
@@ -68,15 +72,19 @@ namespace Windows.UI.Xaml.Controls
             get { return (DataTemplate)GetValue(CellEditingTemplateProperty); }
             set { SetValue(CellEditingTemplateProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the System.Windows.Controls.DataGridTemplateColumn.CellEditingTemplate
+        /// Identifies the <see cref="DataGridTemplateColumn.CellEditingTemplate"/>
         /// dependency property.
         /// </summary>
         public static readonly DependencyProperty CellEditingTemplateProperty =
-            DependencyProperty.Register("CellEditingTemplate", typeof(DataTemplate), typeof(DataGridTemplateColumn), new PropertyMetadata(null, CellEditingTemplateProperty_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(CellEditingTemplate), 
+                typeof(DataTemplate), 
+                typeof(DataGridTemplateColumn), 
+                new PropertyMetadata(null, OnCellEditingTemplateChanged));
 
-        private static void CellEditingTemplateProperty_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnCellEditingTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             //probably nothing to do here
         }
@@ -85,7 +93,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (CellTemplate != null)
             {
-                FrameworkElement element = CellTemplate.INTERNAL_InstantiateFrameworkTemplate();
+                FrameworkElement element = CellTemplate.LoadContent() as FrameworkElement;
                 element.DataContext = childData;
                 return element;
             }

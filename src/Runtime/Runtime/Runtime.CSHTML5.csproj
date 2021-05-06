@@ -1024,10 +1024,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Content Include="DefaultStyles\INTERNAL_DefaultDataGridStyle.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="DefaultStyles\INTERNAL_DefaultDataGridStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
-    </Content>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultDataPagerStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

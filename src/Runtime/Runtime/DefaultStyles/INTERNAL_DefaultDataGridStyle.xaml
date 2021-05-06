@@ -1,7 +1,6 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:Runtime.CSHTML5.DefaultStyles">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
 
     <Style TargetType="DataGridColumnHeader">
@@ -93,6 +92,31 @@
                            
                         </Grid>
                     </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>        
+    </Style>
+    
+    <Style TargetType="DataGrid">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGrid">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid x:Name="PART_MainGrid"
+                              Grid.Row="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" x:Name="PART_HeadersRow" />
+                            </Grid.RowDefinitions>
+                        </Grid>
+                        <DataPager x:Name="PART_Pager" 
+                                   Grid.Row="1"
+                                   PageSize="{TemplateBinding PageSize}"
+                                   DisplayMode="FirstLastPreviousNext"/>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml.Controls
 {
     /// <summary>
     /// Serves as the base class for columns that can bind to a property in the data
-    /// source of a System.Windows.Controls.DataGrid.
+    /// source of a <see cref="DataGrid"/>.
     /// </summary>
     public abstract partial class DataGridBoundColumn : DataGridColumn
     {
