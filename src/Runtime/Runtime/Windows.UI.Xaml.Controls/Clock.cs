@@ -55,7 +55,9 @@ namespace Windows.UI.Xaml.Controls
         public void ChangeOption(string option, object value)
         {
             if (_flatpickrInstance != null)
-                CSHTML5.Interop.ExecuteJavaScript($"$0.set('{option}', {value})", _flatpickrInstance);
+            {
+                CSHTML5.Interop.ExecuteJavaScript("$0.set($1, $2)", _flatpickrInstance, option, value);
+            }
         }
 
         private void TimePicker_Loaded(object sender, RoutedEventArgs e)
