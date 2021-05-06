@@ -194,6 +194,12 @@
     <Error
       Condition="'$(IsCompilingTheBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
       Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha7.aspx"/>
+    <Exec
+      Condition="'$(IsCompilingTheBrowserProject)'=='True' And $(OpenSilverType)&lt;3"
+      Command="explorer.exe https://opensilver.net/permalinks/update/alpha19.aspx" Timeout="2000" ContinueOnError="True"></Exec>
+    <Error
+      Condition="'$(IsCompilingTheBrowserProject)'=='True' And $(OpenSilverType)&lt;3"
+      Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha19.aspx"/>
 
     <!--============================================================
       If compiling CSHTML5 itself, remove some references:
