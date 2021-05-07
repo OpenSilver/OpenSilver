@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Windows.Controls.Primitives;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -639,8 +640,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(HorizontalContentAlignment), 
                 typeof(HorizontalAlignment), 
-                typeof(Control), 
+                typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(HorizontalAlignment.Center, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
                 new PropertyMetadata(HorizontalAlignment.Center));
+#endif
 
         //-----------------------
         // VERTICALCONTENTALIGNMENT
@@ -662,8 +667,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(VerticalContentAlignment), 
                 typeof(VerticalAlignment), 
-                typeof(Control), 
+                typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(VerticalAlignment.Center, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
                 new PropertyMetadata(VerticalAlignment.Center));
+#endif
 
         //-----------------------
         // TABINDEX
@@ -1224,6 +1233,31 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         {
 
         }
+#if WORKINPROGRESS
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
+            if (childElements.Count() == 0)
+            {
+                return Size.Zero;
+            }
+
+            Size extent = new Size(0.0, 0.0);
+
+            foreach (DependencyObject child in childElements)
+            {
+                if (child as FrameworkElement == null)
+                    continue;
+
+                FrameworkElement childElement = child as FrameworkElement; 
+                childElement.Measure(availableSize);
+                extent.Width += childElement.DesiredSize.Width;
+                extent.Height += childElement.DesiredSize.Height;
+            }
+            return extent;
+        }
+#endif
+
 #endif
     }
 }

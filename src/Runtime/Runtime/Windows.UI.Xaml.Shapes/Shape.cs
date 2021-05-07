@@ -1165,6 +1165,13 @@ context.restore();
                 typeof(Shape), 
                 new PropertyMetadata(PenLineCap.Flat));
 
+#if WORKINPROGRESS
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            return Size.Zero;
+        }
+#endif
+
 #endif
 
     }

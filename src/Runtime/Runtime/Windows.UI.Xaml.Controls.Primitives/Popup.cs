@@ -508,8 +508,13 @@ namespace Windows.UI.Xaml.Controls.Primitives
             DependencyProperty.Register(
                 nameof(VerticalContentAlignment), 
                 typeof(VerticalAlignment), 
-                typeof(Popup), 
+                typeof(Popup),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(VerticalAlignment.Top, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, VerticalContentAlignment_Changed)
+#else
                 new PropertyMetadata(VerticalAlignment.Top, VerticalContentAlignment_Changed)
+#endif
+                
                 { 
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
                 });

@@ -45,8 +45,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #if WORKINPROGRESS
             if (INTERNAL_ParentWindow != null)
             {
-                this.Measure(new Size(INTERNAL_ParentWindow.Bounds.Width, INTERNAL_ParentWindow.Bounds.Height));
-                this.Arrange(new Rect(INTERNAL_ParentWindow.Bounds.Left, INTERNAL_ParentWindow.Bounds.Top, INTERNAL_ParentWindow.Bounds.Width, INTERNAL_ParentWindow.Bounds.Height));
+                Rect windowBounds = INTERNAL_ParentWindow.Bounds;
+                this.Measure(new Size(windowBounds.Width, windowBounds.Height));
+                this.Arrange(windowBounds);
             }
 #endif
         }
@@ -83,7 +84,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             if (this.Content == null || this.INTERNAL_ParentWindow == null)
                 return availableSize;
 
-            availableSize = new Size(INTERNAL_ParentWindow.Bounds.Width, INTERNAL_ParentWindow.Bounds.Height);
+            Rect windowBounds = INTERNAL_ParentWindow.Bounds;
+            availableSize = new Size(windowBounds.Width, windowBounds.Height);
             this.Content.Measure(availableSize);
             return availableSize;
         }
@@ -92,7 +94,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             if (this.Content == null)
                 return finalSize;
 
-            finalSize = new Size(INTERNAL_ParentWindow.Bounds.Width, INTERNAL_ParentWindow.Bounds.Height);
+            Rect windowBounds = INTERNAL_ParentWindow.Bounds;
+            finalSize = new Size(windowBounds.Width, windowBounds.Height);
             this.Content.Arrange(new Rect(finalSize));
             return finalSize;
         }
