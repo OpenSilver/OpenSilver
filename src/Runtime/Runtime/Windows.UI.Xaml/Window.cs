@@ -480,21 +480,29 @@ namespace Windows.UI.Xaml
                 return;
             }
 
-            double width = Bounds.Width;
-            double height = Bounds.Height;
+            Rect windowBounds = this.Bounds;
+            double width = windowBounds.Width;
+            double height = windowBounds.Height;
+            Debug.WriteLine($"CalculateWindowLayout {width}, {height}");
             Current.Measure(new Size(width, height));
-            Current.Arrange(new Rect(Bounds.Left, Bounds.Top, width, height));
+            Current.Arrange(windowBounds);
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            availableSize = new Size(Bounds.Width, Bounds.Height);
-            return base.MeasureOverride(availableSize);
+            if (this.Content == null)
+                return Size.Zero;
+
+            Rect windowBounds = this.Bounds;
+            availableSize = new Size(windowBounds.Width, windowBounds.Height);
+            Content.Measure(availableSize);
+            return Content.DesiredSize;
         }
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            finalSize = new Size(Bounds.Width, Bounds.Height);
+            Rect windowBounds = this.Bounds;
+            finalSize = new Size(windowBounds.Width, windowBounds.Height);
             return base.ArrangeOverride(finalSize);
         }
 #endif

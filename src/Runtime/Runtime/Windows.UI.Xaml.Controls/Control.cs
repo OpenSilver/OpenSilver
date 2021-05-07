@@ -656,12 +656,19 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the VerticalContentAlignment dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty VerticalContentAlignmentProperty =
+            DependencyProperty.Register("VerticalContentAlignment", 
+                                        typeof(VerticalAlignment), 
+                                        typeof(Control), 
+                                        new FrameworkPropertyMetadata(VerticalAlignment.Center, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
         public static readonly DependencyProperty VerticalContentAlignmentProperty =
             DependencyProperty.Register("VerticalContentAlignment", 
                                         typeof(VerticalAlignment), 
                                         typeof(Control), 
                                         new PropertyMetadata(VerticalAlignment.Center));
-
+#endif
 
         //-----------------------
         // TABINDEX
@@ -1313,6 +1320,31 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         {
 
         }
+#if WORKINPROGRESS
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
+            if (childElements.Count() == 0)
+            {
+                return Size.Zero;
+            }
+
+            Size extent = new Size(0.0, 0.0);
+
+            foreach (DependencyObject child in childElements)
+            {
+                if (child as FrameworkElement == null)
+                    continue;
+
+                FrameworkElement childElement = child as FrameworkElement; 
+                childElement.Measure(availableSize);
+                extent.Width += childElement.DesiredSize.Width;
+                extent.Height += childElement.DesiredSize.Height;
+            }
+            return extent;
+        }
+#endif
+
 #endif
     }
 }

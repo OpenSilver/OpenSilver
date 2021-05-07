@@ -417,9 +417,6 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                 outerDivStyle.boxSizing = "border-box"; //this is so that the borderWidth we set does not increase the size of the whole thing.
                 backgroundColor = isReadOnly ? "#DDDDDD" : "White";
 
-#if WORKINPROGRESS
-                BorderThickness = new Thickness(1);
-#endif
             }
             else //if the TextBox is templated, we don't want contentEditable div to have a border:
             {
@@ -442,9 +439,6 @@ style.height = '100%';
 formerOuterDiv.firstChild.firstChild.setAttribute('contenteditable', 'false');
 ", additionalDivForMargins);
 
-#if WORKINPROGRESS
-                BorderThickness = new Thickness(0);
-#endif
                 //dynamic divPreviouslyModified = additionalDivForMargins.firstChild;
                 //dynamic stylePreviouslyModified = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(divPreviouslyModified);
                 //stylePreviouslyModified.borderWidth = "0px";
@@ -1748,7 +1742,11 @@ element.setAttribute(""data-maxlength"", ""{1}"");
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            return Application.Current.TextMeasurementService.Measure(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, TextWrapping, Padding, availableSize.Width);
+            Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
+            Size TextSize = Application.Current.TextMeasurementService.Measure(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, TextWrapping, Padding, (availableSize.Width - BorderThicknessSize.Width).Max(0));
+            TextSize.Width = TextSize.Width + BorderThicknessSize.Width;
+            TextSize.Height = TextSize.Height + BorderThicknessSize.Height;
+            return TextSize;
         }
 #endif
 

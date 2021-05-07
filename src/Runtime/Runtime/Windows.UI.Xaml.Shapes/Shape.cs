@@ -1159,6 +1159,13 @@ context.restore();
             DependencyProperty.Register(nameof(StrokeDashCap), typeof(PenLineCap), typeof(Shape), new PropertyMetadata(PenLineCap.Flat));
 #endif
 
+#if WORKINPROGRESS
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            return Size.Zero;
+        }
+#endif
+
 #endif
 
     }

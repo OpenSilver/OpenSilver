@@ -33,6 +33,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
+using System.Diagnostics;
 #else
 using Windows.Foundation;
 using Windows.UI.Core;
@@ -787,45 +788,8 @@ namespace Windows.UI.Xaml
         protected virtual Size MeasureOverride(Size availableSize)
         {
             INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
-            //Console.WriteLine($"FrmeworkElement MeasureOverride ({this}) {domElementReference.UniqueIdentifier}, ({Width}, {Height})");
-            //return Size.Zero;
-            
-            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
-
-            //Console.WriteLine($"MeasureOverride {this} (FrameworkElement)");
-            //Console.WriteLine($"MeasureOverride {domElementReference.UniqueIdentifier}, Children: {childElements.Count()}, ({Width}, {Height}) (FrameElement)");
-
-            if (childElements.Count() == 0)
-            {
-                if (Double.IsNaN(Width))
-                {
-                    //Console.WriteLine($"FrameworkElement MeasureOverride {domElementReference.UniqueIdentifier} {this} get ActualWidth");
-                }
-                if (Double.IsNaN(Height))
-                {
-                    //Console.WriteLine($"FrameworkElement MeasureOverride {domElementReference.UniqueIdentifier} {this} get ActualHeight");
-                }
-
-                Size size = new Size(Double.IsNaN(Width) ? ActualWidth : Width, Double.IsNaN(Height) ? ActualHeight : Height);
-                return size;
-            }
-
-
-            //Console.WriteLine($"FrameworkElement MeasureOverride {this}");
-            Size extent = new Size(0.0, 0.0);
-            
-            foreach (DependencyObject child in childElements)
-            {
-                if (child as FrameworkElement == null)
-                    continue;
-
-                FrameworkElement childElement = child as FrameworkElement;
-                childElement.Measure(availableSize);
-                extent.Width += childElement.DesiredSize.Width;
-                extent.Height += childElement.DesiredSize.Height;
-            }
-
-            return extent;
+            Debug.WriteLine($"FrmeworkElement MeasureOverride ({this}) {domElementReference.UniqueIdentifier}, ({Width}, {Height})");
+            return Size.Zero;
         }
 #endif
         #endregion Work in progress

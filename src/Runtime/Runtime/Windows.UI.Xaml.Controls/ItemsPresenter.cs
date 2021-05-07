@@ -150,5 +150,17 @@ namespace Windows.UI.Xaml.Controls
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.ItemsHost, this);
             }
         }
+#if WORKINPROGRESS
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (ItemsHost == null)
+            {
+                return Size.Zero;
+            }
+
+            ItemsHost.Measure(availableSize);
+            return ItemsHost.DesiredSize;
+        }
+#endif
     }
 }
