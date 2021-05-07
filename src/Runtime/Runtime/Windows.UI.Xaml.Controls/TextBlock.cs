@@ -69,6 +69,7 @@ namespace Windows.UI.Xaml.Controls
             divStyle.textAlign = "left"; // this is the default value.
 #if WORKINPROGRESS
             divStyle.lineHeight = "125%";
+            divStyle.boxSizing = "border-box";
 #endif
             domElementWhereToPlaceChildren = div;
             return div;

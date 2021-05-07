@@ -465,8 +465,13 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Identifies the VerticalContentAlignment dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty VerticalContentAlignmentProperty =
+            DependencyProperty.Register("VerticalContentAlignment", typeof(VerticalAlignment), typeof(Popup), new FrameworkPropertyMetadata(VerticalAlignment.Top, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, VerticalContentAlignment_Changed)
+#else
         public static readonly DependencyProperty VerticalContentAlignmentProperty =
             DependencyProperty.Register("VerticalContentAlignment", typeof(VerticalAlignment), typeof(Popup), new PropertyMetadata(VerticalAlignment.Top, VerticalContentAlignment_Changed)
+#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void VerticalContentAlignment_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
