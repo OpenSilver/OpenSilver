@@ -452,12 +452,13 @@ namespace DotNetForHtml5.Compiler
                                                 // Get a reference to the list to which we add the generated markup extensions code
                                                 List<string> markupExtensionsAdditionalCode = GetListThatContainsAdditionalCodeFromDictionary(
                                                     elementThatIsRootOfTheCurrentNamescope, namescopeRootToMarkupExtensionsAdditionalCode);
-
+                                                
                                                 bool isDependencyProperty =
                                                     reflectionOnSeparateAppDomain.GetField(
                                                         propertyName + "Property", 
                                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
-                                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName) != null;
+                                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
+                                                        assemblyNameWithoutExtension) != null;
 
                                                 string propertyDeclaringTypeName;
                                                 string propertyTypeNamespace;
@@ -611,7 +612,8 @@ namespace DotNetForHtml5.Compiler
                                                     bool isDependencyProperty = reflectionOnSeparateAppDomain.GetField(
                                                         propertyName + "Property",
                                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
-                                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName) != null;
+                                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
+                                                        assemblyNameWithoutExtension) != null;
 
                                                     if (isDependencyProperty)
                                                     {

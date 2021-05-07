@@ -290,9 +290,9 @@ namespace DotNetForHtml5.Compiler
             return _marshalledObject.IsAssignableFrom(namespaceName, typeName, fromNamespaceName, fromTypeName);
         }
 
-        public string GetField(string fieldName, string namespaceName, string typeName)
+        public string GetField(string fieldName, string namespaceName, string typeName, string assemblyName)
         {
-            return _marshalledObject.GetField(fieldName, namespaceName, typeName);
+            return _marshalledObject.GetField(fieldName, namespaceName, typeName, assemblyName);
         }
 
         public class MarshalledObject : MarshalByRefObject, IMarshalledObject
@@ -1851,14 +1851,21 @@ namespace DotNetForHtml5.Compiler
                 return type.IsAssignableFrom(fromType);
             }
 
-            public string GetField(string fieldName, string namespaceName, string typeName)
+            public string GetField(string fieldName, string namespaceName, string typeName, string assemblyName)
             {
                 Type type = this.FindType(namespaceName, typeName, null, true);
 
                 FieldInfo field;
                 for (; type != null; type = type.BaseType)
                 {
-                    if ((field = type.GetField(fieldName)) != null)
+                    var lookup = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance;
+                    if (assemblyName == type.Assembly.GetName().Name)
+                    {
+                        lookup |= BindingFlags.NonPublic;
+                    }
+
+                    if ((field = type.GetField(fieldName, lookup)) != null &&
+                        (field.IsPublic || field.IsAssembly || field.IsFamilyOrAssembly))
                     {
                         return field.Name;
                     }

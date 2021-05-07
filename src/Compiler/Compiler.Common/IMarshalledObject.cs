@@ -111,6 +111,6 @@ namespace DotNetForHtml5.Compiler.Common
 
         bool IsAssignableFrom(string namespaceName, string typeName, string fromNamespaceName, string fromTypeName);
 
-        string GetField(string fieldName, string namespaceName, string typeName);
+        string GetField(string fieldName, string namespaceName, string typeName, string assemblyName);
     }
 }
