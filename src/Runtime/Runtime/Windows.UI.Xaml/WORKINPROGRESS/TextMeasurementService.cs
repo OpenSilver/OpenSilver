@@ -68,6 +68,8 @@ namespace Windows.UI.Xaml
             textBoxDivStyle.height = "";
             textBoxDivStyle.width = "";
             textBoxDivStyle.top = "0px";
+            textBoxDivStyle.borderWidth = "0";
+
             measureTextBoxElementID = ((INTERNAL_HtmlDomElementReference)textBoxReference).UniqueIdentifier;
 
             // For TextBlock
@@ -85,6 +87,7 @@ namespace Windows.UI.Xaml
             textBlockDivStyle.height = "";
             textBlockDivStyle.width = "";
             textBlockDivStyle.top = "0px";
+            textBlockDivStyle.borderWidth = "0";
             measureTextBlockElementID = ((INTERNAL_HtmlDomElementReference)textBlockReference).UniqueIdentifier;
         }
 
