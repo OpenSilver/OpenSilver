@@ -19,6 +19,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Markup;
 using DotNetForHtml5.Core;
+using OpenSilver.Internal;
 #if !MIGRATION
 using Windows.UI.Xaml.Media;
 #endif
@@ -134,9 +135,11 @@ namespace Windows.UI
             }
         }
 
-        internal string INTERNAL_ToHtmlString(double opacity) // Note: we didn't use a default value for the "opacity" argument to force the caller to ask herself if it is correct to call this method or if she should call "SolidColorBrush.INTERNAL_ToHtmlString()" instead (because the latter takes into account the "Brush.Opacity" property).
+        internal string INTERNAL_ToHtmlString(double opacity)
         {
-            return "rgba(" + R.ToString() + ", " + G.ToString() + ", " + B.ToString() + ", " + (((double)A / 255) * opacity).ToString().Replace(',', '.') + ")"; //todo: instead of calling the "Replace" method, use ToString(CultureInfo.InvariantCulture) when CSHTML5 will support it.
+            return string.Format(CultureInfo.InvariantCulture,
+                "rgba({0}, {1}, {2}, {3})",
+                this.R, this.G, this.B, opacity * this.A / 255d);
         }
 
         internal static object INTERNAL_ConvertFromString(string colorString)
@@ -214,8 +217,10 @@ namespace Windows.UI
 
         internal string INTERNAL_ToHtmlStringForVelocity()
         {
-            return "#" + R.ToString("X2") + G.ToString("X2") + B.ToString("X2"); //todo: make sure the ToString uses an invariant culture so that the users do not end up having commas instead of dots for non integers.
-
+            return string.Format("#{0}{1}{2}", 
+                R.ToInvariantString("X2"), 
+                G.ToInvariantString("X2"), 
+                B.ToInvariantString("X2"));
         }
 
         public static explicit operator Brush(Color color)  // explicit Color to Brush conversion operator
@@ -243,7 +248,11 @@ namespace Windows.UI
 
         public override string ToString()
         {
-            return "#" + A.ToString("X2") + R.ToString("X2") + G.ToString("X2") + B.ToString("X2");
+            return string.Format("#{0}{1}{2}{3}", 
+                A.ToInvariantString("X2"), 
+                R.ToInvariantString("X2"), 
+                G.ToInvariantString("X2"), 
+                B.ToInvariantString("X2"));
         }
 
         public override int GetHashCode()
@@ -297,7 +306,7 @@ namespace Windows.UI
 
         public static bool operator !=(Color color1, Color color2)
         {
-            return (!(color1 == color2));
+            return !(color1 == color2);
         }
     }
 }

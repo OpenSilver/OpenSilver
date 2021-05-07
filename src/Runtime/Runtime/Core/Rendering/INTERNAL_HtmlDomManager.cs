@@ -22,6 +22,7 @@ using DotNetBrowser;
 #else
 using Bridge;
 #endif
+using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -1160,24 +1161,26 @@ parentElement.appendChild(child);
             {
                 throw new ArgumentNullException("obj");
             }
-            else if (obj is string)
+            else if (obj is string str)
             {
-                return @"""" + EscapeStringForUseInJavaScript((string)obj) + @"""";
+                return @"""" + EscapeStringForUseInJavaScript(str) + @"""";
             }
-            else if (obj is bool)
+            else if (obj is bool b)
             {
-                return ((bool)obj ? "true" : "false");
+                return (b ? "true" : "false");
             }
-            else if (obj is char)
+            else if (obj is char c)
+            {
+                return @"""" + EscapeStringForUseInJavaScript(c.ToString()) + @"""";
+            }
+            else if (obj is IFormattable formattable)
+            {
+                return formattable.ToInvariantString();
+            }
+            else
             {
                 return @"""" + EscapeStringForUseInJavaScript(obj.ToString()) + @"""";
             }
-            else if (IsNumericType(obj))
-            {
-                return obj.ToString();
-            }
-            else // This includes objects that override the "ToString" method, such as the class "Uri".
-                return @"""" + EscapeStringForUseInJavaScript(obj.ToString()) + @"""";
         }
 
 #if !BRIDGE

@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -182,7 +183,9 @@ $0.miterLimit = $1", jsContext2d,
 
         static private string ConvertColorToHtml(Color color)
         {
-            return "rgba(" + color.R + ", " + color.G + ", " + color.B + ", " + ((double)color.A / 255).ToString().Replace(',', '.') + ")";
+            return string.Format(CultureInfo.InvariantCulture,
+                "rgba({0}, {1}, {2}, {3})",
+                color.R, color.G, color.B, color.A / 255d);
         }
     }
 }
