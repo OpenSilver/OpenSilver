@@ -249,7 +249,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             UpdateVisualStates();
         }
 
-        private void UpdateVisualStates()
+        internal override void UpdateVisualStates()
         {
             if(this.INTERNAL_IsLegacyVisualStates) //Silverlight/WPF visual states
             {
