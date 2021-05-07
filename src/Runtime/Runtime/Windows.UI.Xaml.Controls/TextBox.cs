@@ -93,7 +93,6 @@ namespace Windows.UI.Xaml.Controls
         public TextBox()
         {
             this.DefaultStyleKey = typeof(TextBox);
-            UseSystemFocusVisuals = true;
         }
 
 
