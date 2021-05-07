@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Controls
             this.Loaded += TimePicker_Loaded;
         }
 
-        public DependencyProperty MinuteIntervalProperty = DependencyProperty.Register(
+        public static DependencyProperty MinuteIntervalProperty = DependencyProperty.Register(
             "MinuteInterval",
             typeof(int),
             typeof(Clock),
