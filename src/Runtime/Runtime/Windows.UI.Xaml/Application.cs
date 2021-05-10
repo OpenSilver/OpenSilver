@@ -544,7 +544,7 @@ namespace Windows.UI.Xaml
 
 #endregion
 
-        static Host _host = new Host(true);
+        private Host _host = new Host(true);
 
         /// <summary>
         /// Gets various details about the application's host.
