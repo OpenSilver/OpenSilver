@@ -1195,11 +1195,15 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                             bool nameMatch = attr.IsNameSetExplicitly ?
                                          attr.Name == name.LocalName :
                                          type.Name == name.LocalName;
-                            bool namespaceMatch = attr.Namespace == name.NamespaceName;
 
-                            if (nameMatch && namespaceMatch)
+                            if(nameMatch)
                             {
-                                return type;
+                                bool namespaceMatch = attr.IsNamespaceSetExplicitly ?
+                                    attr.Namespace == name.NamespaceName :
+                                    DataContractSerializer_Helpers.GetDefaultNamespace(type.Namespace, useXmlSerializerFormat: false) == name.NamespaceName;
+
+                                if (namespaceMatch)
+                                    return type;
                             }
                         }
                     }
