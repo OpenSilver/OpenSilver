@@ -80,7 +80,7 @@ namespace Windows.UI.Xaml.Controls
 
 			if (noWrapSize == Size.Empty)
 			{
-				noWrapSize = Application.Current.TextMeasurementService.Measure(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, TextWrapping.NoWrap, Padding, Double.PositiveInfinity);
+				noWrapSize = Application.Current.TextMeasurementService.MeasureTextBlock(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, TextWrapping.NoWrap, Padding, Double.PositiveInfinity);
 				noWrapSize.Width = noWrapSize.Width + BorderThicknessSize.Width;
 				noWrapSize.Height = noWrapSize.Height + BorderThicknessSize.Height;
 			}
