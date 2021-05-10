@@ -50,6 +50,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private bool SkipCoerceSelectedItemCheck;
         private SelectionInfo _selectionInfo;
 
+        private DependencyPropertyChangedEventArgs _indexChangeEventArgs = null; //this one is so we can call ManageSelectedIndex_Changed from OnSelectedItemChanged (we cannot call it from OnSelectedIndexChanged because SelectedItem is not up to date at that moment if the selection change comes from SelectedValue).
+
         #endregion Data
 
         #region Constructor
@@ -125,6 +127,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 }
             }
 
+            //calling the methods to update the Visual Tree/Selection:
+            s.ApplySelectedIndex(s.SelectedIndex);
+            s.ManageSelectedIndex_Changed(s._indexChangeEventArgs);
+
             //We do not want to raise the event here when we have a MultiSelector (or when SelectionMode is not Single ?)
             if (!(s is MultiSelector))
             {
@@ -181,6 +187,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private static void OnSelectedIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Selector s = (Selector)d;
+
+            s._indexChangeEventArgs = e; //keeping the event args for the call of ManageSelectedIndex_Changed in OnSelectedItemChanged
 
             int newValue = (int)e.NewValue;
             // we only want to change the other ones if the change comes from 
@@ -240,8 +248,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     s._selectionChangeIsOnIndex = false;
                 }
             }
-            s.ApplySelectedIndex(newValue);
-            s.ManageSelectedIndex_Changed(e);
         }
 
         private static object CoerceSelectedIndex(DependencyObject d, object baseValue)
