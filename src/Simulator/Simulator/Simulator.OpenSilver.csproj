@@ -66,6 +66,16 @@
       <Link>VersionInformation_SharedWithOtherProjects.cs</Link>
     </Compile>
     <Compile Include="Compilation\CompilationState.cs" />
+    <Compile Include="Console\ConsoleControl.xaml.cs">
+      <DependentUpon>ConsoleControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Console\ConsoleMessage.cs" />
+    <Compile Include="Console\ConsoleMessageControl.xaml.cs">
+      <DependentUpon>ConsoleMessageControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Console\FileSource.cs" />
+    <Compile Include="Console\IMessageSource.cs" />
+    <Compile Include="Console\InteropSource.cs" />
     <Compile Include="DialogBoxes\MessageBoxScrollable.xaml.cs">
       <DependentUpon>MessageBoxScrollable.xaml</DependentUpon>
     </Compile>
@@ -113,6 +123,14 @@
     <Compile Include="XamlInspection\XamlSinglePropertyEditor.xaml.cs">
       <DependentUpon>XamlSinglePropertyEditor.xaml</DependentUpon>
     </Compile>
+    <Page Include="Console\ConsoleControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Console\ConsoleMessageControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DialogBoxes\MessageBoxScrollable.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -42,6 +42,8 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Net.NetworkInformation;
 using DotNetForHtml5.EmulatorWithoutJavascript.Debugging;
+using DotNetBrowser.Events;
+using DotNetForHtml5.EmulatorWithoutJavascript.Console;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
@@ -475,10 +477,58 @@ ends with "".Browser"" in your solution.";
                             OnLoaded();
                         }), DispatcherPriority.ApplicationIdle);
                     };
-                MainWebBrowser.ConsoleMessageEvent += _javaScriptErrorsReportingHandler.OnConsoleMessageEvent;
+                //MainWebBrowser.ConsoleMessageEvent += _javaScriptErrorsReportingHandler.OnConsoleMessageEvent;
+                MainWebBrowser.ConsoleMessageEvent += OnConsoleMessageEvent;
             }
 
             LoadIndexFile();
+        }
+
+        private void OnConsoleMessageEvent(object sender, ConsoleEventArgs args)
+        {
+            switch(args.Level)
+            {
+#if DEBUG
+                case ConsoleEventArgs.MessageLevel.DEBUG:
+#endif
+                case ConsoleEventArgs.MessageLevel.LOG:
+                    Console.AddMessage(new ConsoleMessage(args.Message, ConsoleMessage.MessageLevel.Log));
+                    break;
+                case ConsoleEventArgs.MessageLevel.WARNING:
+                    if (!string.IsNullOrEmpty(args.Source))
+                    {
+                        Console.AddMessage(new ConsoleMessage(
+                            args.Message,
+                            ConsoleMessage.MessageLevel.Warning,
+                            new FileSource(args.Source, args.LineNumber)
+                            ));
+                    }
+                    else
+                    {
+                        Console.AddMessage(new ConsoleMessage(
+                            args.Message,
+                            ConsoleMessage.MessageLevel.Warning
+                            ));
+                    }
+                    break;
+                case ConsoleEventArgs.MessageLevel.ERROR:
+                    if (!string.IsNullOrEmpty(args.Source))
+                    {
+                        Console.AddMessage(new ConsoleMessage(
+                            args.Message,
+                            ConsoleMessage.MessageLevel.Error,
+                            new FileSource(args.Source, args.LineNumber)
+                            ));
+                    }
+                    else
+                    {
+                        Console.AddMessage(new ConsoleMessage(
+                            args.Message,
+                            ConsoleMessage.MessageLevel.Error
+                            ));
+                    }
+                    break;
+            }
         }
 
         void LoadIndexFile(string urlFragment = null)
@@ -911,7 +961,7 @@ Click OK to continue.";
                         InteropHelpers.InjectWpfMediaElementFactory(_coreAssembly);
                         InteropHelpers.InjectWebClientFactory(_coreAssembly);
                         InteropHelpers.InjectClipboardHandler(_coreAssembly);
-                        InteropHelpers.InjectSimulatorProxy(new SimulatorProxy(MainWebBrowser), _coreAssembly);
+                        InteropHelpers.InjectSimulatorProxy(new SimulatorProxy(MainWebBrowser, Console), _coreAssembly);
 #if OPENSILVER
                         // In the OpenSilver Version, we use this work-around to know if we're in the simulator
                         InteropHelpers.InjectIsRunningInTheSimulator_WorkAround(_coreAssembly);

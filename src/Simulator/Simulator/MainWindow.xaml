@@ -5,6 +5,7 @@
         xmlns:mahapps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:xamlinspection="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection"
         xmlns:licensecheckernamespace="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking"
+        xmlns:console="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.Console"
         Title="Simulator - C#/XAML for HTML5"
         SizeToContent="WidthAndHeight"
         ResizeMode="CanResizeWithGrip"
@@ -132,82 +133,98 @@
                         </StackPanel>
                     </Grid>
                 </StackPanel>
-                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left" Margin="30,66,20,0">
-                    <StackPanel Orientation="Vertical" Margin="0,0,0,0">
-                        <RadioButton x:Name="DisplaySize_Phone" Content="Phone" Click="DisplaySize_Click" Cursor="Hand" BorderBrush="{x:Null}" Focusable="False" Padding="12,8" Style="{StaticResource {x:Type ToggleButton}}" HorizontalAlignment="Center"/>
-                        <RadioButton x:Name="DisplaySize_Tablet" Content="Tablet" Margin="0,10,0,0" Click="DisplaySize_Click" Cursor="Hand" BorderBrush="{x:Null}" Focusable="False" Padding="12,8" Style="{StaticResource {x:Type ToggleButton}}" HorizontalAlignment="Center"/>
-                        <RadioButton x:Name="DisplaySize_Desktop" Content="Desktop&#x0a;Browser" IsChecked="True" Margin="0,10,0,0" Click="DisplaySize_Click" Cursor="Hand" BorderBrush="{x:Null}" Focusable="False" Padding="12,8" Style="{StaticResource {x:Type ToggleButton}}" HorizontalAlignment="Center"/>
-                    </StackPanel>
-                    <StackPanel x:Name="OptionsForDisplaySize_Phone" Orientation="Vertical" Margin="0,30,0,0" Visibility="Collapsed">
-                        <RadioButton x:Name="DisplaySize_Phone_Portrait" Content="Portrait" IsChecked="True" Click="DisplaySize_Click" Cursor="Hand" BorderBrush="{x:Null}" Focusable="False" Padding="12,8" Style="{StaticResource {x:Type ToggleButton}}" HorizontalAlignment="Center"/>
-                        <RadioButton x:Name="DisplaySize_Phone_Landscape" Content="Landscape" Margin="0,10,0,0" Click="DisplaySize_Click" Cursor="Hand" BorderBrush="{x:Null}" Focusable="False" Padding="12,8" Style="{StaticResource {x:Type ToggleButton}}" HorizontalAlignment="Center"/>
-                    </StackPanel>
-                    <StackPanel x:Name="OptionsForDisplaySize_Tablet" Orientation="Vertical" Margin="0,30,0,0" Visibility="Collapsed">
-                        <RadioButton x:Name="DisplaySize_Tablet_Portrait" Content="Portrait" IsChecked="True" Click="DisplaySize_Click" Cursor="Hand" BorderBrush="{x:Null}" Focusable="False" Padding="12,8" Style="{StaticResource {x:Type ToggleButton}}" HorizontalAlignment="Center"/>
-                        <RadioButton x:Name="DisplaySize_Tablet_Landscape" Content="Landscape" Margin="0,10,0,0" Click="DisplaySize_Click" Cursor="Hand" BorderBrush="{x:Null}" Focusable="False" Padding="12,8" Style="{StaticResource {x:Type ToggleButton}}" HorizontalAlignment="Center"/>
-                    </StackPanel>
-                    <!--<TextBlock Text="Display Size: " VerticalAlignment="Center"/>
+                <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left" Margin="30,66,20,0">
+                        <StackPanel Orientation="Vertical" Margin="0,0,0,0">
+                            <RadioButton x:Name="DisplaySize_Phone" Content="Phone" Click="DisplaySize_Click" Cursor="Hand" BorderBrush="{x:Null}" Focusable="False" Padding="12,8" Style="{StaticResource {x:Type ToggleButton}}" HorizontalAlignment="Center"/>
+                            <RadioButton x:Name="DisplaySize_Tablet" Content="Tablet" Margin="0,10,0,0" Click="DisplaySize_Click" Cursor="Hand" BorderBrush="{x:Null}" Focusable="False" Padding="12,8" Style="{StaticResource {x:Type ToggleButton}}" HorizontalAlignment="Center"/>
+                            <RadioButton x:Name="DisplaySize_Desktop" Content="Desktop&#x0a;Browser" IsChecked="True" Margin="0,10,0,0" Click="DisplaySize_Click" Cursor="Hand" BorderBrush="{x:Null}" Focusable="False" Padding="12,8" Style="{StaticResource {x:Type ToggleButton}}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel x:Name="OptionsForDisplaySize_Phone" Orientation="Vertical" Margin="0,30,0,0" Visibility="Collapsed">
+                            <RadioButton x:Name="DisplaySize_Phone_Portrait" Content="Portrait" IsChecked="True" Click="DisplaySize_Click" Cursor="Hand" BorderBrush="{x:Null}" Focusable="False" Padding="12,8" Style="{StaticResource {x:Type ToggleButton}}" HorizontalAlignment="Center"/>
+                            <RadioButton x:Name="DisplaySize_Phone_Landscape" Content="Landscape" Margin="0,10,0,0" Click="DisplaySize_Click" Cursor="Hand" BorderBrush="{x:Null}" Focusable="False" Padding="12,8" Style="{StaticResource {x:Type ToggleButton}}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel x:Name="OptionsForDisplaySize_Tablet" Orientation="Vertical" Margin="0,30,0,0" Visibility="Collapsed">
+                            <RadioButton x:Name="DisplaySize_Tablet_Portrait" Content="Portrait" IsChecked="True" Click="DisplaySize_Click" Cursor="Hand" BorderBrush="{x:Null}" Focusable="False" Padding="12,8" Style="{StaticResource {x:Type ToggleButton}}" HorizontalAlignment="Center"/>
+                            <RadioButton x:Name="DisplaySize_Tablet_Landscape" Content="Landscape" Margin="0,10,0,0" Click="DisplaySize_Click" Cursor="Hand" BorderBrush="{x:Null}" Focusable="False" Padding="12,8" Style="{StaticResource {x:Type ToggleButton}}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                        <!--<TextBlock Text="Display Size: " VerticalAlignment="Center"/>
                             <ComboBox Margin="5,0,0,0" SelectedIndex="0" x:Name="DisplaySizeComboBox" SelectionChanged="DisplaySizeComboBox_SelectionChanged">
                                 <ComboBoxItem Content="iPhone - Portrait (320x480)"/>
                                 <ComboBoxItem Content="iPhone - Landscape (480x320)"/>
                                 <ComboBoxItem Content="iPad - Portrait (768x1024)"/>
                                 <ComboBoxItem Content="iPad - Landscape (1024x768)"/>
                             </ComboBox>-->
-                </StackPanel>
-                <StackPanel Grid.Row="2" Grid.Column="0"  Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Left">
-                    <StackPanel.Resources>
-                        <Style TargetType="{x:Type Border}">
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="Cursor" Value="Hand"/>
-                            <Setter Property="Margin" Value="10, 10, 10, 10"/>
-                        </Style>
-                    </StackPanel.Resources>
-                    <Border MouseLeftButtonUp="ButtonShowAdvancedTools_Click">
-                        <ToolTipService.ToolTip>
-                            <TextBlock Text="Advanced tools"/>
-                        </ToolTipService.ToolTip>
-                        <Border.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Inspect Visual Tree" Cursor="Hand" Click="ButtonViewXamlTree_Click"/>
-                                <MenuItem Header="View HTML/JS compilation log..." x:Name="MenuButtonViewCompilationLog" Cursor="Hand" Click="ButtonViewCompilationLog_Click"/>
-                                <MenuItem Header="View JavaScript console log..." Cursor="Hand" Click="ButtonViewConsoleLog_Click"/>
-                                <MenuItem Header="Execute custom JavaScript code..." Cursor="Hand" Click="ButtonExecuteJS_Click"/>
-                                <MenuItem Header="View all JS code executed by the Simulator so far..." Visibility="Collapsed" Cursor="Hand" Click="ButtonViewJavaScriptLog_Click"/>
-                                <MenuItem Header="Debug JS code executed by the Simulator so far..." Cursor="Hand" Click="ButtonDebugJavaScriptLog_Click"/>
-                                <MenuItem Header="View current HTML..." Cursor="Hand" Click="ButtonSeeHtml_Click"/>
-                                <MenuItem Header="Save current HTML as File..." Cursor="Hand" Click="ButtonSaveHtml_Click"/>
-                                <MenuItem Header="Re-instantiate App.xaml.cs" Cursor="Hand" Click="ButtonRestart_Click"/>
-                                <MenuItem Header="Display the number of DOM elements..." Cursor="Hand" Click="ButtonStats_Click"/>
-                                <MenuItem Header="Clear cookies and cache" Cursor="Hand" Click="ButtonClearCookiesAndCache_Click"/>
-                                <CheckBox x:Name="CheckBoxCORS" Content="Ignore and bypass cross-domain calls errors (CORS)"/>
-                            </ContextMenu>
-                        </Border.ContextMenu>
-                        <Path Data="F1M60.9043,41.6863C57.7236,39.6523 41.5319,29.1797 32.4893,23.332 33.1949,17.4545 30.6182,11.4167 25.3102,7.98975 20.0208,4.57422 13.4778,4.68884 8.41565,7.72009L22.7796,17.0052 22.3782,25.129 15.1432,28.8373 0.76886,19.5496C0.0845947,25.4115 2.66895,31.4285 7.95862,34.8463 13.2617,38.2709 19.8206,38.142 24.888,35.0925 33.9541,40.9545 50.2184,51.4688 53.303,53.4492 57.6168,56.2239 65.3626,44.5326 60.9043,41.6863z" Stretch="Uniform" Fill="#FF6D6D6D" Width="24" Height="24" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" />
-                    </Border>
-                </StackPanel>
+                    </StackPanel>
 
-                <ScrollViewer x:Name="MainScrollViewer" Grid.Row="1" Grid.Column="1" Grid.RowSpan="1000" Margin="0,10,10,10" BorderThickness="0" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-                    <!-- Note: setting Focusable to false in the ScrollVewer is required to allow DotNetBrowser to retain the focus (cf. email from DotNetBrowser support on 2017.11.29) -->
-                    <Border x:Name="MainBorder" Background="Transparent" CornerRadius="40" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
-                        <Grid>
-                            <Border x:Name="PhoneDecoration1" Visibility="Collapsed" Background="#FF333333" Height="8" Width="50" CornerRadius="5" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,25,0,0"/>
-                            <Border x:Name="PhoneDecoration2" Visibility="Collapsed" Background="#FF333333" Height="40" Width="40" CornerRadius="15" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
-                            <Grid x:Name="ContainerForMainWebBrowserAndHighlightElement" Margin="0,0,0,0">
-                                <Border x:Name="BrowserContainer"/>
-                                <Canvas x:Name="ContainerForHighlightElement">
-                                    <Rectangle x:Name="HighlightElement" Visibility="Collapsed" Stroke="Red" StrokeDashArray="4 2" StrokeThickness="2"/>
-                                </Canvas>
-                                <Canvas x:Name="ContainerForElementPickerHighlight">
-                                    <Rectangle x:Name="ElementPickerHighlight" Visibility="Collapsed" Stroke="Blue" StrokeDashArray="4 2" StrokeThickness="2"/>
-                                </Canvas>
-                                <Rectangle x:Name="ElementPickerForInspection" Visibility="Collapsed" Fill="Transparent" MouseMove="ElementPickerForInspection_MouseMove" MouseDown="ElementPickerForInspection_MouseDown"/>
+                    <StackPanel Grid.Row="1" Grid.Column="0"  Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="Margin" Value="10, 10, 10, 10"/>
+                            </Style>
+                        </StackPanel.Resources>
+                        <Border MouseLeftButtonUp="ButtonShowAdvancedTools_Click">
+                            <ToolTipService.ToolTip>
+                                <TextBlock Text="Advanced tools"/>
+                            </ToolTipService.ToolTip>
+                            <Border.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Inspect Visual Tree" Cursor="Hand" Click="ButtonViewXamlTree_Click"/>
+                                    <MenuItem Header="View HTML/JS compilation log..." x:Name="MenuButtonViewCompilationLog" Cursor="Hand" Click="ButtonViewCompilationLog_Click"/>
+                                    <MenuItem Header="View JavaScript console log..." Cursor="Hand" Click="ButtonViewConsoleLog_Click"/>
+                                    <MenuItem Header="Execute custom JavaScript code..." Cursor="Hand" Click="ButtonExecuteJS_Click"/>
+                                    <MenuItem Header="View all JS code executed by the Simulator so far..." Visibility="Collapsed" Cursor="Hand" Click="ButtonViewJavaScriptLog_Click"/>
+                                    <MenuItem Header="Debug JS code executed by the Simulator so far..." Cursor="Hand" Click="ButtonDebugJavaScriptLog_Click"/>
+                                    <MenuItem Header="View current HTML..." Cursor="Hand" Click="ButtonSeeHtml_Click"/>
+                                    <MenuItem Header="Save current HTML as File..." Cursor="Hand" Click="ButtonSaveHtml_Click"/>
+                                    <MenuItem Header="Re-instantiate App.xaml.cs" Cursor="Hand" Click="ButtonRestart_Click"/>
+                                    <MenuItem Header="Display the number of DOM elements..." Cursor="Hand" Click="ButtonStats_Click"/>
+                                    <MenuItem Header="Clear cookies and cache" Cursor="Hand" Click="ButtonClearCookiesAndCache_Click"/>
+                                    <CheckBox x:Name="CheckBoxCORS" Content="Ignore and bypass cross-domain calls errors (CORS)"/>
+                                </ContextMenu>
+                            </Border.ContextMenu>
+                            <Path Data="F1M60.9043,41.6863C57.7236,39.6523 41.5319,29.1797 32.4893,23.332 33.1949,17.4545 30.6182,11.4167 25.3102,7.98975 20.0208,4.57422 13.4778,4.68884 8.41565,7.72009L22.7796,17.0052 22.3782,25.129 15.1432,28.8373 0.76886,19.5496C0.0845947,25.4115 2.66895,31.4285 7.95862,34.8463 13.2617,38.2709 19.8206,38.142 24.888,35.0925 33.9541,40.9545 50.2184,51.4688 53.303,53.4492 57.6168,56.2239 65.3626,44.5326 60.9043,41.6863z" Stretch="Uniform" Fill="#FF6D6D6D" Width="24" Height="24" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" />
+                        </Border>
+                    </StackPanel>
+
+                    <ScrollViewer x:Name="MainScrollViewer" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Margin="0,10,10,10" BorderThickness="0" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                        <!-- Note: setting Focusable to false in the ScrollVewer is required to allow DotNetBrowser to retain the focus (cf. email from DotNetBrowser support on 2017.11.29) -->
+                        <Border x:Name="MainBorder" Background="Transparent" CornerRadius="40" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
+                            <Grid>
+                                <Border x:Name="PhoneDecoration1" Visibility="Collapsed" Background="#FF333333" Height="8" Width="50" CornerRadius="5" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,25,0,0"/>
+                                <Border x:Name="PhoneDecoration2" Visibility="Collapsed" Background="#FF333333" Height="40" Width="40" CornerRadius="15" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
+                                <Grid x:Name="ContainerForMainWebBrowserAndHighlightElement" Margin="0,0,0,0">
+                                    <Border x:Name="BrowserContainer"/>
+                                    <Canvas x:Name="ContainerForHighlightElement">
+                                        <Rectangle x:Name="HighlightElement" Visibility="Collapsed" Stroke="Red" StrokeDashArray="4 2" StrokeThickness="2"/>
+                                    </Canvas>
+                                    <Canvas x:Name="ContainerForElementPickerHighlight">
+                                        <Rectangle x:Name="ElementPickerHighlight" Visibility="Collapsed" Stroke="Blue" StrokeDashArray="4 2" StrokeThickness="2"/>
+                                    </Canvas>
+                                    <Rectangle x:Name="ElementPickerForInspection" Visibility="Collapsed" Fill="Transparent" MouseMove="ElementPickerForInspection_MouseMove" MouseDown="ElementPickerForInspection_MouseDown"/>
+                                </Grid>
+                                <Border x:Name="ContainerOfLoadingMessage" CornerRadius="5" Background="#88000000" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
+                                    <TextBlock Text="Launching the application Please wait..."  Width="200" Foreground="White" FontSize="16" Margin="15,10" TextWrapping="Wrap" TextAlignment="Center"/>
+                                </Border>
                             </Grid>
-                            <Border x:Name="ContainerOfLoadingMessage" CornerRadius="5" Background="#88000000" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
-                                <TextBlock Text="Launching the application Please wait..."  Width="200" Foreground="White" FontSize="16" Margin="15,10" TextWrapping="Wrap" TextAlignment="Center"/>
-                            </Border>
-                        </Grid>
-                    </Border>
-                </ScrollViewer>
+                        </Border>
+                    </ScrollViewer>
+
+                </Grid>
+
+                <console:ConsoleControl Grid.ColumnSpan="2" Grid.Row="2" x:Name="Console" />
+
                 <!--<StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                     <Button Content="Stats" Click="ButtonStats_Click" Cursor="Hand" BorderThickness="0" />
                     <Button Content="Execute JS" Click="ButtonExecuteJS_Click" Margin="10,0,0,0" Cursor="Hand" BorderThickness="0"/>
