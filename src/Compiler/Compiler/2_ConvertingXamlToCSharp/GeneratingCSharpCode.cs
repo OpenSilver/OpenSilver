@@ -290,7 +290,11 @@ namespace DotNetForHtml5.Compiler
                                 if (GettingInformationAboutXamlTypes.IsPropertyOrFieldACollection(element, reflectionOnSeparateAppDomain, isAttachedProperty)
                                     && (element.Elements().Count() != 1
                                     || (!GettingInformationAboutXamlTypes.IsTypeAssignableFrom(element.Elements().First().Name, element.Name, reflectionOnSeparateAppDomain, isAttached: isAttachedProperty)) // To handle the case where the user explicitly declares the collection element. Example: <Application.Resources><ResourceDictionary><Child x:Key="test"/></ResourceDictionary></Application.Resources> (rather than <Application.Resources><Child x:Key="test"/></Application.Resources>), in which case we need to do "=" instead pf "Add()"
-                                    && element.Elements().First().Name != DefaultXamlNamespace + "Binding" && element.Elements().First().Name.LocalName != "StaticResourceExtension" && element.Elements().First().Name.LocalName != "StaticResource"))
+                                    && element.Elements().First().Name != DefaultXamlNamespace + "Binding" 
+                                    && element.Elements().First().Name.LocalName != "StaticResourceExtension" 
+                                    && element.Elements().First().Name.LocalName != "StaticResource"
+                                    && element.Elements().First().Name.LocalName != "TemplateBinding"
+                                    && element.Elements().First().Name.LocalName != "TemplateBindingExtension"))
                                 {
                                     //------------------------
                                     // PROPERTY TYPE IS A COLLECTION
@@ -512,6 +516,22 @@ namespace DotNetForHtml5.Compiler
                                                 {
                                                     markupExtensionsAdditionalCode.Add(string.Format("{3}.BindingOperations.SetBinding({0}, {1}, {2});", parentElementUniqueNameOrThisKeyword, propertyDeclaringTypeName + "." + propertyName + "Property", GetUniqueName(child), namespaceSystemWindowsData)); //we add the container itself since we couldn't add it inside the while
                                                 }
+                                            }
+                                            else if (child.Name.LocalName == "TemplateBindingExtension")
+                                            {
+                                                var dependencyPropertyName =
+                                                    "global::" + reflectionOnSeparateAppDomain.GetField(
+                                                        propertyName + "Property",
+                                                        isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
+                                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
+                                                        assemblyNameWithoutExtension);
+
+                                                stringBuilder.AppendLine(string.Format(
+                                                    "{0}.SetValue({1}, {2}.ProvideValue(new global::System.ServiceProvider({3}.TemplateOwner, null)));",
+                                                    parentElementUniqueNameOrThisKeyword,
+                                                    dependencyPropertyName,
+                                                    GetUniqueName(child),
+                                                    TemplateOwnerValuePlaceHolder));
                                             }
                                             else if (child.Name == xNamespace + "NullExtension")
                                             {

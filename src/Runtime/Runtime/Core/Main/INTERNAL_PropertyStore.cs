@@ -130,22 +130,22 @@ namespace CSHTML5.Internal
 
                 if (storage.BaseValueSourceInternal == BaseValueSourceInternal.Local)
                 {
-                    BindingExpression currentExpr = storage.LocalValue as BindingExpression;
+                    var currentExpr = storage.LocalValue as Expression;
                     if (currentExpr != null)
                     {
-                        BindingExpression newExpr = newValue as BindingExpression;
+                        var newExpr = newValue as Expression;
                         if (currentExpr == newExpr)
                         {
                             global::System.Diagnostics.Debug.Assert(newExpr.IsAttached);
-                            RefreshBindingExpressionCommon(storage, newExpr);
+                            RefreshExpressionCommon(storage, newExpr, false);
                             return;
                         }
 
                         // if the current BindingExpression is a TwoWay binding, we don't want to remove the binding 
-                        // unless we are overriding it with a new BindingExpression.
-                        if (newExpr != null || currentExpr.ParentBinding.Mode != BindingMode.TwoWay)
+                        // unless we are overriding it with a new Expression.
+                        if (newExpr != null || !currentExpr.CanSetValue(storage.Owner, storage.Property))
                         {
-                            currentExpr.OnDetached(storage.Owner);
+                            currentExpr.OnDetach(storage.Owner, storage.Property);
                         }
                         else
                         {
@@ -167,14 +167,14 @@ namespace CSHTML5.Internal
                                  true); // propagateChanges
         }
 
-        internal static void RefreshBindingExpressionCommon(INTERNAL_PropertyStorage storage, BindingExpression expression)
+        internal static void RefreshExpressionCommon(INTERNAL_PropertyStorage storage, Expression expression, bool isInStyle)
         {
             global::System.Diagnostics.Debug.Assert(expression != null, "Expression should not be null");
             global::System.Diagnostics.Debug.Assert(storage.IsExpression || storage.IsExpressionFromStyle, "Property base value is not a BindingExpression !");
 
             UpdateEffectiveValue(storage,
                                  expression,
-                                 expression.ParentBinding._isInStyle ? BaseValueSourceInternal.LocalStyle : BaseValueSourceInternal.Local,
+                                 isInStyle ? BaseValueSourceInternal.LocalStyle : BaseValueSourceInternal.Local,
                                  false, // coerceWithCurrentValue
                                  false, // coerceValue
                                  false, // clearValue
@@ -183,13 +183,14 @@ namespace CSHTML5.Internal
 
         internal static void ClearValueCommon(INTERNAL_PropertyStorage storage)
         {
-            // Check for binding expression
-            BindingExpression currentExpr = storage.IsExpression
-                                            ? storage.LocalValue as BindingExpression
-                                            : null;
+            // Check for expression
+            var currentExpr = storage.IsExpression
+                              ? storage.LocalValue as Expression
+                              : null;
+
             if (currentExpr != null)
             {
-                currentExpr.OnDetached(storage.Owner);
+                currentExpr.OnDetach(storage.Owner, storage.Property);
             }
 
             // Reset local value
@@ -240,10 +241,10 @@ namespace CSHTML5.Internal
         {
             if (storage.IsExpression || storage.IsExpressionFromStyle)
             {
-                BindingExpression currentExpr = storage.ModifiedValue.BaseValue as BindingExpression;
+                var currentExpr = storage.ModifiedValue.BaseValue as Expression;
                 if (currentExpr != null)
                 {
-                    currentExpr.OnDetached(storage.Owner);
+                    currentExpr.OnDetach(storage.Owner, storage.Property);
                 }
             }
 
@@ -319,7 +320,7 @@ namespace CSHTML5.Internal
             BaseValueSourceInternal oldBaseValueSource = storage.BaseValueSourceInternal;
 
             object oldValue;
-            BindingExpression currentExpr = null;
+            Expression currentExpr = null;
 
             // Compute new value
             object effectiveValue;
@@ -350,10 +351,10 @@ namespace CSHTML5.Internal
                 // Get old value before it gets overriden
                 oldValue = GetEffectiveValue(storage);
 
-                currentExpr = (storage.IsExpression || storage.IsExpressionFromStyle) ? storage.ModifiedValue.BaseValue as BindingExpression : null;
+                currentExpr = (storage.IsExpression || storage.IsExpressionFromStyle) ? storage.ModifiedValue.BaseValue as Expression : null;
 
 #if USEASSERT
-                // If the current base value is a BindingExpression, it should have been detached by now
+                // If the current base value is an Expression, it should have been detached by now
                 // Or is the same instance as 'effectiveValue' (this occurs when we update a property bound to a
                 // BindingExpression)
                 global::System.Diagnostics.Debug.Assert(currentExpr == null ||
@@ -371,7 +372,7 @@ namespace CSHTML5.Internal
 
             if (!isCoerceOperation)
             {
-                BindingExpression newExpr = effectiveValue as BindingExpression;
+                var newExpr = effectiveValue as Expression;
                 if (newExpr == null)
                 {
                     computedValue = storage.Property.PropertyType == typeof(string)
@@ -385,16 +386,16 @@ namespace CSHTML5.Internal
                     global::System.Diagnostics.Debug.Assert(effectiveValueKind == BaseValueSourceInternal.Local || effectiveValueKind == BaseValueSourceInternal.LocalStyle);
 #endif
 
-                    // If the new BindingExpression is the same as the current one,
-                    // the BindingExpression is already attached
+                    // If the new Expression is the same as the current one,
+                    // the Expression is already attached
                     bool isNewBinding = !object.ReferenceEquals(currentExpr, newExpr);
                     if (isNewBinding)
                     {
                         if (newExpr.IsAttached)
                         {
-                            throw new InvalidOperationException(string.Format("Cannot attach an instance of '{0}' multiple times", typeof(BindingExpression)));
+                            throw new InvalidOperationException(string.Format("Cannot attach an instance of '{0}' multiple times", newExpr.GetType()));
                         }
-                        newExpr.OnAttached(storage.Owner);
+                        newExpr.OnAttach(storage.Owner, storage.Property);
                         storage.Value = newExpr; // Set the new base value
                     }
 
@@ -407,14 +408,14 @@ namespace CSHTML5.Internal
                         storage.SetExpressionFromStyleValue(storage.TypeMetadata.DefaultValue, newExpr);
                     }
 
-                    // 1- 'isNewBinding == true' means that we are attaching a new BindingExpression.
-                    // 2- 'newValue is BindingExpression == true' means that we are re-evaluating a BindingEpression
-                    // (usually by calling RefreshBindingExpressionCommon)
+                    // 1- 'isNewBinding == true' means that we are attaching a new Expression.
+                    // 2- 'newValue is Expression == true' means that we are re-evaluating an Expression
+                    // (usually by calling RefreshExpressionCommon)
                     // 3- Otherwise we are trying to change the value of a TwoWay binding.
-                    // In that case we have to preserve the BindingExpression (this is not the case if the first two 
+                    // In that case we have to preserve the Expression (this is not the case if the first two 
                     // situations), hence the following line :
-                    computedValue = isNewBinding || newValue is BindingExpression ? newExpr.GetValue(storage.Property, storage.Owner.GetType())
-                                                                                  : newValue;
+                    computedValue = isNewBinding || newValue is Expression ? newExpr.GetValue(storage.Owner, storage.Property)
+                                                                           : newValue;
                     computedValue = storage.Property.PropertyType == typeof(string)
                                     ? computedValue?.ToString()
                                     : computedValue;
@@ -485,10 +486,14 @@ namespace CSHTML5.Internal
                 }
             }
 
-            // Update the source of the Binding, in case the previous value of a property was a Binding and the Mode was "TwoWay":
-            if (currentExpr != null && currentExpr.ParentBinding.Mode == BindingMode.TwoWay) //note: we know that oldBindingExpression.IsUpdating is false because oldBindingExpression is only set in that case (otherwise, it is null).
+            // Update the source of the Binding, in case the previous value
+            // of a property was a Binding and the Mode was "TwoWay":
+            // Note: we know that oldBindingExpression.IsUpdating is false
+            // because oldBindingExpression is only set in that case (otherwise,
+            // it is null).
+            if (currentExpr != null) 
             {
-                currentExpr.TryUpdateSourceObject(computedValue);
+                currentExpr.SetValue(storage.Owner, storage.Property, computedValue);
             }
         }
 
@@ -666,10 +671,10 @@ namespace CSHTML5.Internal
         {
             if (storage.BaseValueSourceInternal == BaseValueSourceInternal.LocalStyle)
             {
-                BindingExpression oldExpr = storage.IsExpressionFromStyle ? storage.LocalStyleValue as BindingExpression : null;
+                var oldExpr = storage.IsExpressionFromStyle ? storage.LocalStyleValue as Expression : null;
                 if (oldExpr != null)
                 {
-                    oldExpr.OnDetached(storage.Owner);
+                    oldExpr.OnDetach(storage.Owner, storage.Property);
                 }
             }
 
@@ -701,10 +706,10 @@ namespace CSHTML5.Internal
         {
             if (storage.BaseValueSourceInternal == BaseValueSourceInternal.ThemeStyle)
             {
-                BindingExpression oldExpr = storage.IsExpressionFromStyle ? storage.ThemeStyleValue as BindingExpression : null;
+                var oldExpr = storage.IsExpressionFromStyle ? storage.ThemeStyleValue as Expression : null;
                 if (oldExpr != null)
                 {
-                    oldExpr.OnDetached(storage.Owner);
+                    oldExpr.OnDetach(storage.Owner, storage.Property);
                 }
             }
 

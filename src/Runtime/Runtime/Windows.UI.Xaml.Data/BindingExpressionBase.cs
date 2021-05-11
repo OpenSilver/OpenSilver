@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,29 +11,16 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if WORKINPROGRESS
 
 #if MIGRATION
-namespace System.Windows
+namespace System.Windows.Data
 #else
-namespace Windows.UI.Xaml
+namespace Windows.UI.Xaml.Data
 #endif
 {
-	[OpenSilver.NotImplemented]
-    public partial class TemplateBindingExpression
+    public abstract class BindingExpressionBase : Expression
     {
-        internal TemplateBindingExpression()
-        {
-
-        }
+        internal BindingExpressionBase() { }
     }
 }
-
-#endif

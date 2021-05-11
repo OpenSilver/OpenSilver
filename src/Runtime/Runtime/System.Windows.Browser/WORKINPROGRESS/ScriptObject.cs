@@ -15,7 +15,6 @@
 
 using System.ComponentModel;
 using System.Dynamic;
-using System.Linq.Expressions;
 
 #if MIGRATION
 using System.Windows.Threading;
@@ -299,7 +298,7 @@ namespace System.Windows.Browser
         /// <returns>
         /// The <see cref="DynamicMetaObject"/> to bind this object.
         /// </returns>
-        DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression parameter)
+        DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(System.Linq.Expressions.Expression parameter)
         {
             return null;
         }

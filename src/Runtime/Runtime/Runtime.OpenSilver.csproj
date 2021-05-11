@@ -120,6 +120,8 @@
 		<Compile Include="Windows.UI.Xaml.Controls\CalendarExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DatePickerFormat.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Typography.cs" />
+		<Compile Include="Windows.UI.Xaml\Expression.cs" />
+		<Compile Include="Windows.UI.Xaml\TemplateBindingExtension.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontCapitals.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontStretches.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\NotificationWindow.cs" />
@@ -824,9 +826,8 @@
 		<Compile Include="Windows.UI.Xaml.Data\RelativeSource.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\RelativeSourceMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\StandardPropertyPathNode.cs" />
-		<Compile Include="Windows.UI.Xaml.Data\TemplateBinding.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\UpdateSourceTrigger.cs" />
-		<Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
+		<Compile Include="Windows.UI.Xaml.Data\BindingExpressionBase.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\CollectionViewSource.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\Bold.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\Hyperlink.cs" />
@@ -1075,7 +1076,7 @@
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\WindowStyle.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\OutOfBrowserSettings.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\WindowSettings.cs" />
-		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TemplateBindingExpression.cs" />
+		<Compile Include="Windows.UI.Xaml\TemplateBindingExpression.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\IDataObject.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\WindowState.cs" />

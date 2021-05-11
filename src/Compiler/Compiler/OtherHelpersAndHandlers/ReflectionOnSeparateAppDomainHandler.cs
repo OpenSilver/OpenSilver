@@ -1867,7 +1867,8 @@ namespace DotNetForHtml5.Compiler
                     if ((field = type.GetField(fieldName, lookup)) != null &&
                         (field.IsPublic || field.IsAssembly || field.IsFamilyOrAssembly))
                     {
-                        return field.Name;
+                        return string.IsNullOrWhiteSpace(field.DeclaringType.Namespace) ? string.Empty : $"{field.DeclaringType.Namespace}." +
+                               $"{GetTypeNameIncludingGenericArguments(field.DeclaringType)}.{field.Name}";
                     }
                 }
 

@@ -46,7 +46,7 @@ namespace System
         /// <summary>
         /// Initialize a new instance of the <see cref="ServiceProvider"/> class.
         /// </summary>
-        public ServiceProvider(object element, DependencyProperty property) : this(element, property, new List<object>())
+        public ServiceProvider(object element, DependencyProperty property) : this(element, property, new List<object>(0))
         {
         }
         

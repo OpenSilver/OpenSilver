@@ -163,17 +163,18 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\RichTextBox.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TextBlock.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WebView.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\BindingExpressionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Data\CollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\CollectionViewGroup.cs" />
     <Compile Include="Windows.UI.Xaml.Data\CollectionViewSource.cs" />
     <Compile Include="Windows.UI.Xaml.Data\DataExtensionMethods.cs" />
     <Compile Include="Windows.UI.Xaml.Data\EnumerableCollectionView.cs" />
+    <Compile Include="Windows.UI.Xaml\Expression.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IndexedEnumerable.cs" />
     <Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Toolkit\ItemsControlExtensions.cs" />
     <Compile Include="Windows.UI.Xaml.Data\ListCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\Binding.cs" />
-    <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Block.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\BlockCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
@@ -684,7 +685,6 @@
     <Compile Include="Windows.UI.Xaml.Data\RelativeSource.cs" />
     <Compile Include="Windows.UI.Xaml.Data\RelativeSourceMode.cs" />
     <Compile Include="Windows.UI.Xaml.Data\StandardPropertyPathNode.cs" />
-    <Compile Include="Windows.UI.Xaml.Data\TemplateBinding.cs" />
     <Compile Include="Windows.UI.Xaml.Data\UpdateSourceTrigger.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Bold.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Hyperlink.cs" />
@@ -883,6 +883,8 @@
     <Compile Include="Windows.UI.Xaml\ResourceDictionary.cs" />
     <Compile Include="Windows.UI.Xaml\ResourceDictionaryCollection.cs" />
     <Compile Include="Windows.UI.Xaml\ResourcesChangeInfo.cs" />
+    <Compile Include="Windows.UI.Xaml\TemplateBindingExpression.cs" />
+    <Compile Include="Windows.UI.Xaml\TemplateBindingExtension.cs" />
     <Compile Include="Windows.UI.Xaml\TextDecorationCollection.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEvent.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEventArgs.cs" />
@@ -935,7 +937,6 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\OutOfBrowserSettings.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TabletDeviceType.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\RoutedEventArgs.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TemplateBindingExpression.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerAction.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerActionCollection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerBase.cs" />

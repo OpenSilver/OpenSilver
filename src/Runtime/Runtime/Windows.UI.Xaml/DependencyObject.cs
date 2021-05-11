@@ -513,11 +513,11 @@ namespace Windows.UI.Xaml
 
         #region Binding related elements
 
-        internal void ApplyBindingExpression(DependencyProperty dp, BindingExpression expression)
+        internal void ApplyExpression(DependencyProperty dp, Expression expression, bool isInStyle)
         {
             INTERNAL_PropertyStorage storage;
             INTERNAL_PropertyStore.TryGetStorage(this, dp, true/*create*/, out storage);
-            INTERNAL_PropertyStore.RefreshBindingExpressionCommon(storage, expression); // Set LocalStyle if Binding is from style.
+            INTERNAL_PropertyStore.RefreshExpressionCommon(storage, expression, isInStyle); // Set LocalStyle if Binding is from style.
         }
 
         internal void INTERNAL_UpdateBindingsSource()
@@ -528,11 +528,11 @@ namespace Windows.UI.Xaml
             {
                 if (storage.IsExpression)
                 {
-                    ((BindingExpression)storage.LocalValue).OnSourceAvailable();
+                    (storage.LocalValue as BindingExpression)?.OnSourceAvailable();
                 }
                 else if (storage.IsExpressionFromStyle)
                 {
-                    ((BindingExpression)storage.ModifiedValue.BaseValue).OnSourceAvailable();
+                    (storage.ModifiedValue.BaseValue as BindingExpression)?.OnSourceAvailable();
                 }
             }
         }

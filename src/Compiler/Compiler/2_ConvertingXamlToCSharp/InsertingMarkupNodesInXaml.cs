@@ -224,15 +224,8 @@ namespace DotNetForHtml5.Compiler
                         currentSubAttributeWithoutUselessPart = currentSubAttributeWithoutUselessPart.Remove(0, indexOfCharacterAfterClassName).Trim();
                         currentSubAttributeWithoutUselessPart = currentSubAttributeWithoutUselessPart.Remove(currentSubAttributeWithoutUselessPart.Length - 1, 1); //to remove the '}' at the end
 
-                        //we replace {TemplateBinding ...} with {Binding ..., RelativeSource={RelativeSource TemplatedParent}}
-                        if (nextClassName == "TemplateBinding")
-                        {
-                            nextClassName = "Binding";
-                            currentSubAttributeWithoutUselessPart += ", RelativeSource={RelativeSource TemplatedParent}"; //we simply add it at the end because the order doesn't change anything.
-                        }
-
                         // We add the suffix "Extension" to the markup extension name (unless it is a Binding or RelativeSource). For example, "StaticResource" becomes "StaticResourceExtension":
-                        if (!nextClassName.EndsWith("Binding") && !nextClassName.EndsWith("RelativeSource") && !nextClassName.EndsWith("Extension"))
+                        if (nextClassName != "Binding" && nextClassName != "RelativeSource" && !nextClassName.EndsWith("Extension"))
                         {
                             // this is a trick, we need to check if :
                             // - type named 'MyCurrentMarkupExtensionName' exist.
