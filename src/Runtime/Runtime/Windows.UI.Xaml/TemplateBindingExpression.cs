@@ -61,7 +61,7 @@ namespace Windows.UI.Xaml
             }
 
             // Note: consider caching the default value as we should always have d == Target.
-            return SourceProperty.GetMetadata(d.GetType()).DefaultValue; 
+            return TargetProperty.GetMetadata(Target.GetType()).DefaultValue; 
         }
 
         internal override void OnAttach(DependencyObject d, DependencyProperty dp)
