@@ -546,10 +546,7 @@ namespace Windows.UI.Xaml.Controls
                     }
                     if (newChildren != null)
                     {
-                        foreach (object newChild in newChildren)
-                        {
-                            AddChild(newChild);
-                        }
+                        AddChildren(newChildren);
                     }
                 }
                 else
