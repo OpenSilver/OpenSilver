@@ -54,10 +54,17 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Content dependency property.
         /// </summary>
+#if WORKINPROGRESS
+        public static readonly DependencyProperty ContentProperty = DependencyProperty.Register("Content",
+                                                                                                typeof(object),
+                                                                                                typeof(ContentControl),
+                                                                                                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, OnContentPropertyChanged));
+#else
         public static readonly DependencyProperty ContentProperty = DependencyProperty.Register("Content",
                                                                                                 typeof(object),
                                                                                                 typeof(ContentControl),
                                                                                                 new PropertyMetadata(null, OnContentPropertyChanged));
+#endif
 
         /// <summary>
         /// Gets or sets the data template that is used to display the content of the
