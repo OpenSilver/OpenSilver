@@ -53,13 +53,6 @@
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
-                            <VisualStateGroup x:Name="SortStates">
-                                <VisualState x:Name="Unsorted" />
-                                <VisualState x:Name="SortAscending">
-                                </VisualState>
-                                <VisualState x:Name="SortDescending">
-                                </VisualState>
-                            </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <Grid Name="Root">
                             <Border x:Name="BackgroundRectangle" Background="#FF1F3B53" />
@@ -74,29 +67,26 @@
                                     </LinearGradientBrush>
                                 </Border.Background>
                             </Border>
-                            <!-- Temporary removing Margin="{TemplateBinding Padding}" -->
-                            <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
 
-                                <ContentPresenter Content="{TemplateBinding Content}"/>
+                            <Border HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                                <!--<Path Grid.Column="1" Name="SortIcon" Fill="#FF444444" RenderTransformOrigin=".5,.5" HorizontalAlignment="Left" VerticalAlignment="Center" Opacity="0" Stretch="Uniform" Width="8" Margin="4,0,0,0" Data="F1 M -5.215,6.099L 5.215,6.099L 0,0L -5.215,6.099 Z ">
-                                    <Path.RenderTransform>
-                                        <ScaleTransform ScaleX=".9" ScaleY=".9" />
-                                    </Path.RenderTransform>
-                                </Path>-->
-                            </Grid>
-                           
+                                    <ContentPresenter Content="{TemplateBinding Content}" Margin="{TemplateBinding Padding}" />
+
+                                    <Border Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="8" Margin="4,0,0,0" />
+                                </Grid>
+                            </Border>
                         </Grid>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
-        </Setter>        
+        </Setter>
     </Style>
-    
+
     <Style TargetType="DataGrid">
         <Setter Property="Template">
             <Setter.Value>

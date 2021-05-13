@@ -1091,9 +1091,6 @@ namespace Windows.UI.Xaml.Controls
                     _mainGrid.ColumnDefinitions.Add(columnDefinition);
                     DataGridColumnHeader columnHeader = column.GetHeader();
 
-                    columnHeader.HorizontalContentAlignment = HorizontalAlignment.Center;
-                    columnHeader.VerticalContentAlignment = VerticalAlignment.Center;
-                    columnHeader.FontWeight = FontWeights.Bold;
                     if (!double.IsNaN(ColumnHeaderHeight))
                     {
                         columnHeader.Height = ColumnHeaderHeight;
