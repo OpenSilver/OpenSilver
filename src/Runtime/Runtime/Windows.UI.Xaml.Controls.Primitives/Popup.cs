@@ -354,7 +354,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
 #if WORKINPROGRESS
         public static readonly DependencyProperty HorizontalOffsetProperty =
-            DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(Popup), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure, HorizontalOffset_Changed)
+            DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(Popup), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsArrange, HorizontalOffset_Changed)
 #else
         public static readonly DependencyProperty HorizontalOffsetProperty =
             DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(Popup), new PropertyMetadata(0d, HorizontalOffset_Changed)
@@ -386,7 +386,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
 #if WORKINPROGRESS
         public static readonly DependencyProperty VerticalOffsetProperty =
-            DependencyProperty.Register("VerticalOffset", typeof(double), typeof(Popup), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure, VerticalOffset_Changed)
+            DependencyProperty.Register("VerticalOffset", typeof(double), typeof(Popup), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsArrange, VerticalOffset_Changed)
 #else
         public static readonly DependencyProperty VerticalOffsetProperty =
             DependencyProperty.Register("VerticalOffset", typeof(double), typeof(Popup), new PropertyMetadata(0d, VerticalOffset_Changed)
@@ -680,6 +680,37 @@ namespace Windows.UI.Xaml.Controls.Primitives
         protected override Size MeasureOverride(Size availableSize)
         {
             return Size.Zero;
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            UIElement targetElement = this.PlacementTarget;
+
+            if (targetElement != null)
+            {
+                Point placementTargetPosition = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(targetElement);
+
+                //we get the size of the element:
+                Size elementCurrentSize;
+                if (targetElement is FrameworkElement)
+                {
+                    elementCurrentSize = ((FrameworkElement)targetElement).INTERNAL_GetActualWidthAndHeightUsinggetboudingClientRect();
+                }
+                else
+                {
+                    elementCurrentSize = new Size();
+                }
+
+                //We put the popup at the calculated position:
+                RefreshPopupPosition(placementTargetPosition, elementCurrentSize);
+            }
+
+            if (_popupRoot != null)
+            {
+                _popupRoot.InvalidateMeasure();
+                _popupRoot.InvalidateArrange();
+            }
+            return finalSize;
         }
 #endif
     }
