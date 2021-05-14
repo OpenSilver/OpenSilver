@@ -12,15 +12,9 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DotNetForHtml5.Core;
+
 #if MIGRATION
 using System.Windows.Shapes;
 #else
@@ -73,6 +67,7 @@ namespace Windows.UI.Xaml.Media
                                                         double xOffsetToApplyAfterMultiplication, 
                                                         double yOffsetToApplyAfterMultiplication, 
                                                         Size shapeActualSize);
+
         internal protected abstract void GetMinMaxXY(ref double minX, 
                                                      ref double maxX, 
                                                      ref double minY, 
@@ -88,10 +83,13 @@ namespace Windows.UI.Xaml.Media
             return PathGeometry.INTERNAL_ConvertFromString(pathAsString);
         }
 
-        public static readonly DependencyProperty TransformProperty = DependencyProperty.Register("Transform", 
-                                                                                                  typeof(Transform), 
-                                                                                                  typeof(Geometry), 
-                                                                                                  new PropertyMetadata(null, OnTransformPropertyChanged));
+        public static readonly DependencyProperty TransformProperty = 
+            DependencyProperty.Register(
+                nameof(Transform), 
+                typeof(Transform), 
+                typeof(Geometry), 
+                new PropertyMetadata(null, OnTransformPropertyChanged));
+        
         public Transform Transform
         {
             get { return (Transform)this.GetValue(TransformProperty); }

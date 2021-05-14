@@ -14,22 +14,18 @@
 
 
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
+
 #if MIGRATION
-using System.Windows;
 using System.Windows.Media;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Data;
 #else
-using Windows.UI.Xaml.Media;
 using Windows.UI.Text;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Input;
 #endif
 
@@ -111,31 +107,28 @@ namespace Windows.UI.Xaml.Controls
             get { return (Brush)GetValue(BackgroundProperty); }
             set { SetValue(BackgroundProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Background dependency property.
+        /// Identifies the <see cref="Control.Background"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BackgroundProperty =
-            DependencyProperty.Register("Background", typeof(Brush), typeof(Control), new PropertyMetadata(null
-#if REVAMPPOINTEREVENTS
-                , Background_Changed
-#endif
-                )
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(Background), typeof(Brush), 
+                typeof(Control), 
+                new PropertyMetadata(null, Background_Changed)
                 {
-                    return new CSSEquivalent()
+                    GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
                         Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
-                    };
-                },
-            });
+                    }
+                });
 
-#if REVAMPPOINTEREVENTS
         private static void Background_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+#if REVAMPPOINTEREVENTS
             INTERNAL_UpdateCssPointerEvents((Control)d);
-        }
 #endif
+        }
 
         internal bool INTERNAL_IsLegacyVisualStates
         {
@@ -157,20 +150,22 @@ namespace Windows.UI.Xaml.Controls
             get { return (Brush)GetValue(BorderBrushProperty); }
             set { SetValue(BorderBrushProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the BorderBrush dependency property.
+        /// Identifies the <see cref="Control.BorderBrush"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BorderBrushProperty =
-            DependencyProperty.Register("BorderBrush", typeof(Brush), typeof(Control), new PropertyMetadata(null)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(BorderBrush), 
+                typeof(Brush), 
+                typeof(Control), 
+                new PropertyMetadata((object)null)
                 {
-                    return new CSSEquivalent()
+                    GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
                         Name = new List<string> { "borderColor" },
-                    };
-                },
-            });
+                    }
+                });
 
         //-----------------------
         // BORDERTHICKNESS
@@ -183,27 +178,31 @@ namespace Windows.UI.Xaml.Controls
             get { return (Thickness)GetValue(BorderThicknessProperty); }
             set { SetValue(BorderThicknessProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the BorderThickness dependency property.
+        /// Identifies the <see cref="Control.BorderThickness"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BorderThicknessProperty =
-            DependencyProperty.Register("BorderThickness", 
-                                        typeof(Thickness), 
-                                        typeof(Control), 
-                                        new PropertyMetadata(new Thickness())
-                                        {
-                                            MethodToUpdateDom = BorderThickness_MethodToUpdateDom,
-                                        });
+            DependencyProperty.Register(
+                nameof(BorderThickness), 
+                typeof(Thickness), 
+                typeof(Control), 
+                new PropertyMetadata(new Thickness())
+                {
+                    MethodToUpdateDom = BorderThickness_MethodToUpdateDom,
+                });
 
-        static void BorderThickness_MethodToUpdateDom(DependencyObject d, object newValue)
+        private static void BorderThickness_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             var control = (Control)d;
-            if (!control.HasTemplate && newValue != null) //todo: check why sometimes this is null.
+            if (!control.HasTemplate)
             {
                 var newThickness = (Thickness)newValue;
                 dynamic domElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(control);
                 domElement.borderStyle = "solid"; //todo: see if we should put this somewhere else
-                domElement.borderWidth = newThickness.Top + "px " + newThickness.Right + "px " + newThickness.Bottom + "px " + newThickness.Left + "px ";
+                domElement.borderWidth = string.Format(CultureInfo.InvariantCulture,
+                    "{0}px {1}px {2}px {3}px",
+                    newThickness.Top, newThickness.Right, newThickness.Bottom, newThickness.Left);
             }
         }
 
@@ -219,33 +218,24 @@ namespace Windows.UI.Xaml.Controls
             get { return (FontWeight)GetValue(FontWeightProperty); }
             set { SetValue(FontWeightProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the FontWeight dependency property.
+        /// Identifies the <see cref="Control.FontWeight"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontWeightProperty =
-            DependencyProperty.Register("FontWeight", typeof(FontWeight), typeof(Control), new PropertyMetadata(FontWeights.Normal)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(FontWeight), 
+                typeof(FontWeight), 
+                typeof(Control), 
+                new PropertyMetadata(FontWeights.Normal)
                 {
-                    return new CSSEquivalent()
+                    GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
-                        Value = (inst, value) =>
-                        {
-                            if (value != null)
-                            {
-                                return ((FontWeight)value).Weight.ToString();
-                            }
-                            else
-                            {
-                                return "";
-                            }
-                        },
+                        Value = (inst, value) => ((FontWeight)value).Weight.ToInvariantString(),
                         Name = new List<string> { "fontWeight" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
-                    };
-                },
-            });
-
+                    }
+                });
 
         /// <summary>
         /// Gets or sets the style in which the text is rendered.
@@ -255,39 +245,30 @@ namespace Windows.UI.Xaml.Controls
             get { return (FontStyle)GetValue(FontStyleProperty); }
             set { SetValue(FontStyleProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the FontStyle dependency property.
+        /// Identifies the <see cref="Control.FontStyle"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontStyleProperty =
+            DependencyProperty.Register(
+                nameof(FontStyle),
+                typeof(FontStyle),
+                typeof(Control),
+                new PropertyMetadata(
 #if MIGRATION
-            DependencyProperty.Register("FontStyle", typeof(FontStyle), typeof(Control), new PropertyMetadata(FontStyles.Normal)
+                    FontStyles.Normal
 #else
-            DependencyProperty.Register("FontStyle", typeof(FontStyle), typeof(Control), new PropertyMetadata(FontStyle.Normal)
+                    FontStyle.Normal
 #endif
-            {
-                GetCSSEquivalent = (instance) =>
+                    )
                 {
-                    return new CSSEquivalent()
+                    GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
-                        Value = (inst, value) =>
-                        {
-                            if (value != null)
-                            {
-                                return ((FontStyle)value).ToString().ToLower();
-                            }
-                            else
-                            {
-                                return "";
-                            }
-                        },
+                        Value = (inst, value) => ((FontStyle)value).ToString().ToLower(),
                         Name = new List<string> { "fontStyle" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
-                    };
-                }
-            }
-            );
-
-
+                    }
+                });
 
         //-----------------------
         // FOREGROUND
@@ -301,22 +282,23 @@ namespace Windows.UI.Xaml.Controls
             get { return (Brush)GetValue(ForegroundProperty); }
             set { SetValue(ForegroundProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Foreground dependency property.
+        /// Identifies the <see cref="Control.Foreground"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ForegroundProperty =
-            DependencyProperty.Register("Foreground", typeof(Brush), typeof(Control), new PropertyMetadata(new SolidColorBrush(Colors.Black))
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(Foreground), 
+                typeof(Brush), 
+                typeof(Control), 
+                new PropertyMetadata(new SolidColorBrush(Colors.Black))
                 {
-                    return new CSSEquivalent()
+                    GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
                         Name = new List<string> { "color", "colorAlpha" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
-                    };
-                },
-            });
-
+                    }
+                });
 
         //-----------------------
         // FONTFAMILY
@@ -330,47 +312,26 @@ namespace Windows.UI.Xaml.Controls
             get { return (FontFamily)GetValue(FontFamilyProperty); }
             set { SetValue(FontFamilyProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the FontFamily dependency property.
+        /// Identifies the <see cref="Control.FontFamily"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontFamilyProperty =
-            DependencyProperty.Register("FontFamily", typeof(FontFamily), typeof(Control), new PropertyMetadata(null)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(FontFamily), 
+                typeof(FontFamily), 
+                typeof(Control), 
+                new PropertyMetadata((object)null)
                 {
-                    return new CSSEquivalent()
+                    GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
-                        Value = (inst, value) =>
-                        {
-                            if (value != null)
-                            {
-                                if (value is FontFamily)
-                                {
-                                    return INTERNAL_FontsHelper.LoadFont(((FontFamily)value).Source, (UIElement)instance);
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        return INTERNAL_FontsHelper.LoadFont(value.ToString(), (UIElement)instance);
-                                    }
-                                    catch
-                                    {
-                                        return "";
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                return "";
-                            }
-                        },
+                        Value = (inst, value) => (value is FontFamily) ?
+                            INTERNAL_FontsHelper.LoadFont(((FontFamily)value).Source, (UIElement)instance) :
+                            string.Empty,
                         Name = new List<string> { "fontFamily" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
-                    };
-                },
-            });
-
+                    }
+                });
 
         //-----------------------
         // FONTSIZE
@@ -384,21 +345,21 @@ namespace Windows.UI.Xaml.Controls
             get { return (double)GetValue(FontSizeProperty); }
             set { SetValue(FontSizeProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the FontSize dependency property.
+        /// Identifies the <see cref="Control.FontSize"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontSizeProperty =
-            DependencyProperty.Register("FontSize", typeof(double), typeof(Control), new PropertyMetadata(11d)
-            {
-                MethodToUpdateDom = (instance, newValue) =>
+            DependencyProperty.Register(
+                nameof(FontSize), 
+                typeof(double), 
+                typeof(Control), 
+                new PropertyMetadata(11d)
                 {
-                    // When the FontSize changes, we also want to set the "Line-Height" CSS property in order to get the exact same result as in Silverlight:
-                    var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification((UIElement)instance);
-                    domStyle.lineHeight = "125%";
-                },
-                GetCSSEquivalent = (instance) =>
-                {
-                    return new CSSEquivalent()
+                    MethodToUpdateDom = (instance, newValue) =>
+                        INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification((UIElement)instance).lineHeight = "125%",
+                    
+                    GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
                         Value = (inst, value) =>
                         {
@@ -411,14 +372,15 @@ namespace Windows.UI.Xaml.Controls
                                         value = value.GetType().GetProperty(p).GetValue(value)
                                     );
                             }
-#endif
-                            return (Math.Floor((double)value * 1000) / 1000).ToString() + "px"; // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most.
+
+#endif                      // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 
+                            // decimals at the most.
+                            return (Math.Floor((double)value * 1000) / 1000).ToInvariantString() + "px"; 
                         },
                         Name = new List<string> { "fontSize" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
-                    };
-                },
-            });
+                    },
+                });
 
         //-----------------------
         // TEXTDECORATION
@@ -435,7 +397,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the TextDecorations dependency property.
+        /// Identifies the <see cref="Control.TextDecorations"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty TextDecorationsProperty = 
             DependencyProperty.Register(
@@ -469,13 +431,14 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the TextDecorations dependency property.
         /// </summary>
         public static readonly DependencyProperty TextDecorationsProperty =
-            DependencyProperty.Register("TextDecorations", 
-                                        typeof(TextDecorations?), 
-                                        typeof(Control), 
-                                        new PropertyMetadata(null)
-                                        {
-                                            GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations,
-                                        });
+            DependencyProperty.Register(
+                nameof(TextDecorations), 
+                typeof(TextDecorations?), 
+                typeof(Control), 
+                new PropertyMetadata((object)null)
+                {
+                    GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations,
+                });
 
         internal static CSSEquivalent INTERNAL_GetCSSEquivalentForTextDecorations(DependencyObject instance)
         {
@@ -537,45 +500,41 @@ namespace Windows.UI.Xaml.Controls
             get { return (Thickness)GetValue(PaddingProperty); }
             set { SetValue(PaddingProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Padding dependency property.
+        /// Identifies the <see cref="Control.Padding"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty PaddingProperty =
-            DependencyProperty.Register("Padding", 
-                                        typeof(Thickness), 
-                                        typeof(Control), 
-                                        new PropertyMetadata(new Thickness()) 
-                                        { 
-                                            MethodToUpdateDom = Padding_MethodToUpdateDom,
-                                        });
+            DependencyProperty.Register(
+                nameof(Padding), 
+                typeof(Thickness), 
+                typeof(Control), 
+                new PropertyMetadata(new Thickness()) 
+                { 
+                    MethodToUpdateDom = Padding_MethodToUpdateDom,
+                });
+
         private static void Padding_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             var control = (Control)d;
-            if (!(control.INTERNAL_VisualParent is Canvas) && !control.HasTemplate) //if the parent is a canvas, we ignore this property and we want to ignore this property if there is a ControlTemplate on this control.
+            // if the parent is a canvas, we ignore this property and we want to ignore this
+            // property if there is a ControlTemplate on this control.
+            if (!(control.INTERNAL_VisualParent is Canvas) && !control.HasTemplate) 
             {
                 var innerDomElement = control.INTERNAL_InnerDomElement;
                 if (innerDomElement != null)
                 {
                     var styleOfInnerDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDomElement);
-                    Thickness newPadding;
-                    if (newValue != null)
-                        newPadding = (Thickness)newValue;
-                    else
-                        newPadding = new Thickness();
-                    if (newPadding == null) //if it is null, we want 0 everywhere
-                    {
-                        newPadding = new Thickness();
-                    }
-                    //todo: if the container has a padding, add it to the margin
+                    Thickness newPadding = (Thickness)newValue;
+                    
+                    // todo: if the container has a padding, add it to the margin
                     styleOfInnerDomElement.boxSizing = "border-box";
-                    styleOfInnerDomElement.paddingLeft = newPadding.Left + "px";
-                    styleOfInnerDomElement.paddingTop = newPadding.Top + "px";
-                    styleOfInnerDomElement.paddingRight = newPadding.Right + "px";
-                    styleOfInnerDomElement.paddingBottom = newPadding.Bottom + "px";
+                    styleOfInnerDomElement.padding = string.Format(CultureInfo.InvariantCulture,
+                        "{0}px {1}px {2}px {3}px",
+                        newPadding.Top, newPadding.Right, newPadding.Bottom, newPadding.Left);
                 }
             }
         }
-
 
         //-----------------------
         // HORIZONTALCONTENTALIGNMENT
@@ -591,14 +550,14 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the HorizontalContentAlignment dependency property.
+        /// Identifies the <see cref="Control.HorizontalContentAlignment"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty HorizontalContentAlignmentProperty =
-            DependencyProperty.Register("HorizontalContentAlignment", 
-                                        typeof(HorizontalAlignment), 
-                                        typeof(Control), 
-                                        new PropertyMetadata(HorizontalAlignment.Center));
-
+            DependencyProperty.Register(
+                nameof(HorizontalContentAlignment), 
+                typeof(HorizontalAlignment), 
+                typeof(Control), 
+                new PropertyMetadata(HorizontalAlignment.Center));
 
         //-----------------------
         // VERTICALCONTENTALIGNMENT
@@ -614,14 +573,14 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the VerticalContentAlignment dependency property.
+        /// Identifies the <see cref="Control.VerticalContentAlignment"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty VerticalContentAlignmentProperty =
-            DependencyProperty.Register("VerticalContentAlignment", 
-                                        typeof(VerticalAlignment), 
-                                        typeof(Control), 
-                                        new PropertyMetadata(VerticalAlignment.Center));
-
+            DependencyProperty.Register(
+                nameof(VerticalContentAlignment), 
+                typeof(VerticalAlignment), 
+                typeof(Control), 
+                new PropertyMetadata(VerticalAlignment.Center));
 
         //-----------------------
         // TABINDEX
@@ -637,16 +596,21 @@ namespace Windows.UI.Xaml.Controls
             get { return (int)GetValue(TabIndexProperty); }
             set { SetValue(TabIndexProperty, value); }
         }
-        public static readonly DependencyProperty TabIndexProperty =
-            DependencyProperty.Register("TabIndex", 
-                                        typeof(int), 
-                                        typeof(Control), 
-                                        new PropertyMetadata(int.MaxValue)
-                                        {
-                                            MethodToUpdateDom = TabIndexProperty_MethodToUpdateDom,
-                                        });
 
-        const int TABINDEX_BROWSER_MAX_VALUE = 32767;
+        /// <summary>
+        /// Identifies the <see cref="Control.TabIndex"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TabIndexProperty =
+            DependencyProperty.Register(
+                nameof(TabIndex), 
+                typeof(int), 
+                typeof(Control), 
+                new PropertyMetadata(int.MaxValue)
+                {
+                    MethodToUpdateDom = TabIndexProperty_MethodToUpdateDom,
+                });
+
+        private const int TABINDEX_BROWSER_MAX_VALUE = 32767;
 
         internal virtual bool INTERNAL_GetFocusInBrowser
         {
@@ -717,17 +681,19 @@ namespace Windows.UI.Xaml.Controls
             get { return (bool)GetValue(IsTabStopProperty); }
             set { SetValue(IsTabStopProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Control.IsTabStop dependency property.
+        /// Identifies the <see cref="Control.IsTabStop"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty IsTabStopProperty =
-            DependencyProperty.Register("IsTabStop",    
-                                        typeof(bool), 
-                                        typeof(Control), 
-                                        new PropertyMetadata(true)
-                                        {
-                                            MethodToUpdateDom = TabStopProperty_MethodToUpdateDom,
-                                        });
+            DependencyProperty.Register(
+                nameof(IsTabStop),    
+                typeof(bool), 
+                typeof(Control), 
+                new PropertyMetadata(true)
+                {
+                    MethodToUpdateDom = TabStopProperty_MethodToUpdateDom,
+                });
 
         //-----------------------
         // TEMPLATE
@@ -747,14 +713,16 @@ namespace Windows.UI.Xaml.Controls
             get { return (ControlTemplate)GetValue(TemplateProperty); }
             set { SetValue(TemplateProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Template dependency property.
+        /// Identifies the <see cref="Control.Template"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty TemplateProperty =
-            DependencyProperty.Register("Template", 
-                                        typeof(ControlTemplate), 
-                                        typeof(Control), 
-                                        new PropertyMetadata(null, OnTemplateChanged));
+            DependencyProperty.Register(
+                nameof(Template), 
+                typeof(ControlTemplate), 
+                typeof(Control), 
+                new PropertyMetadata(null, OnTemplateChanged));
 
         private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -857,8 +825,8 @@ namespace Windows.UI.Xaml.Controls
             this.OnApplyTemplate();
         }
 
-
 #region ---------- INameScope implementation ----------
+
         //note: copy from UserControl
         Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
 
@@ -905,7 +873,6 @@ namespace Windows.UI.Xaml.Controls
             _nameScopeDictionary.Clear();
         }
 
-
 #endregion
 
         //-----------------------
@@ -941,7 +908,6 @@ namespace Windows.UI.Xaml.Controls
             set { _useSystemFocusVisuals = value; } //todo: change the element in the visual tree?
         }
 
-
         private INTERNAL_VisualStateGroupCollection _visualStateGroups;
         public INTERNAL_VisualStateGroupCollection INTERNAL_GetVisualStateGroups()
         {
@@ -959,7 +925,6 @@ namespace Windows.UI.Xaml.Controls
             return INTERNAL_GetVisualStateGroups();
         }
 #endif
-
 
 #if MIGRATION
         public override void OnApplyTemplate()
@@ -1030,7 +995,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-
         bool _isFocused = false;
         void Control_LostFocus(object sender, RoutedEventArgs e)
         {
@@ -1056,7 +1020,6 @@ void Control_PointerEntered(object sender, Input.PointerRoutedEventArgs e)
             _isPointerOver = true;
             UpdateVisualStates();
         }
-
 
 #if MIGRATION
         void Control_MouseLeave(object sender, Input.MouseEventArgs e)
@@ -1192,10 +1155,11 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TabNavigationProperty = 
-            DependencyProperty.Register("TabNavigation", 
-                                        typeof(KeyboardNavigationMode), 
-                                        typeof(Control), 
-                                        new PropertyMetadata(KeyboardNavigationMode.Local));
+            DependencyProperty.Register(
+                nameof(TabNavigation), 
+                typeof(KeyboardNavigationMode), 
+                typeof(Control), 
+                new PropertyMetadata(KeyboardNavigationMode.Local));
 
         [OpenSilver.NotImplemented]
         public KeyboardNavigationMode TabNavigation
@@ -1206,10 +1170,11 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FontStretchProperty = 
-            DependencyProperty.Register("FontStretch", 
-                                        typeof(FontStretch), 
-                                        typeof(Control), 
-                                        new PropertyMetadata(new FontStretch()));
+            DependencyProperty.Register(
+                nameof(FontStretch), 
+                typeof(FontStretch), 
+                typeof(Control), 
+                new PropertyMetadata(new FontStretch()));
 
         /// <summary>
         ///     The stretch of the desired font.

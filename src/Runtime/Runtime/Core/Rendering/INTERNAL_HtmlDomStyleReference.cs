@@ -123,6 +123,7 @@ namespace CSHTML5.Internal
         public string borderBottomRightRadius { set { SetStylePropertyValue("borderBottomRightRadius", value); } }
         public string borderCollapse { set { SetStylePropertyValue("borderCollapse", value); } }
         public string borderColor { set { SetStylePropertyValue("borderColor", value); } }
+        public string borderRadius { set { SetStylePropertyValue("borderRadius", value); } }
         public string borderSpacing { set { SetStylePropertyValue("borderSpacing", value); } }
         public string borderStyle { set { SetStylePropertyValue("borderStyle", value); } }
         public string borderTopLeftRadius { set { SetStylePropertyValue("borderTopLeftRadius", value); } }

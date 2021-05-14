@@ -12,16 +12,10 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Markup;
+
 #if MIGRATION
 using System.Windows.Shapes;
 #else
@@ -45,7 +39,7 @@ namespace Windows.UI.Xaml.Media
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the System.Windows.Media.PathGeometry class.
+        /// Initializes a new instance of the <see cref="PathGeometry"/> class.
         /// </summary>
         public PathGeometry()
         {
@@ -53,7 +47,7 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Initializes a new instance of the System.Windows.Media.PathGeometry class.
+        /// Initializes a new instance of the <see cref="PathGeometry"/> class.
         /// </summary>
         /// <param name="figures">A collection of figures</param>
         public PathGeometry(IEnumerable<PathFigure> figures)
@@ -93,11 +87,17 @@ namespace Windows.UI.Xaml.Media
             }
             set { SetValue(FiguresProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Figures dependency property.
+        /// Identifies the <see cref="PathGeometry.Figures"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty FiguresProperty =
-            DependencyProperty.Register("Figures", typeof(PathFigureCollection), typeof(PathGeometry), new PropertyMetadata(null, Figures_Changed));
+            DependencyProperty.Register(
+                nameof(Figures), 
+                typeof(PathFigureCollection), 
+                typeof(PathGeometry), 
+                new PropertyMetadata(null, Figures_Changed));
 
         private static void Figures_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -128,10 +128,15 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the FillRule dependency property.
+        /// Identifies the <see cref="PathGeometry.FillRule"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty FillRuleProperty =
-            DependencyProperty.Register("FillRule", typeof(FillRule), typeof(PathGeometry), new PropertyMetadata(FillRule.EvenOdd, FillRule_Changed));
+            DependencyProperty.Register(
+                nameof(FillRule), 
+                typeof(FillRule), 
+                typeof(PathGeometry), 
+                new PropertyMetadata(FillRule.EvenOdd, FillRule_Changed));
 
         private static void FillRule_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

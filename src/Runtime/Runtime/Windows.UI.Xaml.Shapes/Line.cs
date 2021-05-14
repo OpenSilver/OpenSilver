@@ -12,13 +12,9 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if MIGRATION
 using System.Windows.Media;
 #else
@@ -53,88 +49,104 @@ namespace Windows.UI.Xaml.Shapes
         //    ScheduleRedraw();
         //}
 
-        // Returns:
-        //     The x-coordinate for the start point of the line, in pixels. The default
-        //     is 0.
         /// <summary>
         /// Gets or sets the x-coordinate of the Line start point.
+        /// The default is 0.
         /// </summary>
         public double X1
         {
             get { return (double)GetValue(X1Property); }
             set { SetValue(X1Property, value); }
         }
+
         /// <summary>
-        /// Identifies the X1 dependency property.
+        /// Identifies the <see cref="Line.X1"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty X1Property =
-            DependencyProperty.Register("X1", typeof(double), typeof(Line), new PropertyMetadata(0d, X1_Changed));
+            DependencyProperty.Register(
+                nameof(X1), 
+                typeof(double), 
+                typeof(Line), 
+                new PropertyMetadata(0d, X1_Changed));
+
         private static void X1_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Line line = (Line)d;
             line.ScheduleRedraw();
         }
 
-        // Returns:
-        //     The x-coordinate for the end point of the line, in pixels. The default is
-        //     0.
         /// <summary>
         /// Gets or sets the x-coordinate of the Line end point.
+        /// The default is 0.
         /// </summary>
         public double X2
         {
             get { return (double)GetValue(X2Property); }
             set { SetValue(X2Property, value); }
         }
+
         /// <summary>
-        /// Identifies the X2 dependency property.
+        /// Identifies the <see cref="Line.X2"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty X2Property =
-            DependencyProperty.Register("X2", typeof(double), typeof(Line), new PropertyMetadata(0d, X2_Changed));
+            DependencyProperty.Register(
+                nameof(X2), 
+                typeof(double), 
+                typeof(Line), 
+                new PropertyMetadata(0d, X2_Changed));
+
         private static void X2_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Line line = (Line)d;
             line.ScheduleRedraw();
         }
 
-        // Returns:
-        //     The y-coordinate for the start point of the line, in pixels. The default
-        //     is 0.
         /// <summary>
         /// Gets or sets the y-coordinate of the Line start point.
+        /// The default is 0.
         /// </summary>
         public double Y1
         {
             get { return (double)GetValue(Y1Property); }
             set { SetValue(Y1Property, value); }
         }
+
         /// <summary>
-        /// Identifies the Y1 dependency property.
+        /// Identifies the <see cref="Line.Y1"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty Y1Property =
-            DependencyProperty.Register("Y1", typeof(double), typeof(Line), new PropertyMetadata(0d, Y1_Changed));
+            DependencyProperty.Register(
+                nameof(Y1), 
+                typeof(double), 
+                typeof(Line), 
+                new PropertyMetadata(0d, Y1_Changed));
+
         private static void Y1_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Line line = (Line)d;
             line.ScheduleRedraw();
         }
 
-        // Returns:
-        //     The y-coordinate for the end point of the line, in pixels. The default is
-        //     0.
         /// <summary>
         /// Gets or sets the y-coordinate of the Line end point.
+        /// The default is 0.
         /// </summary>
         public double Y2
         {
             get { return (double)GetValue(Y2Property); }
             set { SetValue(Y2Property, value); }
         }
+
         /// <summary>
-        /// Identifies the Y2 dependency property.
+        /// Identifies the <see cref="Line.Y2"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty Y2Property =
-            DependencyProperty.Register("Y2", typeof(double), typeof(Line), new PropertyMetadata(0d, Y2_Changed));
+            DependencyProperty.Register(
+                nameof(Y2), 
+                typeof(double), 
+                typeof(Line), 
+                new PropertyMetadata(0d, Y2_Changed));
+
         private static void Y2_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Line line = (Line)d;
@@ -261,7 +273,7 @@ if ($0.setLineDash)
                     CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.strokeStyle = $1", context, strokeValue);
 
                 //context.strokeStyle = strokeAsString; //set the shape's lines color
-                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.lineWidth= $1", context, StrokeThickness.ToString());
+                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.lineWidth= $1", context, StrokeThickness);
                 //context.lineWidth = StrokeThickness.ToString();
                 if (Stroke != null && StrokeThickness > 0)
                 {
@@ -270,6 +282,5 @@ if ($0.setLineDash)
                 }
             }
         }
-
     }
 }

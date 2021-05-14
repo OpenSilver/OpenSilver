@@ -12,21 +12,14 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-using CSHTML5;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media.Effects;
+
 #if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -38,7 +31,6 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.Foundation;
-using Windows.System;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 #endif
@@ -148,21 +140,26 @@ namespace Windows.UI.Xaml
             set { SetValue(ClipToBoundsProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="UIElement.ClipToBounds"/> dependency
+        /// property.
+        /// </summary>
         public static readonly DependencyProperty ClipToBoundsProperty =
-            DependencyProperty.Register("ClipToBounds",
-                                        typeof(bool),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(false)
-                                        {
-                                            MethodToUpdateDom = ClipToBounds_MethodToUpdateDom,
-                                        });
+            DependencyProperty.Register(
+                nameof(ClipToBounds),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(false)
+                {
+                    MethodToUpdateDom = ClipToBounds_MethodToUpdateDom,
+                });
 
         private static void ClipToBounds_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             //todo: doesn't work with vertical overflow if the display is table or table-cell
             UIElement uiElement = (UIElement)d;
-            dynamic outerDomElement = uiElement.INTERNAL_OuterDomElement;
-            dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
+            var outerDomElement = uiElement.INTERNAL_OuterDomElement;
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
             if ((bool)newValue)
             {
                 style.overflow = "hidden"; //todo: ? if this is a ScrollViewer do not do anything?
@@ -231,14 +228,19 @@ namespace Windows.UI.Xaml
             set { SetValue(EffectProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="UIElement.Effect"/> dependency
+        /// property.
+        /// </summary>
         public static readonly DependencyProperty EffectProperty =
-            DependencyProperty.Register("Effect",
-                                        typeof(Effect),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(null, Effect_Changed)
-                                        {
-                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                                        });
+            DependencyProperty.Register(
+                nameof(Effect),
+                typeof(Effect),
+                typeof(UIElement),
+                new PropertyMetadata(null, Effect_Changed)
+                {
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                });
 
         private static void Effect_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -270,16 +272,18 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the RenderTransform dependency property.
+        /// Identifies the <see cref="UIElement.RenderTransform"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty RenderTransformProperty =
-            DependencyProperty.Register("RenderTransform",
-                                        typeof(Transform),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(null, RenderTransform_Changed)
-                                        {
-                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                                        });
+            DependencyProperty.Register(
+                nameof(RenderTransform),
+                typeof(Transform),
+                typeof(UIElement),
+                new PropertyMetadata(null, RenderTransform_Changed)
+                {
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                });
 
         private static void RenderTransform_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -303,7 +307,7 @@ namespace Windows.UI.Xaml
                 }
                 else
                 {
-                    dynamic domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(uiElement);
+                    var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(uiElement);
 
                     try
                     {
@@ -337,37 +341,36 @@ namespace Windows.UI.Xaml
             set { SetValue(RenderTransformOriginProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="UIElement.RenderTransformOrigin"/>
+        /// dependency property.
+        /// </summary>
         public static readonly DependencyProperty RenderTransformOriginProperty =
-            DependencyProperty.Register("RenderTransformOrigin",
-                                        typeof(Point),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(new Point(0d, 0d), RenderTransformOrigin_Changed)
-                                        {
-                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                                        });
+            DependencyProperty.Register(
+                nameof(RenderTransformOrigin),
+                typeof(Point),
+                typeof(UIElement),
+                new PropertyMetadata(new Point(0d, 0d), RenderTransformOrigin_Changed)
+                {
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                });
 
         private static void RenderTransformOrigin_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var uiElement = (UIElement)d;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
             {
-                Point newValue;
-                if (e.NewValue is Point)
-                {
-                    newValue = (Point)e.NewValue;
-                }
-                else
-                {
-                    newValue = new Point(0d, 0d);
-                }
-                ApplyRenderTransformOrigin(uiElement, newValue);
+                ApplyRenderTransformOrigin(uiElement, (Point)e.NewValue);
             }
         }
 
-        static void ApplyRenderTransformOrigin(UIElement uiElement, Point newValue)
+        private static void ApplyRenderTransformOrigin(UIElement uiElement, Point newValue)
         {
-            dynamic domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(uiElement);
-            string transformOriginValue = (newValue.X * 100).ToString() + "% " + (newValue.Y * 100).ToString() + "%"; //todo: make sure that "ToString" is culture-independent (so we use dot instead of comma for decimal separator).
+            var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(uiElement);
+            string transformOriginValue = string.Format(CultureInfo.InvariantCulture,
+                "{0}% {1}%", 
+                newValue.X * 100, newValue.Y * 100);
+
             try
             {
                 domStyle.transformOrigin = transformOriginValue;
@@ -408,13 +411,15 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the UseLayoutRounding dependency property.
+        /// Identifies the <see cref="UIElement.UseLayoutRounding"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty UseLayoutRoundingProperty =
-            DependencyProperty.Register("UseLayoutRounding",
-                                        typeof(bool),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(false));
+            DependencyProperty.Register(
+                nameof(UseLayoutRounding),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(false));
 
         //-------------------------------------------------------------------
         // NOTE: The "UseLayoutRounding" is currently not supported, but we 
@@ -438,17 +443,19 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the Visibility dependency property.
+        /// Identifies the <see cref="UIElement.Visibility"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty VisibilityProperty =
-            DependencyProperty.Register("Visibility",
-                                        typeof(Visibility),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(Visibility.Visible, Visibility_Changed));
+            DependencyProperty.Register(
+                nameof(Visibility),
+                typeof(Visibility),
+                typeof(UIElement),
+                new PropertyMetadata(Visibility.Visible, Visibility_Changed));
 
-        string _previousValueOfDisplayCssProperty = "block";
+        private string _previousValueOfDisplayCssProperty = "block";
 
-        static void Visibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void Visibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var uiElement = (UIElement)d;
             Visibility newValue = (Visibility)e.NewValue;
@@ -483,7 +490,7 @@ namespace Windows.UI.Xaml
                     mostOuterDomElement = ((UIElement)uiElement.INTERNAL_VisualParent).INTERNAL_VisualChildrenInformation[uiElement].INTERNAL_OptionalChildWrapper_OuterDomElement; // Note: this is useful for example inside a Grid, where we want to hide the whole child wrapper in order to ensure that it doesn't capture mouse clicks thus preventing users from clicking on other elements in the Grid.
                 if (mostOuterDomElement == null)
                     mostOuterDomElement = uiElement.INTERNAL_AdditionalOutsideDivForMargins ?? uiElement.INTERNAL_OuterDomElement;
-                dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(mostOuterDomElement);
+                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(mostOuterDomElement);
 
                 // Apply the visibility:
                 if (newValue == Visibility.Collapsed)
@@ -526,13 +533,15 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the IsVisible dependency property.
+        /// Identifies the <see cref="UIElement.IsVisible"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty IsVisibleProperty =
-            DependencyProperty.Register("IsVisible",
-                                        typeof(bool),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(true, OnIsVisiblePropertyChanged, CoerceIsVisibleProperty));
+            DependencyProperty.Register(
+                nameof(IsVisible),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(true, OnIsVisiblePropertyChanged, CoerceIsVisibleProperty));
 
         private static void OnIsVisiblePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -604,21 +613,24 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the Opacity dependency property.
+        /// Identifies the <see cref="UIElement.Opacity"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty OpacityProperty =
-            DependencyProperty.Register("Opacity", typeof(double), typeof(UIElement), new PropertyMetadata(1.0)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(Opacity), 
+                typeof(double), 
+                typeof(UIElement), 
+                new PropertyMetadata(1.0)
                 {
-                    return new CSSEquivalent()
+                    GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
-                        Value = (inst, value) => { return (Math.Floor(Convert.ToDouble(value) * 1000) / 1000).ToString(); }, // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most.
+                        // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most.
+                        Value = (inst, value) => (Math.Floor(Convert.ToDouble(value) * 1000) / 1000).ToInvariantString(),
                         Name = new List<string> { "opacity" },
                         ApplyAlsoWhenThereIsAControlTemplate = true,
-                    };
-                },
-            });
+                    }
+                });
 
         #endregion
 
@@ -633,17 +645,20 @@ namespace Windows.UI.Xaml
             get { return (bool)GetValue(IsHitTestVisibleProperty); }
             set { SetValue(IsHitTestVisibleProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the IsHitTestVisible property.
+        /// Identifies the <see cref="UIElement.IsHitTestVisible"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty IsHitTestVisibleProperty =
-            DependencyProperty.Register("IsHitTestVisible",
-                                        typeof(bool),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(true, OnIsHitTestVisiblePropertyChanged, CoerceIsHitTestVisibleProperty)
-                                        {
-                                            MethodToUpdateDom = IsHitTestVisible_MethodToUpdateDom,
-                                        });
+            DependencyProperty.Register(
+                nameof(IsHitTestVisible),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(true, OnIsHitTestVisiblePropertyChanged, CoerceIsHitTestVisibleProperty)
+                {
+                    MethodToUpdateDom = IsHitTestVisible_MethodToUpdateDom,
+                });
 
         private static void OnIsHitTestVisiblePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -667,7 +682,6 @@ namespace Windows.UI.Xaml
         private static object CoerceIsHitTestVisibleProperty(DependencyObject d, object baseValue)
         {
             UIElement @this = (UIElement)d;
-
 
             if (!(baseValue is bool)) //todo: this is a temporary workaround - cf. comment in "CoerceIsEnabledProperty"
                 return true;
@@ -717,15 +731,8 @@ namespace Windows.UI.Xaml
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
-                dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
-                if (element.INTERNAL_ArePointerEventsEnabled)
-                {
-                    style.pointerEvents = "auto";
-                }
-                else
-                {
-                    style.pointerEvents = "none";
-                }
+                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
+                style.pointerEvents = element.INTERNAL_ArePointerEventsEnabled ? "auto" : "none";
             }
         }
 #else
@@ -778,13 +785,15 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the AllowDrop dependency property.
+        /// Identifies the <see cref="UIElement.AllowDrop"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty AllowDropProperty =
-            DependencyProperty.Register("AllowDrop",
-                                        typeof(bool),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(false));
+            DependencyProperty.Register(
+                nameof(AllowDrop),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(false));
 
         #endregion
 
@@ -793,11 +802,8 @@ namespace Windows.UI.Xaml
             // Used to update the DOM structure (for example, in case of a grid, we need to (re)create the rows and columns where to place the child elements).
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("true")]
-
-#else
-        [Template("true")]
+#if BRIDGE
+        [Bridge.Template("true")]
 #endif
         private static bool IsRunningInJavaScript() //must be static for Bridge "Template" to work properly
         {
@@ -885,7 +891,7 @@ namespace Windows.UI.Xaml
     }
 ", element);
 #else
-                    Script.Write(@"
+                    Bridge.Script.Write(@"
      document.onmouseup = function(e) {
         if(e.doNotReroute == undefined)
         {
@@ -1094,7 +1100,7 @@ namespace Windows.UI.Xaml
  document.ondblclick = null;
 ");
 #else
-                    Script.Write(@"
+                    Bridge.Script.Write(@"
  document.onmousedown = null;
  document.onmouseup = null;
  document.onmouseover = null;
@@ -1174,30 +1180,31 @@ namespace Windows.UI.Xaml
             get { return (bool)GetValue(AllowScrollOnTouchMoveProperty); }
             set { SetValue(AllowScrollOnTouchMoveProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the AllowScrollOnTouchMove dependency property.
+        /// Identifies the <see cref="UIElement.AllowScrollOnTouchMove"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty AllowScrollOnTouchMoveProperty =
-            DependencyProperty.Register("AllowScrollOnTouchMove", typeof(bool), typeof(UIElement), new PropertyMetadata(true, AllowScrollOnTouchMove_Changed)
-            {
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            });
+            DependencyProperty.Register(
+                nameof(AllowScrollOnTouchMove), 
+                typeof(bool), 
+                typeof(UIElement), 
+                new PropertyMetadata(true, AllowScrollOnTouchMove_Changed)
+                {
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                });
 
         private static void AllowScrollOnTouchMove_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement element = (UIElement)d;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
-                string value;
-                if ((bool)e.NewValue)
-                {
-                    value = "auto";
-                }
-                else
-                {
-                    value = "none"; // Note: "none" disables scrolling, pinching and other gestures. It is supposed to not have any effect on the "TouchStart", "TouchMove", and "TouchEnd" events.
-                }
-                CSHTML5.Interop.ExecuteJavaScript("$0.style.touchAction = $1", element.INTERNAL_OuterDomElement, value);
+                // Note: "none" disables scrolling, pinching and other gestures.
+                // It is supposed to not have any effect on the "TouchStart",
+                // "TouchMove", and "TouchEnd" events.
+                CSHTML5.Interop.ExecuteJavaScript("$0.style.touchAction = $1",
+                    element.INTERNAL_OuterDomElement, (bool)e.NewValue ? "auto" : "none");
             }
         }
 

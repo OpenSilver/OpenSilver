@@ -12,14 +12,10 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
+
 #if MIGRATION
 using System.Windows.Shapes;
 #else
@@ -72,10 +68,15 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the Points dependency property.
+        /// Identifies the <see cref="PolyBezierSegment.Points"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty PointsProperty =
-            DependencyProperty.Register("Points", typeof(PointCollection), typeof(PolyBezierSegment), new PropertyMetadata(null, Points_Changed));
+            DependencyProperty.Register(
+                nameof(Points), 
+                typeof(PointCollection), 
+                typeof(PolyBezierSegment), 
+                new PropertyMetadata(null, Points_Changed));
 
         private static void Points_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -106,7 +107,7 @@ namespace Windows.UI.Xaml.Media
                                                object canvasDomElement,
                                                Point previousLastPoint)
         {
-            dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
             int i = 0;
             Point lastPoint = previousLastPoint;
             while (i < Points.Count - 2)

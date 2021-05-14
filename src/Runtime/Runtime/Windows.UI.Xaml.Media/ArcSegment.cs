@@ -12,13 +12,10 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -82,10 +79,15 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the IsLargeArc dependency property.
+        /// Identifies the <see cref="ArcSegment.IsLargeArc"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty IsLargeArcProperty =
-            DependencyProperty.Register("IsLargeArc", typeof(bool), typeof(ArcSegment), new PropertyMetadata(false, IsLargeArc_Changed));
+            DependencyProperty.Register(
+                nameof(IsLargeArc), 
+                typeof(bool), 
+                typeof(ArcSegment), 
+                new PropertyMetadata(false, IsLargeArc_Changed));
 
         private static void IsLargeArc_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -109,11 +111,17 @@ namespace Windows.UI.Xaml.Media
             get { return (Point)GetValue(PointProperty); }
             set { SetValue(PointProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Point dependency property.
+        /// Identifies the <see cref="ArcSegment.Point"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty PointProperty =
-            DependencyProperty.Register("Point", typeof(Point), typeof(ArcSegment), new PropertyMetadata(new Point(), Point_Changed));
+            DependencyProperty.Register(
+                nameof(Point), 
+                typeof(Point), 
+                typeof(ArcSegment), 
+                new PropertyMetadata(new Point(), Point_Changed));
 
         private static void Point_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -137,10 +145,15 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the RotationAngle dependency property.
+        /// Identifies the <see cref="ArcSegment.RotationAngle"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty RotationAngleProperty =
-            DependencyProperty.Register("RotationAngle", typeof(double), typeof(ArcSegment), new PropertyMetadata(0d, RotationAngle_Changed));
+            DependencyProperty.Register(
+                nameof(RotationAngle), 
+                typeof(double), 
+                typeof(ArcSegment), 
+                new PropertyMetadata(0d, RotationAngle_Changed));
 
         private static void RotationAngle_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -168,10 +181,15 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the Size dependency property.
+        /// Identifies the <see cref="ArcSegment.Size"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty SizeProperty =
-            DependencyProperty.Register("Size", typeof(Size), typeof(ArcSegment), new PropertyMetadata(new Size(), Size_Changed));
+            DependencyProperty.Register(
+                nameof(Size), 
+                typeof(Size), 
+                typeof(ArcSegment), 
+                new PropertyMetadata(new Size(), Size_Changed));
 
         private static void Size_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -195,10 +213,15 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the SweepDirection dependency property.
+        /// Identifies the <see cref="ArcSegment.SweepDirection"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty SweepDirectionProperty =
-            DependencyProperty.Register("SweepDirection", typeof(SweepDirection), typeof(ArcSegment), new PropertyMetadata(SweepDirection.Counterclockwise, SweepDirection_Changed));
+            DependencyProperty.Register(
+                nameof(SweepDirection), 
+                typeof(SweepDirection), 
+                typeof(ArcSegment), 
+                new PropertyMetadata(SweepDirection.Counterclockwise, SweepDirection_Changed));
 
         private static void SweepDirection_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -255,7 +278,7 @@ namespace Windows.UI.Xaml.Media
             UpdateArcData();
 
 
-            dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
             context.save(); // save state
             context.translate(xOffsetToApplyBeforeMultiplication * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
                               yOffsetToApplyBeforeMultiplication * verticalMultiplicator + yOffsetToApplyAfterMultiplication);

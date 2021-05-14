@@ -12,13 +12,9 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -59,10 +55,15 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the Point dependency property.
+        /// Identifies the <see cref="LineSegment.Point"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty PointProperty =
-            DependencyProperty.Register("Point", typeof(Point), typeof(LineSegment), new PropertyMetadata(new Point(), Point_Changed));
+            DependencyProperty.Register(
+                nameof(Point), 
+                typeof(Point), 
+                typeof(LineSegment), 
+                new PropertyMetadata(new Point(), Point_Changed));
 
         private static void Point_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -86,7 +87,7 @@ namespace Windows.UI.Xaml.Media
                                                object canvasDomElement, 
                                                Point previousLastPoint)
         {
-            dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
             // tell the context that there should be a line from the starting point to this point
             //context.lineTo((Point.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 

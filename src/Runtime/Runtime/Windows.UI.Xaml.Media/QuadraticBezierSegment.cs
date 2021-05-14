@@ -12,13 +12,9 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -58,10 +54,15 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the Point1 dependency property.
+        /// Identifies the <see cref="QuadraticBezierSegment.Point1"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty Point1Property =
-            DependencyProperty.Register("Point1", typeof(Point), typeof(QuadraticBezierSegment), new PropertyMetadata(new Point(), Point1_Changed));
+            DependencyProperty.Register(
+                nameof(Point1), 
+                typeof(Point), 
+                typeof(QuadraticBezierSegment), 
+                new PropertyMetadata(new Point(), Point1_Changed));
 
         private static void Point1_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -82,10 +83,15 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the Point2 dependency property.
+        /// Identifies the <see cref="QuadraticBezierSegment.Point2"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty Point2Property =
-            DependencyProperty.Register("Point2", typeof(Point), typeof(QuadraticBezierSegment), new PropertyMetadata(new Point(), Point2_Changed));
+            DependencyProperty.Register(
+                nameof(Point2), 
+                typeof(Point), 
+                typeof(QuadraticBezierSegment), 
+                new PropertyMetadata(new Point(), Point2_Changed));
 
         private static void Point2_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -109,7 +115,7 @@ namespace Windows.UI.Xaml.Media
                                                object canvasDomElement, 
                                                Point previousLastPoint)
         {
-            dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
             // tell the context that there should be a quadratic bezier curve from the starting 
             // point to this point, with the previous point as control point.

@@ -12,13 +12,9 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -47,11 +43,17 @@ namespace Windows.UI.Xaml.Media
             get { return (Point)GetValue(Point1Property); }
             set { SetValue(Point1Property, value); }
         }
+
         /// <summary>
-        /// Identifies the Point1 dependency property.
+        /// Identifies the <see cref="BezierSegment.Point1"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty Point1Property =
-            DependencyProperty.Register("Point1", typeof(Point), typeof(BezierSegment), new PropertyMetadata(new Point(), Point1_Changed));
+            DependencyProperty.Register(
+                nameof(Point1), 
+                typeof(Point), 
+                typeof(BezierSegment), 
+                new PropertyMetadata(new Point(), Point1_Changed));
 
         private static void Point1_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -70,11 +72,17 @@ namespace Windows.UI.Xaml.Media
             get { return (Point)GetValue(Point2Property); }
             set { SetValue(Point2Property, value); }
         }
+
         /// <summary>
-        /// Identifies the Point2 dependency property.
+        /// Identifies the <see cref="BezierSegment.Point2"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty Point2Property =
-            DependencyProperty.Register("Point2", typeof(Point), typeof(BezierSegment), new PropertyMetadata(new Point(), Point2_Changed));
+            DependencyProperty.Register(
+                nameof(Point2), 
+                typeof(Point), 
+                typeof(BezierSegment), 
+                new PropertyMetadata(new Point(), Point2_Changed));
 
         private static void Point2_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -93,11 +101,17 @@ namespace Windows.UI.Xaml.Media
             get { return (Point)GetValue(Point3Property); }
             set { SetValue(Point3Property, value); }
         }
+
         /// <summary>
-        /// Identifies the Point3 dependency property.
+        /// Identifies the <see cref="BezierSegment.Point3"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty Point3Property =
-            DependencyProperty.Register("Point3", typeof(Point), typeof(BezierSegment), new PropertyMetadata(new Point(), Point3_Changed));
+            DependencyProperty.Register(
+                nameof(Point3), 
+                typeof(Point), 
+                typeof(BezierSegment), 
+                new PropertyMetadata(new Point(), Point3_Changed));
 
         private static void Point3_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -117,7 +131,7 @@ namespace Windows.UI.Xaml.Media
                                                object canvasDomElement, 
                                                Point previousLastPoint)
         {
-            dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
             // tell the context that there should be a cubic bezier curve from the 
             // starting point to this point, with the two previous points as control points.

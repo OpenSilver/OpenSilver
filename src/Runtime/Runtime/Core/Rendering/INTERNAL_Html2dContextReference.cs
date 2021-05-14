@@ -16,25 +16,16 @@
 //#define CHECK_THAT_ID_EXISTS 
 //#define PERFORMANCE_ANALYSIS
 
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CSHTML5.Internal
 {
     // Note: this class is intented to be used by the Simulator only, not when compiled to JavaScript.
 #if BRIDGE
-    [External] //we exclude this class
-#else
-    [JSIgnore]
+    [Bridge.External] //we exclude this class
 #endif
 
 #if CSHTML5NETSTANDARD
@@ -107,8 +98,10 @@ returnValue;", _domElementUniqueIdentifier, methodName, methodArgumentsFormatted
         public string fillStyle { set { SetPropertyValue("fillStyle", value); } }
         public string strokeStyle { set { SetPropertyValue("strokeStyle", value); } }
         public string lineWidth { set { SetPropertyValue("lineWidth", value); } }
+        public string lineDashOffset { set { SetPropertyValue("lineDashOffset", value); } }
 
 
+        public void transform(params object[] args) { InvokeMethod("transform", args); }
         public void translate(params object[] args) { InvokeMethod("translate", args); }
         public void rotate(params object[] args) { InvokeMethod("rotate", args); }
         public void scale(params object[] args) { InvokeMethod("scale", args); }
@@ -125,6 +118,7 @@ returnValue;", _domElementUniqueIdentifier, methodName, methodArgumentsFormatted
         public void createLinearGradient(params object[] args) { InvokeMethod("createLinearGradient", args); }
 
         public void arc(params object[] args) { InvokeMethod("arc", args); }
+        public void ellipse(params object[] args) { InvokeMethod("ellipse", args); }
         public void rect(params object[] args) { InvokeMethod("rect", args); }
 
         public void moveTo(params object[] args) { InvokeMethod("moveTo", args); }

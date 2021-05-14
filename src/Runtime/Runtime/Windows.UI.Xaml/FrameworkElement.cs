@@ -12,33 +12,21 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Markup;
 
 #if MIGRATION
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
 #else
 using Windows.Foundation;
-using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Markup;
-using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -258,10 +246,8 @@ namespace Windows.UI.Xaml
             domElementWhereToPlaceChildren = div2;
             return div1;
         }
-#if !BRIDGE
-        [JSReplacement("true")]
-#else
-        [Template("true")]
+#if BRIDGE
+        [Bridge.Template("true")]
 #endif
         static bool IsRunningInJavaScript()
         {
@@ -314,29 +300,26 @@ namespace Windows.UI.Xaml
             get { return (Cursor)GetValue(CursorProperty); }
             set { SetValue(CursorProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the <see cref="FrameworkElement.Cursor"/> dependency
+        /// property.
+        /// </summary>
         public static readonly DependencyProperty CursorProperty =
-            DependencyProperty.Register("Cursor", 
-                                        typeof(Cursor), 
-                                        typeof(FrameworkElement), 
-                                        new PropertyMetadata((object)null)
-                                        {
-                                            MethodToUpdateDom = Cursor_MethodToUpdateDom,
-                                        });
+            DependencyProperty.Register(
+                nameof(Cursor), 
+                typeof(Cursor), 
+                typeof(FrameworkElement), 
+                new PropertyMetadata((object)null)
+                {
+                    MethodToUpdateDom = Cursor_MethodToUpdateDom,
+                });
 
         private static void Cursor_MethodToUpdateDom(DependencyObject d, object newValue)
         {
-            var frameworkElement = (FrameworkElement)d;
-            var newCursor = (Cursor)newValue;
-            var outerDomElement = frameworkElement.INTERNAL_OuterDomElement;
-            var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
-            if (newCursor == null) //if it is null, we want 0 everywhere
-            {
-                styleOfOuterDomElement.cursor = "inherit";
-            }
-            else
-            {
-                styleOfOuterDomElement.cursor = newCursor.ToHtmlString();
-            }
+            var fe = (FrameworkElement)d;
+            var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(fe.INTERNAL_OuterDomElement);
+            styleOfOuterDomElement.cursor = ((Cursor)newValue)?.ToHtmlString() ?? "inherit";
         }
 
         #endregion
@@ -351,26 +334,29 @@ namespace Windows.UI.Xaml
             get { return (bool)GetValue(IsEnabledProperty); }
             set { SetValue(IsEnabledProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the IsEnabled dependency property.
+        /// Identifies the <see cref="FrameworkElement.IsEnabled"/> dependency
+        /// property.
         /// </summary>
         public static readonly DependencyProperty IsEnabledProperty =
-            DependencyProperty.Register("IsEnabled",
-                                        typeof(bool),
-                                        typeof(FrameworkElement),
-                                        new PropertyMetadata(true, IsEnabled_Changed, CoerceIsEnabledProperty)
-                                        {
-                                            MethodToUpdateDom = IsEnabled_MethodToUpdateDom,
-                                        });
+            DependencyProperty.Register(
+                nameof(IsEnabled),
+                typeof(bool),
+                typeof(FrameworkElement),
+                new PropertyMetadata(true, IsEnabled_Changed, CoerceIsEnabledProperty)
+                {
+                    MethodToUpdateDom = IsEnabled_MethodToUpdateDom,
+                });
 
         private static void IsEnabled_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            FrameworkElement frameworkElement = (FrameworkElement)d;
-            if (frameworkElement.IsEnabledChanged != null)
+            FrameworkElement fe = (FrameworkElement)d;
+            if (fe.IsEnabledChanged != null)
             {
-                frameworkElement.IsEnabledChanged(frameworkElement, e);
+                fe.IsEnabledChanged(fe, e);
             }
-            UIElement.InvalidateForceInheritPropertyOnChildren(frameworkElement, e.Property);
+            UIElement.InvalidateForceInheritPropertyOnChildren(fe, e.Property);
         }
 
         private static object CoerceIsEnabledProperty(DependencyObject d, object baseValue)
@@ -475,22 +461,24 @@ namespace Windows.UI.Xaml
             get { return (string)GetValue(NameProperty); }
             set { SetValue(NameProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Name dependency property.
+        /// Identifies the <see cref="FrameworkElement.Name"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty NameProperty =
-            DependencyProperty.Register("Name", 
-                                        typeof(string), 
-                                        typeof(FrameworkElement), 
-                                        new PropertyMetadata(string.Empty)
-                                        {
-                                            MethodToUpdateDom = OnNameChanged_MethodToUpdateDom,
-                                        });
+            DependencyProperty.Register(
+                nameof(Name), 
+                typeof(string), 
+                typeof(FrameworkElement), 
+                new PropertyMetadata(string.Empty)
+                {
+                    MethodToUpdateDom = OnNameChanged_MethodToUpdateDom,
+                });
 
         private static void OnNameChanged_MethodToUpdateDom(DependencyObject d, object value)
         {
-            var @this = (FrameworkElement)d;
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(@this.INTERNAL_OuterDomElement, "dataId", (value ?? string.Empty).ToString());
+            var fe = (FrameworkElement)d;
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(fe.INTERNAL_OuterDomElement, "dataId", (value ?? string.Empty).ToString());
         }
 
         #endregion
@@ -506,16 +494,19 @@ namespace Windows.UI.Xaml
             get { return (object)GetValue(DataContextProperty); }
             set { SetValue(DataContextProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the DataContext dependency property.
+        /// Identifies the <see cref="FrameworkElement.DataContext"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty DataContextProperty = DependencyProperty.Register("DataContext",
-                                                                                                    typeof(object),
-                                                                                                    typeof(FrameworkElement),
-                                                                                                    new PropertyMetadata(null, OnDataContextPropertyChanged)
-                                                                                                    {
-                                                                                                        Inherits = true
-                                                                                                    });
+        public static readonly DependencyProperty DataContextProperty = 
+            DependencyProperty.Register(
+                nameof(DataContext),
+                typeof(object),
+                typeof(FrameworkElement),
+                new PropertyMetadata(null, OnDataContextPropertyChanged)
+                {
+                    Inherits = true
+                });
 
         private static void OnDataContextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -550,10 +541,11 @@ namespace Windows.UI.Xaml
 
         [OpenSilver.NotImplemented]
         public static DependencyProperty TriggersProperty =
-            DependencyProperty.Register("Triggers",
-                                        typeof(TriggerCollection),
-                                        typeof(FrameworkElement),
-                                        new PropertyMetadata(new TriggerCollection()));
+            DependencyProperty.Register(
+                nameof(Triggers),
+                typeof(TriggerCollection),
+                typeof(FrameworkElement),
+                new PropertyMetadata(new TriggerCollection()));
 
         #endregion
 
@@ -562,10 +554,11 @@ namespace Windows.UI.Xaml
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FlowDirectionProperty =
-            DependencyProperty.Register("FlowDirection",
-                                        typeof(FlowDirection),
-                                        typeof(FrameworkElement),
-                                        new PropertyMetadata(FlowDirection.LeftToRight));
+            DependencyProperty.Register(
+                nameof(FlowDirection),
+                typeof(FlowDirection),
+                typeof(FrameworkElement),
+                new PropertyMetadata(FlowDirection.LeftToRight));
 
         /// <summary>
         /// Gets or sets the direction that text and other user interface 
@@ -591,10 +584,11 @@ namespace Windows.UI.Xaml
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LanguageProperty =
-            DependencyProperty.Register("Language",
-                                        typeof(XmlLanguage),
-                                        typeof(FrameworkElement),
-                                        null);
+            DependencyProperty.Register(
+                nameof(Language),
+                typeof(XmlLanguage),
+                typeof(FrameworkElement),
+                null);
 
         [OpenSilver.NotImplemented]
         public XmlLanguage Language
@@ -656,13 +650,14 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the Tag dependency property.
+        /// Identifies the <see cref="FrameworkElement.Tag"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty TagProperty =
-            DependencyProperty.Register("Tag", 
-                                        typeof(object), 
-                                        typeof(FrameworkElement), 
-                                        new PropertyMetadata((object)null));
+            DependencyProperty.Register(
+                nameof(Tag), 
+                typeof(object), 
+                typeof(FrameworkElement), 
+                new PropertyMetadata((object)null));
 
         #endregion
 
@@ -690,13 +685,14 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the Style dependency property.
+        /// Identifies the <see cref="FrameworkElement.Style"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty StyleProperty =
-            DependencyProperty.Register("Style", 
-                                        typeof(Style), 
-                                        typeof(FrameworkElement), 
-                                        new PropertyMetadata(null, OnStyleChanged));
+            DependencyProperty.Register(
+                nameof(Style), 
+                typeof(Style), 
+                typeof(FrameworkElement), 
+                new PropertyMetadata(null, OnStyleChanged));
 
         private static void OnStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -899,10 +895,11 @@ namespace Windows.UI.Xaml
         /// property.
         /// </summary>
         public static readonly DependencyProperty DefaultStyleKeyProperty =
-            DependencyProperty.Register("DefaultStyleKey", 
-                                        typeof(object), 
-                                        typeof(FrameworkElement), 
-                                        new PropertyMetadata(null, OnThemeStyleKeyChanged));
+            DependencyProperty.Register(
+                nameof(DefaultStyleKey), 
+                typeof(object), 
+                typeof(FrameworkElement), 
+                new PropertyMetadata(null, OnThemeStyleKeyChanged));
 
         private static void OnThemeStyleKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
