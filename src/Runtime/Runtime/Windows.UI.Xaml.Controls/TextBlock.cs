@@ -63,9 +63,7 @@ namespace Windows.UI.Xaml.Controls
             dynamic div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
             dynamic divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
             divStyle.whiteSpace = TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap";
-#if !WORKINPROGRESS
             divStyle.overflow = "hidden"; //keeps the text from overflowing despite the TextBlock's size limitations.
-#endif
             divStyle.textAlign = "left"; // this is the default value.
 #if WORKINPROGRESS
             divStyle.lineHeight = "125%";
