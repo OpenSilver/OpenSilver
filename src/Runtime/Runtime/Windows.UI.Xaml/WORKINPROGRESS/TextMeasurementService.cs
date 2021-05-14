@@ -68,7 +68,7 @@ namespace Windows.UI.Xaml
             textBoxDivStyle.height = "";
             textBoxDivStyle.width = "";
             textBoxDivStyle.top = "0px";
-            textBoxDivStyle.borderWidth = "0";
+            textBoxDivStyle.borderWidth = "1";
 
             measureTextBoxElementID = ((INTERNAL_HtmlDomElementReference)textBoxReference).UniqueIdentifier;
 
@@ -86,8 +86,8 @@ namespace Windows.UI.Xaml
             textBlockDivStyle.visibility = "hidden";
             textBlockDivStyle.height = "";
             textBlockDivStyle.width = "";
-            textBlockDivStyle.top = "0px";
-            textBlockDivStyle.borderWidth = "0";
+            textBlockDivStyle.top = "100px";
+            textBlockDivStyle.borderWidth = "1";
             measureTextBlockElementID = ((INTERNAL_HtmlDomElementReference)textBlockReference).UniqueIdentifier;
         }
 
@@ -134,7 +134,7 @@ namespace Windows.UI.Xaml
                 System.Threading.Thread.Sleep(20);
             }
 
-            return new Size(associatedTextBox.ActualWidth + 1, associatedTextBox.ActualHeight);
+            return new Size(associatedTextBox.ActualWidth + 2, associatedTextBox.ActualHeight);
         }
 
         public Size MeasureTextBlock(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, FontStretch stretch, TextWrapping wrapping, Thickness padding, double maxWidth)
