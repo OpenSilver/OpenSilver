@@ -42,6 +42,11 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public partial class DataGridCell : ButtonBase
     {
+        public DataGridCell()
+        {
+            this.DefaultStyleKey = typeof(DataGridCell);
+        }
+
         //For some reason in the wpf comments, below was "Gets or sets the column that the cell is in." although the set part is internal.
         /// <summary>
         /// Gets the column that the cell is in.
