@@ -154,7 +154,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(AlternatingRowBackground),
                 typeof(Brush),
                 typeof(DataGrid),
-                new PropertyMetadata(new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString("#f0f0e9"))));
+                new PropertyMetadata(new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString("#AAEAEFF4"))));
 
         /// <summary>
         /// Gets or sets the vertical padding in all cells
