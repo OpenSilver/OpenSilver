@@ -29,7 +29,8 @@ namespace Windows.UI.Xaml.Controls
             Size desiredSize = Size.Zero;
             availableSize = new Size(width.IsAbsolute ? width.Value : availableSize.Width, height.IsAbsolute ? height.Value : availableSize.Height);
 
-            foreach (FrameworkElement child in Children)
+            UIElement[] childrens = Children.ToArray();
+            foreach (UIElement child in childrens)
             {
                 child.Measure(availableSize);
                 desiredSize = desiredSize.Max(child.DesiredSize);
@@ -101,7 +102,8 @@ namespace Windows.UI.Xaml.Controls
             int rowSpan;
             int columnSpan;
 
-            foreach (UIElement child in Children)
+            UIElement[] childrens = Children.ToArray();
+            foreach (UIElement child in childrens)
             {
                 GetChildPosition(child, currentRowDefinitions.Length, currentColumnDefinitions.Length, out row, out column, out rowSpan, out columnSpan);
 
@@ -132,7 +134,8 @@ namespace Windows.UI.Xaml.Controls
 
             Rect finalRect = new Rect(new Size(finalWidth, finalHeight));
 
-            foreach (FrameworkElement child in Children)
+            UIElement[] childrens = Children.ToArray();
+            foreach (UIElement child in childrens)
             {
                 child.Arrange(finalRect);
             }
@@ -228,7 +231,8 @@ namespace Windows.UI.Xaml.Controls
             int rowSpan;
             int columnSpan;
 
-            foreach (FrameworkElement child in Children)
+            UIElement[] childrens = Children.ToArray();
+            foreach (UIElement child in childrens)
             {
                 GetChildPosition(child, currentRowDefinitions.Length, currentColumnDefinitions.Length, out row, out column, out rowSpan, out columnSpan);
 
@@ -255,7 +259,7 @@ namespace Windows.UI.Xaml.Controls
             SetActualLength(currentRowDefinitions, rowsLength);
             SetActualLength(currentColumnDefinitions, columnsLength);
 
-            foreach (FrameworkElement child in Children)
+            foreach (UIElement child in childrens)
             {
                 GetChildPosition(child, currentRowDefinitions.Length, currentColumnDefinitions.Length, out row, out column, out rowSpan, out columnSpan);
 

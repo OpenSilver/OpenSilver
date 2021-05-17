@@ -112,7 +112,8 @@ namespace Windows.UI.Xaml.Controls
 			List<UIElement> currentGroup = new List<UIElement>();
 			double currentGroupMainLength = 0;
 
-			foreach (UIElement child in Children)
+			UIElement[] childrens = Children.ToArray();
+			foreach (UIElement child in childrens)
 			{
 				double childMainLength = GetMainLength(child.DesiredSize);
 
@@ -148,7 +149,8 @@ namespace Windows.UI.Xaml.Controls
 				return Size.Zero;
 			}
 
-			foreach (UIElement child in Children)
+			UIElement[] childrens = Children.ToArray();
+			foreach (UIElement child in childrens)
 			{
 				MeasureChild(child, GetMainLength(availableSize), GetCrossLength(availableSize));
 			}
