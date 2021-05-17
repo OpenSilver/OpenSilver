@@ -739,6 +739,29 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 return tcs.Task;
             }
 
+#if OPENSILVER
+            /// <summary>
+            /// Calls a WebMethod
+            /// </summary>
+            /// <param name="webMethodName">The name of the Method</param>
+            /// <param name="interfaceType">The Type of the interface</param>
+            /// <param name="methodReturnType"></param>
+            /// <param name="messageHeaders">The SOAP envelope headers</param>
+            /// <param name="originalRequestObject"></param>
+            /// <param name="soapVersion"></param>
+            /// <returns>The result of the call of the method.</returns>
+            public object CallWebMethod(
+                string webMethodName,
+                Type interfaceType,
+                Type methodReturnType,
+                IEnumerable<MessageHeader> messageHeaders,
+                IDictionary<string, object> originalRequestObject,
+                string soapVersion) // Note: we don't arrive here using c#.
+            {
+                return CallWebMethod(webMethodName, interfaceType, methodReturnType,
+                        GetEnvelopeHeaders(messageHeaders?.ToList()), originalRequestObject, soapVersion);
+            }
+#endif
             /// <summary>
             /// Calls a WebMethod
             /// </summary>
@@ -752,6 +775,30 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 string webMethodName,
                 Type interfaceType,
                 Type methodReturnType,
+                IDictionary<string, object> originalRequestObject,
+                string soapVersion) // Note: we don't arrive here using c#.
+            {
+                return CallWebMethod(webMethodName, interfaceType, methodReturnType, "", originalRequestObject, soapVersion);
+            }
+
+
+
+
+            /// <summary>
+            /// Calls a WebMethod
+            /// </summary>
+            /// <param name="webMethodName">The name of the Method</param>
+            /// <param name="interfaceType">The Type of the interface</param>
+            /// <param name="methodReturnType"></param>
+            /// <param name="messageHeaders"></param>
+            /// <param name="originalRequestObject"></param>
+            /// <param name="soapVersion"></param>
+            /// <returns>The result of the call of the method.</returns>
+            public object CallWebMethod(
+                string webMethodName,
+                Type interfaceType,
+                Type methodReturnType,
+                string messageHeaders,
                 IDictionary<string, object> originalRequestObject,
                 string soapVersion) // Note: we don't arrive here using c#.
             {
@@ -800,7 +847,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     method,
                     interfaceType,
                     methodReturnType,
-                    null,
+                    messageHeaders,
                     originalRequestObject,
                     soapVersion,
                     isXmlSerializer,
