@@ -291,7 +291,8 @@ namespace Windows.UI.Xaml.Controls
 #if WORKINPROGRESS
         protected override Size MeasureOverride(Size availableSize)
         {
-            foreach (UIElement child in Children)
+            UIElement[] childrens = Children.ToArray();
+            foreach (UIElement child in childrens)
             {
                 child.Measure(Size.Infinity);
             }
@@ -300,7 +301,8 @@ namespace Windows.UI.Xaml.Controls
         }
         protected override Size ArrangeOverride(Size finalSize)
         {
-            foreach (UIElement child in Children)
+            UIElement[] childrens = Children.ToArray();
+            foreach (UIElement child in childrens)
             {
                 // Canvas.Left and Canvas.Top have higher priority
                 //double x = GetLeft(child).DefaultIfNaN(finalSize.Width - child.DesiredSize.Width - GetRight(child)).DefaultIfNaN(0);
