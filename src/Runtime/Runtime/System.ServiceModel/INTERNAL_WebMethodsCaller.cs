@@ -80,6 +80,26 @@ namespace System.ServiceModel
             return task;
         }
 
+#if OPENSILVER
+        public static RETURN_TYPE CallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(
+            string endpointAddress,
+            string webMethodName,
+            IEnumerable<Channels.MessageHeader> messageHeaders,
+            IDictionary<string, object> requestParameters,
+            string soapVersion) where INTERFACE_TYPE : class
+        {
+            var webMethodsCaller = new CSHTML5_ClientBase<INTERFACE_TYPE>.WebMethodsCaller(endpointAddress);
+
+            return (RETURN_TYPE)webMethodsCaller.CallWebMethod(
+                webMethodName,
+                typeof(INTERFACE_TYPE),
+                typeof(RETURN_TYPE),
+                messageHeaders,
+                requestParameters,
+                soapVersion);
+        }
+#endif
+
         public static RETURN_TYPE CallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(
             string endpointAddress,
             string webMethodName,
@@ -233,6 +253,23 @@ namespace System.ServiceModel
                 requestParameters,
                 soapVersion);
         }
+
+#if OPENSILVER
+        public static void CallWebMethod_WithoutReturnValue<INTERFACE_TYPE>(
+            string endpointAddress,
+            string webMethodName,
+            IEnumerable<Channels.MessageHeader> messageHeaders,
+            IDictionary<string, object> requestParameters,
+            string soapVersion) where INTERFACE_TYPE : class
+        {
+            CallWebMethod<object, INTERFACE_TYPE>(
+                endpointAddress,
+                webMethodName,
+                messageHeaders,
+                requestParameters,
+                soapVersion);
+        }
+#endif
 
         public static void CallWebMethod_WithoutReturnValue<INTERFACE_TYPE>(
             string endpointAddress,
