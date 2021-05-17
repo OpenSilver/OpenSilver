@@ -291,7 +291,8 @@ namespace Windows.UI.Xaml.Controls
             double mainLength = 0;
             double crossLength = 0;
 
-            foreach (FrameworkElement child in Children)
+            UIElement[] childrens = Children.ToArray();
+            foreach (UIElement child in childrens)
             {
                 child.Measure(measureSize);
 
@@ -308,13 +309,6 @@ namespace Windows.UI.Xaml.Controls
         }
         protected override Size ArrangeOverride(Size finalSize)
         {
-            /*Console.WriteLine($"StackPanel {Orientation}");
-            foreach (FrameworkElement child in Children)
-            {
-                INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)child.INTERNAL_OuterDomElement;
-
-                Console.WriteLine($"{domElementReference.UniqueIdentifier} desiredSize ({child.DesiredSize.Width},{child.DesiredSize.Height})");
-            }*/
             double panelMainLength = Children.Select(child => GetMainLength(child.DesiredSize)).Sum();
             double panelCrossLength = GetCrossLength(finalSize);
 
@@ -323,14 +317,15 @@ namespace Windows.UI.Xaml.Controls
             Size measureSize = CreateSize(Orientation, Double.PositiveInfinity, panelCrossLength);
             //Console.WriteLine($"StackPanel ArrangeOverride measureSize {measureSize.Width}, {measureSize.Height}");
 
-            foreach (FrameworkElement child in Children)
+            UIElement[] childrens = Children.ToArray();
+            foreach (UIElement child in childrens)
             {
                 child.Measure(measureSize);
             }
 
             bool isNormalFlow = FlowDirection == FlowDirection.LeftToRight;
             double childrenMainLength = 0;
-            foreach (UIElement child in Children)
+            foreach (UIElement child in childrens)
             {
                 double childMainLength = GetMainLength(child.DesiredSize);
                 double childMainStart = isNormalFlow ? childrenMainLength : panelMainLength - childrenMainLength - childMainLength;

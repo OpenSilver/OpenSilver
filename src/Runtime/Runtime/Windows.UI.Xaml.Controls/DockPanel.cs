@@ -303,7 +303,8 @@ namespace Windows.UI.Xaml.Controls
             double remainingWidth = availableSize.Width;
             double remainingHeight = availableSize.Height;
 
-            foreach (UIElement child in Children)
+            UIElement[] childrens = Children.ToArray();
+            foreach (UIElement child in childrens)
             {
                 child.Measure(new Size(remainingWidth, remainingHeight));
 
