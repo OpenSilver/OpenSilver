@@ -110,17 +110,29 @@ namespace Windows.UI.Xaml.Controls
                 {
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.Children[i], this, i);
                 }
-            }            
+            }
+#if WORKINPROGRESS
+            InvalidateMeasure();
+            InvalidateArrange();
+#endif
         }
 
         internal virtual void OnChildrenAdded(UIElement newChild, int index)
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, this, index);
+#if WORKINPROGRESS
+            InvalidateMeasure();
+            InvalidateArrange();
+#endif
         }
 
         internal virtual void OnChildrenRemoved(UIElement oldChild, int index)
         {
             INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
+#if WORKINPROGRESS
+            InvalidateMeasure();
+            InvalidateArrange();
+#endif
         }
 
         internal virtual void OnChildrenReplaced(UIElement oldChild, UIElement newChild, int index)
@@ -133,6 +145,10 @@ namespace Windows.UI.Xaml.Controls
             INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
 
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, this, index);
+#if WORKINPROGRESS
+            InvalidateMeasure();
+            InvalidateArrange();
+#endif
         }
 
         internal virtual void OnChildrenMoved(UIElement oldChild, int newIndex, int oldIndex)
@@ -143,6 +159,10 @@ namespace Windows.UI.Xaml.Controls
             }
 
             INTERNAL_VisualTreeManager.MoveVisualChildInSameParent(oldChild, this, newIndex, oldIndex);
+#if WORKINPROGRESS
+            InvalidateMeasure();
+            InvalidateArrange();
+#endif
         }
 
 #endregion Children Management
@@ -237,10 +257,6 @@ namespace Windows.UI.Xaml.Controls
                 }
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChildren[i], this);
                 INTERNAL_OnChildProgressivelyLoaded();
-#if WORKINPROGRESS
-                InvalidateMeasure();
-                InvalidateArrange();
-#endif
             }
         }
 
