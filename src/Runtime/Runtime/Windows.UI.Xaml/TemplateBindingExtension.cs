@@ -42,7 +42,7 @@ namespace Windows.UI.Xaml
             if (provider != null)
             {
                 var dp = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(
-                    provider.TargetObject.GetType(), Path);
+                    provider.TargetObject?.GetType(), Path);
 
                 if (dp != null)
                 {
