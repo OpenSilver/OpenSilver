@@ -279,7 +279,7 @@ namespace DotNetForHtml5.Compiler
                         }
                         return;
                 }
-#elif BRIDE
+#elif BRIDGE
                 switch (assemblyName)
                 {
                     default:
