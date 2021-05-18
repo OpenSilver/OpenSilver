@@ -39,11 +39,106 @@ namespace Windows.UI.Xaml.Controls
         public RowDefinition()
         {
             MinHeight = 0;
+            _effectiveMinSize = 0;
+            _effectiveUnitType = GridUnitType.Auto;
+            _measureArrangeSize = 0;
+            _finalOffset = 0;
+            _sizeCache = 0;
         }
         double IDefinitionBase.MinLength { get { return MinHeight; } }
         double IDefinitionBase.MaxLength { get { return MaxHeight; } }
         GridLength IDefinitionBase.Length { get { return Height; } }
 
+        private double _effectiveMinSize;
+        private double _measureArrangeSize;
+        private double _sizeCache;
+        private double _finalOffset;
+
+        private GridUnitType _effectiveUnitType;
+
+        double IDefinitionBase.GetUserMaxSize()
+        {
+            return MaxHeight;
+        }
+
+        double IDefinitionBase.GetUserMinSize()
+        {
+            return MinHeight;
+        }
+
+        GridUnitType IDefinitionBase.GetUserSizeType()
+        {
+            return Height.GridUnitType;
+        }
+
+        double IDefinitionBase.GetUserSizeValue()
+        {
+            return Height.Value;
+        }
+
+        void IDefinitionBase.UpdateEffectiveMinSize(double newValue)
+        {
+            _effectiveMinSize = Math.Max(_effectiveMinSize, newValue);
+        }
+
+        void IDefinitionBase.SetEffectiveUnitType(GridUnitType type)
+        {
+            _effectiveUnitType = type;
+        }
+
+        void IDefinitionBase.SetEffectiveMinSize(double value)
+        {
+            _effectiveMinSize = value;
+        }
+
+        double IDefinitionBase.GetEffectiveMinSize()
+        {
+            return _effectiveMinSize;
+        }
+
+        GridUnitType IDefinitionBase.GetEffectiveUnitType()
+        {
+            return _effectiveUnitType;
+        }
+
+        void IDefinitionBase.SetMeasureArrangeSize(double value)
+        {
+            _measureArrangeSize = value;
+        }
+
+        double IDefinitionBase.GetMeasureArrangeSize()
+        {
+            return _measureArrangeSize;
+        }
+
+        void IDefinitionBase.SetSizeCache(double value)
+        {
+            _sizeCache = value;
+        }
+
+        double IDefinitionBase.GetSizeCache()
+        {
+            return _sizeCache;
+        }
+
+        double IDefinitionBase.GetPreferredSize()
+        {
+            return
+                (_effectiveUnitType != GridUnitType.Auto
+                 && _effectiveMinSize < _measureArrangeSize)
+                    ? _measureArrangeSize
+                    : _effectiveMinSize;
+        }
+
+        double IDefinitionBase.GetFinalOffset()
+        {
+            return _finalOffset;
+        }
+
+        void IDefinitionBase.SetFinalOffset(double value)
+        {
+            _finalOffset = value;
+        }
 #else
     public sealed partial class RowDefinition : DependencyObject
     {

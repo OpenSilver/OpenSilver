@@ -26,6 +26,23 @@ namespace Windows.UI.Xaml.Controls
         double MinLength { get; }
         double MaxLength { get; }
         GridLength Length { get; }
+
+        double GetUserMaxSize();
+        double GetUserMinSize();
+        GridUnitType GetUserSizeType();
+        double GetUserSizeValue();
+        void UpdateEffectiveMinSize(double newValue);
+        void SetEffectiveUnitType(GridUnitType type);
+        GridUnitType GetEffectiveUnitType();
+        void SetEffectiveMinSize(double value);
+        double GetEffectiveMinSize();
+        void SetMeasureArrangeSize(double value);
+        double GetMeasureArrangeSize();
+        void SetSizeCache(double value);
+        double GetSizeCache();
+        double GetPreferredSize();
+        double GetFinalOffset();
+        void SetFinalOffset(double value);
     }
 }
 #endif
