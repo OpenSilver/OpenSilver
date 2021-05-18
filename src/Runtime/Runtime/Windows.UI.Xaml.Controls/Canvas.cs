@@ -202,6 +202,9 @@ namespace Windows.UI.Xaml.Controls
         public static void SetLeft(UIElement element, double value)
         {
             element.SetValue(LeftProperty, value);
+
+            if ((Canvas)element.INTERNAL_VisualParent is Canvas)
+                ((Canvas)element.INTERNAL_VisualParent).InvalidateArrange();
         }
 
         /// <summary>
@@ -223,6 +226,9 @@ namespace Windows.UI.Xaml.Controls
         public static void SetTop(UIElement element, double value)
         {
             element.SetValue(TopProperty, value);
+
+            if ((Canvas)element.INTERNAL_VisualParent is Canvas)
+                ((Canvas)element.INTERNAL_VisualParent).InvalidateArrange();
         }
         /// <summary>
         /// Gets the value of the Canvas.Top XAML attached property for the target element.
