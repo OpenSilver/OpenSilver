@@ -20,11 +20,12 @@
 using CSHTML5;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace System.IO.IsolatedStorage
+namespace OpenSilver.IO.IsolatedStorage
 {
     public partial class IsolatedStorageFileStream : FileStream, IDisposable
     {
@@ -63,9 +64,20 @@ namespace System.IO.IsolatedStorage
             if (mode == FileMode.Open || mode == FileMode.OpenOrCreate)
             {
                 //attempt to read the file:
-                string fileContent = Convert.ToString(Interop.ExecuteJavaScript("localStorage.getItem($0)", _filePath.ToLower()));
-                if (fileContent != null) //note: the fileContent
+                Object obj = Interop.ExecuteJavaScript("localStorage.getItem($0);", _filePath.ToLower() + "ǀǀCaseSensitivePath");
+                bool isNullOrUndefined = false;
+                if (Interop.IsRunningInTheSimulator)
                 {
+                    isNullOrUndefined = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0 == undefined || $0 == null", obj));
+                }
+                else
+                {
+                    isNullOrUndefined = Interop.IsNull(obj) || Interop.IsUndefined(obj);
+                }
+
+                if (!isNullOrUndefined)
+                {
+                    string fileContent = Convert.ToString(obj);
                     byte[] bytes = Convert.FromBase64String(fileContent);
                     _fs.Write(bytes, 0, bytes.Length);
                     _fs.Position = 0;
