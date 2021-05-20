@@ -41,6 +41,7 @@ using System.Windows.Media;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Net.NetworkInformation;
+using DotNetForHtml5.EmulatorWithoutJavascript.Debugging;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
@@ -72,6 +73,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         string _intermediateOutputAbsolutePath;
         bool _isFirstTimeJavaScriptCompilation = false;
         WPFBrowserView MainWebBrowser;
+        ChromiumDevTools _devTools;
         bool _pendingRefreshOfHighlight = false;
         Assembly _coreAssembly;
         Assembly _typeForwardingAssembly;
@@ -132,7 +134,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             BrowserPreferences.SetChromiumSwitches(
                 @"--disable-web-security",
                 @"--allow-file-access-from-files",
-                @"--allow-file-access"
+                @"--allow-file-access",
+                @"--remote-debugging-port=9222"
             );
 
             BrowserContextParams parameters = new BrowserContextParams(_browserUserDataDir)
@@ -1482,6 +1485,25 @@ Click OK to continue.";
                 ButtonHideXamlTree_Click(sender, e);
                 MessageBox.Show("The Visual Tree is not available.");
             }
+        }
+
+        private void ButtonOpenDevTools_Click(object sender, RoutedEventArgs e)
+        {
+            if (_devTools != null)
+            {
+                _devTools.Focus();
+                return;
+            }
+
+            _devTools = new ChromiumDevTools(MainWebBrowser.Browser.GetRemoteDebuggingURL());
+            _devTools.Show();
+
+            _devTools.Closing += ChromiumDevTools_Closing;
+        }
+
+        private void ChromiumDevTools_Closing(object sender, CancelEventArgs e)
+        {
+            _devTools = null;
         }
 
         private void ButtonHideXamlTree_Click(object sender, RoutedEventArgs e)

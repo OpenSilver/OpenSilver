@@ -129,6 +129,9 @@
     <Compile Include="Interop\JavaScriptExecutionHandler.cs" />
     <Compile Include="SupportClasses\ResourceInterceptor.cs" />
     <Compile Include="TrialHelpers_MoreMethods.cs" />
+    <Compile Include="Debugging\ChromiumDevTools.xaml.cs">
+      <DependentUpon>ChromiumDevTools.xaml</DependentUpon>
+    </Compile>
     <Compile Include="XamlInspection\TreeViewDataTemplateSelector.cs" />
     <Compile Include="XamlInspection\TreeNode.cs" />
     <Compile Include="XamlInspection\XamlInspectionTreeView.xaml.cs">
@@ -165,6 +168,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Debugging\ChromiumDevTools.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="XamlInspection\XamlInspectionTreeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
