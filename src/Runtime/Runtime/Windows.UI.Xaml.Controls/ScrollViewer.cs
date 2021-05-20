@@ -38,6 +38,16 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public ScrollViewer() : base() { }
 
+        internal override FrameworkTemplate TemplateCache
+        {
+            get { return null; }
+            set { }
+        }
+
+        internal override FrameworkTemplate TemplateInternal
+        {
+            get { return null; }
+        }
 
         /*
         public bool BringIntoViewOnFocusChange { get; set; }
