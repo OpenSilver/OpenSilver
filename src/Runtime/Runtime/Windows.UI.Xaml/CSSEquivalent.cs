@@ -25,7 +25,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    internal partial class CSSEquivalent
+    public partial class CSSEquivalent
     {
         internal List<string> Name;
         /// <summary>
