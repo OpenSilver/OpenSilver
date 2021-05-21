@@ -47,6 +47,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotImplemented.Analyzer", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotImplemented.Analyzer.Tests", "Analyzers\NotImplemented.Tests\NotImplemented.Analyzer.Tests.csproj", "{4934A835-03E3-448D-A327-C6E68F68B0DC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{99A3BA00-F4D3-4D9C-B6C8-A63D197ACC7D}"
+	ProjectSection(SolutionItems) = preProject
+		Runtime\Scripts\cshtml5.css = Runtime\Scripts\cshtml5.css
+		Runtime\Scripts\cshtml5.js = Runtime\Scripts\cshtml5.js
+		Runtime\Scripts\fastclick.js = Runtime\Scripts\fastclick.js
+		Runtime\Scripts\flatpickr.css = Runtime\Scripts\flatpickr.css
+		Runtime\Scripts\flatpickr.js = Runtime\Scripts\flatpickr.js
+		Runtime\Scripts\OpenSilver.js = Runtime\Scripts\OpenSilver.js
+		Runtime\Scripts\ResizeSensor.js = Runtime\Scripts\ResizeSensor.js
+		Runtime\Scripts\velocity.js = Runtime\Scripts\velocity.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		SL.WorkInProgress|Any CPU = SL.WorkInProgress|Any CPU
@@ -173,6 +185,7 @@ Global
 		{F0839AF2-1981-4355-9358-C38D744EB678} = {BDA9A1B3-15CD-4068-9A6D-BDA030FBEC5E}
 		{D83C5616-EB62-4BD2-8DA3-59C893B7ED39} = {F0839AF2-1981-4355-9358-C38D744EB678}
 		{4934A835-03E3-448D-A327-C6E68F68B0DC} = {F0839AF2-1981-4355-9358-C38D744EB678}
+		{99A3BA00-F4D3-4D9C-B6C8-A63D197ACC7D} = {BDA9A1B3-15CD-4068-9A6D-BDA030FBEC5E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A13C12CC-0544-49D7-A852-FCE1C884AA54}
