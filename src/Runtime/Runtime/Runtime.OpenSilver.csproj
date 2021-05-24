@@ -1212,6 +1212,10 @@
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultListBoxStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Content>
     <Content Include="DefaultStyles\INTERNAL_DefaultTileViewStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
