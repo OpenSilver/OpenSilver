@@ -84,9 +84,10 @@ namespace System.ServiceModel
         public static RETURN_TYPE CallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(
             string endpointAddress,
             string webMethodName,
-            IEnumerable<Channels.MessageHeader> messageHeaders,
+            IEnumerable<Channels.MessageHeader> outgoingMessageHeaders,
             IDictionary<string, object> requestParameters,
-            string soapVersion) where INTERFACE_TYPE : class
+            string soapVersion,
+            out Channels.MessageHeaders incomingMessageHeaders) where INTERFACE_TYPE : class
         {
             var webMethodsCaller = new CSHTML5_ClientBase<INTERFACE_TYPE>.WebMethodsCaller(endpointAddress);
 
@@ -94,9 +95,10 @@ namespace System.ServiceModel
                 webMethodName,
                 typeof(INTERFACE_TYPE),
                 typeof(RETURN_TYPE),
-                messageHeaders,
+                outgoingMessageHeaders,
                 requestParameters,
-                soapVersion);
+                soapVersion,
+                out incomingMessageHeaders);
         }
 #endif
 
@@ -276,16 +278,18 @@ namespace System.ServiceModel
         public static void CallWebMethod_WithoutReturnValue<INTERFACE_TYPE>(
             string endpointAddress,
             string webMethodName,
-            IEnumerable<Channels.MessageHeader> messageHeaders,
+            IEnumerable<Channels.MessageHeader> outgoingMessageHeaders,
             IDictionary<string, object> requestParameters,
-            string soapVersion) where INTERFACE_TYPE : class
+            string soapVersion,
+            out Channels.MessageHeaders incomingMessageHeaders) where INTERFACE_TYPE : class
         {
             CallWebMethod<object, INTERFACE_TYPE>(
                 endpointAddress,
                 webMethodName,
-                messageHeaders,
+                outgoingMessageHeaders,
                 requestParameters,
-                soapVersion);
+                soapVersion,
+                out incomingMessageHeaders);
         }
 #endif
 

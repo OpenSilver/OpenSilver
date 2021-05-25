@@ -521,7 +521,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 string soapVersion)
             {
                 BeginCallWebMethod(webMethodName, interfaceType, methodReturnType,
-                    GetEnvelopeHeaders(messageHeaders?.ToList()), originalRequestObject,
+                    GetEnvelopeHeaders(messageHeaders?.ToList(), soapVersion), originalRequestObject,
                     callback, soapVersion);
             }
 #endif
@@ -746,20 +746,29 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             /// <param name="webMethodName">The name of the Method</param>
             /// <param name="interfaceType">The Type of the interface</param>
             /// <param name="methodReturnType"></param>
-            /// <param name="messageHeaders">The SOAP envelope headers</param>
+            /// <param name="outgoingMessageHeaders">The SOAP envelope headers</param>
             /// <param name="originalRequestObject"></param>
             /// <param name="soapVersion"></param>
+            /// <param name="incomingMessageHeaders"></param>
             /// <returns>The result of the call of the method.</returns>
             public object CallWebMethod(
                 string webMethodName,
                 Type interfaceType,
                 Type methodReturnType,
-                IEnumerable<MessageHeader> messageHeaders,
+                IEnumerable<MessageHeader> outgoingMessageHeaders,
                 IDictionary<string, object> originalRequestObject,
-                string soapVersion) // Note: we don't arrive here using c#.
+                string soapVersion,
+                out MessageHeaders incomingMessageHeaders) // Note: we don't arrive here using c#.
             {
-                return CallWebMethod(webMethodName, interfaceType, methodReturnType,
-                        GetEnvelopeHeaders(messageHeaders?.ToList()), originalRequestObject, soapVersion);
+                string outgoingMessageHeadersString = GetEnvelopeHeaders(outgoingMessageHeaders?.ToList(), soapVersion);
+                string incomingMessageString = null;
+
+                var response = CallWebMethod(webMethodName, interfaceType, methodReturnType,
+                        outgoingMessageHeadersString, originalRequestObject, soapVersion, out incomingMessageString);
+
+                incomingMessageHeaders = GetEnvelopeHeaders(incomingMessageString, soapVersion);
+
+                return response;
             }
 #endif
             /// <summary>
@@ -778,7 +787,8 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 IDictionary<string, object> originalRequestObject,
                 string soapVersion) // Note: we don't arrive here using c#.
             {
-                return CallWebMethod(webMethodName, interfaceType, methodReturnType, "", originalRequestObject, soapVersion);
+                string incomingMessage;
+                return CallWebMethod(webMethodName, interfaceType, methodReturnType, "", originalRequestObject, soapVersion, out incomingMessage);
             }
 
 
@@ -790,17 +800,19 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             /// <param name="webMethodName">The name of the Method</param>
             /// <param name="interfaceType">The Type of the interface</param>
             /// <param name="methodReturnType"></param>
-            /// <param name="messageHeaders"></param>
+            /// <param name="outgoingMessageHeaders"></param>
             /// <param name="originalRequestObject"></param>
             /// <param name="soapVersion"></param>
+            /// <param name="incomingMessageString"></param>
             /// <returns>The result of the call of the method.</returns>
             public object CallWebMethod(
                 string webMethodName,
                 Type interfaceType,
                 Type methodReturnType,
-                string messageHeaders,
+                string outgoingMessageHeaders,
                 IDictionary<string, object> originalRequestObject,
-                string soapVersion) // Note: we don't arrive here using c#.
+                string soapVersion,
+                out string incomingMessageString) // Note: we don't arrive here using c#.
             {
                 //**************************************
                 // What the request should look like in case of classes or strings:
@@ -847,7 +859,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     method,
                     interfaceType,
                     methodReturnType,
-                    messageHeaders,
+                    outgoingMessageHeaders,
                     originalRequestObject,
                     soapVersion,
                     isXmlSerializer,
@@ -863,6 +875,8 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                         null,
                         false,
                         Application.Current.Host.Settings.DefaultSoapCredentialsMode);
+
+                incomingMessageString = response;
 
                 return ReadAndPrepareResponse(
                     response,
@@ -921,7 +935,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             }
 
 #if OPENSILVER
-            private static string GetEnvelopeHeaders(ICollection<MessageHeader> messageHeaders)
+            private static string GetEnvelopeHeaders(ICollection<MessageHeader> messageHeaders, string soapVersion)
             {
                 if (messageHeaders == null || !messageHeaders.Any())
                 {
@@ -935,16 +949,25 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     using (var sw = new StringWriter())
                     using (var xw = XmlWriter.Create(sw, settings))
                     {
-                        mh.WriteHeader(xw, MessageVersion.Default);
+                        mh.WriteHeader(xw, soapVersion == "1.1" ? MessageVersion.Soap11 : MessageVersion.Soap12WSAddressing10);
 
                         xw.Flush();
                         return sw.ToString();
                     }
                 }));
             }
+
+            private static MessageHeaders GetEnvelopeHeaders(string incomingMessageString, string soapVersion)
+            {
+                using (var reader = XmlReader.Create(new StringReader(incomingMessageString)))
+                {
+                    var incomingMessage = Message.CreateMessage(reader, int.MaxValue, soapVersion == "1.1" ? MessageVersion.Soap11 : MessageVersion.Soap12WSAddressing10);
+                    return incomingMessage.Headers;
+                }
+            }
 #endif
 
-            private void ProcessNode(XElement node, Action<XElement> action)
+                private void ProcessNode(XElement node, Action<XElement> action)
             {
                 action(node);
                 foreach (XElement child in node.Elements())
@@ -1305,17 +1328,29 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 // we make our own exception. Because it is easier that way (it will probably
                 // require an actual deserialization of the users' FaultException later on, to 
                 // be able to support their custom ones).
+
+                VerifyThatResponseIsNotNullOrEmpty(responseAsString);
+                string NS;
+                if (soapVersion == "1.1")
+                {
+                    NS = "http://schemas.xmlsoap.org/soap/envelope/";
+                }
+                else
+                {
+                    Debug.Assert(soapVersion == "1.2",
+                                    string.Format("Unexpected soap version ({0}) !", soapVersion));
+                    NS = "http://www.w3.org/2003/05/soap-envelope";
+                }
+
+                XElement envelopeElement = XDocument.Parse(responseAsString).Root;
+                XElement headerElement = envelopeElement.Element(XName.Get("Header", NS));
+                XElement bodyElement = envelopeElement.Element(XName.Get("Body", NS));
+
+
 #if OPENSILVER
                 // Error parsing, if applicable
                 if (soapVersion == "1.2")
                 {
-                    const string NS = "http://www.w3.org/2003/05/soap-envelope";
-
-                    VerifyThatResponseIsNotNullOrEmpty(responseAsString);
-                    XElement envelopeElement = XDocument.Parse(responseAsString).Root;
-                    XElement headerElement = envelopeElement.Element(XName.Get("Header", NS));
-                    XElement bodyElement = envelopeElement.Element(XName.Get("Body", NS));
-
                     XElement faultElement = bodyElement.Element(XName.Get("Fault", NS));
 
                     if (faultElement != null)
@@ -1446,12 +1481,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     // to allow passing it as Generic type argument when calling CallWebMethod.
                     if (requestResponseType == typeof(object))
                     {
-                        VerifyThatResponseIsNotNullOrEmpty(responseAsString);
-                        XDocument doc = XDocument.Parse(responseAsString);
-                        XElement currentElement = doc.Root; //Current element is Envelope
-                        currentElement = (XElement)currentElement.FirstNode; //Current element is now Body
-                        currentElement = (XElement)currentElement.FirstNode; //Current element is now METHODNAMEResponse
-                        if (currentElement.Nodes().Count() == 0)
+                        if (bodyElement != null && bodyElement.Nodes().Count() == 0)
                         {
                             // Note: there might be a more efficient way of checking if the method has a return 
                             // type (possibly through a smart use of responseAsString.IndexOf but it seems 
@@ -1481,23 +1511,18 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     }
 
                     DataContractSerializerCustom deSerializer = new DataContractSerializerCustom(typeToDeserialize, types);
-                    VerifyThatResponseIsNotNullOrEmpty(responseAsString);
-                    XDocument xDoc = XDocument.Parse(responseAsString);
-                    responseAsString = RemoveUnparsableStrings(responseAsString);
-                    XElement xElement = xDoc.Root;
+                    XElement xElement = envelopeElement;
 
                     //exclude the parts that are <Enveloppe><Body>... since they are useless 
                     // and would keep the deserialization from working properly
                     // they should always be the two outermost elements
                     if (soapVersion == "1.1")
                     {
-                        xElement = xElement.Element(XName.Get("Body", "http://schemas.xmlsoap.org/soap/envelope/")) ?? xElement;
+                        xElement = bodyElement ?? xElement;
                     }
                     else
                     {
-                        Debug.Assert(soapVersion == "1.2",
-                                     string.Format("Unexpected soap version ({0}) !", soapVersion));
-                        xElement = xElement.Element(XName.Get("Body", "http://www.w3.org/2003/05/soap-envelope"));
+                        xElement = bodyElement;
                     }
 
                     // we check if the type is defined in the next XElement because 
@@ -1599,24 +1624,6 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 }
 
                 return requestResponse;
-            }
-
-            // Now that we use the javascript function ParseFromString 
-            // we need to remove unsparable strings from the response
-            // To Do : replace the encoding of the soap response so there 
-            // are no unparsable strings
-            private string RemoveUnparsableStrings(string str)
-            {
-                string[] unparsableStrings = new string[]
-                {
-                    "&#x1A;"
-                };
-
-                foreach (string unparsableString in unparsableStrings)
-                {
-                    str = str.Replace(unparsableString, "");
-                }
-                return str;
             }
 
             static void VerifyThatResponseIsNotNullOrEmpty(string responseAsString)
