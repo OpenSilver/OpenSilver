@@ -1191,6 +1191,10 @@
 		<Content Include="DefaultStyles\INTERNAL_DefaultHeaderedContentControlStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultListBoxStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Content>
     <Content Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
