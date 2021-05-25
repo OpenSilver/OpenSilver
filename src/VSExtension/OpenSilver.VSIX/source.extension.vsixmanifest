@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
-    <Metadata>
-        <Identity Id="OpenSilver.64201874-6ead-4828-b5af-31a76285b73d" Version="1.0.018" Language="en-US" Publisher="Userware" />
-        <DisplayName>OpenSilver</DisplayName>
-        <Description xml:space="preserve">Project templates for creating OpenSilver applications. OpenSilver is an open-source reimplementation of Silverlight that runs on current browsers via WebAssembly.</Description>
-        <Icon>Logo_32x32.png</Icon>
-        <PreviewImage>Logo_200x200.png</PreviewImage>
-    </Metadata>
-    <Installation>
-        <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[16.4.29519.181, 17.0)" />
-        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[16.4.29519.181, 17.0)" />
-        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[16.4.29519.181, 17.0)" />
-        <InstallationTarget Id="Microsoft.VisualStudio.IntegratedShell" Version="[16.4.29519.181, 17.0)" />
-        <InstallationTarget Id="Microsoft.VisualStudio.Ultimate" Version="[16.4.29519.181, 17.0)" />
-    </Installation>
-    <Dependencies>
-        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
-    </Dependencies>
-    <Prerequisites>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[16.0,17.0)" DisplayName="Visual Studio core editor" />
-        <Prerequisite Id="Microsoft.VisualStudio.ComponentGroup.WebToolsExtensions" Version="[16.0,)" DisplayName="ASP.NET and web development"/>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.ManagedDesktop.Prerequisites" Version="[16.0,)" DisplayName=".NET desktop development tools"/>
-    </Prerequisites>
-    <Assets>
-        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="DotNetForHtml5.VisualStudioExtension.ShellIntegration" Path="|DotNetForHtml5.VisualStudioExtension.ShellIntegration;PkgdefProjectOutputGroup|" d:VsixSubPath="ShellIntegration" />
-        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor" Path="|DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor;PkgdefProjectOutputGroup|" d:VsixSubPath="SplittedXamlEditor" />
-        <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="File" Path="ItemTemplates" d:TargetPath="ItemTemplates\CSharp" />
-        <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="File" Path="CSharpXamlForHtml5.XamlDesigner.dll" AssemblyName="CSharpXamlForHtml5.XamlDesigner.dll" />
-        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="OpenSilverApplicationTemplate" d:TargetPath="|OpenSilverApplicationTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
-        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="OpenSilverClassLibraryTemplate" d:TargetPath="|OpenSilverClassLibraryTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
-        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="OpenSilverUwpApplicationTemplate" d:TargetPath="|OpenSilverUwpApplicationTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
-        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="OpenSilverUwpClassLibraryTemplate" d:TargetPath="|OpenSilverUwpClassLibraryTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
-        <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="OpenSilver.TemplateWizards" Path="|OpenSilver.TemplateWizards|" AssemblyName="|OpenSilver.TemplateWizards;AssemblyName|" />
-    </Assets>
+	<Metadata>
+		<Identity Id="OpenSilver.64201874-6ead-4828-b5af-31a76285b73d" Version="1.0.019" Language="en-US" Publisher="Userware" />
+		<DisplayName>OpenSilver</DisplayName>
+		<Description xml:space="preserve">Project templates for creating OpenSilver applications. OpenSilver is an open-source reimplementation of Silverlight that runs on current browsers via WebAssembly.</Description>
+		<Icon>Logo_32x32.png</Icon>
+		<PreviewImage>Logo_200x200.png</PreviewImage>
+	</Metadata>
+	<Installation>
+		<InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[16.4.29519.181, 17.0)" />
+		<InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[16.4.29519.181, 17.0)" />
+		<InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[16.4.29519.181, 17.0)" />
+		<InstallationTarget Id="Microsoft.VisualStudio.IntegratedShell" Version="[16.4.29519.181, 17.0)" />
+		<InstallationTarget Id="Microsoft.VisualStudio.Ultimate" Version="[16.4.29519.181, 17.0)" />
+	</Installation>
+	<Dependencies>
+		<Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+	</Dependencies>
+	<Prerequisites>
+		<Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[16.0,17.0)" DisplayName="Visual Studio core editor" />
+		<Prerequisite Id="Microsoft.VisualStudio.ComponentGroup.WebToolsExtensions" Version="[16.0,)" DisplayName="ASP.NET and web development"/>
+		<Prerequisite Id="Microsoft.VisualStudio.Component.ManagedDesktop.Prerequisites" Version="[16.0,)" DisplayName=".NET desktop development tools"/>
+	</Prerequisites>
+	<Assets>
+		<Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="DotNetForHtml5.VisualStudioExtension.ShellIntegration" Path="|DotNetForHtml5.VisualStudioExtension.ShellIntegration;PkgdefProjectOutputGroup|" d:VsixSubPath="ShellIntegration" />
+		<Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor" Path="|DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor;PkgdefProjectOutputGroup|" d:VsixSubPath="SplittedXamlEditor" />
+		<Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="File" Path="ItemTemplates" d:TargetPath="ItemTemplates\CSharp" />
+		<Asset Type="Microsoft.VisualStudio.Assembly" d:Source="File" Path="CSharpXamlForHtml5.XamlDesigner.dll" AssemblyName="CSharpXamlForHtml5.XamlDesigner.dll" />
+		<Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="OpenSilverApplicationTemplate" d:TargetPath="|OpenSilverApplicationTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
+		<Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="OpenSilverClassLibraryTemplate" d:TargetPath="|OpenSilverClassLibraryTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
+		<Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="OpenSilverUwpApplicationTemplate" d:TargetPath="|OpenSilverUwpApplicationTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
+		<Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="OpenSilverUwpClassLibraryTemplate" d:TargetPath="|OpenSilverUwpClassLibraryTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
+		<Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="OpenSilver.TemplateWizards" Path="|OpenSilver.TemplateWizards|" AssemblyName="|OpenSilver.TemplateWizards;AssemblyName|" />
+	</Assets>
 </PackageManifest>

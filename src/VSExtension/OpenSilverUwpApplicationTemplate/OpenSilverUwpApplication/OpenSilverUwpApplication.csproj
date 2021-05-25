@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenSilver.UWPCompatible" Version="1.0.0-alpha-018" />
+    <PackageReference Include="OpenSilver.UWPCompatible" Version="1.0.0-alpha-019" />
   </ItemGroup>
 
   <ItemGroup>

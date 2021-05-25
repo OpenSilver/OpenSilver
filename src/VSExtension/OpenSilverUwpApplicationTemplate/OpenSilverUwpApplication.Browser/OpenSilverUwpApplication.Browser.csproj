@@ -37,7 +37,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="3.2.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Build" Version="3.2.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="3.2.1" PrivateAssets="all" />
-    <PackageReference Include="OpenSilver.UWPCompatible" Version="1.0.0-alpha-018" />
+    <PackageReference Include="OpenSilver.UWPCompatible" Version="1.0.0-alpha-019" />
   </ItemGroup>
 
   <ItemGroup>

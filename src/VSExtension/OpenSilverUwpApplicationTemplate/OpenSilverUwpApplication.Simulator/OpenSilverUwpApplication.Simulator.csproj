@@ -66,7 +66,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="OpenSilver.UWPCompatible.Simulator" Version="1.0.0-alpha-018" />
+    <PackageReference Include="OpenSilver.UWPCompatible.Simulator" Version="1.0.0-alpha-019" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
