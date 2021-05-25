@@ -24,4 +24,8 @@
             </ProjectTemplateLink>
         </ProjectCollection>
     </TemplateContent>
+	<WizardExtension>
+		<Assembly>OpenSilver.TemplateWizards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</Assembly>
+		<FullClassName>OpenSilver.TemplateWizards.SetSlnDependencies</FullClassName>
+	</WizardExtension>
 </VSTemplate>

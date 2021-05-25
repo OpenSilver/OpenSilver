@@ -128,6 +128,12 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
+    <ProjectReference Include="..\OpenSilver.TemplateWizards\OpenSilver.TemplateWizards.csproj">
+      <Project>{5BCC3CB3-6BB0-4382-8FBA-62D8D5071C23}</Project>
+      <Name>OpenSilver.TemplateWizards</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
     <ProjectReference Include="..\OpenSilverApplicationTemplate\OpenSilverApplicationTemplate.csproj">
       <Project>{ED7A89B5-CD09-4697-8CEA-69EC1546D1DF}</Project>
       <Name>OpenSilverApplicationTemplate</Name>

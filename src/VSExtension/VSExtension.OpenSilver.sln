@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSilverUwpApplicationTem
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSilverUwpClassLibraryTemplate", "OpenSilverUwpClassLibraryTemplate\OpenSilverUwpClassLibraryTemplate.csproj", "{EDA8EF8D-2EF0-4C9A-BB83-63E577F2CD12}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSilver.TemplateWizards", "OpenSilver.TemplateWizards\OpenSilver.TemplateWizards.csproj", "{5BCC3CB3-6BB0-4382-8FBA-62D8D5071C23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{EDA8EF8D-2EF0-4C9A-BB83-63E577F2CD12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDA8EF8D-2EF0-4C9A-BB83-63E577F2CD12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDA8EF8D-2EF0-4C9A-BB83-63E577F2CD12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BCC3CB3-6BB0-4382-8FBA-62D8D5071C23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BCC3CB3-6BB0-4382-8FBA-62D8D5071C23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BCC3CB3-6BB0-4382-8FBA-62D8D5071C23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BCC3CB3-6BB0-4382-8FBA-62D8D5071C23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
