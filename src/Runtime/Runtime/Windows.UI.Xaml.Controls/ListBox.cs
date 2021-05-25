@@ -82,7 +82,10 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Initializes a new instance of the ListBox class.
         /// </summary>
-        public ListBox() { }
+        public ListBox()
+        {
+            this.DefaultStyleKey = typeof(ListBox);
+        }
 
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
