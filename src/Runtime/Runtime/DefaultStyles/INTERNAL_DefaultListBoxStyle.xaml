@@ -10,7 +10,7 @@
       </Grid.RenderTransform>
       <VisualStateManager.VisualStateGroups>
         <VisualStateGroup x:Name="OpenStates">
-          <VisualStateGroup.Transitions>
+          <!--<VisualStateGroup.Transitions>
             <VisualTransition GeneratedDuration="0"/>
             <VisualTransition GeneratedDuration="0:0:0.2" To="Open">
               <Storyboard>
@@ -22,7 +22,7 @@
                 <DoubleAnimation Duration="0:0:0.2" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Root"/>
               </Storyboard>
             </VisualTransition>
-          </VisualStateGroup.Transitions>
+          </VisualStateGroup.Transitions>-->
           <VisualState x:Name="Closed">
             <Storyboard>
               <DoubleAnimation Duration="0" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Root"/>
@@ -54,9 +54,9 @@
     <Setter Property="VerticalContentAlignment" Value="Top"/>
     <Setter Property="IsTabStop" Value="False"/>
     <Setter Property="BorderThickness" Value="1"/>
-    <Setter Property="TabNavigation" Value="Once"/>
+    <!--<Setter Property="TabNavigation" Value="Once"/>
     <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
-    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>-->
     <Setter Property="BorderBrush">
       <Setter.Value>
         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -106,14 +106,14 @@
               </VisualStateGroup>
             </VisualStateManager.VisualStateGroups>
             <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2">
-              <ScrollViewer x:Name="ScrollViewer" BorderBrush="Transparent" BorderThickness="0" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" TabNavigation="{TemplateBinding TabNavigation}">
+              <ScrollViewer x:Name="ScrollViewer" BorderBrush="Transparent" BorderThickness="0" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
                 <ItemsPresenter/>
               </ScrollViewer>
             </Border>
             <Border x:Name="ValidationErrorElement" BorderBrush="#FFDB000C" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" Visibility="Collapsed">
               <ToolTipService.ToolTip>
-                <ToolTip x:Name="validationTooltip" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" Placement="Right" PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}" Template="{StaticResource ValidationToolTipTemplate}">
-                  <ToolTip.Triggers>
+                <ToolTip x:Name="validationTooltip" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" Template="{StaticResource ValidationToolTipTemplate}">
+                  <!--<ToolTip.Triggers>
                     <EventTrigger RoutedEvent="Canvas.Loaded">
                       <BeginStoryboard>
                         <Storyboard>
@@ -127,7 +127,7 @@
                         </Storyboard>
                       </BeginStoryboard>
                     </EventTrigger>
-                  </ToolTip.Triggers>
+                  </ToolTip.Triggers>-->
                 </ToolTip>
               </ToolTipService.ToolTip>
               <Grid Background="Transparent" HorizontalAlignment="Right" Height="10" Margin="0,-4,-4,0" VerticalAlignment="Top" Width="10">
