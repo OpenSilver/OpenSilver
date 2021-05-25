@@ -197,12 +197,12 @@ namespace Windows.UI.Xaml
             return null;
         }
 
-        public virtual dynamic GetDomElementWhereToPlaceChild(UIElement child) // Note: if overridden, it supercedes the "INTERNAL_InnerDomElement" property.
+        public virtual object GetDomElementWhereToPlaceChild(UIElement child) // Note: if overridden, it supercedes the "INTERNAL_InnerDomElement" property.
         {
             return null;
         }
 
-        public dynamic GetChildsWrapper(UIElement child)
+        public object GetChildsWrapper(UIElement child)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_VisualTreeManager.IsElementInVisualTree(child))
             {
@@ -485,7 +485,7 @@ namespace Windows.UI.Xaml
                 INTERNAL_UpdateCssPointerEvents(uiElement);
 #endif
                 // Get a reference to the most outer DOM element to show/hide:
-                dynamic mostOuterDomElement = null;
+                object mostOuterDomElement = null;
                 if (uiElement.INTERNAL_VisualParent is UIElement)
                     mostOuterDomElement = ((UIElement)uiElement.INTERNAL_VisualParent).INTERNAL_VisualChildrenInformation[uiElement].INTERNAL_OptionalChildWrapper_OuterDomElement; // Note: this is useful for example inside a Grid, where we want to hide the whole child wrapper in order to ensure that it doesn't capture mouse clicks thus preventing users from clicking on other elements in the Grid.
                 if (mostOuterDomElement == null)
@@ -743,7 +743,7 @@ namespace Windows.UI.Xaml
 
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
-                dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
+                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
                 if (isHitTestVisible && isEnabled)
                 {
                     style.pointerEvents = "auto";
@@ -830,7 +830,7 @@ namespace Windows.UI.Xaml
             return CapturePointer(value, this.INTERNAL_OuterDomElement);
         }
 
-        private bool CapturePointer(Pointer value, dynamic element) //note: when the pointer is already captured, trying to capture it again does absolutely nothing (even after releasing the first one)
+        private bool CapturePointer(Pointer value, object element) //note: when the pointer is already captured, trying to capture it again does absolutely nothing (even after releasing the first one)
         {
             // We set the events on document then reroute these events to the UIElement.
             if (Pointer.INTERNAL_captured == null)
@@ -839,58 +839,7 @@ namespace Windows.UI.Xaml
 
                 if (IsRunningInJavaScript())
                 {
-#if !BRIDGE
-                    JSIL.Verbatim.Expression(@"
-     document.onmouseup = function(e) {
-        if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }
-     document.onmouseover = function(e) {
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }       
-    document.onmousedown = function(e) {
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }                               
-     document.onmouseout = function(e) {   
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }                                      
-     document.onmousemove = function(e) {  
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }                                      
-     document.onclick = function(e) {      
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }                                      
-     document.oncontextmenu = function(e) {
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }                                      
-     document.ondblclick = function(e) {   
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }
-", element);
-#else
+#if BRIDGE
                     Bridge.Script.Write(@"
      document.onmouseup = function(e) {
         if(e.doNotReroute == undefined)
@@ -1247,19 +1196,19 @@ namespace Windows.UI.Xaml
         /// </returns>
         public GeneralTransform TransformToVisual(UIElement visual)
         {
-            dynamic outerDivOfThisControl = this.INTERNAL_OuterDomElement;
+            var outerDivOfThisControl = this.INTERNAL_OuterDomElement;
 
             // If no "visual" was specified, we use the Window root instead.
             // Note: This is useful for example when calculating the position of popups, which are defined in absolute coordinates, at the same level as the Window root.
-            dynamic outerDivOfReferenceVisual =
+            var outerDivOfReferenceVisual =
                 (visual != null) ? visual.INTERNAL_OuterDomElement : this.INTERNAL_ParentWindow.INTERNAL_OuterDomElement;
 
             double offsetLeft, offsetTop;
             if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
             {
                 // ------- IN-BROWSER -------
-                dynamic rectOfThisControl = outerDivOfThisControl.getBoundingClientRect();
-                dynamic rectOfReferenceVisual = outerDivOfReferenceVisual.getBoundingClientRect();
+                var rectOfThisControl = ((dynamic)outerDivOfThisControl).getBoundingClientRect();
+                var rectOfReferenceVisual = ((dynamic)outerDivOfReferenceVisual).getBoundingClientRect();
 
                 offsetLeft = rectOfThisControl.left - rectOfReferenceVisual.left;
                 offsetTop = rectOfThisControl.top - rectOfReferenceVisual.top;

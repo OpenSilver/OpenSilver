@@ -97,12 +97,8 @@ namespace Windows.UI.Xaml
 
             // Create the DIV that will correspond to the root of the window visual tree:
             object windowRootDiv;
-#if CSHTML5NETSTANDARD
-            INTERNAL_HtmlDomStyleReference
-#else
-            dynamic
-#endif
-            windowRootDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", rootDomElement, this, out windowRootDiv);
+
+            var windowRootDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", rootDomElement, this, out windowRootDiv);
 
             windowRootDivStyle.position = "absolute";
             windowRootDivStyle.width = "100%";

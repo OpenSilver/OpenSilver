@@ -52,7 +52,7 @@ namespace Windows.UI.Xaml
         {
         }
 
-        internal static void INTERNAL_InitializeOuterDomElementWidthAndHeight(FrameworkElement element, dynamic outerDomElement)
+        internal static void INTERNAL_InitializeOuterDomElementWidthAndHeight(FrameworkElement element, object outerDomElement)
         {
 #if PERFSTAT
             var t0 = Performance.now();
@@ -776,7 +776,7 @@ if ($0.tagName.toLowerCase() != 'span')
                                     if ((fe.Parent is Grid))
                                     {
                                         //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
-                                        dynamic boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
+                                        var boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
                                         if (!isMsGrid)
                                         {
                                             boxSizingStyle.marginTop = "0px";
@@ -800,7 +800,7 @@ if ($0.tagName.toLowerCase() != 'span')
                                 if (isCSSGrid && (fe.Parent is Grid))
                                 {
                                     //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
-                                    dynamic boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
+                                    var boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
                                     if (!isMsGrid)
                                     {
                                         boxSizingStyle.marginTop = "auto";
@@ -829,7 +829,7 @@ if ($0.tagName.toLowerCase() != 'span')
                                 if (isCSSGrid && (fe.Parent is Grid))
                                 {
                                     //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
-                                    dynamic boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
+                                    var boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
                                     if (!isMsGrid)
                                     {
                                         boxSizingStyle.marginTop = "auto";
@@ -862,7 +862,7 @@ if ($0.tagName.toLowerCase() != 'span')
                                 }
                                 else
                                 {
-                                    dynamic boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
+                                    var boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
                                     boxSizingStyle.msGridRowAlign = "stretch";
                                 }
                             }

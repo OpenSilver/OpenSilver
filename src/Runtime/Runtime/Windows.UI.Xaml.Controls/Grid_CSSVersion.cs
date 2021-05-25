@@ -29,21 +29,12 @@ namespace Windows.UI.Xaml.Controls
 {
     public partial class Grid
     {
-        void ColumnDefinitions_CollectionChanged_CSSVersion(object sender, NotifyCollectionChangedEventArgs e)
+        private void ColumnDefinitions_CollectionChanged_CSSVersion(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
                 if (e.NewItems != null)
                 {
-                    //foreach (ColumnDefinition columnDefinition in e.NewItems)
-                    //{
-                    //    columnDefinition.Parent = this;
-                    //    if (columnDefinition.Visibility == Visibility.Collapsed)
-                    //    {
-                    //        Grid_InternalHelpers.RefreshColumnVisibility(this, columnDefinition, Visibility.Collapsed);
-                    //        //columnDefinition.Visibility = Visibility.Collapsed; //to call the Visibility_changed callback. //Note: this could set the localValue when it should be the VisualStateValue.
-                    //    }
-                    //}
                     Grid_InternalHelpers.RefreshAllColumnsWidth_CSSVersion(this);
                 }
 
@@ -56,7 +47,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        void RowDefinitions_CollectionChanged_CSSVersion(object sender, NotifyCollectionChangedEventArgs e)
+        private void RowDefinitions_CollectionChanged_CSSVersion(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (this._isLoaded)
             {
@@ -79,7 +70,7 @@ namespace Windows.UI.Xaml.Controls
             this.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth = _innerDiv;
 
             // Set the "display" CSS property:
-            dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_innerDiv);
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_innerDiv);
             style.display = !Grid_InternalHelpers.isMSGrid() ? style.display = "grid" : Grid_InternalHelpers.INTERNAL_CSSGRID_MS_PREFIX + "grid";
 
             // Normalize the sizes of the rows and columns:
@@ -138,7 +129,7 @@ namespace Windows.UI.Xaml.Controls
                     MakeGridPositionCorrect(ref elementLastRow, maxRow);
                     MakeGridPositionCorrect(ref elementLastColumn, maxColumn);
 
-                    dynamic style = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(uiElement);
+                    var style = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(uiElement);
 
                     style.zIndex = Canvas.GetZIndex(uiElement).ToString(); // we need this because for some reason, shapes overlap everything in their cell unless everyone has their zIndex set, in which case it depends of the order of the grid's children (which i the normal behaviour).
                     style.position = "relative";
@@ -185,18 +176,6 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
                     }
                 }
             }
-            //for (int i = 0; i <= maxRow; ++i)
-            //{
-            //    for (int j = 0; j <= maxColumn; ++j)
-            //    {
-            //        UIElement uiElement = lastElements[i, j];
-            //        if (uiElement != null)
-            //        {
-            //            dynamic style = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(uiElement);
-            //            style.position = "relative";
-            //        }
-            //    }
-            //}
         }
 
         /// <summary>
@@ -222,14 +201,14 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
 
         //Note: the result of these properties will be defined in the html style as : grid-area: row-start column-start row-end column-end
 
-        static void Row_Changed_CSSVersion(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void Row_Changed_CSSVersion(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement element = (UIElement)d;
             ////int oldValue = (int)e.OldValue;
             ApplyRowPosition(element);
         }
 
-        static void ApplyRowPosition(UIElement element)
+        private static void ApplyRowPosition(UIElement element)
         {
             int maxRow = 0;
             if (element.INTERNAL_VisualParent != null && element.INTERNAL_VisualParent is Grid) //Note: this also checks if INTERNAL_VisualTreeManager.IsElementInVisualTree(element) is true because there is no point in setting it on Windows and Popups.
@@ -240,23 +219,19 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
                     maxRow = parent._rowDefinitionsOrNull.Count - 1;
                 }
 
-
                 int elementRow = GetRow(element);
                 MakeGridPositionCorrect(ref elementRow, maxRow);
-
 
                 int rowSpan = GetRowSpan(element);
                 if (rowSpan <= 1)
                     rowSpan = 1;
 
-
-                dynamic style = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(element);
+                var style = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(element);
                 bool isMsGrid = Grid_InternalHelpers.isMSGrid();
                 if (!isMsGrid)
                 {
                     int lastRow = elementRow + rowSpan - 1; //note: there was a -1 here before but it seems to not give he result expected.
                     MakeGridPositionCorrect(ref lastRow, maxRow);
-
 
                     style.gridRowStart = (elementRow + 1).ToString(); //Note: +1 because rows start from 1 instead of 0 in js.
                     style.gridRowEnd = (lastRow + 2).ToString(); //Note: +1 because rows start from 1 instead of 0 in js and another + 1 because the gridRowEnd seems to be the row BEFORE WHITCH the span ends.
@@ -267,12 +242,10 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
                     style.msGridRow = (elementRow + 1).ToString(); //Note: +1 because rows start from 1 instead of 0 in js.
                     style.msGridRowSpan = (rowSpan).ToString();
                 }
-
-
             }
         }
 
-        static void ApplyColumnPosition(UIElement element)
+        private static void ApplyColumnPosition(UIElement element)
         {
             int maxColumn = 0;
             if (element.INTERNAL_VisualParent != null && element.INTERNAL_VisualParent is Grid) //Note: this also checks if INTERNAL_VisualTreeManager.IsElementInVisualTree(element) is true because there is no point in setting it on Windows and Popups.
@@ -282,12 +255,10 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
                 {
                     maxColumn = parent._columnDefinitionsOrNull.Count - 1;
 
-
                     int elementColumn = GetColumn(element);
                     MakeGridPositionCorrect(ref elementColumn, maxColumn);
 
-
-                    dynamic style = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(element);
+                    var style = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(element);
                     int columnSpan = GetColumnSpan(element);
                     if (columnSpan <= 1)
                         columnSpan = 1;
@@ -305,45 +276,42 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
                         style.msGridColumn = (elementColumn + 1).ToString(); //Note: +1 because columns start from 1 instead of 0 in js.
                         style.msGridColumnSpan = (columnSpan).ToString(); //Note: +1 because columns start from 1 instead of 0 in js and another + 1 because the gridColumnEnd seems to be the column BEFORE WHITCH the span ends.
                     }
-
                 }
             }
         }
 
-        static void RowSpan_Changed_CSSVersion(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void RowSpan_Changed_CSSVersion(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement element = (UIElement)d;
             ApplyRowPosition(element);
         }
 
-        static void Column_Changed_CSSVersion(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void Column_Changed_CSSVersion(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement element = (UIElement)d;
             ApplyColumnPosition(element);
         }
 
-        static void ColumnSpan_Changed_CSSVersion(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void ColumnSpan_Changed_CSSVersion(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement element = (UIElement)d;
             ApplyColumnPosition(element);
         }
-
 
         #endregion
 
-
         private double GetColumnActualWidth_CSSVersion(ColumnDefinition columnDefinition)
         {
-            double returnValue = double.NaN;
+            double returnValue = 0;
 
             //make a new div that we add to the grid in the correct column, with width and height at 100%, (opacity at 0 ?), position: absolute
             int columnIndex = _columnDefinitionsOrNull.IndexOf(columnDefinition);
 
-            dynamic div1 = AddTemporaryDivForRowOrColumnDimensions(columnIndex, 0);
+            var div1 = AddTemporaryDivForRowOrColumnDimensions(columnIndex, 0);
 
             if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
             {
-                returnValue = div1.offsetWidth;
+                returnValue = ((dynamic)div1).offsetWidth;
             }
             else
             {
@@ -355,32 +323,18 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
             return returnValue;
         }
 
-        //private double GetColumnActualHeight_CSSVersion(ColumnDefinition columnDefinition)
-        //{
-        //    //the column's height is basically the height of the whole grid, right?
-        //    if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
-        //    {
-        //        return _innerDiv.offsetHeight;
-        //    }
-        //    else
-        //    {
-        //        INTERNAL_SimulatorExecuteJavaScript.ForceExecutionOfAllPendingCode(); // Explanation: we usually optimize performance in the Simulator by postponing the JS code that sets the CSS properties. This reduces the number of interop calls between C# and the browser. However, in the current case here we need to have all the properties already applied in order to be able to calculate the size of the DOM element. Therefore we need to call the "ForceExecution" method.
-        //        return (double)INTERNAL_HtmlDomManager.CastToJsValue_SimulatorOnly(INTERNAL_HtmlDomManager.GetDomElementAttribute(_innerDiv, "offsetHeight"));
-        //    }
-        //}
-
         private double GetRowActualHeight_CSSVersion(RowDefinition rowDefinition)
         {
-            double returnValue = double.NaN;
+            double returnValue = 0;
 
             //make a new div that we add to the grid in the correct column, with width and height at 100%, (opacity at 0 ?), position: absolute
             int rowIndex = _rowDefinitionsOrNull.IndexOf(rowDefinition);
 
-            dynamic div1 = AddTemporaryDivForRowOrColumnDimensions(0, rowIndex);
+            var div1 = AddTemporaryDivForRowOrColumnDimensions(0, rowIndex);
 
             if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
             {
-                returnValue = div1.offsetHeight;
+                returnValue = ((dynamic)div1).offsetHeight;
             }
             else
             {
@@ -392,24 +346,10 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
             return returnValue;
         }
 
-        //private double GetRowActualWidth_CSSVersion(RowDefinition rowDefinition)
-        //{
-        //    //the row's width is basically the width of the whole grid, right?
-        //    if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
-        //    {
-        //        return _innerDiv.offsetWidth;
-        //    }
-        //    else
-        //    {
-        //        INTERNAL_SimulatorExecuteJavaScript.ForceExecutionOfAllPendingCode(); // Explanation: we usually optimize performance in the Simulator by postponing the JS code that sets the CSS properties. This reduces the number of interop calls between C# and the browser. However, in the current case here we need to have all the properties already applied in order to be able to calculate the size of the DOM element. Therefore we need to call the "ForceExecution" method.
-        //        return (double)INTERNAL_HtmlDomManager.CastToJsValue_SimulatorOnly(INTERNAL_HtmlDomManager.GetDomElementAttribute(_innerDiv, "offsetWidth"));
-        //    }
-        //}
-
         private object AddTemporaryDivForRowOrColumnDimensions(int columnIndex, int rowIndex)
         {
-            dynamic div1;
-            dynamic div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", (object)_innerDiv, this, out div1);
+            object div1;
+            var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", (object)_innerDiv, this, out div1);
             div1style.width = "100%";
             div1style.height = "100%";
             div1style.opacity = "0";
@@ -424,10 +364,7 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
             else
             {
                 div1style.msGridColumn = (columnIndex + 1).ToString(); //Note: +1 because columns start from 1 instead of 0 in js.
-                //div1style.msGridColumnSpan = (columnSpan).ToString(); //Note: +1 because columns start from 1 instead of 0 in js and another + 1 because the gridColumnEnd seems to be the column BEFORE WHITCH the span ends.
-
                 div1style.msGridRow = (rowIndex + 1).ToString(); //Note: +1 because columns start from 1 instead of 0 in js.
-
             }
 
             return div1;

@@ -83,13 +83,13 @@ namespace Windows.UI.Xaml.Documents
         
         protected override void OnAfterApplyHorizontalAlignmentAndWidth()
         {
-            dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement);
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement);
             style.display = "inline";
         }
 
         protected override void OnAfterApplyVerticalAlignmentAndWidth()
         {
-            dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement);
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement);
             style.display = "inline";
         }
     }

@@ -198,7 +198,7 @@ namespace Windows.UI.Xaml.Controls
             if (!control.HasTemplate)
             {
                 var newThickness = (Thickness)newValue;
-                dynamic domElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(control);
+                var domElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(control);
                 domElement.borderStyle = "solid"; //todo: see if we should put this somewhere else
                 domElement.borderWidth = string.Format(CultureInfo.InvariantCulture,
                     "{0}px {1}px {2}px {3}px",

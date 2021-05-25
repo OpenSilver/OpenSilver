@@ -119,6 +119,10 @@ namespace CSHTML5.Internal
         public string background { set { SetStylePropertyValue("background", value); } }
         public string backgroundColor { set { SetStylePropertyValue("backgroundColor", value); } }
         public string border { set { SetStylePropertyValue("border", value); } }
+        public string borderRight { set { SetStylePropertyValue("borderRight", value); } }
+        public string borderLeft { set { SetStylePropertyValue("borderLeft", value); } }
+        public string borderBottom { set { SetStylePropertyValue("borderBottom", value); } }
+        public string borderTop { set { SetStylePropertyValue("borderTop", value); } }
         public string borderBottomLeftRadius { set { SetStylePropertyValue("borderBottomLeftRadius", value); } }
         public string borderBottomRightRadius { set { SetStylePropertyValue("borderBottomRightRadius", value); } }
         public string borderCollapse { set { SetStylePropertyValue("borderCollapse", value); } }
@@ -152,6 +156,12 @@ namespace CSHTML5.Internal
         public string minWidth { set { SetStylePropertyValue("minWidth", value); } }
         public string maxHeight { set { SetStylePropertyValue("maxHeight", value); _maxHeight = value; } get { return _maxHeight; } }
         public string maxWidth { set { SetStylePropertyValue("maxWidth", value); _maxWidth = value; } get { return _maxWidth; } }
+        public string msGridColumn { set { SetStylePropertyValue("msGridColumn", value); } }
+        public string msGridColumns { set { SetStylePropertyValue("msGridColumns", value); } }
+        public string msGridColumnSpan { set { SetStylePropertyValue("msGridColumnSpan", value); } }
+        public string msGridRow { set { SetStylePropertyValue("msGridRow", value); } }
+        public string msGridRows { set { SetStylePropertyValue("msGridRows", value); } }
+        public string msGridRowSpan { set { SetStylePropertyValue("msGridRowSpan", value); } }
         public string msGridRowAlign { set { SetStylePropertyValue("msGridRowAlign", value); } }
         public string msTransform { set { SetStylePropertyValue("msTransform", value); } }
         public string msTransformOrigin { set { SetStylePropertyValue("msTransformOrigin", value); } }
@@ -171,6 +181,7 @@ namespace CSHTML5.Internal
         public string tableLayout { set { SetStylePropertyValue("tableLayout", value); } }
         public string textAlign { set { SetStylePropertyValue("textAlign", value); } }
         public string textDecoration { set { SetStylePropertyValue("textDecoration", value); } }
+        public string textOverflow { set { SetStylePropertyValue("textOverflow", value); } }
         public string textShadow { set { SetStylePropertyValue("textShadow", value); } }
         public string transform { set { SetStylePropertyValue("transform", value); } }
         public string transformOrigin { set { SetStylePropertyValue("transformOrigin", value); } }

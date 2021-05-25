@@ -215,9 +215,9 @@ namespace Windows.UI.Xaml
             //------------------
 
             object div1;
-            dynamic div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
+            var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
             object div2;
-            dynamic div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
+            var div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
             div2style.width = "100%";
             div2style.height = "100%";
             if (INTERNAL_ForceEnableAllPointerEvents)
@@ -236,9 +236,9 @@ namespace Windows.UI.Xaml
             //------------------
 
             object div1;
-            dynamic div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
+            var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
             object div2;
-            dynamic div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
+            var div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
             div2style.width = "100%";
             div2style.height = "100%";
             if (INTERNAL_ForceEnableAllPointerEvents)

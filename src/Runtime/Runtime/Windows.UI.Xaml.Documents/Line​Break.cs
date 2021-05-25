@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Documents
     {
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            dynamic linebreak = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("br", parentRef, this);
+            var linebreak = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("br", parentRef, this);
             domElementWhereToPlaceChildren = linebreak;
             return linebreak;
         }

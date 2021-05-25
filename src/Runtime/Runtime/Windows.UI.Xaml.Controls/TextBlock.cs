@@ -60,8 +60,8 @@ namespace Windows.UI.Xaml.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            dynamic div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
-            dynamic divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+            var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
             divStyle.whiteSpace = TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap";
             divStyle.overflow = "hidden"; //keeps the text from overflowing despite the TextBlock's size limitations.
             divStyle.textAlign = "left"; // this is the default value.
@@ -226,7 +226,7 @@ namespace Windows.UI.Xaml.Controls
 
         private static void OnTextTrimmedChangedUpdateDOM(DependencyObject d, object newValue)
         {
-            dynamic style = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification((TextBlock)d);
+            var style = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification((TextBlock)d);
             switch ((TextTrimming)newValue)
             {
                 case TextTrimming.CharacterEllipsis:

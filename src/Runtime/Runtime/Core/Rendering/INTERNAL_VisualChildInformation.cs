@@ -37,8 +37,8 @@ namespace CSHTML5.Internal
         // Note: for structures that don't require the creation of "wrappers" around their children, those two fields must be left blank.
 
         public UIElement INTERNAL_UIElement { get; set; }
-        public dynamic INTERNAL_OptionalChildWrapper_OuterDomElement { get; set; } // This is used to remove the child (and its parent-specific wrapper) from the DOM.
-        public dynamic INTERNAL_OptionalChildWrapper_ChildWrapperInnerDomElement { get; set; } // This is used to place grand-children inside.
+        public object INTERNAL_OptionalChildWrapper_OuterDomElement { get; set; } // This is used to remove the child (and its parent-specific wrapper) from the DOM.
+        public object INTERNAL_OptionalChildWrapper_ChildWrapperInnerDomElement { get; set; } // This is used to place grand-children inside.
     }
 
 }

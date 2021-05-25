@@ -169,7 +169,7 @@ namespace Windows.UI.Xaml.Shapes
                     ApplyMarginToFixNegativeCoordinates(_marginOffsets);
                 }
 
-                dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
+                var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
                 context.rect(xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication, yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication, sizeX, sizeY);
 
                 //todo: make sure the parameters below are correct.

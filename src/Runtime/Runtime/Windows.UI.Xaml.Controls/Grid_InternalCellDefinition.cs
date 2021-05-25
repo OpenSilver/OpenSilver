@@ -37,9 +37,9 @@ namespace Windows.UI.Xaml.Controls
         public bool IsOverlapped = false; // Means that another cell is overlapping this cell due to the "ColumnSpan" or "RowSpan".
         public bool IsOccupied = false;
         public INTERNAL_CellDefinition ParentCell;
-        public dynamic DomElement;
-        public dynamic RowDomElement;
-        public dynamic ColumnDomElement;
+        public object DomElement;
+        public object RowDomElement;
+        public object ColumnDomElement;
         internal string INTERNAL_previousValueOfDisplayCssProperty = "table-cell";
         internal int numberOfChildren = 0;
     }

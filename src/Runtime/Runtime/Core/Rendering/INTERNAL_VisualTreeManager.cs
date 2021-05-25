@@ -69,7 +69,7 @@ namespace CSHTML5.Internal
                     INTERNAL_HtmlDomManager.RemoveFromDom(child.INTERNAL_AdditionalOutsideDivForMargins, stringForDebugging);
 
                     // Remove the parent-specific wrapper around the child in the DOM (if any):
-                    dynamic optionalChildWrapper_OuterDomElement = parent.INTERNAL_VisualChildrenInformation[child].INTERNAL_OptionalChildWrapper_OuterDomElement;
+                    var optionalChildWrapper_OuterDomElement = parent.INTERNAL_VisualChildrenInformation[child].INTERNAL_OptionalChildWrapper_OuterDomElement;
                     if (optionalChildWrapper_OuterDomElement != null)
                         INTERNAL_HtmlDomManager.RemoveFromDom(optionalChildWrapper_OuterDomElement);
 

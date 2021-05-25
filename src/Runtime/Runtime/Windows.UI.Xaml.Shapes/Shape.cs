@@ -147,7 +147,7 @@ namespace Windows.UI.Xaml.Shapes
             var shape = (Shape)d;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(shape))
             {
-                dynamic shapeDom = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(shape);
+                var shapeDom = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(shape);
 
                 Stretch newValue = (Stretch)e.NewValue;
                 if (double.IsNaN(shape.Width))
@@ -425,8 +425,8 @@ namespace Windows.UI.Xaml.Shapes
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
-                context.lineWidth = StrokeThickness + "";
+                var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
+                context.lineWidth = StrokeThickness.ToInvariantString();
                 ScheduleRedraw();
             }
         }
