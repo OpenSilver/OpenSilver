@@ -220,7 +220,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TimeUpDown.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TreeViewItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\UpDownBase.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WebView.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WrapPanel.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\Binding.cs" />
