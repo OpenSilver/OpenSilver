@@ -19,13 +19,17 @@ using System.Windows.Controls.Common;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using VisualStates = System.Windows.Controls.Internal.VisualStates;
 #else
 using Windows.System;
 using Windows.UI.Xaml.Controls.Common;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using VisualStates = Windows.UI.Xaml.Controls.Internal.VisualStates; 
 #endif
+
+using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
 
 #if WORKINPROGRESS && OPENSILVER
 #if MIGRATION
@@ -104,9 +108,9 @@ namespace Windows.UI.Xaml.Controls
             this.IsEnabledChanged += new DependencyPropertyChangedEventHandler(this.ValidationSummary_IsEnabledChanged);
             if (DesignerProperties.IsInDesignTool)
             {
-                this.Errors.Add(new ValidationSummaryItem("Sample Error", typeof(ValidationSummaryItem).Name, ValidationSummaryItemType.ObjectError, null, null));
-                this.Errors.Add(new ValidationSummaryItem("Sample Error", typeof(ValidationSummaryItem).Name, ValidationSummaryItemType.ObjectError, null, null));
-                this.Errors.Add(new ValidationSummaryItem("Sample Error", typeof(ValidationSummaryItem).Name, ValidationSummaryItemType.ObjectError, null, null));
+                this.Errors.Add(new ValidationSummaryItem(resources.ValidationSummarySampleError, typeof(ValidationSummaryItem).Name, ValidationSummaryItemType.ObjectError, null, null));
+                this.Errors.Add(new ValidationSummaryItem(resources.ValidationSummarySampleError, typeof(ValidationSummaryItem).Name, ValidationSummaryItemType.ObjectError, null, null));
+                this.Errors.Add(new ValidationSummaryItem(resources.ValidationSummarySampleError, typeof(ValidationSummaryItem).Name, ValidationSummaryItemType.ObjectError, null, null));
             }
         }
 
@@ -276,7 +280,7 @@ namespace Windows.UI.Xaml.Controls
             if (vs != null && !vs.AreHandlersSuspended())
             {
                 vs.SetValueNoCallback(ValidationSummary.HasErrorsProperty, e.OldValue);
-                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, "{0} cannot be set because the underlying property is read only.", "HasErrors"));
+                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, resources.UnderlyingPropertyIsReadOnly, "HasErrors"));
             }
         }
 
@@ -310,7 +314,7 @@ namespace Windows.UI.Xaml.Controls
             if (vs != null && !vs.AreHandlersSuspended())
             {
                 vs.SetValueNoCallback(ValidationSummary.HasDisplayedErrorsProperty, e.OldValue);
-                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, "{0} cannot be set because the underlying property is read only.", "HasDisplayedErrors"));
+                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, resources.UnderlyingPropertyIsReadOnly, "HasDisplayedErrors"));
             }
         }
 
@@ -755,7 +759,7 @@ namespace Windows.UI.Xaml.Controls
 
         internal string GetHeaderString()
         {
-            string errorString = this._displayedErrors.Count == 1 ? "1 Error" : String.Format(CultureInfo.InvariantCulture, "{0} Errors", this._displayedErrors.Count);
+            string errorString = this._displayedErrors.Count == 1 ? resources.ValidationSummaryHeaderError : String.Format(CultureInfo.InvariantCulture, resources.ValidationSummaryHeaderErrors, this._displayedErrors.Count);
             return errorString;
         }
 

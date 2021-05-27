@@ -119,26 +119,15 @@
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IRecyclingItemContainerGenerator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\AutoCompleteSearch.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\CalendarExtensions.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\Common\Extensions.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridEditAction.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridHeadersVisibility.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridRowDetailsVisibilityMode.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\DescriptionViewer.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\FocusingInvalidControlEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\PopulatingEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\RangeObservableCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TileView.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TileViewItem.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationHelper.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationItemCollection.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationMetadata.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummary.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryFilters.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItem.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItemSource.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItemType.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\BusyIndicator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Calendar.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CalendarBlackoutDatesCollection.cs" />
@@ -422,7 +411,6 @@
     <Compile Include="Windows.UI.Xaml.Controls\Frame.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\INavigate.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ItemsControlDragDropTarget.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\Label.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Slider.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Toolkit\CollectionHelpers.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Toolkit\EnumerableExtensions.cs" />
@@ -1117,10 +1105,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="DefaultStyles\INTERNAL_DefaultValidationControlsStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultViewboxStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1140,6 +1124,7 @@
   <ItemGroup>
     <Folder Include="System.ComponentModel\WORKINPROGRESS\" />
     <Folder Include="System.Reflection\WORKINPROGRESS\" />
+    <Folder Include="Windows.UI.Xaml.Controls\Common\" />
   </ItemGroup>
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' " />

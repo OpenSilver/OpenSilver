@@ -269,6 +269,9 @@ namespace DotNetForHtml5.Compiler
 #if CSHTML5BLAZOR
                 switch (assemblyName)
                 {
+                    case "System.Windows.Controls.Data.Input":
+                        assemblyName = "OpenSilver.Controls.Data.Input";
+                        return;
                     case "System.Windows.Controls.Data.DataForm.Toolkit":
                         assemblyName = "OpenSilver.Controls.Data.DataForm.Toolkit";
                         return;
@@ -282,6 +285,9 @@ namespace DotNetForHtml5.Compiler
 #elif BRIDGE
                 switch (assemblyName)
                 {
+                    case "System.Windows.Controls.Data.Input":
+                        assemblyName = "CSHTML5.Controls.Data.Input";
+                        return;
                     default:
                         if (assemblyName == "System" || assemblyName.StartsWith("System."))
                         {

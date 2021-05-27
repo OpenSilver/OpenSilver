@@ -15,11 +15,15 @@ using System.Globalization;
 using System.Windows.Controls.Common;
 using System.Windows.Data;
 using System.Windows.Input;
+using VisualStates = System.Windows.Controls.Internal.VisualStates;
 #else
 using Windows.UI.Xaml.Controls.Common;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
+using VisualStates = Windows.UI.Xaml.Controls.Internal.VisualStates; 
 #endif
+
+using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
 
 #if WORKINPROGRESS && OPENSILVER
 #if MIGRATION
@@ -225,7 +229,7 @@ namespace Windows.UI.Xaml.Controls
             if (label != null && !label.AreHandlersSuspended())
             {
                 label.SetValueNoCallback(DescriptionViewer.IsFocusedProperty, e.OldValue);
-                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, "{0} cannot be set because the underlying property is read only.", "IsFocused"));
+                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, resources.UnderlyingPropertyIsReadOnly, "IsFocused"));
             }
         }
 
@@ -258,7 +262,7 @@ namespace Windows.UI.Xaml.Controls
             if (dv != null && !dv.AreHandlersSuspended())
             {
                 dv.SetValueNoCallback(DescriptionViewer.IsValidProperty, e.OldValue);
-                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, "{0} cannot be set because the underlying property is read only.", "IsValid"));
+                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, resources.UnderlyingPropertyIsReadOnly, "IsValid"));
             }
         }
 

@@ -12,17 +12,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
-
-#if SL_TOOLKIT
-using resources = System.Windows.Controls.Data.Input.Resources;
-#endif // SL_TOOLKIT
+using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
 
 #if MIGRATION
 using System.Windows.Data;
 using System.Windows.Controls.Common;
+using VisualStates = System.Windows.Controls.Internal.VisualStates;
 #else
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Controls.Common;
+using VisualStates = Windows.UI.Xaml.Controls.Internal.VisualStates; 
 #endif
 
 #if MIGRATION
@@ -37,19 +36,10 @@ namespace Windows.UI.Xaml.Controls
     /// <QualityBand>Preview</QualityBand>
     [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
     [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
-#if SL_TOOLKIT
     [TemplateVisualState(Name = VisualStates.StateNotRequired, GroupName = VisualStates.GroupRequired)]
     [TemplateVisualState(Name = VisualStates.StateRequired, GroupName = VisualStates.GroupRequired)]
-#else
-    [TemplateVisualState(Name = "NotRequired", GroupName = "RequiredStates")]
-    [TemplateVisualState(Name = "Required", GroupName = "RequiredStates")]
-#endif // SL_TOOLKIT
     [TemplateVisualState(Name = VisualStates.StateValid, GroupName = VisualStates.GroupValidation)]
-#if SL_TOOLKIT
     [TemplateVisualState(Name = VisualStates.StateInvalid, GroupName = VisualStates.GroupValidation)]
-#else
-    [TemplateVisualState(Name = "Invalid", GroupName = VisualStates.GroupValidation)]
-#endif // SL_TOOLKIT
     public class Label : ContentControl
     {
         #region Member fields
@@ -136,7 +126,7 @@ namespace Windows.UI.Xaml.Controls
 
         /// <summary>
         ///   Gets or sets a value that indicates whether 
-        ///   the <see cref="P:System.Windows.Controls.Label.Target" /> field is required. 
+        ///   the <see cref="Label.Target" /> field is required. 
         /// </summary>
         public bool IsRequired
         {
@@ -183,7 +173,7 @@ namespace Windows.UI.Xaml.Controls
 
         /// <summary>
         ///   Gets a value that indicates whether 
-        ///   the <see cref="P:System.Windows.Controls.Label.Target" /> field data is valid. 
+        ///   the <see cref="Label.Target" /> field data is valid. 
         /// </summary>
         public bool IsValid
         {
@@ -197,14 +187,7 @@ namespace Windows.UI.Xaml.Controls
             if (label != null && !label.AreHandlersSuspended())
             {
                 label.SetValueNoCallback(Label.IsValidProperty, e.OldValue);
-#if SL_TOOLKIT
                 throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, resources.UnderlyingPropertyIsReadOnly, "IsValid"));
-#else
-                throw new InvalidOperationException(
-                    String.Format(CultureInfo.InvariantCulture,
-                                  "{0} cannot be set because the underlying property is read only.",
-                                  "IsValid"));
-#endif // SL_TOOLKIT
             }
         }
 
@@ -223,9 +206,9 @@ namespace Windows.UI.Xaml.Controls
 
         /// <summary>
         ///   Gets or sets the path to the dependency property on the 
-        ///   <see cref="P:System.Windows.FrameworkElement.DataContext" /> of the 
-        ///   <see cref="P:System.Windows.Controls.Label.Target" /> control that this 
-        ///   <see cref="T:System.Windows.Controls.Label" /> is associated with. 
+        ///   <see cref="FrameworkElement.DataContext" /> of the 
+        ///   <see cref="Label.Target" /> control that this 
+        ///   <see cref="Label" /> is associated with. 
         /// </summary>
         public string PropertyPath
         {
@@ -259,7 +242,7 @@ namespace Windows.UI.Xaml.Controls
             new PropertyMetadata(OnTargetPropertyChanged));
 
         /// <summary>
-        ///   Gets or sets the control that this <see cref="T:System.Windows.Controls.Label" /> is associated with. 
+        ///   Gets or sets the control that this <see cref="Label" /> is associated with. 
         /// </summary>
         public FrameworkElement Target
         {
@@ -509,11 +492,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void UpdateRequiredState()
         {
-#if SL_TOOLKIT
             VisualStateManager.GoToState(this, this.IsRequired ? VisualStates.StateRequired : VisualStates.StateNotRequired, true);
-#else
-            VisualStateManager.GoToState(this, this.IsRequired ? "Required" : "NotRequired", true);
-#endif // SL_TOOLKIT
         }
 
         /// <summary>
@@ -521,11 +500,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void UpdateValidationState()
         {
-#if SL_TOOLKIT
             VisualStateManager.GoToState(this, this.IsValid ? VisualStates.StateValid : VisualStates.StateInvalid, true);
-#else
-            VisualStateManager.GoToState(this, this.IsValid ? VisualStates.StateValid : "Invalid", true);
-#endif // SL_TOOLKIT
         }
 
         #endregion UpdateState

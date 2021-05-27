@@ -1,8 +1,9 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
 
     <!--ValidationSummary-->
-    <Style TargetType="ValidationSummary">
+    <Style TargetType="sdk:ValidationSummary">
         <Setter Property="IsTabStop"
                 Value="False" />
         <Setter Property="Background"
@@ -148,7 +149,7 @@
         </Setter>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="ValidationSummary">
+                <ControlTemplate TargetType="sdk:ValidationSummary">
                     <Grid x:Name="ValidationSummary">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
@@ -229,14 +230,14 @@
     </Style>
 
     <!--Label-->
-    <Style TargetType="Label">
+    <Style TargetType="sdk:Label">
         <Setter Property="IsTabStop"
                 Value="False" />
         <Setter Property="HorizontalContentAlignment"
                 Value="Left" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="Label">
+                <ControlTemplate TargetType="sdk:Label">
                     <Grid>
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
@@ -302,7 +303,7 @@
     </Style>
 
     <!--DescriptionViewer-->
-    <Style TargetType="DescriptionViewer">
+    <Style TargetType="sdk:DescriptionViewer">
         <Setter Property="IsTabStop"
                 Value="False" />
         <Setter Property="GlyphTemplate">
@@ -414,7 +415,7 @@
         </Setter>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="DescriptionViewer">
+                <ControlTemplate TargetType="sdk:DescriptionViewer">
                     <StackPanel Orientation="Horizontal">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="DescriptionStates">

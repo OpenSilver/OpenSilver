@@ -10,6 +10,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -161,7 +162,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>The string representation of the ValidationSummaryItem.</returns>
         public override string ToString()
         {
-            return String.Format(CultureInfo.InvariantCulture, "{0}: {1}", this.MessageHeader, this.Message);
+            return String.Format(CultureInfo.InvariantCulture, resources.ValidationSummaryItem, this.MessageHeader, this.Message);
         }
 
         private void NotifyPropertyChanged(string propertyName)

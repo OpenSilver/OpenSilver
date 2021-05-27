@@ -27,6 +27,7 @@
     <!-- OpenSilver runtime -->
     <file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.dll" target="lib/netstandard2.0/OpenSilver.dll" />
 	<file src="../../src/Runtime/DataForm.Toolkit/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.dll" />
+	<file src="../../src/Runtime/Controls.Data.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.Input.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.Input.dll" />
 
     <!-- OpenSilver targets -->
     <file src="../../src/Targets/$Target$.targets" target="build/$PackageId$.targets" />

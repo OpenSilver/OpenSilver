@@ -7,10 +7,11 @@
 
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit">
+                    xmlns:toolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+                    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
 
     <!--DataForm-->
-    <Style TargetType="sdk:DataForm">
+    <Style TargetType="toolkit:DataForm">
         <Setter Property="AutoCommit"
                 Value="True" />
         <Setter Property="AutoGenerateFields"
@@ -51,8 +52,8 @@
                 Value="Visible" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="sdk:DataForm">
-                    <Grid sdk:DataField.IsFieldGroup="True">
+                <ControlTemplate TargetType="toolkit:DataForm">
+                    <Grid toolkit:DataField.IsFieldGroup="True">
                         <Grid.Resources>
                             <Style x:Key="ButtonGeneric"
                                    TargetType="Button">
@@ -678,7 +679,7 @@
                                     <ContentPresenter x:Name="ContentPresenter"
                                                       Margin="12,12,6,12" />
                                 </ScrollViewer>
-                                <ValidationSummary x:Name="ValidationSummary"
+                                <sdk:ValidationSummary x:Name="ValidationSummary"
                                                    Grid.Row="2"
                                                    MaxHeight="100"
                                                    BorderThickness="0" />
@@ -716,7 +717,7 @@
     </Style>
 
     <!--DataField-->
-    <Style TargetType="sdk:DataField">
+    <Style TargetType="toolkit:DataField">
         <Setter Property="IsTabStop"
                 Value="False" />
         <Setter Property="Margin"
@@ -725,7 +726,7 @@
                 Value="24" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="sdk:DataField">
+                <ControlTemplate TargetType="toolkit:DataField">
                     <ContentControl x:Name="ContentControl"
                                     Foreground="{TemplateBinding Foreground}"
                                     IsTabStop="False"

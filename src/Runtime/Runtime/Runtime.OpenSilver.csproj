@@ -129,7 +129,6 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\WebRequestCreator.cs" />
 		<Compile Include="System.Xaml\IMarkupExtension.cs" />
 		<Compile Include="Windows.Foundation\WORKINPROGRESS\Point.cs" />
-		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\DescriptionViewerAutomationPeer.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\RangeBaseAutomationPeer.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\ScrollBarAutomationPeer.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Provider\WORKINPROGRESS\IDockProvider.cs" />
@@ -155,7 +154,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\AccordionSelectionMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\AutoCompleteSearch.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\Common\Extensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DataGridEditAction.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DataGridHeadersVisibility.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DataGridRowDetailsVisibilityMode.cs" />
@@ -167,8 +165,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\TileView.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TileViewItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TimePickerPopupTemplate.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\ValidationHelper.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\ValidationMetadata.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Accordion.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AccordionItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
@@ -224,7 +220,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TimeUpDown.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TreeViewItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\UpDownBase.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\ValidationItemCollection.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WebView.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WrapPanel.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
@@ -344,7 +339,6 @@
 		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\TextBlockAutomationPeer.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\TextBoxAutomationPeer.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\ToggleButtonAutomationPeer.cs" />
-		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\ValidationSummaryAutomationPeer.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Provider\WORKINPROGRESS\IExpandCollapseProvider.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Provider\WORKINPROGRESS\IGridItemProvider.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Provider\WORKINPROGRESS\IGridProvider.cs" />
@@ -366,16 +360,10 @@
 		<Compile Include="Windows.UI.Xaml.Automation.Provider\WORKINPROGRESS\IWindowProvider.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptableMemberAttribute.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptableTypeAttribute.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\FocusingInvalidControlEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\OpenFileDialog.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\RichTextBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\SaveFileDialog.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ScrollContentPresenter.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\ValidationSummary.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryFilters.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItem.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItemSource.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItemType.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\VirtualizingPanel.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\VirtualizingStackPanel.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IItemContainerGenerator.cs" />
@@ -747,7 +735,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\ItemsControl.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ItemsPanelTemplate.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ItemsPresenter.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\Label.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ListBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ListBoxItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\MediaElement.cs" />
@@ -796,7 +783,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\Viewbox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\VisualStates.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WebView.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DescriptionViewer.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Frame.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Page.cs" />
@@ -1198,9 +1184,6 @@
     <Content Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
-		<Content Include="DefaultStyles\INTERNAL_DefaultValidationControlsStyle.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Content>
 		<Content Include="DefaultStyles\INTERNAL_DefaultDataGridStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Content>
