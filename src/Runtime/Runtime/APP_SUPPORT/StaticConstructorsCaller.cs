@@ -44,6 +44,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             LoadTypeConstructor("Windows.UI.Xaml.Media", "System.Windows.Media", "DoubleCollection", coreAssembly);
             LoadTypeConstructor("Windows.UI.Xaml.Media", "System.Windows.Media", "FontFamily", coreAssembly);
             LoadTypeConstructor("Windows.UI.Xaml.Media", "System.Windows.Media", "Geometry", coreAssembly);
+            LoadTypeConstructor("Windows.UI.Xaml.Media", "System.Windows.Media", "PointCollection", coreAssembly);
             LoadTypeConstructor("Windows.UI.Xaml.Media", "System.Windows.Media", "ImageSource", coreAssembly);
             LoadTypeConstructor("Windows.UI.Xaml.Media", "System.Windows.Media", "Matrix", coreAssembly);
             LoadTypeConstructor("Windows.UI.Xaml", "System.Windows", "PropertyPath", coreAssembly);
