@@ -120,6 +120,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\CalendarExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DatePickerFormat.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Typography.cs" />
+		<Compile Include="Windows.UI.Xaml.Media\Polygon.cs" />
 		<Compile Include="Windows.UI.Xaml\Expression.cs" />
 		<Compile Include="Windows.UI.Xaml\TemplateBindingExtension.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontCapitals.cs" />
@@ -262,7 +263,6 @@
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\EasingColorKeyFrame.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\LinearColorKeyFrame.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\MultiScaleTileSource.cs" />
-		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\Polygon.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\SkewTransform.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TextFormattingMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\TextHintingMode.cs" />

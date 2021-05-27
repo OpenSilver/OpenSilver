@@ -285,6 +285,22 @@ namespace CSHTML5.Internal
             //context.lineWidth = path.StrokeThickness;
         }
 
+        internal static void PreparePolygon(object canvasDomElement, PointCollection points)
+        {
+            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+
+            context.beginPath();
+            context.moveTo(points[0].X, points[0].Y);
+
+            for (int i = 1; i < points.Count; i++)
+            {
+                context.lineTo(points[i].X, points[i].Y);
+            }
+
+            context.closePath();
+            context.fill();
+        }
+
         internal static void PrepareEllipse(object canvasDomElement, double ellipseWidth, double ellipseHeight, double centerX, double centerY)
         {
             var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);

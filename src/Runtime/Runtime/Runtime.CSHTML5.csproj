@@ -169,6 +169,7 @@
     <Compile Include="Windows.UI.Xaml.Data\CollectionViewSource.cs" />
     <Compile Include="Windows.UI.Xaml.Data\DataExtensionMethods.cs" />
     <Compile Include="Windows.UI.Xaml.Data\EnumerableCollectionView.cs" />
+    <Compile Include="Windows.UI.Xaml.Media\Polygon.cs" />
     <Compile Include="Windows.UI.Xaml\Expression.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IndexedEnumerable.cs" />
     <Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
@@ -1128,7 +1129,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
-	<Content Include="DefaultStyles\INTERNAL_DefaultListBoxStyle.xaml">
+    <Content Include="DefaultStyles\INTERNAL_DefaultListBoxStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
