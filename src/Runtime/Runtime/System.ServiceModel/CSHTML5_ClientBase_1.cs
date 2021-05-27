@@ -1488,7 +1488,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                             // complicated and not necessarily more efficient).
                             // this is a method with no return type, there is no need to read the response 
                             // after checking that there was no FaultException.
-                            return null;
+                            return string.Empty;
                         }
                     }
 
