@@ -8,7 +8,7 @@ using System.Diagnostics;
 #if MIGRATION
 namespace System.Windows.Controls.Internal
 #else
-namespace Windows.UI.Xaml.Controls
+namespace Windows.UI.Xaml.Controls.Internal
 #endif
 {
     internal static class VisualStates
