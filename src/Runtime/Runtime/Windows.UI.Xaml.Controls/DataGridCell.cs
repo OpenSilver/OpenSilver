@@ -40,6 +40,8 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a cell of a System.Windows.Controls.DataGrid control.
     /// </summary>
+    [TemplateVisualState(Name = "Normal", GroupName = "Common")]
+    [TemplateVisualState(Name = "Selected", GroupName = "Common")]
     public partial class DataGridCell : ButtonBase
     {
         public DataGridCell()
@@ -115,33 +117,8 @@ namespace Windows.UI.Xaml.Controls
         {
             //todo: call event accordingly to the new Value + set the Background/Foreground
             DataGridCell dataGridCell = (DataGridCell)d;
-
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(dataGridCell))
-            {
-                bool newValue = (bool)e.NewValue;
-                    if (newValue)
-                    {
-                        dataGridCell.Background = dataGridCell.Column._parent.SelectedItemBackground;
-                        dataGridCell.Foreground = dataGridCell.Column._parent.SelectedItemForeground;
-                        //todo: event. (inside or outside of this if?)
-                    }
-                    else
-                    {
-                        int RowIndex = Grid.GetRow(dataGridCell);
-
-                        if (RowIndex % 2 == 0 && RowIndex != 0) // gray color
-                        {
-                            dataGridCell.Background = dataGridCell.Column._parent.AlternatingRowBackground ?? dataGridCell.Column._parent.Background;
-                        }
-                        else // white color
-                        {
-                            dataGridCell.Background = dataGridCell.Column._parent.RowBackground ?? dataGridCell.Column._parent.Background;
-                        }
-                        dataGridCell.Foreground = dataGridCell.Column._parent.UnselectedItemForeground ?? dataGridCell.Column._parent.Foreground;
-
-                        //todo: event. (inside or outside of this if?)
-                    }
-            }
+            bool newValue = (bool)e.NewValue;
+            VisualStateManager.GoToState(dataGridCell, newValue ? "Selected" : "Normal", false);
         }
 
         // if the content of the cell is clickable, it will mark this cell as selected
