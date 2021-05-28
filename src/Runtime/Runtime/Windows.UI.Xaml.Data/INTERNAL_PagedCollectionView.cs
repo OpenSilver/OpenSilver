@@ -545,7 +545,6 @@ namespace Windows.UI.Xaml.Data
                 int newPageIndex = VerifyPageIndex(value);
                 if (newPageIndex != _PageIndex) // ChangeOutputColletion can take lot of time, because it refreshes the controls that use this as source
                 {
-                    int oldCount = this.Count;
 #if WORKINPROGRESS && !CSHTML5NETSTANDARD
                     OnPageChanging(newPageIndex);
 #endif
@@ -556,10 +555,8 @@ namespace Windows.UI.Xaml.Data
                     OnPageChanged();
 
 #if WORKINPROGRESS && !CSHTML5NETSTANDARD
-                    if (this.Count != oldCount)
-                    {
-                        OnPropertyChanged("Count");
-                    }
+                   
+                    OnPropertyChanged("Count");
 #endif
                 }
             }
