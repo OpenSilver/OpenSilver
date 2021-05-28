@@ -46,7 +46,11 @@ namespace Windows.UI.Xaml.Controls
         //     was committed or canceled.
         [OpenSilver.NotImplemented]
         public DataGridCellEditEndedEventArgs(DataGridColumn column, DataGridRow row, DataGridEditAction editAction)
-        { }
+        {
+            Column = column;
+            Row = row;
+            EditAction = editAction;
+        }
 
         //
         // Summary:
