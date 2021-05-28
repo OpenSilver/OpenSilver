@@ -1696,9 +1696,15 @@ element.setAttribute(""data-maxlength"", ""{1}"");
         }
         #endregion
 
-        [OpenSilver.NotImplemented]
         public void Select(int start, int length)
         {
+            if (start < 0)
+                throw new ArgumentOutOfRangeException(nameof(start));
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length));
+
+            SelectionStart = start;
+            SelectionLength = length;
         }
 
         [OpenSilver.NotImplemented]
