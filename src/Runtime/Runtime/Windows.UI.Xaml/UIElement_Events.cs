@@ -1242,6 +1242,7 @@ namespace Windows.UI.Xaml
         /// <param name="eventArgs">The arguments for the event.</param>
         protected virtual void OnGotFocus(RoutedEventArgs eventArgs)
         {
+            FocusManager.SetFocusedElement(this.INTERNAL_ParentWindow, this);
             if (_gotFocusEventManager == null)
                 return;
             foreach (RoutedEventHandler handler in _gotFocusEventManager.Handlers.ToList<RoutedEventHandler>())
