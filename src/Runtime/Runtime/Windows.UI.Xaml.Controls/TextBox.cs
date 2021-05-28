@@ -1666,6 +1666,17 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             textBox.UpdateVisualStates();
         }
 
+        public void Select(int start, int length)
+        {
+            if (start < 0)
+                throw new ArgumentOutOfRangeException(nameof(start));
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length));
+
+            SelectionStart = start;
+            SelectionLength = length;
+        }
+
         #region Not implemented yet (should we move this in WORKINPROGRESS ?)
 
         [OpenSilver.NotImplemented]
@@ -1695,11 +1706,6 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             set { SetValue(SelectionBackgroundProperty, value); }
         }
         #endregion
-
-        [OpenSilver.NotImplemented]
-        public void Select(int start, int length)
-        {
-        }
 
         [OpenSilver.NotImplemented]
         public string SelectedText { get; set; }
