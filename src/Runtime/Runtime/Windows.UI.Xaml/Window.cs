@@ -252,7 +252,14 @@ namespace Windows.UI.Xaml
                 InvalidateArrange();
 
                 // At the first contentChanged, InvaliateMeasure/Arrange does not work because IsArrangeValid and IsMeasureValid is false.
-                CalculateWindowLayout();
+                if (CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
+                {
+                    Debug.WriteLine("Delayed CalculateWindowLayout");
+                    // On the simulator, Window Bounds height is zero at the startup.
+                    Task.Delay(500).ContinueWith(t => CalculateWindowLayout());
+                }
+                else
+                    CalculateWindowLayout();
 #endif
 
             }
@@ -471,10 +478,7 @@ namespace Windows.UI.Xaml
         private void CalculateWindowLayout()
         {
             if (Current.INTERNAL_VisualChildrenInformation == null)
-            {
-                Console.WriteLine("INTERNAL_VisualChildrenInformation is null");
                 return;
-            }
 
             Rect windowBounds = this.Bounds;
             double width = windowBounds.Width;

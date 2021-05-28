@@ -117,11 +117,6 @@ namespace Windows.UI.Xaml.Controls
                 default:
                     throw new NotSupportedException(string.Format("Unexpected collection change action '{0}'.", e.Action));
             }
-
-#if WORKINPROGRESS
-            InvalidateMeasure();
-            InvalidateArrange();
-#endif
         }
 
 #region Children Management

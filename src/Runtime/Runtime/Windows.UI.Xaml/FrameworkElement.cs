@@ -903,29 +903,29 @@ namespace Windows.UI.Xaml
             
             if (metadata != null)
             {
-                //INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
                 if (metadata.AffectsMeasure)
                 {
-                    //Console.WriteLine($"AffectsMeasure {domElementReference.UniqueIdentifier} {this} {e.Property}");
                     InvalidateMeasure();
                 }
 
                 if (metadata.AffectsArrange)
                 {
-                    //Console.WriteLine($"AffectsArrange {domElementReference.UniqueIdentifier} {this} {e.Property}");
                     InvalidateArrange();
                 }
 
                 if (metadata.AffectsRender)
                 {
-                    //Console.WriteLine($"AffectsRender {domElementReference.UniqueIdentifier} {this} {e.Property}");
                     //InvalidateVisual();
                 }
 
                 if (metadata.AffectsParentMeasure)
                 {
-                    //Console.WriteLine($"AffectsParentMeasure {domElementReference.UniqueIdentifier} {this} {e.Property}");
                     InvalidateParentMeasure();
+                }
+
+                if (metadata.AffectsParentArrange)
+                {
+                    InvalidateParentArrange();
                 }
             }
         }
@@ -950,6 +950,7 @@ namespace Windows.UI.Xaml
             finalSize = size.Combine(finalSize).Bounds(MinSize, MaxSize);
 
             Size arrangedSize = ArrangeOverride(finalSize);
+            arrangedSize = size.Combine(arrangedSize).Bounds(MinSize, MaxSize);
 
             Rect containingRect = new Rect(arrangedSize);
 
@@ -1050,6 +1051,10 @@ namespace Windows.UI.Xaml
             availableSize = size.Combine(availableSize).Bounds(MinSize, MaxSize);
 
             Size measuredSize = MeasureOverride(availableSize);
+            
+            var w = Math.Max(0, Math.Min(availableSize.Width, measuredSize.Width));
+            var h = Math.Max(0, Math.Min(availableSize.Height, measuredSize.Height));
+            measuredSize = new Size(w, h);
             measuredSize = size.Combine(measuredSize).Bounds(MinSize, MaxSize);
 
             measuredSize.Width = Math.Max(0, measuredSize.Width + Margin.Left + Margin.Right);

@@ -177,35 +177,49 @@ namespace Windows.UI.Xaml
         public void Arrange(Rect finalRect)
         {
             if (this.INTERNAL_OuterDomElement == null)
+            {
+                LayoutManager.Current.RemoveArrange(this);
+                PreviousFinalRect = finalRect;
+                IsArrangeValid = true;
                 return;
+            }
 
             using (System.Windows.Threading.Dispatcher.INTERNAL_GetCurrentDispatcher().DisableProcessing())
             {
                 using (DisableMeasureInvalidation())
                 {
-                    if (Visibility != Visibility.Visible || 
-                        (IsArrangeValid && finalRect.Location.IsClose(PreviousFinalRect.Location) && finalRect.Size.IsClose(PreviousFinalRect.Size)))
+                    bool previousArrangeValid = IsArrangeValid;
+                    Rect savedPreviousFinalRect = PreviousFinalRect;
+                    PreviousFinalRect = finalRect;
+                    IsArrangeValid = true;
+
+                    LayoutManager.Current.RemoveArrange(this);
+
+                    if (Visibility != Visibility.Visible ||
+                        (previousArrangeValid && finalRect.Location.IsClose(savedPreviousFinalRect.Location) && finalRect.Size.IsClose(savedPreviousFinalRect.Size)))
                     {
                         //Console.WriteLine($"Arrange previousFinalRect {this}");
-                        LayoutManager.Current.RemoveArrange(this);
                         return;
                     }
 
                     if (!IsMeasureValid)
                     {
+                        Size previousDesiredSize = this.DesiredSize;
                         Measure(finalRect.Size);
+                        if (previousDesiredSize != this.DesiredSize)
+                        {
+                            this.InvalidateParentMeasure();
+                            this.InvalidateParentArrange();
+                        }
                     }
 
                     ArrangeCore(finalRect);
 
                     PreviousFinalRect = finalRect;
 
-                    IsArrangeValid = true;
-
                     // Render with new size & location
                     Render();
 
-                    LayoutManager.Current.RemoveArrange(this);
                     LayoutManager.Current.AddUpdatedElement(this);
                 }
             }
@@ -255,19 +269,30 @@ namespace Windows.UI.Xaml
         public void Measure(Size availableSize)
         {
             if (this.INTERNAL_OuterDomElement == null)
+            {
+                LayoutManager.Current.RemoveMeasure(this);
+                PreviousAvailableSize = availableSize;
+                IsMeasureValid = true;
                 return;
+            }
 
             using (System.Windows.Threading.Dispatcher.INTERNAL_GetCurrentDispatcher().DisableProcessing())
             {
                 using (DisableMeasureInvalidation())
                 {
+                    bool previousMeasureValid = IsMeasureValid;
+                    Size savedPreviousAvailableSize = PreviousAvailableSize;
+                    PreviousAvailableSize = availableSize;
+                    IsMeasureValid = true;
+
+                    LayoutManager.Current.RemoveMeasure(this);
+
                     if (Visibility == Visibility.Collapsed)
                     {
                         DesiredSize = Size.Zero;
                     }
-                    else if (IsMeasureValid && PreviousAvailableSize.IsClose(availableSize))
+                    else if (previousMeasureValid && savedPreviousAvailableSize.IsClose(availableSize))
                     {
-                        //Console.WriteLine($"Measure previousDesiredSize {this}");
                         DesiredSize = previousDesiredSize;
                     }
                     else
@@ -277,12 +302,6 @@ namespace Windows.UI.Xaml
                         PreviousAvailableSize = availableSize;
                         previousDesiredSize = DesiredSize;
                     }
-
-                    IsMeasureValid = true;
-                    LayoutManager.Current.RemoveMeasure(this);
-
-                    INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
-                    //Console.WriteLine($"UIElemet {domElementReference.UniqueIdentifier}, DesiredSize: {DesiredSize.Width}, {DesiredSize.Height}");
                 }
             }
         }
@@ -306,6 +325,14 @@ namespace Windows.UI.Xaml
             }
         }
 
+        public void InvalidateParentArrange()
+        {
+            if (INTERNAL_VisualParent as UIElement != null)
+            {
+                (INTERNAL_VisualParent as UIElement).InvalidateArrange();
+            }
+        }
+        
         public void InvalidateMeasure()
         {
             if (disableMeasureInvalidationRequests > 0 || !IsMeasureValid)
