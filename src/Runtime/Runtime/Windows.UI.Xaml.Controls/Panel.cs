@@ -86,11 +86,6 @@ namespace Windows.UI.Xaml.Controls
                     this.OnChildrenMoved((UIElement)e.OldItems[0], e.NewStartingIndex, e.OldStartingIndex);
                     break;
             }
-
-#if WORKINPROGRESS
-            InvalidateMeasure();
-            InvalidateArrange();
-#endif
         }
 
 #region Children Management

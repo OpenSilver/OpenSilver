@@ -16,6 +16,7 @@ using CSHTML5.Internal;
 using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 #if MIGRATION
 namespace System.Windows.Controls

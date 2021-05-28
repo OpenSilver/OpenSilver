@@ -18,6 +18,7 @@ using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Windows.Controls.Primitives;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -1142,7 +1143,7 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         {
             // I think this method should in most (all?) case return two divs, as if it was a frameworkElement.
 #if !BRIDGE
-                return base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
+                return CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
 #else
             return CreateDomElement_WorkaroundBridgeInheritanceBug(parentRef, out domElementWhereToPlaceChildren);
 #endif
