@@ -26,6 +26,7 @@ namespace Windows.Foundation
         private HashSet<UIElement> updatedElements;
 
         private object queueLock = new object();
+        private object updatedElementsLock = new object();
 
         private DispatcherOperation updateLayoutOperation;
 
@@ -89,10 +90,27 @@ namespace Windows.Foundation
                 return;
             }
 
-            foreach (UIElement pathElement in GetElementPath(element))
+            lock (updatedElementsLock)
             {
-                updatedElements.Add(pathElement);
+                foreach (UIElement pathElement in GetElementPath(element))
+                {
+                    updatedElements.Add(pathElement);
+                }
             }
+        }
+
+        public UIElement RemoveUpdatedElementAndReturn()
+        {
+            lock (updatedElementsLock)
+            {
+                if (updatedElements.Count > 0)
+                {
+                    UIElement updated = updatedElements.First();
+                    updatedElements.Remove(updated);
+                    return updated;
+                }
+            }
+            return null;
         }
 
         public void BeginUpdateLayout()
@@ -105,7 +123,6 @@ namespace Windows.Foundation
 
         public void UpdateLayout()
         {
-            Console.WriteLine("LayoutManager UpdateLayout");
             while (measureQueue.Count > 0 || arrangeQueue.Count > 0)
             {
                 while (measureQueue.Count > 0)
@@ -119,6 +136,7 @@ namespace Windows.Foundation
                     {
                         element.InvalidateArrange();
                         element.InvalidateParentMeasure();
+                        element.InvalidateParentArrange();
                     }
                 }
 
@@ -131,9 +149,7 @@ namespace Windows.Foundation
 
                 while (updatedElements.Count > 0 && measureQueue.Count == 0 && arrangeQueue.Count == 0) // LayoutUpdated can invalidate other elements
                 {
-                    UIElement element = updatedElements.First();
-                    updatedElements.Remove(element);
-
+                    UIElement element = RemoveUpdatedElementAndReturn();
                     element.RaiseLayoutUpdated();
                 }
             }
