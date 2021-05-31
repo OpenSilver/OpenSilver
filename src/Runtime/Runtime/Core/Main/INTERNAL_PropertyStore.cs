@@ -544,7 +544,7 @@ namespace CSHTML5.Internal
             }
             else
             {
-                global::System.Diagnostics.Debug.Assert(storage.IsExpression /* || storage.IsExpressionFromStyle*/);
+                global::System.Diagnostics.Debug.Assert(storage.IsExpression || storage.IsExpressionFromStyle);
                 baseValue = storage.ModifiedValue.ExpressionValue;
             }
             return baseValue;
