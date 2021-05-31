@@ -1203,6 +1203,9 @@ var range,selection;
 
         private void NEW_SET_SELECTION(int startIndex, int endIndex)
         {
+            if (_contentEditableDiv == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+                return;
+
             CSHTML5.Interop.ExecuteJavaScriptAsync(@"
 var range = document.createRange();
 var sel = window.getSelection();
@@ -1220,6 +1223,13 @@ sel.addRange(range);
             //todo: fix the that happens (at least in chrome) that makes the index returned be 0 when the caret is on the last line when it's empty
             //what I think happens: the range gives the index of the <br> in the childNodes of _contentEditableDiv which makes it not find the range.startContainer, which is actually _contentEditableDiv.
             //todo: (probably in the documant.getRangeStartAndEnd and document.getRangeGlobalStartAndEndIndexes methods), fix the bad count of characters in the simulator when copy/pasting a multiline text.
+
+            if (_contentEditableDiv == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                selectionStartIndex = 0;
+                selectionLength = 0;
+                return;
+            }
 
             var globalIndexes = CSHTML5.Interop.ExecuteJavaScript(@"
 (function(domElement){
