@@ -1,7 +1,4 @@
-#if WORKINPROGRESS
-
 using System;
-using System.Xml.Schema;
 
 #if MIGRATION
 namespace System.Windows.Input
@@ -30,7 +27,7 @@ namespace Windows.UI.Xaml.Input
         /// <returns>The object that currently has focus. Typically, this is a <see cref="T:System.Windows.Controls.Control" /> class.</returns>
 		public static object GetFocusedElement()
         {
-            return GetFocusedElement(Window.Current);
+            return Window.Current?.GetValue(FocusedElementProperty);
         }
 
         /// <summary>
@@ -54,4 +51,3 @@ namespace Windows.UI.Xaml.Input
         }
     }
 }
-#endif
