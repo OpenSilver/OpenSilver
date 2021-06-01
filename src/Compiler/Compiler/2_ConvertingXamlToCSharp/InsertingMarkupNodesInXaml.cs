@@ -435,6 +435,7 @@ namespace DotNetForHtml5.Compiler
                     if (subAttributeValue.StartsWith("\'"))
                     {
                         subAttributeValue = subAttributeValue.Trim('\'');
+                        subAttributeValue = UnescapeString(subAttributeValue);
                         if (subAttributeValue.StartsWith("{"))
                         {
                             subAttributeValue = "{}" + subAttributeValue;
@@ -446,6 +447,30 @@ namespace DotNetForHtml5.Compiler
                 }
             }
             return returnValue;
+        }
+
+        private static string UnescapeString(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return str;
+
+            var sb = new StringBuilder();
+            bool isEscaped = false;
+            for (int i = 0; i < str.Length; i++)
+            {
+                char c = str[i];
+                
+                if (c == '\\' && !isEscaped)
+                {
+                    isEscaped = true;
+                    continue;
+                }
+
+                sb.Append(c);
+                isEscaped = false;
+            }
+
+            return sb.ToString();
         }
 
         static int CountBrackets(string str)
