@@ -202,9 +202,6 @@ namespace Windows.UI.Xaml.Controls
         public static void SetLeft(UIElement element, double value)
         {
             element.SetValue(LeftProperty, value);
-
-            if ((Canvas)element.INTERNAL_VisualParent is Canvas)
-                ((Canvas)element.INTERNAL_VisualParent).InvalidateArrange();
         }
 
         /// <summary>
@@ -226,9 +223,6 @@ namespace Windows.UI.Xaml.Controls
         public static void SetTop(UIElement element, double value)
         {
             element.SetValue(TopProperty, value);
-
-            if ((Canvas)element.INTERNAL_VisualParent is Canvas)
-                ((Canvas)element.INTERNAL_VisualParent).InvalidateArrange();
         }
         /// <summary>
         /// Gets the value of the Canvas.Top XAML attached property for the target element.
@@ -310,9 +304,6 @@ namespace Windows.UI.Xaml.Controls
             UIElement[] childrens = Children.ToArray();
             foreach (UIElement child in childrens)
             {
-                // Canvas.Left and Canvas.Top have higher priority
-                //double x = GetLeft(child).DefaultIfNaN(finalSize.Width - child.DesiredSize.Width - GetRight(child)).DefaultIfNaN(0);
-                //double y = GetTop(child).DefaultIfNaN(finalSize.Height - child.DesiredSize.Height - GetBottom(child)).DefaultIfNaN(0);
                 double x = GetLeft(child).DefaultIfNaN(0);
                 double y = GetTop(child).DefaultIfNaN(0);
 
