@@ -222,7 +222,15 @@ namespace Windows.UI.Xaml.Data
 
                 if (ParentBinding.StringFormat != null)
                 {
-                    value = String.Format(ParentBinding.StringFormat, value);
+                    try
+                    {
+                        value = String.Format(ParentBinding.StringFormat, value);
+                    }
+                    catch (FormatException fe)
+                    {
+                        HandleException(fe);
+                        return ParentBinding.FallbackValue;
+                    }
                 }
 
                 // If null, apply the "TargetNullValue":
@@ -648,14 +656,7 @@ namespace Windows.UI.Xaml.Data
                 }
                 catch (Exception ex)
                 {
-                    if (Application.Current.Host.Settings.EnableBindingErrorsLogging)
-                    {
-                        Debug.WriteLine(ex.ToString());
-                    }
-                    if (Application.Current.Host.Settings.EnableBindingErrorsThrowing)
-                    {
-                        throw;
-                    }
+                    HandleException(ex);
                 }
             }
 
@@ -666,6 +667,18 @@ namespace Windows.UI.Xaml.Data
             }
 
             return value;
+        }
+
+        private static void HandleException(Exception ex)
+        {
+            if (Application.Current.Host.Settings.EnableBindingErrorsLogging)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+            if (Application.Current.Host.Settings.EnableBindingErrorsThrowing)
+            {
+                throw ex;
+            }
         }
 
         private void OnTargetInheritedContextChanged(object sender, EventArgs e)
