@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package >
+<package>
   <metadata>
     <id>OpenSilver.Simulator</id>
     <version>$PackageVersion$</version>
@@ -9,28 +9,16 @@
     <description>OpenSilver is an open-source reimplementation of Silverlight that runs on current browsers via WebAssembly.</description>
     <copyright>Copyright (c) 2020, Userware. All rights reserved.</copyright>
     <tags>silverlight webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono uwp</tags>
-    <!-- <iconUrl> is deprecated and replaced by <icon> -->
-    <!--<iconUrl>https://opensilver.net/permalinks/images/OpenSilver_logo_128x128.png</iconUrl>-->
     <icon>images\OpenSilver_icon.png</icon>
-    <!--<licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>-->
-    <!--<releaseNotes>Summary of changes made in this release of the package.</releaseNotes>-->
-    <!-- <dependencies>
-      <group targetFramework=".NETStandard2.0">
-		<dependency id="Microsoft.JSInterop" version="3.1.3" />
-        <dependency id="Microsoft.CSharp" version="4.7.0" />
-        <dependency id="System.ComponentModel.Composition" version="4.7.0" />
-        <dependency id="System.ServiceModel.Primitives" version="4.6.0" />
-      </group>
-    </dependencies> -->
+    <licenseUrl>https://raw.githubusercontent.com/OpenSilver/OpenSilver/master/LICENSE.txt</licenseUrl>
 
-    <references>
-        <reference file="CSharpXamlForHtml5.Simulator.dll" />
-        <reference file="MahApps.Metro.dll" />
-        <reference file="DotNetBrowser.Chromium32.dll" />
-        <reference file="DotNetBrowser.Chromium64.dll" />
-        <reference file="DotNetBrowser.dll" />
-        <reference file="System.Windows.Interactivity.dll" />
-    </references>
+    <dependencies>
+      <group targetFramework="net45">
+        <dependency id="DotNetBrowser" version="1.21.5" />
+        <dependency id="MahApps.Metro" version="1.2.4.0" />
+        <dependency id="Microsoft.Web.Administration" version="7.0.0.0" />
+      </group>
+    </dependencies>
 
     <contentFiles>
         <files include="any/net45/**" buildAction="None" copyToOutput="true"/>
@@ -39,28 +27,23 @@
 
   <files>
     <!-- OpenSilver.Simulator libs -->
-    <file src="../../src/Simulator/Simulator/bin/OpenSilver/Debug/CSharpXamlForHtml5.Simulator.dll" target="lib/net45" />
-    <file src="../../src/Simulator/Simulator/bin/OpenSilver/Debug/DotNetBrowser.Chromium32.dll" target="lib/net45" />
-    <file src="../../src/Simulator/Simulator/bin/OpenSilver/Debug/DotNetBrowser.Chromium64.dll" target="lib/net45" />
-    <file src="../../src/Simulator/Simulator/bin/OpenSilver/Debug/DotNetBrowser.dll" target="lib/net45" />
-    <file src="../../src/Simulator/Simulator/bin/OpenSilver/Debug/MahApps.Metro.dll" target="lib/net45" />
-    <file src="../../src/Simulator/Simulator/bin/OpenSilver/Debug/System.Windows.Interactivity.dll" target="lib/net45" />
+    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/CSharpXamlForHtml5.Simulator.dll" target="lib/net45" />
 
     <!-- OpenSilver HTML files -->
-    <file src="../../src/Simulator/Simulator/bin/OpenSilver/Debug/simulator_root.html" target="contentFiles/any/net45" />
-    <file src="../../src/Simulator/Simulator/bin/OpenSilver/Debug/interop_debug_root.html" target="contentFiles/any/net45" />
+    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/simulator_root.html" target="contentFiles/any/net45" />
+    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/interop_debug_root.html" target="contentFiles/any/net45" />
 
     <!-- OpenSilver JS and CSS files -->
-    <file src="../../src/Runtime/Scripts/opensilver.js" target="contentFiles/any/net45/js_css" />
-    <file src="../../src/Runtime/Scripts/cshtml5.css" target="contentFiles/any/net45/js_css" />
-    <file src="../../src/Runtime/Scripts/cshtml5.js" target="contentFiles/any/net45/js_css" />
-    <file src="../../src/Runtime/Scripts/fastclick.js" target="contentFiles/any/net45/js_css" />
-    <file src="../../src/Runtime/Scripts/flatpickr.css" target="contentFiles/any/net45/js_css" />
-    <file src="../../src/Runtime/Scripts/flatpickr.js" target="contentFiles/any/net45/js_css" />
-    <file src="../../src/Runtime/Scripts/velocity.js" target="contentFiles/any/net45/js_css" />
-    <file src="../../src/Runtime/Scripts/ResizeSensor.js" target="contentFiles/any/net45/js_css" />
+    <file src="../src/Runtime/Scripts/opensilver.js" target="contentFiles/any/net45/js_css" />
+    <file src="../src/Runtime/Scripts/cshtml5.css" target="contentFiles/any/net45/js_css" />
+    <file src="../src/Runtime/Scripts/cshtml5.js" target="contentFiles/any/net45/js_css" />
+    <file src="../src/Runtime/Scripts/fastclick.js" target="contentFiles/any/net45/js_css" />
+    <file src="../src/Runtime/Scripts/flatpickr.css" target="contentFiles/any/net45/js_css" />
+    <file src="../src/Runtime/Scripts/flatpickr.js" target="contentFiles/any/net45/js_css" />
+    <file src="../src/Runtime/Scripts/velocity.js" target="contentFiles/any/net45/js_css" />
+    <file src="../src/Runtime/Scripts/ResizeSensor.js" target="contentFiles/any/net45/js_css" />
 
     <!-- OpenSilver icon -->
-    <file src="OpenSilver_icon.png" target="images\OpenSilver_icon.png" />
+    <file src="nuspec/OpenSilver_icon.png" target="images\OpenSilver_icon.png" />
   </files>
 </package>

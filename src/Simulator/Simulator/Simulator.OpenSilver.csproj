@@ -20,32 +20,8 @@
     <DefineConstants>TRACE;DEBUG;OPENSILVER</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotNetBrowser, Version=1.21.5.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DotNetBrowser.1.21.5\lib\DotNetBrowser.dll</HintPath>
-    </Reference>
-    <Reference Include="DotNetBrowser.Chromium32, Version=1.21.5.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DotNetBrowser.1.21.5\lib\DotNetBrowser.Chromium32.dll</HintPath>
-    </Reference>
-    <Reference Include="DotNetBrowser.Chromium64, Version=1.21.5.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DotNetBrowser.1.21.5\lib\DotNetBrowser.Chromium64.dll</HintPath>
-    </Reference>
-    <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f">
-      <HintPath>..\..\packages\MahApps.Metro.1.2.4.0\lib\net45\MahApps.Metro.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Web.Administration, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\..\packages\Microsoft.Web.Administration.7.0.0.0\lib\net20\Microsoft.Web.Administration.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\..\packages\MahApps.Metro.1.2.4.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
-    <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Serialization" />
@@ -64,6 +40,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\ActivationHelpers_SharedWithOtherProjects.cs">
       <Link>ActivationHelpers_SharedWithOtherProjects.cs</Link>
     </Compile>
@@ -147,6 +127,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -186,7 +170,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -315,6 +298,16 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\LicensingServiceReference\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DotNetBrowser" Version="1.21.5" />
+    <PackageReference Include="MahApps.Metro" Version="1.2.4" />
+    <PackageReference Include="Microsoft.Web.Administration" Version="7.0.0" />
+    <PackageReference Include="NuGet.Build.Tasks.Pack">
+      <Version>5.9.1</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -28,13 +28,9 @@ echo.
 nuget restore ../src/OpenSilver.sln
 
 echo. 
-echo %ESC%[95mBuilding %ESC%[0mSL %ESC%[95mconfiguration%ESC%[0m
+echo %ESC%[95mBuilding and packaging %ESC%[0mOpenSilver.Simulator %ESC%[0m
 echo. 
-msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -restore
-echo. 
-echo %ESC%[95mPacking %ESC%[0mOpenSilver.Simulator %ESC%[95mNuGet package%ESC%[0m
-echo. 
-nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageVersion=1.0.0-private-%PackageVersion%"
+msbuild -t:pack slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -p:PackageOutputPath=%~dp0output/OpenSilver -p:NuspecFile=%~dp0nuspec/OpenSilver.Simulator.nuspec -p:NuspecBasePath=%~dp0 -p:NuspecProperties=PackageVersion=1.0.0-private-%PackageVersion%
 
 explorer "output\OpenSilver"
 
