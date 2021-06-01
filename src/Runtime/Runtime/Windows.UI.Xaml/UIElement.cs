@@ -449,19 +449,14 @@ namespace Windows.UI.Xaml
         /// Identifies the <see cref="UIElement.Visibility"/> dependency 
         /// property.
         /// </summary>
-#if WORKINPROGRESS
-        public static readonly DependencyProperty VisibilityProperty =
-            DependencyProperty.Register(
-                nameof(Visibility),
-                typeof(Visibility),
-                                        typeof(UIElement),
-                                        new FrameworkPropertyMetadata(Visibility.Visible, FrameworkPropertyMetadataOptions.AffectsParentMeasure, Visibility_Changed));
-#else
         public static readonly DependencyProperty VisibilityProperty =
             DependencyProperty.Register(
                 nameof(Visibility),
                 typeof(Visibility),
                 typeof(UIElement),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(Visibility.Visible, FrameworkPropertyMetadataOptions.AffectsParentMeasure, Visibility_Changed));
+#else
                 new PropertyMetadata(Visibility.Visible, Visibility_Changed));
 #endif
 
