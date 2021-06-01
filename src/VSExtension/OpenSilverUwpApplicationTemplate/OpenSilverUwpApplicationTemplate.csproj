@@ -65,7 +65,9 @@
     <VSTemplate Include="OpenSilverUwpApplication.vstemplate" />
     <None Include="OpenSilverUwpApplication/**" />
     <None Include="OpenSilverUwpApplication.Browser/**" />
-    <None Include="OpenSilverUwpApplication.Simulator/**" />
+    <None Include="OpenSilverUwpApplication.Simulator\OpenSilverUwpApplication.Simulator.csproj" />
+    <None Include="OpenSilverUwpApplication.Simulator\OpenSilverUwpApplication.Simulator.vstemplate" />
+    <None Include="OpenSilverUwpApplication.Simulator\Startup.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />

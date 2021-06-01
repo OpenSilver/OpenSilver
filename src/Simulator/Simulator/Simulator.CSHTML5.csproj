@@ -97,10 +97,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
+    <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </ApplicationDefinition>
+    </Page>
     <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\ActivationHelpers_SharedWithOtherProjects.cs">
       <Link>ActivationHelpers_SharedWithOtherProjects.cs</Link>
     </Compile>
@@ -132,6 +132,8 @@
     <Compile Include="LicenseChecking\LicenseChecker.xaml.cs">
       <DependentUpon>LicenseChecker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SimulatorLauncher.cs" />
+    <Compile Include="SimulatorLaunchParameters.cs" />
     <Compile Include="SupportClasses\CookieData.cs" />
     <Compile Include="SupportClasses\CrossDomainCallsHelper.cs" />
     <Compile Include="SupportClasses\Serializer.cs" />

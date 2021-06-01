@@ -75,6 +75,8 @@
     <Compile Include="LicenseChecking\LicenseChecker.xaml.cs">
       <DependentUpon>LicenseChecker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SimulatorLauncher.cs" />
+    <Compile Include="SimulatorLaunchParameters.cs" />
     <Compile Include="SupportClasses\CookieData.cs" />
     <Compile Include="SupportClasses\CrossDomainCallsHelper.cs" />
     <Compile Include="SupportClasses\Serializer.cs" />

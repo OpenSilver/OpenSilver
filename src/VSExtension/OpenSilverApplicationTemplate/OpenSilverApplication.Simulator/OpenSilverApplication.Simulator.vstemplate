@@ -5,11 +5,7 @@
     </TemplateData>
     <TemplateContent>
         <Project File="OpenSilverApplication.Simulator.csproj" ReplaceParameters="true">
-            <ProjectItem ReplaceParameters="true" TargetFileName="App.xaml">App.xaml</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="App.xaml.cs">App.xaml.cs</ProjectItem>
-            <Folder Name="Properties" TargetFolderName="Properties">
-                <ProjectItem ReplaceParameters="true" TargetFileName="AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
-            </Folder>
+            <ProjectItem ReplaceParameters="true" TargetFileName="Startup.cs">Startup.cs</ProjectItem>
         </Project>
     </TemplateContent>
 </VSTemplate>
