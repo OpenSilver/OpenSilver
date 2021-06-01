@@ -318,6 +318,13 @@ if(nextSibling != undefined) {
                 }
 
                 INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
+
+#if WORKINPROGRESS
+                child.InvalidateMeasure();
+                child.InvalidateArrange();
+                parent.InvalidateMeasure();
+                parent.InvalidateArrange();
+#endif
             }
         }
 
