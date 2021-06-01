@@ -7,6 +7,7 @@ using CSHTML5.Internal;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.Linq;
+using System.Windows.Controls;
 #else
 using Windows.UI.Xaml.Media;
 using Windows.Foundation;
@@ -123,7 +124,6 @@ namespace Windows.UI.Xaml
 
         public Size RenderSize { get { return VisualBounds.Size; } }
 
-        [OpenSilver.NotImplemented]
         public Size DesiredSize { get; private set; }
         
         public Rect VisualBounds { get; protected set; }
@@ -227,6 +227,9 @@ namespace Windows.UI.Xaml
 
         private void Render()
         {
+            if (this.INTERNAL_VisualParent != null && this.INTERNAL_VisualParent as Canvas != null)
+                return;
+
             if (this as Window == null && this as PopupRoot == null)
             {
                 INTERNAL_HtmlDomStyleReference uiStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement);
