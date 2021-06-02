@@ -76,9 +76,9 @@ namespace CSHTML5.Internal
                 html5Path = html5Path.Replace('\\', '/');
 
                 // If the path does not contain an assembly name, we need to add it:
-                string assemblyNameIncludingSlashes;
+                string assemblyName;
                 string pathAfterAssemblyName;
-                if (!DoesPathContainAssemblyName("/" + html5Path, out assemblyNameIncludingSlashes, out pathAfterAssemblyName))
+                if (!DoesPathContainAssemblyName("/" + html5Path, out assemblyName, out pathAfterAssemblyName))
                 {
                     // We are supposed to know the startup assembly (it is set by the constructor of the "Application" class):
                     string startupAssemblyShortName = StartupAssemblyInfo.StartupAssemblyShortName;
@@ -90,7 +90,7 @@ namespace CSHTML5.Internal
                 else
                 {
                     // Make sure the portion of the path AFTER the assembly name is lowercase:
-                    html5Path = assemblyNameIncludingSlashes + pathAfterAssemblyName.ToLower();
+                    html5Path = assemblyName + "/" + pathAfterAssemblyName.ToLower();
                 }
 
                 // Get the relative path where the resources are located (such as "Resources/"), and ensure that it ends with "/":
@@ -132,9 +132,9 @@ namespace CSHTML5.Internal
                 string html5Path = uri.Substring(23);
 
                 // If the path does not contain an assembly name, we need to add it:
-                string assemblyNameIncludingSlashes;
+                string assemblyName;
                 string pathAfterAssemblyName;
-                if (!DoesPathContainAssemblyName("/" + html5Path, out assemblyNameIncludingSlashes, out pathAfterAssemblyName))
+                if (!DoesPathContainAssemblyName("/" + html5Path, out assemblyName, out pathAfterAssemblyName))
                 {
                     // We are supposed to know the startup assembly (it is set by the constructor of the "Application" class):
                     string startupAssemblyShortName = StartupAssemblyInfo.StartupAssemblyShortName;
@@ -146,7 +146,7 @@ namespace CSHTML5.Internal
                 else
                 {
                     // Make sure the portion of the path AFTER the assembly name is lowercase:
-                    html5Path = assemblyNameIncludingSlashes + pathAfterAssemblyName.ToLower();
+                    html5Path = assemblyName + "/" + pathAfterAssemblyName.ToLower();
                 }
 
                 // Get the relative path where the resources are located (such as "Resources/"), and ensure that it ends with "/":
@@ -356,7 +356,7 @@ namespace CSHTML5.Internal
             return value;
         }
 
-        static bool DoesPathContainAssemblyName(string path, out string assemblyNameIncludingSlashes, out string pathAfterAssemblyName)
+        static bool DoesPathContainAssemblyName(string path, out string assemblyName, out string pathAfterAssemblyName)
         {
             //BRIDGETODO: verify "to lower" & "to lower invariant" doesnt change much, otherwise, implement it
             string pathLowercase = path.ToLower();
@@ -365,12 +365,12 @@ namespace CSHTML5.Internal
             {
                 if (pathLowercase.Contains("/" + assemblyShortName.ToLower() + "/"))
                 {
-                    assemblyNameIncludingSlashes = "/" + assemblyShortName + "/"; // Note: here we deliberately do not call "ToLower()".
-                    pathAfterAssemblyName = pathLowercase.Substring(assemblyNameIncludingSlashes.Length);
+                    assemblyName = assemblyShortName; // Note: here we deliberately do not call "ToLower()".
+                    pathAfterAssemblyName = pathLowercase.Substring(assemblyName.Length + 2); // + 2 because we want to remove "/assemblyName/"
                     return true;
                 }
             }
-            assemblyNameIncludingSlashes = null;
+            assemblyName = null;
             pathAfterAssemblyName = null;
             return false;
         }
