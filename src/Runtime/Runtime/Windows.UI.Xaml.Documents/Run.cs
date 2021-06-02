@@ -34,8 +34,6 @@ namespace Windows.UI.Xaml.Documents
     [ContentProperty("Text")]
     public sealed partial class Run : Inline
     {
-        private const string defaultText = "\u00A0"; // We add a space at the end of the text so that two <Run> tags do not appear to touch each other (eg. <Run>This is a</Run><Run>test.</Run>).
-
         /// <summary>
         /// Get or Set the Text property
         /// </summary>
@@ -48,10 +46,12 @@ namespace Windows.UI.Xaml.Documents
         /// <summary>
         /// Identifies the Text dependency property.
         /// </summary>
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", 
-                                                                                             typeof(string), 
-                                                                                             typeof(Run), 
-                                                                                             new PropertyMetadata(string.Empty, OnTextPropertyChanged, CoerceTextProperty));
+        public static readonly DependencyProperty TextProperty = 
+            DependencyProperty.Register(
+                nameof(Text), 
+                typeof(string), 
+                typeof(Run), 
+                new PropertyMetadata(string.Empty, OnTextPropertyChanged));
 
         private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -60,15 +60,6 @@ namespace Windows.UI.Xaml.Documents
             {
                 INTERNAL_HtmlDomManager.SetContentString(run, (string)e.NewValue);
             }
-        }
-
-        private static object CoerceTextProperty(DependencyObject d, object baseValue)
-        {
-            if (string.IsNullOrEmpty((string)baseValue))
-            {
-                return defaultText;
-            }
-            return baseValue;
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
@@ -82,7 +73,7 @@ namespace Windows.UI.Xaml.Documents
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            INTERNAL_HtmlDomManager.SetContentString(this, (string)CoerceTextProperty(this, this.Text));
+            INTERNAL_HtmlDomManager.SetContentString(this, this.Text);
         }
     }
 }
