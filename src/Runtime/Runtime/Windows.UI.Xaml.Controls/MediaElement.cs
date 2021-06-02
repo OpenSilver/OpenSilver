@@ -285,7 +285,11 @@ namespace Windows.UI.Xaml.Controls
                         {
                             INTERNAL_HtmlDomManager.RemoveFromDom(control._mediaElement); //note: there can be only one child element.
                         }
+#if OPENSILVER
+                        if (!INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround() || tagString == "video")
+#else
                         if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript || tagString == "video")
+#endif
                         {
                             object element = null;
                             object outerDiv = control.INTERNAL_OuterDomElement;
