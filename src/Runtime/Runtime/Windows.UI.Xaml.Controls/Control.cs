@@ -355,10 +355,7 @@ namespace Windows.UI.Xaml.Controls
                 typeof(double), 
                 typeof(Control), 
                 new PropertyMetadata(11d)
-                {
-                    MethodToUpdateDom = (instance, newValue) =>
-                        INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification((UIElement)instance).lineHeight = "125%",
-                    
+                { 
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
                         Value = (inst, value) =>
@@ -381,6 +378,44 @@ namespace Windows.UI.Xaml.Controls
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
                     },
                 });
+
+        //-----------------------
+        // LINEHEIGHT (CSS PROPERTY)
+        //-----------------------
+        // NOTE: the commit that introduced this DependencyProperty slightly changes the original behaviour. To get the same appearance as before, you can set this property on MainPage, most likely to the value '125%'.
+        /// <summary>
+        /// Used to set the line-height css property on the element. Its value is automatically inherited. For the possible values and their meaning, see https://developer.mozilla.org/en-US/docs/Web/CSS/line-height
+        /// </summary>
+        public string LineHeight
+        {
+            get { return (string)GetValue(LineHeightProperty); }
+            set { SetValue(LineHeightProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the LineHeight dependency property.
+        /// </summary>
+        public static readonly DependencyProperty LineHeightProperty =
+            DependencyProperty.Register(
+                nameof(LineHeight), 
+                typeof(string), 
+                typeof(Control), 
+                new PropertyMetadata((object)null)
+                {
+                    MethodToUpdateDom = (instance, value) =>
+                    {
+                        ((Control)instance).UpdateCSSLineHeight((string)value);
+                    }
+                });
+
+        private void UpdateCSSLineHeight(string value)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this);
+                domStyle.lineHeight = value ?? "";
+            }
+        }
 
         //-----------------------
         // TEXTDECORATION
