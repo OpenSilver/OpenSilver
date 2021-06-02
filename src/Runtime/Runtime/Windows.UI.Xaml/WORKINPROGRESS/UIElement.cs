@@ -294,7 +294,7 @@ namespace Windows.UI.Xaml
                     {
                         DesiredSize = Size.Zero;
                     }
-                    else if (previousMeasureValid && savedPreviousAvailableSize.IsClose(availableSize))
+                    else if (previousMeasureValid && savedPreviousAvailableSize.IsClose(availableSize) && previousDesiredSize != Size.Empty)
                     {
                         DesiredSize = previousDesiredSize;
                     }
