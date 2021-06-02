@@ -242,8 +242,7 @@ namespace Windows.UI.Core
                     ProcessQueueAsync();
                 }
             };
-            action.BeginInvoke(ar => action.EndInvoke(ar), null);
-            //ApplicationHost.Current.TaskScheduler.ScheduleTask(action);
+            BeginInvoke(action);
         }
         private bool TryDequeue(out DispatcherOperation operation)
         {
