@@ -167,12 +167,17 @@ namespace Windows.UI.Xaml.Controls
                         string dataUrl = sourceAsBitmapImage.INTERNAL_DataURL;
                         INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", dataUrl);
                     }
+                    //set the width and height to "inherit" so the image takes up the size defined for it (and applied to _imageDiv's parent):
+                    CSHTML5.Interop.ExecuteJavaScript("$0.style.width = 'inherit'; $0.style.height = 'inherit'", _imageDiv);
                 }
             }
             else
             {
                 //If Source == null we show empty image to prevent broken image icon
                 INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", TransparentGifOnePixel);
+
+                //Set css width and height values to 0 so we don't use space for an image that should not take any. Note: if the size is specifically set in the Xaml, it will still apply on a parent dom element so it won't change the appearance.
+                CSHTML5.Interop.ExecuteJavaScript("$0.style.width = ''; $0.style.height = ''", _imageDiv);
             }
             INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "alt", " "); //the text displayed when the image cannot be found. We set it as an empty string since there is nothing in Xaml
         }
@@ -608,8 +613,8 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
 
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(img);
             style.display = "block"; //this is to avoid a random few pixels wide gap below the image.
-            style.width = "inherit";
-            style.height = "inherit";
+            style.width = "0"; // Defaulting to 0 because if there is no source set, we want the 1x1 transparent placeholder image to be sure to take no space. If the source is set, it will then be set to "inherit"
+            style.height = "0"; // Same as above.
             style.objectPosition = "center top";
 
             CSHTML5.Interop.ExecuteJavaScriptAsync(@"
@@ -618,6 +623,8 @@ $0.addEventListener('mousedown', function(e) {
 }, false);
 $0.addEventListener('error', function(e) {
     this.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    this.style.width = 0;
+    this.style.height = 0;
 });
 ", img);
 
