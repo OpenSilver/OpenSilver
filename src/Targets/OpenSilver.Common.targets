@@ -548,9 +548,9 @@
 
     <PropertyGroup>
       <ResourcesSourceLocation>$(OutputAssemblyDirectory)</ResourcesSourceLocation>
-      <ResourcesSourceLocation Condition="'$(TargetFramework)' == 'net6.0'">$(OutputAssemblyDirectory)\wwwroot\_framework</ResourcesSourceLocation>
+      <ResourcesSourceLocation Condition="'$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0'">$(OutputAssemblyDirectory)\wwwroot\_framework</ResourcesSourceLocation>
       <ResourcesRootOutput>$(Cshtml5OutputRootPath)</ResourcesRootOutput>
-      <ResourcesRootOutput Condition="'$(TargetFramework)' == 'net6.0'">$(OutputAssemblyDirectory)\..\..\..\wwwroot\</ResourcesRootOutput>
+      <ResourcesRootOutput Condition="'$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0'">$(OutputAssemblyDirectory)\..\..\..\wwwroot\</ResourcesRootOutput>
     </PropertyGroup>
 
     <!--============================================================
