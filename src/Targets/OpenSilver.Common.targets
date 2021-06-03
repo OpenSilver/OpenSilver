@@ -557,7 +557,7 @@
       ResourceExtractorAndCopier (only during Pass 2)
       ============================================================-->
     <ResourcesExtractorAndCopier
-      Condition="'$(IsBrowserProject)' == 'true' And '$(IsSecondPass)'=='True' And '$(SkipResourcesExtractorAndCopier)'!='true'"
+      Condition="'$(IsSecondPass)'=='True' And '$(SkipResourcesExtractorAndCopier)'!='true'"
       SourceAssembly="$(ResourcesSourceLocation)\$(AssemblyName).dll"
       OutputRootPath="$(ResourcesRootOutput)"
       OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
