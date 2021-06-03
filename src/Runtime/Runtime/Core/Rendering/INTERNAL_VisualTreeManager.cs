@@ -64,10 +64,6 @@ namespace CSHTML5.Internal
                 if (parent.INTERNAL_VisualChildrenInformation != null
                     && parent.INTERNAL_VisualChildrenInformation.ContainsKey(child))
                 {
-                    // Remove the element from the DOM:
-                    string stringForDebugging = !IsRunningInJavaScript() ? "Removing " + child.GetType().ToString() : null;
-                    INTERNAL_HtmlDomManager.RemoveFromDom(child.INTERNAL_AdditionalOutsideDivForMargins, stringForDebugging);
-
                     // Remove the parent-specific wrapper around the child in the DOM (if any):
                     var optionalChildWrapper_OuterDomElement = parent.INTERNAL_VisualChildrenInformation[child].INTERNAL_OptionalChildWrapper_OuterDomElement;
                     if (optionalChildWrapper_OuterDomElement != null)
@@ -78,9 +74,14 @@ namespace CSHTML5.Internal
 
                     child.INTERNAL_SpanParentCell = null;
 
+                    var additionalOutsideDivForMargins = child.INTERNAL_AdditionalOutsideDivForMargins;
+
                     // Detach the element as well as all the children recursively:
                     DetachVisualChidrenRecursively(child);
 
+                    //// Remove the element from the DOM:
+                    var stringForDebugging = !IsRunningInJavaScript() ? "Removing " + child.GetType() : null;
+                    INTERNAL_HtmlDomManager.RemoveFromDom(additionalOutsideDivForMargins, stringForDebugging);
 
                     INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
                 }
