@@ -134,6 +134,11 @@ namespace Windows.UI.Xaml
         public Rect PreviousFinalRect { get; private set; }
         public Size PreviousAvailableSize { get; private set; }
         private Size previousDesiredSize;
+        
+        private Size layoutMeasuredSize;
+        private Size layoutLastSize;
+        private bool layoutProcessing;
+
         private int disableMeasureInvalidationRequests;
         private IDisposable disableMeasureInvalidationToken;
         private int visualLevel;
@@ -149,12 +154,40 @@ namespace Windows.UI.Xaml
                 return visualLevel;
             }
         }
+
+        public bool IsCustomLayoutRoot
+        {
+            get
+            {
+                FrameworkElement child = this as FrameworkElement;
+
+                if (child.CustomLayout == false)
+                    return false;
+
+                FrameworkElement layoutRoot = null;
+                while (child != null)
+                {
+                    if (child.CustomLayout)
+                        layoutRoot = child;
+                    child = child.INTERNAL_VisualParent as FrameworkElement;
+                }
+
+                if (layoutRoot == null)
+                    return false;
+
+                return layoutRoot == this;
+            }
+        }
+
         public UIElement()
         {
             DesiredSize = Size.Zero;
             PreviousFinalRect = Rect.Empty;
             PreviousAvailableSize = Size.Infinity;
             previousDesiredSize = Size.Empty;
+            layoutMeasuredSize = Size.Empty;
+            layoutLastSize = Size.Empty;
+            layoutProcessing = false;
             IsMeasureValid = false;
             IsArrangeValid = false;
             visualLevel = -1;
@@ -227,6 +260,9 @@ namespace Windows.UI.Xaml
 
         private void Render()
         {
+            if (IsCustomLayoutRoot)
+                return;
+
             if (this.INTERNAL_VisualParent != null && this.INTERNAL_VisualParent as Canvas != null)
                 return;
 
@@ -350,7 +386,38 @@ namespace Windows.UI.Xaml
 
         public void UpdateLayout()
         {
-            
+
+        }
+
+        public void UpdateCustomLayout(Size newSize)
+        {
+            layoutLastSize = newSize;
+            if (layoutProcessing)
+                return;
+
+            layoutProcessing = true;
+            Dispatcher.BeginInvoke((Action)BeginUpdateCustomLayout);
+        }
+
+        public void BeginUpdateCustomLayout()
+        {
+            layoutMeasuredSize = layoutLastSize;
+            Measure(layoutMeasuredSize);
+
+            if (layoutMeasuredSize != layoutLastSize)
+            {
+                BeginUpdateCustomLayout();
+                return;
+            }
+
+            Arrange(new Rect(layoutMeasuredSize));
+            if (layoutMeasuredSize != layoutLastSize)
+            {
+                BeginUpdateCustomLayout();
+                return;
+            }
+
+            layoutProcessing = false;
         }
 
 #if OPENSILVER

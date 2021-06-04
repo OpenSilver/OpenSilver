@@ -83,6 +83,47 @@ namespace Windows.UI.Xaml
 #endif
         }
 
+#if WORKINPROGRESS
+        /// <summary>
+        /// Enable or disable measure/arrange layout system in a sub tree
+        /// </summary>
+        public bool CustomLayout
+        {
+            get { return (bool)GetValue(CustomLayoutProperty); }
+            set { SetValue(CustomLayoutProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="FrameworkElement.CustomLayout"/> dependency 
+        /// property.
+        /// </summary>
+        public static readonly DependencyProperty CustomLayoutProperty =
+            DependencyProperty.Register(
+                nameof(CustomLayout),
+                typeof(bool),
+                typeof(FrameworkElement),
+                new PropertyMetadata(false, CustomLayout_Changed));
+
+        private static void CustomLayout_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            FrameworkElement fe = d as FrameworkElement;
+            if ((bool)e.NewValue == true)
+                fe.SizeChanged += Element_SizeChanged;
+            else
+                fe.SizeChanged -= Element_SizeChanged;
+        }
+
+        private static void Element_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            FrameworkElement fe = sender as FrameworkElement;
+
+            if (fe.IsCustomLayoutRoot == false)
+                return;
+
+            fe.UpdateCustomLayout(e.NewSize);
+        }
+
+#endif
         #region Height property
 
         /// <summary>
