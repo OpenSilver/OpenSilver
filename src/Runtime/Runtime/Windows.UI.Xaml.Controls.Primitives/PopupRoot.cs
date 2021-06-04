@@ -43,12 +43,13 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 && this.INTERNAL_LinkedPopup.INTERNAL_VisualParent == null) // We check that the <Popup> has no visual parent. In fact, if it had a visual parent, it means that it is in the visual tree (for example if the <Popup> was declared in XAML), and therefore the Loaded event has already been called once.
                 this.INTERNAL_LinkedPopup.INTERNAL_RaiseLoadedEvent();
 #if WORKINPROGRESS
-            if (INTERNAL_ParentWindow != null)
+            /*if (INTERNAL_ParentWindow != null)
             {
                 Rect windowBounds = INTERNAL_ParentWindow.Bounds;
                 this.Measure(new Size(windowBounds.Width, windowBounds.Height));
                 this.Arrange(windowBounds);
-            }
+            }*/
+            // Disabled for enabling in a sub part
 #endif
         }
 

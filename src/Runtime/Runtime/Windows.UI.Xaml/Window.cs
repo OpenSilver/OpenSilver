@@ -247,6 +247,7 @@ namespace Windows.UI.Xaml
 #if WORKINPROGRESS
                 Application.Current.TextMeasurementService.CreateMeasurementText(this);
 
+                /*
                 // Invalidate when content changed
                 InvalidateMeasure();
                 InvalidateArrange();
@@ -259,7 +260,8 @@ namespace Windows.UI.Xaml
                     Task.Delay(500).ContinueWith(t => CalculateWindowLayout());
                 }
                 else
-                    CalculateWindowLayout();
+                    CalculateWindowLayout();*/
+                // Disabled for enabling in a sub part
 #endif
 
             }
