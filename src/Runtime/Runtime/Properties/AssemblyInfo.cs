@@ -49,7 +49,11 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 #endif
 
+#if OPENSILVER
+[assembly: InternalsVisibleTo("OpenSilver.Simulator")]
+#else
 [assembly: InternalsVisibleTo("CSharpXamlForHtml5.Simulator")]
+#endif
 [assembly: InternalsVisibleTo("Runtime.OpenSilver.Tests")]
 
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml", "System.Windows.Markup")] // This is used for example in the {x:Static ...} markup extension.

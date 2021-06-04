@@ -7,7 +7,7 @@
     <ProjectGuid>{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
+    <AssemblyName>OpenSilver.Simulator</AssemblyName>
     <RootNamespace>DotNetForHtml5.EmulatorWithoutJavascript</RootNamespace>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>

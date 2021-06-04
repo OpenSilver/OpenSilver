@@ -27,7 +27,7 @@
 
   <files>
     <!-- OpenSilver.Simulator libs -->
-    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/CSharpXamlForHtml5.Simulator.dll" target="lib/net45" />
+    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.dll" target="lib/net45" />
 
     <!-- OpenSilver HTML files -->
     <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/simulator_root.html" target="contentFiles/any/net45" />
