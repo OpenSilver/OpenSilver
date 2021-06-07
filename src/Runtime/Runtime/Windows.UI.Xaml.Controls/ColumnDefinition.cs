@@ -172,12 +172,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the MaxWidth dependency property.
         /// </summary>
+        public static readonly DependencyProperty MaxWidthProperty =
+            DependencyProperty.Register("MaxWidth", typeof(double), typeof(ColumnDefinition),
 #if WORKINPROGRESS
-        public static readonly DependencyProperty MaxWidthProperty =
-            DependencyProperty.Register("MaxWidth", typeof(double), typeof(ColumnDefinition), new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure, MaxWidth_Changed)
+                new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure, MaxWidth_Changed)
 #else
-        public static readonly DependencyProperty MaxWidthProperty =
-            DependencyProperty.Register("MaxWidth", typeof(double), typeof(ColumnDefinition), new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed)
+                new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed)
 #endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
@@ -205,12 +205,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the MinWidth dependency property.
         /// </summary>
+        public static readonly DependencyProperty MinWidthProperty =
+            DependencyProperty.Register("MinWidth", typeof(double), typeof(ColumnDefinition),
 #if WORKINPROGRESS
-        public static readonly DependencyProperty MinWidthProperty =
-            DependencyProperty.Register("MinWidth", typeof(double), typeof(ColumnDefinition), new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure, MinWidth_Changed)
+                new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure, MinWidth_Changed)
 #else
-        public static readonly DependencyProperty MinWidthProperty =
-            DependencyProperty.Register("MinWidth", typeof(double), typeof(ColumnDefinition), new PropertyMetadata(double.PositiveInfinity, MinWidth_Changed)
+                new PropertyMetadata(double.PositiveInfinity, MinWidth_Changed)
 #endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
@@ -238,12 +238,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Width dependency property.
         /// </summary>
+        public static readonly DependencyProperty WidthProperty =
+            DependencyProperty.Register("Width", typeof(GridLength), typeof(ColumnDefinition),
 #if WORKINPROGRESS
-        public static readonly DependencyProperty WidthProperty =
-            DependencyProperty.Register("Width", typeof(GridLength), typeof(ColumnDefinition), new FrameworkPropertyMetadata(new GridLength(1.0, GridUnitType.Star), FrameworkPropertyMetadataOptions.AffectsMeasure, Width_Changed)
+                new FrameworkPropertyMetadata(new GridLength(1.0, GridUnitType.Star), FrameworkPropertyMetadataOptions.AffectsMeasure, Width_Changed)
 #else
-        public static readonly DependencyProperty WidthProperty =
-            DependencyProperty.Register("Width", typeof(GridLength), typeof(ColumnDefinition), new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), Width_Changed)
+                new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), Width_Changed)
 #endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
@@ -326,12 +326,12 @@ namespace Windows.UI.Xaml.Controls
         }
 
         // Using a DependencyProperty as the backing store for Visibility.  This enables animation, styling, binding, etc...
+        internal static readonly DependencyProperty VisibilityProperty =
+            DependencyProperty.Register("Visibility", typeof(Visibility), typeof(ColumnDefinition),
 #if WORKINPROGRESS
-        internal static readonly DependencyProperty VisibilityProperty =
-            DependencyProperty.Register("Visibility", typeof(Visibility), typeof(ColumnDefinition), new FrameworkPropertyMetadata(Visibility.Visible, FrameworkPropertyMetadataOptions.AffectsMeasure, Visibility_Changed));
+                new FrameworkPropertyMetadata(Visibility.Visible, FrameworkPropertyMetadataOptions.AffectsMeasure, Visibility_Changed));
 #else
-        internal static readonly DependencyProperty VisibilityProperty =
-            DependencyProperty.Register("Visibility", typeof(Visibility), typeof(ColumnDefinition), new PropertyMetadata(Visibility.Visible, Visibility_Changed));
+                new PropertyMetadata(Visibility.Visible, Visibility_Changed));
 #endif
         private static void Visibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

@@ -576,12 +576,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Identifies the Orientation dependency property.
         /// </summary>
+        public static readonly DependencyProperty OrientationProperty =
+            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(ScrollBar),
 #if WORKINPROGRESS
-        public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(ScrollBar), new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Orientation_Changed));
+                new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Orientation_Changed));
 #else
-        public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(ScrollBar), new PropertyMetadata(Orientation.Vertical, Orientation_Changed));
+                new PropertyMetadata(Orientation.Vertical, Orientation_Changed));
 #endif
         private static void Orientation_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

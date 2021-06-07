@@ -118,12 +118,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the System.Windows.Controls.Frame.Source dependency property.
         /// </summary>
+        public static readonly DependencyProperty SourceProperty =
+            DependencyProperty.Register("Source", typeof(Uri), typeof(Frame),
 #if WORKINPROGRESS
-        public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register("Source", typeof(Uri), typeof(Frame), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Source_Changed)
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Source_Changed)
 #else
-        public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register("Source", typeof(Uri), typeof(Frame), new PropertyMetadata(null, Source_Changed)
+                new PropertyMetadata(null, Source_Changed)
 #endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 

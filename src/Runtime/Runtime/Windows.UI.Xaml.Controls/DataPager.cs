@@ -289,12 +289,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Style dependency property.
         /// </summary>
+        public static readonly DependencyProperty NumericButtonStyleProperty =
+            DependencyProperty.Register("NumericButtonStyle", typeof(Style), typeof(DataPager),
 #if WORKINPROGRESS
-        public static readonly DependencyProperty NumericButtonStyleProperty =
-            DependencyProperty.Register("NumericButtonStyle", typeof(Style), typeof(DataPager), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure));
 #else
-        public static readonly DependencyProperty NumericButtonStyleProperty =
-            DependencyProperty.Register("NumericButtonStyle", typeof(Style), typeof(DataPager), new PropertyMetadata(null));
+                new PropertyMetadata(null));
 #endif
 
 #endregion

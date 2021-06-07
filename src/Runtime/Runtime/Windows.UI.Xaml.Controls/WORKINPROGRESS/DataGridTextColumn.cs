@@ -51,19 +51,14 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the FontFamily dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
-#if WORKINPROGRESS
         public static readonly DependencyProperty FontFamilyProperty =
             DependencyProperty.Register(
                 "FontFamily",
                 typeof(FontFamily),
                 typeof(DataGridTextColumn),
+#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure, OnFontFamilyPropertyChanged));
 #else
-        public static readonly DependencyProperty FontFamilyProperty =
-            DependencyProperty.Register(
-                "FontFamily",
-                typeof(FontFamily),
-                typeof(DataGridTextColumn),
                 new PropertyMetadata(OnFontFamilyPropertyChanged));
 #endif
 
