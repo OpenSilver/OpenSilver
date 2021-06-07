@@ -43,7 +43,6 @@ namespace CSHTML5.Internal
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(canvasDomElement);
             style.width = "0px";
             style.height = "0px";
-            style.marginBottom = "-4px"; // This is due to the fact that there is a 4px margin at the bottom of the html <canvas>, cf. https://stackoverflow.com/questions/8600393/there-is-a-4px-gap-below-canvas-video-audio-elements-in-html5
             return div;
         }
 
