@@ -261,7 +261,7 @@ namespace Windows.UI.Xaml
                 }
                 else
                     CalculateWindowLayout();*/
-                // Disabled for enabling in a sub part
+                // Disabled for enabling measure/arrange layout system
 #endif
 
             }

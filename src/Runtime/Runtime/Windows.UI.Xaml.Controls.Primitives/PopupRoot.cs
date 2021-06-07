@@ -49,7 +49,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 this.Measure(new Size(windowBounds.Width, windowBounds.Height));
                 this.Arrange(windowBounds);
             }*/
-            // Disabled for enabling in a sub part
+            // Disabled for enabling measure/arrange layout system
 #endif
         }
 
