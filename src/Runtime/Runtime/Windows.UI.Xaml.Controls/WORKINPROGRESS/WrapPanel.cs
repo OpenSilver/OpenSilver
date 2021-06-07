@@ -32,17 +32,13 @@ namespace Windows.UI.Xaml.Controls
 		//     The identifier for the System.Windows.Controls.WrapPanel.ItemHeight  dependency
 		//     property.
         [OpenSilver.NotImplemented]
-#if WORKINPROGRESS
 	public static readonly DependencyProperty ItemHeightProperty =
 		DependencyProperty.Register("ItemHeight",
 										typeof(double),
 										typeof(WrapPanel),
+#if WORKINPROGRESS
 										new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
 #else
-	public static readonly DependencyProperty ItemHeightProperty =
-			DependencyProperty.Register("ItemHeight",
-										typeof(double),
-										typeof(WrapPanel),
 										new PropertyMetadata(double.NaN));
 #endif
 
@@ -68,17 +64,13 @@ namespace Windows.UI.Xaml.Controls
 		//     The identifier for the System.Windows.Controls.WrapPanel.ItemWidth  dependency
 		//     property.
         [OpenSilver.NotImplemented]
-#if WORKINPROGRESS
     public static readonly DependencyProperty ItemWidthProperty =
 		    DependencyProperty.Register("ItemWidth",
 										typeof(double),
 										typeof(WrapPanel),
+#if WORKINPROGRESS
 										new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
 #else
-	public static readonly DependencyProperty ItemWidthProperty =
-			DependencyProperty.Register("ItemWidth",
-										typeof(double),
-										typeof(WrapPanel),
 										new PropertyMetadata(double.NaN));
 #endif
 		private void MeasureChild(UIElement child, double availableMainLength, double availableCrossLength)

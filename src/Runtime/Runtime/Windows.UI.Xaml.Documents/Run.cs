@@ -48,15 +48,12 @@ namespace Windows.UI.Xaml.Documents
         /// <summary>
         /// Identifies the Text dependency property.
         /// </summary>
-#if WORKINPROGRESS
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", 
                                                                                              typeof(string), 
-                                                                                             typeof(Run), 
+                                                                                             typeof(Run),
+#if WORKINPROGRESS
                                                                                              new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextPropertyChanged, CoerceTextProperty));
 #else
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", 
-                                                                                             typeof(string), 
-                                                                                             typeof(Run), 
                                                                                              new PropertyMetadata(string.Empty, OnTextPropertyChanged, CoerceTextProperty));
 #endif
         private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

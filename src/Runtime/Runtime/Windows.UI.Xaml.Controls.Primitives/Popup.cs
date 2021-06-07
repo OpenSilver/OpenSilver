@@ -125,12 +125,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Gets the identifier for the Placement dependency property
         /// </summary>
+        public static readonly DependencyProperty PlacementProperty =
+            DependencyProperty.Register("Placement", typeof(PlacementMode), typeof(Popup),
 #if WORKINPROGRESS
-        public static readonly DependencyProperty PlacementProperty =
-            DependencyProperty.Register("Placement", typeof(PlacementMode), typeof(Popup), new FrameworkPropertyMetadata(PlacementMode.Right, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+                new FrameworkPropertyMetadata(PlacementMode.Right, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
 #else
-        public static readonly DependencyProperty PlacementProperty =
-            DependencyProperty.Register("Placement", typeof(PlacementMode), typeof(Popup), new PropertyMetadata(PlacementMode.Right));
+                new PropertyMetadata(PlacementMode.Right));
 #endif
 
 
@@ -352,12 +352,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Gets the identifier for the HorizontalOffset dependency property.
         /// </summary>
+        public static readonly DependencyProperty HorizontalOffsetProperty =
+            DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(Popup),
 #if WORKINPROGRESS
-        public static readonly DependencyProperty HorizontalOffsetProperty =
-            DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(Popup), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsArrange, HorizontalOffset_Changed)
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsArrange, HorizontalOffset_Changed)
 #else
-        public static readonly DependencyProperty HorizontalOffsetProperty =
-            DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(Popup), new PropertyMetadata(0d, HorizontalOffset_Changed)
+                new PropertyMetadata(0d, HorizontalOffset_Changed)
 #endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
@@ -384,12 +384,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Gets the identifier for the VerticalOffset dependency property.
         /// </summary>
+        public static readonly DependencyProperty VerticalOffsetProperty =
+            DependencyProperty.Register("VerticalOffset", typeof(double), typeof(Popup),
 #if WORKINPROGRESS
-        public static readonly DependencyProperty VerticalOffsetProperty =
-            DependencyProperty.Register("VerticalOffset", typeof(double), typeof(Popup), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsArrange, VerticalOffset_Changed)
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsArrange, VerticalOffset_Changed)
 #else
-        public static readonly DependencyProperty VerticalOffsetProperty =
-            DependencyProperty.Register("VerticalOffset", typeof(double), typeof(Popup), new PropertyMetadata(0d, VerticalOffset_Changed)
+                new PropertyMetadata(0d, VerticalOffset_Changed)
 #endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
@@ -465,12 +465,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Identifies the VerticalContentAlignment dependency property.
         /// </summary>
+        public static readonly DependencyProperty VerticalContentAlignmentProperty =
+            DependencyProperty.Register("VerticalContentAlignment", typeof(VerticalAlignment), typeof(Popup),
 #if WORKINPROGRESS
-        public static readonly DependencyProperty VerticalContentAlignmentProperty =
-            DependencyProperty.Register("VerticalContentAlignment", typeof(VerticalAlignment), typeof(Popup), new FrameworkPropertyMetadata(VerticalAlignment.Top, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, VerticalContentAlignment_Changed)
+                new FrameworkPropertyMetadata(VerticalAlignment.Top, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, VerticalContentAlignment_Changed)
 #else
-        public static readonly DependencyProperty VerticalContentAlignmentProperty =
-            DependencyProperty.Register("VerticalContentAlignment", typeof(VerticalAlignment), typeof(Popup), new PropertyMetadata(VerticalAlignment.Top, VerticalContentAlignment_Changed)
+                new PropertyMetadata(VerticalAlignment.Top, VerticalContentAlignment_Changed)
 #endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 

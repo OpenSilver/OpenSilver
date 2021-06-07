@@ -85,19 +85,14 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the Text dependency property.
         /// </summary>
-#if WORKINPROGRESS
         public static readonly DependencyProperty TextProperty = 
             DependencyProperty.Register(
                 "Text",
                 typeof(string),
                 typeof(TextBlock),
+#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextPropertyChanged));
 #else
-        public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register(
-                "Text",
-                typeof(string),
-                typeof(TextBlock),
                 new PropertyMetadata(string.Empty, OnTextPropertyChanged));
 #endif
 
@@ -181,12 +176,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the TextWrapping dependency property.
         /// </summary>
+        public static readonly DependencyProperty TextWrappingProperty =
+            DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBlock),
 #if WORKINPROGRESS
-        public static readonly DependencyProperty TextWrappingProperty =
-            DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBlock), new FrameworkPropertyMetadata(TextWrapping.NoWrap, FrameworkPropertyMetadataOptions.AffectsMeasure)
+                new FrameworkPropertyMetadata(TextWrapping.NoWrap, FrameworkPropertyMetadataOptions.AffectsMeasure)
 #else
-        public static readonly DependencyProperty TextWrappingProperty =
-            DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBlock), new PropertyMetadata(TextWrapping.NoWrap)
+                new PropertyMetadata(TextWrapping.NoWrap)
 #endif
             {
                 GetCSSEquivalent = (instance) =>
@@ -232,19 +227,14 @@ namespace Windows.UI.Xaml.Controls
             return;
         }
 
-#if WORKINPROGRESS
         public static readonly DependencyProperty TextTrimmingProperty = 
             DependencyProperty.Register(
                 "TextTrimming",
                 typeof(TextTrimming),
                 typeof(TextBlock),
+#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(TextTrimming.None, FrameworkPropertyMetadataOptions.AffectsMeasure)
 #else
-        public static readonly DependencyProperty TextTrimmingProperty = 
-            DependencyProperty.Register(
-                "TextTrimming",
-                typeof(TextTrimming),
-                typeof(TextBlock),
                 new PropertyMetadata(TextTrimming.None)
 #endif
 
