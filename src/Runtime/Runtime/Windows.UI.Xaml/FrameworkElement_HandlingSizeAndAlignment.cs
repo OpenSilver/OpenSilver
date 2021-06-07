@@ -83,7 +83,7 @@ namespace Windows.UI.Xaml
 
 #if WORKINPROGRESS
         /// <summary>
-        /// Enable or disable measure/arrange layout system in a sub tree
+        /// Enable or disable measure/arrange layout system in a sub part
         /// </summary>
         public bool CustomLayout
         {
