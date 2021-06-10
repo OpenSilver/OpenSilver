@@ -58,8 +58,7 @@
 
     <!-- OpenSilver simulator -->
     <file src="../../src/Simulator/Simulator/bin/OpenSilver/$Configuration$/CSharpXamlForHtml5.Simulator.exe" target="tools/simulator/CSharpXamlForHtml5.Simulator.exe" />
-    <file src="../../src/Simulator/Simulator/bin/OpenSilver/$Configuration$/DotNetBrowser.Chromium32.dll" target="tools/simulator/DotNetBrowser.Chromium32.dll" />
-	<file src="../../src/Simulator/Simulator/bin/OpenSilver/$Configuration$/DotNetBrowser.Chromium64.dll" target="tools/simulator/DotNetBrowser.Chromium64.dll" />
+	<file src="../../src/Simulator/Simulator/bin/OpenSilver/$Configuration$/DotNetBrowser.Chromium.dll" target="tools/simulator/DotNetBrowser.Chromium.dll" />
     <file src="../../src/Simulator/Simulator/bin/OpenSilver/$Configuration$/DotNetBrowser.dll" target="tools/simulator/DotNetBrowser.dll" />
     <file src="../../src/Simulator/Simulator/bin/OpenSilver/$Configuration$/MahApps.Metro.dll" target="tools/simulator/MahApps.Metro.dll" />
     <file src="../../src/Simulator/Simulator/bin/OpenSilver/$Configuration$/System.Windows.Interactivity.dll" target="tools/simulator/System.Windows.Interactivity.dll" />

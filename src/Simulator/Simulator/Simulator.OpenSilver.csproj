@@ -29,14 +29,11 @@
     <DefineConstants>TRACE;DEBUG;OPENSILVER;WORKINPROGRESS</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotNetBrowser, Version=1.21.5.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DotNetBrowser.1.21.5\lib\DotNetBrowser.dll</HintPath>
+    <Reference Include="DotNetBrowser, Version=1.14.0.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\DotNetBrowser.1.14\lib\DotNetBrowser.dll</HintPath>
     </Reference>
-    <Reference Include="DotNetBrowser.Chromium32, Version=1.21.5.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DotNetBrowser.1.21.5\lib\DotNetBrowser.Chromium32.dll</HintPath>
-    </Reference>
-    <Reference Include="DotNetBrowser.Chromium64, Version=1.21.5.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DotNetBrowser.1.21.5\lib\DotNetBrowser.Chromium64.dll</HintPath>
+    <Reference Include="DotNetBrowser.Chromium, Version=1.14.0.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\DotNetBrowser.1.14\lib\DotNetBrowser.Chromium.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f">
       <HintPath>..\..\packages\MahApps.Metro.1.2.4.0\lib\net45\MahApps.Metro.dll</HintPath>
