@@ -128,6 +128,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridComboBoxColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridHyperlinkColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTemplateColumn.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\PasswordBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Typography.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontCapitals.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontStretches.cs" />
