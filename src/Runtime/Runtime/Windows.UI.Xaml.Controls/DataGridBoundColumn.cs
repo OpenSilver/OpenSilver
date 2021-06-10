@@ -53,5 +53,15 @@ namespace Windows.UI.Xaml.Controls
         {
             //todo: tell the DataGrid that the Binding has changed so it has to refresh the elements (only i it is already in the visual tree).
         }
+
+        [OpenSilver.NotImplemented]
+        protected abstract FrameworkElement GenerateEditingElement(DataGridCell cell, object dataItem);
+        [OpenSilver.NotImplemented]
+        protected abstract object PrepareCellForEdit(FrameworkElement editingElement, RoutedEventArgs editingEventArgs);
+        [OpenSilver.NotImplemented]
+        protected abstract FrameworkElement GenerateElement(DataGridCell cell, object dataItem);
+        [OpenSilver.NotImplemented]
+        public virtual Binding ClipboardContentBinding { get; set; }
+
     }
 }
