@@ -120,7 +120,7 @@ namespace System.ServiceModel
             string endpointAddress,
             string webMethodName,
             Type methodReturnType,
-            IEnumerable<Channels.MessageHeader> messageHeaders,
+            string messageHeaders,
             IDictionary<string, object> requestParameters,
             string soapVersion) where INTERFACE_TYPE : class
         {
@@ -179,7 +179,7 @@ namespace System.ServiceModel
                 endpointAddress,
                 webMethodName,
                 methodReturnType,
-                null,
+                "",
                 requestParameters,
                 soapVersion);
         }
