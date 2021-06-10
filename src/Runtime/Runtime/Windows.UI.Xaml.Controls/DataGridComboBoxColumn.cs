@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Controls
     /// Represents a System.Windows.Controls.DataGrid column that hosts System.Windows.Controls.ComboBox
     /// controls in its cells.
     /// </summary>
-    class DataGridComboBoxColumn : DataGridBoundColumn
+    public partial class DataGridComboBoxColumn : DataGridBoundColumn
     {
         internal override FrameworkElement GenerateEditingElement(object childData)
         {
