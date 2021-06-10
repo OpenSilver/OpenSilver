@@ -117,11 +117,12 @@ namespace System.ServiceModel
         }
 
         public static IAsyncResult BeginCallWebMethod<INTERFACE_TYPE>(
-           string endpointAddress,
-           string webMethodName,
-           Type methodReturnType,
-           IDictionary<string, object> requestParameters,
-           string soapVersion) where INTERFACE_TYPE : class
+            string endpointAddress,
+            string webMethodName,
+            Type methodReturnType,
+            string messageHeaders,
+            IDictionary<string, object> requestParameters,
+            string soapVersion) where INTERFACE_TYPE : class
         {
             // Read the parameters
             AsyncCallback callback = (AsyncCallback)requestParameters[CallbackParameterName];
@@ -152,6 +153,7 @@ namespace System.ServiceModel
                 webMethodName,
                 typeof(INTERFACE_TYPE),
                 methodReturnType,
+                messageHeaders,
                 requestParameters,
                 (xmlReturnedFromTheServer) =>
                 {
@@ -164,6 +166,22 @@ namespace System.ServiceModel
                 soapVersion);
 
             return webMethodAsyncResult;
+        }
+
+        public static IAsyncResult BeginCallWebMethod<INTERFACE_TYPE>(
+           string endpointAddress,
+           string webMethodName,
+           Type methodReturnType,
+           IDictionary<string, object> requestParameters,
+           string soapVersion) where INTERFACE_TYPE : class
+        {
+            return BeginCallWebMethod<INTERFACE_TYPE>(
+                endpointAddress,
+                webMethodName,
+                methodReturnType,
+                "",
+                requestParameters,
+                soapVersion);
         }
 
         public static IAsyncResult BeginCallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(

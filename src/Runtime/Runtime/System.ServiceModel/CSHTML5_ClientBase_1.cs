@@ -526,7 +526,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             }
 #endif
 
-            private void BeginCallWebMethod(
+            public void BeginCallWebMethod(
                 string webMethodName,
                 Type interfaceType,
                 Type methodReturnType,
