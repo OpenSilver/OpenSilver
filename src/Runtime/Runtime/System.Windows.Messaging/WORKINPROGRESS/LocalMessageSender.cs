@@ -37,6 +37,11 @@ namespace System.Windows.Messaging
 
         }
 
+        [OpenSilver.NotImplemented]
+        public void SendAsync(string message, object userState)
+        {
+
+        }
     }
 }
 #endif
