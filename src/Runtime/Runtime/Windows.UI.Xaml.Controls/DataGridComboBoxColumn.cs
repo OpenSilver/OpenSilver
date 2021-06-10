@@ -30,10 +30,10 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Represents a System.Windows.Controls.DataGrid column that hosts System.Windows.Controls.ComboBox
+    /// Represents a <see cref="DataGrid"/> column that hosts <see cref="ComboBox"/>
     /// controls in its cells.
     /// </summary>
-    class DataGridComboBoxColumn : DataGridBoundColumn
+    internal partial class DataGridComboBoxColumn : DataGridBoundColumn
     {
         internal override FrameworkElement GenerateEditingElement(object childData)
         {

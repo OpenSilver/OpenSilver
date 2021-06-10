@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Represents a System.Windows.Controls.DataGrid column that hosts System.Uri
+    /// Represents a <see cref="DataGrid"/> column that hosts <see cref="Uri"/>
     /// elements in its cells.
     /// </summary>
     public partial class DataGridHyperlinkColumn : DataGridBoundColumn

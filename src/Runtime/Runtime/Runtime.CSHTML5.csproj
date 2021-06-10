@@ -141,13 +141,18 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridBeginningEditEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridBoundColumn.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridCellEditEndedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridCellEditEndingEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridCheckBoxColumn.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridColumn.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridComboBoxColumn.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridGridLinesVisibility.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridHyperlinkColumn.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridPreparingCellForEditEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRow.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRowEditEndedEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTemplateColumn.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTextColumn.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DatePickerFormat.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Frame.cs" />
@@ -693,7 +698,7 @@
     <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerSpan.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerTextBlock.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\TextElementCollection_1.cs" />
-	<Compile Include="Windows.UI.Xaml.Input\FocusManager.cs" />
+    <Compile Include="Windows.UI.Xaml.Input\FocusManager.cs" />
     <Compile Include="Windows.UI.Xaml.Input\KeyEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Input\KeyRoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Input\Pointer.cs" />
@@ -878,7 +883,7 @@
     <Compile Include="Windows.UI.Xaml\TemplateBindingExpression.cs" />
     <Compile Include="Windows.UI.Xaml\TemplateBindingExtension.cs" />
     <Compile Include="Windows.UI.Xaml\TextDecorationCollection.cs" />
-	  <Compile Include="Windows.UI.Xaml\TreeWalkHelper.cs" />
+    <Compile Include="Windows.UI.Xaml\TreeWalkHelper.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEvent.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEventHandler.cs" />
@@ -1116,7 +1121,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-	  <Page Include="DefaultStyles\INTERNAL_DefaultListBoxStyle.xaml">
+    <Page Include="DefaultStyles\INTERNAL_DefaultListBoxStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
