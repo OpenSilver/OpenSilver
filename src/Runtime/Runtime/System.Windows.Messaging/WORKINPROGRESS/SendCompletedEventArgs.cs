@@ -48,6 +48,9 @@ namespace System.Windows.Messaging
 
 		[OpenSilver.NotImplemented]
         public Exception Error { get; }
+
+        [OpenSilver.NotImplemented]
+        public object UserState { get; }
     }
 }
 #endif
