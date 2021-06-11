@@ -19,12 +19,12 @@ namespace Windows.UI.Xaml.Input
                 "FocusedElement",
                 typeof(UIElement),
                 typeof(FocusManager),
-                new PropertyMetadata());
+                new PropertyMetadata((object)null));
 
         /// <summary>
         /// Queries the Silverlight focus system to determine which object has focus.
         /// </summary>
-        /// <returns>The object that currently has focus. Typically, this is a <see cref="T:System.Windows.Controls.Control" /> class.</returns>
+        /// <returns>The object that currently has focus. Typically, this is a <see cref="Controls.Control" /> class.</returns>
 		public static object GetFocusedElement()
         {
             return Window.Current?.GetValue(FocusedElementProperty);

@@ -3,9 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#if MIGRATION
+using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Controls;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Input
