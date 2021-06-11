@@ -142,10 +142,11 @@ public class ClientSideResourceManager : ResourceManager
     /// Be sure to generate from only the neutral one.</param>
     /// <param name="overrideClassNamespace">class namespace of the type if resource namespace is override by resource generator tool.
     /// Be sure to generate from only the neutral one.</param>
-    public static void HackResourceClass(Type classType, string overrideClassNamespace)
+    /// <param name="resourceFieldName">resourceFileName to be overriten, defauklts to resourceMan</param>
+    public static void HackResourceClass(Type classType, string overrideClassNamespace, string resourceFieldName = "resourceMan")
     {
         var newRm = new ClientSideResourceManager(classType.Assembly, overrideClassNamespace);
-        var fieldToHack = classType.GetField("resourceMan", BindingFlags.Static | BindingFlags.NonPublic);
+        var fieldToHack = classType.GetField(resourceFieldName, BindingFlags.Static | BindingFlags.NonPublic);
         fieldToHack.SetValue(null, newRm);
     }
 

@@ -151,7 +151,6 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Page.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\RichTextBox.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TextBlock.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WebView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\BindingExpressionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Data\CollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\CollectionViewGroup.cs" />
