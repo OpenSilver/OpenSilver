@@ -14,14 +14,16 @@ using System.ComponentModel;
 using System.Globalization;
 using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
 
+//Note about below: We cannot use "VisualStates" as the alias because Bridge will use the VisualStates class defined in Runtime.CSHTML5 instead of using this alias.
+//                  It is due to the fact it recognizes VisualStates as a type defined in the current namespace before recognizing it as the alias.
 #if MIGRATION
 using System.Windows.Data;
 using System.Windows.Controls.Common;
-using VisualStates = System.Windows.Controls.Internal.VisualStates;
+using InternalVisualStates = System.Windows.Controls.Internal.VisualStates; // See note above #if
 #else
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Controls.Common;
-using VisualStates = Windows.UI.Xaml.Controls.Internal.VisualStates; 
+using InternalVisualStates = Windows.UI.Xaml.Controls.Internal.VisualStates; // See note above #if
 #endif
 
 #if MIGRATION
@@ -34,12 +36,12 @@ namespace Windows.UI.Xaml.Controls
     /// Displays a caption, required field indicator, and validation error indicator for a control.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
-    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
-    [TemplateVisualState(Name = VisualStates.StateNotRequired, GroupName = VisualStates.GroupRequired)]
-    [TemplateVisualState(Name = VisualStates.StateRequired, GroupName = VisualStates.GroupRequired)]
-    [TemplateVisualState(Name = VisualStates.StateValid, GroupName = VisualStates.GroupValidation)]
-    [TemplateVisualState(Name = VisualStates.StateInvalid, GroupName = VisualStates.GroupValidation)]
+    [TemplateVisualState(Name = InternalVisualStates.StateNormal, GroupName = InternalVisualStates.GroupCommon)]
+    [TemplateVisualState(Name = InternalVisualStates.StateDisabled, GroupName = InternalVisualStates.GroupCommon)]
+    [TemplateVisualState(Name = InternalVisualStates.StateNotRequired, GroupName = InternalVisualStates.GroupRequired)]
+    [TemplateVisualState(Name = InternalVisualStates.StateRequired, GroupName = InternalVisualStates.GroupRequired)]
+    [TemplateVisualState(Name = InternalVisualStates.StateValid, GroupName = InternalVisualStates.GroupValidation)]
+    [TemplateVisualState(Name = InternalVisualStates.StateInvalid, GroupName = InternalVisualStates.GroupValidation)]
     public class Label : ContentControl
     {
         #region Member fields
@@ -484,7 +486,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void UpdateCommonState()
         {
-            VisualStateManager.GoToState(this, this.IsEnabled ? VisualStates.StateNormal : VisualStates.StateDisabled, true);
+            VisualStateManager.GoToState(this, this.IsEnabled ? InternalVisualStates.StateNormal : InternalVisualStates.StateDisabled, true);
         }
 
         /// <summary>
@@ -492,7 +494,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void UpdateRequiredState()
         {
-            VisualStateManager.GoToState(this, this.IsRequired ? VisualStates.StateRequired : VisualStates.StateNotRequired, true);
+            VisualStateManager.GoToState(this, this.IsRequired ? InternalVisualStates.StateRequired : InternalVisualStates.StateNotRequired, true);
         }
 
         /// <summary>
@@ -500,7 +502,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void UpdateValidationState()
         {
-            VisualStateManager.GoToState(this, this.IsValid ? VisualStates.StateValid : VisualStates.StateInvalid, true);
+            VisualStateManager.GoToState(this, this.IsValid ? InternalVisualStates.StateValid : InternalVisualStates.StateInvalid, true);
         }
 
         #endregion UpdateState
