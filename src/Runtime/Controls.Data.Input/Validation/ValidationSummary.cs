@@ -19,14 +19,14 @@ using System.Windows.Controls.Common;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using VisualStates = System.Windows.Controls.Internal.VisualStates;
+using InternalVisualStates = System.Windows.Controls.Internal.VisualStates;
 #else
 using Windows.System;
 using Windows.UI.Xaml.Controls.Common;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using VisualStates = Windows.UI.Xaml.Controls.Internal.VisualStates; 
+using InternalVisualStates = Windows.UI.Xaml.Controls.Internal.VisualStates; 
 #endif
 
 using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
@@ -50,10 +50,10 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
     [TemplatePart(Name = PART_SummaryListBox, Type = typeof(ListBox))]
-    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
-    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
-    [TemplateVisualState(Name = "Empty", GroupName = VisualStates.GroupValidation)]
-    [TemplateVisualState(Name = "HasErrors", GroupName = VisualStates.GroupValidation)]
+    [TemplateVisualState(Name = InternalVisualStates.StateNormal, GroupName = InternalVisualStates.GroupCommon)]
+    [TemplateVisualState(Name = InternalVisualStates.StateDisabled, GroupName = InternalVisualStates.GroupCommon)]
+    [TemplateVisualState(Name = InternalVisualStates.StateEmpty, GroupName = InternalVisualStates.GroupValidation)]
+    [TemplateVisualState(Name = InternalVisualStates.StateHasErrors, GroupName = InternalVisualStates.GroupValidation)]
     [StyleTypedProperty(Property = "SummaryListBoxStyle", StyleTargetType = typeof(ListBox))]
     [StyleTypedProperty(Property = "ErrorStyle", StyleTargetType = typeof(ListBoxItem))]
     public class ValidationSummary : Control
@@ -1025,18 +1025,18 @@ namespace Windows.UI.Xaml.Controls
         private void UpdateValidationState(bool useTransitions)
         {
             this.HasDisplayedErrors = this._displayedErrors.Count > 0;
-            VisualStateManager.GoToState(this, this.HasDisplayedErrors ? "HasErrors" : "Empty", useTransitions);
+            VisualStateManager.GoToState(this, this.HasDisplayedErrors ? InternalVisualStates.StateHasErrors : InternalVisualStates.StateEmpty, useTransitions);
         }
 
         private void UpdateCommonState(bool useTransitions)
         {
             if (this.IsEnabled)
             {
-                VisualStateManager.GoToState(this, VisualStates.StateNormal, useTransitions);
+                VisualStateManager.GoToState(this, InternalVisualStates.StateNormal, useTransitions);
             }
             else
             {
-                VisualStateManager.GoToState(this, VisualStates.StateDisabled, useTransitions);
+                VisualStateManager.GoToState(this, InternalVisualStates.StateDisabled, useTransitions);
             }
         }
 

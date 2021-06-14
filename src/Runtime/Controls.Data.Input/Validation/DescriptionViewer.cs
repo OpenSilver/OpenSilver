@@ -15,12 +15,12 @@ using System.Globalization;
 using System.Windows.Controls.Common;
 using System.Windows.Data;
 using System.Windows.Input;
-using VisualStates = System.Windows.Controls.Internal.VisualStates;
+using InternalVisualStates = System.Windows.Controls.Internal.VisualStates;
 #else
 using Windows.UI.Xaml.Controls.Common;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using VisualStates = Windows.UI.Xaml.Controls.Internal.VisualStates; 
+using InternalVisualStates = Windows.UI.Xaml.Controls.Internal.VisualStates; 
 #endif
 
 using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
@@ -43,14 +43,14 @@ namespace Windows.UI.Xaml.Controls
     /// Displays a description and tracks error state for a control.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
-    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
-    [TemplateVisualState(Name = VisualStates.StateNoDescription, GroupName = VisualStates.GroupDescription)]
-    [TemplateVisualState(Name = VisualStates.StateHasDescription, GroupName = VisualStates.GroupDescription)]
-    [TemplateVisualState(Name = VisualStates.StateValidFocused, GroupName = VisualStates.GroupValidation)]
-    [TemplateVisualState(Name = VisualStates.StateValidUnfocused, GroupName = VisualStates.GroupValidation)]
-    [TemplateVisualState(Name = VisualStates.StateInvalidFocused, GroupName = VisualStates.GroupValidation)]
-    [TemplateVisualState(Name = VisualStates.StateInvalidUnfocused, GroupName = VisualStates.GroupValidation)]
+    [TemplateVisualState(Name = InternalVisualStates.StateNormal, GroupName = InternalVisualStates.GroupCommon)]
+    [TemplateVisualState(Name = InternalVisualStates.StateDisabled, GroupName = InternalVisualStates.GroupCommon)]
+    [TemplateVisualState(Name = InternalVisualStates.StateNoDescription, GroupName = InternalVisualStates.GroupDescription)]
+    [TemplateVisualState(Name = InternalVisualStates.StateHasDescription, GroupName = InternalVisualStates.GroupDescription)]
+    [TemplateVisualState(Name = InternalVisualStates.StateValidFocused, GroupName = InternalVisualStates.GroupValidation)]
+    [TemplateVisualState(Name = InternalVisualStates.StateValidUnfocused, GroupName = InternalVisualStates.GroupValidation)]
+    [TemplateVisualState(Name = InternalVisualStates.StateInvalidFocused, GroupName = InternalVisualStates.GroupValidation)]
+    [TemplateVisualState(Name = InternalVisualStates.StateInvalidUnfocused, GroupName = InternalVisualStates.GroupValidation)]
     [StyleTypedProperty(Property = "ToolTipStyle", StyleTargetType = typeof(ToolTip))]
     public class DescriptionViewer : Control
     {
@@ -549,7 +549,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void UpdateCommonState()
         {
-            VisualStateManager.GoToState(this, this.IsEnabled ? VisualStates.StateNormal : VisualStates.StateDisabled, true);
+            VisualStateManager.GoToState(this, this.IsEnabled ? InternalVisualStates.StateNormal : InternalVisualStates.StateDisabled, true);
         }
 
         /// <summary>
@@ -557,7 +557,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void UpdateDescriptionState()
         {
-            VisualStateManager.GoToState(this, String.IsNullOrEmpty(this.Description) ? VisualStates.StateNoDescription : VisualStates.StateHasDescription, true);
+            VisualStateManager.GoToState(this, String.IsNullOrEmpty(this.Description) ? InternalVisualStates.StateNoDescription : InternalVisualStates.StateHasDescription, true);
         }
 
         /// <summary>
@@ -569,16 +569,16 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (this.IsFocused && !String.IsNullOrEmpty(this.Description))
                 {
-                    VisualStateManager.GoToState(this, VisualStates.StateValidFocused, true);
+                    VisualStateManager.GoToState(this, InternalVisualStates.StateValidFocused, true);
                 }
                 else
                 {
-                    VisualStateManager.GoToState(this, VisualStates.StateValidUnfocused, true);
+                    VisualStateManager.GoToState(this, InternalVisualStates.StateValidUnfocused, true);
                 }
             }
             else
             {
-                VisualStateManager.GoToState(this, this.IsFocused ? VisualStates.StateInvalidFocused : VisualStates.StateInvalidUnfocused, true);
+                VisualStateManager.GoToState(this, this.IsFocused ? InternalVisualStates.StateInvalidFocused : InternalVisualStates.StateInvalidUnfocused, true);
             }
         }
 
