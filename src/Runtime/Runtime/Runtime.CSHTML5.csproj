@@ -171,7 +171,6 @@
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextElementCollection_1.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextPointer.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextSelection.cs" />
-    <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\FocusManager.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\EasingFunctionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\RepeatBehavior.cs" />
@@ -689,6 +688,7 @@
     <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerSpan.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerTextBlock.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\TextElementCollection_1.cs" />
+	<Compile Include="Windows.UI.Xaml.Input\FocusManager.cs" />
     <Compile Include="Windows.UI.Xaml.Input\KeyEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Input\KeyRoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Input\Pointer.cs" />

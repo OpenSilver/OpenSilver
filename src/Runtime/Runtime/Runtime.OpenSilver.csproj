@@ -371,7 +371,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\LayoutInformation.cs" />
 		<Compile Include="Windows.UI.Xaml.Data\CollectionViewGroup.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Block.cs" />
-		<Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\FocusManager.cs" />
+		<Compile Include="Windows.UI.Xaml.Input\FocusManager.cs" />
 		<Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\Touch.cs" />
 		<Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TouchAction.cs" />
 		<Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TouchDevice.cs" />
