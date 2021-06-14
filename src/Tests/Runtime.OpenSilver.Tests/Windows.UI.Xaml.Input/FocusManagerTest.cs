@@ -13,9 +13,9 @@ using Windows.UI.Xaml.Controls;
 #endif
 
 #if MIGRATION
-namespace System.Windows.Input
+namespace System.Windows.Input.Tests
 #else
-namespace Windows.UI.Xaml.Input
+namespace Windows.UI.Xaml.Input.Tests
 #endif
 {
     [TestClass]
