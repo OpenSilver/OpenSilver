@@ -16,12 +16,10 @@
 using CSHTML5;
 using CSHTML5.Internal;
 using System;
-#if WORKINPROGRESS
 #if MIGRATION 
 using System.Windows.Navigation;
 #else
 using Windows.UI.Xaml.Navigation;
-#endif
 #endif
 
 #if MIGRATION
