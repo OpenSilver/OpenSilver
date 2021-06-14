@@ -551,12 +551,10 @@ namespace Windows.UI.Xaml
             var uiElement = (UIElement)d;
             bool newValue = (bool)e.NewValue;
 
-            if (uiElement.INTERNAL_DeferredRenderingWhenControlBecomesVisible != null
-                && newValue == true)
+            if (uiElement.INTERNAL_DeferredRenderingWhenControlBecomesVisible != null && newValue)
             {
-                Action deferredLoadingWhenControlBecomesVisible = uiElement.INTERNAL_DeferredRenderingWhenControlBecomesVisible;
+                uiElement.INTERNAL_DeferredRenderingWhenControlBecomesVisible.Invoke();
                 uiElement.INTERNAL_DeferredRenderingWhenControlBecomesVisible = null;
-                deferredLoadingWhenControlBecomesVisible();
             }
 
             // Invalidate the children so that they will inherit the new value.
