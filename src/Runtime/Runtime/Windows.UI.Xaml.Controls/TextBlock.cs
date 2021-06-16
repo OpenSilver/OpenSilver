@@ -66,7 +66,6 @@ namespace Windows.UI.Xaml.Controls
             divStyle.overflow = "hidden"; //keeps the text from overflowing despite the TextBlock's size limitations.
             divStyle.textAlign = "left"; // this is the default value.
 #if WORKINPROGRESS
-            divStyle.lineHeight = "125%";
             divStyle.boxSizing = "border-box";
 #endif
             domElementWhereToPlaceChildren = div;
