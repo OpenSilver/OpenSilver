@@ -104,7 +104,6 @@
     <Compile Include="SupportClasses\ReflectionInUserAssembliesHelper.cs" />
     <Compile Include="SupportClasses\ScreenCoordinatesHelper.cs" />
     <Compile Include="Interop\WpfMediaElementFactory.cs" />
-    <Compile Include="SupportClasses\JavaScriptErrorsReportingHandler.cs" />
     <Compile Include="Interop\JavaScriptExecutionHandler.cs" />
     <Compile Include="SupportClasses\ResourceInterceptor.cs" />
     <Compile Include="TrialHelpers_MoreMethods.cs" />

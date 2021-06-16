@@ -182,7 +182,6 @@
                                 <ContextMenu>
                                     <MenuItem Header="Inspect Visual Tree" Cursor="Hand" Click="ButtonViewXamlTree_Click"/>
                                     <MenuItem Header="View HTML/JS compilation log..." x:Name="MenuButtonViewCompilationLog" Cursor="Hand" Click="ButtonViewCompilationLog_Click"/>
-                                    <MenuItem Header="View JavaScript console log..." Cursor="Hand" Click="ButtonViewConsoleLog_Click"/>
                                     <MenuItem Header="Execute custom JavaScript code..." Cursor="Hand" Click="ButtonExecuteJS_Click"/>
                                     <MenuItem Header="View all JS code executed by the Simulator so far..." Visibility="Collapsed" Cursor="Hand" Click="ButtonViewJavaScriptLog_Click"/>
                                     <MenuItem Header="Debug JS code executed by the Simulator so far..." Cursor="Hand" Click="ButtonDebugJavaScriptLog_Click"/>
