@@ -53,7 +53,7 @@ namespace TestApplication
             Tests.Add(new Test("IsHitTestVisible", "IsHitTestVisible Opacity"));
             Tests.Add(new Test("ChildWindow", "ChildWindow"));
             Tests.Add(new Test("Viewbox", "Viewbox"));
-            Tests.Add(new Test("Frame", "Frame"));
+            Tests.Add(new Test("Frame", "Frame")); //TODO: fix it
 
             TestCategory events = new TestCategory("Events");
             events.Children.Add(new Test("Grid with multiple elements", "Events/GridWithMultipleElements"));
@@ -144,6 +144,10 @@ namespace TestApplication
             Tests.Add(new Test("(De)Serialization", "DeSerialization"));
             Tests.Add(new Test("Two TextBoxes Horizontally", "TwoTextBoxesHorizontally"));
             Tests.Add(new Test("TextBox Properties", "TextBoxProperties"));
-        }
+
+			TestCategory shapes = new TestCategory("Shapes");
+			shapes.Children.Add(new Test("Polygon", "Shapes/Polygon"));
+			Tests.Add(shapes);
+		}
     }
 }

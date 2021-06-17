@@ -274,6 +274,9 @@
     <Compile Include="Tests\ShadowDropEffectTest.xaml.cs">
       <DependentUpon>ShadowDropEffectTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\Shapes\PolygonTest.xaml.cs">
+      <DependentUpon>PolygonTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\StackPanels\HorizontalTest.xaml.cs">
       <DependentUpon>HorizontalTest.xaml</DependentUpon>
     </Compile>
@@ -577,6 +580,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\ShadowDropEffectTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\Shapes\PolygonTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
