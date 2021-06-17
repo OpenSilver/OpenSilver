@@ -738,9 +738,10 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             /// <param name="webMethodName">The name of the WebMethod</param>
             /// <param name="interfaceType">The Type of the interface</param>
             /// <param name="methodReturnType">The return Type of the method</param>
+            /// <param name="outgoingMessageHeaders">The outgoing message headers</param>
             /// <param name="originalRequestObject">The additional arguments of the method</param>
-            /// <param name="soapVersion"></param>
-            /// <returns>The result of the call of the method.</returns>
+            /// <param name="soapVersion">The SOAP Version of the request</param>
+            /// <returns>The result of the call of the method and the incoming message headers.</returns>
             public Task<(T, MessageHeaders)> CallWebMethodAsync<T>(
                 string webMethodName,
                 Type interfaceType,
@@ -803,7 +804,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             /// <param name="interfaceType">The Type of the interface</param>
             /// <param name="methodReturnType">The return Type of the method</param>
             /// <param name="originalRequestObject">The additional arguments of the method</param>
-            /// <param name="soapVersion"></param>
+            /// <param name="soapVersion">The SOAP Version of the request</param>
             /// <returns>The result of the call of the method.</returns>
             public Task<T> CallWebMethodAsync<T>(
                 string webMethodName,
@@ -855,15 +856,15 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
                 return tcs.Task;
             }
-         
+
             /// <summary>
             /// Calls a WebMethod
             /// </summary>
             /// <param name="webMethodName">The name of the Method</param>
             /// <param name="interfaceType">The Type of the interface</param>
-            /// <param name="methodReturnType"></param>
-            /// <param name="originalRequestObject"></param>
-            /// <param name="soapVersion"></param>
+            /// <param name="methodReturnType">The return Type of the method</param>
+            /// <param name="originalRequestObject">The additional arguments of the method</param>
+            /// <param name="soapVersion">The SOAP Version of the request</param>
             /// <returns>The result of the call of the method.</returns>
             public object CallWebMethod(
                 string webMethodName,
@@ -953,11 +954,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             /// </summary>
             /// <param name="webMethodName">The name of the Method</param>
             /// <param name="interfaceType">The Type of the interface</param>
-            /// <param name="methodReturnType"></param>
-            /// <param name="outgoingMessageHeaders"></param>
-            /// <param name="originalRequestObject"></param>
-            /// <param name="soapVersion"></param>
-            /// <returns>The result of the call of the method.</returns>
+            /// <param name="methodReturnType">The return Type of the method</param>
+            /// <param name="outgoingMessageHeaders">The outgoing message headers</param>
+            /// <param name="originalRequestObject">The additional arguments of the method</param>
+            /// <param name="soapVersion">The SOAP Version of the request</param>
+            /// <returns>The result of the call of the method and the incoming message headers.</returns>
             public (object, MessageHeaders) CallWebMethod(
                 string webMethodName,
                 Type interfaceType,
