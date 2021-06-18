@@ -224,7 +224,8 @@ namespace Windows.UI.Xaml.Data
                 {
                     try
                     {
-                        value = String.Format(ParentBinding.StringFormat, value);
+                        string stringFormat = GetEffectiveStringFormat(ParentBinding.StringFormat);
+                        value = String.Format(stringFormat, value);
                     }
                     catch (FormatException fe)
                     {
@@ -601,6 +602,20 @@ namespace Windows.UI.Xaml.Data
                     IsUpdating = oldIsUpdating;
                 }
             }
+        }
+
+        /// <summary>
+        /// Create a format that is suitable for String.Format
+        /// </summary>
+        /// <param name="stringFormat"></param>
+        /// <returns></returns>
+        internal static string GetEffectiveStringFormat(string stringFormat)
+        {
+            if (stringFormat.IndexOf('{') < 0)
+            {
+                stringFormat = @"{0:" + stringFormat + @"}";
+            }
+            return stringFormat;
         }
 
         #endregion Internal Methods
