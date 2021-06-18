@@ -12,6 +12,9 @@
 *  
 \*====================================================================================*/
 
+#if BRIDGE
+using Bridge;
+#endif
 
 using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
@@ -22,8 +25,8 @@ using System.Linq;
 using System.Collections;
 using System.Diagnostics;
 
-#if BRIDGE
-using Bridge;
+#if !MIGRATION
+using Windows.Foundation;
 #endif
 
 #if MIGRATION
@@ -2082,7 +2085,7 @@ namespace Windows.UI.Xaml.Controls
             double rowSpacing,
             double columnSpacing)
         {
-            Size availableSize = Size.Zero;
+            Size availableSize = new Size();
 
             if (CellCache.IsAuto(columnWidthTypes) && !CellCache.IsStar(columnWidthTypes))
             {
@@ -2302,7 +2305,7 @@ namespace Windows.UI.Xaml.Controls
             double rowSpacing = 0;
             double columnSpacing = 0;
 
-            Size desiredSize = Size.Zero;
+            Size desiredSize = new Size();
 
             Size innerAvailableSize = new Size(availableSize.Width, availableSize.Height);
 
@@ -2563,7 +2566,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 // A call to .Measure() is required before arranging children
                 // When the DefinitionsChanged is set, the measure is already invalidated
-                return default;  // Returning (0, 0)
+                return default(Size);  // Returning (0, 0)
             }
 
             try

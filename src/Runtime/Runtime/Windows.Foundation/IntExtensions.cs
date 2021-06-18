@@ -8,7 +8,7 @@ namespace System.Windows
 namespace Windows.Foundation
 #endif
 {
-	public static class IntExtensions
+	internal static class IntExtensions
     {
         public static int Min(this int @this, int value)
         {

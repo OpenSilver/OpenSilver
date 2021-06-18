@@ -128,7 +128,6 @@ namespace Windows.UI.Xaml
 
         private void WindowSizeChangedEventHandler(object sender, WindowSizeChangedEventArgs e)
         {
-
             InvalidateMeasure();
             InvalidateArrange();
         }
@@ -489,7 +488,7 @@ namespace Windows.UI.Xaml
         protected override Size MeasureOverride(Size availableSize)
         {
             if (this.Content as FrameworkElement == null)
-                return Size.Zero;
+                return new Size();
 
             FrameworkElement _content = this.Content as FrameworkElement;
             Rect windowBounds = this.Bounds;

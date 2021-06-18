@@ -8,7 +8,7 @@ namespace System.Windows
 namespace Windows.Foundation
 #endif
 {
-	public static class PointExtensions
+	internal static class PointExtensions
     {
         public static bool IsClose(this Point @this, Point point)
         {

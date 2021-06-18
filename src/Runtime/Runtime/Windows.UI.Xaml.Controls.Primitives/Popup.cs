@@ -702,7 +702,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #endif
         protected override Size MeasureOverride(Size availableSize)
         {
-            return Size.Zero;
+            return new Size();
         }
 
         protected override Size ArrangeOverride(Size finalSize)

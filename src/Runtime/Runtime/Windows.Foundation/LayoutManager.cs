@@ -1,21 +1,21 @@
-#if !MIGRATION
 using System;
 using System.Collections.Generic;
+using System.Linq;
+
+#if MIGRATION
+using System.Windows.Threading;
+#else
+using Windows.Foundation;
 using Windows.UI.Core;
-using Windows.UI.Xaml;
 #endif
 
 #if MIGRATION
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Threading;
-
 namespace System.Windows
 #else
-namespace Windows.Foundation
+namespace Windows.UI.Xaml
 #endif
 {
-    public class LayoutManager
+    internal class LayoutManager
     {
         public static readonly LayoutManager Current = new LayoutManager();
 
@@ -115,7 +115,11 @@ namespace Windows.Foundation
         {
             if (updateLayoutOperation == null || updateLayoutOperation.Status == DispatcherOperationStatus.Completed)
             {
+#if MIGRATION
                 updateLayoutOperation = Dispatcher.INTERNAL_GetCurrentDispatcher().InvokeAsync(UpdateLayout, DispatcherPriority.Render);
+#else
+                updateLayoutOperation = CoreDispatcher.INTERNAL_GetCurrentDispatcher().InvokeAsync(UpdateLayout, DispatcherPriority.Render);
+#endif
             }
         }
 

@@ -12,6 +12,11 @@
 *  
 \*====================================================================================*/
 
+using System;
+
+#if !MIGRATION
+using Windows.UI.Xaml;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Threading

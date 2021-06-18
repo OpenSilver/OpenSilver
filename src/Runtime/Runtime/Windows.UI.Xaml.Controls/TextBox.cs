@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Windows.Data;
 using System.Windows.Media;
 #else
+using Windows.Foundation;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
@@ -1723,6 +1724,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
         [OpenSilver.NotImplemented]
         public double LineHeight { get; set; }
 #endif
+
         protected override Size MeasureOverride(Size availableSize)
         {
             Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);

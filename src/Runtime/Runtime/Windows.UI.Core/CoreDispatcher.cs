@@ -188,7 +188,11 @@ namespace Windows.UI.Core
         private IDisposable disableProcessingToken;
         private bool isProcessQueueScheduled;
 
+#if MIGRATION
         public Dispatcher()
+#else
+        public CoreDispatcher()
+#endif
         {
             queue = new PriorityQueue<DispatcherOperation>((int)DispatcherPriority.Send + 1);
             disableProcessingToken = new Disposable(EnableProcessing);

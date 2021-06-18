@@ -16,6 +16,7 @@ using CSHTML5.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Markup;
@@ -25,7 +26,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
-using System.Diagnostics;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml.Controls;
@@ -890,13 +890,17 @@ namespace Windows.UI.Xaml
         }
 
 #endif
-        public override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             // Skip when loading or changed on TextMeasurement Div.
-            if (this.INTERNAL_OuterDomElement == null || Application.Current.TextMeasurementService.IsTextMeasureDivID(((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier))
+            if (this.INTERNAL_OuterDomElement == null || 
+                Application.Current.TextMeasurementService.IsTextMeasureDivID(
+                    ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier))
+            {
                 return;
+            }
 
-            FrameworkPropertyMetadata metadata = e.Property.GetMetadata(GetType()) as FrameworkPropertyMetadata;
+            var metadata = e.Property.GetMetadata(GetType()) as FrameworkPropertyMetadata;
             
             if (metadata != null)
             {
@@ -926,7 +930,7 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-        protected sealed override void ArrangeCore(Rect finalRect)
+        internal sealed override void ArrangeCore(Rect finalRect)
         {
             bool isDefaultAlignment = HorizontalAlignment == HorizontalAlignment.Stretch && VerticalAlignment == VerticalAlignment.Stretch;
             Size finalSize = isDefaultAlignment ? finalRect.Size : new Size(
@@ -993,7 +997,7 @@ namespace Windows.UI.Xaml
                 alignedTop = container.Top + (container.Height - alignedRectSize.Height) / 2;
             }
 
-            return alignedLeft == 0 && alignedTop == 0 ? Point.Zero : new Point(alignedLeft, alignedTop);
+            return alignedLeft == 0 && alignedTop == 0 ? new Point() : new Point(alignedLeft, alignedTop);
         }
 
         //
@@ -1022,7 +1026,7 @@ namespace Windows.UI.Xaml
             return finalSize;
         }
 
-        protected sealed override Size MeasureCore(Size availableSize)
+        internal sealed override Size MeasureCore(Size availableSize)
         {
             Size MinSize = new Size(MinWidth, MinHeight);
             Size MaxSize = new Size(MaxWidth, MaxHeight);
@@ -1065,7 +1069,7 @@ namespace Windows.UI.Xaml
         {
             INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
             Debug.WriteLine($"FrmeworkElement MeasureOverride ({this}) {domElementReference.UniqueIdentifier}, ({Width}, {Height})");
-            return Size.Zero;
+            return new Size();
         }
 
 #endregion Work in progress

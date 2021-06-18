@@ -13,10 +13,10 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using System;
 using System.Windows.Markup;
 using System.Diagnostics;
 using System.Collections.Generic;
-using System.Windows.Controls.Primitives;
 using System.Linq;
 
 #if MIGRATION
@@ -341,11 +341,12 @@ namespace Windows.UI.Xaml.Controls
             }
 
             if (this.Content == null)
-                return Size.Zero;
+                return new Size();
 
             Size actualSize = new Size(Double.IsNaN(Width) ? ActualWidth : Width, Double.IsNaN(Height) ? ActualHeight : Height);
             return actualSize;
         }
+
         protected override Size ArrangeOverride(Size finalSize)
         {
             IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);

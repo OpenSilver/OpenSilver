@@ -204,7 +204,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (ItemsHost == null)
             {
-                return Size.Zero;
+                return new Size();
             }
 
             ItemsHost.Measure(availableSize);

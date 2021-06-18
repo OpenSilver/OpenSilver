@@ -25,7 +25,7 @@ namespace System.Windows
 			DependencyProperty.Register("Content",
 										typeof(FrameworkElement),
 										typeof(NotificationWindow),
-										new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+										null);
 
 		//
 		// Summary:
@@ -38,7 +38,7 @@ namespace System.Windows
 			DependencyProperty.Register("Height",
 										typeof(double),
 										typeof(NotificationWindow),
-										new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+										null);
 
 		//
 		// Summary:
@@ -51,7 +51,7 @@ namespace System.Windows
 			DependencyProperty.Register("Width",
 										typeof(double),
 										typeof(NotificationWindow),
-										new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+										null);
 
 		//
 		// Summary:
@@ -59,7 +59,7 @@ namespace System.Windows
 		[OpenSilver.NotImplemented]
 		public NotificationWindow()
 		{
-			
+
 		}
 
 		//

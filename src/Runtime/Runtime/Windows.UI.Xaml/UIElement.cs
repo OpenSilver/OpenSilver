@@ -99,18 +99,21 @@ namespace Windows.UI.Xaml
 
         public Size DesiredSize { get; private set; }
         
-        public Rect VisualBounds { get; protected set; }
+        internal Rect VisualBounds { get; set; }
 
-        public bool IsMeasureValid { get; private set; }
-        public bool IsArrangeValid { get; private set; }
+        internal bool IsMeasureValid { get; private set; }
 
-        public bool IsRendered { get; private set; }
-        public Rect RenderedVisualBounds { get; private set; }
+        internal bool IsArrangeValid { get; private set; }
 
-        public Rect PreviousFinalRect { get; private set; }
-        public Size PreviousAvailableSize { get; private set; }
+        internal bool IsRendered { get; private set; }
+
+        internal Rect RenderedVisualBounds { get; private set; }
+
+        internal Rect PreviousFinalRect { get; private set; }
+
+        internal Size PreviousAvailableSize { get; private set; }
+
         private Size previousDesiredSize;
-        
         private Size layoutMeasuredSize;
         private Size layoutLastSize;
         private bool layoutProcessing;
@@ -118,20 +121,21 @@ namespace Windows.UI.Xaml
         private int disableMeasureInvalidationRequests;
         private IDisposable disableMeasureInvalidationToken;
         private int visualLevel;
-        public int VisualLevel
+
+        internal int VisualLevel
         {
             get
             {
                 if (visualLevel == -1)
                 {
-                    visualLevel = (INTERNAL_VisualParent as UIElement) != null ? (INTERNAL_VisualParent as UIElement).VisualLevel + 1 : 0;
+                    visualLevel = ((VisualTreeHelper.GetParent(this) as UIElement)?.VisualLevel ?? 0) + 1;
                 }
 
                 return visualLevel;
             }
         }
 
-        public bool IsCustomLayoutRoot
+        internal bool IsCustomLayoutRoot
         {
             get
             {
@@ -155,7 +159,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        public bool IsUnderCustomLayout
+        internal bool IsUnderCustomLayout
         {
             get
             {
@@ -176,9 +180,9 @@ namespace Windows.UI.Xaml
 
         public UIElement()
         {
-            DesiredSize = Size.Zero;
+            DesiredSize = new Size();
             PreviousFinalRect = Rect.Empty;
-            PreviousAvailableSize = Size.Infinity;
+            PreviousAvailableSize = new Size(double.PositiveInfinity, double.PositiveInfinity);
             previousDesiredSize = Size.Empty;
             layoutMeasuredSize = Size.Empty;
             layoutLastSize = Size.Empty;
@@ -519,7 +523,7 @@ namespace Windows.UI.Xaml
                 nameof(Visibility),
                 typeof(Visibility),
                 typeof(UIElement),
-                new FrameworkPropertyMetadata(Visibility.Visible, FrameworkPropertyMetadataOptions.AffectsParentMeasure, Visibility_Changed));
+                new PropertyMetadata(Visibility.Visible, Visibility_Changed));
 
         private string _previousValueOfDisplayCssProperty = "block";
 
@@ -542,6 +546,8 @@ namespace Windows.UI.Xaml
 
             // Update the "IsVisible" property (which is inherited using the "coerce" method):
             d.SetValue(IsVisibleProperty, newValue != Visibility.Collapsed);
+
+            uiElement.InvalidateParentMeasure();
         }
 
         internal static void INTERNAL_ApplyVisibility(UIElement uiElement, Visibility newValue)
@@ -1388,14 +1394,17 @@ namespace Windows.UI.Xaml
             disableMeasureInvalidationRequests++;
             return disableMeasureInvalidationToken;
         }
+
         internal void RaiseLayoutUpdated()
         {
             OnLayoutUpdated();
         }
+
         protected virtual void OnLayoutUpdated()
         {
             //
         }
+
         public void Arrange(Rect finalRect)
         {
             if (this.INTERNAL_OuterDomElement == null)
@@ -1406,7 +1415,11 @@ namespace Windows.UI.Xaml
                 return;
             }
 
+#if MIGRATION
             using (System.Windows.Threading.Dispatcher.INTERNAL_GetCurrentDispatcher().DisableProcessing())
+#else
+            using (Windows.UI.Core.CoreDispatcher.INTERNAL_GetCurrentDispatcher().DisableProcessing())
+#endif
             {
                 using (DisableMeasureInvalidation())
                 {
@@ -1464,23 +1477,23 @@ namespace Windows.UI.Xaml
 
                     if (this.IsRendered == false)
                     {
-                        uiStyle.SetVisualBounds(VisualBounds, true, false, true);
+                        INTERNAL_HtmlDomManager.SetVisualBounds(uiStyle, VisualBounds, true, false, true);
                         this.IsRendered = true;
                     }
                     else
                     {
-                        uiStyle.SetVisualBounds(VisualBounds, false, false, false);
+                        INTERNAL_HtmlDomManager.SetVisualBounds(uiStyle, VisualBounds, false, false, false);
                     }
                 }
             }
         }
 
-        protected virtual void ArrangeCore(Rect finalRect)
+        internal virtual void ArrangeCore(Rect finalRect)
         {
 
         }
 
-        protected virtual Size MeasureCore(Size availableSize)
+        internal virtual Size MeasureCore(Size availableSize)
         {
             return Size.Empty;
         }
@@ -1495,7 +1508,11 @@ namespace Windows.UI.Xaml
                 return;
             }
 
+#if MIGRATION
             using (System.Windows.Threading.Dispatcher.INTERNAL_GetCurrentDispatcher().DisableProcessing())
+#else
+            using (Windows.UI.Core.CoreDispatcher.INTERNAL_GetCurrentDispatcher().DisableProcessing())
+#endif
             {
                 using (DisableMeasureInvalidation())
                 {
@@ -1508,7 +1525,7 @@ namespace Windows.UI.Xaml
 
                     if (Visibility == Visibility.Collapsed)
                     {
-                        DesiredSize = Size.Zero;
+                        DesiredSize = new Size();
                     }
                     else if (previousMeasureValid && savedPreviousAvailableSize.IsClose(availableSize) && previousDesiredSize != Size.Empty)
                     {
@@ -1536,20 +1553,15 @@ namespace Windows.UI.Xaml
 
             LayoutManager.Current.AddArrange(this);
         }
-        public void InvalidateParentMeasure()
+
+        internal void InvalidateParentMeasure()
         {
-            if (INTERNAL_VisualParent as UIElement != null)
-            {
-                (INTERNAL_VisualParent as UIElement).InvalidateMeasure();
-            }
+            (VisualTreeHelper.GetParent(this) as UIElement)?.InvalidateMeasure();
         }
 
-        public void InvalidateParentArrange()
+        internal void InvalidateParentArrange()
         {
-            if (INTERNAL_VisualParent as UIElement != null)
-            {
-                (INTERNAL_VisualParent as UIElement).InvalidateArrange();
-            }
+            (VisualTreeHelper.GetParent(this) as UIElement)?.InvalidateArrange();
         }
         
         public void InvalidateMeasure()
@@ -1569,7 +1581,7 @@ namespace Windows.UI.Xaml
 
         }
 
-        public void UpdateCustomLayout(Size newSize)
+        internal void UpdateCustomLayout(Size newSize)
         {
             layoutLastSize = newSize;
             if (layoutProcessing)
@@ -1579,7 +1591,7 @@ namespace Windows.UI.Xaml
             Dispatcher.BeginInvoke((Action)BeginUpdateCustomLayout);
         }
 
-        public void BeginUpdateCustomLayout()
+        private void BeginUpdateCustomLayout()
         {
             layoutMeasuredSize = layoutLastSize;
             Measure(layoutMeasuredSize);

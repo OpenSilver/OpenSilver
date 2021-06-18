@@ -63,7 +63,7 @@ namespace Windows.UI.Xaml
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
             if (element.IsUnderCustomLayout)
             {
-                style.SetPosition(element.RenderedVisualBounds, false, true, false);
+                INTERNAL_HtmlDomManager.SetPosition(style, element.RenderedVisualBounds, false, true, false);
             }
             else
             {

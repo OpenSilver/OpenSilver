@@ -21,10 +21,17 @@ using JSIL.Meta;
 #else
 using Bridge;
 #endif
+
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
+
+#if MIGRATION
 using System.Windows;
+#else
+using Windows.Foundation;
+#endif
 
 namespace CSHTML5.Internal
 {
@@ -59,12 +66,12 @@ namespace CSHTML5.Internal
             }
         }
 
-        string _domElementUniqueIdentifier;
+        internal string Uid { get; }
 
         // Note: It's important that the constructor stays Private because we need to recycle the instances that correspond to the same ID using the "GetInstance" public static method, so thateach ID always corresponds to the same instance. This is useful to ensure that private fields such as "_display" work propertly.
         private INTERNAL_HtmlDomStyleReference(string elementId)
         {
-            _domElementUniqueIdentifier = elementId;
+            Uid = elementId;
         }
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
@@ -94,47 +101,9 @@ namespace CSHTML5.Internal
             return true;
         }
 
-        internal void SetVisualBounds(Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
-        {
-            string javaScriptCodeToExecute = string.Format(@"
-var element = document.getElementByIdSafe(""{0}"");
-if (element)
-{{
-element.style.left = ""{1}px"";
-element.style.top = ""{2}px"";
-element.style.width = ""{3}px"";
-element.style.height = ""{4}px"";
-{5}{6}{7}
-}}
-            ", _domElementUniqueIdentifier, visualBounds.Left, visualBounds.Top, visualBounds.Width, visualBounds.Height,
-            bSetPositionAbsolute ? "element.style.position=\"absolute\";" : "",
-            bSetZeroMargin ? "element.style.margin=\"0\";" : "",
-            bSetZeroPadding ? "element.style.padding=\"0\";" : "");
-
-            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
-        }
-
-        internal void SetPosition(Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
-        {
-            string javaScriptCodeToExecute = string.Format(@"
-var element = document.getElementByIdSafe(""{0}"");
-if (element)
-{{
-element.style.left = ""{1}px"";
-element.style.top = ""{2}px"";
-{3}{4}{5}
-}}
-            ", _domElementUniqueIdentifier, visualBounds.Left, visualBounds.Top,
-            bSetPositionAbsolute ? "element.style.position=\"absolute\";" : "",
-            bSetZeroMargin ? "element.style.margin=\"0\";" : "",
-            bSetZeroPadding ? "element.style.padding=\"0\";" : "");
-
-            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
-        }
-
         void SetStylePropertyValue(string propertyName, string propertyValue)
         {
-            string javaScriptCodeToExecute = "var element = document.getElementByIdSafe(\"" + _domElementUniqueIdentifier + "\");if (element) { element.style." + propertyName + " = \"" + propertyValue + "\"; } ";
+            string javaScriptCodeToExecute = "var element = document.getElementByIdSafe(\"" + Uid + "\");if (element) { element.style." + propertyName + " = \"" + propertyValue + "\"; } ";
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
 
@@ -187,6 +156,7 @@ element.style.top = ""{2}px"";
         public string height { set { SetStylePropertyValue("height", value); _height = value; } get { return _height; } }
         public string left { set { SetStylePropertyValue("left", value); } }
         public string lineHeight { set { SetStylePropertyValue("lineHeight", value); } }
+        public string margin { set { SetStylePropertyValue("margin", value); } }
         public string marginBottom { set { SetStylePropertyValue("marginBottom", value); } }
         public string marginLeft { set { SetStylePropertyValue("marginLeft", value); } }
         public string marginRight { set { SetStylePropertyValue("marginRight", value); } }

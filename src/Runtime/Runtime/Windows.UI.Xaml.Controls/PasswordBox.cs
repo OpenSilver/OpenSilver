@@ -17,12 +17,11 @@ using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 using System.Windows.Media;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml.Media;
 #endif
 
@@ -436,6 +435,7 @@ $0.focus()
 
         #endregion
 #endif
+
         protected override Size MeasureOverride(Size availableSize)
         {
             Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);

@@ -43,13 +43,6 @@ namespace Windows.Foundation
         private double _width;
         private double _height;
 
-        private static readonly Size zeroSize;
-        private static readonly Size infinitySize;
-        public bool IsWidthEmpty { get { return Double.IsNaN(_width); } }
-        public bool IsHeightEmpty { get { return Double.IsNaN(_height); } }
-        public bool IsEmpty { get { return IsWidthEmpty && IsHeightEmpty; } }
-        public bool IsPartiallyEmpty { get { return IsWidthEmpty || IsHeightEmpty; } }
-        
         static Size()
         {
             emptySize = new Size
@@ -58,8 +51,6 @@ namespace Windows.Foundation
                 _height = double.NegativeInfinity
             };
 
-            zeroSize = new Size(0, 0);
-            infinitySize = new Size(Double.PositiveInfinity, Double.PositiveInfinity);
             TypeFromStringConverters.RegisterConverter(typeof(Size), s => Parse(s));
         }
 
@@ -71,18 +62,10 @@ namespace Windows.Foundation
         /// <param name="height">The initial height of the instance of Windows.Foundation.Size.</param>
         public Size(double width, double height)
         {
-#if !BRIDGE
-
-            if ((!double.IsNaN(width) && width < 0) || (!double.IsNaN(height) && height < 0))
-            {
-                throw new ArgumentException("Width and Height cannot be negative.");
-            }
-#else
             if(width < 0 || height < 0)
             {
                 throw new ArgumentException("Width and Height cannot be negative.");
             }
-#endif
             this._width = width;
             this._height = height;
         }
@@ -115,47 +98,6 @@ namespace Windows.Foundation
             return size1.Height == size2.Height && size1.Width == size2.Width;
         }
 
-
-        public static Size operator -(Size size)
-        {
-            if (size == Size.Zero)
-            {
-                return size;
-            }
-
-            return new Size((-size.Width).Max(0), (-size.Height).Max(0));
-        }
-
-        public static Size operator -(Size size1, Size size2)
-        {
-            if (size1 == Size.Zero)
-            {
-                return -size2;
-            }
-
-            if (size2 == Size.Zero)
-            {
-                return size1;
-            }
-
-            return new Size((size1.Width - size2.Width).Max(0), (size1.Height - size2.Height).Max(0));
-        }
-
-        public static Size operator +(Size size1, Size size2)
-        {
-            if (size1 == Size.Zero)
-            {
-                return size2;
-            }
-
-            if (size2 == Size.Zero)
-            {
-                return size1;
-            }
-
-            return new Size(size1.Width + size2.Width, size1.Height + size2.Height);
-        }
-        
         /// <summary>
         /// Gets a value that represents a static empty Windows.Foundation.Size.
         /// </summary>
@@ -166,29 +108,6 @@ namespace Windows.Foundation
                 return emptySize;
             }
         }
-
-        /// <summary>
-        /// Gets a value that represents a static zero Windows.Foundation.Size.
-        /// </summary>
-        public static Size Zero
-        {
-            get
-            {
-                return zeroSize;
-            }
-        }
-
-        /// <summary>
-        /// Gets a value that represents a static infinity Windows.Foundation.Size.
-        /// </summary>
-        public static Size Infinity
-        {
-            get
-            {
-                return infinitySize;
-            }
-        }
-        
 
         /// <summary>
         /// Gets or sets the height of this instance of Windows.Foundation.Size in pixels. The default is 0. The value cannot be negative.
@@ -210,6 +129,18 @@ namespace Windows.Foundation
                     throw new ArgumentException("Height cannot be negative.");
                 }
                 this._height = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value that indicates whether this instance of
+        /// Windows.Foundation.Size is Windows.Foundation.Size.Empty.
+        /// </summary>
+        public bool IsEmpty
+        {
+            get
+            {
+                return this._width < 0;
             }
         }
 
@@ -327,8 +258,28 @@ namespace Windows.Foundation
 
     }
     
-    public static class SizeExtensions
+    internal static class SizeExtensions
     {
+        public static bool IsWidthAuto(this Size size)
+        {
+            return double.IsNaN(size.Width);
+        }
+
+        public static bool IsHeightAuto(this Size size)
+        {
+            return double.IsNaN(size.Height);
+        }
+
+        public static bool IsPartiallyAuto(this Size size)
+        {
+            return size.IsWidthAuto() || size.IsHeightAuto();
+        }
+
+        public static bool IsAuto(this Size size)
+        {
+            return size.IsHeightAuto() && size.IsHeightAuto();
+        }
+
         public static Size Combine(this Size size, Size fallback)
         {
             if (!(Double.IsNaN(size.Width) || Double.IsNaN(size.Height)))
@@ -364,17 +315,17 @@ namespace Windows.Foundation
 
         public static Size Min(this Size @this, Size size)
         {
-            if (@this.IsEmpty)
+            if (@this.IsAuto())
             {
                 return size;
             }
 
-            if (size.IsEmpty)
+            if (size.IsAuto())
             {
                 return @this;
             }
 
-            if (!@this.IsPartiallyEmpty && !@size.IsPartiallyEmpty)
+            if (!@this.IsPartiallyAuto() && !@size.IsPartiallyAuto())
             {
                 if (@this.Width < size.Width && @this.Height < size.Height)
                 {
@@ -388,23 +339,23 @@ namespace Windows.Foundation
             }
 
             return new Size(
-                @this.IsWidthEmpty ? size.Width : (size.IsWidthEmpty ? @this.Width : Math.Min(@this.Width, size.Width)),
-                @this.IsHeightEmpty ? size.Height : (size.IsHeightEmpty ? @this.Height : Math.Min(@this.Height, size.Height)));
+                @this.IsWidthAuto() ? size.Width : (size.IsWidthAuto() ? @this.Width : Math.Min(@this.Width, size.Width)),
+                @this.IsHeightAuto() ? size.Height : (size.IsHeightAuto() ? @this.Height : Math.Min(@this.Height, size.Height)));
         }
 
         public static Size Max(this Size @this, Size size)
         {
-            if (@this.IsEmpty)
+            if (@this.IsAuto())
             {
                 return size;
             }
 
-            if (size.IsEmpty)
+            if (size.IsAuto())
             {
                 return @this;
             }
 
-            if (!@this.IsPartiallyEmpty && !@size.IsPartiallyEmpty)
+            if (!@this.IsPartiallyAuto() && !@size.IsPartiallyAuto())
             {
                 if (@this.Width > size.Width && @this.Height > size.Height)
                 {
@@ -418,8 +369,34 @@ namespace Windows.Foundation
             }
 
             return new Size(
-                @this.IsWidthEmpty ? size.Width : (size.IsWidthEmpty ? @this.Width : Math.Max(@this.Width, size.Width)),
-                @this.IsHeightEmpty ? size.Height : (size.IsHeightEmpty ? @this.Height : Math.Max(@this.Height, size.Height)));
+                @this.IsWidthAuto() ? size.Width : (size.IsWidthAuto() ? @this.Width : Math.Max(@this.Width, size.Width)),
+                @this.IsHeightAuto() ? size.Height : (size.IsHeightAuto() ? @this.Height : Math.Max(@this.Height, size.Height)));
+        }
+
+        internal static Size Add(this Size left, Size right)
+        {
+            if (right == new Size())
+            {
+                return left;
+            }
+
+            return new Size(
+                left.Width + right.Width,
+                left.Height + right.Height
+            );
+        }
+
+        public static Size Subtract(this Size left, Size right)
+        {
+            if (right == new Size())
+            {
+                return left;
+            }
+
+            return new Size(
+                Math.Max(left.Width - right.Width, 0),
+                Math.Max(left.Height - right.Height, 0)
+            );
         }
     }
 }

@@ -1163,7 +1163,7 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
             IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);
             if (childElements.Count() == 0)
             {
-                return Size.Zero;
+                return new Size();
             }
 
             Size extent = new Size(0.0, 0.0);

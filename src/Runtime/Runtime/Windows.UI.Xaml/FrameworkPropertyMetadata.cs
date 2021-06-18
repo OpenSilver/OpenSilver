@@ -21,7 +21,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    public enum FrameworkPropertyMetadataOptions
+    internal enum FrameworkPropertyMetadataOptions
     {
         None = 0,
         AffectsMeasure = 0x1,
@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml
         AffectsRender = 0x10,
     }
 
-    public class FrameworkPropertyMetadata : PropertyMetadata
+    internal class FrameworkPropertyMetadata : PropertyMetadata
     {
         public bool AffectsArrange { get; set; }
         public bool AffectsMeasure { get; set; }

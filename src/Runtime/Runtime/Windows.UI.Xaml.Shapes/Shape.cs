@@ -1168,7 +1168,7 @@ context.restore();
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            return Size.Zero;
+            return new Size();
         }
 
     }

@@ -196,7 +196,7 @@ namespace Windows.UI.Xaml.Controls
                         "IsExpanded",
                         typeof(bool),
                         typeof(Expander),
-                        new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure, OnIsExpandedPropertyChanged));
+                        new PropertyMetadata(OnIsExpandedPropertyChanged));
 
         /// <summary>
         /// ExpandedProperty PropertyChangedCallback static function.

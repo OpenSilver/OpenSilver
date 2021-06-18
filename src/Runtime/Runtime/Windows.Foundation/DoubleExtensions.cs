@@ -8,7 +8,7 @@ namespace System.Windows
 namespace Windows.Foundation
 #endif
 {
-	public static class DoubleExtensions
+	internal static class DoubleExtensions
 	{
         private const double Epsilon = 1e-10;
         public static bool IsClose(this double @this, double value)

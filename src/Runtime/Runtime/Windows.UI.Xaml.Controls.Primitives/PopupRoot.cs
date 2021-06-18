@@ -12,8 +12,11 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
+
+#if !MIGRATION
+using Windows.Foundation;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls.Primitives
@@ -87,6 +90,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             this.Content.Measure(availableSize);
             return availableSize;
         }
+
         protected override Size ArrangeOverride(Size finalSize)
         {
             if (this.Content == null)

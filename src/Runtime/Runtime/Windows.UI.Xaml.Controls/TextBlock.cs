@@ -17,16 +17,12 @@ using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
-using System.Collections;
 
 #if MIGRATION
 using System.Windows.Documents;
 #else
-using Windows.UI.Text;
-using Windows.UI.Xaml.Navigation;
+using Windows.Foundation;
 using Windows.UI.Xaml.Documents;
 #endif
 
@@ -306,7 +302,7 @@ namespace Windows.UI.Xaml.Controls
 
 		private Size noWrapSize = Size.Empty;
 
-		public override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+		internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
 		{
 			// Skip when loading or changed on TextMeasurement Div.
 			if (this.INTERNAL_OuterDomElement == null || Application.Current.TextMeasurementService.IsTextMeasureDivID(((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier))
@@ -323,6 +319,7 @@ namespace Windows.UI.Xaml.Controls
 			}
 			base.OnPropertyChanged(e);
 		}
+
 		protected override Size MeasureOverride(Size availableSize)
 		{
             Size actualSize = this.INTERNAL_GetActualWidthAndHeight();

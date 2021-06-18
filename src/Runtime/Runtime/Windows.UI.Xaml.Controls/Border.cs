@@ -25,6 +25,7 @@ using System.Windows.Markup;
 #if MIGRATION
 using System.Windows.Media;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml.Media;
 #endif
 
@@ -311,13 +312,13 @@ namespace Windows.UI.Xaml.Controls
         {
             if (Child == null)
             {
-                return Size.Zero;
+                return new Size();
             }
 
             Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
             Size PaddingSize = new Size(Padding.Left + Padding.Right, Padding.Top + Padding.Bottom);
-            Child.Measure((availableSize - BorderThicknessSize - PaddingSize).Max(Size.Zero));
-            return Child.DesiredSize + BorderThicknessSize + PaddingSize;
+            Child.Measure(availableSize.Subtract(BorderThicknessSize).Subtract(PaddingSize).Max(new Size()));
+            return Child.DesiredSize.Add(BorderThicknessSize).Add(PaddingSize);
         }
 
         protected override Size ArrangeOverride(Size finalSize)
@@ -328,7 +329,7 @@ namespace Windows.UI.Xaml.Controls
                 Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
                 Size PaddingSize = new Size(Padding.Left + Padding.Right, Padding.Top + Padding.Bottom);
                 
-                Child.Arrange(new Rect(PaddingLocation, (finalSize - BorderThicknessSize - PaddingSize).Max(Size.Zero)));
+                Child.Arrange(new Rect(PaddingLocation, finalSize.Subtract(BorderThicknessSize).Subtract(PaddingSize).Max(new Size())));
             }
 
             return finalSize;

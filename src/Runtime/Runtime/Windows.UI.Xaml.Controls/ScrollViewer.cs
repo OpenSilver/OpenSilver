@@ -17,8 +17,10 @@ using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+#if !MIGRATION
+using Windows.Foundation;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -1355,7 +1357,7 @@ namespace Windows.UI.Xaml.Controls
         protected override Size MeasureOverride(Size availableSize)
         {
             if (Content as FrameworkElement == null)
-                return Size.Zero;
+                return new Size();
 
             double visibleHorizontalScrollBarWidth = 0;
             double visibleVerticalScrollBarWidth = 0;

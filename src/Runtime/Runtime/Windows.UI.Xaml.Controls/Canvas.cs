@@ -18,6 +18,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+#if !MIGRATION
+using Windows.Foundation;
+#endif
+
 #if MIGRATION
 namespace System.Windows.Controls
 #else
@@ -218,14 +222,17 @@ namespace Windows.UI.Xaml.Controls
 
         protected override Size MeasureOverride(Size availableSize)
         {
+            var childConstraint = new Size(double.PositiveInfinity, double.PositiveInfinity);
+
             UIElement[] childrens = Children.ToArray();
             foreach (UIElement child in childrens)
             {
-                child.Measure(Size.Infinity);
+                child.Measure(childConstraint);
             }
 
-            return Size.Zero;
+            return new Size();
         }
+
         protected override Size ArrangeOverride(Size finalSize)
         {
             UIElement[] childrens = Children.ToArray();

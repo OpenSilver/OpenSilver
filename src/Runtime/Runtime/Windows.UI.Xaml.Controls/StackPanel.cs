@@ -17,8 +17,10 @@ using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+#if !MIGRATION
+using Windows.Foundation;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -262,22 +264,26 @@ namespace Windows.UI.Xaml.Controls
         {
             return Orientation == Orientation.Horizontal ? size.Height : size.Width;
         }
+
         private double GetMainLength(Size size)
         {
             return Orientation == Orientation.Horizontal ? size.Width : size.Height;
         }
+
         private static Size CreateSize(Orientation orientation, double mainLength, double crossLength)
         {
             return orientation == Orientation.Horizontal ?
                 new Size(mainLength, crossLength) :
                 new Size(crossLength, mainLength);
         }
+
         private static Rect CreateRect(Orientation orientation, double mainStart, double crossStart, double mainLength, double crossLength)
         {
             return orientation == Orientation.Horizontal ?
                 new Rect(mainStart, crossStart, mainLength, crossLength) :
                 new Rect(crossStart, mainStart, crossLength, mainLength);
         }
+
         protected override Size MeasureOverride(Size availableSize)
         {
             double availableCrossLength = GetCrossLength(availableSize);
@@ -302,6 +308,7 @@ namespace Windows.UI.Xaml.Controls
 
             return CreateSize(Orientation, mainLength, crossLength);
         }
+
         protected override Size ArrangeOverride(Size finalSize)
         {
             double panelMainLength = Children.Select(child => GetMainLength(child.DesiredSize)).Sum();

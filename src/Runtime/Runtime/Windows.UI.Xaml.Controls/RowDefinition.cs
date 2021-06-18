@@ -162,24 +162,21 @@ namespace Windows.UI.Xaml.Controls
             get { return (double)GetValue(MaxHeightProperty); }
             set { SetValue(MaxHeightProperty, value); }
         }
+
         /// <summary>
         /// Identifies the MaxHeight dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxHeightProperty =
-            DependencyProperty.Register("MaxHeight", typeof(double), typeof(RowDefinition),
-                new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure, MaxHeight_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-        static void MaxHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            DependencyProperty.Register(
+                nameof(MaxHeight), 
+                typeof(double), 
+                typeof(RowDefinition),
+                new PropertyMetadata(double.PositiveInfinity, MaxHeight_Changed));
+
+        private static void MaxHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            //todo: set the new value in a proper manner
-            var rowDefinition = (RowDefinition)d;
-            double newValue = (double)e.NewValue;
-            //if (INTERNAL_VisualTreeManager.IsElementInVisualTree(rowDefinition))
-            //    INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(rowDefinition).maxHeight = newValue + "px";
+            ((RowDefinition)d).Parent?.InvalidateMeasure();
         }
-
-
-
 
         /// <summary>
         /// Gets or sets a value that represents the minimum height of a RowDefinition. Returns a Double that represents the minimum height in pixels. The default is 0.
@@ -189,23 +186,21 @@ namespace Windows.UI.Xaml.Controls
             get { return (double)GetValue(MinHeightProperty); }
             set { SetValue(MinHeightProperty, value); }
         }
+
         /// <summary>
         /// Identifies the MinHeight dependency property.
         /// </summary>
         public static readonly DependencyProperty MinHeightProperty =
-            DependencyProperty.Register("MinHeight", typeof(double), typeof(RowDefinition),
-                new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure, MinHeight_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-        static void MinHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            DependencyProperty.Register(
+                nameof(MinHeight), 
+                typeof(double), 
+                typeof(RowDefinition),
+                new PropertyMetadata(double.PositiveInfinity, MinHeight_Changed));
+
+        private static void MinHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            //todo: set the new value in a proper manner
-            var rowDefinition = (RowDefinition)d;
-            double newValue = (double)e.NewValue;
-            //if (INTERNAL_VisualTreeManager.IsElementInVisualTree(rowDefinition))
-            //    INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(rowDefinition).minHeight = newValue + "px";
+            ((RowDefinition)d).Parent?.InvalidateMeasure();
         }
-
-
 
         /// <summary>
         /// Gets the calculated height of a RowDefinition element, or sets the GridLength value of a row that is defined by the RowDefinition.
@@ -216,15 +211,18 @@ namespace Windows.UI.Xaml.Controls
             get { return (GridLength)GetValue(HeightProperty); }
             set { SetValue(HeightProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Height dependency property.
         /// </summary>
         public static readonly DependencyProperty HeightProperty =
-            DependencyProperty.Register("Height", typeof(GridLength), typeof(RowDefinition),
-                new FrameworkPropertyMetadata(new GridLength(1.0, GridUnitType.Star), FrameworkPropertyMetadataOptions.AffectsMeasure, Height_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(Height), 
+                typeof(GridLength), 
+                typeof(RowDefinition),
+                new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), Height_Changed));
 
-        static void Height_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void Height_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var rowDefinition = (RowDefinition)d;
             Grid grid = rowDefinition.Parent;
@@ -266,6 +264,8 @@ namespace Windows.UI.Xaml.Controls
 
                 }
             }
+
+            rowDefinition.Parent?.InvalidateMeasure();
         }
 
 

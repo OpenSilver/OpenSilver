@@ -18,6 +18,7 @@
 #if MIGRATION
 using System.Windows.Navigation;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml.Navigation;
 #endif
 

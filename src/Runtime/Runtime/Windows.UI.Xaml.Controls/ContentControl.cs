@@ -19,16 +19,15 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls.Primitives;
 using System.Windows.Markup;
-using System.Windows.Media;
 
 #if MIGRATION
 using System.Windows.Data;
+using System.Windows.Media;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -230,7 +229,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        
         protected override Size MeasureOverride(Size availableSize)
         {
             IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);
@@ -244,6 +242,7 @@ namespace Windows.UI.Xaml.Controls
             Size actualSize = new Size(Double.IsNaN(Width) ? ActualWidth : Width, Double.IsNaN(Height) ? ActualHeight : Height);
             return actualSize;
         }
+
         protected override Size ArrangeOverride(Size finalSize)
         {
 

@@ -211,8 +211,6 @@ namespace Windows.Foundation
         /// </summary>
         public static Rect Empty { get; }
 
-        public static Rect Zero { get; }
-
         /// <summary>
         /// Gets or sets the height of the rectangle.
         /// </summary>
@@ -627,7 +625,6 @@ namespace Windows.Foundation
                 _x = double.PositiveInfinity,
                 _y = double.PositiveInfinity
             };
-            Zero = new Rect(0, 0, 0, 0);
             TypeFromStringConverters.RegisterConverter(typeof(Rect), s => Parse(s));
         }
     }

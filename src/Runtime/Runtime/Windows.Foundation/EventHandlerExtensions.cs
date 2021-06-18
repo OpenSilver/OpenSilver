@@ -1,18 +1,15 @@
-#if !MIGRATION
 using System;
-#endif
-
-#if MIGRATION
 using System.ComponentModel;
 using System.Diagnostics;
 
+#if MIGRATION
 namespace System.Windows
 #else
-namespace Windows.Foundation
+namespace Windows.UI.Xaml
 #endif
 {
     [DebuggerNonUserCode]
-    public static class EventHandlerExtensions
+    internal static class EventHandlerExtensions
     {
         public static void Raise(this EventHandler handler, object sender)
         {

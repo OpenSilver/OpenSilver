@@ -155,7 +155,6 @@ namespace Windows.UI.Xaml.Controls
             };
         }
 
-
         /// <summary>
         /// Gets or sets a value that represents the maximum width of a ColumnDefinition. Returns a Double that represents the maximum width in pixels. The default is PositiveInfinity.
         /// </summary>
@@ -164,26 +163,21 @@ namespace Windows.UI.Xaml.Controls
             get { return (double)GetValue(MaxWidthProperty); }
             set { SetValue(MaxWidthProperty, value); }
         }
+
         /// <summary>
         /// Identifies the MaxWidth dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxWidthProperty =
-            DependencyProperty.Register("MaxWidth", typeof(double), typeof(ColumnDefinition),
-                new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure, MaxWidth_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(MaxWidth), 
+                typeof(double), 
+                typeof(ColumnDefinition),
+                new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed));
 
-
-        static void MaxWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void MaxWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            //todo: set the new value in a proper manner
-            var rowDefinition = (ColumnDefinition)d;
-            double newValue = (double)e.NewValue;
-            //if (INTERNAL_VisualTreeManager.IsElementInVisualTree(rowDefinition))
-            //        INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(rowDefinition).maxWidth = newValue + "px";
+            ((ColumnDefinition)d).Parent?.InvalidateMeasure();
         }
-
-
-
 
         /// <summary>
         /// Gets or sets a value that represents the minimum width of a ColumnDefinition. Returns a Double that represents the minimum width in pixels. The default is 0.
@@ -193,25 +187,21 @@ namespace Windows.UI.Xaml.Controls
             get { return (double)GetValue(MinWidthProperty); }
             set { SetValue(MinWidthProperty, value); }
         }
+
         /// <summary>
         /// Identifies the MinWidth dependency property.
         /// </summary>
         public static readonly DependencyProperty MinWidthProperty =
-            DependencyProperty.Register("MinWidth", typeof(double), typeof(ColumnDefinition),
-                new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure, MinWidth_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(MinWidth), 
+                typeof(double), 
+                typeof(ColumnDefinition),
+                new PropertyMetadata(double.PositiveInfinity, MinWidth_Changed));
 
-
-        static void MinWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void MinWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            //todo: set the new value in a proper manner
-            var rowDefinition = (ColumnDefinition)d;
-            double newValue = (double)e.NewValue;
-            //if (INTERNAL_VisualTreeManager.IsElementInVisualTree(rowDefinition))
-            //    INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(rowDefinition).minWidth = newValue + "px";
+            ((ColumnDefinition)d).Parent?.InvalidateMeasure();
         }
-
-
 
         /// <summary>
         /// Gets the calculated width of a ColumnDefinition element, or sets the GridLength value of a row that is defined by the ColumnDefinition.
@@ -222,17 +212,21 @@ namespace Windows.UI.Xaml.Controls
             get { return (GridLength)GetValue(WidthProperty); }
             set { SetValue(WidthProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Width dependency property.
         /// </summary>
         public static readonly DependencyProperty WidthProperty =
-            DependencyProperty.Register("Width", typeof(GridLength), typeof(ColumnDefinition),
-                new FrameworkPropertyMetadata(new GridLength(1.0, GridUnitType.Star), FrameworkPropertyMetadataOptions.AffectsMeasure, Width_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(Width), 
+                typeof(GridLength), 
+                typeof(ColumnDefinition),
+                new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), Width_Changed));
 
-        static void Width_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void Width_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var columnDefinition = (ColumnDefinition)d;
+
             Grid grid = columnDefinition.Parent;
 
             if (grid != null
@@ -271,6 +265,8 @@ namespace Windows.UI.Xaml.Controls
                     }
                 }
             }
+
+            columnDefinition.Parent?.InvalidateMeasure();
         }
 
         #region ActualWidth / ActualHeight
@@ -310,15 +306,22 @@ namespace Windows.UI.Xaml.Controls
 
         // Using a DependencyProperty as the backing store for Visibility.  This enables animation, styling, binding, etc...
         internal static readonly DependencyProperty VisibilityProperty =
-            DependencyProperty.Register("Visibility", typeof(Visibility), typeof(ColumnDefinition),
-                new FrameworkPropertyMetadata(Visibility.Visible, FrameworkPropertyMetadataOptions.AffectsMeasure, Visibility_Changed));
+            DependencyProperty.Register(
+                nameof(Visibility), 
+                typeof(Visibility), 
+                typeof(ColumnDefinition),
+                new PropertyMetadata(Visibility.Visible, Visibility_Changed));
+
         private static void Visibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ColumnDefinition columnDefinition = (ColumnDefinition)d;
+
             if (columnDefinition.Parent != null)
             {
                 Grid_InternalHelpers.RefreshColumnVisibility(columnDefinition.Parent, columnDefinition, (Visibility)e.NewValue);
             }
+
+            columnDefinition.Parent?.InvalidateMeasure();
         }
     }
 }
