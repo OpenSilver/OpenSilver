@@ -811,17 +811,22 @@ ends with "".Browser"" in your solution.";
 
         private void ButtonDebugJavaScriptLog_Click(object sender, RoutedEventArgs e)
         {
+#if BRIDGE
+            string destinationFolderName = "TempDebugCshtml5";
+#elif OPENSILVER
+            string destinationFolderName = "TempDebugOpenSilver";
+#endif
             string info =
-@"This feature lets you debug the JavaScript code executed by the Simulator so far, which corresponds to the content of the Interop.ExecuteJavaScript(...) calls as well as the JS/C# interop calls that are specific to the Simulator.
+$@"This feature lets you debug the JavaScript code executed by the Simulator so far, which corresponds to the content of the Interop.ExecuteJavaScript(...) calls as well as the JS/C# interop calls that are specific to the Simulator.
 
-A folder named 'TempDebugCshtml5' will be created on your desktop. The folder will contain a file named 'index.html' and other files. Just open that file with a browser and use the Browser Developer Tools to debug the code. In particular, you can look for errors in the browser Console output, and you can enable the 'Pause on caught exceptions' option in the Developer Tools to step into the code when an error occurs.
+A folder named '{destinationFolderName}' will be created on your desktop. The folder will contain a file named 'index.html' and other files. Just open that file with a browser and use the Browser Developer Tools to debug the code. In particular, you can look for errors in the browser Console output, and you can enable the 'Pause on caught exceptions' option in the Developer Tools to step into the code when an error occurs.
 
 Click OK to continue.";
             MessageBoxResult result = MessageBox.Show(info, "Information", MessageBoxButton.OKCancel, MessageBoxImage.Information);
             if (result != MessageBoxResult.Cancel)
             {
                 string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                string destinationPath = Path.Combine(desktopPath, @"TempDebugCshtml5\");
+                string destinationPath = Path.Combine(desktopPath, destinationFolderName);
 
                 try
                 {
@@ -833,66 +838,18 @@ Click OK to continue.";
                     string simulatorExePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     File.Copy(Path.Combine(simulatorExePath, "interop_debug_root.html"), Path.Combine(destinationPath, "index.html"), true);
 
-                    // Copy "cshtml5.css":
-#if !BRIDGE
-                    string cshtml5cssPath = Path.Combine(simulatorExePath, @"..\..\..\OtherLibraries\cshtml5.css"); // Path for development
-#else
-                    string cshtml5cssPath = Path.Combine(simulatorExePath, @"..\..\js_css\cshtml5.css"); // Path for Bridge
+#if OPENSILVER
+                    string simulatorJsCssPath = Path.Combine(simulatorExePath, @"js_css");
+#elif BRIDGE
+                    string simulatorJsCssPath = Path.Combine(simulatorExePath, @"..\..\js_css");
 #endif
-                    if (!File.Exists(cshtml5cssPath))
-                        cshtml5cssPath = Path.Combine(simulatorExePath, @"..\Libraries\cshtml5.css"); // Path for production
-                    File.Copy(cshtml5cssPath, Path.Combine(destinationPath, "cshtml5.css"), true);
 
-                    // Copy "cshtml5.js":
-#if !BRIDGE
-                    string cshtml5jsPath = Path.Combine(simulatorExePath, @"..\..\..\OtherLibraries\cshtml5.js"); // Path for development
-#else
-                    string cshtml5jsPath = Path.Combine(simulatorExePath, @"..\..\js_css\cshtml5.js"); // Path for Bridge
-#endif
-                    if (!File.Exists(cshtml5jsPath))
-                        cshtml5jsPath = Path.Combine(simulatorExePath, @"..\Libraries\cshtml5.js"); // Path for production
-                    File.Copy(cshtml5jsPath, Path.Combine(destinationPath, "cshtml5.js"), true);
-
-                    // Copy "velocity.js":
-#if !BRIDGE
-                    string velocityjsPath = Path.Combine(simulatorExePath, @"..\..\..\OtherLibraries\velocity.js"); // Path for development
-#else
-                    string velocityjsPath = Path.Combine(simulatorExePath, @"..\..\js_css\velocity.js"); // Path for Bridge
-#endif
-                    if (!File.Exists(velocityjsPath))
-                        velocityjsPath = Path.Combine(simulatorExePath, @"..\Libraries\velocity.js"); // Path for production
-                    File.Copy(velocityjsPath, Path.Combine(destinationPath, "velocity.js"), true);
-
-                    // Copy "flatpickr.min.css":
-#if !BRIDGE
-                    string flatpickrcssPath = Path.Combine(simulatorExePath, @"..\..\..\OtherLibraries\flatpickr.css"); // Path for development
-#else
-                    string flatpickrcssPath = Path.Combine(simulatorExePath, @"..\..\js_css\flatpickr.css"); // Path for Bridge
-#endif
-                    if (!File.Exists(flatpickrcssPath))
-                        flatpickrcssPath = Path.Combine(simulatorExePath, @"..\Libraries\flatpickr.css"); // Path for production
-                    File.Copy(flatpickrcssPath, Path.Combine(destinationPath, "flatpickr.css"), true);
-
-                    // Copy "flatpickr.js":
-#if !BRIDGE
-                    string flatpickrjsPath = Path.Combine(simulatorExePath, @"..\..\..\OtherLibraries\flatpickr.js"); // Path for development
-#else
-                    string flatpickrjsPath = Path.Combine(simulatorExePath, @"..\..\js_css\flatpickr.js"); // Path for Bridge
-#endif
-                    if (!File.Exists(flatpickrjsPath))
-                        flatpickrjsPath = Path.Combine(simulatorExePath, @"..\Libraries\flatpickr.js"); // Path for production
-                    File.Copy(flatpickrjsPath, Path.Combine(destinationPath, "flatpickr.js"), true);
-
-                    // Copy "ResizeSensor.js":
-#if !BRIDGE
-                    string resizeSensorjsPath = Path.Combine(simulatorExePath, @"..\..\..\OtherLibraries\ResizeSensor.js"); // Path for development
-#else
-                    string resizeSensorjsPath = Path.Combine(simulatorExePath, @"..\..\js_css\ResizeSensor.js"); // Path for Bridge
-#endif
-                    if (!File.Exists(resizeSensorjsPath))
-                        resizeSensorjsPath = Path.Combine(simulatorExePath, @"..\Libraries\ResizeSensor.js"); // Path for production
-                    File.Copy(resizeSensorjsPath, Path.Combine(destinationPath, "ResizeSensor.js"), true);
-
+                    File.Copy(Path.Combine(simulatorJsCssPath, "cshtml5.css"), Path.Combine(destinationPath, "cshtml5.css"), true);
+                    File.Copy(Path.Combine(simulatorJsCssPath, "cshtml5.js"), Path.Combine(destinationPath, "cshtml5.js"), true);
+                    File.Copy(Path.Combine(simulatorJsCssPath, "velocity.js"), Path.Combine(destinationPath, "velocity.js"), true);
+                    File.Copy(Path.Combine(simulatorJsCssPath, "flatpickr.css"), Path.Combine(destinationPath, "flatpickr.css"), true);
+                    File.Copy(Path.Combine(simulatorJsCssPath, "flatpickr.js"), Path.Combine(destinationPath, "flatpickr.js"), true);
+                    File.Copy(Path.Combine(simulatorJsCssPath, "ResizeSensor.js"), Path.Combine(destinationPath, "ResizeSensor.js"), true);
 
                     // Create "interopcalls.js" which contains all the JS executed by the Simulator so far:
                     string fullLog = _javaScriptExecutionHandler.GetFullLogOfExecutedJavaScriptCode(removeCallbacksArgumentsCode: true); //Note: we remove the callsbacks arguments code because they do not exist when running outside the Simulator, due to the fact that they are created in the event handlers, and those are not executed outside the Simulator. If we did not remove this code, we would get errors saying that objects like document.jsSimulatorObjectReferences["args481089"] are not defined.
