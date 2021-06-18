@@ -12,21 +12,6 @@ namespace Windows.UI.Xaml.Controls
 	{
 		//
 		// Summary:
-		//     Gets or sets the height of each line of content.
-		//
-		// Returns:
-		//     The height of each line in pixels. A value of 0 indicates that the line height
-		//     is determined automatically from the current font characteristics. The default
-		//     is 0.
-		//
-		// Exceptions:
-		//   T:System.ArgumentException:
-		//     System.Windows.Controls.TextBlock.LineHeight is set to a non-positive value.
-        [OpenSilver.NotImplemented]
-		public double LineHeight { get; set; }
-		
-		//
-		// Summary:
 		//     Gets or sets a value that indicates how a line box is determined for each line
 		//     of text in the System.Windows.Controls.TextBlock.
 		//

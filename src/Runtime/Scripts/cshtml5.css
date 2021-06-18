@@ -37,7 +37,6 @@ body {
     overflow-y: hidden;
     cursor: default;
     font-family: 'Segoe UI', Verdana, 'DejaVu Sans', Lucida, 'MS Sans Serif', sans-serif;
-    line-height: 150%;
     -webkit-touch-callout: none; /* prevents callout to copy image, etc when tap to hold */
     -webkit-text-size-adjust: none; /* prevents webkit from resizing text to fit */
     -webkit-user-select: text; /* 'none' prevents copy paste. 'text' allows it. */

@@ -1,22 +1,19 @@
 <VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
-  <TemplateData>
-    <Name>UWP-Compatible Variation of OpenSilver Class Library</Name>
-    <Description>A project for creating a class library that uses the UWP-compatible variation of OpenSilver (ie. it uses the UWP dialect of XAML instead of the Silverlight dialect).</Description>
-    <ProjectType>CSharp</ProjectType>
-    <ProjectSubType>
-    </ProjectSubType>
-    <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>ClassLibrary</DefaultName>
-    <ProvideDefaultName>true</ProvideDefaultName>
-    <LocationField>Enabled</LocationField>
-    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
-    <CreateInPlace>true</CreateInPlace>
-    <Icon>__TemplateIcon.ico</Icon>
-    <SortOrder>50</SortOrder>
-  </TemplateData>
-  <TemplateContent>
-    <Project TargetFileName="OpenSilverUwpClassLibrary.csproj" File="OpenSilverUwpClassLibrary.csproj" ReplaceParameters="true">
-      <ProjectItem ReplaceParameters="true" TargetFileName="Class1.cs">Class1.cs</ProjectItem>
-    </Project>
-  </TemplateContent>
+    <TemplateData>
+        <Name>UWP-Compatible Variation of OpenSilver Class Library</Name>
+        <Description>A project for creating a class library that uses the UWP-compatible variation of OpenSilver (ie. it uses the UWP dialect of XAML instead of the Silverlight dialect).</Description>
+        <Icon>Icon.ico</Icon>
+        <ProjectType>CSharp</ProjectType>
+        <LanguageTag>C#</LanguageTag>
+        <SortOrder>40</SortOrder>
+        <CreateNewFolder>true</CreateNewFolder>
+        <DefaultName>OpenSilverClassLibrary</DefaultName>
+        <ProvideDefaultName>true</ProvideDefaultName>
+        <CreateInPlace>true</CreateInPlace>
+    </TemplateData>
+    <TemplateContent>
+        <Project File="OpenSilverUwpClassLibrary.csproj" ReplaceParameters="true">
+            <ProjectItem ReplaceParameters="true" TargetFileName="Class1.cs">Class1.cs</ProjectItem>
+        </Project>
+    </TemplateContent>
 </VSTemplate>
