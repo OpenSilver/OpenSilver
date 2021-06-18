@@ -1515,6 +1515,13 @@ namespace Windows.UI.Xaml
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
+            // We check if the parent has implicit styles in its ancestors and inherit it if it is the case
+            FrameworkElement parent = VisualTreeHelper.GetParent(this) as FrameworkElement;
+            if (parent != null && parent.ShouldLookupImplicitStyles)
+            {
+                ShouldLookupImplicitStyles = true;
+            }
+
             // Fetch the implicit style
             // If this element's ResourceDictionary contains the
             // implicit style, it has already been retrieved.
