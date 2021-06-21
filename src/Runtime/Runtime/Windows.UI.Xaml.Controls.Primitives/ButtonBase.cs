@@ -117,6 +117,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 buttonBase.Click += ExecuteCommand;
             }
+
+            // Set IsEnabled value depending on CanExecute
+            if (buttonBase.Command != null)
+            {
+                buttonBase.IsEnabled = buttonBase.IsEnabled && buttonBase.Command.CanExecute(buttonBase.CommandParameter);
+            }
         }
 
         static void ExecuteCommand(object sender, RoutedEventArgs e)
