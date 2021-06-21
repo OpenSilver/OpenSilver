@@ -121,7 +121,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             // Set IsEnabled value depending on CanExecute
             if (buttonBase.Command != null)
             {
-                buttonBase.IsEnabled = buttonBase.IsEnabled && buttonBase.Command.CanExecute(buttonBase.CommandParameter);
+                buttonBase.SetCurrentValue(IsEnabledProperty, buttonBase.IsEnabled && buttonBase.Command.CanExecute(buttonBase.CommandParameter));
             }
         }
 
