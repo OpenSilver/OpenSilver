@@ -29,9 +29,9 @@ namespace System.Windows.Controls
 #else
 namespace Windows.UI.Xaml.Controls
 #endif
-{ 
+{
     /// <summary>
-    /// Represents a System.Windows.Controls.DataGrid column that hosts textual content
+    /// Represents a <see cref="DataGrid"/> column that hosts textual content
     /// in its cells.
     /// </summary>
     public partial class DataGridTextColumn
@@ -111,15 +111,23 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        //
-        // Summary:
-        //     Gets or sets the style that is used when rendering the element that the column
-        //     displays for a cell in editing mode.
-        //
-        // Returns:
-        //     The style that is used when rendering an editing element. The default is null.
         [OpenSilver.NotImplemented]
-        public Style EditingElementStyle { get; set; }
+        protected override FrameworkElement GenerateEditingElement(DataGridCell cell, object dataItem)
+        {
+            return null;
+        }
+
+        [OpenSilver.NotImplemented]
+        protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
+        {
+            return null;
+        }
+
+        [OpenSilver.NotImplemented]
+        protected override object PrepareCellForEdit(FrameworkElement editingElement, RoutedEventArgs editingEventArgs)
+        {
+            return null;
+        }
     }
 }
 #endif

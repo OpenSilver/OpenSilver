@@ -124,9 +124,11 @@ namespace System.Xml.Linq
             //Note about the js below: Array.from is to get the possibility to call the filter method:
 
             string nameAsString = name.LocalName;
+            string namespaceAsString = name.NamespaceName;
             // object jsNodeForElement = CSHTML5.Interop.ExecuteJavaScript("Array.from($0.childNodes).filter(node => node.tagName == $1)[0]", INTERNAL_jsnode, name.ToString());
             //todo: check whether the line above is more efficient than the line below and change accordingly (if IE allows it, see todo in Elements(XName))
-            object jsNodeForElement = CSHTML5.Interop.ExecuteJavaScript("Array.from($0.childNodes).filter(function(node) { return node.tagName == $1})[0]", INTERNAL_jsnode, nameAsString);//}
+            // Note: below, the test ((!$2 && !node.namespaceURI) || node.namespaceURI == $2) can be read as both are null or empty, or they are the same. This way, the case one is null while the other is empty will still be considered a match.
+            object jsNodeForElement = CSHTML5.Interop.ExecuteJavaScript("Array.from($0.childNodes).filter(function(node) { return (node.localName == $1 && ((!$2 && !node.namespaceURI) || node.namespaceURI == $2))})[0]", INTERNAL_jsnode, nameAsString, namespaceAsString);//}
 
             if (XDocument.IsNullOrUndefined(jsNodeForElement)) //not found, we return null.
             {

@@ -68,6 +68,7 @@
     <Compile Include="DotNetBrowser\JSValue.cs" />
     <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\CompilerGeneratedAttribute.cs" />
     <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\OptionalFieldAttribute.cs" />
+    <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\WeakReference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypesRequiredByTheSimulator\DynamicMetaObject.cs" />
     <Compile Include="TypesRequiredByTheSimulator\DynamicMetaObjectBinder.cs" />

@@ -12,13 +12,11 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Shapes;
-using System.Windows;
 #else
 using Windows.UI.Xaml.Shapes;
 using Windows.Foundation;
@@ -42,7 +40,7 @@ namespace Windows.UI.Xaml.Media
                                                         double yOffsetToApplyAfterMultiplication, 
                                                         Size shapeActualSize)
         {
-            dynamic ctx = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+            var ctx = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
             Rect rect = Rect;
 
@@ -71,13 +69,16 @@ namespace Windows.UI.Xaml.Media
             set { SetValue(RectProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="RectangleGeometry.Rect"/> dependency
+        /// property.
+        /// </summary>
         public static readonly DependencyProperty RectProperty = 
             DependencyProperty.Register(
-                "Rect", 
+                nameof(Rect), 
                 typeof(Rect), 
                 typeof(RectangleGeometry), 
                 new PropertyMetadata(Rect.Empty));
-
 
 #if WORKINPROGRESS
         /// <summary>
@@ -95,10 +96,14 @@ namespace Windows.UI.Xaml.Media
             set { this.SetValue(RadiusXProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="RectangleGeometry.RadiusX"/> dependency
+        /// property.
+        /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RadiusXProperty =
             DependencyProperty.Register(
-                "RadiusX",
+                nameof(RadiusX),
                 typeof(double),
                 typeof(RectangleGeometry),
                 new PropertyMetadata(0d));
@@ -118,10 +123,14 @@ namespace Windows.UI.Xaml.Media
             set { this.SetValue(RadiusYProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="RectangleGeometry.RadiusY" /> dependency
+        /// property.
+        /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RadiusYProperty =
             DependencyProperty.Register(
-                "RadiusY",
+                nameof(RadiusY),
                 typeof(double),
                 typeof(RectangleGeometry),
                 new PropertyMetadata(0d));

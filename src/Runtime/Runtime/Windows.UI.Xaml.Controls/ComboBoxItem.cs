@@ -12,18 +12,13 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 #if MIGRATION
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 #endif
 
@@ -38,6 +33,94 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public partial class ComboBoxItem : SelectorItem
     {
-        
+        public ComboBoxItem()
+        {
+            this.DefaultStyleKey = typeof(ComboBoxItem);
+            //this.Loaded += (sender, e) =>
+            //{
+            //    UpdateVisualStates();
+            //};
+        }
+
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
+        {
+            base.OnApplyTemplate();
+            this.UpdateVisualStates();
+        }
+
+        protected internal override void HandleIsSelectedChanged(bool oldValue, bool newValue)
+        {
+            UpdateVisualStates();
+        }
+
+#if MIGRATION
+        protected override void OnMouseEnter(MouseEventArgs eventArgs)
+#else
+        protected override void OnPointerEntered(PointerRoutedEventArgs eventArgs)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseEnter(eventArgs);
+#else
+            base.OnPointerEntered(eventArgs);
+#endif
+            this.INTERNAL_ParentSelectorControl.NotifyItemMouseEnter(this);
+            this.IsMouseOver = true;
+            this.UpdateVisualStates();
+        }
+
+#if MIGRATION
+        protected internal override void OnMouseLeave(MouseEventArgs eventArgs)
+#else
+        protected internal override void OnPointerExited(PointerRoutedEventArgs eventArgs)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeave(eventArgs);
+#else
+            base.OnPointerExited(eventArgs);
+#endif
+            this.IsMouseOver = false;
+            this.UpdateVisualStates();
+        }
+
+        internal override void UpdateVisualStates()
+        {
+            if (!IsEnabled)
+            {
+                GoToState(VisualStates.StateDisabled);
+            }
+            else if (IsMouseOver)
+            {
+                GoToState(VisualStates.StateMouseOver);
+            }
+            else
+            {
+                GoToState(VisualStates.StateNormal);
+            }
+
+            if (IsSelected)
+            {
+                GoToState(VisualStates.StateSelected);
+            }
+            else
+            {
+                GoToState(VisualStates.StateUnselected);
+            }
+#if WORKINPROGRESS
+            if (IsFocused)
+            {
+                GoToState(VisualStates.StateFocused);
+            }
+            else
+            {
+                GoToState(VisualStates.StateUnfocused);
+            }
+#endif
+        }
     }
 }

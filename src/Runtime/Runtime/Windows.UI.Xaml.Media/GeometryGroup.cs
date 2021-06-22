@@ -12,12 +12,11 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Windows.Markup;
+
 #if MIGRATION
 using System.Windows.Shapes;
-using System.Windows;
 #else
 using Windows.UI.Xaml.Shapes;
 using Windows.Foundation;
@@ -108,7 +107,7 @@ namespace Windows.UI.Xaml.Media
 
         public static readonly DependencyProperty ChildrenProperty = 
             DependencyProperty.Register(
-                "Children", 
+                nameof(Children), 
                 typeof(GeometryCollection), 
                 typeof(GeometryGroup), 
                 null);
@@ -130,7 +129,7 @@ namespace Windows.UI.Xaml.Media
 
         public static readonly DependencyProperty FillRuleProperty = 
             DependencyProperty.Register(
-                "FillRule", 
+                nameof(FillRule), 
                 typeof(FillRule), 
                 typeof(GeometryGroup), 
                 null);

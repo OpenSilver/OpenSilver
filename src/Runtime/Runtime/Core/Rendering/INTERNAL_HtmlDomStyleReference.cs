@@ -69,7 +69,7 @@ namespace CSHTML5.Internal
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
             //            string javaScriptCodeToExecute = string.Format(@"
-            //                    var element = document.getElementById(""{0}"");
+            //                    var element = document.getElementByIdSafe(""{0}"");
             //                    element.style.{1} = ""{2}"";
             //                ", _domElementUniqueIdentifier, binder.Name, value);
 
@@ -85,7 +85,7 @@ namespace CSHTML5.Internal
 #endif
 
 #if CHECK_THAT_ID_EXISTS
-            var domElement = INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("document.getElementById(\"" + _domElementUniqueIdentifier + "\")");
+            var domElement = INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("document.getElementByIdSafe(\"" + _domElementUniqueIdentifier + "\")");
             if (domElement == null)
                 throw new Exception("DOM element ID not found: " + _domElementUniqueIdentifier);
 #endif
@@ -95,7 +95,7 @@ namespace CSHTML5.Internal
 
         void SetStylePropertyValue(string propertyName, string propertyValue)
         {
-            string javaScriptCodeToExecute = "var element = document.getElementById(\"" + _domElementUniqueIdentifier + "\");if (element) { element.style." + propertyName + " = \"" + propertyValue + "\"; } ";
+            string javaScriptCodeToExecute = "var element = document.getElementByIdSafe(\"" + _domElementUniqueIdentifier + "\");if (element) { element.style." + propertyName + " = \"" + propertyValue + "\"; } ";
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
 
@@ -103,7 +103,7 @@ namespace CSHTML5.Internal
         //        {
         //            return ExecuteJavaScriptWithResult(
         //                    string.Format(@"
-        //var element = document.getElementById(""{0}"");
+        //var element = document.getElementByIdSafe(""{0}"");
         //if (element)
         //    return element.style.{1};
         //else
@@ -119,10 +119,15 @@ namespace CSHTML5.Internal
         public string background { set { SetStylePropertyValue("background", value); } }
         public string backgroundColor { set { SetStylePropertyValue("backgroundColor", value); } }
         public string border { set { SetStylePropertyValue("border", value); } }
+        public string borderRight { set { SetStylePropertyValue("borderRight", value); } }
+        public string borderLeft { set { SetStylePropertyValue("borderLeft", value); } }
+        public string borderBottom { set { SetStylePropertyValue("borderBottom", value); } }
+        public string borderTop { set { SetStylePropertyValue("borderTop", value); } }
         public string borderBottomLeftRadius { set { SetStylePropertyValue("borderBottomLeftRadius", value); } }
         public string borderBottomRightRadius { set { SetStylePropertyValue("borderBottomRightRadius", value); } }
         public string borderCollapse { set { SetStylePropertyValue("borderCollapse", value); } }
         public string borderColor { set { SetStylePropertyValue("borderColor", value); } }
+        public string borderRadius { set { SetStylePropertyValue("borderRadius", value); } }
         public string borderSpacing { set { SetStylePropertyValue("borderSpacing", value); } }
         public string borderStyle { set { SetStylePropertyValue("borderStyle", value); } }
         public string borderTopLeftRadius { set { SetStylePropertyValue("borderTopLeftRadius", value); } }
@@ -151,6 +156,12 @@ namespace CSHTML5.Internal
         public string minWidth { set { SetStylePropertyValue("minWidth", value); } }
         public string maxHeight { set { SetStylePropertyValue("maxHeight", value); _maxHeight = value; } get { return _maxHeight; } }
         public string maxWidth { set { SetStylePropertyValue("maxWidth", value); _maxWidth = value; } get { return _maxWidth; } }
+        public string msGridColumn { set { SetStylePropertyValue("msGridColumn", value); } }
+        public string msGridColumns { set { SetStylePropertyValue("msGridColumns", value); } }
+        public string msGridColumnSpan { set { SetStylePropertyValue("msGridColumnSpan", value); } }
+        public string msGridRow { set { SetStylePropertyValue("msGridRow", value); } }
+        public string msGridRows { set { SetStylePropertyValue("msGridRows", value); } }
+        public string msGridRowSpan { set { SetStylePropertyValue("msGridRowSpan", value); } }
         public string msGridRowAlign { set { SetStylePropertyValue("msGridRowAlign", value); } }
         public string msTransform { set { SetStylePropertyValue("msTransform", value); } }
         public string msTransformOrigin { set { SetStylePropertyValue("msTransformOrigin", value); } }
@@ -170,6 +181,7 @@ namespace CSHTML5.Internal
         public string tableLayout { set { SetStylePropertyValue("tableLayout", value); } }
         public string textAlign { set { SetStylePropertyValue("textAlign", value); } }
         public string textDecoration { set { SetStylePropertyValue("textDecoration", value); } }
+        public string textOverflow { set { SetStylePropertyValue("textOverflow", value); } }
         public string textShadow { set { SetStylePropertyValue("textShadow", value); } }
         public string transform { set { SetStylePropertyValue("transform", value); } }
         public string transformOrigin { set { SetStylePropertyValue("transformOrigin", value); } }

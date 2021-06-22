@@ -60,8 +60,8 @@ namespace Windows.UI.Xaml.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            dynamic div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
-            dynamic divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+            var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
             divStyle.whiteSpace = TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap";
             divStyle.overflow = "hidden"; //keeps the text from overflowing despite the TextBlock's size limitations.
             divStyle.textAlign = "left"; // this is the default value.
@@ -226,7 +226,7 @@ namespace Windows.UI.Xaml.Controls
 
         private static void OnTextTrimmedChangedUpdateDOM(DependencyObject d, object newValue)
         {
-            dynamic style = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification((TextBlock)d);
+            var style = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification((TextBlock)d);
             switch ((TextTrimming)newValue)
             {
                 case TextTrimming.CharacterEllipsis:
@@ -247,5 +247,60 @@ namespace Windows.UI.Xaml.Controls
             get { return (TextTrimming)GetValue(TextTrimmingProperty); }
             set { SetValue(TextTrimmingProperty, value); }
         }
+
+
+        // Note on LineHeight: We could make use of the browser's capabilities (see https://developer.mozilla.org/en-US/docs/Web/CSS/line-height) to improve this property.
+        //      For that, we would need a class with an implicit cast from/to double (so the original way of using it would still work), and that would be able to parse strings such as 125% (in that case, getting its value as a double would return the FontSize * 1.25)
+
+        // Returns:
+        //     The height of each line in pixels. A value of 0 indicates that the line height
+        //     is determined automatically from the current font characteristics. The default
+        //     is 0.
+        //
+        // Exceptions:
+        //   T:System.ArgumentException:
+        //     System.Windows.Controls.TextBlock.LineHeight is set to a non-positive value.
+        //[OpenSilver.NotImplemented]
+        /// <summary>
+        /// Gets or sets the height of each line of content.
+        /// </summary>
+        public double LineHeight
+        {
+            get { return (double)GetValue(LineHeightProperty); }
+            set { SetValue(LineHeightProperty, value); }
+        }
+        /// <summary>
+        /// Identifies the LineHeight dependency property.
+        /// </summary>
+        public static readonly DependencyProperty LineHeightProperty =
+            DependencyProperty.Register("LineHeight", typeof(double), typeof(TextBlock), new PropertyMetadata(0d)
+            {
+                MethodToUpdateDom = (instance, value) =>
+                {
+                    double valueAsDouble = (double)value;
+                    if(valueAsDouble < 0)
+                    {
+                        throw new ArgumentException("TextBlock.LineHeight is set to a non-positive value.");
+                    }
+                    if(valueAsDouble > 0)
+                    {
+                        ((TextBlock)instance).UpdateCSSLineHeight(value.ToString() + "px");
+                    }
+                    else
+                    {
+                        ((TextBlock)instance).UpdateCSSLineHeight("normal"); //todo: adapt this to what the value would exactly be in Silverlight (probably something like "125%" but I'm not sure of the exact value)
+                    }
+                }
+            });
+
+        private void UpdateCSSLineHeight(string value)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this);
+                domStyle.lineHeight = value ?? "";
+            }
+        }
+
     }
 }

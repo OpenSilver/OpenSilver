@@ -167,12 +167,17 @@ namespace Windows.UI.Xaml.Controls
                         string dataUrl = sourceAsBitmapImage.INTERNAL_DataURL;
                         INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", dataUrl);
                     }
+                    //set the width and height to "inherit" so the image takes up the size defined for it (and applied to _imageDiv's parent):
+                    CSHTML5.Interop.ExecuteJavaScript("$0.style.width = 'inherit'; $0.style.height = 'inherit'", _imageDiv);
                 }
             }
             else
             {
                 //If Source == null we show empty image to prevent broken image icon
                 INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", TransparentGifOnePixel);
+
+                //Set css width and height values to 0 so we don't use space for an image that should not take any. Note: if the size is specifically set in the Xaml, it will still apply on a parent dom element so it won't change the appearance.
+                CSHTML5.Interop.ExecuteJavaScript("$0.style.width = ''; $0.style.height = ''", _imageDiv);
             }
             INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "alt", " "); //the text displayed when the image cannot be found. We set it as an empty string since there is nothing in Xaml
         }
@@ -186,8 +191,10 @@ namespace Windows.UI.Xaml.Controls
             //todo-perf: we might want to put Parent in a local variable but I doubt this would have a big impact since it only happens once when the image is loaded.
             //              If we move this to a method that will be called whenever there is a size change, we might actually want to do it (probably still minor impact on performance though).
 
-            double parentWidth = ((FrameworkElement)Parent).ActualWidth;
-            double parentHeight = ((FrameworkElement)Parent).ActualHeight;
+            FrameworkElement parent = (FrameworkElement)VisualTreeHelper.GetParent(this);
+
+            double parentWidth = parent.ActualWidth;
+            double parentHeight = parent.ActualHeight;
 
             if (CSHTML5.Interop.IsRunningInTheSimulator)
             {
@@ -212,9 +219,9 @@ namespace Windows.UI.Xaml.Controls
             // If one of the sizes is bigger than that of the container, reduce it?
             // -----------------------smaller----------------------------increase it?
 
-            bool isParentLimitingHorizontalSize = !((Parent is StackPanel && ((StackPanel)Parent).Orientation == Orientation.Horizontal)
-                                                    || (Parent is WrapPanel && ((WrapPanel)Parent).Orientation == Orientation.Horizontal)
-                                                    || Parent is Canvas); //todo: fill the list.
+            bool isParentLimitingHorizontalSize = !((parent is StackPanel && ((StackPanel)parent).Orientation == Orientation.Horizontal)
+                                                    || (parent is WrapPanel && ((WrapPanel)parent).Orientation == Orientation.Horizontal)
+                                                    || parent is Canvas); //todo: fill the list.
             bool limitSize = isParentLimitingHorizontalSize
                                 && (HorizontalAlignment == HorizontalAlignment.Stretch && (double.IsNaN(Width) && currentWidth != parentWidth)) //is stretch and different size than the parent
                                 || ((double.IsNaN(Width) && currentWidth > parentWidth));  //this can only be true if not stretch, meaning that we only want to limit the size to that of the parent.
@@ -228,9 +235,9 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
 
-            bool isParentLimitingVerticalSize = !((Parent is StackPanel && ((StackPanel)Parent).Orientation == Orientation.Vertical)
-                                                    || (Parent is WrapPanel && ((WrapPanel)Parent).Orientation == Orientation.Vertical)
-                                                    || Parent is Canvas); //todo: fill the list.
+            bool isParentLimitingVerticalSize = !((parent is StackPanel && ((StackPanel)parent).Orientation == Orientation.Vertical)
+                                                    || (parent is WrapPanel && ((WrapPanel)parent).Orientation == Orientation.Vertical)
+                                                    || parent is Canvas); //todo: fill the list.
             if (isParentLimitingVerticalSize)
             {
                 if (double.IsNaN(Height) && currentHeight != parentHeight)
@@ -608,17 +615,19 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
 
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(img);
             style.display = "block"; //this is to avoid a random few pixels wide gap below the image.
-            style.width = "inherit";
-            style.height = "inherit";
+            style.width = "0"; // Defaulting to 0 because if there is no source set, we want the 1x1 transparent placeholder image to be sure to take no space. If the source is set, it will then be set to "inherit"
+            style.height = "0"; // Same as above.
             style.objectPosition = "center top";
 
-            CSHTML5.Interop.ExecuteJavaScriptAsync($@"
-$0.addEventListener('mousedown', function(e) {{
+            CSHTML5.Interop.ExecuteJavaScriptAsync(@"
+$0.addEventListener('mousedown', function(e) {
     e.preventDefault();
-}}, false);
-$0.addEventListener('error', function(e) {{
-    this.src = '{TransparentGifOnePixel}';
-}});
+}, false);
+$0.addEventListener('error', function(e) {
+    this.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    this.style.width = 0;
+    this.style.height = 0;
+});
 ", img);
 
             _imageDiv = img;

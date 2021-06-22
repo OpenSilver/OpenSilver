@@ -47,6 +47,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotImplemented.Analyzer", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotImplemented.Analyzer.Tests", "Analyzers\NotImplemented.Tests\NotImplemented.Analyzer.Tests.csproj", "{4934A835-03E3-448D-A327-C6E68F68B0DC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{99A3BA00-F4D3-4D9C-B6C8-A63D197ACC7D}"
+	ProjectSection(SolutionItems) = preProject
+		Runtime\Scripts\cshtml5.css = Runtime\Scripts\cshtml5.css
+		Runtime\Scripts\cshtml5.js = Runtime\Scripts\cshtml5.js
+		Runtime\Scripts\fastclick.js = Runtime\Scripts\fastclick.js
+		Runtime\Scripts\flatpickr.css = Runtime\Scripts\flatpickr.css
+		Runtime\Scripts\flatpickr.js = Runtime\Scripts\flatpickr.js
+		Runtime\Scripts\OpenSilver.js = Runtime\Scripts\OpenSilver.js
+		Runtime\Scripts\ResizeSensor.js = Runtime\Scripts\ResizeSensor.js
+		Runtime\Scripts\velocity.js = Runtime\Scripts\velocity.js
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Data.Input.OpenSilver", "Runtime\Controls.Data.Input\Controls.Data.Input.OpenSilver.csproj", "{BA70EA67-F71B-4DCA-A283-5C71C05DC3C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		SL.WorkInProgress|Any CPU = SL.WorkInProgress|Any CPU
@@ -95,14 +109,14 @@ Global
 		{4D0CA743-4F06-40DA-92D7-F31D8F395E2A}.UWP.WorkInProgress|Any CPU.Build.0 = UWP.WorkInProgress|Any CPU
 		{4D0CA743-4F06-40DA-92D7-F31D8F395E2A}.UWP|Any CPU.ActiveCfg = UWP|Any CPU
 		{4D0CA743-4F06-40DA-92D7-F31D8F395E2A}.UWP|Any CPU.Build.0 = UWP|Any CPU
-		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.SL.WorkInProgress|Any CPU.ActiveCfg = SL.WorkInProgress|Any CPU
-		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.SL.WorkInProgress|Any CPU.Build.0 = SL.WorkInProgress|Any CPU
-		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.SL|Any CPU.ActiveCfg = SL|Any CPU
-		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.SL|Any CPU.Build.0 = SL|Any CPU
-		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.UWP.WorkInProgress|Any CPU.ActiveCfg = UWP.WorkInProgress|Any CPU
-		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.UWP.WorkInProgress|Any CPU.Build.0 = UWP.WorkInProgress|Any CPU
-		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.UWP|Any CPU.ActiveCfg = UWP|Any CPU
-		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.UWP|Any CPU.Build.0 = UWP|Any CPU
+		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.SL.WorkInProgress|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.SL.WorkInProgress|Any CPU.Build.0 = Debug|Any CPU
+		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.SL|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.SL|Any CPU.Build.0 = Debug|Any CPU
+		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.UWP.WorkInProgress|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.UWP.WorkInProgress|Any CPU.Build.0 = Debug|Any CPU
+		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.UWP|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}.UWP|Any CPU.Build.0 = Debug|Any CPU
 		{2D8E03A2-A9E2-4CD7-81A4-A268D0E28BD8}.SL.WorkInProgress|Any CPU.ActiveCfg = SL.WorkInProgress|Any CPU
 		{2D8E03A2-A9E2-4CD7-81A4-A268D0E28BD8}.SL.WorkInProgress|Any CPU.Build.0 = SL.WorkInProgress|Any CPU
 		{2D8E03A2-A9E2-4CD7-81A4-A268D0E28BD8}.SL|Any CPU.ActiveCfg = SL|Any CPU
@@ -153,6 +167,14 @@ Global
 		{4934A835-03E3-448D-A327-C6E68F68B0DC}.UWP.WorkInProgress|Any CPU.Build.0 = Debug|Any CPU
 		{4934A835-03E3-448D-A327-C6E68F68B0DC}.UWP|Any CPU.ActiveCfg = Debug|Any CPU
 		{4934A835-03E3-448D-A327-C6E68F68B0DC}.UWP|Any CPU.Build.0 = Debug|Any CPU
+		{BA70EA67-F71B-4DCA-A283-5C71C05DC3C3}.SL.WorkInProgress|Any CPU.ActiveCfg = SL.WorkInProgress|Any CPU
+		{BA70EA67-F71B-4DCA-A283-5C71C05DC3C3}.SL.WorkInProgress|Any CPU.Build.0 = SL.WorkInProgress|Any CPU
+		{BA70EA67-F71B-4DCA-A283-5C71C05DC3C3}.SL|Any CPU.ActiveCfg = SL|Any CPU
+		{BA70EA67-F71B-4DCA-A283-5C71C05DC3C3}.SL|Any CPU.Build.0 = SL|Any CPU
+		{BA70EA67-F71B-4DCA-A283-5C71C05DC3C3}.UWP.WorkInProgress|Any CPU.ActiveCfg = UWP.WorkInProgress|Any CPU
+		{BA70EA67-F71B-4DCA-A283-5C71C05DC3C3}.UWP.WorkInProgress|Any CPU.Build.0 = UWP.WorkInProgress|Any CPU
+		{BA70EA67-F71B-4DCA-A283-5C71C05DC3C3}.UWP|Any CPU.ActiveCfg = UWP|Any CPU
+		{BA70EA67-F71B-4DCA-A283-5C71C05DC3C3}.UWP|Any CPU.Build.0 = UWP|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -173,6 +195,8 @@ Global
 		{F0839AF2-1981-4355-9358-C38D744EB678} = {BDA9A1B3-15CD-4068-9A6D-BDA030FBEC5E}
 		{D83C5616-EB62-4BD2-8DA3-59C893B7ED39} = {F0839AF2-1981-4355-9358-C38D744EB678}
 		{4934A835-03E3-448D-A327-C6E68F68B0DC} = {F0839AF2-1981-4355-9358-C38D744EB678}
+		{99A3BA00-F4D3-4D9C-B6C8-A63D197ACC7D} = {BDA9A1B3-15CD-4068-9A6D-BDA030FBEC5E}
+		{BA70EA67-F71B-4DCA-A283-5C71C05DC3C3} = {BDA9A1B3-15CD-4068-9A6D-BDA030FBEC5E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A13C12CC-0544-49D7-A852-FCE1C884AA54}

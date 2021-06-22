@@ -50,8 +50,14 @@
     <DocumentationFile>$(BinFolder)\Migration.WorkInProgress\CSHTML5.Migration.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Core\Main\DescendentsWalker.cs" />
+    <Compile Include="Core\Main\DescendentsWalkerBase.cs" />
+    <Compile Include="Core\Main\EmptyEnumerator.cs" />
+    <Compile Include="Core\Main\InheritablePropertyChangeInfo.cs" />
     <Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
+    <Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
+    <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
     <Compile Include="OpenSilver\NotImplementedAttribute.cs" />
     <Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
     <Compile Include="PagedCollectionView\CollectionViewGroupRoot.cs" />
@@ -107,6 +113,7 @@
     <Compile Include="System.Xaml\IMarkupExtension.cs" />
     <Compile Include="System.Xml\WORKINPROGRESS\XmlSerializer.cs" />
     <Compile Include="System\TypeExtensions.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls.Primitives\DatePickerTextBox.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\TabPanel.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\CalendarDayButton.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridCellsPresenter.cs" />
@@ -116,26 +123,16 @@
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IItemContainerGenerator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\IRecyclingItemContainerGenerator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\AutoCompleteSearch.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\Common\Extensions.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\CalendarExtensions.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridEditAction.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridHeadersVisibility.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridRowDetailsVisibilityMode.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\DescriptionViewer.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\FocusingInvalidControlEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\PopulatingEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\RangeObservableCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TileView.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TileViewItem.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationHelper.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationItemCollection.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationMetadata.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummary.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryFilters.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItem.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItemSource.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\ValidationSummaryItemType.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\BusyIndicator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Calendar.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CalendarBlackoutDatesCollection.cs" />
@@ -144,32 +141,39 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridBeginningEditEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridBoundColumn.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridCellEditEndedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridCellEditEndingEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridCheckBoxColumn.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridColumn.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridComboBoxColumn.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridGridLinesVisibility.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridHyperlinkColumn.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridPreparingCellForEditEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRow.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridRowEditEndedEventArgs.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTemplateColumn.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTextColumn.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\DatePickerFormat.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Frame.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Page.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\RichTextBox.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TextBlock.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\WebView.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\BindingExpressionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Data\CollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\CollectionViewGroup.cs" />
     <Compile Include="Windows.UI.Xaml.Data\CollectionViewSource.cs" />
     <Compile Include="Windows.UI.Xaml.Data\DataExtensionMethods.cs" />
     <Compile Include="Windows.UI.Xaml.Data\EnumerableCollectionView.cs" />
+    <Compile Include="Windows.UI.Xaml.Media\Polygon.cs" />
+    <Compile Include="Windows.UI.Xaml\Expression.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IndexedEnumerable.cs" />
     <Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Toolkit\ItemsControlExtensions.cs" />
     <Compile Include="Windows.UI.Xaml.Data\ListCollectionView.cs" />
     <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\Binding.cs" />
-    <Compile Include="Windows.UI.Xaml.Data\WORKINPROGRESS\BindingExpressionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Block.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\BlockCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
@@ -177,7 +181,6 @@
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextElementCollection_1.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextPointer.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\TextSelection.cs" />
-    <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\FocusManager.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\EasingFunctionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\RepeatBehavior.cs" />
@@ -416,7 +419,6 @@
     <Compile Include="Windows.UI.Xaml.Controls\Frame.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\INavigate.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ItemsControlDragDropTarget.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\Label.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Slider.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Toolkit\CollectionHelpers.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Toolkit\EnumerableExtensions.cs" />
@@ -607,7 +609,6 @@
     <Compile Include="Windows.UI.Xaml.Controls\HyperlinkButton.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\Image.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_CalendarOrClockBase.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_CheckBoxAndRadioButtonHelpers.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_ContextMenuHelpers.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\INTERNAL_DateTimePickerBase.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ItemCollection.cs" />
@@ -627,7 +628,7 @@
     <Compile Include="Windows.UI.Xaml.Controls\PanelDragDropTarget.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\PasswordBox.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ProgressBar.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\RadioButton.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\RadioButton.CSHTML5.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\RowDefinition.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\RowDefinitionCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ScrollBarVisibility.cs" />
@@ -681,7 +682,6 @@
     <Compile Include="Windows.UI.Xaml.Data\RelativeSource.cs" />
     <Compile Include="Windows.UI.Xaml.Data\RelativeSourceMode.cs" />
     <Compile Include="Windows.UI.Xaml.Data\StandardPropertyPathNode.cs" />
-    <Compile Include="Windows.UI.Xaml.Data\TemplateBinding.cs" />
     <Compile Include="Windows.UI.Xaml.Data\UpdateSourceTrigger.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Bold.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\Hyperlink.cs" />
@@ -698,6 +698,7 @@
     <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerSpan.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerTextBlock.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\TextElementCollection_1.cs" />
+    <Compile Include="Windows.UI.Xaml.Input\FocusManager.cs" />
     <Compile Include="Windows.UI.Xaml.Input\KeyEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml.Input\KeyRoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Input\Pointer.cs" />
@@ -843,6 +844,7 @@
     <Compile Include="Windows.UI.Xaml\CSSEquivalent.cs" />
     <Compile Include="Windows.UI.Xaml\DataTemplate.cs" />
     <Compile Include="Windows.UI.Xaml\DependencyObject.cs" />
+    <Compile Include="Windows.UI.Xaml\DependencyObjectCollection_1.cs" />
     <Compile Include="Windows.UI.Xaml\DependencyProperty.cs" />
     <Compile Include="Windows.UI.Xaml\DependencyPropertyChangedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\DependencyPropertyChangedEventHandler.cs" />
@@ -865,11 +867,11 @@
     <Compile Include="Windows.UI.Xaml\ICanConvertToCSSValues.cs" />
     <Compile Include="Windows.UI.Xaml\ICloneOnAnimation.cs" />
     <Compile Include="Windows.UI.Xaml\IHasAccessToPropertiesWhereItIsUsed.cs" />
-    <Compile Include="Windows.UI.Xaml\INTERNAL_VisualStateGroupCollection.cs" />
     <Compile Include="Windows.UI.Xaml\MessageBox.cs" />
     <Compile Include="Windows.UI.Xaml\MessageBoxButton.cs" />
     <Compile Include="Windows.UI.Xaml\MessageBoxResult.cs" />
     <Compile Include="Windows.UI.Xaml\PositionsWatcher.cs" />
+    <Compile Include="Windows.UI.Xaml\PresentationFrameworkCollection_1.cs" />
     <Compile Include="Windows.UI.Xaml\PropertyChangedCallback.cs" />
     <Compile Include="Windows.UI.Xaml\PropertyMetadata.cs" />
     <Compile Include="Windows.UI.Xaml\PropertyPath.cs" />
@@ -878,6 +880,10 @@
     <Compile Include="Windows.UI.Xaml\ResourceDictionary.cs" />
     <Compile Include="Windows.UI.Xaml\ResourceDictionaryCollection.cs" />
     <Compile Include="Windows.UI.Xaml\ResourcesChangeInfo.cs" />
+    <Compile Include="Windows.UI.Xaml\TemplateBindingExpression.cs" />
+    <Compile Include="Windows.UI.Xaml\TemplateBindingExtension.cs" />
+    <Compile Include="Windows.UI.Xaml\TextDecorationCollection.cs" />
+    <Compile Include="Windows.UI.Xaml\TreeWalkHelper.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEvent.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEventHandler.cs" />
@@ -907,7 +913,6 @@
     <Compile Include="Windows.UI.Xaml\Visibility.cs" />
     <Compile Include="Windows.UI.Xaml\VisualState.cs" />
     <Compile Include="Windows.UI.Xaml\VisualStateChangedEventArgs.cs" />
-    <Compile Include="Windows.UI.Xaml\VisualStateChangedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml\VisualStateGroup.cs" />
     <Compile Include="Windows.UI.Xaml\VisualStateManager.cs" />
     <Compile Include="Windows.UI.Xaml\WhenToCallPropertyChangedEnum.cs" />
@@ -918,7 +923,6 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationUnhandledExceptionEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\AssemblyPart.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\AssemblyPartCollection.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DependencyObjectCollection_1.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\EventTrigger.cs" />
@@ -928,12 +932,8 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\IDataObject.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\LineStackingStrategy.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\OutOfBrowserSettings.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\PresentationFrameworkCollection_1.cs" />
     <Compile Include="Windows.UI.Xaml.Input\WORKINPROGRESS\TabletDeviceType.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\RoutedEventArgs.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TemplateBindingExpression.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextDecoration.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TextDecorationCollection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerAction.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerActionCollection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\TriggerBase.cs" />
@@ -1005,10 +1005,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Content Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
+    <Page Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Content>
+    </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultButtonStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1021,15 +1021,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Content Include="DefaultStyles\INTERNAL_DefaultDataGridStyle.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="DefaultStyles\INTERNAL_DefaultDataGridStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
-    </Content>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultDataPagerStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultDatePickerStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DefaultStyles\INTERNAL_DefaultDatePickerTextBoxStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -1041,10 +1045,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Content Include="DefaultStyles\INTERNAL_DefaultItemsControlStyle.xaml">
+    <Page Include="DefaultStyles\INTERNAL_DefaultItemsControlStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Content>
+    </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultHeaderedContentControlStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1061,6 +1065,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Content Include="DefaultStyles\INTERNAL_DefaultPasswordBoxStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
     <Page Include="DefaultStyles\INTERNAL_DefaultSliderStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1077,23 +1085,27 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Content Include="DefaultStyles\INTERNAL_DefaultTextBoxStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
     <Page Include="DefaultStyles\INTERNAL_DefaultThumbStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Content Include="DefaultStyles\INTERNAL_DefaultTileViewStyle.xaml">
+    <Page Include="DefaultStyles\INTERNAL_DefaultTileViewStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultTileViewItemStyle.xaml">
+    </Page>
+    <Page Include="DefaultStyles\INTERNAL_DefaultTileViewItemStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Content>
+    </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultTimePickerStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="DefaultStyles\INTERNAL_DefaultToggleButtonStyle.xaml">
+    <Page Include="DefaultStyles\INTERNAL_DefaultContentControlStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -1101,18 +1113,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="DefaultStyles\INTERNAL_DefaultValidationControlsStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultViewboxStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Content Include="DefaultStyles\INTERNAL_DefaultRepeatButtonStyle.xaml">
+    <Page Include="DefaultStyles\INTERNAL_DefaultRepeatButtonStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Content>
+    </Page>
+    <Page Include="DefaultStyles\INTERNAL_DefaultListBoxStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />
@@ -1120,6 +1132,7 @@
   <ItemGroup>
     <Folder Include="System.ComponentModel\WORKINPROGRESS\" />
     <Folder Include="System.Reflection\WORKINPROGRESS\" />
+    <Folder Include="Windows.UI.Xaml.Controls\Common\" />
   </ItemGroup>
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' " />

@@ -15,10 +15,12 @@
 
 using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+#if MIGRATION
+using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Media;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Documents
@@ -28,14 +30,14 @@ namespace Windows.UI.Xaml.Documents
 {
     internal sealed partial class INTERNAL_TextContainerSpan : INTERNAL_TextContainer
     {
-        #region Constructor
+#region Constructor
         internal INTERNAL_TextContainerSpan(Span span) : base(span)
         {
 
         }
-        #endregion
+#endregion
 
-        #region Public Properties
+#region Public Properties
         public Span Span
         {
             get
@@ -68,14 +70,14 @@ namespace Windows.UI.Xaml.Documents
                 return text;
             }
         }
-        #endregion
+#endregion
 
-        #region Public Methods
+#region Public Methods
         public override void EndChange()
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this.Span))
             {
-                INTERNAL_TextContainerHelper.FromOwner(this.Span.Parent).EndChange();
+                INTERNAL_TextContainerHelper.FromOwner(VisualTreeHelper.GetParent(this.Span)).EndChange();
             }
         }
 

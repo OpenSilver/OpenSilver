@@ -62,8 +62,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            dynamic div = base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
-            dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+            var div = base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
             style.boxSizing = "border-box";
             //Why do we need the box-sizing here:
             // the cell for this has width: 100% and height: 100%

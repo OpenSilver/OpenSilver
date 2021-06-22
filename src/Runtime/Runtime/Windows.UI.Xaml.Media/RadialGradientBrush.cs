@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,11 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -75,32 +73,39 @@ namespace Windows.UI.Xaml.Media
             get { return (Point)GetValue(CenterProperty); }
             set { SetValue(CenterProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the System.Windows.Media.RadialGradientBrush.Center dependency
+        /// Identifies the <see cref="RadialGradientBrush.Center"/> dependency
         /// property.
         /// </summary>
         public static readonly DependencyProperty CenterProperty =
-            DependencyProperty.Register("Center", typeof(Point), typeof(RadialGradientBrush), new PropertyMetadata(new Point(0.5,0.5)));
+            DependencyProperty.Register(
+                nameof(Center), 
+                typeof(Point), 
+                typeof(RadialGradientBrush), 
+                new PropertyMetadata(new Point(0.5, 0.5)));
 
-
-        // Returns:
-        //     The location of the two-dimensional focal point of the gradient. The default
-        //     is (0.5, 0.5). It currently only works on Shapes.
         /// <summary>
         /// Gets or sets the location of the two-dimensional focal point that defines
         /// the beginning of the gradient.
+        /// The default is (0.5, 0.5).
         /// </summary>
         public Point GradientOrigin
         {
             get { return (Point)GetValue(GradientOriginProperty); }
             set { SetValue(GradientOriginProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the System.Windows.Media.RadialGradientBrush.GradientOrigin dependency
+        /// Identifies the <see cref="RadialGradientBrush.GradientOrigin"/> dependency
         /// property.
         /// </summary>
         public static readonly DependencyProperty GradientOriginProperty =
-            DependencyProperty.Register("GradientOrigin", typeof(Point), typeof(RadialGradientBrush), new PropertyMetadata(new Point(0.5, 0.5)));
+            DependencyProperty.Register(
+                nameof(GradientOrigin), 
+                typeof(Point), 
+                typeof(RadialGradientBrush), 
+                new PropertyMetadata(new Point(0.5, 0.5)));
 
         /// <summary>
         /// Gets or sets the horizontal radius of the outermost circle of the radial
@@ -111,12 +116,17 @@ namespace Windows.UI.Xaml.Media
             get { return (double)GetValue(RadiusXProperty); }
             set { SetValue(RadiusXProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the System.Windows.Media.RadialGradientBrush.RadiusX dependency
+        /// Identifies the <see cref="RadialGradientBrush.RadiusX"/> dependency
         /// property.
         /// </summary>
         public static readonly DependencyProperty RadiusXProperty =
-            DependencyProperty.Register("RadiusX", typeof(double), typeof(RadialGradientBrush), new PropertyMetadata(0.5));
+            DependencyProperty.Register(
+                nameof(RadiusX), 
+                typeof(double), 
+                typeof(RadialGradientBrush), 
+                new PropertyMetadata(0.5));
 
         /// <summary>
         /// Gets or sets the vertical radius of the outermost circle of a radial gradient.
@@ -126,32 +136,23 @@ namespace Windows.UI.Xaml.Media
             get { return (double)GetValue(RadiusYProperty); }
             set { SetValue(RadiusYProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the System.Windows.Media.RadialGradientBrush.RadiusY dependency
+        /// Identifies the <see cref="RadialGradientBrush.RadiusY"/> dependency
         /// property.
         /// </summary>
         public static readonly DependencyProperty RadiusYProperty =
-            DependencyProperty.Register("RadiusY", typeof(double), typeof(RadialGradientBrush), new PropertyMetadata(0.5));
-
-
+            DependencyProperty.Register(
+                nameof(RadiusY), 
+                typeof(double), 
+                typeof(RadialGradientBrush), 
+                new PropertyMetadata(0.5));
 
         private string GetGradientStopsString()
         {
-            string gradientStopsString = "";
-            var orderedGradientStops = GradientStops.OrderBy((element) => { return element.Offset; }); //todo: there might be a better way of doing that since I think the OrderBy method is slow.
-            bool isFirst = true;
-
-            foreach (GradientStop gradientStop in orderedGradientStops)
-            {
-                if(!isFirst)
-                {
-                    gradientStopsString +=", " ;
-                }
-                gradientStopsString += gradientStop.Color.INTERNAL_ToHtmlString(this.Opacity) + gradientStop.Offset * 100 + "%";
-                isFirst = false;
-            }
-
-            return gradientStopsString;
+            return string.Join(", ", 
+                GradientStops.OrderBy(gs => gs.Offset)
+                             .Select(gs => gs.Color.INTERNAL_ToHtmlString(this.Opacity) + gs.Offset * 100 + "%"));
         }
 
         internal List<object> INTERNAL_ToHtmlString(DependencyObject parent)
@@ -168,7 +169,8 @@ namespace Windows.UI.Xaml.Media
                 multiplicatorForPercentage = 1;
             }
 
-            string gradientString = string.Format("radial-gradient({0}{5} {1}{5} at {2}{5} {3}{5}, {4})",
+            string gradientString = string.Format(CultureInfo.InvariantCulture, 
+                "radial-gradient({0}{5} {1}{5} at {2}{5} {3}{5}, {4})",
                 (int)(RadiusX * multiplicatorForPercentage), //{0}
                 (int)(RadiusY * multiplicatorForPercentage), //{1}
                 (int)(Center.X * multiplicatorForPercentage), //{2}

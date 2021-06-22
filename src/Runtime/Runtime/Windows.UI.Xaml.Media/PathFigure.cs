@@ -12,19 +12,15 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
-#if !MIGRATION
+
+#if MIGRATION
+using System.Windows.Shapes;
+#else
 using Windows.Foundation;
 using Windows.UI.Xaml.Shapes;
-#else
-using System.Windows.Shapes;
 #endif
 
 #if MIGRATION
@@ -69,11 +65,17 @@ namespace Windows.UI.Xaml.Media
             get { return (bool)GetValue(IsClosedProperty); }
             set { SetValue(IsClosedProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the IsClosed dependency property.
+        /// Identifies the <see cref="PathFigure.IsClosed"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty IsClosedProperty =
-            DependencyProperty.Register("IsClosed", typeof(bool), typeof(PathFigure), new PropertyMetadata(false, IsClosed_Changed));
+            DependencyProperty.Register(
+                nameof(IsClosed), 
+                typeof(bool), 
+                typeof(PathFigure), 
+                new PropertyMetadata(false, IsClosed_Changed));
 
         private static void IsClosed_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -93,11 +95,17 @@ namespace Windows.UI.Xaml.Media
             get { return (bool)GetValue(IsFilledProperty); }
             set { SetValue(IsFilledProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the IsFilled dependency property.
+        /// Identifies the <see cref="PathFigure.IsFilled"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty IsFilledProperty =
-            DependencyProperty.Register("IsFilled", typeof(bool), typeof(PathFigure), new PropertyMetadata(false, IsFilled_Changed));
+            DependencyProperty.Register(
+                nameof(IsFilled), 
+                typeof(bool), 
+                typeof(PathFigure), 
+                new PropertyMetadata(false, IsFilled_Changed));
 
         private static void IsFilled_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -127,11 +135,17 @@ namespace Windows.UI.Xaml.Media
             }
             set { SetValue(SegmentsProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Segments dependency property.
+        /// Identifies the <see cref="PathFigure.Segments" /> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty SegmentsProperty =
-            DependencyProperty.Register("Segments", typeof(PathSegmentCollection), typeof(PathFigure), new PropertyMetadata(null, Segments_Changed));
+            DependencyProperty.Register(
+                nameof(Segments), 
+                typeof(PathSegmentCollection), 
+                typeof(PathFigure), 
+                new PropertyMetadata(null, Segments_Changed));
 
         private static void Segments_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -159,11 +173,17 @@ namespace Windows.UI.Xaml.Media
             get { return (Point)GetValue(StartPointProperty); }
             set { SetValue(StartPointProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the StartPoint dependency property.
+        /// Identifies the <see cref="PathFigure.StartPoint"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty StartPointProperty =
-            DependencyProperty.Register("StartPoint", typeof(Point), typeof(PathFigure), new PropertyMetadata(new Point(), StartPoint_Changed));
+            DependencyProperty.Register(
+                nameof(StartPoint), 
+                typeof(Point), 
+                typeof(PathFigure), 
+                new PropertyMetadata(new Point(), StartPoint_Changed));
 
         private static void StartPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -197,7 +217,7 @@ namespace Windows.UI.Xaml.Media
                                      double strokeThickness, 
                                      Size shapeActualSize)
         {
-            dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
             // todo: In order to support IsFilled, add a call to context.beginPath() here 
             // (instead the call to beginPath() that is located in "Path.cs") and handle 

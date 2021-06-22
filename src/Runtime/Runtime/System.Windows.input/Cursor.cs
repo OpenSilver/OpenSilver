@@ -12,101 +12,125 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using DotNetForHtml5.Core;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace System.Windows.Input
 {
     /// <summary>
     /// Represents the image used for the mouse pointer.
     /// </summary>
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(CursorConverter))]
-#endif
     public sealed partial class Cursor : IDisposable
     {
-        bool _isCustom = false;
-        internal string _cursorHtmlString;
+        private static string[] HtmlCursors { get; }
 
-        internal Cursor()
+        static Cursor()
         {
-            
+            HtmlCursors = new string[Cursors._cursorTypeCount];
+            HtmlCursors[(int)CursorType.None] = "none";
+            HtmlCursors[(int)CursorType.No] = "not-allowed";
+            HtmlCursors[(int)CursorType.Arrow] = "default";
+            HtmlCursors[(int)CursorType.AppStarting] = "progress";
+            HtmlCursors[(int)CursorType.Cross] = "crosshair";
+            HtmlCursors[(int)CursorType.Help] = "help";
+            HtmlCursors[(int)CursorType.IBeam] = "text";
+            HtmlCursors[(int)CursorType.SizeAll] = "move";
+            HtmlCursors[(int)CursorType.SizeNESW] = "nesw-resize";
+            HtmlCursors[(int)CursorType.SizeNS] = "ns-resize";
+            HtmlCursors[(int)CursorType.SizeNWSE] = "nwse-resize";
+            HtmlCursors[(int)CursorType.SizeWE] = "ew-resize";
+            HtmlCursors[(int)CursorType.UpArrow] = "auto"; // not implemented
+            HtmlCursors[(int)CursorType.Wait] = "wait";
+            HtmlCursors[(int)CursorType.Hand] = "pointer";
+            HtmlCursors[(int)CursorType.Pen] = "auto"; // not implemented
+            HtmlCursors[(int)CursorType.ScrollNS] = "auto"; // not implemented
+            HtmlCursors[(int)CursorType.ScrollWE] = "auto"; // not implemented
+            HtmlCursors[(int)CursorType.ScrollAll] = "all-scroll";
+            HtmlCursors[(int)CursorType.ScrollN] = "auto"; // not implemented
+            HtmlCursors[(int)CursorType.ScrollS] = "auto"; // not implemented
+            HtmlCursors[(int)CursorType.ScrollW] = "auto"; // not implemented
+            HtmlCursors[(int)CursorType.ScrollE] = "auto"; // not implemented
+            HtmlCursors[(int)CursorType.ScrollNW] = "auto"; // not implemented
+            HtmlCursors[(int)CursorType.ScrollNE] = "auto"; // not implemented
+            HtmlCursors[(int)CursorType.ScrollSW] = "auto"; // not implemented
+            HtmlCursors[(int)CursorType.ScrollSE] = "auto"; // not implemented
+            HtmlCursors[(int)CursorType.ArrowCD] = "auto"; // not implemented
+            HtmlCursors[(int)CursorType.Stylus] = "auto"; // not implemented
+            HtmlCursors[(int)CursorType.Eraser] = "auto"; // not implemented
+
+            TypeFromStringConverters.RegisterConverter(typeof(Cursor), INTERNAL_ConvertFromString);
         }
 
-        //todo: When we will add different constructors for Cursor, we will need to modify ConvertingStringToValue.PrepareStringForCursor in the compiler accordingly.
-
-        //// Exceptions:
-        ////   System.ArgumentNullException:
-        ////     cursorStream is null.
-        ////
-        ////   System.IO.IOException:
-        ////     This constructor was unable to create a temporary file.
-        ///// <summary>
-        ///// Initializes a new instance of the System.Windows.Input.Cursor class from
-        ///// the specified System.IO.Stream.
-        ///// </summary>
-        ///// <param name="cursorStream">The System.IO.Stream that contains the cursor.</param>
-        //public Cursor(Stream cursorStream)
-        //{
-        //    _isCustom = true; //todo: the rest
-        //}
-       
-        //// Exceptions:
-        ////   System.ArgumentNullException:
-        ////     cursorFile is null.
-        ////
-        ////   System.ArgumentException:
-        ////     cursorFile is not an .ani or .cur file name.
-        ///// <summary>
-        ///// Initializes a new instance of the System.Windows.Input.Cursor class from
-        ///// the specified .ani or a .cur file.
-        ///// </summary>
-        ///// <param name="cursorFile">The file that contains the cursor.</param>
-        //public Cursor(string cursorFile)
-        //{
-        //    _isCustom = true; //todo: the rest
-        //}
+        /// <summary>
+        /// Constructor for Standard Cursors, needn't be public as Stock Cursors
+        /// are exposed in Cursors class.
+        /// </summary>
+        internal Cursor(CursorType cursorType)
+        {
+            if (IsValidCursorType(cursorType))
+            {
+                _cursorType = cursorType;
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("'{0}' cursor type is not valid.", cursorType));
+            }
+        }
 
         /// <summary>
-        /// Releases the resources used by the System.Windows.Input.Cursor class.
+        /// CursorType - Cursor Type Enumeration
+        /// </summary>
+        /// <value></value>
+        internal CursorType CursorType
+        {
+            get
+            {
+                return _cursorType;
+            }
+        }
+
+        private static bool IsValidCursorType(CursorType cursorType)
+        {
+            return ((int)cursorType >= (int)CursorType.None && (int)cursorType <= (int)CursorType.Eraser);
+        }
+
+        /// <summary>
+        /// Releases the resources used by the <see cref="Cursor"/> class.
         /// </summary>
         public void Dispose()
         {
         }
-       
-        ///// <summary>
-        ///// Returns the string representation of the System.Windows.Input.Cursor.
-        ///// </summary>
-        ///// <returns>The name of the cursor.</returns>
-        //public override string ToString();
 
-        internal static object INTERNAL_ConvertFromString(string cursorTypeString)
+        /// <summary>
+        /// Returns the string representation of the <see cref="Cursor"/>.
+        /// </summary>
+        /// <returns>
+        /// The string representation of the cursor. This corresponds to the active <see cref="Cursors"/>
+        /// property name.
+        /// </returns>
+        public override string ToString()
         {
-            try
+            // Get the string representation fo the cursor type enumeration.
+            return Enum.GetName(typeof(CursorType), _cursorType);
+        }
+
+        internal string ToHtmlString()
+        {
+            return HtmlCursors[(int)_cursorType];
+        }
+
+        internal static object INTERNAL_ConvertFromString(string cursorStr)
+        {
+            if (Enum.TryParse(cursorStr, out CursorType cursorType) &&
+                IsValidCursorType(cursorType))
             {
-                Cursors.INTERNAL_CursorsEnum cursorType = (Cursors.INTERNAL_CursorsEnum)Enum.Parse(typeof(Cursors.INTERNAL_CursorsEnum), cursorTypeString); // Note: "TryParse" does not seem to work in JSIL.
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = Cursors.INTERNAL_cursorEnumToCursorString[cursorType];
-                return cursor;
+                return Cursors.EnsureCursor(cursorType);
             }
-            catch (Exception ex)
+            else
             {
-                throw new Exception("Invalid cursor: " + cursorTypeString, ex);
+                throw new ArgumentException(string.Format("'{0}' cursor type is not valid.", cursorStr));
             }
         }
 
-        static Cursor()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(Cursor), INTERNAL_ConvertFromString);
-            Cursors.FillCursorTypeToStringDictionary();
-        }
+        private CursorType _cursorType = CursorType.None;
     }
 }

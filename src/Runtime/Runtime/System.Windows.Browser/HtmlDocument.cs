@@ -99,16 +99,22 @@ namespace System.Windows.Browser
         {
             return null;
         }
-
-        //
-        // Summary:
-        //     Gets or sets the browser's cookie string.
-        //
-        // Returns:
-        //     The cookie string that is stored by the browser. If the browser does not
-        //     have a cookie string, the property returns an empty string.
-		[OpenSilver.NotImplemented]
-        public string Cookies { get; set; }
 #endif
+
+        /// <summary>
+        /// Gets or sets the browser's cookie string. If the browser does not have a 
+        /// cookie string, the property returns an empty string.
+        /// </summary>
+        public string Cookies
+        {
+            get
+            {
+                return CSHTML5.Interop.ExecuteJavaScript("document.cookie").ToString() ?? string.Empty;
+            }
+            set
+            {
+                CSHTML5.Interop.ExecuteJavaScript("document.cookie = $0", value);
+            }
+        }
     }
 }

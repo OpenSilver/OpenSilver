@@ -85,7 +85,7 @@ namespace Windows.UI.Xaml.Documents
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            dynamic a = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("a", parentRef, this);
+            var a = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("a", parentRef, this);
             domElementWhereToPlaceChildren = a;
             return a;
         }

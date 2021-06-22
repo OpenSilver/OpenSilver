@@ -46,7 +46,7 @@ namespace Windows.UI.Xaml.Controls
         private bool _isUserChangingPassword = false;
         private bool _isCodeProgrammaticallyChangingPassword = false;
 
-        Control TextAreaContainer = null;
+        FrameworkElement TextAreaContainer = null;
         object _passwordInputField; //todo: use this
 
         private string[] TextAreaContainerNames = { "ContentElement", "PART_ContentHost" };
@@ -58,6 +58,7 @@ namespace Windows.UI.Xaml.Controls
 
         public PasswordBox()
         {
+            this.DefaultStyleKey = typeof(PasswordBox);
             UseSystemFocusVisuals = true;
         }
 
@@ -328,7 +329,7 @@ $0.focus()
             int i = 0;
             while (TextAreaContainer == null && i < TextAreaContainerNames.Length)
             {
-                TextAreaContainer = GetTemplateChild(TextAreaContainerNames[i]) as Control;
+                TextAreaContainer = GetTemplateChild(TextAreaContainerNames[i]) as FrameworkElement;
                 ++i;
             }
             if (TextAreaContainer != null)
@@ -345,11 +346,16 @@ $0.focus()
                 }
             }
         }
-
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
             base.INTERNAL_OnDetachedFromVisualTree();
-            UnapplyTemplate(this);
+
+            //if (this.Template != null)
+            //{
+            //    object local = this.ReadLocalValueInternal(TemplateProperty);
+            //    this.SetValue(TemplateProperty, null);
+            //    this.SetValue(TemplateProperty, local);
+            //}
         }
 
         #region Fix "input" event not working under IE.

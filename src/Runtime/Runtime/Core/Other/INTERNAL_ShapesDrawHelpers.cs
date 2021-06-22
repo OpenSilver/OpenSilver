@@ -13,11 +13,9 @@
 \*====================================================================================*/
 
 
+using OpenSilver.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if MIGRATION
 using System.Windows;
 using System.Windows.Media;
@@ -45,7 +43,6 @@ namespace CSHTML5.Internal
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(canvasDomElement);
             style.width = "0px";
             style.height = "0px";
-            style.marginBottom = "-4px"; // This is due to the fact that there is a 4px margin at the bottom of the html <canvas>, cf. https://stackoverflow.com/questions/8600393/there-is-a-4px-gap-below-canvas-video-audio-elements-in-html5
             return div;
         }
 
@@ -98,7 +95,7 @@ namespace CSHTML5.Internal
             Size sizeToApply = new Size(Math.Max(sizeX + 1, 0), Math.Max(sizeY + 1, 0)); //example: a vertical line still needs 1 pixel width
 
             //we apply the possible defined size of the outerDomElement of the shape:
-            dynamic style = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement);
+            var style = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement);
             bool frameworkElementWidthWasSpecified = false;
             double frameworkElementWidth = frameworkElement.Width;
             double frameworkElementHeight = frameworkElement.Height;
@@ -106,22 +103,22 @@ namespace CSHTML5.Internal
             {
                 frameworkElementWidthWasSpecified = true;
                 sizeToApply.Width = frameworkElementWidth + 1;
-                style.width = sizeToApply.Width + "px";
+                style.width = sizeToApply.Width.ToInvariantString() + "px";
             }
             bool frameworkElementHeightWasSpecified = false;
             if (!double.IsNaN(frameworkElementHeight))
             {
                 frameworkElementHeightWasSpecified = true;
                 sizeToApply.Height = frameworkElementHeight + 1;
-                style.height = sizeToApply.Height + "px";
+                style.height = sizeToApply.Height.ToInvariantString() + "px";
             }
             
             //We apply the size defined earlier (size either by the Width and/or Height of the Shape (when they are set) or by the width and/or height of its content):
             INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", sizeToApply.Width);
             INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", sizeToApply.Height);
 
-            canvasStyle.width = sizeToApply.Width + "px"; // The "sizeToApply" is the size that the shape would take if it was not constrained by the parent framework element.
-            canvasStyle.height = sizeToApply.Height + "px";
+            canvasStyle.width = sizeToApply.Width.ToInvariantString() + "px"; // The "sizeToApply" is the size that the shape would take if it was not constrained by the parent framework element.
+            canvasStyle.height = sizeToApply.Height.ToInvariantString() + "px";
 
             // Get the framework element size after the initial rendering:
             if (frameworkElementWidthWasSpecified && frameworkElementHeightWasSpecified)
@@ -147,17 +144,17 @@ namespace CSHTML5.Internal
 
                 if (!frameworkElementWidthWasSpecified)
                 {
-                    canvasStyle.width = shapeActualSize.Width + "px";
+                    canvasStyle.width = shapeActualSize.Width.ToInvariantString() + "px";
                     INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + 1); //todo: add StrokeThickness instead of +1?
                 }
                 if (!frameworkElementHeightWasSpecified)
                 {
-                    canvasStyle.height = shapeActualSize.Height + "px";
+                    canvasStyle.height = shapeActualSize.Height.ToInvariantString() + "px";
                     INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + 1); //todo: add StrokeThickness instead of +1?
                 }
             }
 
-            dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
             context.translate(0.5, 0.5); //makes is less blurry for some reason.
         }
 
@@ -274,7 +271,7 @@ namespace CSHTML5.Internal
 
         internal static void PrepareLine(object canvasDomElement, Point StartPoint, Point EndPoint)
         {
-            dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
             context.beginPath(); //this allows to state that we are drawing a new shape (not sure what it serves to but it is apparently good practice to always use it)
             context.moveTo(StartPoint.X, StartPoint.Y); //starting point of the line
@@ -287,9 +284,25 @@ namespace CSHTML5.Internal
             //context.lineWidth = path.StrokeThickness;
         }
 
+        internal static void PreparePolygon(object canvasDomElement, PointCollection points)
+        {
+            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+
+            context.beginPath();
+            context.moveTo(points[0].X, points[0].Y);
+
+            for (int i = 1; i < points.Count; i++)
+            {
+                context.lineTo(points[i].X, points[i].Y);
+            }
+
+            context.closePath();
+            context.fill();
+        }
+
         internal static void PrepareEllipse(object canvasDomElement, double ellipseWidth, double ellipseHeight, double centerX, double centerY)
         {
-            dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
             //todo: StrokeThickness --> ?
 
 
@@ -399,7 +412,7 @@ namespace CSHTML5.Internal
                 // but instead we should apply it BEFORE, otherwise the (0.5, 0.5) translation may get amplified/distorted 
                 // by the subsequent transform.
 
-                dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+                var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
                 context.transform(m.M11, m.M12, m.M21, m.M22, m.OffsetX, m.OffsetY);
 
                 //todo: also apply the transform to other geometry types.

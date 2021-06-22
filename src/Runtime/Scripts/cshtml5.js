@@ -157,6 +157,26 @@ document.addToPerformanceCounters = function (name, initialTime) {
     counter.count += 1;
 }
 
+document.interopErrors = {};
+
+document.getElementByIdSafe = function (id) {
+    let element = document.getElementById(id);
+    if (element == null) {
+        element = document.createElement("div");
+        if (!document.interopErrors[id]) {
+            document.interopErrors[id] = 0;
+        }
+        document.interopErrors[id]++;
+    }
+    return element;
+}
+
+window.ViewInteropErrors = function () {
+    for (var key in document.interopErrors) {
+        console.log(`Unable to find element with id '${key}' (${document.interopErrors[key]} time(s)).`);
+    }
+}
+
 window.ViewProfilerResults = function () {
     if (Object.keys(document.performanceCounters).length > 0) {
         var sortedPerformanceCountersNames = [];

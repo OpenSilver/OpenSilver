@@ -50,6 +50,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private bool SkipCoerceSelectedItemCheck;
         private SelectionInfo _selectionInfo;
 
+        private DependencyPropertyChangedEventArgs _indexChangeEventArgs = null; //this one is so we can call ManageSelectedIndex_Changed from OnSelectedItemChanged (we cannot call it from OnSelectedIndexChanged because SelectedItem is not up to date at that moment if the selection change comes from SelectedValue).
+
         #endregion Data
 
         #region Constructor
@@ -116,6 +118,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                         // we use SetCurrentValue to preserve any potential bindings.
                         s.SetCurrentValue(Selector.SelectedValueProperty, PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(newValue, s.SelectedValuePath));
                         s.SetCurrentValue(Selector.SelectedIndexProperty, s.Items.IndexOf(newValue));
+                        s.OnSelectedItemChanged(newValue);
                     }
                 }
                 finally
@@ -123,6 +126,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     s._selectionChangeIsOnItem = false;
                 }
             }
+
+            //calling the methods to update the Visual Tree/Selection:
+            s.ApplySelectedIndex(s.SelectedIndex);
+            s.ManageSelectedIndex_Changed(s._indexChangeEventArgs);
 
             //We do not want to raise the event here when we have a MultiSelector (or when SelectionMode is not Single ?)
             if (!(s is MultiSelector))
@@ -180,6 +187,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private static void OnSelectedIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Selector s = (Selector)d;
+
+            s._indexChangeEventArgs = e; //keeping the event args for the call of ManageSelectedIndex_Changed in OnSelectedItemChanged
 
             int newValue = (int)e.NewValue;
             // we only want to change the other ones if the change comes from 
@@ -239,8 +248,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     s._selectionChangeIsOnIndex = false;
                 }
             }
-            s.ApplySelectedIndex(newValue);
-            s.ManageSelectedIndex_Changed(e);
         }
 
         private static object CoerceSelectedIndex(DependencyObject d, object baseValue)
@@ -403,7 +410,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 "SelectedItemBackground",
                 typeof(Brush),
                 typeof(Selector),
-                new PropertyMetadata(new SolidColorBrush(Colors.Blue)));
+                new PropertyMetadata(new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString("#FFBADDE9"))));
 
         /// <summary>
         /// Gets or sets the foreground color of the selected Items.
@@ -554,6 +561,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         }
 
+        protected virtual void OnSelectedItemChanged(object selectedItem)
+        {
+
+        }
+
+        public virtual void NotifyItemMouseEnter(SelectorItem item)
+        {
+
+        }
         #endregion Public/Protected Methods
 
         #region Private Methods

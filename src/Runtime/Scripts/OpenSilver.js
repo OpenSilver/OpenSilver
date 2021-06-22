@@ -60,13 +60,55 @@ velocityScript.setAttribute('src', 'libs/ResizeSensor.js');
 document.getElementsByTagName('head')[0].appendChild(velocityScript);
 
 
-window.onCallBack = {}
-window.onCallBack.OnCallbackFromJavaScript = function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject) {
-    DotNet.invokeMethod("OpenSilver", "OnCallbackFromJavaScript", callbackId, idWhereCallbackArgsAreStored, callbackArgsObject);
-};
-window.onCallBack.OnCallbackFromJavaScriptError = function (idWhereCallbackArgsAreStored) {
-    DotNet.invokeMethod("OpenSilver", "OnCallbackFromJavaScriptError", idWhereCallbackArgsAreStored);
-};
+window.onCallBack = (function() {
+	const opensilver = "OpenSilver";
+	const opensilver_js_callback = "OnCallbackFromJavaScript";
+	const opensilver_js_error_callback = "OnCallbackFromJavaScriptError";
+	
+	function prepareCallbackArgs (args) {
+		let callbackArgs;
+		switch (typeof args) {
+			case 'number':
+			case 'string':
+			case 'boolean':
+				callbackArgs = args;
+				break;
+			case 'object':
+				// if we deal with an array, we need to check
+				// that all the items are primitive types.
+				if (Array.isArray(args)) {
+					callbackArgs = args;
+					for (let i = 0; i < args.length; i++) {
+						let itemType = typeof args[i];
+						// do not accept nested arrays for now
+						if (!(args[i] === null || itemType === 'number' || itemType === 'string' || itemType === 'boolean')) {
+							callbackArgs = [];
+							break;
+						}
+					}
+					break;
+				}
+				// if args === null, fall to next case.
+			case 'undefined':
+			default:
+				callbackArgs = [];
+				break;
+		}
+	
+		return callbackArgs;
+	}
+	
+	return {
+		OnCallbackFromJavaScript : function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject) { 
+			let formattedArgs = prepareCallbackArgs(callbackArgsObject); 
+			DotNet.invokeMethod(opensilver, opensilver_js_callback, callbackId, idWhereCallbackArgsAreStored, formattedArgs);
+		},
+		
+		OnCallbackFromJavaScriptError : function (idWhereCallbackArgsAreStored) {
+			DotNet.invokeMethod(opensilver, opensilver_js_error_callback, idWhereCallbackArgsAreStored);
+		}
+	};
+})();
 
 window.callJS = function (javaScriptToExecute) {
     //console.log(javaScriptToExecute);
@@ -82,5 +124,17 @@ window.callJS = function (javaScriptToExecute) {
     else {
         //console.log("not supported");
         return result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")";
+    }
+};
+
+window.callJSUnmarshalled = function (javaScriptToExecute) {
+    javaScriptToExecute = BINDING.conv_string(javaScriptToExecute);
+    var result = eval(javaScriptToExecute);
+    var resultType = typeof result;
+    if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
+        return BINDING.js_to_mono_obj(result);
+    }
+    else {
+        return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
     }
 };

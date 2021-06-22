@@ -38,6 +38,16 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public ScrollViewer() : base() { }
 
+        internal override FrameworkTemplate TemplateCache
+        {
+            get { return null; }
+            set { }
+        }
+
+        internal override FrameworkTemplate TemplateInternal
+        {
+            get { return null; }
+        }
 
         /*
         public bool BringIntoViewOnFocusChange { get; set; }
@@ -556,7 +566,7 @@ namespace Windows.UI.Xaml.Controls
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             object outerDiv;
-            dynamic outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
+            var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
             outerDivStyle.height = "100%";
             outerDivStyle.width = "100%";
             outerDivStyle.overflowX = "scroll";
@@ -573,7 +583,7 @@ namespace Windows.UI.Xaml.Controls
 
 
             object innerDiv;
-            dynamic innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out innerDiv);
+            var innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out innerDiv);
             innerDivStyle.position = "relative";
 
             // Note: the "height" and "width" of the innerDiv are handled in the methods "INTERNAL_ApplyHorizontalSettings" and "INTERNAL_ApplyVerticalSettings".
@@ -585,10 +595,17 @@ namespace Windows.UI.Xaml.Controls
             return outerDiv;
         }
 
+#if OPENSILVER
         private void INTERNAL_ApplyHorizontalSettings(
             ScrollBarVisibility horizontalScrollBarVisibility,
-            object outerDivStyle,
-            object innerDivStyle)
+            INTERNAL_HtmlDomStyleReference outerDivStyle,
+            INTERNAL_HtmlDomStyleReference innerDivStyle)
+#elif BRIDGE
+        private void INTERNAL_ApplyHorizontalSettings(
+            ScrollBarVisibility horizontalScrollBarVisibility,
+            dynamic outerDivStyle,
+            dynamic innerDivStyle)
+#endif
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
@@ -603,23 +620,23 @@ namespace Windows.UI.Xaml.Controls
                         //a solution would be to put for ALL the children : max-width:100% (But it wouldn't work with margins)
                         //the solution above should stop when a child is a canvas : its children can have the size they want
 
-                        ((dynamic)outerDivStyle).overflowX = "hidden";//todo: fix this (the children are not limited to the size of this control)
+                        outerDivStyle.overflowX = "hidden";//todo: fix this (the children are not limited to the size of this control)
                         break;
                     case ScrollBarVisibility.Auto:
                         //there is a scrollbar when the content is wider, there is no scrollbar when the content fits
-                        ((dynamic)outerDivStyle).overflowX = "auto"; //todo: check if the overflowX actually sets overflow-x and not overflow (I think it sets overflow).
+                        outerDivStyle.overflowX = "auto"; //todo: check if the overflowX actually sets overflow-x and not overflow (I think it sets overflow).
 
                         break;
                     case ScrollBarVisibility.Hidden:
                         //--> overflow is hidden
-                        ((dynamic)outerDivStyle).overflowX = "hidden";
+                        outerDivStyle.overflowX = "hidden";
                         break;
                     case ScrollBarVisibility.Visible:
-                        ((dynamic)outerDivStyle).overflowX = "scroll";
+                        outerDivStyle.overflowX = "scroll";
 
                         try // Prevents crash in the simulator that uses IE.
                         {
-                            ((dynamic)outerDivStyle).WebkitOverflowScrolling = "touch"; // Provides inertia smooth scrolling in Safari
+                            outerDivStyle.WebkitOverflowScrolling = "touch"; // Provides inertia smooth scrolling in Safari
                         }
                         catch
                         {
@@ -638,26 +655,33 @@ namespace Windows.UI.Xaml.Controls
                 {
                     if (this.INTERNAL_VisualParent is Grid && !Grid_InternalHelpers.isCSSGridSupported()) //note: currently, only the non-CSS Grid uses the Dom element <table>
                     {
-                        ((dynamic)innerDivStyle).width = "0px"; //we set it that way so that we still have a scrollbar even when in a table (table is unable to limit the size of its content)
-                        ((dynamic)innerDivStyle).overflowX = "visible"; //so that its content can still be seen
+                        innerDivStyle.width = "0px"; //we set it that way so that we still have a scrollbar even when in a table (table is unable to limit the size of its content)
+                        innerDivStyle.overflowX = "visible"; //so that its content can still be seen
                     }
                     else
                     {
-                        ((dynamic)innerDivStyle).width = "auto"; // This makes it possible to center-align an item inside the ScrollViewer.
-                        ((dynamic)innerDivStyle).minWidth = "100%"; // This fixes an issue where the background of the "InputProject" test project is correct only at the top of the page.
+                        innerDivStyle.width = "auto"; // This makes it possible to center-align an item inside the ScrollViewer.
+                        innerDivStyle.minWidth = "100%"; // This fixes an issue where the background of the "InputProject" test project is correct only at the top of the page.
                     }
                 }
                 else
                 {
-                    ((dynamic)innerDivStyle).width = "100%";
+                    innerDivStyle.width = "100%";
                 }
             }
         }
 
+#if OPENSILVER
+        private void INTERNAL_ApplyVerticalSettings(
+            ScrollBarVisibility verticalScrollBarVisibility,
+            INTERNAL_HtmlDomStyleReference outerDivStyle,
+            INTERNAL_HtmlDomStyleReference innerDivStyle)
+#elif BRIDGE
         private void INTERNAL_ApplyVerticalSettings(
             ScrollBarVisibility verticalScrollBarVisibility,
             dynamic outerDivStyle,
             dynamic innerDivStyle)
+#endif
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {

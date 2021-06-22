@@ -28,7 +28,7 @@
                                 BorderThickness="{TemplateBinding BorderThickness}">
                             <Grid>
                                 <ToggleButton x:Name="DropDownToggle"
-                                              IsChecked="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                                              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}"
                                               HorizontalAlignment="Stretch"
                                               VerticalAlignment="Stretch"
                                               HorizontalContentAlignment="Right"
@@ -47,7 +47,7 @@
                                 </ToggleButton>
                                 <TextBox x:Name="Text"
                                          TextWrapping="NoWrap"
-                                         Text="{TemplateBinding Text, Mode=TwoWay}" />
+                                         Text="{Binding Text, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
 
 
                             </Grid>

@@ -51,24 +51,32 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             LoadTypeConstructor("Windows.UI.Xaml", "System.Windows", "PropertyPath", coreAssembly);
             LoadTypeConstructor("Windows.UI.Xaml.Controls", "System.Windows.Controls", "DataGridLength", coreAssembly);
             LoadTypeConstructor("System.Windows.Input", null, "Cursor", coreAssembly);
-#if WORKINPROGRESS
-            LoadTypeConstructor("Windows.UI.Xaml", "System.Windows", "TextDecorationCollection", coreAssembly);
-            LoadTypeConstructor("Windows.UI.Xaml", "System.Windows", "Rect", coreAssembly);
-            LoadTypeConstructor("Windows.UI.Xaml.Media", "System.Windows.Media", "CacheMode", coreAssembly);
-#endif
+            TryLoadTypeConstructor("Windows.UI.Xaml", "System.Windows", "TextDecorationCollection", coreAssembly);
+            TryLoadTypeConstructor("Windows.Foundation", "System.Windows", "Rect", coreAssembly);
         }
 
-        static void LoadTypeConstructor(string typeNamespace, string typeAlternativeNamespaceOrNull, string typeName, Assembly assembly)
+        static bool TryLoadTypeConstructor(string typeNamespace, string typeAlternativeNamespaceOrNull, string typeName, Assembly assembly)
         {
             // Note: an "alternative namespace" can be specified in order to be compatible with the "SLMigration" version of the core assembly.
 
             Type type = assembly.GetType(typeNamespace + "." + typeName);
             if (type == null && !string.IsNullOrEmpty(typeAlternativeNamespaceOrNull))
                 type = assembly.GetType(typeAlternativeNamespaceOrNull + "." + typeName);
+
             if (type == null)
-                throw new Exception(string.Format(@"Unable to call the static constructor of the type '{0}' because the type was not found.", typeName));
+                return false;
 
             System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(type.TypeHandle);
+
+            return true;
+        }
+
+        static void LoadTypeConstructor(string typeNamespace, string typeAlternativeNamespaceOrNull, string typeName, Assembly assembly)
+        {
+            if (!TryLoadTypeConstructor(typeNamespace, typeAlternativeNamespaceOrNull, typeName, assembly))
+            {
+                throw new Exception(string.Format(@"Unable to call the static constructor of the type '{0}' because the type was not found.", typeName));
+            }
         }
     }
 }

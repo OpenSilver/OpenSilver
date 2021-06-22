@@ -12,13 +12,9 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if MIGRATION
 using System.Windows.Media;
 #else
@@ -173,7 +169,7 @@ namespace Windows.UI.Xaml.Shapes
                     ApplyMarginToFixNegativeCoordinates(_marginOffsets);
                 }
 
-                dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
+                var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
                 context.rect(xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication, yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication, sizeX, sizeY);
 
                 //todo: make sure the parameters below are correct.
@@ -188,48 +184,52 @@ namespace Windows.UI.Xaml.Shapes
         }
 #if WORKINPROGRESS
         #region Not supported yet
-        // Summary:
-        //     Gets or sets the x-axis radius of the ellipse that is used to round the corners
-        //     of the rectangle.
-        //
-        // Returns:
-        //     The x-axis radius of the ellipse that is used to round the corners of the
-        //     rectangle.
+
+        /// <summary>
+        /// Gets or sets the x-axis radius of the ellipse that is used to round the corners
+        /// of the rectangle.
+        /// </summary>
 		[OpenSilver.NotImplemented]
         public double RadiusX
         {
             get { return (double)GetValue(RadiusXProperty); }
             set { SetValue(RadiusXProperty, value); }
-        }        //
-        // Summary:
-        //     Identifies the RadiusX dependency property.
-        //
-        // Returns:
-        //     The identifier for the RadiusX dependency property.
-		[OpenSilver.NotImplemented]
-        public static readonly DependencyProperty RadiusXProperty = DependencyProperty.Register("RadiusX", typeof(double), typeof(Rectangle), new PropertyMetadata(0d));
-        //
-        // Summary:
-        //     Gets or sets the y-axis radius of the ellipse that is used to round the corners
-        //     of the rectangle.
-        //
-        // Returns:
-        //     The y-axis radius of the ellipse that is used to round the corners of the
-        //     rectangle. The default is 0.
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Rectangle.RadiusX"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty RadiusXProperty = 
+            DependencyProperty.Register(
+                nameof(RadiusX), 
+                typeof(double), 
+                typeof(Rectangle), 
+                new PropertyMetadata(0d));
+
+        /// <summary>
+        /// Gets or sets the y-axis radius of the ellipse that is used to round the corners
+        /// of the rectangle.
+        /// The default is 0.
+        /// </summary>
 		[OpenSilver.NotImplemented]
         public double RadiusY
         {
             get { return (double)GetValue(RadiusYProperty); }
             set { SetValue(RadiusYProperty, value); }
         }
-        //
-        // Summary:
-        //     Identifies the RadiusY dependency property.
-        //
-        // Returns:
-        //     The identifier for the RadiusY dependency property.
+        
+        /// <summary>
+        /// Identifies the <see cref="Rectangle.RadiusY"/> dependency property.
+        /// </summary>
 		[OpenSilver.NotImplemented]
-        public static readonly DependencyProperty RadiusYProperty = DependencyProperty.Register("RadiusY", typeof(double), typeof(Rectangle), new PropertyMetadata(0d));
+        public static readonly DependencyProperty RadiusYProperty = 
+            DependencyProperty.Register(
+                nameof(RadiusY), 
+                typeof(double), 
+                typeof(Rectangle), 
+                new PropertyMetadata(0d));
+        
         #endregion
 #endif
     }

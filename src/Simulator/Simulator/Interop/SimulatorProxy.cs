@@ -16,6 +16,7 @@
 
 
 using DotNetBrowser.WPF;
+using DotNetForHtml5.EmulatorWithoutJavascript.Console;
 using System;
 using System.IO;
 using System.Windows;
@@ -28,11 +29,12 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
     public class SimulatorProxy
     {
         WPFBrowserView _webControl;
+        ConsoleControl _console;
 
-        public SimulatorProxy(WPFBrowserView webControl)
+        public SimulatorProxy(WPFBrowserView webControl, ConsoleControl console)
         {
             _webControl = webControl;
-
+            _console = console;
         }
 
         //Do not remove this method: called via reflection.
@@ -142,6 +144,14 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         public void StopDispatcherTimer(object dispatcherTimer)
         {
             ((DispatcherTimer)dispatcherTimer).Stop();
+        }
+
+        public void ReportJavaScriptError(string error, string where)
+        {
+            _console.AddMessage(new ConsoleMessage(
+                error,
+                ConsoleMessage.MessageLevel.Error,
+                new InteropSource(where)));
         }
     }
 }

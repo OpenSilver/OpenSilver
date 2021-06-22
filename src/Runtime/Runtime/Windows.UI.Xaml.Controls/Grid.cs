@@ -14,14 +14,13 @@
 
 
 using CSHTML5.Internal;
+using OpenSilver.Internal.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Collections;
+
 #if BRIDGE
 using Bridge;
 #endif
@@ -341,7 +340,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 childColumn = 0;
             }
-            INTERNAL_CellDefinition cell = _currentCellsStructure[childRow][childColumn]; //Note: row and column should always have a correct value.
+            var cell = _currentCellsStructure[childRow][childColumn]; //Note: row and column should always have a correct value.
 
             if (cell.IsOverlapped)
             {
@@ -376,7 +375,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     for (int column = childColumn; column <= childLastColumn; ++column)
                     {
-                        INTERNAL_CellDefinition currentCell = _currentCellsStructure[row][column];
+                        var currentCell = _currentCellsStructure[row][column];
                         if (currentCell.IsOverlapped || (currentCell.IsOccupied && !isFirst)) //note: the test on isFirst is for example for when we have 2 elements in one cell but the second that was added is the one that causes a span.
                         {
                             //no changes since it will either be "sucked in" the cell that overlaps this one or it is already the same overlapping happening on this cell..
@@ -422,7 +421,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 for (int column = cellColumn; column <= cellLastColumn; ++column)
                 {
-                    INTERNAL_CellDefinition cell2 = _currentCellsStructure[row][column];
+                    var cell2 = _currentCellsStructure[row][column];
                     if (isFirst)
                     {
                         parentCell = cell2;
@@ -431,19 +430,18 @@ namespace Windows.UI.Xaml.Controls
                         cell2.ColumnSpan = cellColumnSpan;
                         if (cell2.ColumnDomElement != null)
                         {
-                            dynamic td = cell2.ColumnDomElement;
+                            var td = cell2.ColumnDomElement;
                             INTERNAL_HtmlDomManager.SetDomElementAttribute(td, "rowspan", cellRowSpan);
                             INTERNAL_HtmlDomManager.SetDomElementAttribute(td, "colspan", cellColumnSpan);
 
                             string domElementStyleAppliedValue = null;
-
 
                             //We update the size of the cell if it was not already a star sized cell:
                             Grid_InternalHelpers.RefreshCellWithSpanHeight(this, cell2, ref domElementStyleAppliedValue);
 
                             if (domElementStyleAppliedValue != null)
                             {
-                                dynamic domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell2.DomElement);
+                                var domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell2.DomElement);
                                 domElementStyle.height = domElementStyleAppliedValue;
                             }
 
@@ -456,7 +454,7 @@ namespace Windows.UI.Xaml.Controls
                         cell2.ParentCell = parentCell;
                         if (cell2.ColumnDomElement != null)
                         {
-                            dynamic td = cell2.ColumnDomElement;
+                            var td = cell2.ColumnDomElement;
                             INTERNAL_HtmlDomManager.RemoveFromDom(td); //Note: no need to handle the other children because when adding, arriving here means that there are no other children.
                             cell2.ColumnDomElement = null;
                         }
@@ -533,7 +531,7 @@ namespace Windows.UI.Xaml.Controls
                 // We therefore only count the non-overlapped columns.
                 for (int i = 0; i < cellColumn; ++i)
                 {
-                    INTERNAL_CellDefinition currentCell = _currentCellsStructure[row][i];
+                    var currentCell = _currentCellsStructure[row][i];
                     if (!currentCell.IsOverlapped) //there is no td in the dom tree for each overlapped cell.
                     {
                         ++columnDomIndex;
@@ -541,7 +539,7 @@ namespace Windows.UI.Xaml.Controls
                 }
                 for (int column = cellColumn; column <= maxColumn; ++column)
                 {
-                    INTERNAL_CellDefinition currentCell = _currentCellsStructure[row][column];
+                    var currentCell = _currentCellsStructure[row][column];
                     if (isFirst)
                     {
                         currentCell.RowSpan = 1;
@@ -549,10 +547,9 @@ namespace Windows.UI.Xaml.Controls
                         currentCell.IsOccupied = false; //I think this should be handled somewhere else but it's not wrong anyway so I keep it for now.
                         if (currentCell.ColumnDomElement != null)
                         {
-                            dynamic td = currentCell.ColumnDomElement;
+                            var td = currentCell.ColumnDomElement;
                             INTERNAL_HtmlDomManager.SetDomElementAttribute(td, "rowspan", 1);
                             INTERNAL_HtmlDomManager.SetDomElementAttribute(td, "colspan", 1);
-
                         }
                         isFirst = false;
                     }
@@ -563,37 +560,23 @@ namespace Windows.UI.Xaml.Controls
                         // Put the td back (at the right position)
                         // apply the correct sizing on it
 
-                        dynamic td;
                         // Create and append "<td>" element:
-                        if (columnDomIndex == 0)
-                        {
-                            td = INTERNAL_HtmlDomManager.CreateDomElementAndInsertIt("td", currentCell.RowDomElement, this, columnDomIndex, "beforeBegin");
-                        }
-                        else
-                        {
-
-                            td = INTERNAL_HtmlDomManager.CreateDomElementAndInsertIt("td", currentCell.RowDomElement, this, columnDomIndex - 1, "afterEnd");
-                        }
-                        dynamic tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(td);
-                        ColumnDefinition columnDefinition = ColumnDefinitions[currentCell.Column];
-                        if (columnDefinition.Visibility == Visibility.Visible)
-                        {
-                            tdStyle.display = "table-cell";
-                        }
-                        else
-                        {
-                            tdStyle.display = "none";
-                        }
+                        var td = columnDomIndex == 0 ?
+                            INTERNAL_HtmlDomManager.CreateDomElementAndInsertIt("td", currentCell.RowDomElement, this, columnDomIndex, "beforeBegin") :
+                            INTERNAL_HtmlDomManager.CreateDomElementAndInsertIt("td", currentCell.RowDomElement, this, columnDomIndex - 1, "afterEnd");
+                       
+                        var tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(td);
+                        var columnDefinition = ColumnDefinitions[currentCell.Column];
+                        tdStyle.display = columnDefinition.Visibility == Visibility.Visible ? "table-cell" : "none";
 
                         //no need to set colspan and rowspan since we know there are no children in the cell --> no span.
 
                         Grid_InternalHelpers.ApplyGridLinesValues(this, row, column, tdStyle);
 
                         //we create the div to contain the children:
-                        dynamic div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", td, this);
-                        dynamic divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+                        var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", td, this);
+                        var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
                         divStyle.position = "relative";
-
 
                         //we fill the cell's definition in the structure:
                         currentCell.DomElement = div;
@@ -837,6 +820,11 @@ namespace Windows.UI.Xaml.Controls
                     }
                 }
 
+                if (!this.HasChildren)
+                {
+                    return;
+                }
+
                 for (int i = 0; i < this.Children.Count; ++i)
                 {
                     this.UpdateStructureWhenAddingChild(this.Children[i]);
@@ -848,11 +836,15 @@ namespace Windows.UI.Xaml.Controls
             else
             {
                 base.OnChildrenReset();
-                this.LocallyManageChildrenChanged();
+
+                if (this.HasChildren)
+                {
+                    this.LocallyManageChildrenChanged();
+                }
             }
         }
 
-        public override dynamic GetDomElementWhereToPlaceChild(UIElement child)
+        public override object GetDomElementWhereToPlaceChild(UIElement child)
         {
             bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
             if (isCSSGrid)
@@ -861,9 +853,7 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                //if (!UseCssGridLayout)
-                //{
-                INTERNAL_CellDefinition spanParentCell = child.INTERNAL_SpanParentCell;
+                var spanParentCell = child.INTERNAL_SpanParentCell;
                 if (spanParentCell != null)
                 {
                     if (spanParentCell.IsOverlapped)
@@ -890,9 +880,6 @@ namespace Windows.UI.Xaml.Controls
                 var cell = row[columnIndex];
 
                 return cell.DomElement;
-                //}
-                //else
-                //    return null;
             }
         }
 
@@ -906,53 +893,26 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-
                 // NOTE: The two following lines were commented and replaced by "CreateDomElementAppendItAndGetStyle" because of a bug of JSIL that resulted in bad JavaScript code:
-                //dynamic outerDiv = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef);
-                //dynamic outerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDiv);
                 object outerDiv;
-                dynamic outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
+                var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
                 outerDivStyle.position = "absolute";
                 outerDivStyle.height = "100%";
                 outerDivStyle.width = "100%";
 
-                //if (!INTERNAL_HtmlDomManager.IsInternetExplorer()) // Note: we don't do this under IE10 because it causes the Showcase to not display the content of the pages. //todo: see why on other browsers we do this (cf. changeset 1701)
-                //    outerDivStyle.overflow = "hidden";
-
                 outerDivStyle.pointerEvents = "none";
-                //outerDivStyle.display = "table";
-                //dynamic innerDiv = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", outerDiv);
-                //dynamic innerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDiv);
                 object innerDiv;
-                dynamic innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out innerDiv);
+                var innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out innerDiv);
                 innerDivStyle.position = "relative";
                 innerDivStyle.height = "100%";
                 innerDivStyle.width = "100%";
-
-                //if (!INTERNAL_HtmlDomManager.IsInternetExplorer()) // Note: we don't do this under IE10 because it causes the Showcase to not display the content of the pages. //todo: see why on other browsers we do this (cf. changeset 1701)
-                //    innerDivStyle.overflow = "hidden";
 
                 domElementWhereToPlaceChild = innerDiv;
                 return outerDiv;
             }
         }
 
-        //internal override dynamic ShowChild(UIElement child)
-        //{
-        //    dynamic elementToReturn = base.ShowChild(child); //we need to return this so that a class that inherits from this but doesn't create a wrapper (or a different one) is correctly handled 
-
-        //    dynamic domChildWrapper = INTERNAL_VisualChildrenInformation[child].INTERNAL_OptionalChildWrapper_OuterDomElement;
-        //    var domChildWrapperStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domChildWrapper);
-        //    //domChildWrapperStyle.visibility = "visible";
-        //    domChildWrapperStyle.display = "block"; //todo: verify that it is not necessary to revert to the previous value instead.
-        //    domChildWrapperStyle.width = "100%";
-        //    domChildWrapperStyle.height = "100%";
-
-        //    return elementToReturn;
-        //}
-
-
-#region ****************** Attached Properties ******************
+        #region ****************** Attached Properties ******************
 
         /// <summary>
         /// Sets the value of the Grid.Row XAML attached property on the specified FrameworkElement.
@@ -1148,10 +1108,13 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion
+        #endregion
 
         internal double GetColumnActualWidth(ColumnDefinition columnDefinition)
         {
+            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+                return 0;
+
             bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
             if (isCSSGrid)
             {
@@ -1159,8 +1122,7 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this)
-                    && (object)this.INTERNAL_OuterDomElement != null
+                if (this.INTERNAL_OuterDomElement != null
                     && _columnDefinitionsOrNull != null)
                 {
                     int columnIndex = _columnDefinitionsOrNull.IndexOf(columnDefinition);
@@ -1178,7 +1140,7 @@ namespace Windows.UI.Xaml.Controls
                     var columnDomElement = cell.ColumnDomElement;
                     if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
                     {
-                        return columnDomElement.offsetWidth;
+                        return ((dynamic)columnDomElement).offsetWidth;
                     }
                     else
                     {
@@ -1186,42 +1148,17 @@ namespace Windows.UI.Xaml.Controls
                     }
                 }
                 else
-                    return double.NaN;
+                {
+                    return 0;
+                }
             }
         }
 
-        //internal double GetColumnActualHeight(ColumnDefinition columnDefinition)
-        //{
-        //    bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-        //    if (isCSSGrid)
-        //    {
-        //        return GetColumnActualHeight_CSSVersion(columnDefinition);
-        //    }
-        //    else
-        //    {
-        //      //Note: this doesn't do what would be expected, it should do like the cssversion.
-        //        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && this.INTERNAL_OuterDomElement != null)
-        //        {
-        //            var columnDomElement = _currentCellsStructure[0][0].ColumnDomElement; // Note: The height of the column should not depend on which column we chose.
-        //            if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
-        //            {
-        //                return columnDomElement.offsetHeight;
-        //            }
-        //            else
-        //            {
-        //                INTERNAL_SimulatorExecuteJavaScript.ForceExecutionOfAllPendingCode(); // Explanation: we usually optimize performance in the Simulator by postponing the JS code that sets the CSS properties. This reduces the number of interop calls between C# and the browser. However, in the current case here we need to have all the properties already applied in order to be able to calculate the size of the DOM element. Therefore we need to call the "ForceExecution" method.
-        //                return (double)INTERNAL_HtmlDomManager.CastToJsValue_SimulatorOnly(INTERNAL_HtmlDomManager.GetDomElementAttribute(columnDomElement, "offsetHeight"));
-        //            }
-        //        }
-        //        else
-        //            return double.NaN;
-        //    }
-        //}
-
-
-
         internal double GetRowActualHeight(RowDefinition rowDefinition)
         {
+            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+                return 0;
+
             bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
             if (isCSSGrid)
             {
@@ -1230,56 +1167,47 @@ namespace Windows.UI.Xaml.Controls
             else
             {
                 //Note: in regards to spans, this one should be "correct" since the <tr> is shared between all the cells of the row (at least it is the correct tr, we still need to see if the result is correct).
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this)
-                    && (object)this.INTERNAL_OuterDomElement != null
+                if (this.INTERNAL_OuterDomElement != null
                     && _rowDefinitionsOrNull != null)
                 {
                     int rowIndex = _rowDefinitionsOrNull.IndexOf(rowDefinition);
                     var rowDomElement = _currentCellsStructure[rowIndex][0].RowDomElement;
-            if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
+                    if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
                     {
-                        return rowDomElement.offsetHeight;
+                        return ((dynamic)rowDomElement).offsetHeight;
                     }
-#if !BRIDGE
                     else
                     {
                         return Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(rowDomElement, "offsetHeight"));
                     }
-#else
-            return 0; //NOTE : this code is usde for compilation and only for BRIDGE. We are NOT supposed to get there.
-#endif
                 }
                 else
-                    return double.NaN;
+                {
+                    return 0;
+                }
             }
         }
+    }
 
-        //internal double GetRowActualWidth(RowDefinition rowDefinition)
-        //{
-        //    bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-        //    if (isCSSGrid)
-        //    {
-        //        return GetRowActualWidth_CSSVersion(rowDefinition);
-        //    }
-        //    else
-        //    {
-        //      //Note: this doesn't do what would be expected, it should do like the cssversion.
-        //        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && this.INTERNAL_OuterDomElement != null)
-        //        {
-        //            var columnDomElement = _currentCellsStructure[0][0].RowDomElement; // Note: The width of the row should not depend on which row we chose.
-        //            if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
-        //            {
-        //                return columnDomElement.offsetWidth;
-        //            }
-        //            else
-        //            {
-        //                INTERNAL_SimulatorExecuteJavaScript.ForceExecutionOfAllPendingCode(); // Explanation: we usually optimize performance in the Simulator by postponing the JS code that sets the CSS properties. This reduces the number of interop calls between C# and the browser. However, in the current case here we need to have all the properties already applied in order to be able to calculate the size of the DOM element. Therefore we need to call the "ForceExecution" method.
-        //                return (double)INTERNAL_HtmlDomManager.CastToJsValue_SimulatorOnly(INTERNAL_HtmlDomManager.GetDomElementAttribute(columnDomElement, "offsetWidth"));
-        //            }
-        //        }
-        //        else
-        //            return double.NaN;
-        //    }
-        //}
+    internal sealed class GridNotLogical : Grid
+    {
+        protected override UIElementCollection CreateUIElementCollection(FrameworkElement logicalParent)
+        {
+            return base.CreateUIElementCollection(null);
+        }
+
+        /// <summary> 
+        /// Returns enumerator to logical children.
+        /// </summary>
+        /*protected*/ internal override IEnumerator LogicalChildren
+        {
+            get
+            {
+                // Note: Since children are displayed in a grid in our implementation,
+                // this panel's children are not logical children. There are the logical
+                // children of the grid they are displayed in.
+                return EmptyEnumerator.Instance;
+            }
+        }
     }
 }

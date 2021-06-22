@@ -14,12 +14,16 @@
 
 
 using CSHTML5.Internal;
+using OpenSilver.Internal.Controls;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections;
 using System.Windows.Markup;
+
+#if MIGRATION
+using System.Windows.Data;
+#else
+using Windows.UI.Xaml.Data;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -34,14 +38,17 @@ namespace Windows.UI.Xaml.Controls
     [ContentProperty("Content")]
     public partial class ContentControl : Control
     {
-        #region Constructor
+#region Constructor
+
         public ContentControl()
         {
-
+            this.DefaultStyleKey = typeof(ContentControl);
         }
-        #endregion
 
-        #region Public Properties
+#endregion Constructor
+
+#region Dependency Properties
+
         /// <summary>
         /// Gets or sets the content of a ContentControl.
         /// </summary>
@@ -50,13 +57,21 @@ namespace Windows.UI.Xaml.Controls
             get { return this.GetValue(ContentProperty); }
             set { this.SetValue(ContentProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Content dependency property.
         /// </summary>
-        public static readonly DependencyProperty ContentProperty = DependencyProperty.Register("Content",
-                                                                                                typeof(object),
-                                                                                                typeof(ContentControl),
-                                                                                                new PropertyMetadata(null, OnContentPropertyChanged));
+        public static readonly DependencyProperty ContentProperty =
+            DependencyProperty.Register(
+                nameof(Content),
+                typeof(object),
+                typeof(ContentControl),
+                new PropertyMetadata(null, OnContentChanged));
+
+        private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ContentControl)d).OnContentChanged(e.OldValue, e.NewValue);
+        }
 
         /// <summary>
         /// Gets or sets the data template that is used to display the content of the
@@ -67,126 +82,146 @@ namespace Windows.UI.Xaml.Controls
             get { return (DataTemplate)this.GetValue(ContentTemplateProperty); }
             set { this.SetValue(ContentTemplateProperty, value); }
         }
+
         /// <summary>
         /// Identifies the ContentTemplate dependency property.
         /// </summary>
-        public static readonly DependencyProperty ContentTemplateProperty = DependencyProperty.Register("ContentTemplate",
-                                                                                                        typeof(DataTemplate),
-                                                                                                        typeof(ContentControl),
-                                                                                                        new PropertyMetadata(null, OnContentTemplatePropertyChanged));
-        #endregion
+        public static readonly DependencyProperty ContentTemplateProperty =
+            DependencyProperty.Register(
+                nameof(ContentTemplate),
+                typeof(DataTemplate),
+                typeof(ContentControl),
+                new PropertyMetadata((object)null));
 
-        #region Public Methods
+#endregion Dependency Properties
+
+#region Protected Methods
+
         protected virtual void OnContentChanged(object oldContent, object newContent)
         {
-            if (!this.IsLoaded) // change will be handle when attached to Visual Tree in INTERNAL_OnAttachedToVisualTree().
+            // Remove the old content child
+            this.RemoveLogicalChild(oldContent);
+
+            if (this.ContentIsNotLogical)
             {
                 return;
             }
-            if (this.HasTemplate)
+
+            // We want to update the logical parent only if we don't have one already.
+            FrameworkElement fe = newContent as FrameworkElement;
+            if (fe != null)
             {
-                return;
-            }
-            if (this.ContentTemplate != null)
-            {
-                // note: At this point, we don't need to regenerate the DataTemplate because it is either handle in OnContentTemplatePropertyChanged() or INTERNAL_OnAttachedToVisualTree().
-                if (this.Child != null) // else it means that the ContentTemplate is empty, and there is nothing to do.
+                DependencyObject logicalParent = fe.Parent;
+                if (logicalParent != null)
                 {
-                    ((FrameworkElement)this.Child).DataContext = newContent;
+                    return;
                 }
+            }
+
+            this.AddLogicalChild(newContent);
+        }
+
+#endregion Protected Methods
+
+#region Internal Properties
+
+        /// <summary>
+        ///    Indicates whether Content should be a logical child or not.
+        /// </summary>
+        internal bool ContentIsNotLogical
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Returns enumerator to logical children
+        /// </summary>
+        /*protected*/ internal override IEnumerator LogicalChildren
+        {
+            get
+            {
+                object content = Content;
+                
+                if (ContentIsNotLogical || content == null)
+                {
+                    return EmptyEnumerator.Instance;
+                }
+
+                // If the current ContentControl is in a Template.VisualTree and is meant to host
+                // the content for the container then that content shows up as the logical child
+                // for the container and not for the current ContentControl.
+                FrameworkElement fe = content as FrameworkElement;
+                if (fe != null)
+                {
+                    DependencyObject logicalParent = fe.Parent;
+                    if (logicalParent != null && logicalParent != this)
+                    {
+                        return EmptyEnumerator.Instance;
+                    }
+                }
+
+                return new ContentModelTreeEnumerator(this, content);
+            }
+        }
+
+#endregion Internal Properties
+
+#region Internal Methods
+
+        /// <summary>
+        /// Prepare to display the item.
+        /// </summary>
+        internal void PrepareContentControl(object item, DataTemplate template)
+        {
+            if (item != this)
+            {
+                // don't treat Content as a logical child
+                this.ContentIsNotLogical = true;
+
+                this.ContentTemplate = template;
+                this.Content = item;
             }
             else
             {
-                this.ChangeChild(newContent);
+                this.ContentIsNotLogical = false;
             }
         }
+
+        internal void ClearContentControl(object item)
+        {
+            if (this != item)
+            {
+                this.ClearValue(ContentProperty);
+            }
+        }
+
+#endregion Internal Methods
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            if (this.HasTemplate)
+            if (!this.HasTemplate && this.TemplateChild == null)
             {
-                return;
-            }
-            this.ApplyContentTemplate(this.ContentTemplate);
-        }
-        #endregion
-
-        #region Internal API
-        private UIElement Child { get; set; }
-
-        private void ApplyContentTemplate(DataTemplate template)
-        {
-            object newChild;
-            if (template == null)
-            {
-                newChild = this.Content;
-            }
-            else
-            {
-                FrameworkElement generatedContent = template.INTERNAL_InstantiateFrameworkTemplate();
-                if (generatedContent != null)
-                {
-                    generatedContent.DataContext = this.Content;
-                }
-                newChild = generatedContent;
-            }
-            this.ChangeChild(newChild);
-        }
-        
-
-        private void ChangeChild(object newChild)
-        {
-            this.DetachChild(); // Detach current child.
-
-            UIElement newChildAsUIElement = newChild as UIElement;
-            if(newChildAsUIElement != null)
-            {
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChildAsUIElement, this);
-                this.Child = newChildAsUIElement;
-            }
-            else
-            {
-                string contentAsString = newChild == null ? string.Empty : newChild.ToString();
-                INTERNAL_HtmlDomManager.SetContentString(this, contentAsString, removeTextWrapping: true);
-                this.Child = this; // In the case where the child is not an UIElement, we consider the child to be this Control because we don't add a child (we directly set the content of this element).
+                // If we have no template we have to create a ContentPresenter
+                // manually and attach it to this control.
+                // This can happen for instance if a class derive from
+                // ContentControl and specify a DefaultStyleKey and the associated
+                // default style does not contain a Setter for the Template
+                // property, or if we are not able to find a style for the
+                // given key.
+                // We need to set this ContentPresenter so that if we move from 
+                // no template to a template, the "manually generated" template
+                // will be detached as expected.
+                // Note: this is a Silverlight specific behavior.
+                // In WPF the content of the ContentControl would simply not be
+                // displayed in this scenario.
+                ContentPresenter presenter = new ContentPresenter();
+                BindingOperations.SetBinding(presenter, ContentPresenter.ContentTemplateProperty, new Binding("ContentTemplate") { Source = this });
+                BindingOperations.SetBinding(presenter, ContentPresenter.ContentProperty, new Binding("Content") { Source = this });
+                this.TemplateChild = presenter;
             }
         }
-
-        private void DetachChild()
-        {
-            if (object.ReferenceEquals(this, this.Child)) // if ContentTemplate is null and Content is not an UIElement
-            {
-                INTERNAL_HtmlDomManager.SetContentString(this, string.Empty, removeTextWrapping: true);
-            }
-            else
-            {
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(this.Child, this);
-            }
-            this.Child = null;
-        }
-
-        private static void OnContentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            //we may want to throw the event here instead of in OnContentChanged since we throw the event every time and OnContentChanged can be overriden.
-            ((ContentControl)d).OnContentChanged(e.OldValue, e.NewValue);
-            //else, it should be directly handled by a Binding in the template.
-        }
-
-        private static void OnContentTemplatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ContentControl contentControl = (ContentControl)d;
-            if (!contentControl.IsLoaded) // change will be handle when attached to Visual Tree in INTERNAL_OnAttachedToVisualTree().
-            {
-                return;
-            }
-            if (contentControl.HasTemplate)
-            {
-                return;
-            }
-            contentControl.ApplyContentTemplate((DataTemplate)e.NewValue);
-        }
-#endregion
     }
 }

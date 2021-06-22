@@ -224,15 +224,8 @@ namespace DotNetForHtml5.Compiler
                         currentSubAttributeWithoutUselessPart = currentSubAttributeWithoutUselessPart.Remove(0, indexOfCharacterAfterClassName).Trim();
                         currentSubAttributeWithoutUselessPart = currentSubAttributeWithoutUselessPart.Remove(currentSubAttributeWithoutUselessPart.Length - 1, 1); //to remove the '}' at the end
 
-                        //we replace {TemplateBinding ...} with {Binding ..., RelativeSource={RelativeSource TemplatedParent}}
-                        if (nextClassName == "TemplateBinding")
-                        {
-                            nextClassName = "Binding";
-                            currentSubAttributeWithoutUselessPart += ", RelativeSource={RelativeSource TemplatedParent}"; //we simply add it at the end because the order doesn't change anything.
-                        }
-
                         // We add the suffix "Extension" to the markup extension name (unless it is a Binding or RelativeSource). For example, "StaticResource" becomes "StaticResourceExtension":
-                        if (!nextClassName.EndsWith("Binding") && !nextClassName.EndsWith("RelativeSource") && !nextClassName.EndsWith("Extension"))
+                        if (nextClassName != "Binding" && nextClassName != "RelativeSource" && !nextClassName.EndsWith("Extension"))
                         {
                             // this is a trick, we need to check if :
                             // - type named 'MyCurrentMarkupExtensionName' exist.
@@ -442,6 +435,7 @@ namespace DotNetForHtml5.Compiler
                     if (subAttributeValue.StartsWith("\'"))
                     {
                         subAttributeValue = subAttributeValue.Trim('\'');
+                        subAttributeValue = UnescapeString(subAttributeValue);
                         if (subAttributeValue.StartsWith("{"))
                         {
                             subAttributeValue = "{}" + subAttributeValue;
@@ -453,6 +447,30 @@ namespace DotNetForHtml5.Compiler
                 }
             }
             return returnValue;
+        }
+
+        private static string UnescapeString(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return str;
+
+            var sb = new StringBuilder();
+            bool isEscaped = false;
+            for (int i = 0; i < str.Length; i++)
+            {
+                char c = str[i];
+                
+                if (c == '\\' && !isEscaped)
+                {
+                    isEscaped = true;
+                    continue;
+                }
+
+                sb.Append(c);
+                isEscaped = false;
+            }
+
+            return sb.ToString();
         }
 
         static int CountBrackets(string str)

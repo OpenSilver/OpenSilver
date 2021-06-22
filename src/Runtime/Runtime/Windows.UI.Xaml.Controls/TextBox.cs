@@ -54,7 +54,7 @@ namespace Windows.UI.Xaml.Controls
     public partial class TextBox : Control
     {
         object _contentEditableDiv;
-        Control TextAreaContainer = null;
+        FrameworkElement TextAreaContainer = null;
 
         /// <summary>
         /// The name of the ExpanderButton template part.
@@ -92,7 +92,7 @@ namespace Windows.UI.Xaml.Controls
         ///
         public TextBox()
         {
-            UseSystemFocusVisuals = true;
+            this.DefaultStyleKey = typeof(TextBox);
         }
 
 
@@ -133,7 +133,7 @@ namespace Windows.UI.Xaml.Controls
                         //--- SIMULATOR ONLY: ---
                         // Set the "data-accepts-return" property (that we have invented) so that the "keydown" JavaScript event can retrieve this value:
                         INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element = document.getElementById(""{0}"");
+var element = document.getElementByIdSafe(""{0}"");
 element.setAttribute(""data-acceptsreturn"", ""{1}"");
 ", ((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier, acceptsReturn.ToString().ToLower()));
                     }
@@ -410,14 +410,14 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                 //outerDivStyle.width = "100%";
                 //outerDivStyle.height = "100%";
                 //Note2: We also reset the contentEditable value of the former contentEditable to false. Otherwise, the whole control will be considered editable.
-                dynamic additionalDivForMargins = INTERNAL_AdditionalOutsideDivForMargins;
-                CSHTML5.Interop.ExecuteJavaScript(@"var formerOuterDiv = $0.firstChild;
-var style = formerOuterDiv.style;
-style.borderWidth = '0px';
-style.width = '100%';
-style.height = '100%';
-formerOuterDiv.firstChild.firstChild.setAttribute('contenteditable', 'false');
-", additionalDivForMargins);
+//                dynamic additionalDivForMargins = INTERNAL_AdditionalOutsideDivForMargins;
+//                CSHTML5.Interop.ExecuteJavaScript(@"var formerOuterDiv = $0.firstChild;
+//var style = formerOuterDiv.style;
+//style.borderWidth = '0px';
+//style.width = '100%';
+//style.height = '100%';
+//formerOuterDiv.firstChild.firstChild.setAttribute('contenteditable', 'false');
+//", additionalDivForMargins);
                 //dynamic divPreviouslyModified = additionalDivForMargins.firstChild;
                 //dynamic stylePreviouslyModified = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(divPreviouslyModified);
                 //stylePreviouslyModified.borderWidth = "0px";
@@ -425,6 +425,8 @@ formerOuterDiv.firstChild.firstChild.setAttribute('contenteditable', 'false');
                 //stylePreviouslyModified.height = "100%";
             }
             outerDivStyle.backgroundColor = backgroundColor;
+            outerDivStyle.height = "100%";
+
             object middleDiv;
             var middleDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out middleDiv);
             middleDivStyle.width = "100%";
@@ -438,6 +440,8 @@ formerOuterDiv.firstChild.firstChild.setAttribute('contenteditable', 'false');
                 //set the class to remove margins on <p> inside the contentEditableDiv
                 CSHTML5.Interop.ExecuteJavaScript(@"$0.classList.add(""ie_set_p_margins_to_zero"")", contentEditableDiv);
             }
+
+            CSHTML5.Interop.ExecuteJavaScript(@"$0.classList.add(""single-line-input"")", contentEditableDiv);
 
             contentEditableDivStyle.width = "100%";
             contentEditableDivStyle.height = "100%";
@@ -727,7 +731,7 @@ $0.addEventListener('keydown', function(e) {
                 // Set the "data-accepts-return" property (that we have invented) so that the "KeyDown" and "Paste" JavaScript events can retrieve this value:
                 // also set the "data-maxlength" and the "data-isreadonly" 
                 INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element = document.getElementById(""{0}"");
+var element = document.getElementByIdSafe(""{0}"");
 element.setAttribute(""data-acceptsreturn"", ""{1}"");
 element.setAttribute(""data-maxlength"", ""{2}"");
 element.setAttribute(""data-isreadonly"",""{3}"");
@@ -736,10 +740,10 @@ element.setAttribute(""data-acceptstab"", ""{4}"");
 
                 // Register the "keydown" javascript event:
                 INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element_OutsideEventHandler = document.getElementById(""{0}"");
+var element_OutsideEventHandler = document.getElementByIdSafe(""{0}"");
 element_OutsideEventHandler.addEventListener('keydown', function(e) {{
 
-    var element_InsideEventHandler = document.getElementById(""{0}""); // For some reason we need to get again the reference to the element.
+    var element_InsideEventHandler = document.getElementByIdSafe(""{0}""); // For some reason we need to get again the reference to the element.
     var acceptsReturn = element_InsideEventHandler.getAttribute(""data-acceptsreturn"");
     var maxLength = element_InsideEventHandler.getAttribute(""data-maxlength"");
     var acceptsTab = element_InsideEventHandler.getAttribute(""data-acceptstab"");
@@ -962,9 +966,9 @@ $0.addEventListener('paste', function(e) {
                 // The simulator uses Chrome, so we can set "ContentEditable" to plain-text only:
                 // We still need to prevent prevent line breaks in the pasted text if "AcceptsReturn" is false:
                 INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element_OutsideEventHandler = document.getElementById(""{0}"");
+var element_OutsideEventHandler = document.getElementByIdSafe(""{0}"");
 element_OutsideEventHandler.addEventListener('paste', function(e) {{
-    var element_InsideEventHandler = document.getElementById(""{0}""); // For some reason we need to get again the reference to the element.
+    var element_InsideEventHandler = document.getElementByIdSafe(""{0}""); // For some reason we need to get again the reference to the element.
     var isReadOnly= element_InsideEventHandler.getAttribute(""data-isreadonly"");
     if(isReadOnly !=""true"")
     {{
@@ -1095,7 +1099,7 @@ var range,selection;
             int i = 0;
             while (TextAreaContainer == null && i < TextAreaContainerNames.Length)
             {
-                TextAreaContainer = GetTemplateChild(TextAreaContainerNames[i]) as Control;
+                TextAreaContainer = GetTemplateChild(TextAreaContainerNames[i]) as FrameworkElement;
                 ++i;
             }
             if (TextAreaContainer != null)
@@ -1117,7 +1121,13 @@ var range,selection;
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
             base.INTERNAL_OnDetachedFromVisualTree();
-            UnapplyTemplate(this);
+
+            //if (this.Template != null)
+            //{
+            //    object local = this.ReadLocalValueInternal(TemplateProperty);
+            //    this.SetValue(TemplateProperty, null);
+            //    this.SetValue(TemplateProperty, local);
+            //}
         }
 
         #region Fix "input" event not working under IE.
@@ -1199,6 +1209,9 @@ var range,selection;
 
         private void NEW_SET_SELECTION(int startIndex, int endIndex)
         {
+            if (_contentEditableDiv == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+                return;
+
             CSHTML5.Interop.ExecuteJavaScriptAsync(@"
 var range = document.createRange();
 var sel = window.getSelection();
@@ -1216,6 +1229,13 @@ sel.addRange(range);
             //todo: fix the that happens (at least in chrome) that makes the index returned be 0 when the caret is on the last line when it's empty
             //what I think happens: the range gives the index of the <br> in the childNodes of _contentEditableDiv which makes it not find the range.startContainer, which is actually _contentEditableDiv.
             //todo: (probably in the documant.getRangeStartAndEnd and document.getRangeGlobalStartAndEndIndexes methods), fix the bad count of characters in the simulator when copy/pasting a multiline text.
+
+            if (_contentEditableDiv == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                selectionStartIndex = 0;
+                selectionLength = 0;
+                return;
+            }
 
             var globalIndexes = CSHTML5.Interop.ExecuteJavaScript(@"
 (function(domElement){
@@ -1476,14 +1496,13 @@ return globalIndexes;
                         //--- SIMULATOR ONLY: ---
                         // Set the "data-maxlength" property (that we have made up) so that the "keydown" JavaScript event can retrieve this value:
                         INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element = document.getElementById(""{0}"");
+var element = document.getElementByIdSafe(""{0}"");
 element.setAttribute(""data-maxlength"", ""{1}"");
 ", ((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier, maxlength));
                     }
                 }
             }
         }
-
 
         #region TextDecorations
 #if MIGRATION
@@ -1495,40 +1514,24 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             get { return (TextDecorationCollection)GetValue(TextDecorationsProperty); }
             set { SetValue(TextDecorationsProperty, value); }
         }
+
         /// <summary>
         /// Identifies the TextDecorations dependency property.
         /// </summary>
-        public new static readonly DependencyProperty TextDecorationsProperty = DependencyProperty.Register("TextDecorations",
-                                                                                                        typeof(TextDecorationCollection),
-                                                                                                        typeof(TextBox),
-                                                                                                        new PropertyMetadata(null) 
-                                                                                                        { 
-                                                                                                            MethodToUpdateDom = TextDecorations_MethodToUpdateDom
-                                                                                                        });
+        public new static readonly DependencyProperty TextDecorationsProperty = 
+            DependencyProperty.Register(
+                nameof(TextDecorations),
+                typeof(TextDecorationCollection),
+                typeof(TextBox),
+                new PropertyMetadata((object)null) 
+                { 
+                    MethodToUpdateDom = TextDecorations_MethodToUpdateDom
+                });
 
         static void TextDecorations_MethodToUpdateDom(DependencyObject d, object newValue)
         {
-            var textBox = (TextBox)d;
-            TextDecorationCollection newTextDecorations = (TextDecorationCollection)newValue;
-
-            string cssValue;
-            if (newTextDecorations == System.Windows.TextDecorations.OverLine)
-            {
-                cssValue = "overline";
-            }
-            else if (newTextDecorations == System.Windows.TextDecorations.Strikethrough)
-            {
-                cssValue = "line-through";
-            }
-            else if (newTextDecorations == System.Windows.TextDecorations.Underline)
-            {
-                cssValue = "underline";
-            }
-            else
-            {
-                cssValue = string.Empty; // Note: this will reset the value.
-            }
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBox.INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
+            string cssValue = ((TextDecorationCollection)newValue)?.ToHtmlString() ?? string.Empty;
+            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(((TextBox)d).INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
         }
 #else
         /// <summary>
@@ -1578,7 +1581,6 @@ element.setAttribute(""data-maxlength"", ""{1}"");
         }
 #endif
         #endregion
-
 
         protected override void OnAfterApplyHorizontalAlignmentAndWidth()
         {
@@ -1640,8 +1642,6 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             }
         }
 
-
-
         public bool IsReadOnly
         {
             get { return (bool)GetValue(IsReadOnlyProperty); }
@@ -1663,21 +1663,33 @@ element.setAttribute(""data-maxlength"", ""{1}"");
                     bool isReadOnly = (bool)e.NewValue;
                     bool canChangeBackground = textBox.Template == null;
                     CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.setAttribute(""contentEditable"", $1);
-if($2)
-    $0.style.backgroundColor=$2;
-", textBox._contentEditableDiv, (!isReadOnly).ToString().ToLower(), canChangeBackground.ToString().ToLower(), isReadOnly ? "#DDDDDD" : "#FFFFFF");
+                        $0.setAttribute(""contentEditable"", $1);
+                        if($2) $0.style.backgroundColor=$3;", 
+                        textBox._contentEditableDiv, (!isReadOnly).ToString().ToLower(), canChangeBackground.ToString().ToLower(), isReadOnly ? "#686868" : "#FFFFFF");
 
                     if (!IsRunningInJavaScript())
                     {
                         //--- SIMULATOR ONLY: ---
                         INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element = document.getElementById(""{0}"");
-element.setAttribute(""data-isreadonly"",""{1}"");
-", ((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier, isReadOnly.ToString().ToLower()));
+                            var element = document.getElementByIdSafe(""{0}"");
+                            element.setAttribute(""data-isreadonly"",""{1}"");", 
+                            ((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier, isReadOnly.ToString().ToLower()));
                     }
                 }
             }
+
+            textBox.UpdateVisualStates();
+        }
+
+        public void Select(int start, int length)
+        {
+            if (start < 0)
+                throw new ArgumentOutOfRangeException(nameof(start));
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length));
+
+            SelectionStart = start;
+            SelectionLength = length;
         }
 
         #region Not implemented yet (should we move this in WORKINPROGRESS ?)
@@ -1711,18 +1723,26 @@ element.setAttribute(""data-isreadonly"",""{1}"");
         #endregion
 
         [OpenSilver.NotImplemented]
-        public void Select(int start, int length)
-        {
-
-        }
-
-        [OpenSilver.NotImplemented]
         public string SelectedText { get; set; }
 
         [OpenSilver.NotImplemented]
         public double LineHeight { get; set; }
-
 #endif
 
+        internal override void UpdateVisualStates()
+        {
+            if (!IsEnabled)
+            {
+                GoToState(VisualStates.StateDisabled);
+            }
+            else if (IsReadOnly)
+            {
+                GoToState(VisualStates.StateReadOnly);
+            }
+            else
+            {
+                GoToState(VisualStates.StateNormal);
+            }
+        }
     }
 }

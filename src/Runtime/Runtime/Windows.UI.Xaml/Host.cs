@@ -26,9 +26,19 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
 {
     public partial class Host
     {
-        Content _content;
+        private readonly bool _hookupEvents;
 
-        Settings _settings;
+        private Content _content;
+
+        private Settings _settings;
+
+        public Host() : this(false) { }
+
+        internal Host(bool hookupEvents)
+        {
+            this._hookupEvents = hookupEvents;
+            this._content = new Content(this._hookupEvents);
+        }
 
         /// <summary>
         /// Gets the "Content" sub-object of this Host.
@@ -38,7 +48,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
             get
             {
                 if (_content == null)
-                    _content = new Content();
+                    _content = new Content(this._hookupEvents);
                 return _content;
             }
         }

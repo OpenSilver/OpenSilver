@@ -12,13 +12,9 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -50,11 +46,17 @@ namespace Windows.UI.Xaml.Media
             get { return (Point)GetValue(CenterProperty); }
             set { SetValue(CenterProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Center dependency property.
+        /// Identifies the <see cref="EllipseGeometry.Center"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty CenterProperty =
-            DependencyProperty.Register("Center", typeof(Point), typeof(EllipseGeometry), new PropertyMetadata(new Point(), Point_Changed));
+            DependencyProperty.Register(
+                nameof(Center), 
+                typeof(Point), 
+                typeof(EllipseGeometry), 
+                new PropertyMetadata(new Point(), Point_Changed));
 
         private static void Point_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -73,11 +75,17 @@ namespace Windows.UI.Xaml.Media
             get { return (double)GetValue(RadiusXProperty); }
             set { SetValue(RadiusXProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the RadiusX dependency property.
+        /// Identifies the <see cref="EllipseGeometry.RadiusX"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty RadiusXProperty =
-            DependencyProperty.Register("RadiusX", typeof(double), typeof(EllipseGeometry), new PropertyMetadata(0d, RadiusX_Changed));
+            DependencyProperty.Register(
+                nameof(RadiusX), 
+                typeof(double), 
+                typeof(EllipseGeometry), 
+                new PropertyMetadata(0d, RadiusX_Changed));
 
         private static void RadiusX_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -96,11 +104,17 @@ namespace Windows.UI.Xaml.Media
             get { return (double)GetValue(RadiusYProperty); }
             set { SetValue(RadiusYProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the RadiusY dependency property.
+        /// Identifies the <see cref="EllipseGeometry.RadiusY"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty RadiusYProperty =
-            DependencyProperty.Register("RadiusY", typeof(double), typeof(EllipseGeometry), new PropertyMetadata(0d, RadiusY_Changed));
+            DependencyProperty.Register(
+                nameof(RadiusY), 
+                typeof(double), 
+                typeof(EllipseGeometry), 
+                new PropertyMetadata(0d, RadiusY_Changed));
 
         private static void RadiusY_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -133,15 +147,15 @@ namespace Windows.UI.Xaml.Media
                                                         double yOffsetToApplyAfterMultiplication, 
                                                         Size shapeActualSize)
         {
-            dynamic ctx = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+            var ctx = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
             ctx.ellipse(
                 Center.X + xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication,
                 Center.Y + yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication,
                 RadiusX,
                 RadiusY,
-                0,
-                0,
+                0d,
+                0d,
                 2 * Math.PI);
         }
     }

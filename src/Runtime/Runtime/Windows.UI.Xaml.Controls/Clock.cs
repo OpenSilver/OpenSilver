@@ -40,6 +40,26 @@ namespace Windows.UI.Xaml.Controls
             this.Loaded += TimePicker_Loaded;
         }
 
+        public static DependencyProperty MinuteIntervalProperty = DependencyProperty.Register(
+            "MinuteInterval",
+            typeof(int),
+            typeof(Clock),
+            new PropertyMetadata(5, OnMinuteIntervalChanged ));
+
+        public int MinuteInterval
+        {
+            get => (int)GetValue(MinuteIntervalProperty);
+            set => SetValue(MinuteIntervalProperty, value);
+        }
+
+        public void ChangeOption(string option, object value)
+        {
+            if (_flatpickrInstance != null)
+            {
+                CSHTML5.Interop.ExecuteJavaScript("$0.set($1, $2)", _flatpickrInstance, option, value);
+            }
+        }
+
         private void TimePicker_Loaded(object sender, RoutedEventArgs e)
         {
             DateTime defaultDate = SelectedValue == null ? DateTime.Now : SelectedValue.Value;
@@ -54,8 +74,9 @@ namespace Windows.UI.Xaml.Controls
                     noCalendar: true,
                     time_24hr: true,
                     dateFormat: ""YYYY-MM-DD HH:MM"",
+                    minuteIncrement: $3,
                     defaultDate: new Date(1, 1, 1, $1, $2)
-                    })", div, defaultDate.Hour, defaultDate.Minute - (defaultDate.Minute % 5));
+                    })", div, defaultDate.Hour, defaultDate.Minute - (defaultDate.Minute % MinuteInterval), MinuteInterval);
 
 
             if (CSHTML5.Interop.IsRunningInTheSimulator)
@@ -86,6 +107,15 @@ namespace Windows.UI.Xaml.Controls
 
             // Hide the input area:
             CSHTML5.Interop.ExecuteJavaScript(@"$0.style.display = 'none'", div);
+        }
+
+        private static void OnMinuteIntervalChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if(e.OldValue != e.NewValue)
+            {
+                var clock = d as Clock;
+                clock.ChangeOption("minuteIncrement", e.NewValue);
+            }
         }
 
         static void WorkaroundJSILBug(object clockInstance, object hours, object minutes)

@@ -37,7 +37,6 @@ body {
     overflow-y: hidden;
     cursor: default;
     font-family: 'Segoe UI', Verdana, 'DejaVu Sans', Lucida, 'MS Sans Serif', sans-serif;
-    line-height: 150%;
     -webkit-touch-callout: none; /* prevents callout to copy image, etc when tap to hold */
     -webkit-text-size-adjust: none; /* prevents webkit from resizing text to fit */
     -webkit-user-select: text; /* 'none' prevents copy paste. 'text' allows it. */
@@ -118,4 +117,18 @@ body {
       height: 100%;
       width: 100%;
     }
+}
+
+.single-line-input{
+    white-space: nowrap !important;
+    overflow: hidden !important;
+}
+
+.single-line-input br {
+    display: none;
+}
+
+.single-line-input * {
+    display: inline;
+    white-space: nowrap;
 }

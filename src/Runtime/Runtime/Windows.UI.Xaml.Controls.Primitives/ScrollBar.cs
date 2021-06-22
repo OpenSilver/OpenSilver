@@ -147,6 +147,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 _horizontalRoot.Visibility = (this.Orientation == Orientation.Horizontal ? Visibility.Visible : Visibility.Collapsed);
             }
+
+            if (TryUpdateSizeAndPositionOfUIElements())
+                _controlWasProperlyDrawn = true;
         }
 
         protected override void OnValueChanged(double oldValue, double newValue)

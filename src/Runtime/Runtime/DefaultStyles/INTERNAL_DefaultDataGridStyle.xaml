@@ -1,7 +1,6 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:Runtime.CSHTML5.DefaultStyles">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
 
     <Style TargetType="DataGridColumnHeader">
@@ -54,13 +53,6 @@
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
-                            <VisualStateGroup x:Name="SortStates">
-                                <VisualState x:Name="Unsorted" />
-                                <VisualState x:Name="SortAscending">
-                                </VisualState>
-                                <VisualState x:Name="SortDescending">
-                                </VisualState>
-                            </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <Grid Name="Root">
                             <Border x:Name="BackgroundRectangle" Background="#FF1F3B53" />
@@ -75,24 +67,79 @@
                                     </LinearGradientBrush>
                                 </Border.Background>
                             </Border>
-                            <!-- Temporary removing Margin="{TemplateBinding Padding}" -->
-                            <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
 
-                                <ContentPresenter Content="{TemplateBinding Content}"/>
+                            <Border HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                                <!--<Path Grid.Column="1" Name="SortIcon" Fill="#FF444444" RenderTransformOrigin=".5,.5" HorizontalAlignment="Left" VerticalAlignment="Center" Opacity="0" Stretch="Uniform" Width="8" Margin="4,0,0,0" Data="F1 M -5.215,6.099L 5.215,6.099L 0,0L -5.215,6.099 Z ">
-                                    <Path.RenderTransform>
-                                        <ScaleTransform ScaleX=".9" ScaleY=".9" />
-                                    </Path.RenderTransform>
-                                </Path>-->
-                            </Grid>
-                           
+                                    <ContentPresenter Content="{TemplateBinding Content}" Margin="{TemplateBinding Padding}" />
+
+                                    <Border Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="8" Margin="4,0,0,0" />
+                                </Grid>
+                            </Border>
                         </Grid>
                     </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="DataGrid">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGrid">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid x:Name="PART_MainGrid"
+                              Grid.Row="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" x:Name="PART_HeadersRow" />
+                            </Grid.RowDefinitions>
+                        </Grid>
+                        <DataPager x:Name="PART_Pager" 
+                                   Grid.Row="1"
+                                   PageSize="{TemplateBinding PageSize}"
+                                   DisplayMode="FirstLastPreviousNext"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="DataGridCell">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridCell">
+                    <Grid x:Name="Root" Background="{TemplateBinding Background}" >
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="Common">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="Selected">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="BackgroundRectangle" Storyboard.TargetProperty="Opacity" Duration="0" To="1"/>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border x:Name="BackgroundRectangle" Background="#FFBADDE9" Opacity="0" />
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Margin="{TemplateBinding Padding}" />
+                        </Border>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

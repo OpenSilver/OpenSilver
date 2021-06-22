@@ -15,10 +15,8 @@
 
 using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.ObjectModel;
+
 #if MIGRATION
 using System.Windows.Input;
 #else
@@ -32,471 +30,259 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
     /// <summary>
-    /// Base class for controls that can switch states, such as CheckBox and RadioButton.
+    /// Base class for controls that can switch states, such as <see cref="CheckBox"/>
+    /// and <see cref="RadioButton"/>.
     /// </summary>
-    public partial class ToggleButton : ButtonBase
+    [TemplateVisualState(Name = "Normal", GroupName = "CommonStates")]
+    [TemplateVisualState(Name = "MouseOver", GroupName = "CommonStates")]
+    [TemplateVisualState(Name = "Pressed", GroupName = "CommonStates")]
+    [TemplateVisualState(Name = "Disabled", GroupName = "CommonStates")]
+    [TemplateVisualState(Name = "Unfocused", GroupName = "FocusStates")]
+    [TemplateVisualState(Name = "Focused", GroupName = "FocusStates")]
+    [TemplateVisualState(Name = "Checked", GroupName = "CheckStates")]
+    [TemplateVisualState(Name = "Unchecked", GroupName = "CheckStates")]
+    [TemplateVisualState(Name = "Indeterminate", GroupName = "CheckStates")]
+    public class ToggleButton : ButtonBase
     {
-        public ToggleButton()
+        #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ToggleButton"/> class.
+        /// </summary>
+        public ToggleButton() : base()
         {
-            _reactsToKeyboardEventsWhenFocused = true;
-
-
-#if OLD_IMPLEMENTATION_OF_THE_CLICK_BASED_ON_HTML_CLICK_EVENT
-            base._forceClickEventToBeTheLastEventRaised = true; // This is due to the fact that on Chrome and FireFox, the "click" event of the radio button happens before the "change" event, unlike in MS XAML.
-#endif
-            base.DisableBaseControlHandlingOfVisualStates = true; // This prevents the Control class from calling "GoToState" when the pointer is over/pressed, so that we can handle those in this class. This is required because the ToggleButton contains states such as "CheckedPressed", "CheckedPointerOver", etc.
-
-            SetDefaultStyle();
-        }
-
-        internal bool INTERNAL_IsCodeProgrammaticallyChangingIsChecked = false; // Used by the CheckBox and the RadioButton derived classes.
-        //internal dynamic INTERNAL_InnerDomElement = null; // This is the DOM element that will be like <input type="radio"> or <input type="checkbox">.
-        bool? _isChecked = false;
-        bool _isDisabled;
-
-        protected virtual void SetDefaultStyle() // Overridden in CheckBox and RadioButton
-        {
-            // Set default style:
             this.DefaultStyleKey = typeof(ToggleButton);
         }
 
+        #endregion Constructor
+
+        #region Dependency Properties
+
         /// <summary>
-        /// Gets or sets whether the ToggleButton is checked.
-        /// Returns:
-        /// True if the ToggleButton is checked; false if the ToggleButton is unchecked;
-        /// otherwise null. The default is false.  If you are programming using C# or
-        /// Visual Basic, the type of this property is projected as bool? (a nullable
-        /// Boolean).
-        /// </summary>
-        public bool? IsChecked
-        {
-            get { return (bool?)GetValue(IsCheckedProperty); }
-            set { SetValue(IsCheckedProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the IsChecked dependency property
+        /// Identifies the <see cref="ToggleButton.IsChecked"/> dependency
+        /// property.
         /// </summary>
         public static readonly DependencyProperty IsCheckedProperty =
-            DependencyProperty.Register("IsChecked", typeof(bool?), typeof(ToggleButton), new PropertyMetadata(false, IsChecked_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-        internal static void IsChecked_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ToggleButton toggleButton = (ToggleButton)d;
-
-            bool? isChecked = (bool?)e.NewValue;
-
-            // Update DOM appearance (if not using a ControlTemplate):
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(toggleButton) && !(toggleButton.HasTemplate))
-            {
-                toggleButton.UpdateDomBasedOnCheckedState(isChecked);
-            }
-
-            // Raise user events if the new value is different from the old value:
-            bool hasValueRemainedTheSame = (e.NewValue != null && e.NewValue.Equals(e.OldValue)) || (e.NewValue == null && e.OldValue == null);
-            if (!hasValueRemainedTheSame) // note: We do not simply check "e.NewValue != e.OldValue" because it does not work as expected for boxed values, so example if both values are "true", it returns "false". //todo: do the same for other similar comparisons in the project.
-            {
-                if (isChecked == null)
-                {
-                    toggleButton.OnIndeterminate();
-                }
-                else if (isChecked == true)
-                {
-                    toggleButton.OnChecked();
-                }
-                else // false
-                {
-                    toggleButton.OnUnchecked();
-                }
-            }
-        }
-
+            DependencyProperty.Register(
+                "IsChecked",
+                typeof(bool?),
+                typeof(ToggleButton),
+                new PropertyMetadata(false, OnIsCheckedChanged));
 
         /// <summary>
-        /// Determines whether the control supports two or three states.
+        /// Gets or sets whether the <see cref="ToggleButton"/> is checked.
         /// </summary>
-        public bool IsThreeState
+        /// <returns>
+        /// <c>true</c> if the <see cref="ToggleButton"/> is checked; <c>false</c>
+        /// if the <see cref="ToggleButton"/> is unchecked; otherwise
+        /// null. The default is <c>false</c>.
+        /// </returns>
+        public bool? IsChecked
         {
-            get { return (bool)GetValue(IsThreeStateProperty); }
-            set { SetValue(IsThreeStateProperty, value); }
+            get { return (bool?)this.GetValue(IsCheckedProperty); }
+            set { this.SetValue(IsCheckedProperty, value); }
         }
 
-        /// <summary>
-        /// Identifies the ToggleButton.IsThreeState dependency property.
-        /// </summary>
-        public static readonly DependencyProperty IsThreeStateProperty =
-            DependencyProperty.Register("IsThreeState", typeof(bool), typeof(ToggleButton), new PropertyMetadata(false));
+        private static void OnIsCheckedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ToggleButton button = (ToggleButton)d;
+            bool? oldValue = (bool?)e.OldValue;
+            bool? newValue = (bool?)e.NewValue;
 
-#if MIGRATION
-        internal override void OnKeyDownWhenFocused(object sender, KeyEventArgs e)
-        {
-            if ((e.Key == Key.Space) || (e.Key == Key.Enter))
-#else
-        internal override void OnKeyDownWhenFocused(object sender, KeyRoutedEventArgs e)
-        {
-            if ((e.Key == Windows.System.VirtualKey.Space) || (e.Key == Windows.System.VirtualKey.Enter))
-#endif
+            if (newValue == true)
             {
-                ToggleButton_Click(this, null);
+                button.OnChecked(new RoutedEventArgs { OriginalSource = button });
             }
-        }
-
-#if MIGRATION
-        public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
-        {
-            base.OnApplyTemplate();
-
-            Click += ToggleButton_Click;
-            var visualStateGroups = base.INTERNAL_GetVisualStateGroups();
-
-            // Apply the current state:
-            UpdateVisualStates();
-
-            if (visualStateGroups != null
-                &&
-                (visualStateGroups.ContainsVisualState("PointerOver") || visualStateGroups.ContainsVisualState("CheckedPointerOver") || visualStateGroups.ContainsVisualState("IndeterminatePointerOver")))
+            else if (newValue == false)
             {
-                // Note: We unregster the event before registering it because, in case the user removes the control from the visual tree and puts it back, the "OnApplyTemplate" is called again.
-#if MIGRATION
-                this.MouseEnter -= Control_MouseEnter;
-                this.MouseEnter += Control_MouseEnter;
-                this.MouseLeave -= Control_MouseLeave;
-                this.MouseLeave += Control_MouseLeave;
-                this.LostMouseCapture -= Control_LostMouseCapture;
-                this.LostMouseCapture += Control_LostMouseCapture;
-#else
-                this.PointerEntered -= Control_PointerEntered;
-                this.PointerEntered += Control_PointerEntered;
-                this.PointerExited -= Control_PointerExited;
-                this.PointerExited += Control_PointerExited;
-                this.PointerCaptureLost -= Control_PointerCaptureLost;
-                this.PointerCaptureLost += Control_PointerCaptureLost;
-#endif
-            }
-
-            if (visualStateGroups != null
-                &&
-                (visualStateGroups.ContainsVisualState("Pressed") || visualStateGroups.ContainsVisualState("CheckedPressed") || visualStateGroups.ContainsVisualState("IndeterminatePressed")))
-            {
-                // Note: We unregster the event before registering it because, in case the user removes the control from the visual tree and puts it back, the "OnApplyTemplate" is called again.
-#if MIGRATION
-                this.MouseLeftButtonDown -= Control_MouseLeftButtonDown;
-                this.MouseLeftButtonDown += Control_MouseLeftButtonDown;
-                this.MouseLeftButtonUp -= Control_MouseLeftButtonUp;
-                this.MouseLeftButtonUp += Control_MouseLeftButtonUp;
-#else
-                this.PointerPressed -= Control_PointerPressed;
-                this.PointerPressed += Control_PointerPressed;
-                this.PointerReleased -= Control_PointerReleased;
-                this.PointerReleased += Control_PointerReleased;
-#endif
-            }
-        }
-
-        bool _isPointerOver = false;
-        bool _isPressed = false;
-
-#if MIGRATION
-        void Control_LostMouseCapture(object sender, MouseEventArgs e)
-
-#else
-        void Control_PointerCaptureLost(object sender, Input.PointerRoutedEventArgs e)
-#endif
-        {
-            _isPressed = false;
-            UpdateVisualStates();
-        }
-
-#if MIGRATION
-        void Control_MouseEnter(object sender, Input.MouseEventArgs e)
-#else
-        void Control_PointerEntered(object sender, Input.PointerRoutedEventArgs e)
-#endif
-        {
-            _isPointerOver = true;
-            UpdateVisualStates();
-        }
-
-#if MIGRATION
-        void Control_MouseLeave(object sender, Input.MouseEventArgs e)
-#else
-        void Control_PointerExited(object sender, Input.PointerRoutedEventArgs e)
-#endif
-        {
-            _isPointerOver = false;
-            UpdateVisualStates();
-        }
-
-#if MIGRATION
-        void Control_MouseLeftButtonDown(object sender, Input.MouseButtonEventArgs e)
-#else
-        void Control_PointerPressed(object sender, Input.PointerRoutedEventArgs e)
-#endif
-        {
-            _isPressed = true;
-            UpdateVisualStates();
-        }
-
-#if MIGRATION
-        void Control_MouseLeftButtonUp(object sender, Input.MouseButtonEventArgs e)
-#else
-        void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
-#endif
-        {
-            _isPressed = false;
-            UpdateVisualStates();
-        }
-
-        private void UpdateVisualStates()
-        {
-            if(this.INTERNAL_IsLegacyVisualStates) //Silverlight/WPF visual states
-            {
-                // "call to base"
-                if (this._isDisabled)
-                {
-                    VisualStateManager.GoToState(this, VisualStates.StateDisabled, true);
-                }
-                else if (this._isPressed)
-                {
-                    VisualStateManager.GoToState(this, VisualStates.StatePressed, true);
-                }
-                else if (this._isPointerOver)
-                {
-#if MIGRATION
-                    VisualStateManager.GoToState(this, VisualStates.StateMouseOver, true);
-#else
-                    VisualStateManager.GoToState(this, "PointerOver", true);
-#endif
-                }
-                else
-                {
-                    VisualStateManager.GoToState(this, VisualStates.StateNormal, true);
-                }
-
-                //ToggleButton states
-                if (this._isChecked == true)
-                {
-                    VisualStateManager.GoToState(this, "Checked", true);
-                }
-                else if (this._isChecked == false)
-                {
-                    VisualStateManager.GoToState(this, "Unchecked", true);
-                }
-                else
-                {
-                    VisualStateManager.GoToState(this, "Indeterminate", true);
-                }
-            }
-            else // UWP visual states
-            {
-                if (this._isChecked == false)
-                {
-                    if (this._isDisabled)
-                    {
-                        VisualStateManager.GoToState(this, VisualStates.StateDisabled, true);
-                    }
-                    else if (this._isPressed)
-                    {
-                        VisualStateManager.GoToState(this, VisualStates.StatePressed, true);
-                    }
-                    else if (this._isPointerOver)
-                    {
-#if MIGRATION
-                        VisualStateManager.GoToState(this, VisualStates.StateMouseOver, true);
-#else
-                        VisualStateManager.GoToState(this, "PointerOver", true);
-#endif
-                    }
-                    else
-                    {
-                        VisualStateManager.GoToState(this, VisualStates.StateNormal, true);
-                    }
-                }
-                else if (this._isChecked == true)
-                {
-                    if (this._isDisabled)
-                    {
-                        VisualStateManager.GoToState(this, "CheckedDisabled", true);
-                    }
-                    else if (this._isPressed)
-                    {
-                        VisualStateManager.GoToState(this, "CheckedPressed", true);
-                    }
-                    else if (this._isPointerOver)
-                    {
-                        VisualStateManager.GoToState(this, "CheckedPointerOver", true);
-                    }
-                    else
-                    {
-                        VisualStateManager.GoToState(this, "Checked", true);
-                    }
-                }
-                else if (this._isChecked == null)
-                {
-                    if (this._isDisabled)
-                    {
-                        VisualStateManager.GoToState(this, "IndeterminateDisabled", true);
-                    }
-                    else if (this._isPressed)
-                    {
-                        VisualStateManager.GoToState(this, "IndeterminatePressed", true);
-                    }
-                    else if (this._isPointerOver)
-                    {
-                        VisualStateManager.GoToState(this, "IndeterminatePointerOver", true);
-                    }
-                    else
-                    {
-                        VisualStateManager.GoToState(this, "Indeterminate", true);
-                    }
-                }
-            }
-        }
-
-        internal void ToggleButton_Click(object sender, RoutedEventArgs e) //note: IsThreeState only has an effect when clicking when IsChecked is true, which makes the checkbox go to the Indeterminate state.
-        {
-            if (IsChecked == true)
-            {
-                if (IsThreeState)
-                {
-                    SetCurrentValue(IsCheckedProperty, null);
-                }
-                else
-                {
-                    SetCurrentValue(IsCheckedProperty, false);
-                }
-            }
-            else if (IsChecked == null)
-            {
-                SetCurrentValue(IsCheckedProperty, false);
+                button.OnUnchecked(new RoutedEventArgs { OriginalSource = button });
             }
             else
             {
-                SetCurrentValue(IsCheckedProperty, true);
+                button.OnIndeterminate(new RoutedEventArgs { OriginalSource = button });
             }
+
+            button.UpdateVisualStates();
         }
-
-        internal void UnregisterFromDefaultClickEvent()
-        {
-            Click -= ToggleButton_Click;
-        }
-
-        protected virtual void UpdateDomBasedOnCheckedState(bool? isChecked)
-        {
-            // (Virtual method)
-        }
-
-        ///// <summary>
-        ///// Gets or sets a value that indicates whether the control supports three states.
-        ///// Returns true if the control supports three states; otherwise, false. The default is false.
-        ///// </summary>
-        //public bool IsThreeState
-        //{
-        //    get { return (bool)GetValue(IsThreeStateProperty); }
-        //    private set { SetValue(IsThreeStateProperty, value); }
-        //}
-        //public static readonly DependencyProperty IsThreeStateProperty =
-        //    DependencyProperty.Register("IsThreeState", typeof(bool), typeof(ToggleButton), new PropertyMetadata(false, IsThreeState_Changed));
-
-        //static void IsThreeState_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        //{
-        //    //todo: fill this method
-        //}
 
         /// <summary>
-        /// This method is used to subscribe to the click event on the child container so that clicking on it toggles it.
+        /// Identifies the <see cref="ToggleButton.IsThreeState"/> dependency
+        /// property.
         /// </summary>
-        /// <param name="divWhereToPlaceChild"></param>
-        /// <param name="toggleDomElement"></param>
-        internal virtual void SubscribeToClickEventForChildContainerDiv(dynamic divWhereToPlaceChild, dynamic toggleDomElement)
-        {
-            //we do nothing, it is supposed to be overriden.
-        }
+        public static readonly DependencyProperty IsThreeStateProperty =
+            DependencyProperty.Register(
+                "IsThreeState",
+                typeof(bool),
+                typeof(ToggleButton),
+                new PropertyMetadata(false));
 
         /// <summary>
-        /// Occurs when a ToggleButton is checked.
+        /// Gets or sets whether the control supports two or three states.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> if the control supports three states; otherwise, <c>false</c>. 
+        /// The default is <c>false</c>.
+        /// </returns>
+        public bool IsThreeState
+        {
+            get { return (bool)this.GetValue(IsThreeStateProperty); }
+            set { this.SetValue(IsThreeStateProperty, value); }
+        }
+
+        #endregion Dependency Properties
+
+        #region Public Events
+
+        /// <summary>
+        /// Occurs when a <see cref="ToggleButton"/> is checked.
         /// </summary>
         public event RoutedEventHandler Checked;
-        /// <summary>
-        /// Raises the Checked event.
-        /// </summary>
-        protected void OnChecked()
-        {
-            if (Checked != null)
-            {
-                Checked(this, new RoutedEventArgs()
-                {
-                    OriginalSource = this
-                });
-            }
-            _isChecked = true;
-            UpdateVisualStates();
-        }
 
         /// <summary>
-        /// Occurs when the state of a ToggleButton is switched to the indeterminate state.
+        /// Occurs when the state of a <see cref="ToggleButton"/> is
+        /// switched to the indeterminate state.
         /// </summary>
         public event RoutedEventHandler Indeterminate;
-        /// <summary>
-        /// Raises the Indeterminate event.
-        /// </summary>
-        protected void OnIndeterminate()
-        {
-            if (Indeterminate != null)
-            {
-                Indeterminate(this, new RoutedEventArgs()
-                {
-                    OriginalSource = this
-                });
-            }
-            _isChecked = null;
-            UpdateVisualStates();
-        }
 
         /// <summary>
-        /// Occurs when a ToggleButton is unchecked.
+        /// Occurs when a <see cref="ToggleButton"/> is unchecked.
         /// </summary>
         public event RoutedEventHandler Unchecked;
-        /// <summary>
-        /// Raises the Unchecked event.
-        /// </summary>
-        protected void OnUnchecked()
-        {
-            if (Unchecked != null)
-            {
-                Unchecked(this, new RoutedEventArgs()
-                {
-                    OriginalSource = this
-                });
-            }
-            _isChecked = false;
-            UpdateVisualStates();
 
+        #endregion Public Events
+
+        #region Public Methods
+
+        /// <summary>
+        /// Returns the string representation of a <see cref="ToggleButton"/> object.
+        /// </summary>
+        public override string ToString()
+        {
+            bool? isChecked = this.IsChecked;
+            return string.Format("{0} Content:{1} IsChecked:{2}",
+                                 base.ToString(),
+                                 this.Content,
+                                 isChecked == null ? "null" : isChecked.Value.ToString());
         }
 
-#if WORKINPROGRESS
-        /// <summary>
-        /// Called when the ToggleButton receives toggle stimulus.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        protected virtual void OnToggle() //todo: see what it is supposed to do and implement it
-        {
+        #endregion Public Methods
 
+        #region Protected Methods
+
+        /// <summary>
+        /// Called when the <see cref="ToggleButton"/> is clicked by
+        /// the mouse or the keyboard.
+        /// </summary>
+        protected override void OnClick()
+        {
+            OnToggle();
+            base.OnClick();
+        }
+
+        /// <summary>
+        /// Called when the <see cref="ContentControl"/> property changes.
+        /// </summary>
+        /// <param name="oldContent">
+        /// The content to be replaced.
+        /// </param>
+        /// <param name="newContent">
+        /// The new content to display.
+        /// </param>
+        protected override void OnContentChanged(object oldContent, object newContent)
+        {
+            base.OnContentChanged(oldContent, newContent);
+        }
+
+#if false
+        /// <summary>
+        /// Returns a <see cref="ToggleButtonAutomationPeer"/> for use
+        /// by the Silverlight automation infrastructure.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="ToggleButtonAutomationPeer"/> for the <see cref="ToggleButton"/>
+        /// object.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new ToggleButtonAutomationPeer(this);
         }
 #endif
 
-        //-----------------------
-        // ISENABLED (OVERRIDE)
-        //-----------------------
-
-        protected internal override void ManageIsEnabled(bool isEnabled)
+        /// <summary>
+        /// Called by the <see cref="ToggleButton.OnClick"/> method
+        /// to implement toggle behavior.
+        /// </summary>
+        protected internal virtual void OnToggle()
         {
-            base.ManageIsEnabled(isEnabled); // Useful for setting the "disabled" attribute on the DOM element.
-
-            _isDisabled = !isEnabled; // We remember the value so that when we update the visual states, we know whether we should go to the "Disabled" state or not.
-            UpdateVisualStates();
+            // If IsChecked == true && IsThreeState == true   --->  IsChecked = null
+            // If IsChecked == true && IsThreeState == false  --->  IsChecked = false
+            // If IsChecked == false                          --->  IsChecked = true
+            // If IsChecked == null                           --->  IsChecked = false
+            bool? isChecked;
+            if (IsChecked == true)
+                isChecked = IsThreeState ? (bool?)null : (bool?)false;
+            else // false or null
+                isChecked = IsChecked.HasValue; // HasValue returns true if IsChecked==false
+            SetCurrentValue(IsCheckedProperty, isChecked);
         }
+
+        /// <summary>
+        /// Raises the Checked event.
+        /// </summary>
+        protected virtual void OnChecked(RoutedEventArgs e)
+        {
+            if (Checked != null)
+            {
+                Checked(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the Indeterminate event.
+        /// </summary>
+        protected virtual void OnIndeterminate(RoutedEventArgs e)
+        {
+            if (Indeterminate != null)
+            {
+                Indeterminate(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the Unchecked event.
+        /// </summary>
+        protected virtual void OnUnchecked(RoutedEventArgs e)
+        {
+            if (Unchecked != null)
+            {
+                Unchecked(this, e);
+            }
+        }
+
+        #endregion Protected Methods
+
+        #region Internal Methods
+
+        internal override void UpdateVisualStates()
+        {
+            base.UpdateVisualStates();
+            // Update the Check state group
+            var isChecked = IsChecked;
+            if (isChecked == true)
+            {
+                VisualStateManager.GoToState(this, "Checked", true);
+            }
+            else if (isChecked == false)
+            {
+                VisualStateManager.GoToState(this, "Unchecked", true);
+            }
+            else
+            {
+                // isChecked is null
+                VisualStates.GoToState(this, true, "Indeterminate", "Unchecked");
+            }
+        }
+
+        #endregion Internal Methods
     }
 }

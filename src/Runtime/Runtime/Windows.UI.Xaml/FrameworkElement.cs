@@ -12,29 +12,20 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
 using CSHTML5.Internal;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Markup;
 
 #if MIGRATION
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 #else
 using Windows.Foundation;
-using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Markup;
@@ -54,6 +45,167 @@ namespace Windows.UI.Xaml
     /// </summary>
     public abstract partial class FrameworkElement : UIElement
     {
+        #region Logical Parent
+
+        /// <summary>
+        /// Gets the parent object of this FrameworkElement in the object tree.
+        /// </summary>
+        public DependencyObject Parent
+        {
+            get;
+            private set;
+        }
+
+        internal void AddLogicalChild(object child)
+        {
+            if (child != null)
+            {
+                // It is invalid to modify the children collection that we
+                // might be iterating during a property invalidation tree walk.
+                if (IsLogicalChildrenIterationInProgress)
+                {
+                    throw new InvalidOperationException("Cannot modify the logical children for this node at this time because a tree walk is in progress.");
+                }
+
+                HasLogicalChildren = true;
+
+                FrameworkElement fe = child as FrameworkElement;
+                if (fe != null)
+                {
+                    fe.ChangeLogicalParent(this);
+                }
+            }
+        }
+
+        internal void RemoveLogicalChild(object child)
+        {
+            if (child != null)
+            {
+                // It is invalid to modify the children collection that we
+                // might be iterating during a property invalidation tree walk.
+                if (IsLogicalChildrenIterationInProgress)
+                {
+                    throw new InvalidOperationException("Cannot modify the logical children for this node at this time because a tree walk is in progress.");
+                }
+
+                if (child is FrameworkElement fe && fe.Parent == this)
+                {
+                    fe.ChangeLogicalParent(null);
+                }
+
+                // This could have been the last child, so check if we have any more children
+                IEnumerator children = LogicalChildren;
+
+                // if null, there are no children.
+                if (children == null)
+                {
+                    HasLogicalChildren = false;
+                }
+                else
+                {
+                    // If we can move next, there is at least one child
+                    HasLogicalChildren = children.MoveNext();
+                }
+            }
+        }
+
+        internal void ChangeLogicalParent(DependencyObject newParent)
+        {
+            // Logical Parent must first be dropped before you are attached to a newParent
+            if (Parent != null && newParent != null && Parent != newParent)
+            {
+                throw new InvalidOperationException("Specified element is already the logical child of another element. Disconnect it first.");
+            }
+
+            // Trivial check to avoid loops
+            if (newParent == this)
+            {
+                throw new InvalidOperationException("Element cannot be its own parent.");
+            }
+
+            Parent = newParent;
+
+            OnParentChangedInternal(newParent);
+        }
+
+        private void OnParentChangedInternal(DependencyObject parent)
+        {
+            // For now we only update the value of inherited properties
+
+            InvalidateInheritedProperties(this, parent);
+        }
+
+        internal static void InvalidateInheritedProperties(UIElement uie, DependencyObject newParent)
+        {
+            if (newParent == null)
+            {
+                uie.ResetInheritedProperties();
+            }
+            else
+            {
+                INTERNAL_PropertyStorage[] storages = newParent.INTERNAL_AllInheritedProperties.Values.ToArray();
+                foreach (var storage in storages)
+                {
+                    uie.SetInheritedValue(storage.Property,
+                                          INTERNAL_PropertyStore.GetEffectiveValue(storage),
+                                          true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns enumerator to logical children
+        /// </summary>
+        /*protected*/ internal virtual IEnumerator LogicalChildren
+        {
+            get { return null; }
+        }
+
+        internal bool IsLogicalChildrenIterationInProgress
+        {
+            get { return ReadInternalFlag(InternalFlags.IsLogicalChildrenIterationInProgress); }
+            set { WriteInternalFlag(InternalFlags.IsLogicalChildrenIterationInProgress, value); }
+        }
+
+        internal bool HasLogicalChildren
+        {
+            get { return ReadInternalFlag(InternalFlags.HasLogicalChildren); }
+            set { WriteInternalFlag(InternalFlags.HasLogicalChildren, value); }
+        }
+
+        #endregion Logical Parent
+
+        private FrameworkElement _templateChild; // Non-null if this FE has a child that was created as part of a template.
+
+        // Note: TemplateChild is an UIElement in WPF.
+        internal virtual FrameworkElement TemplateChild
+        {
+            get
+            {
+                return this._templateChild;
+            }
+            set
+            {
+                if (this._templateChild != value)
+                {
+                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(this._templateChild, this);
+                    this._templateChild = value;
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this._templateChild, this, 0);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the element that should be used as the StateGroupRoot for VisualStateMangager.GoToState calls
+        /// </summary>
+        internal virtual FrameworkElement StateGroupsRoot
+        {
+            get
+            {
+                return _templateChild;
+            }
+        }
+
         //--------------------------------------
         // Note: this is a "partial" class. For anything related to Size and Alignment, please refer to the other file ("FrameworkElement_HandlingSizeAndAlignment.cs").
         //--------------------------------------
@@ -115,7 +267,7 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-        #region Resources
+#region Resources
 
         /// <summary>
         ///     Check if resource is not empty.
@@ -190,18 +342,7 @@ namespace Windows.UI.Xaml
             }
         }
         
-        #endregion
-
-        /// <summary>
-        /// Gets the parent object of this FrameworkElement in the object tree.
-        /// </summary>
-        public DependencyObject Parent
-        {
-            get
-            {
-                return this.INTERNAL_VisualParent;
-            }
-        }
+#endregion
 
         /// <summary>
         /// Gets a value that indicates whether this element is in the Visual Tree, that is, if it has been loaded for presentation.
@@ -227,9 +368,9 @@ namespace Windows.UI.Xaml
             //------------------
 
             object div1;
-            dynamic div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
+            var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
             object div2;
-            dynamic div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
+            var div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
             div2style.width = "100%";
             div2style.height = "100%";
             if (INTERNAL_ForceEnableAllPointerEvents)
@@ -248,9 +389,9 @@ namespace Windows.UI.Xaml
             //------------------
 
             object div1;
-            dynamic div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
+            var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
             object div2;
-            dynamic div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
+            var div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
             div2style.width = "100%";
             div2style.height = "100%";
             if (INTERNAL_ForceEnableAllPointerEvents)
@@ -258,14 +399,80 @@ namespace Windows.UI.Xaml
             domElementWhereToPlaceChildren = div2;
             return div1;
         }
-#if !BRIDGE
-        [JSReplacement("true")]
-#else
-        [Template("true")]
+#if BRIDGE
+        [Bridge.Template("true")]
 #endif
         static bool IsRunningInJavaScript()
         {
             return false;
+        }
+
+        // Internal helper so the FrameworkElement could see the
+        // ControlTemplate/DataTemplate set on the
+        // Control/ContentPresenter/ItemsPresenter
+        internal virtual FrameworkTemplate TemplateInternal
+        {
+            get { return null; }
+        }
+
+        // Internal helper so the FrameworkElement could see the
+        // ControlTemplate/DataTemplate set on the
+        // Control/ContentPresenter/ItemsPresenter
+        internal virtual FrameworkTemplate TemplateCache
+        {
+            get { return null; }
+            set { }
+        }
+
+        internal bool ApplyTemplate()
+        {
+            if (VisualTreeHelper.GetParent(this) == null)
+            {
+                return false;
+            }
+
+            // Notify the ContentPresenter/ItemsPresenter that we are about to generate the
+            // template tree and allow them to choose the right template to be applied.
+            this.OnPreApplyTemplate();
+
+            bool visualsCreated = false;
+            FrameworkElement visualChild = null;
+
+            if (this.TemplateInternal != null)
+            {
+                FrameworkTemplate template = this.TemplateInternal;
+
+                // we only apply the template if no template has been
+                // rendered already for this control.
+                if (this.TemplateChild == null)
+                {
+                    visualChild = template.INTERNAL_InstantiateFrameworkTemplate(this);
+                    if (visualChild != null)
+                    {
+                        visualsCreated = true;
+                    }
+                }
+            }
+
+            if (visualsCreated)
+            {
+                this.TemplateChild = visualChild;
+
+                // Call the OnApplyTemplate method
+                this.OnApplyTemplate();
+            }
+
+            return visualsCreated;
+        }
+
+        /// <summary>
+        /// This virtual is called by FE.ApplyTemplate before it does work to generate the template tree.
+        /// </summary>
+        /// This virtual is overridden for the following reasons
+        /// 1. By ContentPresenter/ItemsPresenter to choose the template to be applied in this case.
+        internal virtual void OnPreApplyTemplate()
+        {
+
         }
 
         /// <summary>
@@ -280,7 +487,45 @@ namespace Windows.UI.Xaml
         protected virtual void OnApplyTemplate()
 #endif
         {
+            
+        }
 
+        // Note: the returned Size is unused for now.
+        internal override sealed Size MeasureCore()
+        {
+            if (this.TemplateCache != null)
+            {
+                this.ClearRegisteredNames(); // todo: remove this once namescope is fixed.
+            }
+            if (!this.ApplyTemplate())
+            {
+                if (this.TemplateChild != null)
+                {
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.TemplateChild, this, 0);
+                }
+            }
+            return new Size();
+        }
+
+        //
+        //  This method
+        //  1. Updates the template cache for the given fe
+        //
+        internal static void UpdateTemplateCache(
+            FrameworkElement fe,
+            FrameworkTemplate oldTemplate,
+            FrameworkTemplate newTemplate,
+            DependencyProperty templateProperty)
+        {
+            if (newTemplate != null)
+            {
+                newTemplate.Seal();
+            }
+
+            // Update the template cache
+            fe.TemplateCache = newTemplate;
+
+            fe.TemplateChild = null;
         }
 
         /// <summary>
@@ -299,7 +544,7 @@ namespace Windows.UI.Xaml
             return BindingOperations.GetBindingExpression(this, dp);
         }
 
-        #region Cursor
+#region Cursor
 
         // Returns:
         //     The cursor to display. The default value is defined as null per this dependency
@@ -314,34 +559,31 @@ namespace Windows.UI.Xaml
             get { return (Cursor)GetValue(CursorProperty); }
             set { SetValue(CursorProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the <see cref="FrameworkElement.Cursor"/> dependency
+        /// property.
+        /// </summary>
         public static readonly DependencyProperty CursorProperty =
-            DependencyProperty.Register("Cursor", 
-                                        typeof(Cursor), 
-                                        typeof(FrameworkElement), 
-                                        new PropertyMetadata((object)null)
-                                        {
-                                            MethodToUpdateDom = Cursor_MethodToUpdateDom,
-                                        });
+            DependencyProperty.Register(
+                nameof(Cursor), 
+                typeof(Cursor), 
+                typeof(FrameworkElement), 
+                new PropertyMetadata((object)null)
+                {
+                    MethodToUpdateDom = Cursor_MethodToUpdateDom,
+                });
 
         private static void Cursor_MethodToUpdateDom(DependencyObject d, object newValue)
         {
-            var frameworkElement = (FrameworkElement)d;
-            var newCursor = (Cursor)newValue;
-            var outerDomElement = frameworkElement.INTERNAL_OuterDomElement;
-            var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
-            if (newCursor == null) //if it is null, we want 0 everywhere
-            {
-                styleOfOuterDomElement.cursor = "inherit";
-            }
-            else
-            {
-                styleOfOuterDomElement.cursor = newCursor._cursorHtmlString;
-            }
+            var fe = (FrameworkElement)d;
+            var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(fe.INTERNAL_OuterDomElement);
+            styleOfOuterDomElement.cursor = ((Cursor)newValue)?.ToHtmlString() ?? "inherit";
         }
 
-        #endregion
+#endregion
 
-        #region IsEnabled
+#region IsEnabled
 
         /// <summary>
         /// Gets or sets a value indicating whether the user can interact with the control.
@@ -351,31 +593,34 @@ namespace Windows.UI.Xaml
             get { return (bool)GetValue(IsEnabledProperty); }
             set { SetValue(IsEnabledProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the IsEnabled dependency property.
+        /// Identifies the <see cref="FrameworkElement.IsEnabled"/> dependency
+        /// property.
         /// </summary>
         public static readonly DependencyProperty IsEnabledProperty =
-            DependencyProperty.Register("IsEnabled",
-                                        typeof(bool),
-                                        typeof(FrameworkElement),
-                                        new PropertyMetadata(true, IsEnabled_Changed, CoerceIsEnabledProperty)
-                                        {
-                                            MethodToUpdateDom = IsEnabled_MethodToUpdateDom,
-                                        });
+            DependencyProperty.Register(
+                nameof(IsEnabled),
+                typeof(bool),
+                typeof(FrameworkElement),
+                new PropertyMetadata(true, IsEnabled_Changed, CoerceIsEnabledProperty)
+                {
+                    MethodToUpdateDom = IsEnabled_MethodToUpdateDom,
+                });
 
         private static void IsEnabled_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            FrameworkElement frameworkElement = (FrameworkElement)d;
-            if (frameworkElement.IsEnabledChanged != null)
+            FrameworkElement fe = (FrameworkElement)d;
+            if (fe.IsEnabledChanged != null)
             {
-                frameworkElement.IsEnabledChanged(frameworkElement, e);
+                fe.IsEnabledChanged(fe, e);
             }
-            UIElement.InvalidateForceInheritPropertyOnChildren(frameworkElement, e.Property);
+            fe.InvalidateForceInheritPropertyOnChildren(e.Property);
         }
 
         private static object CoerceIsEnabledProperty(DependencyObject d, object baseValue)
         {
-            FrameworkElement @this = (FrameworkElement)d;
+            FrameworkElement fe = (FrameworkElement)d;
 
             if (!(baseValue is bool)) //todo: this is a temporary workaround to avoid an invalid cast exception. Fix this by investigating why sometimes baseValue is not a bool, such as a Binding (eg. Client_GD).
                 return true;
@@ -387,7 +632,16 @@ namespace Windows.UI.Xaml
             // if our parent is true, but we can always be false.
             if ((bool)baseValue)
             {
-                DependencyObject parent = @this.Parent;
+                // Our parent can constrain us.  We can be plugged into either
+                // a "visual" or "content" tree.  If we are plugged into a
+                // "content" tree, the visual tree is just considered a
+                // visual representation, and is normally composed of raw
+                // visuals, not UIElements, so we prefer the content tree.
+                //
+                // The content tree uses the "logical" links.  But not all
+                // "logical" links lead to a content tree.
+                //
+                DependencyObject parent = fe.Parent ?? VisualTreeHelper.GetParent(fe);
                 if (parent == null || (bool)parent.GetValue(IsEnabledProperty))
                 {
                     return true;
@@ -439,6 +693,32 @@ namespace Windows.UI.Xaml
 
         #endregion
 
+        #region ForceInherit property support
+
+        internal override void InvalidateForceInheritPropertyOnChildren(DependencyProperty property)
+        {
+            if (property == IsEnabledProperty)
+            {
+                IEnumerator enumerator = LogicalChildren;
+
+                if (enumerator != null)
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        DependencyObject child = enumerator.Current as DependencyObject;
+                        if (child != null)
+                        {
+                            child.CoerceValue(property);
+                        }
+                    }
+                }
+            }
+
+            base.InvalidateForceInheritPropertyOnChildren(property);
+        }
+
+        #endregion ForceInherit property support
+
         #region Names handling
 
         /// <summary>
@@ -475,27 +755,29 @@ namespace Windows.UI.Xaml
             get { return (string)GetValue(NameProperty); }
             set { SetValue(NameProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Name dependency property.
+        /// Identifies the <see cref="FrameworkElement.Name"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty NameProperty =
-            DependencyProperty.Register("Name", 
-                                        typeof(string), 
-                                        typeof(FrameworkElement), 
-                                        new PropertyMetadata(string.Empty)
-                                        {
-                                            MethodToUpdateDom = OnNameChanged_MethodToUpdateDom,
-                                        });
+            DependencyProperty.Register(
+                nameof(Name), 
+                typeof(string), 
+                typeof(FrameworkElement), 
+                new PropertyMetadata(string.Empty)
+                {
+                    MethodToUpdateDom = OnNameChanged_MethodToUpdateDom,
+                });
 
         private static void OnNameChanged_MethodToUpdateDom(DependencyObject d, object value)
         {
-            var @this = (FrameworkElement)d;
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(@this.INTERNAL_OuterDomElement, "dataId", (value ?? string.Empty).ToString());
+            var fe = (FrameworkElement)d;
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(fe.INTERNAL_OuterDomElement, "dataId", (value ?? string.Empty).ToString());
         }
 
-        #endregion
+#endregion
 
-        #region DataContext
+#region DataContext
 
         /// <summary>
         /// Gets or sets the data context for a FrameworkElement when it participates
@@ -506,16 +788,19 @@ namespace Windows.UI.Xaml
             get { return (object)GetValue(DataContextProperty); }
             set { SetValue(DataContextProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the DataContext dependency property.
+        /// Identifies the <see cref="FrameworkElement.DataContext"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty DataContextProperty = DependencyProperty.Register("DataContext",
-                                                                                                    typeof(object),
-                                                                                                    typeof(FrameworkElement),
-                                                                                                    new PropertyMetadata(null, OnDataContextPropertyChanged)
-                                                                                                    {
-                                                                                                        Inherits = true
-                                                                                                    });
+        public static readonly DependencyProperty DataContextProperty = 
+            DependencyProperty.Register(
+                nameof(DataContext),
+                typeof(object),
+                typeof(FrameworkElement),
+                new PropertyMetadata(null, OnDataContextPropertyChanged)
+                {
+                    Inherits = true
+                });
 
         private static void OnDataContextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -533,11 +818,11 @@ namespace Windows.UI.Xaml
         /// <summary>Occurs when the data context for this element changes. </summary>
         public event DependencyPropertyChangedEventHandler DataContextChanged;
 
-        #endregion
+#endregion
 
-        #region Work in progress
+#region Work in progress
 #if WORKINPROGRESS
-        #region Triggers
+#region Triggers
 
         [OpenSilver.NotImplemented]
         public TriggerCollection Triggers
@@ -550,22 +835,24 @@ namespace Windows.UI.Xaml
 
         [OpenSilver.NotImplemented]
         public static DependencyProperty TriggersProperty =
-            DependencyProperty.Register("Triggers",
-                                        typeof(TriggerCollection),
-                                        typeof(FrameworkElement),
-                                        new PropertyMetadata(new TriggerCollection()));
+            DependencyProperty.Register(
+                nameof(Triggers),
+                typeof(TriggerCollection),
+                typeof(FrameworkElement),
+                new PropertyMetadata(new TriggerCollection()));
 
-        #endregion
+#endregion
 
         [OpenSilver.NotImplemented]
         public event EventHandler LayoutUpdated;
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FlowDirectionProperty =
-            DependencyProperty.Register("FlowDirection",
-                                        typeof(FlowDirection),
-                                        typeof(FrameworkElement),
-                                        new PropertyMetadata(FlowDirection.LeftToRight));
+            DependencyProperty.Register(
+                nameof(FlowDirection),
+                typeof(FlowDirection),
+                typeof(FrameworkElement),
+                new PropertyMetadata(FlowDirection.LeftToRight));
 
         /// <summary>
         /// Gets or sets the direction that text and other user interface 
@@ -591,10 +878,11 @@ namespace Windows.UI.Xaml
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LanguageProperty =
-            DependencyProperty.Register("Language",
-                                        typeof(XmlLanguage),
-                                        typeof(FrameworkElement),
-                                        null);
+            DependencyProperty.Register(
+                nameof(Language),
+                typeof(XmlLanguage),
+                typeof(FrameworkElement),
+                null);
 
         [OpenSilver.NotImplemented]
         public XmlLanguage Language
@@ -641,9 +929,9 @@ namespace Windows.UI.Xaml
             return new Size();
         }
 #endif
-        #endregion Work in progress
+#endregion Work in progress
 
-        #region Tag
+#region Tag
 
         /// <summary>
         /// Gets or sets an arbitrary object value that can be used to store custom information
@@ -656,17 +944,18 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the Tag dependency property.
+        /// Identifies the <see cref="FrameworkElement.Tag"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty TagProperty =
-            DependencyProperty.Register("Tag", 
-                                        typeof(object), 
-                                        typeof(FrameworkElement), 
-                                        new PropertyMetadata((object)null));
+            DependencyProperty.Register(
+                nameof(Tag), 
+                typeof(object), 
+                typeof(FrameworkElement), 
+                new PropertyMetadata((object)null));
 
-        #endregion
+#endregion
 
-        #region Handling Styles
+#region Handling Styles
 
         [Obsolete("Use DefaultStyleKey")]
         protected void INTERNAL_SetDefaultStyle(Style defaultStyle)
@@ -690,13 +979,14 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the Style dependency property.
+        /// Identifies the <see cref="FrameworkElement.Style"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty StyleProperty =
-            DependencyProperty.Register("Style", 
-                                        typeof(Style), 
-                                        typeof(FrameworkElement), 
-                                        new PropertyMetadata(null, OnStyleChanged));
+            DependencyProperty.Register(
+                nameof(Style), 
+                typeof(Style), 
+                typeof(FrameworkElement), 
+                new PropertyMetadata(null, OnStyleChanged));
 
         private static void OnStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -835,7 +1125,7 @@ namespace Windows.UI.Xaml
             {
                 object implicitStyle;
                 // First, try to find an implicit style in parents' resources.
-                for (FrameworkElement f = fe; f != null; f = (FrameworkElement)f.Parent)
+                for (FrameworkElement f = fe; f != null; f = VisualTreeHelper.GetParent(f) as FrameworkElement)
                 {
                     if (f.HasResources && f.Resources.HasImplicitStyles)
                     {
@@ -861,7 +1151,7 @@ namespace Windows.UI.Xaml
             return DependencyProperty.UnsetValue;
         }
 
-        #region DefaultStyleKey
+#region DefaultStyleKey
 
         // Indicates if the ThemeStyle is being re-evaluated
         internal bool IsThemeStyleUpdateInProgress
@@ -899,10 +1189,11 @@ namespace Windows.UI.Xaml
         /// property.
         /// </summary>
         public static readonly DependencyProperty DefaultStyleKeyProperty =
-            DependencyProperty.Register("DefaultStyleKey", 
-                                        typeof(object), 
-                                        typeof(FrameworkElement), 
-                                        new PropertyMetadata(null, OnThemeStyleKeyChanged));
+            DependencyProperty.Register(
+                nameof(DefaultStyleKey), 
+                typeof(object), 
+                typeof(FrameworkElement), 
+                new PropertyMetadata(null, OnThemeStyleKeyChanged));
 
         private static void OnThemeStyleKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1075,11 +1366,11 @@ namespace Windows.UI.Xaml
             get { return _themeStyleCache; }
         }
 
-        #endregion DefaultStyleKey
+#endregion DefaultStyleKey
 
-        #endregion Handling Styles
+#endregion Handling Styles
 
-        #region Loaded/Unloaded events
+#region Loaded/Unloaded events
 
         /// <summary>
         /// Occurs when a FrameworkElement has been constructed and added to the object tree.
@@ -1103,9 +1394,9 @@ namespace Windows.UI.Xaml
                 Unloaded(this, new RoutedEventArgs());
         }
 
-        #endregion
+#endregion
 
-        #region BindingValidationError event
+#region BindingValidationError event
 
         internal bool INTERNAL_AreThereAnyBindingValidationErrorHandlers = false;
 
@@ -1157,7 +1448,57 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-        #endregion
+#endregion
+
+#region ---------- INameScope implementation ----------
+        //note: copy from UserControl
+        Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
+
+        /// <summary>
+        /// Finds the UIElement with the specified name. Returns null if not found.
+        /// </summary>
+        /// <param name="name">The name to look for.</param>
+        /// <returns>The object with the specified name if any; otherwise null.</returns>
+        internal object TryFindTemplateChildFromName(string name)
+        {
+            //todo: see if this fits to the behaviour it should have.
+            if (_nameScopeDictionary.ContainsKey(name))
+                return _nameScopeDictionary[name];
+            else
+                return null;
+        }
+
+        public void RegisterName(string name, object scopedElement)
+        {
+            if (_nameScopeDictionary.ContainsKey(name) && _nameScopeDictionary[name] != scopedElement)
+                throw new ArgumentException(string.Format("Cannot register duplicate name '{0}' in this scope.", name));
+
+            _nameScopeDictionary[name] = scopedElement;
+        }
+
+#if BRIDGE
+        // find "COMMENT 26.03.2020" at the beginning of this class for the reason of the existence of the method below:
+        private void registerName(string name, object scopedElement)
+        {
+            RegisterName(name, scopedElement);
+        }
+#endif
+
+        public void UnregisterName(string name)
+        {
+            if (!_nameScopeDictionary.ContainsKey(name))
+                throw new ArgumentException(string.Format("Name '{0}' was not found.", name));
+
+            _nameScopeDictionary.Remove(name);
+        }
+
+        internal void ClearRegisteredNames()
+        {
+            _nameScopeDictionary.Clear();
+        }
+
+
+#endregion
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
@@ -1174,6 +1515,13 @@ namespace Windows.UI.Xaml
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
+            // We check if the parent has implicit styles in its ancestors and inherit it if it is the case
+            FrameworkElement parent = VisualTreeHelper.GetParent(this) as FrameworkElement;
+            if (parent != null && parent.ShouldLookupImplicitStyles)
+            {
+                ShouldLookupImplicitStyles = true;
+            }
+
             // Fetch the implicit style
             // If this element's ResourceDictionary contains the
             // implicit style, it has already been retrieved.
@@ -1188,6 +1536,8 @@ namespace Windows.UI.Xaml
             {
                 UpdateThemeStyleProperty();
             }
+
+            InvalidateMeasureInternal();
         }
 
         // Extracts the required flag and returns
@@ -1271,11 +1621,11 @@ namespace Windows.UI.Xaml
         //Remove this entry later since it is supposed to be in InternalFlags2
         HasStyleInvalidated = 0x02000000,
 
-        //HasLogicalChildren = 0x04000000,
+        HasLogicalChildren = 0x04000000,
 
         // Are we in the process of iterating the logical children.
         // This flag is set during a descendents walk, for property invalidation.
-        //IsLogicalChildrenIterationInProgress = 0x08000000,
+        IsLogicalChildrenIterationInProgress = 0x08000000,
 
         //Are we creating a new root after system metrics have changed?
         //CreatingRoot = 0x10000000,

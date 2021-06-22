@@ -68,7 +68,7 @@ namespace CSHTML5.Internal
                 DOMDocument document = INTERNAL_Simulator.DOMDocument;
 
                 // Get the domElement from the id:
-                var domElement = document.GetElementById(((INTERNAL_HtmlDomElementReference)(domElementRef)).UniqueIdentifier);
+                var domElement = document.getElementByIdSafe(((INTERNAL_HtmlDomElementReference)(domElementRef)).UniqueIdentifier);
 
                 // Add the listener:
                 domElement.AddEventListener(eventType, newProxy.OnEvent, false); //todo: replace "false"?
@@ -102,7 +102,7 @@ namespace CSHTML5.Internal
                 DOMDocument document = INTERNAL_Simulator.DOMDocument;
 
                 // Get the domElement from the id:
-                var domElement = document.GetElementById(((INTERNAL_HtmlDomElementReference)(domElementRef)).UniqueIdentifier);
+                var domElement = document.getElementByIdSafe(((INTERNAL_HtmlDomElementReference)(domElementRef)).UniqueIdentifier);
 
                 // Remove the listener:
                 if (domElement != null) //todo: this line was added when we moved from Awesomium to DotNetBrowser because otherwise a NullReferenceException occurred. However, it is strange that thre was no NullReferenceException with Awesomium. We should investigate to understand why, because it may be a sign of a change somewhere that has broken something.

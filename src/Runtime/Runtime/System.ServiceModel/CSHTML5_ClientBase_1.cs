@@ -526,7 +526,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             }
 #endif
 
-            private void BeginCallWebMethod(
+            public void BeginCallWebMethod(
                 string webMethodName,
                 Type interfaceType,
                 Type methodReturnType,
@@ -739,6 +739,29 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 return tcs.Task;
             }
 
+#if OPENSILVER
+            /// <summary>
+            /// Calls a WebMethod
+            /// </summary>
+            /// <param name="webMethodName">The name of the Method</param>
+            /// <param name="interfaceType">The Type of the interface</param>
+            /// <param name="methodReturnType"></param>
+            /// <param name="messageHeaders">The SOAP envelope headers</param>
+            /// <param name="originalRequestObject"></param>
+            /// <param name="soapVersion"></param>
+            /// <returns>The result of the call of the method.</returns>
+            public object CallWebMethod(
+                string webMethodName,
+                Type interfaceType,
+                Type methodReturnType,
+                IEnumerable<MessageHeader> messageHeaders,
+                IDictionary<string, object> originalRequestObject,
+                string soapVersion) // Note: we don't arrive here using c#.
+            {
+                return CallWebMethod(webMethodName, interfaceType, methodReturnType,
+                        GetEnvelopeHeaders(messageHeaders?.ToList()), originalRequestObject, soapVersion);
+            }
+#endif
             /// <summary>
             /// Calls a WebMethod
             /// </summary>
@@ -752,6 +775,30 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 string webMethodName,
                 Type interfaceType,
                 Type methodReturnType,
+                IDictionary<string, object> originalRequestObject,
+                string soapVersion) // Note: we don't arrive here using c#.
+            {
+                return CallWebMethod(webMethodName, interfaceType, methodReturnType, "", originalRequestObject, soapVersion);
+            }
+
+
+
+
+            /// <summary>
+            /// Calls a WebMethod
+            /// </summary>
+            /// <param name="webMethodName">The name of the Method</param>
+            /// <param name="interfaceType">The Type of the interface</param>
+            /// <param name="methodReturnType"></param>
+            /// <param name="messageHeaders"></param>
+            /// <param name="originalRequestObject"></param>
+            /// <param name="soapVersion"></param>
+            /// <returns>The result of the call of the method.</returns>
+            public object CallWebMethod(
+                string webMethodName,
+                Type interfaceType,
+                Type methodReturnType,
+                string messageHeaders,
                 IDictionary<string, object> originalRequestObject,
                 string soapVersion) // Note: we don't arrive here using c#.
             {
@@ -800,7 +847,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     method,
                     interfaceType,
                     methodReturnType,
-                    null,
+                    messageHeaders,
                     originalRequestObject,
                     soapVersion,
                     isXmlSerializer,
@@ -1134,7 +1181,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             }
 
 #if OPENSILVER
-            private FaultException GetFaultException(string response)
+            private FaultException GetFaultException(string response, bool useXmlSerializerFormat)
             {
                 FaultException fe = null;
                 const string ns = "http://schemas.xmlsoap.org/soap/envelope/";
@@ -1150,7 +1197,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     if (detailElement != null)
                     {
                         detailElement = detailElement.Elements().First();
-                        Type detailType = ResolveType(detailElement.Name);
+                        Type detailType = ResolveType(detailElement.Name, useXmlSerializerFormat);
 
                         DataContractSerializerCustom serializer =
                             new DataContractSerializerCustom(detailType, false);
@@ -1176,7 +1223,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 return fe ?? new FaultException();
             }
 
-            private static Type ResolveType(XName name)
+            private static Type ResolveType(XName name, bool useXmlSerializerFormat)
             {
                 Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
                 for (int i = 0; i < assemblies.Length; ++i)
@@ -1195,11 +1242,15 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                             bool nameMatch = attr.IsNameSetExplicitly ?
                                          attr.Name == name.LocalName :
                                          type.Name == name.LocalName;
-                            bool namespaceMatch = attr.Namespace == name.NamespaceName;
 
-                            if (nameMatch && namespaceMatch)
+                            if(nameMatch)
                             {
-                                return type;
+                                bool namespaceMatch = attr.IsNamespaceSetExplicitly ?
+                                    attr.Namespace == name.NamespaceName :
+                                    DataContractSerializer_Helpers.GetDefaultNamespace(type.Namespace, useXmlSerializerFormat) == name.NamespaceName;
+
+                                if (namespaceMatch)
+                                    return type;
                             }
                         }
                     }
@@ -1352,7 +1403,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     }
                     if (m != -1)
                     {
-                        FaultException fe = GetFaultException(responseAsString);
+                        FaultException fe = GetFaultException(responseAsString, isXmlSerializer);
                         raiseFaultException(fe);
                         return null;
                     }
@@ -1525,6 +1576,10 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                             requestResponse = (char)(int.Parse(responseAsString)); //todo: support encodings
                         else if (requestResponseType == typeof(DateTime) || requestResponseType == typeof(DateTime?))
                             requestResponse = INTERNAL_DateTimeHelpers.ToDateTime(responseAsString); //todo: ensure this is the culture-invariant parsing!
+                        else if (requestResponseType == typeof(void))
+                        {
+                            // Do nothing so null object will be returned
+                        }
                         else
                             throw new NotSupportedException(
                                 string.Format("The following type is not supported in the current WCF implementation: '{0}'. \nPlease report this issue to support@cshtml5.com",

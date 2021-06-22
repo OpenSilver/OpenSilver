@@ -14,9 +14,7 @@
 
 
 using CSHTML5.Internal;
-#if !BRIDGE
-using JSIL.Meta;
-#endif
+using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -31,16 +29,14 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    static class Grid_InternalHelpers
+    internal static class Grid_InternalHelpers
     {
         internal const string INTERNAL_CSSGRID_MS_PREFIX = "-ms-";
 
-        static bool? _isGridSupported;
-        static bool? _isMSGrid;
+        private static bool? _isGridSupported;
+        private static bool? _isMSGrid;
 
-#if !BRIDGE
-        [JSReplacement("document.isGridSupported")]
-#else 
+#if BRIDGE
         [Bridge.Template("document.isGridSupported")]
 #endif
         internal static bool isCSSGridSupported()
@@ -52,9 +48,7 @@ namespace Windows.UI.Xaml.Controls
             return _isGridSupported.Value;
         }
 
-#if !BRIDGE
-        [JSReplacement("document.isMSGrid")]
-#else
+#if BRIDGE
         [Bridge.Template("document.isMSGrid")]
 #endif
         internal static bool isMSGrid()
@@ -66,9 +60,7 @@ namespace Windows.UI.Xaml.Controls
             return _isMSGrid.Value;
         }
 
-#if !BRIDGE
-        [JSReplacement("document.gridSupport")]
-#else
+#if BRIDGE
         [Bridge.Template("document.gridSupport")]
 #endif
         private static string GetGridSupportAsString()
@@ -96,7 +88,7 @@ namespace Windows.UI.Xaml.Controls
             return output;
         }
 
-        static IEnumerable<RowDefinition> IterateThroughCollectionOrCreateNewElementIfCollectionIsNullOrEmpty(RowDefinitionCollection rowDefinitionsOrNull)
+        private static IEnumerable<RowDefinition> IterateThroughCollectionOrCreateNewElementIfCollectionIsNullOrEmpty(RowDefinitionCollection rowDefinitionsOrNull)
         {
             if (rowDefinitionsOrNull != null && rowDefinitionsOrNull.Count > 0)
             {
@@ -106,10 +98,12 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
             else
+            {
                 yield return new RowDefinition();
+            }
         }
 
-        static IEnumerable<ColumnDefinition> IterateThroughCollectionOrCreateNewElementIfCollectionIsNullOrEmpty(ColumnDefinitionCollection columnDefinitionsOrNull)
+        private static IEnumerable<ColumnDefinition> IterateThroughCollectionOrCreateNewElementIfCollectionIsNullOrEmpty(ColumnDefinitionCollection columnDefinitionsOrNull)
         {
             if (columnDefinitionsOrNull != null && columnDefinitionsOrNull.Count > 0)
             {
@@ -119,7 +113,9 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
             else
+            {
                 yield return new ColumnDefinition();
+            }
         }
 
         public static string ConvertGridLengthToCssString(GridLength gridLength, double minSize, string signUsedForPercentage = "%")
@@ -133,28 +129,29 @@ namespace Windows.UI.Xaml.Controls
                 bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
                 if (isCSSGrid)
                 {
-                    string minWidthString = (double.IsNaN(minSize) || double.IsInfinity(minSize) ? "0px" : minSize.ToString().Replace(',', '.') + "px"); //todo: replace the comma replacement with "ToString(CultureInfo.InvariantCulture)" when JSIL will support it.
-                    return "minmax(" + minWidthString + ", " + gridLength.Value.ToString().Replace(',', '.') + signUsedForPercentage + ")"; //todo: replace the comma replacement with "ToString(CultureInfo.InvariantCulture)" when JSIL will support it.
+                    string minWidthString = (double.IsNaN(minSize) || double.IsInfinity(minSize) ? 
+                        "0px" : minSize.ToInvariantString() + "px");
+                    return "minmax(" + minWidthString + ", " + gridLength.Value.ToInvariantString() + signUsedForPercentage + ")";
                 }
                 else
                 {
                     //todo: implement MinWidth / MinHeight (minSize) for legacy non-CSS-Grid compatible browsers
-                    return gridLength.Value.ToString().Replace(',', '.') + signUsedForPercentage; //todo: replace the comma replacement with "ToString(CultureInfo.InvariantCulture)" when JSIL will support it.
+                    return gridLength.Value.ToInvariantString() + signUsedForPercentage;
                 }
             }
             else
             {
-                return gridLength.Value.ToString().Replace(',', '.') + "px"; //todo: replace the comma replacement with "ToString(CultureInfo.InvariantCulture)" when JSIL will support it.
+                return gridLength.Value.ToInvariantString() + "px";
             }
         }
 
-        public static dynamic GenerateDomElementsForGrid_NonCSSVersion(Grid grid, List<List<INTERNAL_CellDefinition>> cellsStructure, ColumnDefinitionCollection columnDefinitionsOrNull, RowDefinitionCollection rowDefinitionsOrNull, object parentRef, out List<ColumnDefinition> normalizedColumnDefinitions, out List<RowDefinition> normalizedRowDefinitions)
+        public static object GenerateDomElementsForGrid_NonCSSVersion(Grid grid, List<List<INTERNAL_CellDefinition>> cellsStructure, ColumnDefinitionCollection columnDefinitionsOrNull, RowDefinitionCollection rowDefinitionsOrNull, object parentRef, out List<ColumnDefinition> normalizedColumnDefinitions, out List<RowDefinition> normalizedRowDefinitions)
         {
             //Note: the "cellsStructure" parameter will be modified because we will store the DOM elements that correspond to each cell.
 
             // Create "<table>" element:
-            dynamic table = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("table", parentRef, grid);
-            dynamic tableStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(table);
+            var table = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("table", parentRef, grid);
+            var tableStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(table);
             tableStyle.borderCollapse = "collapse";
             tableStyle.position = "relative";
             tableStyle.height = "100%";
@@ -168,50 +165,32 @@ namespace Windows.UI.Xaml.Controls
             int currentRowIndex = 0;
             foreach (RowDefinition rowDefinition in normalizedRowDefinitions)
             {
-                List<INTERNAL_CellDefinition> currentRow = cellsStructure[currentRowIndex];
+                var currentRow = cellsStructure[currentRowIndex];
 
                 // Create and append "<tr>" element:
-                dynamic tr = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("tr", table, grid);
+                var tr = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("tr", table, grid);
 
                 int currentColumnIndex = 0;
                 foreach (ColumnDefinition columnDefinition in normalizedColumnDefinitions)
                 {
-                    INTERNAL_CellDefinition currentCell = currentRow[currentColumnIndex];
+                    var currentCell = currentRow[currentColumnIndex];
 
                     if (!currentCell.IsOverlapped) // "Overlapped" means that another cell is overlapping this cell due to the "ColumnSpan" or "RowSpan".
                     {
                         // Create and append "<td>" element:
-                        dynamic td = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("td", tr, grid);
-                        dynamic tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(td);
-                        if (columnDefinition.Visibility == Visibility.Visible)
-                        {
-                            tdStyle.display = "table-cell";
-                        }
-                        else
-                        {
-                            tdStyle.display = "none";
-                        }
-
+                        var td = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("td", tr, grid);
+                        var tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(td);
+                        tdStyle.display = (columnDefinition.Visibility == Visibility.Visible) ? "table-cell" : "none";
+                        
                         INTERNAL_HtmlDomManager.SetDomElementAttribute(td, "rowspan", currentCell.RowSpan);
                         INTERNAL_HtmlDomManager.SetDomElementAttribute(td, "colspan", currentCell.ColumnSpan);
 
                         ApplyGridLinesValues(grid, currentRowIndex, currentColumnIndex, tdStyle);
 
                         //we create the div to contain the children:
-                        dynamic div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", td, grid);
-                        dynamic divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+                        var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", td, grid);
+                        var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
                         divStyle.position = "relative";
-
-                        //todo: uncomment the following ? if yes, we will probably need to override the metadata for width and height in Grid so that we do the same when they change.
-                        //if (grid.Width != double.NaN)
-                        //{
-                        //    divStyle.maxWidth = grid.Width + "px";
-                        //}
-                        //if (grid.Height != double.NaN)
-                        //{
-                        //    divStyle.maxHeight = grid.Height + "px";
-                        //}
-
 
                         //we fill the cell's definition in the structure:
                         currentCell.DomElement = div;
@@ -222,11 +201,6 @@ namespace Windows.UI.Xaml.Controls
                 }
                 currentRowIndex++;
             }
-
-            //note: I moved the following into the calling method since we need the return value of this method to be set into a property for it to work.
-            //// Refresh rows heights and columns widths:
-            //RefreshAllRowsHeight_NonCSSVersion(grid, normalizedRowDefinitions);
-            //RefreshAllColumnsWidth_NonCSSVersion(grid, normalizedColumnDefinitions);
 
             return table;
         }
@@ -239,16 +213,16 @@ namespace Windows.UI.Xaml.Controls
                 int currentRowIndex = 0;
                 foreach (RowDefinition rowDefinition in rowDefinitions) //todo: see if removing the normalization from here didn't break anything (case where there are no rows or no columns defined, Normalization adds one)
                 {
-                    List<INTERNAL_CellDefinition> currentRow = cellsStructure[currentRowIndex];
+                    var currentRow = cellsStructure[currentRowIndex];
                     int currentColumnIndex = 0;
                     foreach (ColumnDefinition columnDefinition in columnDefinitions)
                     {
-                        INTERNAL_CellDefinition currentCell = currentRow[currentColumnIndex];
+                        var currentCell = currentRow[currentColumnIndex];
 
                         if (!currentCell.IsOverlapped) // "Overlapped" means that another cell is overlapping this cell due to the "ColumnSpan" or "RowSpan".
                         {
                             var td = currentCell.ColumnDomElement;
-                            dynamic tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(td);
+                            var tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(td);
                             ApplyGridLinesValues(grid, currentRowIndex, currentColumnIndex, tdStyle);
                         }
                         currentColumnIndex++;
@@ -258,8 +232,11 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-
+#if BRIDGE
         internal static void ApplyGridLinesValues(Grid grid, int rowIndex, int columnIndex, dynamic tdStyle)
+#else
+        internal static void ApplyGridLinesValues(Grid grid, int rowIndex, int columnIndex, INTERNAL_HtmlDomStyleReference tdStyle)
+#endif
         {
             if (grid.INTERNAL_StringToSetVerticalGridLinesInCss != null)
             {
@@ -417,33 +394,12 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
 
-
-
             // If there is no row, add one. If there is no column, add one.
             if (normalizedColumnDefinitions.Count == 0)
                 normalizedColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1d, GridUnitType.Star), Parent = grid });
             if (normalizedRowDefinitions.Count == 0)
                 normalizedRowDefinitions.Add(new RowDefinition() { Height = new GridLength(1d, GridUnitType.Star), Parent = grid });
         }
-
-        //internal static void RefreshRowsHeightsAndColumnsWidths(Grid grid, List<List<INTERNAL_CellDefinition>> cellsStructure, ColumnDefinitionCollection columnDefinitionsOrNull, RowDefinitionCollection rowDefinitionsOrNull)
-        //{
-        //    List<ColumnDefinition> normalizedColumnDefinitions;
-        //    List<RowDefinition> normalizedRowDefinitions;
-        //    NormalizeWidthAndHeightPercentages(grid, columnDefinitionsOrNull, rowDefinitionsOrNull, out normalizedColumnDefinitions, out normalizedRowDefinitions);
-
-        //    if (Grid_InternalHelpers.isCSSGridSupported())
-        //    {
-        //        RefreshAllRowsHeight_CSSVersion(grid, normalizedRowDefinitions);
-        //        RefreshAllColumnsWidth_CSSVersion(grid, normalizedColumnDefinitions);
-        //    }
-        //    else
-        //    {
-        //        RefreshAllRowsHeight_NonCSSVersion(grid, normalizedRowDefinitions);
-        //        RefreshAllColumnsWidth_NonCSSVersion(grid, normalizedColumnDefinitions);
-        //    }
-        //}
-
 
         /// <summary>
         /// Refreshes the height of all the rows (and their columns) of the given grid
@@ -509,7 +465,7 @@ namespace Windows.UI.Xaml.Controls
             if (isFirstRow)
                 rowsAsString = "minmax(0px, 1fr)"; //this means that there is no rowDefinition or it is empty --> we want to put minmax(0px, 1fr) so that the grid actually limits its content size.
 
-            dynamic domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(grid._innerDiv);
+            var domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(grid._innerDiv);
             bool isMsGrid = Grid_InternalHelpers.isMSGrid();
             if (!isMsGrid)
             {
@@ -524,7 +480,7 @@ namespace Windows.UI.Xaml.Controls
         internal static void RefreshRowHeight_NonCSSVersion(Grid grid, int rowIndex, bool isTheOnlyRow, List<RowDefinition> normalizedRowsDefinitionsIfNeeded = null)
         {
             bool clipToBounds = grid.ClipToBounds;
-            List<INTERNAL_CellDefinition> row = grid._currentCellsStructure[rowIndex];
+            var row = grid._currentCellsStructure[rowIndex];
             RowDefinition rowDefinition;
             if (normalizedRowsDefinitionsIfNeeded != null)
             {
@@ -543,7 +499,7 @@ namespace Windows.UI.Xaml.Controls
             }
             else if (isTheOnlyRow && !double.IsNaN(grid.Height))
             {
-                internalElementForRowHeight = grid.Height.ToString().Replace(',', '.') + "px";
+                internalElementForRowHeight = grid.Height.ToInvariantString() + "px";
                 rowHeight = "auto";
             }
             //we set the height of the row:
@@ -555,7 +511,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (!cell.IsOverlapped)
                 {
-                    dynamic domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.DomElement);
+                    var domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.DomElement);
 
                     string domElementStyleAppliedValue = internalElementForRowHeight;
 
@@ -618,7 +574,7 @@ namespace Windows.UI.Xaml.Controls
                 bool isAbsoluteHeight = true;
                 for (int i = 0; i < cell.RowSpan; ++i)
                 {
-                    RowDefinition currentRowDefinition = grid._rowDefinitionsOrNull[rowIndex];
+                    var currentRowDefinition = grid._rowDefinitionsOrNull[rowIndex];
 
                     if (currentRowDefinition.Height.IsAbsolute)
                     {
@@ -658,17 +614,16 @@ namespace Windows.UI.Xaml.Controls
             }
             else if (isTheOnlyRow && !double.IsNaN(grid.Height))
             {
-                internalElementForRowHeight = grid.Height.ToString().Replace(',', '.') + "px";
+                internalElementForRowHeight = grid.Height.ToInvariantString() + "px";
                 rowHeight = "auto";
             }
 
             //we set the height of the cell based on the row's height
             if (!cell.IsOverlapped)
             {
-                dynamic domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.DomElement);
+                var domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.DomElement);
 
                 string domElementStyleAppliedValue = internalElementForRowHeight;
-
 
                 //domElementStyle.height = internalElementForRowHeight;
                 if (internalElementForRowHeight.EndsWith("px"))
@@ -709,18 +664,13 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
 
-
-
-
-
-
             //We set the width:
             //Note: this part is very similar to the RefreshColumnWidth_NonCSSVersion method.
             //todo: factorize the common parts ([getting columnWidth and internalElementForColumnWidth] and [setting the cell's dom element's style]).
 
             if (!cell.IsOverlapped)
             {
-                dynamic tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.ColumnDomElement);
+                var tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.ColumnDomElement);
                 string columnWidth = ConvertGridLengthToCssString(normalizedColumnDefinition.Width, normalizedColumnDefinition.MinWidth);
                 string internalElementForColumnWidth = "100%";
                 if (columnWidth.EndsWith("px"))
@@ -730,7 +680,7 @@ namespace Windows.UI.Xaml.Controls
                 }
                 else if (isTheOnlyColumn && !double.IsNaN(grid.Width))
                 {
-                    internalElementForColumnWidth = grid.Width.ToString().Replace(',', '.') + "px";
+                    internalElementForColumnWidth = grid.Width.ToInvariantString() + "px";
                     columnWidth = "auto";
                 }
 
@@ -738,7 +688,7 @@ namespace Windows.UI.Xaml.Controls
                 tdStyle.position = "relative";
                 tdStyle.padding = "0px";
 
-                dynamic domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.DomElement);
+                var domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.DomElement);
                 domElementStyle.width = internalElementForColumnWidth;
 
                 if (internalElementForColumnWidth.EndsWith("px"))//todo: check if this should be if(columnwidth != "auto") in certain cases
@@ -751,9 +701,7 @@ namespace Windows.UI.Xaml.Controls
                         domElementStyle.overflowX = "hidden";
                 }
             }
-
         }
-
 
         internal static void RefreshAllColumnsWidth_NonCSSVersion(Grid grid, List<ColumnDefinition> normalizedColumnDefinitions = null)
         {
@@ -796,7 +744,7 @@ namespace Windows.UI.Xaml.Controls
 
                 bool hasStarColumn = false;
                 //int indexToLastColumn = normalizedColumnDefinitions.Count;
-                List<int> collapsedColumns = new List<int>();
+                var collapsedColumns = new List<int>();
                 int currentIndex = 0;
                 // Concatenate the string that defines the CSS "gridTemplateColumns" property:
                 foreach (ColumnDefinition columnDefinition in normalizedColumnDefinitions)
@@ -811,7 +759,7 @@ namespace Windows.UI.Xaml.Controls
                     else
                     {
                         collapsedColumns.Add(currentIndex);
-                        columnsAsString = columnsAsString + (!isFirstColumn ? " 0px" : "0px");
+                        columnsAsString += (!isFirstColumn ? " 0px" : "0px");
                     }
                     ++currentIndex;
 
@@ -819,7 +767,7 @@ namespace Windows.UI.Xaml.Controls
                 }
                 if (!hasStarColumn) //We add a "star" column if there was none explicitely defined, since absolutely sized rows and columns are exactly their size.
                 {
-                    columnsAsString = columnsAsString + (!isFirstColumn ? " minmax(0px, 1fr)" : "minmax(0px, 1fr)");
+                    columnsAsString += (!isFirstColumn ? " minmax(0px, 1fr)" : "minmax(0px, 1fr)");
                 }
 
                 //---------------------------------------------------------------
@@ -842,7 +790,7 @@ namespace Windows.UI.Xaml.Controls
                         {
                             // Note: we set to Visible only if it was previously Hidden due to the fact that a Grid column is hidden, to avoid conflicts such as replacing the "overflow" property set by the ScrollViewer or by the "ClipToBounds" property.
                             CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
+if ($0.getAttribute('data-isCollapsedDueToHiddenColumn') == true) {
     $0.style.overflow = 'visible';
     $0.setAttribute('data-isCollapsedDueToHiddenColumn', false);
 }", child.INTERNAL_OuterDomElement);
@@ -856,7 +804,7 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
             if (isFirstColumn)
                 columnsAsString = "minmax(0px, 1fr)"; //this means that there is no columnDefinition or it is empty --> we want to put minmax(0px, 1fr) so that the grid actually limits its content size.
 
-            dynamic domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(grid._innerDiv);
+            var domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(grid._innerDiv);
             bool isMsGrid = Grid_InternalHelpers.isMSGrid();
             if (!isMsGrid)
             {
@@ -896,9 +844,9 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
         internal static void RefreshColumnWidth_NonCSSVersion(Grid grid, int ColumnIndex, bool isTheOnlyColumn, List<ColumnDefinition> normalizedColumnsDefinitionsIfNeeded = null)
         {
             bool clipToBounds = grid.ClipToBounds;
-            List<INTERNAL_CellDefinition> column = new List<INTERNAL_CellDefinition>();
+            var column = new List<INTERNAL_CellDefinition>();
 
-            foreach (List<INTERNAL_CellDefinition> row in grid._currentCellsStructure)
+            foreach (var row in grid._currentCellsStructure)
             {
                 column.Add(row[ColumnIndex]);
             }
@@ -917,7 +865,7 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
             {
                 if (!cell.IsOverlapped)
                 {
-                    dynamic tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.ColumnDomElement);
+                    var tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.ColumnDomElement);
                     string columnWidth = ConvertGridLengthToCssString(columnDefinition.Width, columnDefinition.MinWidth);
                     string internalElementForColumnWidth = "100%";
                     if (columnWidth.EndsWith("px"))
@@ -927,7 +875,7 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
                     }
                     else if (isTheOnlyColumn && !double.IsNaN(grid.Width))
                     {
-                        internalElementForColumnWidth = grid.Width.ToString().Replace(',', '.') + "px";
+                        internalElementForColumnWidth = grid.Width.ToInvariantString() + "px";
                         columnWidth = "auto";
                     }
 
@@ -935,7 +883,7 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
                     tdStyle.position = "relative";
                     tdStyle.padding = "0px";
 
-                    dynamic domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.DomElement);
+                    var domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.DomElement);
                     domElementStyle.width = internalElementForColumnWidth;
 
                     if (internalElementForColumnWidth.EndsWith("px"))//todo: check if this should be if(columnwidth != "auto") in certain cases
@@ -957,20 +905,18 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
         {
             if (grid._currentCellsStructure != null)
             {
-                foreach (List<INTERNAL_CellDefinition> row in grid._currentCellsStructure)
+                foreach (var row in grid._currentCellsStructure)
                 {
                     if (row != null && row[0] != null)
                     {
                         INTERNAL_CellDefinition cell = row[0];
                         if (cell.RowDomElement != null)
                         {
-                            dynamic td = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("td", cell.RowDomElement, grid);
-                            dynamic tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(td);
+                            var td = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("td", cell.RowDomElement, grid);
+                            var tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(td);
 
                             tdStyle.display = "table-cell";
-
                             tdStyle.width = "100%";
-
                         }
                     }
                 }
@@ -981,8 +927,8 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
         {
             if (grid._currentDomTable != null)
             {
-                dynamic tr = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("tr", grid._currentDomTable, grid);
-                dynamic trStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tr);
+                var tr = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("tr", grid._currentDomTable, grid);
+                var trStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tr);
                 trStyle.height = "100%";
             }
         }
@@ -994,11 +940,6 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
                 if (grid.ColumnDefinitions != null)
                 {
                     Grid_InternalHelpers.RefreshAllColumnsWidth_CSSVersion(grid);
-                    //foreach (ColumnDefinition col in grid.ColumnDefinitions)
-                    //{
-                    //    RefreshColumnVisibility_CSSVersion(grid, col, col.Visibility);
-
-                    //}
                 }
             }
         }
@@ -1013,19 +954,19 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
             {
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(grid))
                 {
-                    List<INTERNAL_CellDefinition> column = new List<INTERNAL_CellDefinition>();
+                    var column = new List<INTERNAL_CellDefinition>();
                     int columnIndex = grid._columnDefinitionsOrNull.IndexOf(columnDefinition);
 
-                    foreach (List<INTERNAL_CellDefinition> row in grid._currentCellsStructure)
+                    foreach (var row in grid._currentCellsStructure)
                     {
                         column.Add(row[columnIndex]);
                     }
 
-                    foreach (INTERNAL_CellDefinition cell in column)
+                    foreach (var cell in column)
                     {
                         if (!cell.IsOverlapped)
                         {
-                            dynamic tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.ColumnDomElement);
+                            var tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell.ColumnDomElement);
                             if (newVisibility == Visibility.Collapsed)
                             {
                                 if (((string)tdStyle.display != "none"))
@@ -1058,7 +999,7 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
 
         internal static Dictionary<UIElement, INTERNAL_CellDefinition> HandleSpansInCellsStructureAndReturnRedirectedElements(List<List<INTERNAL_CellDefinition>> newCellsStructure, UIElementCollection Children)
         {
-            Dictionary<UIElement, INTERNAL_CellDefinition> redirectedElements = new Dictionary<UIElement, INTERNAL_CellDefinition>(); //this is to know which children to update (in regards to their INTERNAL_SpanParentCell field) if the structure actually needs to be updated
+            var redirectedElements = new Dictionary<UIElement, INTERNAL_CellDefinition>(); //this is to know which children to update (in regards to their INTERNAL_SpanParentCell field) if the structure actually needs to be updated
 
             // Determine the MIN/MAX cell coordinates by looking at the grid structure:
             int maxRowIndex = newCellsStructure.Count - 1;
@@ -1078,7 +1019,7 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
                 columnIndex = EnsureValueIsBetweenMinAndMax(value: columnIndex, min: 0, max: maxColumnIndex);
 
                 // Get the "cell definition" of the top-left cell occupied by the current element. The "cell definition" is the structure that stores information for each cell of the table:
-                INTERNAL_CellDefinition cellDefinition = newCellsStructure[rowIndex][columnIndex]; //Note: childRow and childColumn should always have a correct value.
+                var cellDefinition = newCellsStructure[rowIndex][columnIndex]; //Note: childRow and childColumn should always have a correct value.
 
                 if (cellDefinition.IsOverlapped) //Note: "IsOverlapped" means that another cell is overlapping this cell due to the "ColumnSpan" or "RowSpan".
                 {
@@ -1113,7 +1054,7 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
                         for (int column = columnIndex; column <= spanLastColumnIndex; ++column)
                         {
                             // Get the "cell structure":
-                            INTERNAL_CellDefinition cellStructure2 = newCellsStructure[row][column];
+                            var cellStructure2 = newCellsStructure[row][column];
 
                             // If one of the cells spanned by the current element is already occupied by another element, we change the current element so that it goes into the cells of that other element. The reason is that with the HTML <Table>, it is not possible to have both spanned elements and non-spanned elements in a same cell.
                             if (cellStructure2.IsOverlapped == true || (cellStructure2.IsOccupied && !isTopLeftCellOfSpannedArea))
@@ -1151,7 +1092,7 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
                         {
                             for (int column = columnIndex; column <= spanLastColumnIndex; ++column)
                             {
-                                INTERNAL_CellDefinition cellDefinition2 = newCellsStructure[row][column];
+                                var cellDefinition2 = newCellsStructure[row][column];
                                 if (isTopLeftCellOfSpannedArea2)
                                 {
                                     //------------------------------
@@ -1188,7 +1129,7 @@ if ($0.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
         /// <param name="min">The minimum allowed.</param>
         /// <param name="max">The maximum allowed.</param>
         /// <returns>The value constrained between min and max.</returns>
-        static int EnsureValueIsBetweenMinAndMax(int value, int min, int max)
+        private static int EnsureValueIsBetweenMinAndMax(int value, int min, int max)
         {
             if (value > max)
                 value = max;

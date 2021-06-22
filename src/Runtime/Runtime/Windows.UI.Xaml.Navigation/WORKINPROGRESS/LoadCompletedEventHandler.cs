@@ -19,8 +19,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#if WORKINPROGRESS
-
 #if MIGRATION
 namespace System.Windows.Navigation
 #else
@@ -41,4 +39,3 @@ namespace Windows.UI.Xaml.Navigation
     public delegate void LoadCompletedEventHandler(object sender, NavigationEventArgs e);
 }
 
-#endif

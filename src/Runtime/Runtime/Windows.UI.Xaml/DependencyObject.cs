@@ -440,14 +440,15 @@ namespace Windows.UI.Xaml
         /// <param name="dp">The identifier of the dependency property to set.</param>
         /// <param name="value">The new local value.</param>
         /// <param name="recursively">Specifies if the inherited value must be applied to the children of this DependencyObject.</param>
-        internal void SetInheritedValue(DependencyProperty dp, object value, bool recursively)
+        /// <returns>true if this property's value changed, false otherwise.</returns>
+        internal bool SetInheritedValue(DependencyProperty dp, object value, bool recursively)
         {
             //-----------------------
             // CALL "SET INHERITED VALUE" ON THE STORAGE:
             //-----------------------
             INTERNAL_PropertyStorage storage;
             INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(this, dp, true/*create*/, out storage);
-            INTERNAL_PropertyStore.SetInheritedValue(storage, value, recursively);
+            return INTERNAL_PropertyStore.SetInheritedValue(storage, value, recursively);
         }
 
         /// <summary>
@@ -513,11 +514,11 @@ namespace Windows.UI.Xaml
 
         #region Binding related elements
 
-        internal void ApplyBindingExpression(DependencyProperty dp, BindingExpression expression)
+        internal void ApplyExpression(DependencyProperty dp, Expression expression, bool isInStyle)
         {
             INTERNAL_PropertyStorage storage;
             INTERNAL_PropertyStore.TryGetStorage(this, dp, true/*create*/, out storage);
-            INTERNAL_PropertyStore.RefreshBindingExpressionCommon(storage, expression); // Set LocalStyle if Binding is from style.
+            INTERNAL_PropertyStore.RefreshExpressionCommon(storage, expression, isInStyle); // Set LocalStyle if Binding is from style.
         }
 
         internal void INTERNAL_UpdateBindingsSource()
@@ -528,11 +529,11 @@ namespace Windows.UI.Xaml
             {
                 if (storage.IsExpression)
                 {
-                    ((BindingExpression)storage.LocalValue).OnSourceAvailable();
+                    (storage.LocalValue as BindingExpression)?.OnSourceAvailable();
                 }
                 else if (storage.IsExpressionFromStyle)
                 {
-                    ((BindingExpression)storage.ModifiedValue.BaseValue).OnSourceAvailable();
+                    (storage.ModifiedValue.BaseValue as BindingExpression)?.OnSourceAvailable();
                 }
             }
         }

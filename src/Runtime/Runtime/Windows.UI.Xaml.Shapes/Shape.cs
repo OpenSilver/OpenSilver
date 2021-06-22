@@ -12,19 +12,13 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if MIGRATION
 using System.Windows.Media;
 using System.Windows.Controls;
@@ -96,21 +90,26 @@ namespace Windows.UI.Xaml.Shapes
 
         #endregion
 
-            #region Dependency Properties
+        #region Dependency Properties
 
-            /// <summary>
-            /// Gets or sets the Brush that specifies how to paint the interior of the shape.
-            /// </summary>
+        /// <summary>
+        /// Gets or sets the Brush that specifies how to paint the interior of the shape.
+        /// </summary>
         public Brush Fill
         {
             get { return (Brush)GetValue(FillProperty); }
             set { SetValue(FillProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Fill dependency property.
+        /// Identifies the <see cref="Shape.Fill"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FillProperty =
-            DependencyProperty.Register("Fill", typeof(Brush), typeof(Shape), new PropertyMetadata(null, Fill_Changed));
+            DependencyProperty.Register(
+                nameof(Fill), 
+                typeof(Brush), 
+                typeof(Shape), 
+                new PropertyMetadata(null, Fill_Changed));
 
         private static void Fill_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -130,20 +129,25 @@ namespace Windows.UI.Xaml.Shapes
             get { return (Stretch)GetValue(StretchProperty); }
             set { SetValue(StretchProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Stretch dependency property.
+        /// Identifies the <see cref="Shape.Stretch"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty StretchProperty =
-            DependencyProperty.Register("Stretch", typeof(Stretch), typeof(Shape), new PropertyMetadata(Stretch.None, Stretch_Changed));
+            DependencyProperty.Register(
+                nameof(Stretch), 
+                typeof(Stretch), 
+                typeof(Shape), 
+                new PropertyMetadata(Stretch.None, Stretch_Changed));
 
-        internal protected static void Stretch_Changed(DependencyObject i, DependencyPropertyChangedEventArgs e)
+        internal protected static void Stretch_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             //note: Stretch is actually more implemented in the Redraw method of the classes that inherit from shape (Line, Ellipse, Path, Rectangle)
 
-            var shape = (Shape)i;
+            var shape = (Shape)d;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(shape))
             {
-                dynamic shapeDom = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(shape);
+                var shapeDom = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(shape);
 
                 Stretch newValue = (Stretch)e.NewValue;
                 if (double.IsNaN(shape.Width))
@@ -199,11 +203,16 @@ namespace Windows.UI.Xaml.Shapes
             get { return (Brush)GetValue(StrokeProperty); }
             set { SetValue(StrokeProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Stroke dependency property.
+        /// Identifies the <see cref="Shape.Stroke"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty StrokeProperty =
-            DependencyProperty.Register("Stroke", typeof(Brush), typeof(Shape), new PropertyMetadata(null, Stroke_Changed));
+            DependencyProperty.Register(
+                nameof(Stroke), 
+                typeof(Brush), 
+                typeof(Shape), 
+                new PropertyMetadata(null, Stroke_Changed));
 
         private static void Stroke_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -218,11 +227,16 @@ namespace Windows.UI.Xaml.Shapes
             get { return Convert.ToDouble(GetValue(StrokeThicknessProperty)); }
             set { SetValue(StrokeThicknessProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the StrokeThickness dependency property.
+        /// Identifies the <see cref="Shape.StrokeThickness"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty StrokeThicknessProperty =
-            DependencyProperty.Register("StrokeThickness", typeof(double), typeof(Shape), new PropertyMetadata(1d, StrokeThickness_Changed));
+            DependencyProperty.Register(
+                nameof(StrokeThickness), 
+                typeof(double), 
+                typeof(Shape), 
+                new PropertyMetadata(1d, StrokeThickness_Changed));
 
         private static void StrokeThickness_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -240,10 +254,14 @@ namespace Windows.UI.Xaml.Shapes
         }
 
         /// <summary>
-        /// Identifies the StrokeStartLineCap dependency property.
+        /// Identifies the <see cref="Shape.StrokeStartLineCap"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty StrokeStartLineCapProperty =
-            DependencyProperty.Register("StrokeStartLineCap", typeof(PenLineCap), typeof(Shape), new PropertyMetadata(PenLineCap.Flat));
+            DependencyProperty.Register(
+                nameof(StrokeStartLineCap), 
+                typeof(PenLineCap), 
+                typeof(Shape), 
+                new PropertyMetadata(PenLineCap.Flat));
 
         /// <summary>
         /// Gets or sets a PenLineCap enumeration value that describes the Shape at the
@@ -256,11 +274,14 @@ namespace Windows.UI.Xaml.Shapes
         }
 
         /// <summary>
-        /// Identifies the StrokeEndLineCap dependency property.
+        /// Identifies the <see cref="Shape.StrokeEndLineCap"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty StrokeEndLineCapProperty =
-            DependencyProperty.Register("StrokeEndLineCap", typeof(PenLineCap), typeof(Shape), new PropertyMetadata(PenLineCap.Flat));
-
+            DependencyProperty.Register(
+                nameof(StrokeEndLineCap), 
+                typeof(PenLineCap), 
+                typeof(Shape), 
+                new PropertyMetadata(PenLineCap.Flat));
 
         /// <summary>
         /// Gets or sets a PenLineJoin enumeration value that specifies the type of join
@@ -273,10 +294,14 @@ namespace Windows.UI.Xaml.Shapes
         }
 
         /// <summary>
-        /// Identifies the StrokeLineJoin dependency property.
+        /// Identifies the <see cref="Shape.StrokeLineJoin"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty StrokeLineJoinProperty =
-            DependencyProperty.Register("StrokeLineJoin", typeof(PenLineJoin), typeof(Shape), new PropertyMetadata(PenLineJoin.Miter));
+            DependencyProperty.Register(
+                nameof(StrokeLineJoin), 
+                typeof(PenLineJoin), 
+                typeof(Shape), 
+                new PropertyMetadata(PenLineJoin.Miter));
 
         /// <summary>
         /// Gets or sets a limit on the ratio of the miter length to half the StrokeThickness
@@ -290,10 +315,14 @@ namespace Windows.UI.Xaml.Shapes
         }
 
         /// <summary>
-        /// Identifies the StrokeMiterLimit dependency property.
+        /// Identifies the <see cref="Shape.StrokeMiterLimit"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty StrokeMiterLimitProperty =
-            DependencyProperty.Register("StrokeMiterLimit", typeof(double), typeof(Shape), new PropertyMetadata(0d));
+            DependencyProperty.Register(
+                nameof(StrokeMiterLimit), 
+                typeof(double), 
+                typeof(Shape), 
+                new PropertyMetadata(0d));
 
         /// <summary>
         /// Gets or sets a collection of Double values that indicates the pattern of
@@ -313,11 +342,16 @@ namespace Windows.UI.Xaml.Shapes
             }
             set { SetValue(StrokeDashArrayProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the StrokeDashArray dependency property.
+        /// Identifies the <see cref="Shape.StrokeDashArray"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty StrokeDashArrayProperty =
-            DependencyProperty.Register("StrokeDashArray", typeof(DoubleCollection), typeof(Shape), new PropertyMetadata(null, StrokeDashArray_Changed));
+            DependencyProperty.Register(
+                nameof(StrokeDashArray), 
+                typeof(DoubleCollection), 
+                typeof(Shape), 
+                new PropertyMetadata(null, StrokeDashArray_Changed));
 
         private static void StrokeDashArray_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -337,11 +371,16 @@ namespace Windows.UI.Xaml.Shapes
             get { return (double)GetValue(StrokeDashOffsetProperty); }
             set { SetValue(StrokeDashOffsetProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the StrokeDashOffset dependency property.
+        /// Identifies the <see cref="Shape.StrokeDashOffset"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty StrokeDashOffsetProperty =
-            DependencyProperty.Register("StrokeDashOffset", typeof(double), typeof(Shape), new PropertyMetadata(0d, StrokeDashOffset_Changed));
+            DependencyProperty.Register(
+                nameof(StrokeDashOffset), 
+                typeof(double), 
+                typeof(Shape), 
+                new PropertyMetadata(0d, StrokeDashOffset_Changed));
 
         private static void StrokeDashOffset_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -350,8 +389,8 @@ namespace Windows.UI.Xaml.Shapes
             {
                 if (shape._canvasDomElement != null)
                 {
-                    dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(shape._canvasDomElement);
-                    context.lineDashOffset = shape.StrokeDashOffset.ToString();
+                    var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(shape._canvasDomElement);
+                    context.lineDashOffset = shape.StrokeDashOffset.ToInvariantString();
                 }
             }
         }
@@ -386,8 +425,8 @@ namespace Windows.UI.Xaml.Shapes
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
-                context.lineWidth = StrokeThickness + "";
+                var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
+                context.lineWidth = StrokeThickness.ToInvariantString();
                 ScheduleRedraw();
             }
         }
@@ -463,6 +502,30 @@ namespace Windows.UI.Xaml.Shapes
 
         private void Shape_SizeChanged(object sender, SizeChangedEventArgs e) //Note: this is called when adding the shape into the visual tree.
         {
+            ScheduleRedraw();
+        }
+
+        protected override void OnAfterApplyHorizontalAlignmentAndWidth()
+        {
+            // Note: The SizeChanged event is not sufficient because the _canvasDomElement has
+            // its size set when drawing, and setting this.Width to a smaller value will set it
+            // on INTERNAL_OuterDomElement but not on the _canvasDomElement, which will prevent
+            // the actual size to be reduced, and thus preventing the SizeChanged event from
+            // being fired.
+            // Because of that, we Schedule a redraw whenever Width or Height are set.
+            base.OnAfterApplyHorizontalAlignmentAndWidth();
+            ScheduleRedraw();
+        }
+
+        protected override void OnAfterApplyVerticalAlignmentAndWidth()
+        {
+            // Note: The SizeChanged event is not sufficient because the _canvasDomElement has
+            // its size set when drawing, and setting this.Width to a smaller value will set it
+            // on INTERNAL_OuterDomElement but not on the _canvasDomElement, which will prevent
+            // the actual size to be reduced, and thus preventing the SizeChanged event from
+            // being fired.
+            // Because of that, we Schedule a redraw whenever Width or Height are set.
+            base.OnAfterApplyVerticalAlignmentAndWidth();
             ScheduleRedraw();
         }
 
@@ -562,8 +625,7 @@ namespace Windows.UI.Xaml.Shapes
 
 
             // context.save() for the fill
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.save()", context);
+            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.save()", context);
 
             // FillStyle:
             double opacity = shape.Fill == null ? 1 : shape.Fill.Opacity;
@@ -600,20 +662,19 @@ $0.save()", context);
             CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.restore(); $0.save()", context); 
 
             //stroke
-            object strokeValue = null;
             opacity = shape.Stroke == null ? 1 : shape.Stroke.Opacity;
-            strokeValue = GetHtmlBrush(shape, 
-                                       shape.Stroke, 
-                                       opacity, 
-                                       minX, 
-                                       minY, 
-                                       maxX, 
-                                       maxY, 
-                                       horizontalMultiplicator, 
-                                       verticalMultiplicator, 
-                                       xOffsetToApplyBeforeMultiplication, 
-                                       yOffsetToApplyBeforeMultiplication, 
-                                       shapeActualSize);
+            object strokeValue = GetHtmlBrush(shape, 
+                                              shape.Stroke, 
+                                              opacity, 
+                                              minX, 
+                                              minY, 
+                                              maxX, 
+                                              maxY, 
+                                              horizontalMultiplicator, 
+                                              verticalMultiplicator, 
+                                              xOffsetToApplyBeforeMultiplication, 
+                                              yOffsetToApplyBeforeMultiplication, 
+                                              shapeActualSize);
 
             double strokeThickness = shape.StrokeThickness;
             if (shape.Stroke == null)
@@ -658,9 +719,8 @@ $0.save()", context);
             }
 
             //todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.lineWidth = $1", context, shape.StrokeThickness + "");
+            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.lineWidth = $1", context, shape.StrokeThickness);
         }
-
 
         internal static object GetHtmlBrush(Shape shape, 
                                             Brush brush, 
@@ -801,7 +861,7 @@ $0.save()", context);
 $0.setAttribute('width', $1);
 $0.setAttribute('height', $2);
 $0.style.width = $1;
-$0.style.height = $2", canvas, distance + "px", tempCanvasHeight + "px");
+$0.style.height = $2", canvas, distance.ToInvariantString() + "px", tempCanvasHeight.ToInvariantString() + "px");
 
                     var ctx = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", canvas);
 
@@ -915,45 +975,44 @@ context.translate($6, 0);
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
                 var styleOfcanvasElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_canvasDomElement);
-                if (newFixingMargin == null) //if it is null, we want 0 everywhere
-                {
-                    newFixingMargin = new Point();
-                }
                 try
                 {
-                    styleOfcanvasElement.transform = "translate(" + newFixingMargin.X.ToString() + "px, " + newFixingMargin.Y.ToString() + "px)";
+                    styleOfcanvasElement.transform = string.Format(CultureInfo.InvariantCulture,
+                        "translate({0}px, {1}px)",
+                        newFixingMargin.X.ToInvariantString(), newFixingMargin.Y.ToInvariantString());
                 }
                 catch
                 {
                 }
                 try
                 {
-                    styleOfcanvasElement.msTransform = "translate(" + newFixingMargin.X.ToString() + "px, " + newFixingMargin.Y.ToString() + "px)";
+                    styleOfcanvasElement.msTransform = string.Format(CultureInfo.InvariantCulture,
+                        "translate({0}px, {1}px)",
+                        newFixingMargin.X.ToInvariantString(), newFixingMargin.Y.ToInvariantString());
                 }
                 catch
                 {
                 }
                 try // Prevents crash in the simulator that uses IE.
                 {
-                    styleOfcanvasElement.WebkitTransform = "translate(" + newFixingMargin.X.ToString() + "px, " + newFixingMargin.Y.ToString() + "px)";
+                    styleOfcanvasElement.WebkitTransform = string.Format(CultureInfo.InvariantCulture,
+                        "translate({0}px, {1}px)",
+                        newFixingMargin.X.ToInvariantString(), newFixingMargin.Y.ToInvariantString());
                 }
                 catch
                 {
                 }
-                //styleOfcanvasElement.marginTop = newFixingMargin.Y.ToString() + "px";
             }
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("return")]
-#else
-        [External]
+#if BRIDGE
+        [Bridge.External]
 #endif
         private void ExecuteJS_SimulatorOnly(string javascript, object canvasDomElement)
         {
             string str = string.Format(@"
 {0}
-var cvas = document.getElementById(""{1}"");
+var cvas = document.getElementByIdSafe(""{1}"");
 if(cvas != undefined && cvas != null) {{
 var context = cvas.getContext('2d');
 context.save();
@@ -1096,14 +1155,15 @@ context.restore();
         }
 
         /// <summary>
-        /// Identifies the StrokeDashCap dependency property.
+        /// Identifies the <see cref="Shape.StrokeDashCap"/> dependency property.
         /// </summary>
-        /// <returns>
-        /// The identifier for the StrokeDashCap dependency property.
-        /// </returns>
 		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty StrokeDashCapProperty =
-            DependencyProperty.Register(nameof(StrokeDashCap), typeof(PenLineCap), typeof(Shape), new PropertyMetadata(PenLineCap.Flat));
+            DependencyProperty.Register(
+                nameof(StrokeDashCap), 
+                typeof(PenLineCap), 
+                typeof(Shape), 
+                new PropertyMetadata(PenLineCap.Flat));
 
 #endif
 

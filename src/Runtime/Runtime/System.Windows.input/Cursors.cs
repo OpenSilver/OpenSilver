@@ -12,346 +12,444 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace System.Windows.Input
 {
     /// <summary>
-    /// Defines a set of default cursors.
+    /// Defines a set of default mouse pointer images.
     /// </summary>
     public static class Cursors
     {
-        internal static Dictionary<INTERNAL_CursorsEnum, string> INTERNAL_cursorEnumToCursorString;
-
-        internal static void FillCursorTypeToStringDictionary()
-        {
-            if (INTERNAL_cursorEnumToCursorString == null)
-            {
-                INTERNAL_cursorEnumToCursorString = new Dictionary<INTERNAL_CursorsEnum, string>();
-            }
-            INTERNAL_cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.AppStarting, "progress");
-            INTERNAL_cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.Arrow, "default");
-            //cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.ArrowCD, "default");             //<-- no equivalent?
-            INTERNAL_cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.Cross, "crosshair");
-            INTERNAL_cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.Hand, "pointer");
-            INTERNAL_cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.Help, "help");
-            INTERNAL_cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.IBeam, "text");
-            INTERNAL_cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.No, "not-allowed");
-            INTERNAL_cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.None, "none");
-            //cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.Pen, "default");                 //<-- no equivalent?
-            //cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.ScrollAll, "all-scroll");       //not exactly it
-            //cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.ScrollE, "default");         //
-            //cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.ScrollN, "default");         //
-            //cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.ScrollNE, "default");        //
-            //cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.ScrollNS, "default");        //
-            //cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.ScrollNW, "default");        //
-            //cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.ScrollS, "default");        //
-            //cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.ScrollSE, "default");        //
-            //cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.ScrollSW, "default");        //
-            //cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.ScrollW, "default");        //
-            //cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.ScrollWE, "default");        //
-            INTERNAL_cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.SizeAll, "move");
-            INTERNAL_cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.SizeNESW, "nesw-resize");
-            INTERNAL_cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.SizeNS, "ns-resize");
-            INTERNAL_cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.SizeNWSE, "nwse-resize");
-            INTERNAL_cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.SizeWE, "ew-resize");
-            //cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.UpArrow, "default");         //
-            INTERNAL_cursorEnumToCursorString.Add(INTERNAL_CursorsEnum.Wait, "wait");
-        }
-
-        internal enum INTERNAL_CursorsEnum
-        {
-            AppStarting,
-            Arrow,
-            //ArrowCD,
-            Cross,
-            Hand,
-            Help,
-            IBeam,
-            No,
-            None,
-            //Pen,
-            //ScrollAll,
-            //ScrollE,
-            //ScrollN,
-            //ScrollNE,
-            //ScrollNS,
-            //ScrollNW,
-            //ScrollS,
-            //ScrollSE,
-            //ScrollSW,
-            //ScrollW,
-            //ScrollWE,
-            SizeAll,
-            SizeNESW,
-            SizeNS,
-            SizeNWSE,
-            SizeWE,
-            //UpArrow,
-            Wait
-        }
-
         /// <summary>
-        /// Gets the System.Windows.Input.Cursor that appears when an application is
-        /// starting.
-        /// </summary>
-        public static Cursor AppStarting
-        {
-            get
-            {
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = INTERNAL_cursorEnumToCursorString[INTERNAL_CursorsEnum.AppStarting];
-                return cursor;
-            }
-        }
-
-        /// <summary>
-        /// Gets the Arrow System.Windows.Input.Cursor.
-        /// </summary>
-        public static Cursor Arrow
-        {
-            get
-            {
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = INTERNAL_cursorEnumToCursorString[INTERNAL_CursorsEnum.Arrow];
-                return cursor;
-            }
-        }
-
-        ///// <summary>
-        ///// Gets the arrow with a compact disk System.Windows.Input.Cursor.
-        ///// </summary>
-        //public static Cursor ArrowCD { get; }
-
-        /// <summary>
-        /// Gets the crosshair System.Windows.Input.Cursor.
-        /// </summary>
-        public static Cursor Cross
-        {
-            get
-            {
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = INTERNAL_cursorEnumToCursorString[INTERNAL_CursorsEnum.Cross];
-                return cursor;
-            }
-        }
-
-        /// <summary>
-        /// Gets a hand System.Windows.Input.Cursor.
-        /// </summary>
-        public static Cursor Hand
-        {
-            get
-            {
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = INTERNAL_cursorEnumToCursorString[INTERNAL_CursorsEnum.Hand];
-                return cursor;
-            }
-        }
-
-        /// <summary>
-        ///  Gets a help System.Windows.Input.Cursor which is a combination of an arrow
-        ///  and a question mark.
-        ///  </summary>
-        public static Cursor Help
-        {
-            get
-            {
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = INTERNAL_cursorEnumToCursorString[INTERNAL_CursorsEnum.Help];
-                return cursor;
-            }
-        }
-
-        /// <summary>
-        /// Gets an I-beam System.Windows.Input.Cursor, which is used to show where the
-        /// text cursor appears when the mouse is clicked.
-        /// </summary>
-        public static Cursor IBeam
-        {
-            get
-            {
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = INTERNAL_cursorEnumToCursorString[INTERNAL_CursorsEnum.IBeam];
-                return cursor;
-            }
-        }
-        
-        /// <summary>
-        /// Gets a System.Windows.Input.Cursor with which indicates that a particular
-        /// region is invalid for a given operation.
-        /// </summary>
-        public static Cursor No
-        {
-            get
-            {
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = INTERNAL_cursorEnumToCursorString[INTERNAL_CursorsEnum.No];
-                return cursor;
-            }
-        }
-        
-        /// <summary>
-        /// Gets a special cursor that is invisible.
+        /// Represents a special <see cref="Cursor"/> that is invisible.
         /// </summary>
         public static Cursor None
         {
-            get
-            {
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = INTERNAL_cursorEnumToCursorString[INTERNAL_CursorsEnum.None];
-                return cursor;
-            }
+            get => EnsureCursor(CursorType.None);
         }
-        
-        ///// <summary>
-        ///// Gets a pen System.Windows.Input.Cursor.
-        ///// </summary>
-        //public static Cursor Pen { get; }
-        
-        ///// <summary>
-        ///// Gets the scroll all System.Windows.Input.Cursor.
-        ///// </summary>
-        //public static Cursor ScrollAll { get; }
-        
-        ///// <summary>
-        ///// Gets the scroll east System.Windows.Input.Cursor.
-        ///// </summary>
-        //public static Cursor ScrollE { get; }
-        
-        ///// <summary>
-        ///// Gets the scroll north System.Windows.Input.Cursor.
-        ///// </summary>
-        //public static Cursor ScrollN { get; }
-        
-        ///// <summary>
-        ///// Gets the scroll northeast cursor.
-        ///// </summary>
-        //public static Cursor ScrollNE { get; }
-        
-        ///// <summary>
-        ///// Gets the scroll north/south cursor.
-        ///// </summary>
-        //public static Cursor ScrollNS { get; }
-        
-        ///// <summary>
-        ///// Gets a scroll northwest cursor.
-        ///// </summary>
-        //public static Cursor ScrollNW { get; }
-        
-        ///// <summary>
-        ///// Gets the scroll south System.Windows.Input.Cursor.
-        ///// </summary>
-        //public static Cursor ScrollS { get; }
-        
-        ///// <summary>
-        ///// Gets a south/east scrolling System.Windows.Input.Cursor.
-        ///// </summary>
-        //public static Cursor ScrollSE { get; }
-        
-        ///// <summary>
-        ///// Gets the scroll southwest System.Windows.Input.Cursor.
-        ///// </summary>
-        //public static Cursor ScrollSW { get; }
-        
-        ///// <summary>
-        ///// Gets the scroll west System.Windows.Input.Cursor.
-        ///// </summary>
-        //public static Cursor ScrollW { get; }
-        
-        ///// <summary>
-        ///// Gets a west/east scrolling System.Windows.Input.Cursor.
-        ///// </summary>
-        //public static Cursor ScrollWE { get; }
-        
+
         /// <summary>
-        /// Gets a four-headed sizing System.Windows.Input.Cursor, which consists of
+        /// Gets a scroll southwest <see cref="Cursor"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor ScrollSW
+        {
+            get => EnsureCursor(CursorType.ScrollSW);
+        }
+
+        /// <summary>
+        /// Gets a scroll northeast <see cref="Cursor"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor ScrollNE
+        {
+            get => EnsureCursor(CursorType.ScrollNE);
+        }
+
+        /// <summary>
+        /// Gets a scroll northwest <see cref="Cursor"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor ScrollNW
+        {
+            get => EnsureCursor(CursorType.ScrollNW);
+        }
+
+        /// <summary>
+        /// Gets the scroll east <see cref="Cursor"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor ScrollE
+        {
+            get => EnsureCursor(CursorType.ScrollE);
+        }
+
+        /// <summary>
+        /// Gets the scroll west <see cref="Cursor"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor ScrollW
+        {
+            get => EnsureCursor(CursorType.ScrollW);
+        }
+
+        /// <summary>
+        /// Gets the scroll south <see cref="Cursor"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor ScrollS
+        {
+            get => EnsureCursor(CursorType.ScrollS);
+        }
+
+        /// <summary>
+        /// Gets the scroll north <see cref="Cursor"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor ScrollN
+        {
+            get => EnsureCursor(CursorType.ScrollN);
+        }
+
+        /// <summary>
+        /// Gets the scroll all <see cref="Cursor"/>.
+        /// </summary>
+        public static Cursor ScrollAll
+        {
+            get => EnsureCursor(CursorType.ScrollAll);
+        }
+
+        /// <summary>
+        /// Gets a west/east scrolling <see cref="Cursor"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor ScrollWE
+        {
+            get => EnsureCursor(CursorType.ScrollWE);
+        }
+
+        /// <summary>
+        /// Gets the scroll north/south <see cref="Cursor"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor ScrollNS
+        {
+            get => EnsureCursor(CursorType.ScrollNS);
+        }
+
+        /// <summary>
+        /// Gets a pen <see cref="Cursor"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor Pen
+        {
+            get => EnsureCursor(CursorType.Pen);
+        }
+
+        /// <summary>
+        /// Represents a Hand <see cref="Cursor"/>.
+        /// </summary>
+        public static Cursor Hand
+        {
+            get => EnsureCursor(CursorType.Hand);
+        }
+
+        /// <summary>
+        /// Represents a Wait <see cref="Cursor"/>.
+        /// </summary>
+        public static Cursor Wait
+        {
+            get => EnsureCursor(CursorType.Wait);
+        }
+
+        /// <summary>
+        /// Gets an up arrow <see cref="Cursor"/>, which is typically used to identify
+        /// an insertion point.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor UpArrow
+        {
+            get => EnsureCursor(CursorType.UpArrow);
+        }
+
+        /// <summary>
+        /// Represents a SizeWE <see cref="Cursor"/>.
+        /// </summary>
+        public static Cursor SizeWE
+        {
+            get => EnsureCursor(CursorType.SizeWE);
+        }
+
+        /// <summary>
+        /// Represents a SizeNWSE <see cref="Cursor"/>.
+        /// </summary>
+        public static Cursor SizeNWSE
+        {
+            get => EnsureCursor(CursorType.SizeNWSE);
+        }
+
+        /// <summary>
+        /// Represents a SizeNS <see cref="Cursor"/>.
+        /// </summary>
+        public static Cursor SizeNS
+        {
+            get => EnsureCursor(CursorType.SizeNS);
+        }
+
+        /// <summary>
+        /// Represents a SizeNESW <see cref="Cursor"/>.
+        /// </summary>
+        public static Cursor SizeNESW
+        {
+            get => EnsureCursor(CursorType.SizeNESW);
+        }
+
+        /// <summary>
+        /// Gets a four-headed sizing <see cref="Cursor"/>, which consists of
         /// four joined arrows that point north, south, east, and west.
         /// </summary>
         public static Cursor SizeAll
         {
-            get
-            {
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = INTERNAL_cursorEnumToCursorString[INTERNAL_CursorsEnum.SizeAll];
-                return cursor;
-            }
+            get => EnsureCursor(CursorType.SizeAll);
         }
-        
+
         /// <summary>
-        /// Gets a two-headed northeast/southwest sizing System.Windows.Input.Cursor.
+        /// Represents an IBeam <see cref="Cursor"/>, which is typically used to show
+        /// where the text cursor appears when the mouse is clicked.
         /// </summary>
-        public static Cursor SizeNESW
+        public static Cursor IBeam
         {
-            get
-            {
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = INTERNAL_cursorEnumToCursorString[INTERNAL_CursorsEnum.SizeNESW];
-                return cursor;
-            }
+            get => EnsureCursor(CursorType.IBeam);
         }
-        
+
         /// <summary>
-        /// Gets a two-headed north/south sizing System.Windows.Input.Cursor.
-        /// </summary>
-        public static Cursor SizeNS
+        ///  Gets a help <see cref="Cursor"/> which is a combination of an arrow
+        ///  and a question mark.
+        ///  </summary>
+        public static Cursor Help
         {
-            get
-            {
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = INTERNAL_cursorEnumToCursorString[INTERNAL_CursorsEnum.SizeNS];
-                return cursor;
-            }
+            get => EnsureCursor(CursorType.Help);
         }
-        
+
         /// <summary>
-        /// Gets a two-headed northwest/southeast sizing System.Windows.Input.Cursor.
+        /// Gets the crosshair <see cref="Cursor"/>.
         /// </summary>
-        public static Cursor SizeNWSE
+        public static Cursor Cross
         {
-            get
-            {
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = INTERNAL_cursorEnumToCursorString[INTERNAL_CursorsEnum.SizeNWSE];
-                return cursor;
-            }
+            get => EnsureCursor(CursorType.Cross);
         }
-        
+
         /// <summary>
-        /// Gets a two-headed west/east sizing System.Windows.Input.Cursor.
+        /// Gets the <see cref="Cursor"/> that appears when an application is
+        /// starting.
         /// </summary>
-        public static Cursor SizeWE
+        public static Cursor AppStarting
         {
-            get
-            {
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = INTERNAL_cursorEnumToCursorString[INTERNAL_CursorsEnum.SizeWE];
-                return cursor;
-            }
+            get => EnsureCursor(CursorType.AppStarting);
         }
-        
-        ///// <summary>
-        ///// Gets an up arrow System.Windows.Input.Cursor, which is typically used to
-        ///// identify an insertion point.
-        ///// </summary>
-        //public static Cursor UpArrow { get; }
-        
+
         /// <summary>
-        /// Specifies a wait (or hourglass) System.Windows.Input.Cursor.
+        /// Represents an Arrow <see cref="Cursor"/>.
         /// </summary>
-        public static Cursor Wait
+        public static Cursor Arrow
         {
-            get
-            {
-                Cursor cursor = new Cursor();
-                cursor._cursorHtmlString = INTERNAL_cursorEnumToCursorString[INTERNAL_CursorsEnum.Wait];
-                return cursor;
-            }
+            get => EnsureCursor(CursorType.Arrow);
         }
+
+        /// <summary>
+        /// Gets a <see cref="Cursor"/> with which indicates that a particular
+        /// region is invalid for a given operation.
+        /// </summary>
+        public static Cursor No
+        {
+            get => EnsureCursor(CursorType.No);
+        }
+
+        /// <summary>
+        /// Gets a scroll southeast <see cref="Cursor"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor ScrollSE
+        {
+            get => EnsureCursor(CursorType.ScrollSE);
+        }
+
+        /// <summary>
+        /// Gets the arrow with a compact disk <see cref="Cursor"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor ArrowCD
+        {
+            get => EnsureCursor(CursorType.ArrowCD);
+        }
+
+        /// <summary>
+        /// Represents an Eraser <see cref="Cursor"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor Eraser
+        {
+            get => EnsureCursor(CursorType.Eraser);
+        }
+
+        /// <summary>
+        /// Represents a Stylus <see cref="Cursor"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static Cursor Stylus
+        {
+            get => EnsureCursor(CursorType.Stylus);
+        }
+
+        internal static Cursor EnsureCursor(CursorType cursorType)
+        {
+            if (_stockCursors[(int)cursorType] == null)
+            {
+                _stockCursors[(int)cursorType] = new Cursor(cursorType);
+            }
+            return _stockCursors[(int)cursorType];
+        }
+
+        internal const int _cursorTypeCount = ((int)CursorType.Eraser) + 1;
+
+        private static Cursor[] _stockCursors = new Cursor[_cursorTypeCount];  //CursorType.Eraser = 29
+    }
+
+    /// <summary>
+    ///     An enumeration of the supported cursor types.
+    /// </summary>
+    internal enum CursorType : int
+    {
+        /// <summary>
+        ///     a value indicating that no cursor should be displayed at all.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        ///     Standard No Cursor.
+        /// </summary>
+        No = 1,
+
+        /// <summary>
+        ///     Standard arrow cursor.
+        /// </summary>
+        Arrow = 2,
+
+        /// <summary>
+        ///     Standard arrow with small hourglass cursor.
+        /// </summary>
+        AppStarting = 3,
+
+        /// <summary>
+        ///     Crosshair cursor.
+        /// </summary>        
+        Cross = 4,
+
+        /// <summary>
+        ///     Help cursor.
+        /// </summary>        	
+        Help = 5,
+
+        /// <summary>
+        ///     Text I-Beam cursor.
+        /// </summary>
+        IBeam = 6,
+
+        /// <summary>
+        ///     Four-way pointing cursor.
+        /// </summary>
+        SizeAll = 7,
+
+        /// <summary>
+        ///     Double arrow pointing NE and SW.
+        /// </summary>
+        SizeNESW = 8,
+
+        /// <summary>
+        ///     Double arrow pointing N and S.
+        /// </summary>
+        SizeNS = 9,
+
+        /// <summary>
+        ///     Double arrow pointing NW and SE.
+        /// </summary>
+        SizeNWSE = 10,
+
+        /// <summary>
+        ///     Double arrow pointing W and E.
+        /// </summary>
+        SizeWE = 11,
+
+        /// <summary>
+        ///     Vertical arrow cursor.
+        /// </summary>
+        UpArrow = 12,
+
+        /// <summary>
+        ///     Hourglass cursor.
+        /// </summary>
+        Wait = 13,
+
+        /// <summary>
+        ///     Hand cursor.
+        /// </summary>
+        Hand = 14,
+
+        /// <summary>
+        /// PenCursor
+        /// </summary>
+        Pen = 15,
+
+        /// <summary>
+        /// ScrollNSCursor
+        /// </summary>
+        ScrollNS = 16,
+
+        /// <summary>
+        /// ScrollWECursor
+        /// </summary>
+        ScrollWE = 17,
+
+        /// <summary>
+        /// ScrollAllCursor
+        /// </summary>
+        ScrollAll = 18,
+
+        /// <summary>
+        /// ScrollNCursor
+        /// </summary>
+        ScrollN = 19,
+
+        /// <summary>
+        /// ScrollSCursor
+        /// </summary>
+        ScrollS = 20,
+
+        /// <summary>
+        /// ScrollWCursor
+        /// </summary>
+        ScrollW = 21,
+
+        /// <summary>
+        /// ScrollECursor
+        /// </summary>
+        ScrollE = 22,
+
+        /// <summary>
+        /// ScrollNWCursor
+        /// </summary>
+        ScrollNW = 23,
+
+        /// <summary>
+        /// ScrollNECursor
+        /// </summary>
+        ScrollNE = 24,
+
+        /// <summary>
+        /// ScrollSWCursor
+        /// </summary>
+        ScrollSW = 25,
+
+        /// <summary>
+        /// ScrollSECursor
+        /// </summary>
+        ScrollSE = 26,
+
+        /// <summary>
+        /// ArrowCDCursor
+        /// </summary>
+        ArrowCD = 27,
+
+        /// <summary>
+        /// StylusCursor
+        /// </summary>
+        Stylus = 28,
+
+        /// <summary>
+        /// EraserCursor
+        /// </summary>
+        Eraser = 29,
+
+        // Update the count in Cursors class and the HtmlCursors array
+        // in the Cursor class if there is a new addition here.
     }
 }

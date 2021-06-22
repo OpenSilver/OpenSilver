@@ -290,7 +290,11 @@ namespace DotNetForHtml5.Compiler
                                 if (GettingInformationAboutXamlTypes.IsPropertyOrFieldACollection(element, reflectionOnSeparateAppDomain, isAttachedProperty)
                                     && (element.Elements().Count() != 1
                                     || (!GettingInformationAboutXamlTypes.IsTypeAssignableFrom(element.Elements().First().Name, element.Name, reflectionOnSeparateAppDomain, isAttached: isAttachedProperty)) // To handle the case where the user explicitly declares the collection element. Example: <Application.Resources><ResourceDictionary><Child x:Key="test"/></ResourceDictionary></Application.Resources> (rather than <Application.Resources><Child x:Key="test"/></Application.Resources>), in which case we need to do "=" instead pf "Add()"
-                                    && element.Elements().First().Name != DefaultXamlNamespace + "Binding" && element.Elements().First().Name.LocalName != "StaticResourceExtension" && element.Elements().First().Name.LocalName != "StaticResource"))
+                                    && element.Elements().First().Name != DefaultXamlNamespace + "Binding" 
+                                    && element.Elements().First().Name.LocalName != "StaticResourceExtension" 
+                                    && element.Elements().First().Name.LocalName != "StaticResource"
+                                    && element.Elements().First().Name.LocalName != "TemplateBinding"
+                                    && element.Elements().First().Name.LocalName != "TemplateBindingExtension"))
                                 {
                                     //------------------------
                                     // PROPERTY TYPE IS A COLLECTION
@@ -306,22 +310,16 @@ namespace DotNetForHtml5.Compiler
                                     string codeToAccessTheEnumerable;
                                     if (isAttachedProperty)
                                     {
-                                        string elementTypeInCSharp = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny);
-                                        if (elementTypeInCSharp == namespaceSystemWindows + ".VisualStateManager" && propertyName == "VisualStateGroups")
-                                        {
-                                            if (DoesClassInheritFromFrameworkTemplate(elementThatIsRootOfTheCurrentNamescope.Name.LocalName))
-                                            {
-                                                codeToAccessTheEnumerable = string.Format("templateOwner_{0}.INTERNAL_GetVisualStateGroups()", GetUniqueName(elementThatIsRootOfTheCurrentNamescope)); //codeToAccessTheEnumerable = "global::Windows.UI.Xaml.VisualStateManager.GetVisualStateGroups(templateOwner)";
-                                            }
-                                            else
-                                            {
-                                                codeToAccessTheEnumerable = "((" + namespaceSystemWindowsControls + ".Control)this).INTERNAL_GetVisualStateGroups()"; //Note: we cast so that the user received a more meaningful error message if the root type of the XAML is not a Control. //codeToAccessTheEnumerable = "global::Windows.UI.Xaml.VisualStateManager.GetVisualStateGroups(this)";
-                                            }
-                                        }
-                                        else
-                                        {
-                                            codeToAccessTheEnumerable = string.Format("{0}.Get{1}({2})", elementTypeInCSharp, propertyName, parentElementUniqueNameOrThisKeyword);
-                                        }
+                                        string elementTypeInCSharp = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                                            elementName.Namespace.NamespaceName, 
+                                            elementName.LocalName, 
+                                            assemblyNameIfAny);
+
+                                        codeToAccessTheEnumerable = string.Format(
+                                            "{0}.Get{1}({2})", 
+                                            elementTypeInCSharp, 
+                                            propertyName, 
+                                            parentElementUniqueNameOrThisKeyword);
                                     }
                                     else
                                     {
@@ -452,12 +450,13 @@ namespace DotNetForHtml5.Compiler
                                                 // Get a reference to the list to which we add the generated markup extensions code
                                                 List<string> markupExtensionsAdditionalCode = GetListThatContainsAdditionalCodeFromDictionary(
                                                     elementThatIsRootOfTheCurrentNamescope, namescopeRootToMarkupExtensionsAdditionalCode);
-
+                                                
                                                 bool isDependencyProperty =
                                                     reflectionOnSeparateAppDomain.GetField(
                                                         propertyName + "Property", 
                                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
-                                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName) != null;
+                                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
+                                                        assemblyNameWithoutExtension) != null;
 
                                                 string propertyDeclaringTypeName;
                                                 string propertyTypeNamespace;
@@ -511,6 +510,22 @@ namespace DotNetForHtml5.Compiler
                                                 {
                                                     markupExtensionsAdditionalCode.Add(string.Format("{3}.BindingOperations.SetBinding({0}, {1}, {2});", parentElementUniqueNameOrThisKeyword, propertyDeclaringTypeName + "." + propertyName + "Property", GetUniqueName(child), namespaceSystemWindowsData)); //we add the container itself since we couldn't add it inside the while
                                                 }
+                                            }
+                                            else if (child.Name.LocalName == "TemplateBindingExtension")
+                                            {
+                                                var dependencyPropertyName =
+                                                    "global::" + reflectionOnSeparateAppDomain.GetField(
+                                                        propertyName + "Property",
+                                                        isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
+                                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
+                                                        assemblyNameWithoutExtension);
+
+                                                stringBuilder.AppendLine(string.Format(
+                                                    "{0}.SetValue({1}, {2}.ProvideValue(new global::System.ServiceProvider({3}.TemplateOwner, null)));",
+                                                    parentElementUniqueNameOrThisKeyword,
+                                                    dependencyPropertyName,
+                                                    GetUniqueName(child),
+                                                    TemplateOwnerValuePlaceHolder));
                                             }
                                             else if (child.Name == xNamespace + "NullExtension")
                                             {
@@ -611,7 +626,8 @@ namespace DotNetForHtml5.Compiler
                                                     bool isDependencyProperty = reflectionOnSeparateAppDomain.GetField(
                                                         propertyName + "Property",
                                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
-                                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName) != null;
+                                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
+                                                        assemblyNameWithoutExtension) != null;
 
                                                     if (isDependencyProperty)
                                                     {

@@ -14,6 +14,7 @@
 
 
 using CSHTML5.Internal;
+using OpenSilver.Internal.Controls;
 using System;
 using System.Collections;
 using System.Diagnostics;
@@ -35,14 +36,13 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public partial class DockPanel : Panel
     {
-        Grid _grid;
-
+        GridNotLogical _grid;
 
         ///// <summary>
         ///// Initializes a new instance of the DockPanel class.
         ///// </summary>
         //public DockPanel();
-        
+
         /// <summary>
         /// Gets or sets a value that indicates whether the last child element within
         /// a DockPanel stretches to fill the remaining available
@@ -88,13 +88,11 @@ namespace Windows.UI.Xaml.Controls
         public static readonly DependencyProperty DockProperty =
             DependencyProperty.RegisterAttached("Dock", typeof(Dock), typeof(DockPanel), new PropertyMetadata(Dock.Left)); //this is the likely default value since Dock.Left is 0.
 
-
-
         internal protected override void INTERNAL_OnAttachedToVisualTree()
         {
             if (_grid == null)
             {
-                _grid = new Grid();
+                _grid = new GridNotLogical();
                 MakeUIStructure();
             }
 
@@ -104,7 +102,7 @@ namespace Windows.UI.Xaml.Controls
         private void MakeUIStructure()
         {
             //we go through the children and determine the rows, columns and positions in the grid:
-            if (Children != null && Children.Count > 0)
+            if (this.HasChildren)
             {
                 int amountOfRows = 1; // = 1 for the remaining space
                 int amountOfColumns = 1; // = 1 for the remaining space
@@ -255,26 +253,18 @@ namespace Windows.UI.Xaml.Controls
             this._grid.Children[index] = newChild;
         }
 
-        internal override void OnChildrenMoved(UIElement oldChild, int newIndex, int oldIndex)
-        {
-            if (newIndex == oldIndex)
-            {
-                return;
-            }
-
-            this.MakeUIStructure();
-            this._grid.Children.Move(oldIndex, newIndex);
-        }
-
         internal override void OnChildrenReset()
         {
             this._grid.Children.Clear();
 
             this.MakeUIStructure();
 
-            foreach (UIElement child in this.Children)
+            if (this.HasChildren)
             {
-                this._grid.Children.Add(child);
+                foreach (UIElement child in this.Children)
+                {
+                    this._grid.Children.Add(child);
+                }
             }
         }
 

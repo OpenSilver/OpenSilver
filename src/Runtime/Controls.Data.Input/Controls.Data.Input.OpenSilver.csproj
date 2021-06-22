@@ -1,0 +1,87 @@
+﻿<Project>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyName>OpenSilver.Controls.Data.Input</AssemblyName>
+    <RootNamespace>System.Windows.Controls</RootNamespace>
+    <Configurations>SL;SL.WorkInProgress;UWP;UWP.WorkInProgress</Configurations>
+    <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
+    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
+    <OpenSilverVersion>1.0.0-alpha-008</OpenSilverVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG;OPENSILVER;MIGRATION</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG;OPENSILVER;MIGRATION;WORKINPROGRESS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG;OPENSILVER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG;OPENSILVER;WORKINPROGRESS</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Automation\DescriptionViewerAutomationPeer.cs" />
+    <Compile Include="Automation\ValidationSummaryAutomationPeer.cs" />
+    <Compile Include="Common\Extensions.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Validation\DescriptionViewer.cs" />
+    <Compile Include="Validation\ValidationSummary.cs" />
+    <Compile Include="Validation\ValidationSummaryFilters.cs" />
+    <Compile Include="Validation\ValidationSummaryItem.cs" />
+    <Compile Include="Validation\ValidationSummaryItemSource.cs" />
+    <Compile Include="Validation\ValidationSummaryItemType.cs" />
+    <Compile Include="Validation\FocusingInvalidControlEventArgs.cs" />
+    <Compile Include="Validation\Label.cs" />
+    <Compile Include="Validation\ValidationItemCollection.cs" />
+    <Compile Include="Validation\ValidationHelper.cs" />
+    <Compile Include="Validation\ValidationMetadata.cs" />
+    <Compile Include="VisualStates.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="themes\generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="themes\generic.SL.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>OpenSilver.Internal.Controls.Data.Input</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' " />
+  <Import Project="..\..\packages\OpenSilver.WorkInProgress.$(OpenSilverVersion)\build\OpenSilver.WorkInProgress.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' " />
+  <Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
+  <Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' " />
+
+</Project>

@@ -46,21 +46,21 @@ namespace Windows.UI.Xaml.Controls
         public TimePicker()
         {
             _defaultText = ""; // the text displayed when no time is selected
-
             // Set default style:
             this.DefaultStyleKey = typeof(TimePicker);
         }
 
         protected override INTERNAL_CalendarOrClockBase GenerateCalendarOrClock()
         {
-            return new Clock();
+            return new Clock() { MinuteInterval = PopupMinutesInterval };
         }
 
-        protected override string SetTextFromDate(string newDate)
+        protected override string SetTextFromDate(DateTime? newDate)
         {
-            string[] split = newDate.Split(' ');
-            string[] time = split[1].Split(':');
-            return time[0] + " : " + time[1];
+            if (newDate == null)
+                return null;
+
+            return newDate.Value.ToString("HH:mm");
         }
 
         protected override void OnSelectionChanged(DateTime? newSelectedDate)
@@ -117,7 +117,46 @@ namespace Windows.UI.Xaml.Controls
             ((TimePicker)d).INTERNAL_SelectedDate = (DateTime?)e.NewValue;
         }
 
-#endregion
+        #region public int PopupMinutesInterval
+        /// <summary>
+        /// Gets or sets the minutes interval between time values allowed by the TimePickerPopup.
+        /// </summary>
+        public int PopupMinutesInterval
+        {
+            get => (int)GetValue(PopupMinutesIntervalProperty);
+            set => SetValue(PopupMinutesIntervalProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the PopupMinutesInterval dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PopupMinutesIntervalProperty =
+            DependencyProperty.Register(
+                "PopupMinutesInterval",
+                typeof(int),
+                typeof(TimePicker),
+                new PropertyMetadata(5, OnPopupMinutesIntervalPropertyChanged));
+
+        /// <summary>
+        /// PopupMinutesIntervalProperty property changed handler.
+        /// </summary>
+        /// <param name="d">
+        /// TimePicker that changed its PopupMinutesInterval.
+        /// </param>
+        /// <param name="e">
+        /// Event arguments.
+        /// </param>
+        private static void OnPopupMinutesIntervalPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue != e.OldValue)
+            {
+                var timePicker = d as TimePicker;
+                ((Clock)timePicker._calendarOrClock).MinuteInterval = (int)e.NewValue;
+            }
+        }
+
+        #endregion
+        #endregion
 
     }
 }

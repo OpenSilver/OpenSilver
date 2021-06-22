@@ -22,7 +22,8 @@ namespace Windows.UI.Xaml.Data
 #endif
 {
     /// <summary>
-    /// Provides the static BindingOperations.SetBinding(DependencyObject,DependencyProperty,BindingBase) method.
+    /// Provides the static <see cref="BindingOperations.SetBinding(DependencyObject, DependencyProperty, Binding)" />
+    /// method.
     /// </summary>
     public static class BindingOperations
     {

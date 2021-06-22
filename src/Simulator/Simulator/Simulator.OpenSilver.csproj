@@ -2,12 +2,12 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">SL</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
+    <AssemblyName>OpenSilver.Simulator</AssemblyName>
     <RootNamespace>DotNetForHtml5.EmulatorWithoutJavascript</RootNamespace>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -16,44 +16,12 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;OPENSILVER</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU'">
-    <DefineConstants>TRACE;DEBUGSILVERLIGHTCOMPATIBLEVERSION;OPENSILVER;WORKINPROGRESS</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG;OPENSILVER</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;OPENSILVER;WORKINPROGRESS</DefineConstants>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotNetBrowser, Version=1.14.0.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e">
-      <HintPath>..\..\packages\DotNetBrowser.1.14\lib\DotNetBrowser.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="DotNetBrowser.Chromium, Version=1.14.0.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e">
-      <HintPath>..\..\packages\DotNetBrowser.1.14\lib\DotNetBrowser.Chromium.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f">
-      <HintPath>..\..\packages\MahApps.Metro.1.2.4.0\lib\net45\MahApps.Metro.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Web.Administration, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\..\packages\Microsoft.Web.Administration.7.0.0.0\lib\net20\Microsoft.Web.Administration.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\..\packages\MahApps.Metro.1.2.4.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
-    <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Serialization" />
@@ -72,10 +40,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
+    <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </ApplicationDefinition>
+    </Page>
     <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\ActivationHelpers_SharedWithOtherProjects.cs">
       <Link>ActivationHelpers_SharedWithOtherProjects.cs</Link>
     </Compile>
@@ -98,6 +66,16 @@
       <Link>VersionInformation_SharedWithOtherProjects.cs</Link>
     </Compile>
     <Compile Include="Compilation\CompilationState.cs" />
+    <Compile Include="Console\ConsoleControl.xaml.cs">
+      <DependentUpon>ConsoleControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Console\ConsoleMessage.cs" />
+    <Compile Include="Console\ConsoleMessageControl.xaml.cs">
+      <DependentUpon>ConsoleMessageControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Console\FileSource.cs" />
+    <Compile Include="Console\IMessageSource.cs" />
+    <Compile Include="Console\InteropSource.cs" />
     <Compile Include="DialogBoxes\MessageBoxScrollable.xaml.cs">
       <DependentUpon>MessageBoxScrollable.xaml</DependentUpon>
     </Compile>
@@ -107,6 +85,8 @@
     <Compile Include="LicenseChecking\LicenseChecker.xaml.cs">
       <DependentUpon>LicenseChecker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SimulatorLauncher.cs" />
+    <Compile Include="SimulatorLaunchParameters.cs" />
     <Compile Include="SupportClasses\CookieData.cs" />
     <Compile Include="SupportClasses\CrossDomainCallsHelper.cs" />
     <Compile Include="SupportClasses\Serializer.cs" />
@@ -124,10 +104,12 @@
     <Compile Include="SupportClasses\ReflectionInUserAssembliesHelper.cs" />
     <Compile Include="SupportClasses\ScreenCoordinatesHelper.cs" />
     <Compile Include="Interop\WpfMediaElementFactory.cs" />
-    <Compile Include="SupportClasses\JavaScriptErrorsReportingHandler.cs" />
     <Compile Include="Interop\JavaScriptExecutionHandler.cs" />
     <Compile Include="SupportClasses\ResourceInterceptor.cs" />
     <Compile Include="TrialHelpers_MoreMethods.cs" />
+    <Compile Include="Debugging\ChromiumDevTools.xaml.cs">
+      <DependentUpon>ChromiumDevTools.xaml</DependentUpon>
+    </Compile>
     <Compile Include="XamlInspection\TreeViewDataTemplateSelector.cs" />
     <Compile Include="XamlInspection\TreeNode.cs" />
     <Compile Include="XamlInspection\XamlInspectionTreeView.xaml.cs">
@@ -140,6 +122,14 @@
     <Compile Include="XamlInspection\XamlSinglePropertyEditor.xaml.cs">
       <DependentUpon>XamlSinglePropertyEditor.xaml</DependentUpon>
     </Compile>
+    <Page Include="Console\ConsoleControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Console\ConsoleMessageControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DialogBoxes\MessageBoxScrollable.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -164,6 +154,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Debugging\ChromiumDevTools.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="XamlInspection\XamlInspectionTreeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -195,7 +189,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -326,10 +319,14 @@
     <WCFMetadataStorage Include="Service References\LicensingServiceReference\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Compiler\Compiler.Common\Compiler.Common.OpenSilver.csproj">
-      <Project>{4ecad5cd-91df-48f6-9e9f-ae0a6e7622a8}</Project>
-      <Name>Compiler.Common.OpenSilver</Name>
-    </ProjectReference>
+    <PackageReference Include="DotNetBrowser" Version="1.21.5" />
+    <PackageReference Include="MahApps.Metro" Version="1.2.4" />
+    <PackageReference Include="Microsoft.Web.Administration" Version="7.0.0" />
+    <PackageReference Include="NuGet.Build.Tasks.Pack">
+      <Version>5.9.1</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

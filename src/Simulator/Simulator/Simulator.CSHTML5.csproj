@@ -49,13 +49,14 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotNetBrowser, Version=1.14.0.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e">
-      <HintPath>..\..\packages\DotNetBrowser.1.14\lib\DotNetBrowser.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="DotNetBrowser, Version=1.21.5.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\DotNetBrowser.1.21.5\lib\DotNetBrowser.dll</HintPath>
     </Reference>
-    <Reference Include="DotNetBrowser.Chromium, Version=1.14.0.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e">
-      <HintPath>..\..\packages\DotNetBrowser.1.14\lib\DotNetBrowser.Chromium.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="DotNetBrowser.Chromium32, Version=1.21.5.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\DotNetBrowser.1.21.5\lib\DotNetBrowser.Chromium32.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetBrowser.Chromium64, Version=1.21.5.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\DotNetBrowser.1.21.5\lib\DotNetBrowser.Chromium64.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f">
       <HintPath>..\..\packages\MahApps.Metro.1.2.4.0\lib\net45\MahApps.Metro.dll</HintPath>
@@ -96,10 +97,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
+    <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </ApplicationDefinition>
+    </Page>
     <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\ActivationHelpers_SharedWithOtherProjects.cs">
       <Link>ActivationHelpers_SharedWithOtherProjects.cs</Link>
     </Compile>
@@ -122,6 +123,16 @@
       <Link>VersionInformation_SharedWithOtherProjects.cs</Link>
     </Compile>
     <Compile Include="Compilation\CompilationState.cs" />
+    <Compile Include="Console\ConsoleControl.xaml.cs">
+      <DependentUpon>ConsoleControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Console\ConsoleMessage.cs" />
+    <Compile Include="Console\ConsoleMessageControl.xaml.cs">
+      <DependentUpon>ConsoleMessageControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Console\FileSource.cs" />
+    <Compile Include="Console\IMessageSource.cs" />
+    <Compile Include="Console\InteropSource.cs" />
     <Compile Include="DialogBoxes\MessageBoxScrollable.xaml.cs">
       <DependentUpon>MessageBoxScrollable.xaml</DependentUpon>
     </Compile>
@@ -131,6 +142,8 @@
     <Compile Include="LicenseChecking\LicenseChecker.xaml.cs">
       <DependentUpon>LicenseChecker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SimulatorLauncher.cs" />
+    <Compile Include="SimulatorLaunchParameters.cs" />
     <Compile Include="SupportClasses\CookieData.cs" />
     <Compile Include="SupportClasses\CrossDomainCallsHelper.cs" />
     <Compile Include="SupportClasses\Serializer.cs" />
@@ -148,10 +161,12 @@
     <Compile Include="SupportClasses\ReflectionInUserAssembliesHelper.cs" />
     <Compile Include="SupportClasses\ScreenCoordinatesHelper.cs" />
     <Compile Include="Interop\WpfMediaElementFactory.cs" />
-    <Compile Include="SupportClasses\JavaScriptErrorsReportingHandler.cs" />
     <Compile Include="Interop\JavaScriptExecutionHandler.cs" />
     <Compile Include="SupportClasses\ResourceInterceptor.cs" />
     <Compile Include="TrialHelpers_MoreMethods.cs" />
+    <Compile Include="Debugging\ChromiumDevTools.xaml.cs">
+      <DependentUpon>ChromiumDevTools.xaml</DependentUpon>
+    </Compile>
     <Compile Include="XamlInspection\TreeViewDataTemplateSelector.cs" />
     <Compile Include="XamlInspection\TreeNode.cs" />
     <Compile Include="XamlInspection\XamlInspectionTreeView.xaml.cs">
@@ -188,6 +203,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Debugging\ChromiumDevTools.xaml">
+      <SubType>Designer</SubType>
+		<Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="XamlInspection\XamlInspectionTreeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -197,6 +216,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="XamlInspection\XamlSinglePropertyEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Console\ConsoleControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Console\ConsoleMessageControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

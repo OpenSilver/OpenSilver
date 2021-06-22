@@ -82,7 +82,10 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Initializes a new instance of the ListBox class.
         /// </summary>
-        public ListBox() { }
+        public ListBox()
+        {
+            this.DefaultStyleKey = typeof(ListBox);
+        }
 
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
@@ -108,6 +111,19 @@ namespace Windows.UI.Xaml.Controls
                     container.IsSelected = true;
                 }
                 container.Click += listBoxItem_Click;
+            }
+        }
+
+        protected override void ClearContainerForItemOverride(DependencyObject element, object item)
+        {
+            base.ClearContainerForItemOverride(element, item);
+
+            ListBoxItem container = element as ListBoxItem;
+            if (container != null)
+            {
+                container.INTERNAL_CorrespondingItem = null;
+                container.INTERNAL_ParentSelectorControl = null;
+                container.Click -= listBoxItem_Click;
             }
         }
 

@@ -55,12 +55,6 @@
     <Content Include="Logo_32x32.png">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="ProjectTemplates\CSharp\OpenSilver\Empty OpenSilver Application.zip">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="ProjectTemplates\CSharp\OpenSilver\Empty OpenSilver UWP Application.zip">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="ItemTemplates\CSharp\OpenSilver %28Silverlight Compatible%29\ChildWindow.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -109,12 +103,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="ProjectTemplates\CSharp\OpenSilver\OpenSilver Silverlight ClassLibrary.zip">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="ProjectTemplates\CSharp\OpenSilver\OpenSilver UWP ClassLibrary.zip">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -139,6 +127,40 @@
       <Name>DotNetForHtml5.VisualStudioExtension.ShellIntegration</Name>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenSilver.TemplateWizards\OpenSilver.TemplateWizards.csproj">
+      <Project>{5BCC3CB3-6BB0-4382-8FBA-62D8D5071C23}</Project>
+      <Name>OpenSilver.TemplateWizards</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenSilverApplicationTemplate\OpenSilverApplicationTemplate.csproj">
+      <Project>{ED7A89B5-CD09-4697-8CEA-69EC1546D1DF}</Project>
+      <Name>OpenSilverApplicationTemplate</Name>
+      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenSilverUwpApplicationTemplate\OpenSilverUwpApplicationTemplate.csproj">
+      <Project>{EA54D27B-8FFC-47DC-A7C1-7F6CB316BDBC}</Project>
+      <Name>OpenSilverUwpApplicationTemplate</Name>
+      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenSilverClassLibraryTemplate\OpenSilverClassLibraryTemplate.csproj">
+      <Project>{2D788498-9178-480A-9DC1-E0953CC7F0E1}</Project>
+      <Name>OpenSilverClassLibraryTemplate</Name>
+      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenSilverUwpClassLibraryTemplate\OpenSilverUwpClassLibraryTemplate.csproj">
+      <Project>{EDA8EF8D-2EF0-4C9A-BB83-63E577F2CD12}</Project>
+      <Name>OpenSilverUwpClassLibraryTemplate</Name>
+      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

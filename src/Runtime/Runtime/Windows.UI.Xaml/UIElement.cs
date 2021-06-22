@@ -1,5 +1,4 @@
 
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,14 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-using CSHTML5;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media.Effects;
+
 #if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -38,7 +30,6 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.Foundation;
-using Windows.System;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 #endif
@@ -55,18 +46,22 @@ namespace Windows.UI.Xaml
     /// </summary>
     public abstract partial class UIElement : DependencyObject
     {
-        //internal bool INTERNAL_hasCapture = false;
+        internal virtual Size MeasureCore()
+        {
+            return new Size(0, 0);
+        }
 
         internal DependencyObject INTERNAL_VisualParent { get; set; } // This is used to determine if the item is in the Visual Tree: null means that the item is not in the visual tree, not null otherwise.
+
         internal Window INTERNAL_ParentWindow { get; set; } // This is a reference to the window where this control is presented. It is useful for example to know where to display the popups. //todo-perfs: replace all these properties with fields?
-        internal
-#if CSHTML5NETSTANDARD //todo: after testing with JSIL, make it "object" in all cases.
-            object
+
+        // This is the main DIV of the HTML representation of the control
+#if CSHTML5NETSTANDARD
+        internal object INTERNAL_OuterDomElement { get; set; }
 #else
-            dynamic
-# endif
-            INTERNAL_OuterDomElement
-        { get; set; } // This is the main DIV of the HTML representation of the control //todo-perfs: replace all these properties with fields?
+        internal dynamic INTERNAL_OuterDomElement { get; set; }
+#endif
+
         internal object INTERNAL_InnerDomElement { get; set; } // This is used to add visual children to the DOM (optionally wrapped into additional code, c.f. "INTERNAL_VisualChildInformation")
         internal object INTERNAL_AdditionalOutsideDivForMargins { get; set; } // This is used to define the margins and to remove the div used for the margins when we remove this element.
         internal object INTERNAL_InnerDivOfTheChildWrapperOfTheParentIfAny { get; set; } // This is non-null only if the parent has a "ChildWrapper", that is, a DIV that it creates for each of its children. If it is the case, we store the "inner div" of that child wrapper. It is useful for alignment purposes (cf. alignment methods in the FrameworkElement class).
@@ -102,7 +97,7 @@ namespace Windows.UI.Xaml
 
 
 
-        #region Special code for RadioButtons
+#region Special code for RadioButtons
 
         private string _childrenRadioButtonDefaultName = null;
         internal string INTERNAL_ChildrenRadioButtonDefaultName //this is used to define a name for the radio buttons contained inside this UIElement that have their GroupName property not defined. Mandatory because RadioButtons without GroupName inside a same UIElement are considered to be part of a same group.
@@ -128,14 +123,14 @@ namespace Windows.UI.Xaml
             return "RadioButtonDefaultGroupName" + i.ToString();
         }
 
-        #endregion
+#endregion
 
         internal virtual object GetDomElementToSetContentString()
         {
             return INTERNAL_InnerDomElement;
         }
 
-        #region ClipToBounds
+#region ClipToBounds
 
         /// <summary>
         /// Gets or sets a value indicating whether to clip the content of this element
@@ -148,21 +143,26 @@ namespace Windows.UI.Xaml
             set { SetValue(ClipToBoundsProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="UIElement.ClipToBounds"/> dependency
+        /// property.
+        /// </summary>
         public static readonly DependencyProperty ClipToBoundsProperty =
-            DependencyProperty.Register("ClipToBounds",
-                                        typeof(bool),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(false)
-                                        {
-                                            MethodToUpdateDom = ClipToBounds_MethodToUpdateDom,
-                                        });
+            DependencyProperty.Register(
+                nameof(ClipToBounds),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(false)
+                {
+                    MethodToUpdateDom = ClipToBounds_MethodToUpdateDom,
+                });
 
         private static void ClipToBounds_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             //todo: doesn't work with vertical overflow if the display is table or table-cell
             UIElement uiElement = (UIElement)d;
-            dynamic outerDomElement = uiElement.INTERNAL_OuterDomElement;
-            dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
+            var outerDomElement = uiElement.INTERNAL_OuterDomElement;
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
             if ((bool)newValue)
             {
                 style.overflow = "hidden"; //todo: ? if this is a ScrollViewer do not do anything?
@@ -175,7 +175,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
 
         /// <summary>
@@ -200,12 +200,12 @@ namespace Windows.UI.Xaml
             return null;
         }
 
-        public virtual dynamic GetDomElementWhereToPlaceChild(UIElement child) // Note: if overridden, it supercedes the "INTERNAL_InnerDomElement" property.
+        public virtual object GetDomElementWhereToPlaceChild(UIElement child) // Note: if overridden, it supercedes the "INTERNAL_InnerDomElement" property.
         {
             return null;
         }
 
-        public dynamic GetChildsWrapper(UIElement child)
+        public object GetChildsWrapper(UIElement child)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_VisualTreeManager.IsElementInVisualTree(child))
             {
@@ -218,7 +218,7 @@ namespace Windows.UI.Xaml
         }
 
 
-        #region Effect
+#region Effect
 
         // todo: we may add the support for multiple effects on the same 
         // UIElement since it is possible in html (but not in wpf). If we 
@@ -231,14 +231,19 @@ namespace Windows.UI.Xaml
             set { SetValue(EffectProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="UIElement.Effect"/> dependency
+        /// property.
+        /// </summary>
         public static readonly DependencyProperty EffectProperty =
-            DependencyProperty.Register("Effect",
-                                        typeof(Effect),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(null, Effect_Changed)
-                                        {
-                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                                        });
+            DependencyProperty.Register(
+                nameof(Effect),
+                typeof(Effect),
+                typeof(UIElement),
+                new PropertyMetadata(null, Effect_Changed)
+                {
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                });
 
         private static void Effect_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -254,10 +259,10 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
 
-        #region RenderTransform and RenderTransformOrigin
+#region RenderTransform and RenderTransformOrigin
 
         /// <summary>
         /// Gets or sets transform information that affects the rendering position of
@@ -270,16 +275,18 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the RenderTransform dependency property.
+        /// Identifies the <see cref="UIElement.RenderTransform"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty RenderTransformProperty =
-            DependencyProperty.Register("RenderTransform",
-                                        typeof(Transform),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(null, RenderTransform_Changed)
-                                        {
-                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                                        });
+            DependencyProperty.Register(
+                nameof(RenderTransform),
+                typeof(Transform),
+                typeof(UIElement),
+                new PropertyMetadata(null, RenderTransform_Changed)
+                {
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                });
 
         private static void RenderTransform_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -303,7 +310,7 @@ namespace Windows.UI.Xaml
                 }
                 else
                 {
-                    dynamic domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(uiElement);
+                    var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(uiElement);
 
                     try
                     {
@@ -337,37 +344,36 @@ namespace Windows.UI.Xaml
             set { SetValue(RenderTransformOriginProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="UIElement.RenderTransformOrigin"/>
+        /// dependency property.
+        /// </summary>
         public static readonly DependencyProperty RenderTransformOriginProperty =
-            DependencyProperty.Register("RenderTransformOrigin",
-                                        typeof(Point),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(new Point(0d, 0d), RenderTransformOrigin_Changed)
-                                        {
-                                            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                                        });
+            DependencyProperty.Register(
+                nameof(RenderTransformOrigin),
+                typeof(Point),
+                typeof(UIElement),
+                new PropertyMetadata(new Point(0d, 0d), RenderTransformOrigin_Changed)
+                {
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                });
 
         private static void RenderTransformOrigin_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var uiElement = (UIElement)d;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
             {
-                Point newValue;
-                if (e.NewValue is Point)
-                {
-                    newValue = (Point)e.NewValue;
-                }
-                else
-                {
-                    newValue = new Point(0d, 0d);
-                }
-                ApplyRenderTransformOrigin(uiElement, newValue);
+                ApplyRenderTransformOrigin(uiElement, (Point)e.NewValue);
             }
         }
 
-        static void ApplyRenderTransformOrigin(UIElement uiElement, Point newValue)
+        private static void ApplyRenderTransformOrigin(UIElement uiElement, Point newValue)
         {
-            dynamic domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(uiElement);
-            string transformOriginValue = (newValue.X * 100).ToString() + "% " + (newValue.Y * 100).ToString() + "%"; //todo: make sure that "ToString" is culture-independent (so we use dot instead of comma for decimal separator).
+            var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(uiElement);
+            string transformOriginValue = string.Format(CultureInfo.InvariantCulture,
+                "{0}% {1}%", 
+                newValue.X * 100, newValue.Y * 100);
+
             try
             {
                 domStyle.transformOrigin = transformOriginValue;
@@ -392,9 +398,9 @@ namespace Windows.UI.Xaml
             uiElement.INTERNAL_RenderTransformOriginHasBeenApplied = true;
         }
 
-        #endregion
+#endregion
 
-        #region UseLayoutRounding
+#region UseLayoutRounding
 
         /// <summary>
         /// Gets or sets a value that determines whether rendering for the object and
@@ -408,13 +414,15 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the UseLayoutRounding dependency property.
+        /// Identifies the <see cref="UIElement.UseLayoutRounding"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty UseLayoutRoundingProperty =
-            DependencyProperty.Register("UseLayoutRounding",
-                                        typeof(bool),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(false));
+            DependencyProperty.Register(
+                nameof(UseLayoutRounding),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(false));
 
         //-------------------------------------------------------------------
         // NOTE: The "UseLayoutRounding" is currently not supported, but we 
@@ -423,9 +431,9 @@ namespace Windows.UI.Xaml
         // it is not significant.
         //-------------------------------------------------------------------
 
-        #endregion
+#endregion
 
-        #region Visibility
+#region Visibility
 
         /// <summary>
         /// Gets or sets the visibility of a UIElement. A UIElement that is not visible
@@ -438,17 +446,19 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the Visibility dependency property.
+        /// Identifies the <see cref="UIElement.Visibility"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty VisibilityProperty =
-            DependencyProperty.Register("Visibility",
-                                        typeof(Visibility),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(Visibility.Visible, Visibility_Changed));
+            DependencyProperty.Register(
+                nameof(Visibility),
+                typeof(Visibility),
+                typeof(UIElement),
+                new PropertyMetadata(Visibility.Visible, Visibility_Changed));
 
-        string _previousValueOfDisplayCssProperty = "block";
+        private string _previousValueOfDisplayCssProperty = "block";
 
-        static void Visibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void Visibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var uiElement = (UIElement)d;
             Visibility newValue = (Visibility)e.NewValue;
@@ -478,12 +488,12 @@ namespace Windows.UI.Xaml
                 INTERNAL_UpdateCssPointerEvents(uiElement);
 #endif
                 // Get a reference to the most outer DOM element to show/hide:
-                dynamic mostOuterDomElement = null;
+                object mostOuterDomElement = null;
                 if (uiElement.INTERNAL_VisualParent is UIElement)
                     mostOuterDomElement = ((UIElement)uiElement.INTERNAL_VisualParent).INTERNAL_VisualChildrenInformation[uiElement].INTERNAL_OptionalChildWrapper_OuterDomElement; // Note: this is useful for example inside a Grid, where we want to hide the whole child wrapper in order to ensure that it doesn't capture mouse clicks thus preventing users from clicking on other elements in the Grid.
                 if (mostOuterDomElement == null)
                     mostOuterDomElement = uiElement.INTERNAL_AdditionalOutsideDivForMargins ?? uiElement.INTERNAL_OuterDomElement;
-                dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(mostOuterDomElement);
+                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(mostOuterDomElement);
 
                 // Apply the visibility:
                 if (newValue == Visibility.Collapsed)
@@ -516,9 +526,9 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
-        #region IsVisible
+#region IsVisible
 
         public bool IsVisible
         {
@@ -526,13 +536,15 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the IsVisible dependency property.
+        /// Identifies the <see cref="UIElement.IsVisible"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty IsVisibleProperty =
-            DependencyProperty.Register("IsVisible",
-                                        typeof(bool),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(true, OnIsVisiblePropertyChanged, CoerceIsVisibleProperty));
+            DependencyProperty.Register(
+                nameof(IsVisible),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(true, OnIsVisiblePropertyChanged, CoerceIsVisibleProperty));
 
         private static void OnIsVisiblePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -548,7 +560,7 @@ namespace Windows.UI.Xaml
             }
 
             // Invalidate the children so that they will inherit the new value.
-            InvalidateForceInheritPropertyOnChildren((UIElement)d, e.Property);
+            uiElement.InvalidateForceInheritPropertyOnChildren(e.Property);
 
             if (uiElement.IsVisibleChanged != null)
             {    
@@ -588,9 +600,9 @@ namespace Windows.UI.Xaml
 
         public event DependencyPropertyChangedEventHandler IsVisibleChanged;
 
-        #endregion
+#endregion
 
-        #region Opacity
+#region Opacity
 
         /// <summary>
         /// Gets or sets the degree of the object's opacity.
@@ -604,25 +616,28 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the Opacity dependency property.
+        /// Identifies the <see cref="UIElement.Opacity"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty OpacityProperty =
-            DependencyProperty.Register("Opacity", typeof(double), typeof(UIElement), new PropertyMetadata(1.0)
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(Opacity), 
+                typeof(double), 
+                typeof(UIElement), 
+                new PropertyMetadata(1.0)
                 {
-                    return new CSSEquivalent()
+                    GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
-                        Value = (inst, value) => { return (Math.Floor(Convert.ToDouble(value) * 1000) / 1000).ToString(); }, // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most.
+                        // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most.
+                        Value = (inst, value) => (Math.Floor(Convert.ToDouble(value) * 1000) / 1000).ToInvariantString(),
                         Name = new List<string> { "opacity" },
                         ApplyAlsoWhenThereIsAControlTemplate = true,
-                    };
-                },
-            });
+                    }
+                });
 
-        #endregion
+#endregion
 
-        #region IsHitTestVisible
+#region IsHitTestVisible
 
         /// <summary>
         /// Gets or sets whether the contained area of this UIElement can return true
@@ -633,22 +648,25 @@ namespace Windows.UI.Xaml
             get { return (bool)GetValue(IsHitTestVisibleProperty); }
             set { SetValue(IsHitTestVisibleProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the IsHitTestVisible property.
+        /// Identifies the <see cref="UIElement.IsHitTestVisible"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty IsHitTestVisibleProperty =
-            DependencyProperty.Register("IsHitTestVisible",
-                                        typeof(bool),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(true, OnIsHitTestVisiblePropertyChanged, CoerceIsHitTestVisibleProperty)
-                                        {
-                                            MethodToUpdateDom = IsHitTestVisible_MethodToUpdateDom,
-                                        });
+            DependencyProperty.Register(
+                nameof(IsHitTestVisible),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(true, OnIsHitTestVisiblePropertyChanged, CoerceIsHitTestVisibleProperty)
+                {
+                    MethodToUpdateDom = IsHitTestVisible_MethodToUpdateDom,
+                });
 
         private static void OnIsHitTestVisiblePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             // Invalidate the children so that they will inherit the new value.
-            InvalidateForceInheritPropertyOnChildren((UIElement)d, e.Property);
+            ((UIElement)d).InvalidateForceInheritPropertyOnChildren(e.Property);
         }
 
         private static void IsHitTestVisible_MethodToUpdateDom(DependencyObject d, object newValue)
@@ -666,8 +684,7 @@ namespace Windows.UI.Xaml
 
         private static object CoerceIsHitTestVisibleProperty(DependencyObject d, object baseValue)
         {
-            UIElement @this = (UIElement)d;
-
+            UIElement uie = (UIElement)d;
 
             if (!(baseValue is bool)) //todo: this is a temporary workaround - cf. comment in "CoerceIsEnabledProperty"
                 return true;
@@ -679,7 +696,7 @@ namespace Windows.UI.Xaml
             // if our parent is true, but we can always be false.
             if ((bool)baseValue)
             {
-                DependencyObject parent = @this.INTERNAL_VisualParent;
+                DependencyObject parent = VisualTreeHelper.GetParent(uie);
                 if (parent == null || (bool)parent.GetValue(IsHitTestVisibleProperty))
                 {
                     return true;
@@ -710,22 +727,15 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-        #endregion
+#endregion
 
 #if REVAMPPOINTEREVENTS
         internal static void INTERNAL_UpdateCssPointerEvents(UIElement element)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
-                dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
-                if (element.INTERNAL_ArePointerEventsEnabled)
-                {
-                    style.pointerEvents = "auto";
-                }
-                else
-                {
-                    style.pointerEvents = "none";
-                }
+                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
+                style.pointerEvents = element.INTERNAL_ArePointerEventsEnabled ? "auto" : "none";
             }
         }
 #else
@@ -736,7 +746,7 @@ namespace Windows.UI.Xaml
 
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
-                dynamic style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
+                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
                 if (isHitTestVisible && isEnabled)
                 {
                     style.pointerEvents = "auto";
@@ -765,7 +775,7 @@ namespace Windows.UI.Xaml
         }
 
 
-        #region AllowDrop
+#region AllowDrop
 
         /// <summary>
         /// Gets or sets a value that determines whether this UIElement
@@ -778,26 +788,25 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the AllowDrop dependency property.
+        /// Identifies the <see cref="UIElement.AllowDrop"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty AllowDropProperty =
-            DependencyProperty.Register("AllowDrop",
-                                        typeof(bool),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(false));
+            DependencyProperty.Register(
+                nameof(AllowDrop),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(false));
 
-        #endregion
+#endregion
 
         internal virtual void INTERNAL_UpdateDomStructureIfNecessary()
         {
             // Used to update the DOM structure (for example, in case of a grid, we need to (re)create the rows and columns where to place the child elements).
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("true")]
-
-#else
-        [Template("true")]
+#if BRIDGE
+        [Bridge.Template("true")]
 #endif
         private static bool IsRunningInJavaScript() //must be static for Bridge "Template" to work properly
         {
@@ -805,7 +814,7 @@ namespace Windows.UI.Xaml
         }
 
 
-        #region CapturePointer, ReleasePointerCapture, IsPointerCaptured, and OnLostMouseCapture
+#region CapturePointer, ReleasePointerCapture, IsPointerCaptured, and OnLostMouseCapture
 
         /// <summary>
         /// Sets pointer capture to a UIElement.
@@ -824,7 +833,7 @@ namespace Windows.UI.Xaml
             return CapturePointer(value, this.INTERNAL_OuterDomElement);
         }
 
-        private bool CapturePointer(Pointer value, dynamic element) //note: when the pointer is already captured, trying to capture it again does absolutely nothing (even after releasing the first one)
+        private bool CapturePointer(Pointer value, object element) //note: when the pointer is already captured, trying to capture it again does absolutely nothing (even after releasing the first one)
         {
             // We set the events on document then reroute these events to the UIElement.
             if (Pointer.INTERNAL_captured == null)
@@ -833,59 +842,8 @@ namespace Windows.UI.Xaml
 
                 if (IsRunningInJavaScript())
                 {
-#if !BRIDGE
-                    JSIL.Verbatim.Expression(@"
-     document.onmouseup = function(e) {
-        if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }
-     document.onmouseover = function(e) {
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }       
-    document.onmousedown = function(e) {
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }                               
-     document.onmouseout = function(e) {   
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }                                      
-     document.onmousemove = function(e) {  
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }                                      
-     document.onclick = function(e) {      
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }                                      
-     document.oncontextmenu = function(e) {
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }                                      
-     document.ondblclick = function(e) {   
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, $0);
-        }
-    }
-", element);
-#else
-                    Script.Write(@"
+#if BRIDGE
+                    Bridge.Script.Write(@"
      document.onmouseup = function(e) {
         if(e.doNotReroute == undefined)
         {
@@ -981,56 +939,56 @@ namespace Windows.UI.Xaml
      document.onmouseup = function(e) {{
         if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }}
      document.onmouseover = function(e) {{
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }} 
     document.onmousedown = function(e) {{
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }}                       
      document.onmouseout = function(e) {{   
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }}                            
      document.onmousemove = function(e) {{
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }}                                    
      document.onclick = function(e) {{   
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }}                                     
      document.oncontextmenu = function(e) {{
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }}                                      
      document.ondblclick = function(e) {{   
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementById(""{0}"");
+               var element = document.getElementByIdSafe(""{0}"");
                document.reroute(e, element);
         }}
     }}
@@ -1094,7 +1052,7 @@ namespace Windows.UI.Xaml
  document.ondblclick = null;
 ");
 #else
-                    Script.Write(@"
+                    Bridge.Script.Write(@"
  document.onmousedown = null;
  document.onmouseup = null;
  document.onmouseover = null;
@@ -1162,9 +1120,9 @@ namespace Windows.UI.Xaml
         public event PointerEventHandler PointerCaptureLost;
 #endif
 
-        #endregion
+#endregion
 
-        #region AllowScrollOnTouchMove
+#region AllowScrollOnTouchMove
 
         /// <summary>
         /// Gets or sets whether pressing (touchscreen devices) on this UIElement then moving should allow scrolling or not. The default value is True.
@@ -1174,34 +1132,35 @@ namespace Windows.UI.Xaml
             get { return (bool)GetValue(AllowScrollOnTouchMoveProperty); }
             set { SetValue(AllowScrollOnTouchMoveProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the AllowScrollOnTouchMove dependency property.
+        /// Identifies the <see cref="UIElement.AllowScrollOnTouchMove"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty AllowScrollOnTouchMoveProperty =
-            DependencyProperty.Register("AllowScrollOnTouchMove", typeof(bool), typeof(UIElement), new PropertyMetadata(true, AllowScrollOnTouchMove_Changed)
-            {
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            });
+            DependencyProperty.Register(
+                nameof(AllowScrollOnTouchMove), 
+                typeof(bool), 
+                typeof(UIElement), 
+                new PropertyMetadata(true, AllowScrollOnTouchMove_Changed)
+                {
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                });
 
         private static void AllowScrollOnTouchMove_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement element = (UIElement)d;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
-                string value;
-                if ((bool)e.NewValue)
-                {
-                    value = "auto";
-                }
-                else
-                {
-                    value = "none"; // Note: "none" disables scrolling, pinching and other gestures. It is supposed to not have any effect on the "TouchStart", "TouchMove", and "TouchEnd" events.
-                }
-                CSHTML5.Interop.ExecuteJavaScript("$0.style.touchAction = $1", element.INTERNAL_OuterDomElement, value);
+                // Note: "none" disables scrolling, pinching and other gestures.
+                // It is supposed to not have any effect on the "TouchStart",
+                // "TouchMove", and "TouchEnd" events.
+                CSHTML5.Interop.ExecuteJavaScript("$0.style.touchAction = $1",
+                    element.INTERNAL_OuterDomElement, (bool)e.NewValue ? "auto" : "none");
             }
         }
 
-        #endregion
+#endregion
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
@@ -1240,19 +1199,19 @@ namespace Windows.UI.Xaml
         /// </returns>
         public GeneralTransform TransformToVisual(UIElement visual)
         {
-            dynamic outerDivOfThisControl = this.INTERNAL_OuterDomElement;
+            var outerDivOfThisControl = this.INTERNAL_OuterDomElement;
 
             // If no "visual" was specified, we use the Window root instead.
             // Note: This is useful for example when calculating the position of popups, which are defined in absolute coordinates, at the same level as the Window root.
-            dynamic outerDivOfReferenceVisual =
+            var outerDivOfReferenceVisual =
                 (visual != null) ? visual.INTERNAL_OuterDomElement : this.INTERNAL_ParentWindow.INTERNAL_OuterDomElement;
 
             double offsetLeft, offsetTop;
             if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
             {
                 // ------- IN-BROWSER -------
-                dynamic rectOfThisControl = outerDivOfThisControl.getBoundingClientRect();
-                dynamic rectOfReferenceVisual = outerDivOfReferenceVisual.getBoundingClientRect();
+                var rectOfThisControl = ((dynamic)outerDivOfThisControl).getBoundingClientRect();
+                var rectOfReferenceVisual = ((dynamic)outerDivOfReferenceVisual).getBoundingClientRect();
 
                 offsetLeft = rectOfThisControl.left - rectOfReferenceVisual.left;
                 offsetTop = rectOfThisControl.top - rectOfReferenceVisual.top;
@@ -1303,19 +1262,98 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal static void InvalidateForceInheritPropertyOnChildren(UIElement uiE, DependencyProperty property)
+        internal virtual void InvalidateForceInheritPropertyOnChildren(DependencyProperty property)
         {
-            if (uiE.INTERNAL_VisualChildrenInformation == null)
+            if (this.INTERNAL_VisualChildrenInformation == null)
             {
                 return;
             }
 
-            foreach (UIElement child in uiE.INTERNAL_VisualChildrenInformation.Select(kp => kp.Key))
+            foreach (UIElement child in this.INTERNAL_VisualChildrenInformation.Select(kp => kp.Key))
             {
                 child.CoerceValue(property);
             }
         }
 
-        #endregion
+        #endregion ForceInherit property support
+
+        internal bool MeasureDirty
+        {
+            get { return ReadFlag(CoreFlags.MeasureDirty); }
+            set { WriteFlag(CoreFlags.MeasureDirty, value); }
+        }
+
+        internal bool MeasureInProgress
+        {
+            get { return ReadFlag(CoreFlags.MeasureInProgress); }
+            set { WriteFlag(CoreFlags.MeasureInProgress, value); }
+        }
+
+        internal bool ReadFlag(CoreFlags field)
+        {
+            return (_flags & field) != 0;
+        }
+
+        internal void WriteFlag(CoreFlags field, bool value)
+        {
+            if (value)
+            {
+                _flags |= field;
+            }
+            else
+            {
+                _flags &= (~field);
+            }
+        }
+
+        private CoreFlags _flags;
+
+        internal void InvalidateMeasureInternal()
+        {
+            if (!this.MeasureDirty &&
+                !this.MeasureInProgress)
+            {
+                this.MeasureDirty = true;
+                INTERNAL_VisualTreeManager.LayoutManager.MeasureQueue.Add(this);
+            }
+        }
+    }
+
+    [Flags]
+    internal enum CoreFlags : uint
+    {
+        None = 0x00000000,
+        //SnapsToDevicePixelsCache = 0x00000001,
+        //ClipToBoundsCache = 0x00000002,
+        MeasureDirty = 0x00000004,
+        //ArrangeDirty = 0x00000008,
+        MeasureInProgress = 0x00000010,
+        //ArrangeInProgress = 0x00000020,
+        //NeverMeasured = 0x00000040,
+        //NeverArranged = 0x00000080,
+        //MeasureDuringArrange = 0x00000100,
+        //IsCollapsed = 0x00000200,
+        //IsKeyboardFocusWithinCache = 0x00000400,
+        //IsKeyboardFocusWithinChanged = 0x00000800,
+        //IsMouseOverCache = 0x00001000,
+        //IsMouseOverChanged = 0x00002000,
+        //IsMouseCaptureWithinCache = 0x00004000,
+        //IsMouseCaptureWithinChanged = 0x00008000,
+        //IsStylusOverCache = 0x00010000,
+        //IsStylusOverChanged = 0x00020000,
+        //IsStylusCaptureWithinCache = 0x00040000,
+        //IsStylusCaptureWithinChanged = 0x00080000,
+        //HasAutomationPeer = 0x00100000,
+        //RenderingInvalidated = 0x00200000,
+        //IsVisibleCache = 0x00400000,
+        //AreTransformsClean = 0x00800000,
+        //IsOpacitySuppressed = 0x01000000,
+        //ExistsEventHandlersStore = 0x02000000,
+        //TouchesOverCache = 0x04000000,
+        //TouchesOverChanged = 0x08000000,
+        //TouchesCapturedWithinCache = 0x10000000,
+        //TouchesCapturedWithinChanged = 0x20000000,
+        //TouchLeaveCache = 0x40000000,
+        //TouchEnterCache = 0x80000000,
     }
 }

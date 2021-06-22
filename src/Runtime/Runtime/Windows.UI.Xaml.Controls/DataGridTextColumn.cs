@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Represents a System.Windows.Controls.DataGrid column that hosts textual content
+    /// Represents a <see cref="DataGrid"/> column that hosts textual content
     /// in its cells.
     /// </summary>
     public partial class DataGridTextColumn : DataGridBoundColumn
@@ -76,8 +76,6 @@ namespace Windows.UI.Xaml.Controls
 
             return textBox;
         }
-
-
 
         internal override FrameworkElement GenerateElement(object childData)
         {

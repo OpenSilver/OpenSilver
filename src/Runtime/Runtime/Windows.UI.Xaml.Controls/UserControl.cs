@@ -14,12 +14,18 @@
 
 
 using CSHTML5.Internal;
+using OpenSilver.Internal.Controls;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
+
+#if MIGRATION
+using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Media;
+#endif
+
 #if !FOR_DESIGN_TIME && !MIGRATION
 using Windows.UI.Xaml.Markup;
 #endif
@@ -37,9 +43,92 @@ namespace Windows.UI.Xaml.Controls
     [ContentProperty("Content")]
     public partial class UserControl : Control, INameScope
     {
+        /// <summary> 
+        /// Returns enumerator to logical children.
+        /// </summary>
+        /*protected*/ internal override IEnumerator LogicalChildren
+        {
+            get
+            {
+                if (this.Content == null)
+                {
+                    return EmptyEnumerator.Instance;
+                }
+
+                // otherwise, its logical children is its visual children
+                return new SingleChildEnumerator(this.Content);
+            }
+        }
+
+#region Constructors
+
+        static UserControl()
+        {
+            // UseContentTemplate
+            ControlTemplate template = new ControlTemplate();
+            template._methodToInstantiateFrameworkTemplate = (owner) =>
+            {
+                TemplateInstance instance = new TemplateInstance();
+
+                instance.TemplateOwner = owner;
+                instance.TemplateContent = ((UserControl)owner).Content as FrameworkElement;
+
+                return instance;
+            };
+            template.Seal();
+
+            UseContentTemplate = template;
+        }
+
         public UserControl()
         {
             IsTabStop = false; //we want to avoid stopping on this element's div when pressing tab.
+        }
+
+#endregion Constructors
+
+        /// <summary>
+        /// Gets or sets the content that is contained within a user control.
+        /// </summary>
+        public UIElement Content
+        {
+            get { return (UIElement)GetValue(ContentProperty); }
+            set { SetValue(ContentProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the Content dependency property
+        /// </summary>
+        public static readonly DependencyProperty ContentProperty =
+            DependencyProperty.Register(
+                nameof(Content),
+                typeof(UIElement),
+                typeof(UserControl),
+                new PropertyMetadata(null, OnContentChanged));
+
+        private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            UserControl uc = (UserControl)d;
+
+            uc.TemplateChild = null;
+            uc.RemoveLogicalChild(e.OldValue);
+            uc.AddLogicalChild(e.NewValue);
+
+            if (VisualTreeHelper.GetParent(uc) != null)
+            {
+                uc.InvalidateMeasureInternal();
+            }
+        }
+
+        /// <summary>
+        /// Gets the element that should be used as the StateGroupRoot for VisualStateMangager.GoToState calls
+        /// </summary>
+        internal override FrameworkElement StateGroupsRoot
+        {
+            get
+            {
+                return Content as FrameworkElement;
+            }
         }
 
 #if REVAMPPOINTEREVENTS
@@ -56,33 +145,21 @@ namespace Windows.UI.Xaml.Controls
         }
 #endif
 
-        /// <summary>
-        /// Gets or sets the content that is contained within a user control.
-        /// </summary>
-        public UIElement Content
+        internal override FrameworkTemplate TemplateCache
         {
-            get { return (UIElement)GetValue(ContentProperty); }
-            set { SetValue(ContentProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the Content dependency property
-        /// </summary>
-        public static readonly DependencyProperty ContentProperty =
-            DependencyProperty.Register("Content", typeof(UIElement), typeof(UserControl), new PropertyMetadata(null, Content_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-
-        static void Content_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            UIElement parent = (UIElement)d;
-            UIElement oldChild = (UIElement)e.OldValue;
-            UIElement newChild = (UIElement)e.NewValue;
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, parent);
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, parent);
+            get { return UseContentTemplate; }
+            set { }
         }
 
-        //protected virtual void InitializeComponent()
-        //{
-        //}
+        internal override FrameworkTemplate TemplateInternal
+        {
+            get { return UseContentTemplate; }
+        }
+
+        private static ControlTemplate UseContentTemplate
+        {
+            get;
+        }
 
 #region ---------- INameScope implementation ----------
 

@@ -12,13 +12,9 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if MIGRATION
 using System.Windows.Shapes;
 #else
@@ -54,21 +50,26 @@ namespace Windows.UI.Xaml.Media
             EndPoint = endPoint;
         }
 
-        // Returns:
-        //     The end point of the line. The default is a Point with value 0,0.
         /// <summary>
         /// Gets or sets the end point of a line.
+        /// The default is a <see cref="Point"/> with value 0,0.
         /// </summary>
         public Point EndPoint
         {
             get { return (Point)GetValue(EndPointProperty); }
             set { SetValue(EndPointProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the EndPoint dependency property.
+        /// Identifies the <see cref="LineGeometry.EndPoint"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty EndPointProperty =
-            DependencyProperty.Register("EndPoint", typeof(Point), typeof(LineGeometry), new PropertyMetadata(new Point(), EndPoint_Changed));
+            DependencyProperty.Register(
+                nameof(EndPoint), 
+                typeof(Point), 
+                typeof(LineGeometry), 
+                new PropertyMetadata(new Point(), EndPoint_Changed));
 
         private static void EndPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -79,21 +80,26 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        // Returns:
-        //     The start point of the line. The default is a Point with value 0,0.
         /// <summary>
         /// Gets or sets the start point of the line.
+        /// The default is a <see cref="Point"/> with value 0,0.
         /// </summary>
         public Point StartPoint
         {
             get { return (Point)GetValue(StartPointProperty); }
             set { SetValue(StartPointProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the StartPoint dependency property.
+        /// Identifies the <see cref="LineGeometry.StartPoint"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty StartPointProperty =
-            DependencyProperty.Register("StartPoint", typeof(Point), typeof(LineGeometry), new PropertyMetadata(new Point(), StartPoint_Changed));
+            DependencyProperty.Register(
+                nameof(StartPoint), 
+                typeof(Point), 
+                typeof(LineGeometry), 
+                new PropertyMetadata(new Point(), StartPoint_Changed));
 
         private static void StartPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -140,7 +146,7 @@ namespace Windows.UI.Xaml.Media
                                                         double yOffsetToApplyAfterMultiplication, 
                                                         Size shapeActualSize)
         {
-            dynamic ctx = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
+            var ctx = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
             ctx.moveTo(StartPoint.X, StartPoint.Y);
             ctx.lineTo(EndPoint.X, EndPoint.Y);

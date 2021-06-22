@@ -16,12 +16,10 @@
 using CSHTML5;
 using CSHTML5.Internal;
 using System;
-#if WORKINPROGRESS
 #if MIGRATION 
 using System.Windows.Navigation;
 #else
 using Windows.UI.Xaml.Navigation;
-#endif
 #endif
 
 #if MIGRATION
@@ -62,6 +60,8 @@ namespace Windows.UI.Xaml.Controls
             iFrameStyle.width = "100%";
             iFrameStyle.height = "100%";
             iFrameStyle.border = "none";
+
+            CSHTML5.Interop.ExecuteJavaScriptAsync("$0.onload = $1", _iFrame, (Action)OnIframeLoad);
 
 #if MIGRATION
             var source = this.SourceUri;
@@ -179,6 +179,28 @@ namespace Windows.UI.Xaml.Controls
                 {
                     CSHTML5.Interop.ExecuteJavaScriptAsync("$0.src = 'about:blank'", _iFrame);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Occurs when top-level navigation completes and the content loads into the WebBrowser control or when an error occurs during loading.
+        /// </summary>
+        public event LoadCompletedEventHandler LoadCompleted;
+
+        /// <summary>
+        /// Called from JavaScript when the iframe loads
+        /// </summary>
+        private void OnIframeLoad()
+        {
+            if (null != LoadCompleted && this._isLoaded)
+            {
+                Uri source;
+#if MIGRATION
+                source = this.SourceUri;
+#else
+                source = this.Source;
+#endif
+                LoadCompleted(this, new NavigationEventArgs(null, source));
             }
         }
     }
