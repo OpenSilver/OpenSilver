@@ -32,9 +32,118 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Defines column-specific properties that apply to Grid objects.
     /// </summary>
+#if WORKINPROGRESS
+    public sealed partial class ColumnDefinition : DependencyObject, IDefinitionBase
+    {
+        internal Grid Parent;
+        public ColumnDefinition()
+        {
+            MinWidth = 0;
+            _effectiveMinSize = 0;
+            _effectiveUnitType = GridUnitType.Auto;
+            _measureArrangeSize = 0;
+            _finalOffset = 0;
+            _sizeCache = 0;
+        }
+        
+        double IDefinitionBase.MinLength { get { return MinWidth; } }
+        double IDefinitionBase.MaxLength { get { return MaxWidth; } }
+        GridLength IDefinitionBase.Length { get { return Width; } }
+        
+        private double _effectiveMinSize;
+        private double _measureArrangeSize;
+        private double _sizeCache;
+        private double _finalOffset;
+
+        private GridUnitType _effectiveUnitType;
+
+        double IDefinitionBase.GetUserMaxSize()
+        {
+            return MaxWidth;
+        }
+
+        double IDefinitionBase.GetUserMinSize()
+        {
+            return MinWidth;
+        }
+
+        GridUnitType IDefinitionBase.GetUserSizeType()
+        {
+            return Width.GridUnitType;
+        }
+
+        double IDefinitionBase.GetUserSizeValue()
+        {
+            return Width.Value;
+        }
+
+        void IDefinitionBase.UpdateEffectiveMinSize(double newValue)
+        {
+            _effectiveMinSize = Math.Max(_effectiveMinSize, newValue);
+        }
+
+        void IDefinitionBase.SetEffectiveUnitType(GridUnitType type)
+        {
+            _effectiveUnitType = type;
+        }
+        void IDefinitionBase.SetEffectiveMinSize(double value)
+        {
+            _effectiveMinSize = value;
+        }
+
+        double IDefinitionBase.GetEffectiveMinSize()
+        {
+            return _effectiveMinSize;
+        }
+
+        GridUnitType IDefinitionBase.GetEffectiveUnitType()
+        {
+            return _effectiveUnitType;
+        }
+
+        void IDefinitionBase.SetMeasureArrangeSize(double value)
+        {
+            _measureArrangeSize = value;
+        }
+
+        double IDefinitionBase.GetMeasureArrangeSize()
+        {
+            return _measureArrangeSize;
+        }
+
+        void IDefinitionBase.SetSizeCache(double value)
+        {
+            _sizeCache = value;
+        }
+
+        double IDefinitionBase.GetSizeCache()
+        {
+            return _sizeCache;
+        }
+
+        double IDefinitionBase.GetPreferredSize()
+        {
+            return
+                (_effectiveUnitType != GridUnitType.Auto
+                 && _effectiveMinSize < _measureArrangeSize)
+                    ? _measureArrangeSize
+                    : _effectiveMinSize;
+        }
+
+        double IDefinitionBase.GetFinalOffset()
+        {
+            return _finalOffset;
+        }
+
+        void IDefinitionBase.SetFinalOffset(double value)
+        {
+            _finalOffset = value;
+        }
+#else
     public sealed partial class ColumnDefinition : DependencyObject
     {
         internal Grid Parent;
+#endif
 
         /// <summary>
         /// Returns a copy of the current ColumnDefinition.
@@ -64,7 +173,12 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the MaxWidth dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxWidthProperty =
-            DependencyProperty.Register("MaxWidth", typeof(double), typeof(ColumnDefinition), new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed)
+            DependencyProperty.Register("MaxWidth", typeof(double), typeof(ColumnDefinition),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure, MaxWidth_Changed)
+#else
+                new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed)
+#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
@@ -92,7 +206,12 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the MinWidth dependency property.
         /// </summary>
         public static readonly DependencyProperty MinWidthProperty =
-            DependencyProperty.Register("MinWidth", typeof(double), typeof(ColumnDefinition), new PropertyMetadata(double.PositiveInfinity, MinWidth_Changed)
+            DependencyProperty.Register("MinWidth", typeof(double), typeof(ColumnDefinition),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure, MinWidth_Changed)
+#else
+                new PropertyMetadata(double.PositiveInfinity, MinWidth_Changed)
+#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 
@@ -120,7 +239,12 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Width dependency property.
         /// </summary>
         public static readonly DependencyProperty WidthProperty =
-            DependencyProperty.Register("Width", typeof(GridLength), typeof(ColumnDefinition), new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), Width_Changed)
+            DependencyProperty.Register("Width", typeof(GridLength), typeof(ColumnDefinition),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(new GridLength(1.0, GridUnitType.Star), FrameworkPropertyMetadataOptions.AffectsMeasure, Width_Changed)
+#else
+                new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), Width_Changed)
+#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void Width_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -203,8 +327,12 @@ namespace Windows.UI.Xaml.Controls
 
         // Using a DependencyProperty as the backing store for Visibility.  This enables animation, styling, binding, etc...
         internal static readonly DependencyProperty VisibilityProperty =
-            DependencyProperty.Register("Visibility", typeof(Visibility), typeof(ColumnDefinition), new PropertyMetadata(Visibility.Visible, Visibility_Changed));
-
+            DependencyProperty.Register("Visibility", typeof(Visibility), typeof(ColumnDefinition),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(Visibility.Visible, FrameworkPropertyMetadataOptions.AffectsMeasure, Visibility_Changed));
+#else
+                new PropertyMetadata(Visibility.Visible, Visibility_Changed));
+#endif
         private static void Visibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ColumnDefinition columnDefinition = (ColumnDefinition)d;

@@ -137,8 +137,12 @@ namespace Windows.UI.Xaml.Shapes
             DependencyProperty.Register(
                 nameof(Stretch), 
                 typeof(Stretch), 
-                typeof(Shape), 
+                typeof(Shape),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(Stretch.None, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, Stretch_Changed));
+#else
                 new PropertyMetadata(Stretch.None, Stretch_Changed));
+#endif
 
         internal protected static void Stretch_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -211,8 +215,12 @@ namespace Windows.UI.Xaml.Shapes
             DependencyProperty.Register(
                 nameof(Stroke), 
                 typeof(Brush), 
-                typeof(Shape), 
+                typeof(Shape),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, Stroke_Changed));
+#else
                 new PropertyMetadata(null, Stroke_Changed));
+#endif
 
         private static void Stroke_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -235,8 +243,12 @@ namespace Windows.UI.Xaml.Shapes
             DependencyProperty.Register(
                 nameof(StrokeThickness), 
                 typeof(double), 
-                typeof(Shape), 
+                typeof(Shape),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(1d, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, StrokeThickness_Changed));
+#else
                 new PropertyMetadata(1d, StrokeThickness_Changed));
+#endif
 
         private static void StrokeThickness_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1164,6 +1176,11 @@ context.restore();
                 typeof(PenLineCap), 
                 typeof(Shape), 
                 new PropertyMetadata(PenLineCap.Flat));
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            return Size.Zero;
+        }
 
 #endif
 

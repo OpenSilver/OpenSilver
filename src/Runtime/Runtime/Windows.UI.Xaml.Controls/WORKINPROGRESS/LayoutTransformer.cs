@@ -36,8 +36,11 @@ namespace System.Windows.Controls
             DependencyProperty.Register("LayoutTransform",
                                         typeof(Transform),
                                         typeof(LayoutTransformer),
+#if WORKINPROGRESS
+                                        new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
                                         null);
-
+#endif
         //
         // Summary:
         //     Initializes a new instance of the LayoutTransformer class.
@@ -104,7 +107,8 @@ namespace System.Windows.Controls
         [OpenSilver.NotImplemented]
         protected override Size ArrangeOverride(Size finalSize)
         {
-            return default(Size);
+            Console.WriteLine($"TODO {this} ArrangeOverride");
+            throw new NotImplementedException("The method or operation is not implemented.");
         }
         //
         // Summary:
@@ -120,7 +124,8 @@ namespace System.Windows.Controls
         [OpenSilver.NotImplemented]
         protected override Size MeasureOverride(Size availableSize)
         {
-			return default(Size);
+            Console.WriteLine($"TODO {this} MeasureOverride");
+            throw new NotImplementedException("The method or operation is not implemented.");
         }
     }
 }

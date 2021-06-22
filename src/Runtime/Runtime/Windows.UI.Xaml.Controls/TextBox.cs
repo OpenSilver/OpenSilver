@@ -216,12 +216,17 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
         /// <summary>
         /// Identifies the Text dependency property.
         /// </summary>
+
         public static readonly DependencyProperty TextProperty =
             DependencyProperty.Register(
                 nameof(Text), 
                 typeof(string), 
                 typeof(TextBox), 
-                new PropertyMetadata(string.Empty, Text_Changed, CoerceText) 
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, Text_Changed, CoerceText)
+#else
+                new PropertyMetadata(string.Empty, Text_Changed, CoerceText)
+#endif
                 { 
                     MethodToUpdateDom = UpdateDomText 
                 });
@@ -234,7 +239,16 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
         private static void UpdateDomText(DependencyObject d, object newValue)
         {
             var textBox = (TextBox)d;
+            if (textBox.INTERNAL_OuterDomElement != null &&
+                Application.Current.TextMeasurementService.IsTextMeasureDivID(((INTERNAL_HtmlDomElementReference)textBox.INTERNAL_OuterDomElement).UniqueIdentifier))
+            {
+                if (textBox._isUpdatingDOM || textBox._contentEditableDiv == null)
+                    return;
 
+                INTERNAL_HtmlDomManager.SetContentString(textBox, textBox.Text);
+                return;
+            }
+            
             if (textBox._isUpdatingDOM || textBox._contentEditableDiv == null)
                 return;
 
@@ -1298,7 +1312,11 @@ return globalIndexes;
                 nameof(TextWrapping), 
                 typeof(TextWrapping), 
                 typeof(TextBox), 
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(TextWrapping.Wrap, FrameworkPropertyMetadataOptions.AffectsMeasure) // Note: we have made "Wrap" the default value because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
+#else
                 new PropertyMetadata(TextWrapping.Wrap) // Note: we have made "Wrap" the default value because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
+#endif
                 {
                     MethodToUpdateDom = TextWrapping_MethodToUpdateDom
                 });
@@ -1594,7 +1612,12 @@ element.setAttribute(""data-maxlength"", ""{1}"");
                     }
                     else
                     {
+#if WORKINPROGRESS
+                        double contentEditableMaxWidth = Math.Max(0, Width - BorderThickness.Left - BorderThickness.Right);
+                        contentEditableStyle.maxWidth = contentEditableMaxWidth + "px";  //note: this might be incorrect as it does not take into consideration any padding, margin, or other elements that happens between outerDomElement and contentEditableDiv.
+#else
                         contentEditableStyle.maxWidth = outerDomStyle.width;  //note: this might be incorrect as it does not take into consideration any padding, margin, or other elements that happens between outerDomElement and contentEditableDiv.
+#endif
                     }
                 }
             }
@@ -1720,6 +1743,15 @@ element.setAttribute(""data-maxlength"", ""{1}"");
 
         [OpenSilver.NotImplemented]
         public double LineHeight { get; set; }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
+            Size TextSize = Application.Current.TextMeasurementService.Measure(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, TextWrapping, Padding, (availableSize.Width - BorderThicknessSize.Width).Max(0));
+            TextSize.Width = TextSize.Width + BorderThicknessSize.Width;
+            TextSize.Height = TextSize.Height + BorderThicknessSize.Height;
+            return TextSize;
+        }
 #endif
 
         internal override void UpdateVisualStates()

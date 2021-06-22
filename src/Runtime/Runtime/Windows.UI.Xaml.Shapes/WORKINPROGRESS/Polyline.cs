@@ -25,7 +25,7 @@ namespace Windows.UI.Xaml.Shapes
 		// Returns:
 		//     The identifier for the System.Windows.Shapes.Polyline.FillRule dependency property.
 		[OpenSilver.NotImplemented]
-		public static readonly DependencyProperty FillRuleProperty = DependencyProperty.Register("FillRule", typeof(FillRule), typeof(Polyline), null);
+		public static readonly DependencyProperty FillRuleProperty = DependencyProperty.Register("FillRule", typeof(FillRule), typeof(Polyline), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
 		//
 		// Summary:
 		//     Identifies the System.Windows.Shapes.Polyline.Points dependency property.
@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Shapes
 		// Returns:
 		//     The identifier for the System.Windows.Shapes.Polyline.Points dependency property.
 		[OpenSilver.NotImplemented]
-		public static readonly DependencyProperty PointsProperty = DependencyProperty.Register("Points", typeof(PointCollection), typeof(Polyline), null);
+		public static readonly DependencyProperty PointsProperty = DependencyProperty.Register("Points", typeof(PointCollection), typeof(Polyline), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
 		//
 		// Summary:
 		//     Initializes a new instance of the System.Windows.Shapes.Polyline class.

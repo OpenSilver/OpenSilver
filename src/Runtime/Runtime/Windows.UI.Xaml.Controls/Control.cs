@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Windows.Controls.Primitives;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -252,8 +253,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(FontWeight), 
                 typeof(FontWeight), 
-                typeof(Control), 
+                typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
                 new PropertyMetadata(FontWeights.Normal)
+#endif
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
@@ -280,11 +285,18 @@ namespace Windows.UI.Xaml.Controls
                 nameof(FontStyle),
                 typeof(FontStyle),
                 typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(
+#else
                 new PropertyMetadata(
+#endif
 #if MIGRATION
                     FontStyles.Normal
 #else
                     FontStyle.Normal
+#endif
+#if WORKINPROGRESS
+                    , FrameworkPropertyMetadataOptions.AffectsMeasure
 #endif
                     )
                 {
@@ -346,8 +358,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(FontFamily), 
                 typeof(FontFamily), 
-                typeof(Control), 
+                typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
                 new PropertyMetadata((object)null)
+#endif
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
@@ -379,8 +395,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(FontSize), 
                 typeof(double), 
-                typeof(Control), 
+                typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(11d, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
                 new PropertyMetadata(11d)
+#endif
                 { 
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
@@ -427,7 +447,11 @@ namespace Windows.UI.Xaml.Controls
                 nameof(TextDecorations),
                 typeof(TextDecorationCollection),
                 typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata((object)null, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
                 new PropertyMetadata((object)null)
+#endif
                 {
                     GetCSSEquivalent = INTERNAL_GetCSSEquivalentForTextDecorations,
                 });
@@ -526,8 +550,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(Padding), 
                 typeof(Thickness), 
-                typeof(Control), 
-                new PropertyMetadata(new Thickness()) 
+                typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
+                new PropertyMetadata(new Thickness())
+#endif
                 { 
                     MethodToUpdateDom = Padding_MethodToUpdateDom,
                 });
@@ -574,8 +602,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(HorizontalContentAlignment), 
                 typeof(HorizontalAlignment), 
-                typeof(Control), 
+                typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(HorizontalAlignment.Center, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
                 new PropertyMetadata(HorizontalAlignment.Center));
+#endif
 
         //-----------------------
         // VERTICALCONTENTALIGNMENT
@@ -597,8 +629,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(VerticalContentAlignment), 
                 typeof(VerticalAlignment), 
-                typeof(Control), 
+                typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(VerticalAlignment.Center, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+#else
                 new PropertyMetadata(VerticalAlignment.Center));
+#endif
 
         //-----------------------
         // TABINDEX
@@ -1032,7 +1068,7 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         {
             // I think this method should in most (all?) case return two divs, as if it was a frameworkElement.
 #if !BRIDGE
-            return base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
+                return base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
 #else
             return CreateDomElement_WorkaroundBridgeInheritanceBug(parentRef, out domElementWhereToPlaceChildren);
 #endif
@@ -1098,8 +1134,12 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
             DependencyProperty.Register(
                 nameof(FontStretch), 
                 typeof(FontStretch), 
-                typeof(Control), 
+                typeof(Control),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(new FontStretch(), FrameworkPropertyMetadataOptions.AffectsMeasure));
+#else
                 new PropertyMetadata(new FontStretch()));
+#endif
 
         /// <summary>
         ///     The stretch of the desired font.
@@ -1155,6 +1195,31 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         {
 
         }
+#if WORKINPROGRESS
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
+            if (childElements.Count() == 0)
+            {
+                return Size.Zero;
+            }
+
+            Size extent = new Size(0.0, 0.0);
+
+            foreach (DependencyObject child in childElements)
+            {
+                if (child as FrameworkElement == null)
+                    continue;
+
+                FrameworkElement childElement = child as FrameworkElement; 
+                childElement.Measure(availableSize);
+                extent.Width += childElement.DesiredSize.Width;
+                extent.Height += childElement.DesiredSize.Height;
+            }
+            return extent;
+        }
+#endif
+
 #endif
     }
 }

@@ -36,6 +36,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Markup;
+using System.Windows.Controls.Primitives;
 #else
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -121,9 +122,20 @@ namespace Windows.UI.Xaml
 
             // Raise the "Loaded" event:
             this.INTERNAL_RaiseLoadedEvent();
+            
+#if WORKINPROGRESS
+            this.SizeChanged += WindowSizeChangedEventHandler;
         }
 
-        #region Bounds and SizeChanged event
+        private void WindowSizeChangedEventHandler(object sender, WindowSizeChangedEventArgs e)
+        {
+
+            InvalidateMeasure();
+            InvalidateArrange();
+#endif
+        }
+
+#region Bounds and SizeChanged event
 
         INTERNAL_EventManager<WindowSizeChangedEventHandler, WindowSizeChangedEventArgs> _windowSizeChangedEventManager;
         /// <summary>
@@ -232,6 +244,26 @@ namespace Windows.UI.Xaml
                         CSHTML5.Native.Html.Printing.PrintManager.ResetPrintArea();
                     }
                 }
+#if WORKINPROGRESS
+                Application.Current.TextMeasurementService.CreateMeasurementText(this);
+
+                /*
+                // Invalidate when content changed
+                InvalidateMeasure();
+                InvalidateArrange();
+
+                // At the first contentChanged, InvaliateMeasure/Arrange does not work because IsArrangeValid and IsMeasureValid is false.
+                if (CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
+                {
+                    Debug.WriteLine("Delayed CalculateWindowLayout");
+                    // On the simulator, Window Bounds height is zero at the startup.
+                    Task.Delay(500).ContinueWith(t => CalculateWindowLayout());
+                }
+                else
+                    CalculateWindowLayout();*/
+                // Disabled for enabling measure/arrange layout system
+#endif
+
             }
         }
 
@@ -443,6 +475,37 @@ namespace Windows.UI.Xaml
         public void DragResize(WindowResizeEdge resizeEdge)
         {
 
+        }
+
+        private void CalculateWindowLayout()
+        {
+            if (Current.INTERNAL_VisualChildrenInformation == null)
+                return;
+
+            Rect windowBounds = this.Bounds;
+            double width = windowBounds.Width;
+            double height = windowBounds.Height;
+            Debug.WriteLine($"CalculateWindowLayout {width}, {height}");
+            Current.Measure(new Size(width, height));
+            Current.Arrange(windowBounds);
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (this.Content == null)
+                return Size.Zero;
+
+            Rect windowBounds = this.Bounds;
+            availableSize = new Size(windowBounds.Width, windowBounds.Height);
+            Content.Measure(availableSize);
+            return Content.DesiredSize;
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            Rect windowBounds = this.Bounds;
+            finalSize = new Size(windowBounds.Width, windowBounds.Height);
+            return base.ArrangeOverride(finalSize);
         }
 #endif
     }

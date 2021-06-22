@@ -65,6 +65,9 @@ namespace Windows.UI.Xaml.Controls
             divStyle.whiteSpace = TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap";
             divStyle.overflow = "hidden"; //keeps the text from overflowing despite the TextBlock's size limitations.
             divStyle.textAlign = "left"; // this is the default value.
+#if WORKINPROGRESS
+            divStyle.boxSizing = "border-box";
+#endif
             domElementWhereToPlaceChildren = div;
             return div;
         }
@@ -86,7 +89,11 @@ namespace Windows.UI.Xaml.Controls
                 "Text",
                 typeof(string),
                 typeof(TextBlock),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextPropertyChanged));
+#else
                 new PropertyMetadata(string.Empty, OnTextPropertyChanged));
+#endif
 
         private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -169,7 +176,12 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the TextWrapping dependency property.
         /// </summary>
         public static readonly DependencyProperty TextWrappingProperty =
-            DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBlock), new PropertyMetadata(TextWrapping.NoWrap)
+            DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBlock),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(TextWrapping.NoWrap, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
+                new PropertyMetadata(TextWrapping.NoWrap)
+#endif
             {
                 GetCSSEquivalent = (instance) =>
                 {
@@ -219,7 +231,12 @@ namespace Windows.UI.Xaml.Controls
                 "TextTrimming",
                 typeof(TextTrimming),
                 typeof(TextBlock),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(TextTrimming.None, FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
                 new PropertyMetadata(TextTrimming.None)
+#endif
+
                 {
                     MethodToUpdateDom = OnTextTrimmedChangedUpdateDOM
                 });

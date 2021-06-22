@@ -224,7 +224,11 @@ namespace Windows.UI.Xaml.Controls
             "Text",
             typeof(string),
             typeof(INTERNAL_DateTimePickerBase),
+#if WORKINPROGRESS
+            new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextChanged)
+#else
             new PropertyMetadata(string.Empty, OnTextChanged)
+#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>

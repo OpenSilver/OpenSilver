@@ -143,6 +143,10 @@ namespace Windows.UI.Xaml.Controls
             {
                 ColumnDefinitions_CollectionChanged_NonCSSVersion(sender, e);
             }
+
+#if WORKINPROGRESS
+            InvalidateDefinitions();
+#endif
         }
 
         void ColumnDefinitions_CollectionChanged_NonCSSVersion(object sender, NotifyCollectionChangedEventArgs e)
@@ -194,6 +198,10 @@ namespace Windows.UI.Xaml.Controls
             {
                 RowDefinitions_CollectionChanged_NonCSSVersion(sender, e);
             }
+            
+#if WORKINPROGRESS
+            InvalidateDefinitions();
+#endif
         }
 
         void RowDefinitions_CollectionChanged_NonCSSVersion(object sender, NotifyCollectionChangedEventArgs e)

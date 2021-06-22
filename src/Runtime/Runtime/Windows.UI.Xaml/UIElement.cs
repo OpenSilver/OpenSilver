@@ -424,7 +424,11 @@ namespace Windows.UI.Xaml
                 nameof(Visibility),
                 typeof(Visibility),
                 typeof(UIElement),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(Visibility.Visible, FrameworkPropertyMetadataOptions.AffectsParentMeasure, Visibility_Changed));
+#else
                 new PropertyMetadata(Visibility.Visible, Visibility_Changed));
+#endif
 
         private string _previousValueOfDisplayCssProperty = "block";
 

@@ -5,6 +5,9 @@ using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
+using System.Windows.Controls.Primitives;
+using System.Linq;
+using System.Windows.Controls;
 #else
 using Windows.UI.Xaml.Media;
 using Windows.Foundation;
@@ -119,39 +122,302 @@ namespace Windows.UI.Xaml
                                         typeof(UIElement), 
                                         null);
 
-		[OpenSilver.NotImplemented]
-        public Size DesiredSize { get; private set; }
-		[OpenSilver.NotImplemented]
-        public Size RenderSize { get; private set; }
+        public Size RenderSize { get { return VisualBounds.Size; } }
 
-		[OpenSilver.NotImplemented]
+        public Size DesiredSize { get; private set; }
+        
+        public Rect VisualBounds { get; protected set; }
+
+        public bool IsMeasureValid { get; private set; }
+        public bool IsArrangeValid { get; private set; }
+
+        public Rect PreviousFinalRect { get; private set; }
+        public Size PreviousAvailableSize { get; private set; }
+        private Size previousDesiredSize;
+        
+        private Size layoutMeasuredSize;
+        private Size layoutLastSize;
+        private bool layoutProcessing;
+
+        private int disableMeasureInvalidationRequests;
+        private IDisposable disableMeasureInvalidationToken;
+        private int visualLevel;
+        public int VisualLevel
+        {
+            get
+            {
+                if (visualLevel == -1)
+                {
+                    visualLevel = (INTERNAL_VisualParent as UIElement) != null ? (INTERNAL_VisualParent as UIElement).VisualLevel + 1 : 0;
+                }
+
+                return visualLevel;
+            }
+        }
+
+        public bool IsCustomLayoutRoot
+        {
+            get
+            {
+                FrameworkElement child = this as FrameworkElement;
+
+                if (child.CustomLayout == false)
+                    return false;
+
+                FrameworkElement layoutRoot = null;
+                while (child != null)
+                {
+                    if (child.CustomLayout)
+                        layoutRoot = child;
+                    child = child.INTERNAL_VisualParent as FrameworkElement;
+                }
+
+                if (layoutRoot == null)
+                    return false;
+
+                return layoutRoot == this;
+            }
+        }
+
+        public UIElement()
+        {
+            DesiredSize = Size.Zero;
+            PreviousFinalRect = Rect.Empty;
+            PreviousAvailableSize = Size.Infinity;
+            previousDesiredSize = Size.Empty;
+            layoutMeasuredSize = Size.Empty;
+            layoutLastSize = Size.Empty;
+            layoutProcessing = false;
+            IsMeasureValid = false;
+            IsArrangeValid = false;
+            visualLevel = -1;
+
+            disableMeasureInvalidationToken = new Disposable(() => disableMeasureInvalidationRequests--);
+        }
+        private IDisposable DisableMeasureInvalidation()
+        {
+            disableMeasureInvalidationRequests++;
+            return disableMeasureInvalidationToken;
+        }
+        internal void RaiseLayoutUpdated()
+        {
+            OnLayoutUpdated();
+        }
+        protected virtual void OnLayoutUpdated()
+        {
+            //
+        }
         public void Arrange(Rect finalRect)
         {
+            if (this.INTERNAL_OuterDomElement == null)
+            {
+                LayoutManager.Current.RemoveArrange(this);
+                PreviousFinalRect = finalRect;
+                IsArrangeValid = true;
+                return;
+            }
+
+            using (System.Windows.Threading.Dispatcher.INTERNAL_GetCurrentDispatcher().DisableProcessing())
+            {
+                using (DisableMeasureInvalidation())
+                {
+                    bool previousArrangeValid = IsArrangeValid;
+                    Rect savedPreviousFinalRect = PreviousFinalRect;
+                    PreviousFinalRect = finalRect;
+                    IsArrangeValid = true;
+
+                    LayoutManager.Current.RemoveArrange(this);
+
+                    if (Visibility != Visibility.Visible ||
+                        (previousArrangeValid && finalRect.Location.IsClose(savedPreviousFinalRect.Location) && finalRect.Size.IsClose(savedPreviousFinalRect.Size)))
+                    {
+                        //Console.WriteLine($"Arrange previousFinalRect {this}");
+                        return;
+                    }
+
+                    if (!IsMeasureValid)
+                    {
+                        Size previousDesiredSize = this.DesiredSize;
+                        Measure(finalRect.Size);
+                        if (previousDesiredSize != this.DesiredSize)
+                        {
+                            this.InvalidateParentMeasure();
+                            this.InvalidateParentArrange();
+                        }
+                    }
+
+                    ArrangeCore(finalRect);
+
+                    PreviousFinalRect = finalRect;
+
+                    // Render with new size & location
+                    Render();
+
+                    LayoutManager.Current.AddUpdatedElement(this);
+                }
+            }
+        }
+
+        private void Render()
+        {
+            if (IsCustomLayoutRoot)
+                return;
+
+            if (this.INTERNAL_VisualParent != null && this.INTERNAL_VisualParent as Canvas != null)
+                return;
+
+            if (this as Window == null && this as PopupRoot == null)
+            {
+                INTERNAL_HtmlDomStyleReference uiStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement);
+                uiStyle.position = "absolute";
+                uiStyle.left = $"{VisualBounds.Left}px";
+                uiStyle.top = $"{VisualBounds.Top}px";
+                uiStyle.width = $"{VisualBounds.Width}px";
+                uiStyle.height = $"{VisualBounds.Height}px";
+                uiStyle.marginLeft = "0";
+                uiStyle.marginTop = "0";
+                uiStyle.marginRight = "0";
+                uiStyle.marginBottom = "0";
+
+                if (this.INTERNAL_AdditionalOutsideDivForMargins != null && this.INTERNAL_AdditionalOutsideDivForMargins != this.INTERNAL_OuterDomElement)
+                {
+                    //INTERNAL_HtmlDomElementReference domElementForMargin = (INTERNAL_HtmlDomElementReference)this.INTERNAL_AdditionalOutsideDivForMargins;
+                    //Console.WriteLine($"Set {domElementForMargin.UniqueIdentifier} padding&margin 0");
+                    INTERNAL_HtmlDomStyleReference uiMarginStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification((INTERNAL_HtmlDomElementReference)this.INTERNAL_AdditionalOutsideDivForMargins);
+                    uiMarginStyle.padding = "0";
+                    uiMarginStyle.marginLeft = "0";
+                    uiMarginStyle.marginTop = "0";
+                    uiMarginStyle.marginRight = "0";
+                    uiMarginStyle.marginBottom = "0";
+                    uiMarginStyle.position = "";    // FOR Grid
+                    uiMarginStyle.gridArea = "";    // FOR Grid
+                }
+            }
+        }
+
+        protected virtual void ArrangeCore(Rect finalRect)
+        {
 
         }
 
-		[OpenSilver.NotImplemented]
+        protected virtual Size MeasureCore(Size availableSize)
+        {
+            return Size.Empty;
+        }
+
         public void Measure(Size availableSize)
         {
+            if (this.INTERNAL_OuterDomElement == null)
+            {
+                LayoutManager.Current.RemoveMeasure(this);
+                PreviousAvailableSize = availableSize;
+                IsMeasureValid = true;
+                return;
+            }
 
+            using (System.Windows.Threading.Dispatcher.INTERNAL_GetCurrentDispatcher().DisableProcessing())
+            {
+                using (DisableMeasureInvalidation())
+                {
+                    bool previousMeasureValid = IsMeasureValid;
+                    Size savedPreviousAvailableSize = PreviousAvailableSize;
+                    PreviousAvailableSize = availableSize;
+                    IsMeasureValid = true;
+
+                    LayoutManager.Current.RemoveMeasure(this);
+
+                    if (Visibility == Visibility.Collapsed)
+                    {
+                        DesiredSize = Size.Zero;
+                    }
+                    else if (previousMeasureValid && savedPreviousAvailableSize.IsClose(availableSize) && previousDesiredSize != Size.Empty)
+                    {
+                        DesiredSize = previousDesiredSize;
+                    }
+                    else
+                    {
+                        DesiredSize = MeasureCore(availableSize);
+
+                        PreviousAvailableSize = availableSize;
+                        previousDesiredSize = DesiredSize;
+                    }
+                }
+            }
         }
 
-		[OpenSilver.NotImplemented]
         public void InvalidateArrange()
         {
+            if (!IsArrangeValid)
+            {
+                return;
+            }
 
+            IsArrangeValid = false;
+
+            LayoutManager.Current.AddArrange(this);
+        }
+        public void InvalidateParentMeasure()
+        {
+            if (INTERNAL_VisualParent as UIElement != null)
+            {
+                (INTERNAL_VisualParent as UIElement).InvalidateMeasure();
+            }
         }
 
-		[OpenSilver.NotImplemented]
+        public void InvalidateParentArrange()
+        {
+            if (INTERNAL_VisualParent as UIElement != null)
+            {
+                (INTERNAL_VisualParent as UIElement).InvalidateArrange();
+            }
+        }
+        
         public void InvalidateMeasure()
         {
+            if (disableMeasureInvalidationRequests > 0 || !IsMeasureValid)
+            {
+                return;
+            }
 
+            IsMeasureValid = false;
+
+            LayoutManager.Current.AddMeasure(this);
         }
 
-		[OpenSilver.NotImplemented]
         public void UpdateLayout()
         {
 
+        }
+
+        public void UpdateCustomLayout(Size newSize)
+        {
+            layoutLastSize = newSize;
+            if (layoutProcessing)
+                return;
+
+            layoutProcessing = true;
+            Dispatcher.BeginInvoke((Action)BeginUpdateCustomLayout);
+        }
+
+        public void BeginUpdateCustomLayout()
+        {
+            layoutMeasuredSize = layoutLastSize;
+            Measure(layoutMeasuredSize);
+
+            if (layoutMeasuredSize != layoutLastSize)
+            {
+                BeginUpdateCustomLayout();
+                return;
+            }
+
+            Arrange(new Rect(layoutMeasuredSize));
+            if (layoutMeasuredSize != layoutLastSize)
+            {
+                BeginUpdateCustomLayout();
+                return;
+            }
+
+            layoutProcessing = false;
         }
 
 #if OPENSILVER

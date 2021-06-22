@@ -485,7 +485,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
             double maxMinusMin = maxValue - minValue;
 
             trackSize = Math.Max(0d, totalControlSize - _smallDecreaseButtonSize - _smallIncreaseButtonSize); // Note: the "Track" is the area where the thumb moves.
+#if WORKINPROGRESS
+            thumbSize = maxMinusMin > 0 ? (trackSize * this.ViewportSize / (maxMinusMin + this.ViewportSize)) : trackSize;
+#else
             thumbSize = maxMinusMin > 0 ? (trackSize * this.ViewportSize / (maxMinusMin * 2)) : trackSize; // Note: the *2 factor was added to obtain the same result as in MS XAML, where for some reason, when for example the ViewportSize is the same as the MaxMinusMin, the thumb occupies half the track length.
+#endif
             thumbSize = Math.Min(trackSize, Math.Max(MINIMUM_THUMB_SIZE, thumbSize));
             scrollableSize = trackSize - thumbSize; // Note: the "ScrollableSize" corresponds to the distance that the center of the thumb can travel.
         }
@@ -573,8 +577,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the Orientation dependency property.
         /// </summary>
         public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(ScrollBar), new PropertyMetadata(Orientation.Vertical, Orientation_Changed));
-
+            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(ScrollBar),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Orientation_Changed));
+#else
+                new PropertyMetadata(Orientation.Vertical, Orientation_Changed));
+#endif
         private static void Orientation_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             // Attempt to refresh all the elements inside the scrollbar:

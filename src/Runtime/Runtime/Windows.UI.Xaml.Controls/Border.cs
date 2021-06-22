@@ -221,8 +221,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(BorderThickness), 
                 typeof(Thickness), 
-                typeof(Border), 
-                new PropertyMetadata(new Thickness()) 
+                typeof(Border),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
+                new PropertyMetadata(new Thickness())
+#endif
                 { 
                     MethodToUpdateDom = BorderThickness_MethodToUpdateDom
                 });
@@ -287,8 +291,12 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(Padding), 
                 typeof(Thickness), 
-                typeof(Border), 
-                new PropertyMetadata(new Thickness()) 
+                typeof(Border),
+#if WORKINPROGRESS
+                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
+#else
+                new PropertyMetadata(new Thickness())
+#endif
                 { 
                     MethodToUpdateDom = Padding_MethodToUpdateDom
                 });
@@ -306,5 +314,34 @@ namespace Windows.UI.Xaml.Controls
                 "{0}px {1}px {2}px {3}px",
                 newPadding.Top, newPadding.Right, newPadding.Bottom, newPadding.Left);
         }
+
+#if WORKINPROGRESS
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (Child == null)
+            {
+                return Size.Zero;
+            }
+
+            Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
+            Size PaddingSize = new Size(Padding.Left + Padding.Right, Padding.Top + Padding.Bottom);
+            Child.Measure((availableSize - BorderThicknessSize - PaddingSize).Max(Size.Zero));
+            return Child.DesiredSize + BorderThicknessSize + PaddingSize;
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            if (Child != null)
+            {
+                Point PaddingLocation = new Point(Padding.Left, Padding.Top);
+                Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
+                Size PaddingSize = new Size(Padding.Left + Padding.Right, Padding.Top + Padding.Bottom);
+                
+                Child.Arrange(new Rect(PaddingLocation, (finalSize - BorderThicknessSize - PaddingSize).Max(Size.Zero)));
+            }
+
+            return finalSize;
+        }
+#endif
     }
 }

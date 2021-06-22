@@ -407,6 +407,19 @@ namespace Windows.UI.Xaml
             INTERNAL_PropertyStore.SetValueCommon(storage, value, false);
         }
 
+        public virtual void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+#if WORKINPROGRESS
+			// When it is DependencyObject(meaning it isn't FrameworkElement), raise parent's.
+			// This function would be called from DependencyObject RowDefinition and ColumnDefinition
+            if (this.InheritedParent != null)
+            {
+                this.InheritedParent.OnPropertyChanged(e);
+                return;
+            }
+#endif
+        }
+
         internal void SetLocalStyleValue(DependencyProperty dp, object value)
         {
             INTERNAL_PropertyStorage storage;
