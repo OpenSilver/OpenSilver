@@ -6,13 +6,11 @@
         xmlns:xamlinspection="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection"
         xmlns:licensecheckernamespace="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking"
         xmlns:console="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.Console"
-        Title="Simulator - C#/XAML for HTML5"
         SizeToContent="WidthAndHeight"
         ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="Manual"
         ShowIconOnTitleBar="True"
         GlowBrush="{DynamicResource AccentColorBrush}"
-        Icon="Icon1.ico"
         Left="100" Top="5">
     <mahapps:MetroWindow.Resources>
         <ResourceDictionary>

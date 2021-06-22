@@ -297,7 +297,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="teamdev.licenses" />
-    <Resource Include="Icon1.ico" />
+    <Resource Include="OpenSilverIcon.ico" />
     <None Include="Service References\LicensingServiceReference\LicensingService.disco" />
     <None Include="Service References\LicensingServiceReference\configuration91.svcinfo" />
     <None Include="Service References\LicensingServiceReference\configuration.svcinfo" />

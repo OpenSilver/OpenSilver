@@ -44,6 +44,7 @@ using System.Net.NetworkInformation;
 using DotNetForHtml5.EmulatorWithoutJavascript.Debugging;
 using DotNetBrowser.Events;
 using DotNetForHtml5.EmulatorWithoutJavascript.Console;
+using System.Windows.Media.Imaging;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
@@ -95,11 +96,18 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             
             InitializeComponent();
 
+#if OPENSILVER
+            Icon = new BitmapImage(new Uri("pack://application:,,,/OpenSilver.Simulator;component/OpenSilverIcon.ico"));
+            Title = "Simulator - OpenSilver";
+#else
+            Icon = new BitmapImage(new Uri("pack://application:,,,/CSharpXamlForHtml5.Simulator;component/CSHTML5Icon.ico"));
+            Title = "Simulator - CSHTML5";
+#endif
+
             MessageToDisplayDuringFirstTimeCompilation.Visibility = Visibility.Collapsed;
             MessageToDisplayWhenCompilationIsSlow.Visibility = Visibility.Collapsed;
 
 #if BRIDGE
-            this.Title += " (v2.x)";
             MenuButtonViewCompilationLog.Visibility = Visibility.Collapsed; // In version 2.x, the JavaScript generation is done at compile-time rather than by the Simulator.
 #else
             WelcomeTextBlock.Visibility = Visibility.Collapsed; // In version 1.x, we do not display the welcome text because there is already a similar text while the JS generation is taking place.
@@ -1954,7 +1962,7 @@ Click OK to continue.";
             }
         }
 
-        #region Element Picker for XAML Inspection
+#region Element Picker for XAML Inspection
 
         void StartElementPickerForInspection()
         {
@@ -2022,7 +2030,7 @@ Click OK to continue.";
                 StopElementPickerForInspection();
         }
 
-        #endregion
+#endregion
 
 
         private bool IsNetworkAvailable()
@@ -2030,14 +2038,14 @@ Click OK to continue.";
             return NetworkInterface.GetIsNetworkAvailable();
         }
 
-        #region profil popup
+#region profil popup
 
         private void ButtonLogout_Click(object sender, RoutedEventArgs e)
         {
             LicenseChecker.LogOut();
         }
 
-        #endregion
+#endregion
 
         private void LaunchOptimizerButton_Click(object sender, RoutedEventArgs e)
         {
