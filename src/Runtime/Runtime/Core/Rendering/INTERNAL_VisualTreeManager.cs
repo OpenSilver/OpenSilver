@@ -153,11 +153,10 @@ namespace CSHTML5.Internal
 
 
                     INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
-#if WORKINPROGRESS
+
                     child.InvalidateMeasure();
                     child.InvalidateArrange();
                     parent.InvalidateArrange();
-#endif
                 }
                 else
                 {
@@ -246,10 +245,9 @@ namespace CSHTML5.Internal
                 // position of the child. We have to iterate through all the
                 // child to find it.
                 MoveVisualChildInSameParent(child, parent, newIndex);
-#if WORKINPROGRESS
+
                 parent.InvalidateMeasure();
                 parent.InvalidateArrange();
-#endif
                 return;
             }
 
@@ -295,10 +293,9 @@ namespace CSHTML5.Internal
                             domElementWhereToPlaceChildStuff,
                             domElementToMove);
                     }
-#if WORKINPROGRESS
+
                     parent.InvalidateMeasure();
                     parent.InvalidateArrange();
-#endif
                 }
             }
         }
@@ -370,12 +367,10 @@ if(nextSibling != undefined) {
 
                 INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
 
-#if WORKINPROGRESS
                 child.InvalidateMeasure();
                 child.InvalidateArrange();
                 parent.InvalidateMeasure();
                 parent.InvalidateArrange();
-#endif
             }
         }
 

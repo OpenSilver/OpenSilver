@@ -56,11 +56,7 @@ namespace Windows.UI.Xaml.Controls
                 "FontFamily",
                 typeof(FontFamily),
                 typeof(DataGridTextColumn),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure, OnFontFamilyPropertyChanged));
-#else
-                new PropertyMetadata(OnFontFamilyPropertyChanged));
-#endif
 
         private static void OnFontFamilyPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

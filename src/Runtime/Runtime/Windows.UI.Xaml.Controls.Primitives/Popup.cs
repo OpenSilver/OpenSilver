@@ -132,11 +132,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 nameof(Placement), 
                 typeof(PlacementMode), 
                 typeof(Popup),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(PlacementMode.Right, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
-#else
-                new PropertyMetadata(PlacementMode.Right));
-#endif
 
         /// <summary>
         /// This boolean determines whether the popup can force its content to catch clicks.
@@ -382,11 +378,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 nameof(HorizontalOffset), 
                 typeof(double), 
                 typeof(Popup),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsArrange, HorizontalOffset_Changed)
-#else
-                new PropertyMetadata(0d, HorizontalOffset_Changed)
-#endif
                 { 
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
                 });
@@ -418,11 +410,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 nameof(VerticalOffset), 
                 typeof(double), 
                 typeof(Popup),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsArrange, VerticalOffset_Changed)
-#else
-                new PropertyMetadata(0d, VerticalOffset_Changed)
-#endif
                 { 
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
                 });
@@ -509,12 +497,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 nameof(VerticalContentAlignment), 
                 typeof(VerticalAlignment), 
                 typeof(Popup),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(VerticalAlignment.Top, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, VerticalContentAlignment_Changed)
-#else
-                new PropertyMetadata(VerticalAlignment.Top, VerticalContentAlignment_Changed)
-#endif
-                
                 { 
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
                 });
@@ -716,7 +699,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
 
         }
-
+#endif
         protected override Size MeasureOverride(Size availableSize)
         {
             return Size.Zero;
@@ -752,6 +735,5 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
             return finalSize;
         }
-#endif
     }
 }

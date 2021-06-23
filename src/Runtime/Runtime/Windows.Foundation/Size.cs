@@ -42,14 +42,13 @@ namespace Windows.Foundation
         
         private double _width;
         private double _height;
-#if WORKINPROGRESS
+
         private static readonly Size zeroSize;
         private static readonly Size infinitySize;
         public bool IsWidthEmpty { get { return Double.IsNaN(_width); } }
         public bool IsHeightEmpty { get { return Double.IsNaN(_height); } }
         public bool IsEmpty { get { return IsWidthEmpty && IsHeightEmpty; } }
         public bool IsPartiallyEmpty { get { return IsWidthEmpty || IsHeightEmpty; } }
-#endif
         
         static Size()
         {
@@ -59,10 +58,8 @@ namespace Windows.Foundation
                 _height = double.NegativeInfinity
             };
 
-#if WORKINPROGRESS
             zeroSize = new Size(0, 0);
             infinitySize = new Size(Double.PositiveInfinity, Double.PositiveInfinity);
-#endif
             TypeFromStringConverters.RegisterConverter(typeof(Size), s => Parse(s));
         }
 
@@ -118,7 +115,7 @@ namespace Windows.Foundation
             return size1.Height == size2.Height && size1.Width == size2.Width;
         }
 
-#if WORKINPROGRESS
+
         public static Size operator -(Size size)
         {
             if (size == Size.Zero)
@@ -158,7 +155,6 @@ namespace Windows.Foundation
 
             return new Size(size1.Width + size2.Width, size1.Height + size2.Height);
         }
-#endif
         
         /// <summary>
         /// Gets a value that represents a static empty Windows.Foundation.Size.
@@ -171,7 +167,6 @@ namespace Windows.Foundation
             }
         }
 
-#if WORKINPROGRESS
         /// <summary>
         /// Gets a value that represents a static zero Windows.Foundation.Size.
         /// </summary>
@@ -193,7 +188,6 @@ namespace Windows.Foundation
                 return infinitySize;
             }
         }
-#endif
         
 
         /// <summary>
@@ -218,19 +212,7 @@ namespace Windows.Foundation
                 this._height = value;
             }
         }
-#if !WORKINPROGRESS      
-        /// <summary>
-        /// Gets a value that indicates whether this instance of
-        /// Windows.Foundation.Size is Windows.Foundation.Size.Empty.
-        /// </summary>
-        public bool IsEmpty
-        {
-            get
-            {
-                return this._width < 0;
-            }
-        }
-#endif      
+
         /// <summary>
         /// Gets or sets the width of this instance of Windows.Foundation.Size.
         /// </summary>
@@ -345,7 +327,6 @@ namespace Windows.Foundation
 
     }
     
-#if WORKINPROGRESS
     public static class SizeExtensions
     {
         public static Size Combine(this Size size, Size fallback)
@@ -441,5 +422,4 @@ namespace Windows.Foundation
                 @this.IsHeightEmpty ? size.Height : (size.IsHeightEmpty ? @this.Height : Math.Max(@this.Height, size.Height)));
         }
     }
-#endif
 }

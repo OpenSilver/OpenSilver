@@ -217,11 +217,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(ColumnHeaderStyle),
                 typeof(Style),
                 typeof(DataGrid),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnColumnHeaderStyleChanged));
-#else
-                new PropertyMetadata(null, OnColumnHeaderStyleChanged));
-#endif
 
         private static void OnColumnHeaderStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -243,11 +239,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(ColumnHeaderHeight),
                 typeof(double),
                 typeof(DataGrid),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
-#else
-                new PropertyMetadata(double.NaN));
-#endif
 
         /// <summary>
         /// Gets or sets the style applied to all cells in the <see cref="DataGrid"/>.

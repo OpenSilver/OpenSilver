@@ -199,7 +199,7 @@ namespace Windows.UI.Xaml.Controls
             // Attach children to panel
             this.Owner.Refresh(false);
         }
-#if WORKINPROGRESS
+
         protected override Size MeasureOverride(Size availableSize)
         {
             if (ItemsHost == null)
@@ -210,6 +210,5 @@ namespace Windows.UI.Xaml.Controls
             ItemsHost.Measure(availableSize);
             return ItemsHost.DesiredSize;
         }
-#endif
     }
 }

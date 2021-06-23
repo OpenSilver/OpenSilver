@@ -51,11 +51,7 @@ namespace Windows.UI.Xaml.Documents
                 nameof(Text), 
                 typeof(string), 
                 typeof(Run),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextPropertyChanged));
-#else
-                new PropertyMetadata(string.Empty, OnTextPropertyChanged));
-#endif
 
         private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -69,10 +65,8 @@ namespace Windows.UI.Xaml.Documents
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             dynamic span = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("span", parentRef, this);
-#if WORKINPROGRESS
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(span);
             style.textDecoration = "inherit";
-#endif
             domElementWhereToPlaceChildren = span;
             return span;
         }

@@ -45,6 +45,9 @@ namespace Windows.Foundation
         internal double _x;
         internal double _y;
 
+		public static readonly Point Empty = new Point();
+		public static readonly Point Zero = new Point(0, 0);
+
         /// <summary>
         /// Initializes a Windows.Foundation.Point structure that
         /// contains the specified values.
@@ -215,6 +218,44 @@ namespace Windows.Foundation
         public string ToString(string format, IFormatProvider formatProvider)
         {
             return null;
+        }
+		public static Point operator +(Point point1, Point point2)
+        {
+            if (point1 == Point.Zero)
+            {
+                return point2;
+            }
+
+            if (point2 == Point.Zero)
+            {
+                return point1;
+            }
+
+            return new Point(point1.X + point2.X, point1.Y + point2.Y);
+        }
+
+        public static Point operator -(Point point1, Point point2)
+        {
+            if (point1 == Point.Zero)
+            {
+                return -point2;
+            }
+
+            if (point2 == Point.Zero)
+            {
+                return point1;
+            }
+
+            return new Point(point1.X - point2.X, point1.Y - point2.Y);
+        }
+        public static Point operator -(Point point)
+        {
+            if (point == Point.Zero)
+            {
+                return point;
+            }
+
+            return new Point(-point.X, -point.Y);
         }
     }
 }

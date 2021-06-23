@@ -80,11 +80,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty OrientationProperty =
             DependencyProperty.Register("Orientation", typeof(Orientation), typeof(WrapPanel),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(Orientation.Horizontal, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Orientation_Changed)
-#else
-                new PropertyMetadata(Orientation.Horizontal, Orientation_Changed)
-#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         static void Orientation_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

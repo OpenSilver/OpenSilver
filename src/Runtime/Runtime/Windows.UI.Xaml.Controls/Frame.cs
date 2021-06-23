@@ -120,11 +120,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty SourceProperty =
             DependencyProperty.Register("Source", typeof(Uri), typeof(Frame),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Source_Changed)
-#else
-                new PropertyMetadata(null, Source_Changed)
-#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void Source_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -828,10 +824,9 @@ namespace Windows.UI.Xaml.Controls
                 }
                 );
             }
-#if WORKINPROGRESS
+
             InvalidateMeasure();
             InvalidateArrange();
-#endif
         }
 
         private bool CheckIfThisIsATopLevelFrame()

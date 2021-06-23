@@ -222,11 +222,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(BorderThickness), 
                 typeof(Thickness), 
                 typeof(Border),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
-#else
-                new PropertyMetadata(new Thickness())
-#endif
                 { 
                     MethodToUpdateDom = BorderThickness_MethodToUpdateDom
                 });
@@ -292,11 +288,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Padding), 
                 typeof(Thickness), 
                 typeof(Border),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
-#else
-                new PropertyMetadata(new Thickness())
-#endif
                 { 
                     MethodToUpdateDom = Padding_MethodToUpdateDom
                 });
@@ -315,7 +307,6 @@ namespace Windows.UI.Xaml.Controls
                 newPadding.Top, newPadding.Right, newPadding.Bottom, newPadding.Left);
         }
 
-#if WORKINPROGRESS
         protected override Size MeasureOverride(Size availableSize)
         {
             if (Child == null)
@@ -342,6 +333,5 @@ namespace Windows.UI.Xaml.Controls
 
             return finalSize;
         }
-#endif
     }
 }

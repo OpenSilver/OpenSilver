@@ -86,11 +86,7 @@ namespace Windows.UI.Xaml.Controls
             "DisplayMode",
             typeof(DataPager_DisplayMode),
             typeof(DataPager),
-#if WORKINPROGRESS
             new FrameworkPropertyMetadata(DataPager_DisplayMode.Numeric, FrameworkPropertyMetadataOptions.AffectsMeasure, OnDisplayModeChanged)
-#else
-            new PropertyMetadata(DataPager_DisplayMode.Numeric, OnDisplayModeChanged)
-#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void OnDisplayModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -208,11 +204,7 @@ namespace Windows.UI.Xaml.Controls
             "PageSize",
             typeof(int),
             typeof(DataPager),
-#if WORKINPROGRESS
             new FrameworkPropertyMetadata(-1, FrameworkPropertyMetadataOptions.AffectsMeasure, OnPageSizeChanged)
-#else
-            new PropertyMetadata(-1, OnPageSizeChanged)
-#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
@@ -291,11 +283,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty NumericButtonStyleProperty =
             DependencyProperty.Register("NumericButtonStyle", typeof(Style), typeof(DataPager),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure));
-#else
-                new PropertyMetadata(null));
-#endif
 
 #endregion
 

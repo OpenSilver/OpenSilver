@@ -36,11 +36,7 @@ namespace Windows.UI.Xaml.Controls
 		DependencyProperty.Register("ItemHeight",
 										typeof(double),
 										typeof(WrapPanel),
-#if WORKINPROGRESS
 										new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
-#else
-										new PropertyMetadata(double.NaN));
-#endif
 
 		//
 		// Summary:
@@ -68,11 +64,7 @@ namespace Windows.UI.Xaml.Controls
 		    DependencyProperty.Register("ItemWidth",
 										typeof(double),
 										typeof(WrapPanel),
-#if WORKINPROGRESS
 										new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
-#else
-										new PropertyMetadata(double.NaN));
-#endif
 		private void MeasureChild(UIElement child, double availableMainLength, double availableCrossLength)
 		{
 			child.Measure(Orientation == Orientation.Horizontal ?

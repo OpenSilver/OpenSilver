@@ -28,16 +28,11 @@ using Windows.Foundation;
 #endif
 
 #if MIGRATION
-#if WORKINPROGRESS
 namespace System.Windows.Threading
-#else
-namespace System.Windows
-#endif
 #else
 namespace Windows.UI.Core
 #endif
 {
-#if WORKINPROGRESS
     public enum DispatcherPriority
     {
         Invalid = -1,
@@ -53,7 +48,6 @@ namespace Windows.UI.Core
         Normal = 9,
         Send = 10,
     }
-#endif
 
     /// <summary>
     /// Provides the core event message dispatcher. Instances of this type are responsible
@@ -189,7 +183,6 @@ namespace Windows.UI.Core
              */
         }
 
-#if WORKINPROGRESS
         private PriorityQueue<DispatcherOperation> queue;
         private int disableProcessingRequests;
         private IDisposable disableProcessingToken;
@@ -269,6 +262,8 @@ namespace Windows.UI.Core
             operation = null;
             return false;
         }
+
+#if WORKINPROGRESS
 		[OpenSilver.NotImplemented]
         public DispatcherOperation BeginInvoke(Delegate d, params object[] args)
         {

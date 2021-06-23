@@ -25,11 +25,8 @@ namespace System.Windows
 			DependencyProperty.Register("Content",
 										typeof(FrameworkElement),
 										typeof(NotificationWindow),
-#if WORKINPROGRESS
 										new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
-#else
-										null);
-#endif
+
 		//
 		// Summary:
 		//     Identifies the System.Windows.NotificationWindow.Height dependency property.
@@ -41,11 +38,8 @@ namespace System.Windows
 			DependencyProperty.Register("Height",
 										typeof(double),
 										typeof(NotificationWindow),
-#if WORKINPROGRESS
 										new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
-#else
-										null);
-#endif
+
 		//
 		// Summary:
 		//     Identifies the System.Windows.NotificationWindow.Width dependency property.
@@ -57,11 +51,8 @@ namespace System.Windows
 			DependencyProperty.Register("Width",
 										typeof(double),
 										typeof(NotificationWindow),
-#if WORKINPROGRESS
 										new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
-#else
-										null);
-#endif
+
 		//
 		// Summary:
 		//     Initializes a new instance of the System.Windows.NotificationWindow class.

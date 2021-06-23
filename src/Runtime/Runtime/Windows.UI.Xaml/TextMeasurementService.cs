@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 #if MIGRATION
 using CSHTML5.Internal;
 using System.Windows.Controls;
@@ -11,8 +10,8 @@ namespace Windows.UI.Xaml
 {
     public interface ITextMeasurementService
     {
-        Size Measure(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, FontStretch stretch, TextWrapping wrapping, Thickness padding, double maxWidth);
-        Size MeasureTextBlock(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, FontStretch stretch, TextWrapping wrapping, Thickness padding, double maxWidth);
+        Size Measure(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, /*FontStretch stretch, */TextWrapping wrapping, Thickness padding, double maxWidth);
+        Size MeasureTextBlock(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, /*FontStretch stretch, */TextWrapping wrapping, Thickness padding, double maxWidth);
         void CreateMeasurementText(UIElement parent);
         bool IsTextMeasureDivID(string id);
     }
@@ -99,7 +98,7 @@ namespace Windows.UI.Xaml
             return false;
         }
 
-        public Size Measure(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, FontStretch stretch, TextWrapping wrapping, Thickness padding, double maxWidth)
+        public Size Measure(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, /*FontStretch stretch, */TextWrapping wrapping, Thickness padding, double maxWidth)
         {
             //Console.WriteLine($"MeasureTextBox maxWidth {maxWidth}");
             if (textBoxReference == null)
@@ -111,7 +110,7 @@ namespace Windows.UI.Xaml
             associatedTextBox.FontFamily = fontFamily;
             associatedTextBox.FontStyle = style;
             associatedTextBox.FontWeight = weight;
-            associatedTextBox.FontStretch = stretch;
+            //associatedTextBox.FontStretch = stretch;
             associatedTextBox.Padding = padding;
             associatedTextBox.FontSize = fontSize;
 
@@ -137,7 +136,7 @@ namespace Windows.UI.Xaml
             return new Size(associatedTextBox.ActualWidth + 2, associatedTextBox.ActualHeight);
         }
 
-        public Size MeasureTextBlock(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, FontStretch stretch, TextWrapping wrapping, Thickness padding, double maxWidth)
+        public Size MeasureTextBlock(string text, double fontSize, FontFamily fontFamily, FontStyle style, FontWeight weight, /*FontStretch stretch, */TextWrapping wrapping, Thickness padding, double maxWidth)
         {
             if (textBlockReference == null)
             {
@@ -148,7 +147,7 @@ namespace Windows.UI.Xaml
             associatedTextBlock.FontFamily = fontFamily;
             associatedTextBlock.FontStyle = style;
             associatedTextBlock.FontWeight = weight;
-            associatedTextBlock.FontStretch = stretch;
+            //associatedTextBlock.FontStretch = stretch;
             associatedTextBlock.Padding = padding;
             associatedTextBlock.FontSize = fontSize;
 
@@ -175,4 +174,3 @@ namespace Windows.UI.Xaml
         }
     }
 }
-#endif

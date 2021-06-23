@@ -41,11 +41,7 @@ namespace Windows.UI.Xaml.Documents
 				"LineHeight",
 				typeof(double),
 				typeof(Block),
-#if WORKINPROGRESS
 				new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure));
-#else
-				new PropertyMetadata(0d));
-#endif
 
 		/// <summary>
 		/// Gets or sets the height of each line of content.

@@ -510,10 +510,8 @@ namespace CSHTML5.Internal
                 currentExpr.SetValue(storage.Owner, storage.Property, computedValue);
             }
 
-#if WORKINPROGRESS
 			// Raise the InvalidateMeasure or InvalidateArrange
             storage.Owner.OnPropertyChanged(new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
-#endif
             return valueChanged;
         }
 

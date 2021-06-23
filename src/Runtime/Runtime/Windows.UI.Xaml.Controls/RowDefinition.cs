@@ -32,7 +32,6 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Defines row-specific properties that apply to Grid elements.
     /// </summary>
-#if WORKINPROGRESS
     public sealed partial class RowDefinition : DependencyObject, IDefinitionBase
     {
         internal Grid Parent;
@@ -139,11 +138,6 @@ namespace Windows.UI.Xaml.Controls
         {
             _finalOffset = value;
         }
-#else
-    public sealed partial class RowDefinition : DependencyObject
-    {
-        internal Grid Parent;
-#endif
 
         /// <summary>
         /// Returns a copy of this RowDefinition.
@@ -173,11 +167,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty MaxHeightProperty =
             DependencyProperty.Register("MaxHeight", typeof(double), typeof(RowDefinition),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure, MaxHeight_Changed)
-#else
-                new PropertyMetadata(double.PositiveInfinity, MaxHeight_Changed)
-#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         static void MaxHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -204,11 +194,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty MinHeightProperty =
             DependencyProperty.Register("MinHeight", typeof(double), typeof(RowDefinition),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure, MinHeight_Changed)
-#else
-                new PropertyMetadata(double.PositiveInfinity, MinHeight_Changed)
-#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         static void MinHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -235,11 +221,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty HeightProperty =
             DependencyProperty.Register("Height", typeof(GridLength), typeof(RowDefinition),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(new GridLength(1.0, GridUnitType.Star), FrameworkPropertyMetadataOptions.AffectsMeasure, Height_Changed)
-#else
-                new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), Height_Changed)
-#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void Height_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)

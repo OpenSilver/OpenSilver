@@ -889,6 +889,7 @@ namespace Windows.UI.Xaml
             set { this.SetValue(LanguageProperty, value); }
         }
 
+#endif
         public override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             // Skip when loading or changed on TextMeasurement Div.
@@ -927,10 +928,6 @@ namespace Windows.UI.Xaml
         }
         protected sealed override void ArrangeCore(Rect finalRect)
         {
-            //INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
-            //Console.WriteLine();
-            //Console.WriteLine($"ArrangeCore {domElementReference.UniqueIdentifier} finalRect ({finalRect.Left},{finalRect.Top}) ({finalRect.Width},{finalRect.Height})");
-
             bool isDefaultAlignment = HorizontalAlignment == HorizontalAlignment.Stretch && VerticalAlignment == VerticalAlignment.Stretch;
             Size finalSize = isDefaultAlignment ? finalRect.Size : new Size(
                 HorizontalAlignment != HorizontalAlignment.Stretch ? Math.Min(DesiredSize.Width, finalRect.Width) : finalRect.Width,
@@ -950,9 +947,6 @@ namespace Windows.UI.Xaml
 
             Rect containingRect = new Rect(arrangedSize);
 
-            //Console.WriteLine($"containingRect (Left {containingRect.Left}, Top {containingRect.Top}, Right {containingRect.Right}, Bottom {containingRect.Bottom})");
-            //Console.WriteLine($"ArrangeCore Margin (Left {Margin.Left}, Top {Margin.Top}, Right {Margin.Right}, Bottom {Margin.Bottom})");
-
             // Add Margin
             double newLeft = containingRect.Left - Margin.Left;
             double newTop = containingRect.Top - Margin.Top;
@@ -967,8 +961,6 @@ namespace Windows.UI.Xaml
             Point alignedOffset = GetAlignmentOffset(finalRect, containingRect.Size, HorizontalAlignment, VerticalAlignment);
 
             Point visualOffset = new Point(alignedOffset.X - containingRect.Location.X, alignedOffset.Y - containingRect.Location.Y);
-
-            //Console.WriteLine($"ArrangeCore VisualBounds {this} {domElementReference.UniqueIdentifier} ({visualOffset.X},{visualOffset.Y})-({arrangedSize.Width},{arrangedSize.Height})");
 
             VisualBounds = new Rect(visualOffset, arrangedSize);
         }
@@ -1015,10 +1007,7 @@ namespace Windows.UI.Xaml
         //     The actual size that is used after the element is arranged in layout.
         protected virtual Size ArrangeOverride(Size finalSize)
         {
-            INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
-            //Console.WriteLine($"FrameworkElement ArrangeOverride {domElementReference.UniqueIdentifier}");
-
-            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
+            IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);
 
             if (childElements.Count() > 0)
             {
@@ -1032,11 +1021,6 @@ namespace Windows.UI.Xaml
 
         protected sealed override Size MeasureCore(Size availableSize)
         {
-            //INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
-            //Console.WriteLine();
-            //Console.WriteLine($"MeasureOverride {this} availableSize {availableSize.Width}, {availableSize.Height} (MeasureCore)");
-            //Console.WriteLine($"MeasureOverride {domElementReference.UniqueIdentifier} Margin left {Margin.Left}, top {Margin.Top}, right {Margin.Right}, bottom {Margin.Bottom} (MeasureCore)");
-            
             Size MinSize = new Size(MinWidth, MinHeight);
             Size MaxSize = new Size(MaxWidth, MaxHeight);
             Size size = new Size(Width, Height);
@@ -1080,7 +1064,7 @@ namespace Windows.UI.Xaml
             Debug.WriteLine($"FrmeworkElement MeasureOverride ({this}) {domElementReference.UniqueIdentifier}, ({Width}, {Height})");
             return Size.Zero;
         }
-#endif
+
 #endregion Work in progress
 
 #region Tag
@@ -1138,11 +1122,7 @@ namespace Windows.UI.Xaml
                 nameof(Style), 
                 typeof(Style), 
                 typeof(FrameworkElement),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnStyleChanged));
-#else
-                new PropertyMetadata(null, OnStyleChanged));
-#endif
 
         private static void OnStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1537,9 +1517,8 @@ namespace Windows.UI.Xaml
         {
             if (Loaded != null)
                 Loaded(this, new RoutedEventArgs());
-#if WORKINPROGRESS
+
             InvalidateMeasure();
-#endif
         }
 
         /// <summary>

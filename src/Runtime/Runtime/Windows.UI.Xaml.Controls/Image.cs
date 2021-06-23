@@ -132,9 +132,8 @@ namespace Windows.UI.Xaml.Controls
                     bmpImage.UriSourceChanged += image.bmpImage_UriSourceChanged;
                 }
                 image.RefreshSource();
-#if WORKINPROGRESS
+
                 image.InvalidateMeasure();
-#endif
             }
         }
 
@@ -249,9 +248,8 @@ namespace Windows.UI.Xaml.Controls
                     //_imageDiv.style.height = parentHeight;
                 }
             }
-#if WORKINPROGRESS
+
             InvalidateMeasure();
-#endif
         }
 
         void bmpImage_ImageOpened(object sender, RoutedEventArgs e)
@@ -281,11 +279,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty StretchProperty =
             DependencyProperty.Register("Stretch", typeof(Stretch), typeof(Image),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(Stretch.Uniform, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Stretch_Changed)
-#else
-                new PropertyMetadata(Stretch.Uniform, Stretch_Changed)
-#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
 

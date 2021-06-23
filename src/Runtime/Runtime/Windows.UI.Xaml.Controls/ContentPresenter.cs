@@ -330,11 +330,9 @@ namespace Windows.UI.Xaml.Controls
 
         #endregion Private classes
 
-#if WORKINPROGRESS
-
         protected override Size MeasureOverride(Size availableSize)
         {
-            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
+            IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);
             if (childElements.Count() > 0)
             {
                 UIElement elementChild = ((UIElement)childElements.ElementAt(0));
@@ -347,7 +345,7 @@ namespace Windows.UI.Xaml.Controls
         }
         protected override Size ArrangeOverride(Size finalSize)
         {
-            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
+            IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);
             if (childElements.Count() > 0)
             {
                 UIElement elementChild = ((UIElement)childElements.ElementAt(0));
@@ -355,7 +353,6 @@ namespace Windows.UI.Xaml.Controls
             }
             return finalSize;
         }
-#endif
     }
 }
 

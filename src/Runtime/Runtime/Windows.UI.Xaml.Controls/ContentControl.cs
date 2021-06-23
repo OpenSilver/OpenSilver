@@ -23,6 +23,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
 using System.Windows.Markup;
+using System.Windows.Media;
 
 #if MIGRATION
 using System.Windows.Data;
@@ -71,11 +72,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Content),
                 typeof(object),
                 typeof(ContentControl),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, OnContentChanged));
-#else
-                new PropertyMetadata(null, OnContentChanged));
-#endif
 
         private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -233,15 +230,10 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#if WORKINPROGRESS
         
         protected override Size MeasureOverride(Size availableSize)
         {
-            //INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
-            //Console.WriteLine($"MeasureOverride {domElementReference.UniqueIdentifier} ContentControl {Content} Width {Width}, Height {Height}, ActualWidth {actualSize.Width}, ActualHeight {actualSize.Height}");
-
-            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
-            //Console.WriteLine($"MeasureOverride {domElementReference.UniqueIdentifier} ContentControl MeasureOverride Child {childElements.Count()}");
+            IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);
             if (childElements.Count() > 0)
             {
                 UIElement elementChild = ((UIElement)childElements.ElementAt(0));
@@ -254,11 +246,8 @@ namespace Windows.UI.Xaml.Controls
         }
         protected override Size ArrangeOverride(Size finalSize)
         {
-            //INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
-            //Console.WriteLine($"ArrangeOverride {domElementReference.UniqueIdentifier} ContentControl {Content} Width {Width}, Height {Height}, ActualWidth {ActualWidth}, ActualHeight {ActualHeight}");
 
-            IEnumerable<DependencyObject> childElements = VisualTreeExtensions.GetVisualChildren(this);
-            //Console.WriteLine($"ArrangeOverride {domElementReference.UniqueIdentifier} ContentControl ArrangeOverride Child {childElements.Count()}");
+            IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);
             if (childElements.Count() > 0)
             {
                 UIElement elementChild = ((UIElement)childElements.ElementAt(0));
@@ -266,6 +255,5 @@ namespace Windows.UI.Xaml.Controls
             }
             return finalSize;
         }
-#endif
     }
 }

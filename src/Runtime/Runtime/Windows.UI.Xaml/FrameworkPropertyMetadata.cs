@@ -21,7 +21,6 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if WORKINPROGRESS
     public enum FrameworkPropertyMetadataOptions
     {
         None = 0,
@@ -85,5 +84,4 @@ namespace Windows.UI.Xaml
             this.AffectsRender = (flags & FrameworkPropertyMetadataOptions.AffectsRender) != 0;
         }
     }
-#endif
 }

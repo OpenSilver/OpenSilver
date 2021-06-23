@@ -42,7 +42,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             if (this.INTERNAL_LinkedPopup != null
                 && this.INTERNAL_LinkedPopup.INTERNAL_VisualParent == null) // We check that the <Popup> has no visual parent. In fact, if it had a visual parent, it means that it is in the visual tree (for example if the <Popup> was declared in XAML), and therefore the Loaded event has already been called once.
                 this.INTERNAL_LinkedPopup.INTERNAL_RaiseLoadedEvent();
-#if WORKINPROGRESS
             /*if (INTERNAL_ParentWindow != null)
             {
                 Rect windowBounds = INTERNAL_ParentWindow.Bounds;
@@ -50,7 +49,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 this.Arrange(windowBounds);
             }*/
             // Disabled for enabling measure/arrange layout system
-#endif
         }
 
         /// <summary>
@@ -79,7 +77,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, parent);
         }
 
-#if WORKINPROGRESS
         protected override Size MeasureOverride(Size availableSize)
         {
             if (this.Content == null || this.INTERNAL_ParentWindow == null)
@@ -100,6 +97,5 @@ namespace Windows.UI.Xaml.Controls.Primitives
             this.Content.Arrange(new Rect(finalSize));
             return finalSize;
         }
-#endif
     }
 }

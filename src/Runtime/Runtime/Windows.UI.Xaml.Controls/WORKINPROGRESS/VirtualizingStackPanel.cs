@@ -97,13 +97,11 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
 		protected override Size MeasureOverride(Size availableSize)
 		{
-			Console.WriteLine($"TODO {this} MeasureOverride");
 			throw new NotImplementedException("The method or operation is not implemented.");
 		}
         [OpenSilver.NotImplemented]
 		protected override Size ArrangeOverride(Size finalSize)
 		{
-			Console.WriteLine($"TODO {this} ArrangeOverride");
 			throw new NotImplementedException("The method or operation is not implemented.");
 		}
 	}

@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if !MIGRATION
 using System;
 using System.Collections.Generic;
@@ -182,4 +180,3 @@ namespace Windows.Foundation
         }
     }
 }
-#endif

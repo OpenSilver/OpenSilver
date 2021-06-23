@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -104,4 +103,3 @@ namespace System.Collections.Generic
         }
     }
 }
-#endif

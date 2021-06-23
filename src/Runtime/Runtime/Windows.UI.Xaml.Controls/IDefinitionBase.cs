@@ -13,8 +13,6 @@
 \*====================================================================================*/
 
 
-#if WORKINPROGRESS
-
 #if MIGRATION
 namespace System.Windows.Controls
 #else
@@ -45,4 +43,3 @@ namespace Windows.UI.Xaml.Controls
         void SetFinalOffset(double value);
     }
 }
-#endif

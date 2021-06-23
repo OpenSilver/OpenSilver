@@ -59,11 +59,8 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty LastChildFillProperty =
             DependencyProperty.Register("LastChildFill", typeof(bool), typeof(DockPanel),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsMeasure));
-#else
-                new PropertyMetadata(true));
-#endif
+
         /// <summary>
         /// Gets the value of the DockPanel.Dock attached property
         /// for a specified System.Windows.UIElement.

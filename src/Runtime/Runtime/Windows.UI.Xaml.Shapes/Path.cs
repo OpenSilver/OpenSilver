@@ -84,11 +84,7 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(Data), 
                 typeof(Geometry), 
                 typeof(Path),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, Data_Changed));
-#else
-                new PropertyMetadata(null, Data_Changed));
-#endif
 
         private static void Data_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

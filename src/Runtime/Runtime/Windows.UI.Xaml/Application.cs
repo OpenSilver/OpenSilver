@@ -70,9 +70,9 @@ namespace Windows.UI.Xaml
         Window _mainWindow;
         ResourceDictionary _resources;
 
-#if WORKINPROGRESS
+
         public ITextMeasurementService TextMeasurementService { get; private set; }
-#endif
+
         public Application()
         {
             // In case of a redirection from Microsoft AAD, when running in the Simulator, we re-instantiate the application. We need to reload the JavaScript files because they are no longer in the HTML DOM due to the AAD redirection:
@@ -115,9 +115,9 @@ namespace Windows.UI.Xaml
             // Get default font-family from css
             INTERNAL_FontsHelper.DefaultCssFontFamily = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("window.getComputedStyle(document.getElementsByTagName('body')[0]).getPropertyValue(\"font-family\")"));
 
-#if WORKINPROGRESS
+
             TextMeasurementService = new TextMeasurementService();
-#endif
+
             // Initialize the window:
             if (_mainWindow == null) // Note: it could be != null if the user clicks "Restart" from the Simulator advanced options.
             {

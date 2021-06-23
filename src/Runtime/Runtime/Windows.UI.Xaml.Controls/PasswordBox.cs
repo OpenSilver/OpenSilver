@@ -435,16 +435,15 @@ $0.focus()
         }
 
         #endregion
-
+#endif
         protected override Size MeasureOverride(Size availableSize)
         {
             Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
-            Size TextSize = Application.Current.TextMeasurementService.Measure(String.Empty, FontSize, FontFamily, FontStyle, FontWeight, FontStretch, TextWrapping.NoWrap, Padding, (availableSize.Width - BorderThicknessSize.Width).Max(0));
+            Size TextSize = Application.Current.TextMeasurementService.Measure(String.Empty, FontSize, FontFamily, FontStyle, FontWeight, /*FontStretch, */TextWrapping.NoWrap, Padding, (availableSize.Width - BorderThicknessSize.Width).Max(0));
             TextSize.Width = TextSize.Width + BorderThicknessSize.Width;
             TextSize.Height = TextSize.Height + BorderThicknessSize.Height;
             return TextSize;
         }
-#endif
 
         //// Summary:
         ////     Gets or sets a value that determines whether the visual UI of the PasswordBox

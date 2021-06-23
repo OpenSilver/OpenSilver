@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if !MIGRATION
 using System;
 #endif
@@ -18,4 +16,3 @@ namespace Windows.Foundation
         }
     }
 }
-#endif

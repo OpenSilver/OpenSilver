@@ -267,7 +267,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#if WORKINPROGRESS
         protected override Size MeasureOverride(Size availableSize)
         {
             if (_contentGrid == null)
@@ -284,6 +283,5 @@ namespace Windows.UI.Xaml.Controls
             _contentGrid.Arrange(new Rect(finalSize));
             return finalSize;
         }
-#endif
     }
 }

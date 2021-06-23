@@ -60,11 +60,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty OrientationProperty =
             DependencyProperty.Register("Orientation", typeof(Orientation), typeof(StackPanel),
-#if WORKINPROGRESS
                 new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Orientation_Changed)
-#else
-                new PropertyMetadata(Orientation.Vertical, Orientation_Changed)
-#endif
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void Orientation_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -262,7 +258,6 @@ namespace Windows.UI.Xaml.Controls
         //    return elementToReturn;
         //}
 
-#if WORKINPROGRESS
         private double GetCrossLength(Size size)
         {
             return Orientation == Orientation.Horizontal ? size.Height : size.Width;
@@ -322,8 +317,11 @@ namespace Windows.UI.Xaml.Controls
             {
                 child.Measure(measureSize);
             }
-
+#if WORKINPROGRESS
             bool isNormalFlow = FlowDirection == FlowDirection.LeftToRight;
+#else
+            bool isNormalFlow = true;
+#endif
             double childrenMainLength = 0;
             foreach (UIElement child in childrens)
             {
@@ -339,6 +337,5 @@ namespace Windows.UI.Xaml.Controls
 
             return CreateSize(Orientation, GetMainLength(finalSize), panelCrossLength);
         }
-#endif
     }
 }

@@ -123,7 +123,6 @@ namespace Windows.UI.Xaml
             // Raise the "Loaded" event:
             this.INTERNAL_RaiseLoadedEvent();
             
-#if WORKINPROGRESS
             this.SizeChanged += WindowSizeChangedEventHandler;
         }
 
@@ -132,10 +131,9 @@ namespace Windows.UI.Xaml
 
             InvalidateMeasure();
             InvalidateArrange();
-#endif
         }
 
-#region Bounds and SizeChanged event
+        #region Bounds and SizeChanged event
 
         INTERNAL_EventManager<WindowSizeChangedEventHandler, WindowSizeChangedEventArgs> _windowSizeChangedEventManager;
         /// <summary>
@@ -244,7 +242,7 @@ namespace Windows.UI.Xaml
                         CSHTML5.Native.Html.Printing.PrintManager.ResetPrintArea();
                     }
                 }
-#if WORKINPROGRESS
+
                 Application.Current.TextMeasurementService.CreateMeasurementText(this);
 
                 /*
@@ -261,9 +259,7 @@ namespace Windows.UI.Xaml
                 }
                 else
                     CalculateWindowLayout();*/
-                // Disabled for enabling measure/arrange layout system
-#endif
-
+                // Disabled for CustomLayout
             }
         }
 
@@ -476,7 +472,7 @@ namespace Windows.UI.Xaml
         {
 
         }
-
+#endif
         private void CalculateWindowLayout()
         {
             if (Current.INTERNAL_VisualChildrenInformation == null)
@@ -492,13 +488,14 @@ namespace Windows.UI.Xaml
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            if (this.Content == null)
+            if (this.Content as FrameworkElement == null)
                 return Size.Zero;
 
+            FrameworkElement _content = this.Content as FrameworkElement;
             Rect windowBounds = this.Bounds;
             availableSize = new Size(windowBounds.Width, windowBounds.Height);
-            Content.Measure(availableSize);
-            return Content.DesiredSize;
+            _content.Measure(availableSize);
+            return _content.DesiredSize;
         }
 
         protected override Size ArrangeOverride(Size finalSize)
@@ -507,6 +504,5 @@ namespace Windows.UI.Xaml
             finalSize = new Size(windowBounds.Width, windowBounds.Height);
             return base.ArrangeOverride(finalSize);
         }
-#endif
     }
 }
