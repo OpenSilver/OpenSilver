@@ -258,7 +258,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             ((ButtonBase)d).OnIsPressedChanged(e);
         }
 
-#if MIGRATION
         /// <summary>
         /// Called when the value of the <see cref="ButtonBase.IsPressed"/> property changes.
         /// </summary>
@@ -267,9 +266,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             this.UpdateVisualStates();
         }
-#endif
-
-
 
         /// <summary>
         /// Gets or sets when the Click event occurs. The default value is ClickMode.Release.
