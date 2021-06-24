@@ -220,6 +220,22 @@ namespace CSHTML5
             // result into the "document.jsSimulatorObjectReferences" for later
             // use in subsequent calls to this method
             int referenceId = ReferenceIDGenerator.GenerateId();
+            
+            // The difference between OpenSilve and CSHTML5 is that in OpenSilver we use ` (allowing multi-line strings) instead of " to better format interops when using the Debug Interops feature in the Simulator
+#if OPENSILVER
+            javascript = string.Format(
+@"
+try {{
+var result = eval(`{0}`);
+document.jsSimulatorObjectReferences[""{1}""] = result;
+result;
+}}
+catch (error) {{
+    eval(`{2}`);
+}}
+result;
+", INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript), referenceId, INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(errorCallBack));
+#else
             javascript = string.Format(
 @"
 try {{
@@ -232,6 +248,7 @@ catch (error) {{
 }}
 result;
 ", INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript), referenceId, INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(errorCallBack));
+#endif
 
             // Execute the javascript code:
             object value = null;

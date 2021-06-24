@@ -61,40 +61,62 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             return _lastExecutedJavaScriptCode;
         }
 
-        internal string GetFullLogOfExecutedJavaScriptCode(bool removeCallbacksArgumentsCode = false)
+        public string FullLogOfExecutedJavaScriptCode
         {
-            // Note: the option to remove the callsbacks arguments code is useful when exporting the JS code via the "Debug JS code" feature of the Simulator, because such code does not exist when running outside the Simulator, due to the fact that they are created in the event handlers, and those are not executed outside the Simulator. If we did not remove this code, we would get errors saying that objects like document.jsSimulatorObjectReferences["args481089"] are not defined.
-
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (string jsCode in _fullLogOfExecutedJavaScriptCode)
+            get
             {
-                if (removeCallbacksArgumentsCode)
+#if OPENSILVER
+                // Note: we use a better solution with OpenSilver: as with ES6 and template literals we can make multiline comments, we can better format interops (particularly stuff in eval() statements).
+                // We cannot use this solution with CSHTML5 as IE11 does not supports ES6
+                
+                StringBuilder stringBuilder = new StringBuilder();
+
+                stringBuilder.AppendLine(@"
+window.onCallBack = {
+    OnCallbackFromJavaScript: function(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject)
+    {
+        // dummy function
+    },
+    OnCallbackFromJavaScriptError: function(idWhereCallbackArgsAreStored)
+    {
+        // dummy function
+    }
+};");
+                
+                foreach (string jsCode in _fullLogOfExecutedJavaScriptCode)
                 {
                     using (StringReader strReader = new StringReader(jsCode))
                     {
                         string line;
                         while ((line = strReader.ReadLine()) != null)
                         {
-                            if (!line.Contains(@"callback_args_"))
-                                stringBuilder.AppendLine(line);
-                            else
-                                stringBuilder.AppendLine("var result = ''; // Callback removed");
+                            line = line.Replace("\\r", "\r");
+                            line = line.Replace("\\n", "\n");
+                            line = line.Replace("\\t", "\t");
+                            stringBuilder.AppendLine(line);
                         }
                     }
+                    
+                    stringBuilder.AppendLine();
                 }
-                else
-                {
-                    stringBuilder.AppendLine(jsCode);
-                }
-            }
-            return stringBuilder.ToString();
-        }
-
-        public string FullLogOfExecutedJavaScriptCode
-        {
-            get
-            {
-                return GetFullLogOfExecutedJavaScriptCode(true);
+                return stringBuilder.ToString();
+#else
+                // Note: the option to remove the callsbacks arguments code is useful when exporting the JS code via the "Debug JS code" feature of the Simulator, because such code does not exist when running outside the Simulator, due to the fact that they are created in the event handlers, and those are not executed outside the Simulator. If we did not remove this code, we would get errors saying that objects like document.jsSimulatorObjectReferences["args481089"] are not defined.
+                
+                return
+@"window.onCallBack = {
+    OnCallbackFromJavaScript: function(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject)
+    {
+        // dummy function
+    },
+    OnCallbackFromJavaScriptError: function(idWhereCallbackArgsAreStored)
+    {
+        // dummy function
+    }
+};
+"
+                + string.Join("\n\n", _fullLogOfExecutedJavaScriptCode);
+#endif
             }
         }
     }

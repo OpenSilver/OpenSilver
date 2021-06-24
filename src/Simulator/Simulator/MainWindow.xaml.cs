@@ -856,7 +856,7 @@ ends with "".Browser"" in your solution.";
 
         private void ButtonViewJavaScriptLog_Click(object sender, RoutedEventArgs e)
         {
-            string fullLog = _javaScriptExecutionHandler.GetFullLogOfExecutedJavaScriptCode();
+            string fullLog = _javaScriptExecutionHandler.FullLogOfExecutedJavaScriptCode;
             var msgBox = new MessageBoxScrollable()
             {
                 Value = fullLog,
@@ -908,7 +908,7 @@ Click OK to continue.";
                     File.Copy(Path.Combine(simulatorJsCssPath, "ResizeSensor.js"), Path.Combine(destinationPath, "ResizeSensor.js"), true);
 
                     // Create "interopcalls.js" which contains all the JS executed by the Simulator so far:
-                    string fullLog = _javaScriptExecutionHandler.GetFullLogOfExecutedJavaScriptCode(removeCallbacksArgumentsCode: true); //Note: we remove the callsbacks arguments code because they do not exist when running outside the Simulator, due to the fact that they are created in the event handlers, and those are not executed outside the Simulator. If we did not remove this code, we would get errors saying that objects like document.jsSimulatorObjectReferences["args481089"] are not defined.
+                    string fullLog = _javaScriptExecutionHandler.FullLogOfExecutedJavaScriptCode;
                     File.WriteAllText(Path.Combine(destinationPath, "interopcalls.js"), fullLog);
                 }
                 catch (Exception ex)
