@@ -92,7 +92,11 @@ namespace Windows.UI.Xaml.Controls
                 this._contentEditableDiv != null)
             {
                 INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this._contentEditableDiv).pointerEvents =
+#if REVAMPPOINTEREVENTS
                     this.INTERNAL_ArePointerEventsEnabled ? "auto" : "none";
+#else
+                    this.IsHitTestVisible && this.IsEnabled ? "auto" : "none";
+#endif
             }
         }
 
@@ -101,7 +105,7 @@ namespace Windows.UI.Xaml.Controls
             get { return true; }
         }
 
-        #region AcceptsReturn
+#region AcceptsReturn
 
         /// <summary>
         /// Gets or sets the value that determines whether the text box allows and displays
@@ -149,9 +153,9 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             }
         }
 
-        #endregion
+#endregion
 
-        #region AcceptsTab
+#region AcceptsTab
 
         /// <summary>
         /// Gets or sets the value that determines whether pressing tab while the TextBox has the focus will add a tabulation in the text or set the focus to the next element.
@@ -173,9 +177,9 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                 typeof(TextBox), 
                 new PropertyMetadata(false));
 
-        #endregion AcceptsTab
+#endregion AcceptsTab
 
-        #region PlaceholderText
+#region PlaceholderText
 
         /// <summary>
         /// Gets or sets the text that is displayed in the control until the value is changed by a user action or some other operation.
@@ -196,9 +200,9 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                 typeof(TextBox), 
                 new PropertyMetadata(string.Empty));
 
-        #endregion PlaceholderText
+#endregion PlaceholderText
 
-        #region Text
+#region Text
 
         /// <summary>
         /// Gets or sets the text displayed in the TextBox.
@@ -254,9 +258,9 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             return value ?? string.Empty;
         }
 
-        #endregion Text
+#endregion Text
 
-        #region TextAlignment
+#region TextAlignment
 
         /// <summary>
         /// Gets or sets how the text should be aligned in the text box.
@@ -304,9 +308,9 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             }
         }
 
-        #endregion TextAlignment
+#endregion TextAlignment
 
-        #region TextChanged Event
+#region TextChanged Event
 
         /// <summary>
         /// Occurs when the text is changed.
@@ -325,9 +329,9 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             }
         }
 
-        #endregion TextChanged Event
+#endregion TextChanged Event
 
-        #region CaretBrush
+#region CaretBrush
 
         /// <summary>
         /// Gets or sets the brush that is used to render the vertical bar that indicates
@@ -359,7 +363,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                     }
                 });
 
-        #endregion CaretBrush
+#endregion CaretBrush
 
         private void TextAreaValueChanged()
         {
@@ -416,7 +420,11 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
 
             CSHTML5.Interop.ExecuteJavaScript(@"$0.classList.add(""single-line-input"")", contentEditableDiv);
 
+#if REVAMPPOINTEREVENTS
             contentEditableDivStyle.pointerEvents = this.INTERNAL_ArePointerEventsEnabled ? "auto" : "none";
+#else
+            contentEditableDivStyle.pointerEvents = this.IsHitTestVisible && this.IsEnabled ? "auto" : "none";
+#endif
             contentEditableDivStyle.width = "100%";
             contentEditableDivStyle.height = "100%";
             contentEditableDivStyle.whiteSpace = "pre-wrap"; // Because by default we have decided to make the TextBox wrap, because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
@@ -1101,7 +1109,7 @@ var range,selection;
             }
         }
 
-        #region Fix "input" event not working under IE.
+#region Fix "input" event not working under IE.
 
         string previousInnerText = null;
 
@@ -1129,7 +1137,7 @@ var range,selection;
 #endif
         }
 
-        #endregion
+#endregion
 
 #if !BRIDGE
         [JSReplacement("window.IE_VERSION")]
@@ -1151,7 +1159,7 @@ var range,selection;
             return false;
         }
 
-        #region Text Selection
+#region Text Selection
 
 
         public int SelectionStart
@@ -1270,9 +1278,9 @@ return globalIndexes;
             this.SelectionLength = this.Text.Length;
         }
 
-        #endregion
+#endregion
 
-        #region TextWrapping
+#region TextWrapping
 
         /// <summary>
         /// Gets or sets how the TextBow wraps text.
@@ -1322,9 +1330,9 @@ return globalIndexes;
             }
         }
 
-        #endregion
+#endregion
 
-        #region HorizontalScrollBarVisibility
+#region HorizontalScrollBarVisibility
 
         /// <summary>
         /// Gets or sets a value that indicates whether a horizontal ScrollBar should
@@ -1380,9 +1388,9 @@ return globalIndexes;
             }
         }
 
-        #endregion
+#endregion
 
-        #region VerticalScrollBarVisibility
+#region VerticalScrollBarVisibility
 
         /// <summary>
         /// Gets or sets a value that indicates whether a vertical ScrollBar should be displayed.
@@ -1435,7 +1443,7 @@ return globalIndexes;
             }
         }
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Gets or sets the value that determines the maximum number of characters allowed
@@ -1485,7 +1493,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             }
         }
 
-        #region TextDecorations
+#region TextDecorations
 #if MIGRATION
         /// <summary>
         /// Gets or sets the text decorations (underline, strikethrough...).
@@ -1561,7 +1569,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBox.INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
         }
 #endif
-        #endregion
+#endregion
 
         protected override void OnAfterApplyHorizontalAlignmentAndWidth()
         {
@@ -1678,7 +1686,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             SelectionLength = length;
         }
 
-        #region Not implemented yet (should we move this in WORKINPROGRESS ?)
+#region Not implemented yet (should we move this in WORKINPROGRESS ?)
 
         [OpenSilver.NotImplemented]
         public event RoutedEventHandler SelectionChanged;
@@ -1693,10 +1701,10 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             set { this.SetValue(TextBox.SelectionForegroundProperty, value); }
         }
 
-        #endregion
+#endregion
 
 #if WORKINPROGRESS
-        #region SelectionBackground
+#region SelectionBackground
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register("SelectionBackground", typeof(Brush), typeof(TextBox), null);
 
@@ -1706,7 +1714,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             get { return (Brush)GetValue(SelectionBackgroundProperty); }
             set { SetValue(SelectionBackgroundProperty, value); }
         }
-        #endregion
+#endregion
 
         [OpenSilver.NotImplemented]
         public string SelectedText { get; set; }
