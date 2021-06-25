@@ -41,7 +41,6 @@ namespace Windows.UI.Xaml.Controls
 
         protected string _defaultText = "Select Date...";
         protected INTERNAL_CalendarOrClockBase _calendarOrClock;
-
         protected const string ElementRoot = "Root";
         protected const string ElementTextBox = "TextBox";
         protected const string ElementButton = "Button";
@@ -242,7 +241,7 @@ namespace Windows.UI.Xaml.Controls
             string newText = (string)e.NewValue;
             if (string.IsNullOrEmpty(newText))
             {
-                dp.SetValueNoCallback(TextProperty, null);
+                dp.OnEmptyText();
             }
             else
             {
@@ -254,13 +253,19 @@ namespace Windows.UI.Xaml.Controls
                 {
                     dp._defaultText = newText;
                 }
-            }
 
-            dp.OnTextChanged();
+                dp.OnTextChanged();
+            }
         }
 
         protected virtual void OnTextChanged()
         {
+        }
+
+
+        protected virtual void OnEmptyText()
+        {
+
         }
 
         protected void RefreshTextBox()
