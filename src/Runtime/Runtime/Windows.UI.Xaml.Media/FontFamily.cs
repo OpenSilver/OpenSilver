@@ -75,5 +75,10 @@ namespace Windows.UI.Xaml.Media
         {
             return _source;
         }
+
+        public static implicit operator FontFamily(string name)
+        {
+            return new FontFamily(name);
+        }
     }
 }

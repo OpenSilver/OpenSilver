@@ -13,6 +13,7 @@
 
 #if WORKINPROGRESS
 
+using CSHTML5.Internal;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -47,6 +48,25 @@ namespace Windows.UI.Xaml.Documents
 		/// </returns>
         [OpenSilver.NotImplemented]
 		public bool HasTrailingParagraphBreakOnPaste { get; set; }
+
+        public Section()
+        {
+			Blocks = new BlockCollection(this, false);
+        }
+
+		protected internal override void INTERNAL_OnAttachedToVisualTree()
+		{
+			base.INTERNAL_OnAttachedToVisualTree();
+			foreach (var block in Blocks)
+			{
+				INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(block, this);
+			}
+		}
+
+		internal override string GetContainerText()
+		{
+			return new INTERNAL_TextContainerSection(this).Text;
+		}
 	}
 }
 

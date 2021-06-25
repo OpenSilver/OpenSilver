@@ -13,6 +13,7 @@
 
 #if WORKINPROGRESS
 
+using CSHTML5.Internal;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -43,6 +44,20 @@ namespace Windows.UI.Xaml.Documents
 		/// </summary>
         [OpenSilver.NotImplemented]
 		public InlineCollection Inlines { get; }
+
+		protected internal override void INTERNAL_OnAttachedToVisualTree()
+		{
+			base.INTERNAL_OnAttachedToVisualTree();
+			foreach (var inline in Inlines)
+			{
+				INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(inline, this);
+			}
+		}
+
+		internal override string GetContainerText()
+		{
+			return new INTERNAL_TextContainerParagraph(this).Text;
+		}
 	}
 }
 
