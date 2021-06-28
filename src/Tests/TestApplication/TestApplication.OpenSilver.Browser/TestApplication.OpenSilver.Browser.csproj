@@ -6,10 +6,14 @@
     <SccLocalPath>SAK</SccLocalPath>
     <Configurations>SL;SL.WorkInProgress;</Configurations>
     <NoXamlPreprocessor>True</NoXamlPreprocessor>
-    <OpenSilverType>3</OpenSilverType>
+    <OpenSilverType>2</OpenSilverType>
 	<OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
 
+  <PropertyGroup>
+		<!-- Change this to upgrade the OpenSilver version -->
+		<OpenSilverVersion>1.0.0-alpha-018</OpenSilverVersion>
+  </PropertyGroup>
   
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
