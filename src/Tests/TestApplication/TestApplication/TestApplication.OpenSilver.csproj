@@ -29,7 +29,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="OpenSilver" Version="$(OpenSilverVersion)" Condition="'$(Configuration)' == 'SL'" />
-		<PackageReference Include="OpenSilver.WorkInProgress" Version="1.0.0-private-2021-06-23" Condition="'$(Configuration)' == 'SL.WorkInProgress'" />
+		<PackageReference Include="OpenSilver.WorkInProgress" Version="$(OpenSilverVersion)" Condition="'$(Configuration)' == 'SL.WorkInProgress'" />
 	</ItemGroup>
 
 	<ItemGroup>

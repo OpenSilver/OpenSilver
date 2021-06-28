@@ -70,7 +70,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Build" Version="3.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="3.2.0" />
     <PackageReference Include="OpenSilver" Version="$(OpenSilverVersion)" Condition="'$(Configuration)' == 'SL'" />
-    <PackageReference Include="OpenSilver.WorkInProgress" Version="1.0.0-private-2021-06-23" />
+	<PackageReference Include="OpenSilver.WorkInProgress" Version="$(OpenSilverVersion)" Condition="'$(Configuration)' == 'SL.WorkInProgress'" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TestApplication\TestApplication.OpenSilver.csproj" />
