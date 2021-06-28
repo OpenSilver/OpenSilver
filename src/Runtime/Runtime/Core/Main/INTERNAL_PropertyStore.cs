@@ -477,7 +477,7 @@ namespace CSHTML5.Internal
             }
 
             bool valueChanged;
-            if (valueChanged = !ArePropertiesEqual(oldValue, computedValue, storage.Property.PropertyType))
+            if (valueChanged = (storage.INTERNAL_IsVisualValueDirty || !ArePropertiesEqual(oldValue, computedValue, storage.Property.PropertyType)))
             {
                 // Raise the PropertyChanged event
                 if (!storage.TypeMetadata.Inherits || ShouldRaisePropertyChanged(storage))
@@ -497,6 +497,7 @@ namespace CSHTML5.Internal
                         TreeWalkHelper.InvalidateOnInheritablePropertyChange(rootElement, info);
                     }
                 }
+                storage.INTERNAL_IsVisualValueDirty = false;
             }
 
             // Update the source of the Binding, in case the previous value
@@ -510,6 +511,12 @@ namespace CSHTML5.Internal
             }
 
             return valueChanged;
+        }
+
+
+        internal static void DirtyVisualValue(INTERNAL_PropertyStorage storage)
+        {
+            storage.INTERNAL_IsVisualValueDirty = true;
         }
 
         private static void ProcessCoerceValue(INTERNAL_PropertyStorage storage,
