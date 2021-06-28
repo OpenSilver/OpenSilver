@@ -21,6 +21,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 
 
 #if MIGRATION
@@ -119,6 +120,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
                         s.SetCurrentValue(Selector.SelectedValueProperty, PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(newValue, s.SelectedValuePath));
                         s.SetCurrentValue(Selector.SelectedIndexProperty, s.Items.IndexOf(newValue));
                         s.OnSelectedItemChanged(newValue);
+
+                        if (s.ItemsSource is ICollectionView view)
+                        {
+                            view.MoveCurrentToPosition(s.Items.IndexOf(newValue));
+                        }
                     }
                 }
                 finally
