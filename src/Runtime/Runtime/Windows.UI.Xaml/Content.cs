@@ -94,7 +94,11 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
             {
                 if (value)
                 {
+#if OPENSILVER
+                    if (!CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
+#else
                     if (!CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
                     {
                         CSHTML5.Interop.ExecuteJavaScript(@"
 var element = document.body;
