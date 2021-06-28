@@ -9,6 +9,7 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
+#if WORKINPROGRESS
 
 #if MIGRATION
 using CSHTML5.Internal;
@@ -53,3 +54,4 @@ namespace Windows.UI.Xaml.Documents
         }
     }
 }
+#endif
