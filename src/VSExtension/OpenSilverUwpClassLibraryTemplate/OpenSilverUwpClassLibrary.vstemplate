@@ -16,4 +16,14 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="Class1.cs">Class1.cs</ProjectItem>
         </Project>
     </TemplateContent>
+	<WizardExtension>
+		<Assembly>OpenSilver.TemplateWizards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</Assembly>
+		<FullClassName>OpenSilver.TemplateWizards.AppCustomizationWizard</FullClassName>
+	</WizardExtension>
+	<WizardData>
+		<OpenSilverInfo>
+			<Api>UWP</Api>
+			<Type>Library</Type>
+		</OpenSilverInfo>
+	</WizardData>
 </VSTemplate>
