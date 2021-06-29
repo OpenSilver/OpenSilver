@@ -16,10 +16,9 @@
                 <ProjectItem ReplaceParameters="true" TargetFileName="UnmarshalledJavaScriptExecutionHandler.cs">UnmarshalledJavaScriptExecutionHandler.cs</ProjectItem>
             </Folder>
             <Folder Name="Pages" TargetFolderName="Pages">
-                <ProjectItem ReplaceParameters="true" TargetFileName="Index.razor">Index.razor</ProjectItem>
+                <ProjectItem ReplaceParameters="true" TargetFileName="Index.cs">Index.cs</ProjectItem>
             </Folder>
-            <ProjectItem ReplaceParameters="false" TargetFileName="_Imports.razor">_Imports.razor</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="App.razor">App.razor</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="App.cs">App.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="Program.cs">Program.cs</ProjectItem>
         </Project>
     </TemplateContent>
