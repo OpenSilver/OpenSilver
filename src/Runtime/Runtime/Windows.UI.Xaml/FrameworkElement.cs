@@ -493,10 +493,6 @@ namespace Windows.UI.Xaml
         // Note: the returned Size is unused for now.
         internal override sealed Size MeasureCore()
         {
-            if (this.TemplateCache != null)
-            {
-                this.ClearRegisteredNames(); // todo: remove this once namescope is fixed.
-            }
             if (!this.ApplyTemplate())
             {
                 if (this.TemplateChild != null)
@@ -1470,8 +1466,27 @@ namespace Windows.UI.Xaml
 
         public void RegisterName(string name, object scopedElement)
         {
+            //
+            // Note: this part is disabled because of namescope has issues.
+            // Currently elements with an x:Name attribute in xaml which are not 
+            // are stored in the same dictionary as elements with an x:Name coming
+            // from a ControlTemplate.
+            // For example, this following xaml code will throw an exception :
+            //
+            // <ContentControl xmlns="...">  <!-- note: this ContentControl is the root of the XAML page -->
+            //   <ContentControl.Template>
+            //     <ControlTemplate TargetType="ContentControl">
+            //       <ContentPresenter x:Name="content" />
+            //     </ControlTemplate>
+            //   </ContentControl.Template>
+            //   <TextBlock x:Name="content"
+            //              Text="Hello" />
+            // </ContentControl>
+            //
+#if false
             if (_nameScopeDictionary.ContainsKey(name) && _nameScopeDictionary[name] != scopedElement)
                 throw new ArgumentException(string.Format("Cannot register duplicate name '{0}' in this scope.", name));
+#endif
 
             _nameScopeDictionary[name] = scopedElement;
         }
@@ -1514,6 +1529,13 @@ namespace Windows.UI.Xaml
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
+
+            // We check if the parent has implicit styles in its ancestors and inherit it if it is the case
+            FrameworkElement parent = VisualTreeHelper.GetParent(this) as FrameworkElement;
+            if (parent != null && parent.ShouldLookupImplicitStyles)
+            {
+                ShouldLookupImplicitStyles = true;
+            }
 
             // Fetch the implicit style
             // If this element's ResourceDictionary contains the

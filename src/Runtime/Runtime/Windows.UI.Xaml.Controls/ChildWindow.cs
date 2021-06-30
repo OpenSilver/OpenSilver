@@ -1409,6 +1409,9 @@ namespace Windows.UI.Xaml.Controls
             if (this.ChildWindowPopup != null)
             {
                 this.ChildWindowPopup.IsOpen = true;
+#if !SILVERLIGHT
+                this.OnOpened();
+#endif
 
                 // while the ChildWindow is open, the DialogResult is always NULL:
                 this._dialogresult = null;

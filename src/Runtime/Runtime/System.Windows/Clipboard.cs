@@ -31,42 +31,28 @@ namespace System.Windows
         public static void SetText(string text)
         {
             // Credits: https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
-#if !CSHTML5NETSTANDARD
+#if OPENSILVER
+            if (CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
+#else
             if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
             {
                 INTERNAL_Simulator.ClipboardHandler.SetText(text);
             }
             else
             {
-#endif
-            CSHTML5.Interop.ExecuteJavaScript(@"
-                  // IE specific
-                  if (window.clipboardData && window.clipboardData.setData) {
-                    return clipboardData.setData(""Text"", $0);
-                  }
-
-                  // all other modern
-                  var target = document.createElement(""textarea"");
-                  target.style.position = ""absolute"";
-                  target.style.left = ""-9999px"";
-                  target.style.top = ""0"";
-                  target.textContent = $0;
-                  document.body.appendChild(target);
-                  target.focus();
-                  target.setSelectionRange(0, target.value.length);
-
-                  // copy the selection of fall back to prompt
-                  try {
-                    document.execCommand(""copy"");
-                    target.remove();
-                  } catch(e) {
-                    window.prompt(""Please confirm that you would like to copy to the clipboard by pressing Ctrl+C now. The data below will be copied to the clipboard."", $0);
-                  }",
-                        text
-                    );
-#if !CSHTML5NETSTANDARD
+                CSHTML5.Interop.ExecuteJavaScript(@"
+if (window.clipboardData && window.clipboardData.setData) // IE specific
+{
+    clipboardData.setData(""Text"", $0);
+}
+else if (navigator && navigator.clipboard && navigator.clipboard.writeText) // all other modern browsers
+{
+    navigator.clipboard.writeText($0);
+}
+", 
+                    text);
             }
-#endif
         }
 
 #if WORKINPROGRESS

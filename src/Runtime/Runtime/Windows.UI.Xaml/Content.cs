@@ -94,22 +94,17 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
             {
                 if (value)
                 {
+#if OPENSILVER
+                    if (!CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
+#else
                     if (!CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
                     {
                         CSHTML5.Interop.ExecuteJavaScript(@"
 var element = document.body;
 var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
-if (requestMethod) { // Native full screen.
+if (requestMethod) {
     requestMethod.call(element);
-} else if (typeof window.ActiveXObject !== 'undefined') { // Older IE (< 11)
-    var isFullScreen = (window.screenTop == 0);
-    if (!isFullScreen)
-    {
-        var wscript = new ActiveXObject('WScript.Shell');
-        if (wscript !== null) {
-            wscript.SendKeys('{F11}');
-        }
-    }
 }");
                     }
                     else
@@ -121,17 +116,8 @@ if (requestMethod) { // Native full screen.
                 {
                     CSHTML5.Interop.ExecuteJavaScript(@"
 var requestMethod = document.exitFullScreen || document.webkitExitFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || document.msExitFullScreen || document.msCancelFullScreen;
-if (requestMethod) { // Native exit full screen.
+if (requestMethod) {
     requestMethod.call(document);
-} else if (typeof window.ActiveXObject !== 'undefined') { // Older IE (< 11)
-    var isFullScreen = (window.screenTop == 0);
-    if (isFullScreen)
-    {
-        var wscript = new ActiveXObject('WScript.Shell');
-        if (wscript !== null) {
-            wscript.SendKeys('{F11}');
-        }
-    }
 }");
                 }
             }

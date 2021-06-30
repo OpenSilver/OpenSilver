@@ -435,6 +435,19 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
+        /// Sets a value that states that the visuals do not reflect the value of the Dependency in C#, so the visuals should be updated even if the value doesn't change the next time it is set.
+        /// </summary>
+        /// <param name="dp">The DependencyProperty that needs its visual's equivalents refreshed.</param>
+        internal void DirtyVisualValue(DependencyProperty dp)
+        {
+            INTERNAL_PropertyStorage storage;
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, true/*create if not found*/, out storage))
+            {
+                INTERNAL_PropertyStore.DirtyVisualValue(storage);
+            }
+        }
+
+        /// <summary>
         /// Sets the inherited value of a dependency property on a DependencyObject. Do not use this method.
         /// </summary>
         /// <param name="dp">The identifier of the dependency property to set.</param>

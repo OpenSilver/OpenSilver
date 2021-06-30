@@ -81,22 +81,59 @@ namespace System.ServiceModel
         }
 
 #if OPENSILVER
-        public static RETURN_TYPE CallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(
+        public static (RETURN_TYPE, Channels.MessageHeaders) CallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(
             string endpointAddress,
             string webMethodName,
-            IEnumerable<Channels.MessageHeader> messageHeaders,
+            IEnumerable<Channels.MessageHeader> outgoingMessageHeaders,
             IDictionary<string, object> requestParameters,
             string soapVersion) where INTERFACE_TYPE : class
         {
             var webMethodsCaller = new CSHTML5_ClientBase<INTERFACE_TYPE>.WebMethodsCaller(endpointAddress);
 
-            return (RETURN_TYPE)webMethodsCaller.CallWebMethod(
+            var (typedResponseBody, incommingMessageHeaders) = webMethodsCaller.CallWebMethod(
                 webMethodName,
                 typeof(INTERFACE_TYPE),
                 typeof(RETURN_TYPE),
-                messageHeaders,
+                outgoingMessageHeaders,
                 requestParameters,
                 soapVersion);
+
+            return ((RETURN_TYPE)typedResponseBody, incommingMessageHeaders);
+        }
+
+        public static Task<(RETURN_TYPE, Channels.MessageHeaders)> CallWebMethodAsync<RETURN_TYPE, INTERFACE_TYPE>(
+            string endpointAddress,
+            string webMethodName,
+            IEnumerable<Channels.MessageHeader> outgoingMessageHeaders,
+            IDictionary<string, object> requestParameters,
+            string soapVersion) where INTERFACE_TYPE : class
+        {
+            // Call the web method
+            var webMethodsCaller = new CSHTML5_ClientBase<INTERFACE_TYPE>.WebMethodsCaller(endpointAddress);
+
+            Task<(RETURN_TYPE, Channels.MessageHeaders)> task;
+            try
+            {
+                task = webMethodsCaller.CallWebMethodAsyncBeginEnd<RETURN_TYPE>(
+                    webMethodName,
+                    typeof(INTERFACE_TYPE),
+                    typeof(RETURN_TYPE),
+                    outgoingMessageHeaders,
+                    requestParameters,
+                    soapVersion);
+            }
+            catch (MissingMethodException)
+            {
+                task = webMethodsCaller.CallWebMethodAsync<RETURN_TYPE>(
+                    webMethodName,
+                    typeof(INTERFACE_TYPE),
+                    typeof(RETURN_TYPE),
+                    outgoingMessageHeaders,
+                    requestParameters,
+                    soapVersion);
+            }
+
+            return task;
         }
 #endif
 
@@ -273,17 +310,33 @@ namespace System.ServiceModel
         }
 
 #if OPENSILVER
-        public static void CallWebMethod_WithoutReturnValue<INTERFACE_TYPE>(
+        public static (object, Channels.MessageHeaders) CallWebMethod_WithoutReturnValue<INTERFACE_TYPE>(
             string endpointAddress,
             string webMethodName,
-            IEnumerable<Channels.MessageHeader> messageHeaders,
+            IEnumerable<Channels.MessageHeader> outgoingMessageHeaders,
             IDictionary<string, object> requestParameters,
             string soapVersion) where INTERFACE_TYPE : class
         {
-            CallWebMethod<object, INTERFACE_TYPE>(
+            return CallWebMethod<object, INTERFACE_TYPE>(
                 endpointAddress,
                 webMethodName,
-                messageHeaders,
+                outgoingMessageHeaders,
+                requestParameters,
+                soapVersion);
+        }
+
+        public static Task<(object, Channels.MessageHeaders)> CallWebMethodAsync_WithoutReturnValue<INTERFACE_TYPE>(
+            string endpointAddress,
+            string webMethodName,
+            IEnumerable<Channels.MessageHeader> outgoingMessageHeaders,
+            IDictionary<string, object> requestParameters,
+            string soapVersion) where INTERFACE_TYPE : class
+        {
+            // The following call works fine because "Task<object>" inherits from "Task".
+            return CallWebMethodAsync<object, INTERFACE_TYPE>(
+                endpointAddress,
+                webMethodName,
+                outgoingMessageHeaders,
                 requestParameters,
                 soapVersion);
         }

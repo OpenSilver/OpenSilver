@@ -123,6 +123,16 @@
       <Link>VersionInformation_SharedWithOtherProjects.cs</Link>
     </Compile>
     <Compile Include="Compilation\CompilationState.cs" />
+    <Compile Include="Console\ConsoleControl.xaml.cs">
+      <DependentUpon>ConsoleControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Console\ConsoleMessage.cs" />
+    <Compile Include="Console\ConsoleMessageControl.xaml.cs">
+      <DependentUpon>ConsoleMessageControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Console\FileSource.cs" />
+    <Compile Include="Console\IMessageSource.cs" />
+    <Compile Include="Console\InteropSource.cs" />
     <Compile Include="DialogBoxes\MessageBoxScrollable.xaml.cs">
       <DependentUpon>MessageBoxScrollable.xaml</DependentUpon>
     </Compile>
@@ -151,7 +161,6 @@
     <Compile Include="SupportClasses\ReflectionInUserAssembliesHelper.cs" />
     <Compile Include="SupportClasses\ScreenCoordinatesHelper.cs" />
     <Compile Include="Interop\WpfMediaElementFactory.cs" />
-    <Compile Include="SupportClasses\JavaScriptErrorsReportingHandler.cs" />
     <Compile Include="Interop\JavaScriptExecutionHandler.cs" />
     <Compile Include="SupportClasses\ResourceInterceptor.cs" />
     <Compile Include="TrialHelpers_MoreMethods.cs" />
@@ -207,6 +216,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="XamlInspection\XamlSinglePropertyEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Console\ConsoleControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Console\ConsoleMessageControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -337,7 +354,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="teamdev.licenses" />
-    <Resource Include="Icon1.ico" />
+    <Resource Include="CSHTML5Icon.ico" />
     <None Include="Service References\LicensingServiceReference\LicensingService.disco" />
     <None Include="Service References\LicensingServiceReference\configuration91.svcinfo" />
     <None Include="Service References\LicensingServiceReference\configuration.svcinfo" />

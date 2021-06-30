@@ -262,7 +262,18 @@ result;
         internal static void ShowErrorMessage(string errorMessage, int indexOfCallInList)
         {
             string str = UnmodifiedJavascriptCalls.ElementAt(indexOfCallInList);
-            string message = string.Format(@"Error in the following javascript code:
+
+#if OPENSILVER
+            if (IsRunningInTheSimulator_WorkAround())
+#else
+            if (IsRunningInTheSimulator())
+#endif
+            {
+                DotNetForHtml5.Core.INTERNAL_Simulator.SimulatorProxy.ReportJavaScriptError(errorMessage, str);
+            }
+            else
+            {
+                string message = string.Format(@"Error in the following javascript code:
 
 {0}
 
@@ -270,7 +281,8 @@ result;
 
 {1}
 ", str, errorMessage);
-            MessageBox.Show(message);
+                Console.WriteLine(message);
+            }
         }
 
 #if BRIDGE

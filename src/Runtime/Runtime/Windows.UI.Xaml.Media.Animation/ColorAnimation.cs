@@ -152,7 +152,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     if (cssEquivalent != null)
                     {
                         cssEquivalentExists = true;
-                        TryStartAnimation(_propertyContainer, cssEquivalent, From, To, Duration, EasingFunction, specificGroupName,
+                        TryStartAnimation(_propertyContainer, cssEquivalent, From, To, Duration, EasingFunction, specificGroupName, _propDp,
                                           OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID));
                     }
                 }
@@ -167,7 +167,7 @@ namespace Windows.UI.Xaml.Media.Animation
                         {
                             if (isFirst)
                             {
-                                bool updateIsFirst = TryStartAnimation(_propertyContainer, equivalent, From, To, Duration, EasingFunction, specificGroupName,
+                                bool updateIsFirst = TryStartAnimation(_propertyContainer, equivalent, From, To, Duration, EasingFunction, specificGroupName, _propDp,
                                                                        OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID));
                                 if (updateIsFirst)
                                 {
@@ -176,7 +176,7 @@ namespace Windows.UI.Xaml.Media.Animation
                             }
                             else
                             {
-                                TryStartAnimation(_propertyContainer, equivalent, From, To, Duration, EasingFunction, specificGroupName,
+                                TryStartAnimation(_propertyContainer, equivalent, From, To, Duration, EasingFunction, specificGroupName, _propDp,
                                                   OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID));
                             }
                         }
@@ -209,7 +209,7 @@ namespace Windows.UI.Xaml.Media.Animation
             };
         }
 
-        static bool TryStartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, Color? from, object to, Duration Duration, EasingFunctionBase easingFunction, string visualStateGroupName, Action callbackForWhenfinished = null)
+        static bool TryStartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, Color? from, object to, Duration Duration, EasingFunctionBase easingFunction, string visualStateGroupName, DependencyProperty dependencyProperty, Action callbackForWhenfinished = null)
         {
             if (cssEquivalent.Name != null && cssEquivalent.Name.Count != 0)
             {
@@ -318,7 +318,7 @@ namespace Windows.UI.Xaml.Media.Animation
                         }
 
                         AnimationHelpers.CallVelocity(cssEquivalent.DomElement, Duration, easingFunction, visualStateGroupName, callbackForWhenfinished, newObj);
-
+                        target.DirtyVisualValue(dependencyProperty);
                         return true;
                     }
                 }

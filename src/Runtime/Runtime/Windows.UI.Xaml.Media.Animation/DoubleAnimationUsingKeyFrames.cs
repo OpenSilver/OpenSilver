@@ -180,7 +180,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     if (cssEquivalent != null)
                     {
                         cssEquivalentExists = true;
-                        StartAnimation(_propertyContainer, cssEquivalent, null, keyFrame.Value, GetKeyFrameDuration(keyFrame), keyFrame.INTERNAL_GetEasingFunction(), specificGroupName,
+                        StartAnimation(_propertyContainer, cssEquivalent, null, keyFrame.Value, GetKeyFrameDuration(keyFrame), keyFrame.INTERNAL_GetEasingFunction(), specificGroupName, _propDp,
                         OnKeyFrameCompleted(_parameters, isLastLoop, keyFrame.Value, _propertyContainer, _targetProperty, _animationID));
                     }
                 }
@@ -191,7 +191,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     foreach (CSSEquivalent equivalent in cssEquivalents)
                     {
                         cssEquivalentExists = true;
-                        StartAnimation(_propertyContainer, equivalent, null, keyFrame.Value, Duration, keyFrame.INTERNAL_GetEasingFunction(), specificGroupName,
+                        StartAnimation(_propertyContainer, equivalent, null, keyFrame.Value, Duration, keyFrame.INTERNAL_GetEasingFunction(), specificGroupName, _propDp,
                         OnKeyFrameCompleted(_parameters, isLastLoop, keyFrame.Value, _propertyContainer, _targetProperty, _animationID));
                     }
                 }
@@ -325,7 +325,7 @@ namespace Windows.UI.Xaml.Media.Animation
         }
 
 
-        static void StartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, double? from, object to, Duration Duration, EasingFunctionBase easingFunction, string visualStateGroupName, Action callbackForWhenfinished = null)
+        static void StartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, double? from, object to, Duration Duration, EasingFunctionBase easingFunction, string visualStateGroupName, DependencyProperty dependencyProperty, Action callbackForWhenfinished = null)
         {
             if (cssEquivalent.Name != null && cssEquivalent.Name.Count != 0)
             {
@@ -364,6 +364,7 @@ namespace Windows.UI.Xaml.Media.Animation
                             }
                         }
                         AnimationHelpers.CallVelocity(cssEquivalent.DomElement, Duration, easingFunction, visualStateGroupName, callbackForWhenfinished, newObj);
+                        target.DirtyVisualValue(dependencyProperty);
                     }
                 }
             }

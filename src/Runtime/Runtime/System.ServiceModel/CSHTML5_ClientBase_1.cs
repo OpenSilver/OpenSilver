@@ -515,13 +515,13 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 string webMethodName,
                 Type interfaceType,
                 Type methodReturnType,
-                IEnumerable<MessageHeader> messageHeaders,
+                IEnumerable<MessageHeader> outgoingMessageHeaders,
                 IDictionary<string, object> originalRequestObject,
                 Action<string> callback,
                 string soapVersion)
             {
                 BeginCallWebMethod(webMethodName, interfaceType, methodReturnType,
-                    GetEnvelopeHeaders(messageHeaders?.ToList()), originalRequestObject,
+                    GetEnvelopeHeaders(outgoingMessageHeaders?.ToList(), soapVersion), originalRequestObject,
                     callback, soapVersion);
             }
 #endif
@@ -678,6 +678,124 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 return tcs.Task;
             }
 
+#if OPENSILVER
+            internal Task<(T, MessageHeaders)> CallWebMethodAsyncBeginEnd<T>(
+                string webMethodName,
+                Type interfaceType,
+                Type methodReturnType,
+                IEnumerable<MessageHeader> outgoingMessageHeaders,
+                IDictionary<string, object> originalRequestObject,
+                string soapVersion)
+            {
+                TaskCompletionSource<(T, MessageHeaders)> tcs = new TaskCompletionSource<(T, MessageHeaders)>();
+
+                AsyncCallback callback = new AsyncCallback(delegate (IAsyncResult asyncResponseResult)
+                {
+                    try
+                    {
+                        T result = EndCallWebMethod<T>(
+                            webMethodName,
+                            interfaceType,
+                            ((WebMethodAsyncResult)asyncResponseResult).XmlReturnedFromTheServer,
+                            soapVersion);
+
+                        var messageHeaders = GetEnvelopeHeaders(((WebMethodAsyncResult)asyncResponseResult).XmlReturnedFromTheServer, soapVersion);
+
+                        tcs.SetResult((result, messageHeaders));
+                    }
+                    catch (Exception ex)
+                    {
+                        tcs.TrySetException(ex);
+                    }
+                });
+                object asyncState = null;
+
+                WebMethodAsyncResult webMethodAsyncResult = new WebMethodAsyncResult(callback, asyncState);
+
+                BeginCallWebMethod(
+                    webMethodName,
+                    interfaceType,
+                    methodReturnType,
+                    outgoingMessageHeaders,
+                    originalRequestObject,
+                    (xmlReturnedFromTheServer) =>
+                    {
+                        // After server call has finished (not deserialized yet)
+                        webMethodAsyncResult.XmlReturnedFromTheServer = xmlReturnedFromTheServer;
+
+                        // This causes a call to "EndCallWebMethod" which will deserialize the response.
+                        webMethodAsyncResult.Completed();
+                    },
+                    soapVersion);
+
+                return tcs.Task;
+            }
+
+            /// <summary>
+            /// Asynchronously calls a WebMethod.
+            /// </summary>
+            /// <typeparam name="T">The return type of the WebMethod</typeparam>
+            /// <param name="webMethodName">The name of the WebMethod</param>
+            /// <param name="interfaceType">The Type of the interface</param>
+            /// <param name="methodReturnType">The return Type of the method</param>
+            /// <param name="outgoingMessageHeaders">The outgoing message headers</param>
+            /// <param name="originalRequestObject">The additional arguments of the method</param>
+            /// <param name="soapVersion">The SOAP Version of the request</param>
+            /// <returns>The result of the call of the method and the incoming message headers.</returns>
+            public Task<(T, MessageHeaders)> CallWebMethodAsync<T>(
+                string webMethodName,
+                Type interfaceType,
+                Type methodReturnType,
+                IEnumerable<MessageHeader> outgoingMessageHeaders,
+                IDictionary<string, object> originalRequestObject,
+                string soapVersion) // Note: we don't arrive here using c#
+            {
+                // todo: find out what happens with methods that take multiple arguments 
+                // (if possible) and change the parameterName to a string[].
+                MethodInfo method = ResolveMethod(interfaceType, webMethodName, webMethodName + "Async");
+                bool isXmlSerializer = IsXmlSerializer(webMethodName, methodReturnType, method);
+                string outgoingMessageHeadersString = GetEnvelopeHeaders(outgoingMessageHeaders?.ToList(), soapVersion);
+
+                Dictionary<string, string> headers;
+                string request;
+                PrepareRequest(
+                    webMethodName,
+                    method,
+                    interfaceType,
+                    methodReturnType,
+                    outgoingMessageHeadersString,
+                    originalRequestObject,
+                    soapVersion,
+                    isXmlSerializer,
+                    out headers,
+                    out request);
+
+                var tcs = new TaskCompletionSource<(T, MessageHeaders)>(); //todo: here we need to change object to the return type
+
+                string response = _webRequestHelper_JSVersion.MakeRequest(
+                    new Uri(_addressOfService),
+                    "POST",
+                    this,
+                    headers,
+                    request,
+                    (sender, args2) =>
+                    {
+                        ReadAndPrepareResponseGeneric_JSVersion(
+                            tcs,
+                            args2,
+                            interfaceType,
+                            methodReturnType,
+                            null,
+                            isXmlSerializer,
+                            soapVersion);
+                    },
+                    true,
+                    Application.Current.Host.Settings.DefaultSoapCredentialsMode);
+
+                return tcs.Task;
+            }
+#endif
+
             /// <summary>
             /// Asynchronously calls a WebMethod.
             /// </summary>
@@ -686,7 +804,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             /// <param name="interfaceType">The Type of the interface</param>
             /// <param name="methodReturnType">The return Type of the method</param>
             /// <param name="originalRequestObject">The additional arguments of the method</param>
-            /// <param name="soapVersion"></param>
+            /// <param name="soapVersion">The SOAP Version of the request</param>
             /// <returns>The result of the call of the method.</returns>
             public Task<T> CallWebMethodAsync<T>(
                 string webMethodName,
@@ -739,66 +857,19 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 return tcs.Task;
             }
 
-#if OPENSILVER
             /// <summary>
             /// Calls a WebMethod
             /// </summary>
             /// <param name="webMethodName">The name of the Method</param>
             /// <param name="interfaceType">The Type of the interface</param>
-            /// <param name="methodReturnType"></param>
-            /// <param name="messageHeaders">The SOAP envelope headers</param>
-            /// <param name="originalRequestObject"></param>
-            /// <param name="soapVersion"></param>
+            /// <param name="methodReturnType">The return Type of the method</param>
+            /// <param name="originalRequestObject">The additional arguments of the method</param>
+            /// <param name="soapVersion">The SOAP Version of the request</param>
             /// <returns>The result of the call of the method.</returns>
             public object CallWebMethod(
                 string webMethodName,
                 Type interfaceType,
                 Type methodReturnType,
-                IEnumerable<MessageHeader> messageHeaders,
-                IDictionary<string, object> originalRequestObject,
-                string soapVersion) // Note: we don't arrive here using c#.
-            {
-                return CallWebMethod(webMethodName, interfaceType, methodReturnType,
-                        GetEnvelopeHeaders(messageHeaders?.ToList()), originalRequestObject, soapVersion);
-            }
-#endif
-            /// <summary>
-            /// Calls a WebMethod
-            /// </summary>
-            /// <param name="webMethodName">The name of the Method</param>
-            /// <param name="interfaceType">The Type of the interface</param>
-            /// <param name="methodReturnType"></param>
-            /// <param name="originalRequestObject"></param>
-            /// <param name="soapVersion"></param>
-            /// <returns>The result of the call of the method.</returns>
-            public object CallWebMethod(
-                string webMethodName,
-                Type interfaceType,
-                Type methodReturnType,
-                IDictionary<string, object> originalRequestObject,
-                string soapVersion) // Note: we don't arrive here using c#.
-            {
-                return CallWebMethod(webMethodName, interfaceType, methodReturnType, "", originalRequestObject, soapVersion);
-            }
-
-
-
-
-            /// <summary>
-            /// Calls a WebMethod
-            /// </summary>
-            /// <param name="webMethodName">The name of the Method</param>
-            /// <param name="interfaceType">The Type of the interface</param>
-            /// <param name="methodReturnType"></param>
-            /// <param name="messageHeaders"></param>
-            /// <param name="originalRequestObject"></param>
-            /// <param name="soapVersion"></param>
-            /// <returns>The result of the call of the method.</returns>
-            public object CallWebMethod(
-                string webMethodName,
-                Type interfaceType,
-                Type methodReturnType,
-                string messageHeaders,
                 IDictionary<string, object> originalRequestObject,
                 string soapVersion) // Note: we don't arrive here using c#.
             {
@@ -847,7 +918,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     method,
                     interfaceType,
                     methodReturnType,
-                    messageHeaders,
+                    "",
                     originalRequestObject,
                     soapVersion,
                     isXmlSerializer,
@@ -876,6 +947,106 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     isXmlSerializer,
                     soapVersion);
             }
+
+#if OPENSILVER
+            /// <summary>
+            /// Calls a WebMethod
+            /// </summary>
+            /// <param name="webMethodName">The name of the Method</param>
+            /// <param name="interfaceType">The Type of the interface</param>
+            /// <param name="methodReturnType">The return Type of the method</param>
+            /// <param name="outgoingMessageHeaders">The outgoing message headers</param>
+            /// <param name="originalRequestObject">The additional arguments of the method</param>
+            /// <param name="soapVersion">The SOAP Version of the request</param>
+            /// <returns>The result of the call of the method and the incoming message headers.</returns>
+            public (object, MessageHeaders) CallWebMethod(
+                string webMethodName,
+                Type interfaceType,
+                Type methodReturnType,
+                IEnumerable<MessageHeader> outgoingMessageHeaders,
+                IDictionary<string, object> originalRequestObject,
+                string soapVersion) // Note: we don't arrive here using c#.
+            {
+                //**************************************
+                // What the request should look like in case of classes or strings:
+                //**************************************
+                //<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+                //  <s:Body>
+                //    <GetCurrentTime xmlns="http://tempuri.org/"/>
+                //  </s:Body>
+                //</s:Envelope>
+                //**************************************
+                // What the request should look like with parameters:
+                //<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+                //  <s:Body>
+                //    <AddTodo xmlns="http://tempuri.org/">
+                //    <id>1</id>
+                //    <todo>zsfzef</todo>
+                //    <priority>1</priority>
+                //    <dueDate i:nil="true" xmlns:i="http://www.w3.org/2001/XMLSchema-instance"/>
+                //    </AddTodo>
+                //  </s:Body>
+                //</s:Envelope>
+                //**************************************
+
+                //**************************************
+                // What the request should look like in case of value types (eg. int MethodName(int)):
+                //**************************************
+
+                //<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+                //    <s:Body>
+                //        <MethodName xmlns="http://tempuri.org/">
+                //            <value>10</value>
+                //        </MethodName>
+                //    </s:Body>
+                //</s:Envelope>
+                //**************************************
+
+                MethodInfo method = ResolveMethod(interfaceType, webMethodName, webMethodName, "Begin" + webMethodName);
+                bool isXmlSerializer = IsXmlSerializer(webMethodName, methodReturnType, method);
+                var outgoingMessageHeadersString = GetEnvelopeHeaders(outgoingMessageHeaders?.ToList(), soapVersion);
+
+                Dictionary<string, string> headers;
+                string request;
+                PrepareRequest(
+                    webMethodName,
+                    method,
+                    interfaceType,
+                    methodReturnType,
+                    outgoingMessageHeadersString,
+                    originalRequestObject,
+                    soapVersion,
+                    isXmlSerializer,
+                    out headers,
+                    out request);
+
+                string response = _webRequestHelper_JSVersion.MakeRequest(
+                        new Uri(_addressOfService),
+                        "POST",
+                        this,
+                        headers,
+                        request,
+                        null,
+                        false,
+                        Application.Current.Host.Settings.DefaultSoapCredentialsMode);
+
+                var typedResponseBody = ReadAndPrepareResponse(
+                    response,
+                    interfaceType,
+                    methodReturnType,
+                    null,
+                    faultException =>
+                    {
+                        throw faultException;
+                    },
+                    isXmlSerializer,
+                    soapVersion);
+
+                var incomingMessageHeaders = GetEnvelopeHeaders(response, soapVersion);
+
+                return (typedResponseBody, incomingMessageHeaders);
+            }
+#endif
 
             private static MethodInfo ResolveMethod(Type interfaceType, string webMethodName, params string[] methodNames)
             {
@@ -921,7 +1092,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             }
 
 #if OPENSILVER
-            private static string GetEnvelopeHeaders(ICollection<MessageHeader> messageHeaders)
+            private static string GetEnvelopeHeaders(ICollection<MessageHeader> messageHeaders, string soapVersion)
             {
                 if (messageHeaders == null || !messageHeaders.Any())
                 {
@@ -935,16 +1106,25 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     using (var sw = new StringWriter())
                     using (var xw = XmlWriter.Create(sw, settings))
                     {
-                        mh.WriteHeader(xw, MessageVersion.Default);
+                        mh.WriteHeader(xw, soapVersion == "1.1" ? MessageVersion.Soap11 : MessageVersion.Soap12WSAddressing10);
 
                         xw.Flush();
                         return sw.ToString();
                     }
                 }));
             }
+
+            private static MessageHeaders GetEnvelopeHeaders(string incomingMessageString, string soapVersion)
+            {
+                using (var reader = XmlReader.Create(new StringReader(incomingMessageString)))
+                {
+                    var incomingMessage = Message.CreateMessage(reader, int.MaxValue, soapVersion == "1.1" ? MessageVersion.Soap11 : MessageVersion.Soap12WSAddressing10);
+                    return incomingMessage.Headers;
+                }
+            }
 #endif
 
-            private void ProcessNode(XElement node, Action<XElement> action)
+                private void ProcessNode(XElement node, Action<XElement> action)
             {
                 action(node);
                 foreach (XElement child in node.Elements())
@@ -1181,6 +1361,43 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             }
 
 #if OPENSILVER
+            private void ReadAndPrepareResponseGeneric_JSVersion<T>(
+                TaskCompletionSource<(T, MessageHeaders)> taskCompletionSource,
+                INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs e,
+                Type interfaceType,
+                Type requestResponseType,
+                IReadOnlyList<Type> knownTypes,
+                bool isXmlSerializer,
+                string soapVersion)
+            {
+                if (e.Error == null)
+                {
+                    T requestResponse = (T)ReadAndPrepareResponse(
+                        e.Result,
+                        interfaceType,
+                        requestResponseType,
+                        knownTypes,
+                        faultException =>
+                        {
+                            taskCompletionSource.TrySetException(faultException);
+                        },
+                        isXmlSerializer,
+                        soapVersion);
+
+                    // Note: this Task.IsCompleted can be true if we met an exception 
+                    // which triggered a call to TrySetException (above).
+                    if (!taskCompletionSource.Task.IsCompleted)
+                    {
+                        taskCompletionSource.SetResult((requestResponse, GetEnvelopeHeaders(e.Result, soapVersion)));
+                    }
+                }
+                else
+                {
+                    taskCompletionSource.TrySetException(e.Error);
+                }
+            }
+
+
             private FaultException GetFaultException(string response, bool useXmlSerializerFormat)
             {
                 FaultException fe = null;
@@ -1305,17 +1522,29 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 // we make our own exception. Because it is easier that way (it will probably
                 // require an actual deserialization of the users' FaultException later on, to 
                 // be able to support their custom ones).
+
+                VerifyThatResponseIsNotNullOrEmpty(responseAsString);
+                string NS;
+                if (soapVersion == "1.1")
+                {
+                    NS = "http://schemas.xmlsoap.org/soap/envelope/";
+                }
+                else
+                {
+                    Debug.Assert(soapVersion == "1.2",
+                                    string.Format("Unexpected soap version ({0}) !", soapVersion));
+                    NS = "http://www.w3.org/2003/05/soap-envelope";
+                }
+
+                XElement envelopeElement = XDocument.Parse(responseAsString).Root;
+                XElement headerElement = envelopeElement.Element(XName.Get("Header", NS));
+                XElement bodyElement = envelopeElement.Element(XName.Get("Body", NS));
+
+
 #if OPENSILVER
                 // Error parsing, if applicable
                 if (soapVersion == "1.2")
                 {
-                    const string NS = "http://www.w3.org/2003/05/soap-envelope";
-
-                    VerifyThatResponseIsNotNullOrEmpty(responseAsString);
-                    XElement envelopeElement = XDocument.Parse(responseAsString).Root;
-                    XElement headerElement = envelopeElement.Element(XName.Get("Header", NS));
-                    XElement bodyElement = envelopeElement.Element(XName.Get("Body", NS));
-
                     XElement faultElement = bodyElement.Element(XName.Get("Fault", NS));
 
                     if (faultElement != null)
@@ -1446,12 +1675,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     // to allow passing it as Generic type argument when calling CallWebMethod.
                     if (requestResponseType == typeof(object))
                     {
-                        VerifyThatResponseIsNotNullOrEmpty(responseAsString);
-                        XDocument doc = XDocument.Parse(responseAsString);
-                        XElement currentElement = doc.Root; //Current element is Envelope
-                        currentElement = (XElement)currentElement.FirstNode; //Current element is now Body
-                        currentElement = (XElement)currentElement.FirstNode; //Current element is now METHODNAMEResponse
-                        if (currentElement.Nodes().Count() == 0)
+                        if (bodyElement != null && bodyElement.Nodes().Count() == 0)
                         {
                             // Note: there might be a more efficient way of checking if the method has a return 
                             // type (possibly through a smart use of responseAsString.IndexOf but it seems 
@@ -1481,23 +1705,18 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     }
 
                     DataContractSerializerCustom deSerializer = new DataContractSerializerCustom(typeToDeserialize, types);
-                    VerifyThatResponseIsNotNullOrEmpty(responseAsString);
-                    XDocument xDoc = XDocument.Parse(responseAsString);
-                    responseAsString = RemoveUnparsableStrings(responseAsString);
-                    XElement xElement = xDoc.Root;
+                    XElement xElement = envelopeElement;
 
                     //exclude the parts that are <Enveloppe><Body>... since they are useless 
                     // and would keep the deserialization from working properly
                     // they should always be the two outermost elements
                     if (soapVersion == "1.1")
                     {
-                        xElement = xElement.Element(XName.Get("Body", "http://schemas.xmlsoap.org/soap/envelope/")) ?? xElement;
+                        xElement = bodyElement ?? xElement;
                     }
                     else
                     {
-                        Debug.Assert(soapVersion == "1.2",
-                                     string.Format("Unexpected soap version ({0}) !", soapVersion));
-                        xElement = xElement.Element(XName.Get("Body", "http://www.w3.org/2003/05/soap-envelope"));
+                        xElement = bodyElement;
                     }
 
                     // we check if the type is defined in the next XElement because 
@@ -1599,24 +1818,6 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 }
 
                 return requestResponse;
-            }
-
-            // Now that we use the javascript function ParseFromString 
-            // we need to remove unsparable strings from the response
-            // To Do : replace the encoding of the soap response so there 
-            // are no unparsable strings
-            private string RemoveUnparsableStrings(string str)
-            {
-                string[] unparsableStrings = new string[]
-                {
-                    "&#x1A;"
-                };
-
-                foreach (string unparsableString in unparsableStrings)
-                {
-                    str = str.Replace(unparsableString, "");
-                }
-                return str;
             }
 
             static void VerifyThatResponseIsNotNullOrEmpty(string responseAsString)

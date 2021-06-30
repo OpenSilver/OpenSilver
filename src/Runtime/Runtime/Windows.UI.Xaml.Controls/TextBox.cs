@@ -18,18 +18,18 @@ using JSIL.Meta;
 #else
 using Bridge;
 #endif
+
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if MIGRATION
-using System.Windows.Input;
+using System.Windows.Data;
 using System.Windows.Media;
 #else
 using Windows.UI.Text;
-using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
 #endif
 
@@ -53,8 +53,9 @@ namespace Windows.UI.Xaml.Controls
     /// </example>
     public partial class TextBox : Control
     {
-        object _contentEditableDiv;
-        FrameworkElement TextAreaContainer = null;
+        private object _contentEditableDiv;
+        private FrameworkElement TextAreaContainer = null;
+        private bool _isUpdatingDOM = false;
 
         /// <summary>
         /// The name of the ExpanderButton template part.
@@ -62,46 +63,49 @@ namespace Windows.UI.Xaml.Controls
         private readonly string[] TextAreaContainerNames = { "ContentElement", "PART_ContentHost" };
         //                                                  Sl & UWP                WPF
 
-        //static TextBox()
-        //{
-        //    Control.FontStyleProperty.OverrideMetadata(typeof(TextBox), new PropertyMetadata(FontStyle.Normal)
-        //    {
-        //        GetCSSEquivalent = (instance) =>
-        //        {
-        //            return new CSSEquivalent()
-        //            {
-        //                DomElement = ((TextBox)instance)._contentEditableDiv,
-        //                Value = (inst, value) =>
-        //                {
-        //                    if (value != null)
-        //                    {
-        //                        return ((FontStyle)value).ToString().ToLower();
-        //                    }
-        //                    else
-        //                    {
-        //                        return "";
-        //                    }
-        //                },
-        //                Name = new List<string> { "fontStyle" },
-        //                ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
-        //            };
-        //        }
-        //    }
-        //    );
-        //}
-        ///
         public TextBox()
         {
             this.DefaultStyleKey = typeof(TextBox);
+
+            // Workaround : since we don't attach a UIElement to the "ContentElement" part,
+            // we have to listen for changes of IsEnabled and IsHitTestVisible to propagate
+            // pointer-events to the editable div.
+            this.SetBinding(IsHitTestVisibleListenerProperty, new Binding("IsHitTestVisible") { Source = this });
+            this.IsEnabledChanged += (o, e) => this.PropagatePointerEventsToContentEditableDiv();
         }
 
+        private static readonly DependencyProperty IsHitTestVisibleListenerProperty =
+            DependencyProperty.Register(
+                "IsHitTestVisibleListener",
+                typeof(bool),
+                typeof(TextBox),
+                new PropertyMetadata(IsHitTestVisibleProperty.GetMetadata(typeof(TextBox)).DefaultValue, OnIsHitTestVisibleChanged));
+
+        private static void OnIsHitTestVisibleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((TextBox)d).PropagatePointerEventsToContentEditableDiv();
+        }
+
+        private void PropagatePointerEventsToContentEditableDiv()
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) &&
+                this._contentEditableDiv != null)
+            {
+                INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this._contentEditableDiv).pointerEvents =
+#if REVAMPPOINTEREVENTS
+                    this.INTERNAL_ArePointerEventsEnabled ? "auto" : "none";
+#else
+                    this.IsHitTestVisible && this.IsEnabled ? "auto" : "none";
+#endif
+            }
+        }
 
         internal sealed override bool INTERNAL_GetFocusInBrowser
         {
             get { return true; }
         }
 
-        #region AcceptsReturn
+#region AcceptsReturn
 
         /// <summary>
         /// Gets or sets the value that determines whether the text box allows and displays
@@ -112,17 +116,25 @@ namespace Windows.UI.Xaml.Controls
             get { return (bool)GetValue(AcceptsReturnProperty); }
             set { SetValue(AcceptsReturnProperty, value); }
         }
+
         /// <summary>
         /// Identifies the AcceptsReturn dependency property.
         /// </summary>
         public static readonly DependencyProperty AcceptsReturnProperty =
-            DependencyProperty.Register("AcceptsReturn", typeof(bool), typeof(TextBox), new PropertyMetadata(false, AcceptsReturn_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(AcceptsReturn), 
+                typeof(bool), 
+                typeof(TextBox), 
+                new PropertyMetadata(false, AcceptsReturn_Changed)
+                { 
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
+                });
 
         private static void AcceptsReturn_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var textBox = (TextBox)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(textBox) && INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(textBox._contentEditableDiv))
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(textBox) && 
+                INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(textBox._contentEditableDiv))
             {
                 if (e.NewValue != e.OldValue && e.NewValue is bool)
                 {
@@ -141,10 +153,10 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             }
         }
 
-        #endregion
+#endregion
 
+#region AcceptsTab
 
-        #region AcceptsTab
         /// <summary>
         /// Gets or sets the value that determines whether pressing tab while the TextBox has the focus will add a tabulation in the text or set the focus to the next element.
         /// True to add a tabulation, false to set the focus to the next element.
@@ -154,16 +166,20 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             get { return (bool)GetValue(AcceptsTabProperty); }
             set { SetValue(AcceptsTabProperty, value); }
         }
+
         /// <summary>
         /// Identifies the AcceptsReturn dependency property.
         /// </summary>
         public static readonly DependencyProperty AcceptsTabProperty =
-            DependencyProperty.Register("AcceptsTab", typeof(bool), typeof(TextBox), new PropertyMetadata(false)); 
-        #endregion
+            DependencyProperty.Register(
+                nameof(AcceptsTab), 
+                typeof(bool), 
+                typeof(TextBox), 
+                new PropertyMetadata(false));
 
+#endregion AcceptsTab
 
-
-        #region PlaceholderText
+#region PlaceholderText
 
         /// <summary>
         /// Gets or sets the text that is displayed in the control until the value is changed by a user action or some other operation.
@@ -173,15 +189,20 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             get { return (string)GetValue(PlaceholderTextProperty); }
             set { SetValue(PlaceholderTextProperty, value); }
         }
+
         /// <summary>
         /// Identifies the PlaceholderText dependency property.
         /// </summary>
         public static readonly DependencyProperty PlaceholderTextProperty =
-            DependencyProperty.Register("PlaceholderText", typeof(string), typeof(TextBox), new PropertyMetadata(string.Empty));
+            DependencyProperty.Register(
+                nameof(PlaceholderText), 
+                typeof(string), 
+                typeof(TextBox), 
+                new PropertyMetadata(string.Empty));
 
-        #endregion
+#endregion PlaceholderText
 
-        #region Text
+#region Text
 
         /// <summary>
         /// Gets or sets the text displayed in the TextBox.
@@ -191,44 +212,33 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             get { return (string)GetValue(TextProperty); }
             set { SetValue(TextProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Text dependency property.
         /// </summary>
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof(string), typeof(TextBox), new PropertyMetadata(string.Empty, Text_Changed, CoerceText) { MethodToUpdateDom = UpdateDomText });
-        static void Text_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            DependencyProperty.Register(
+                nameof(Text), 
+                typeof(string), 
+                typeof(TextBox), 
+                new PropertyMetadata(string.Empty, Text_Changed, CoerceText) 
+                { 
+                    MethodToUpdateDom = UpdateDomText 
+                });
+        
+        private static void Text_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var textBox = (TextBox)d;
-            if (!textBox._isUserChangingText)
-            {
-                //textBox._isCodeProgrammaticallyChangingText = true; // So that when the c# caller sets the text programmatically, it does not get set multiple times.
-                //string newText = e.NewValue as string ?? string.Empty;
-                //if (INTERNAL_VisualTreeManager.IsElementInVisualTree(textBox) && textBox._contentEditableDiv != null)
-                //{
-                //INTERNAL_HtmlDomManager.SetContentString(textBox, newText);
-                textBox.OnTextChanged(new TextChangedEventArgs() { OriginalSource = textBox });
-                //}
-                //textBox._isCodeProgrammaticallyChangingText = false;
-            }
+            ((TextBox)d).OnTextChanged(new TextChangedEventArgs() { OriginalSource = d });
         }
 
         private static void UpdateDomText(DependencyObject d, object newValue)
         {
             var textBox = (TextBox)d;
-            if (!textBox._isUserChangingText)
-            {
-                string displayedText = INTERNAL_HtmlDomManager.GetTextBoxText(textBox.INTERNAL_InnerDomElement);
-                string text = textBox.Text ?? string.Empty;
-                if (displayedText != text)
-                {
-                    if (textBox._contentEditableDiv != null || textBox.Template == null)
-                    {
-                        textBox._isCodeProgrammaticallyChangingText = true;
-                        INTERNAL_HtmlDomManager.SetContentString(textBox, text);
-                        textBox._isCodeProgrammaticallyChangingText = false;
-                    }
-                }
-            }
+
+            if (textBox._isUpdatingDOM || textBox._contentEditableDiv == null)
+                return;
+
+            INTERNAL_HtmlDomManager.SetContentString(textBox, textBox.Text);
         }
 
         internal override object GetDomElementToSetContentString()
@@ -243,18 +253,14 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             }
         }
 
-        static object CoerceText(DependencyObject d, object value)
+        private static object CoerceText(DependencyObject d, object value)
         {
-            if (value == null)
-            {
-                return String.Empty;
-            }
-            return value;
+            return value ?? string.Empty;
         }
 
-        #endregion
+#endregion Text
 
-        #region TextAlignment
+#region TextAlignment
 
         /// <summary>
         /// Gets or sets how the text should be aligned in the text box.
@@ -264,24 +270,25 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             get { return (TextAlignment)GetValue(TextAlignmentProperty); }
             set { SetValue(TextAlignmentProperty, value); }
         }
+
         /// <summary>
         /// Identifies the TextAlignment dependency property.
         /// </summary>
         public static readonly DependencyProperty TextAlignmentProperty =
-            DependencyProperty.Register("TextAlignment", typeof(TextAlignment), typeof(TextBox), new PropertyMetadata(TextAlignment.Left) { MethodToUpdateDom = TextAlignment_MethodToUpdateDom});
+            DependencyProperty.Register(
+                nameof(TextAlignment), 
+                typeof(TextAlignment), 
+                typeof(TextBox), 
+                new PropertyMetadata(TextAlignment.Left) 
+                { 
+                    MethodToUpdateDom = TextAlignment_MethodToUpdateDom
+                });
 
-        static void TextAlignment_MethodToUpdateDom(DependencyObject d, object newValue)
+        private static void TextAlignment_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             var textBlock = (TextBox)d;
-            TextAlignment newTextAlignment;
-            if (newValue is TextAlignment)
-            {
-                newTextAlignment = (TextAlignment)newValue;
-            }
-            else
-            {
-                newTextAlignment = TextAlignment.Left;
-            }
+            var newTextAlignment = (TextAlignment)newValue;
+            
             switch (newTextAlignment)
             {
                 case TextAlignment.Center:
@@ -301,9 +308,9 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             }
         }
 
-        #endregion
+#endregion TextAlignment
 
-        #region text changed event
+#region TextChanged Event
 
         /// <summary>
         /// Occurs when the text is changed.
@@ -322,9 +329,9 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             }
         }
 
-        #endregion
+#endregion TextChanged Event
 
-        #region CaretBrush
+#region CaretBrush
 
         /// <summary>
         /// Gets or sets the brush that is used to render the vertical bar that indicates
@@ -335,45 +342,48 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             get { return (Brush)GetValue(CaretBrushProperty); }
             set { SetValue(CaretBrushProperty, value); }
         }
+
         /// <summary>
         /// Identify the CaretBrush dependency property
         /// </summary>
         public static readonly DependencyProperty CaretBrushProperty =
-            DependencyProperty.Register("CaretBrush", typeof(Brush), typeof(TextBox), new PropertyMetadata(new SolidColorBrush(Colors.Black))
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(CaretBrush), 
+                typeof(Brush), 
+                typeof(TextBox), 
+                new PropertyMetadata(new SolidColorBrush(Colors.Black))
                 {
-                    return new CSSEquivalent()
+                    GetCSSEquivalent = (instance) =>
                     {
-                        Name = new List<String> { "caretColor", "colorAlpha" },
-                        ApplyAlsoWhenThereIsAControlTemplate = false,
-                    };
-                }
-            });
-        #endregion
+                        return new CSSEquivalent()
+                        {
+                            Name = new List<String> { "caretColor", "colorAlpha" },
+                            ApplyAlsoWhenThereIsAControlTemplate = false,
+                        };
+                    }
+                });
 
-        public override void INTERNAL_AttachToDomEvents()
-        {
-            base.INTERNAL_AttachToDomEvents();
-        }
+#endregion CaretBrush
 
-        bool _isCodeProgrammaticallyChangingText = false;
-        bool _isUserChangingText = false;
         private void TextAreaValueChanged()
         {
-            if (!_isCodeProgrammaticallyChangingText)
+            //we get the value:
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                //we get the value:
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+                var text = INTERNAL_HtmlDomManager.GetTextBoxText(this.INTERNAL_InnerDomElement) ?? string.Empty;
+                
+                if (!AcceptsReturn) // This is just in case the user managed to enter multi-line text in a single-line textbox. It can happen (due to a bug) when pasting multi-line text under Interned Explorer 10.
+                    text = text.Replace("\n", "").Replace("\r", "");
+
+                _isUpdatingDOM = true;
+
+                try
                 {
-                    string text = INTERNAL_HtmlDomManager.GetTextBoxText(this.INTERNAL_InnerDomElement);
-                    if (!AcceptsReturn) // This is just in case the user managed to enter multi-line text in a single-line textbox. It can happen (due to a bug) when pasting multi-line text under Interned Explorer 10.
-                        text = text.Replace("\n", "").Replace("\r", "");
-                    _isUserChangingText = true; //To prevent reentrance (infinite loop) when user types some text.
-                    //Text = text;
-                    SetCurrentValue(TextProperty, text); //we call SetLocalvalue directly to avoid replacing the BindingExpression
-                    _isUserChangingText = false;
-                    OnTextChanged(new TextChangedEventArgs() { OriginalSource = this });
+                    SetCurrentValue(TextProperty, text); //we call SetCurrentValue directly to avoid replacing the BindingExpression
+                }
+                finally
+                {
+                    _isUpdatingDOM = false;
                 }
             }
         }
@@ -390,40 +400,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             object outerDiv;
             var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
             string backgroundColor = "transparent"; //value when it is templated
-            if (!isTemplated)
-            {
-                outerDivStyle.borderColor = "#ABADB3";
-                outerDivStyle.borderStyle = "solid";
-                outerDivStyle.borderWidth = "1px";
-                outerDivStyle.boxSizing = "border-box"; //this is so that the borderWidth we set does not increase the size of the whole thing.
-                backgroundColor = isReadOnly ? "#DDDDDD" : "White";
-            }
-            else //if the TextBox is templated, we don't want contentEditable div to have a border:
-            {
-                //Note: commentary below is about ticket #1942 fix:
-                //todo: make the following more consistent with potential change (as in "if the element that receives the solid border in the !isTemplated above is no longer the child node of INTERNAL_AdditionalOutsideDivForMargins, this follows)
-                //Note: 2020/10/08 - outerDivStyle is different here than when we enter the "if".
-                //      The "if" version ends up being the child node of INTERNAL_AdditionalOutsideDivForMargins, (this should always be the case since it is the "no template" version of it so it should not change.)
-                //      here it is the first div inside the ContentPresenter defined in the Template.
-                //      This is why I replaced the following commented lines with the ones after:
-                //outerDivStyle.borderWidth = "0px";
-                //outerDivStyle.width = "100%";
-                //outerDivStyle.height = "100%";
-                //Note2: We also reset the contentEditable value of the former contentEditable to false. Otherwise, the whole control will be considered editable.
-//                dynamic additionalDivForMargins = INTERNAL_AdditionalOutsideDivForMargins;
-//                CSHTML5.Interop.ExecuteJavaScript(@"var formerOuterDiv = $0.firstChild;
-//var style = formerOuterDiv.style;
-//style.borderWidth = '0px';
-//style.width = '100%';
-//style.height = '100%';
-//formerOuterDiv.firstChild.firstChild.setAttribute('contenteditable', 'false');
-//", additionalDivForMargins);
-                //dynamic divPreviouslyModified = additionalDivForMargins.firstChild;
-                //dynamic stylePreviouslyModified = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(divPreviouslyModified);
-                //stylePreviouslyModified.borderWidth = "0px";
-                //stylePreviouslyModified.width = "100%";
-                //stylePreviouslyModified.height = "100%";
-            }
+            
             outerDivStyle.backgroundColor = backgroundColor;
             outerDivStyle.height = "100%";
 
@@ -443,6 +420,11 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
 
             CSHTML5.Interop.ExecuteJavaScript(@"$0.classList.add(""single-line-input"")", contentEditableDiv);
 
+#if REVAMPPOINTEREVENTS
+            contentEditableDivStyle.pointerEvents = this.INTERNAL_ArePointerEventsEnabled ? "auto" : "none";
+#else
+            contentEditableDivStyle.pointerEvents = this.IsHitTestVisible && this.IsEnabled ? "auto" : "none";
+#endif
             contentEditableDivStyle.width = "100%";
             contentEditableDivStyle.height = "100%";
             contentEditableDivStyle.whiteSpace = "pre-wrap"; // Because by default we have decided to make the TextBox wrap, because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
@@ -461,7 +443,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
             this.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth = contentEditableDiv;
 
             contentEditableDivStyle.minWidth = "14px";
-            contentEditableDivStyle.minHeight = (Math.Floor(this.FontSize * 1.5 * 1000) / 1000).ToString() + "px"; // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most. //Note: setting "minHeight" is for FireFox only, because other browsers don't seem to need it. The "1.5" factor is here to ensure that the resulting Height is the same as that of the PasswordBox.
+            contentEditableDivStyle.minHeight = (Math.Floor(this.FontSize * 1.5 * 1000) / 1000).ToInvariantString() + "px"; // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most. //Note: setting "minHeight" is for FireFox only, because other browsers don't seem to need it. The "1.5" factor is here to ensure that the resulting Height is the same as that of the PasswordBox.
 
             // Fix for Internet Explorer: when pressing Enter in the ContentEditable div, IE will create a new paragraph, which results in graphical issues to the distance between paragraphs. To fix this issue, we put an empty DIV inside by default. When IE detects that there are DIVs inside, it adds a new DIV instead of creating a new paragraph when the user presses Enter.
             if (INTERNAL_HtmlDomManager.IsInternetExplorer())
@@ -474,7 +456,6 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
 
             // Set the mark saying that the pointer events must be "absorbed" by the TextBox:
             INTERNAL_HtmlDomManager.SetDomElementProperty(outerDiv, "data-absorb-events", true);
-
 
             //-----------------------
             // Prepare to raise the "TextChanged" event and to update the value of the "Text" property when the DOM text changes:
@@ -522,7 +503,6 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                     TextAreaValueChanged();
                 }));
             }
-
 
             //-----------------------
             // Prevent pressing Enter for line break when "AcceptsReturn" is false and prevent pressing any other key than backspace when "MaxLength" is reached:
@@ -1006,22 +986,38 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
             }
 #endif
 
-            if (isTemplated)
-            {
-                //the following methods were ignored before because _contentEditableDiv was not defined due to the fact that we waited for the template to be made so we would know where to put it.
-                //as a consequence, we call them here:
-                OnAfterApplyHorizontalAlignmentAndWidth();
-                OnAfterApplyVerticalAlignmentAndWidth();
+            // the following methods were ignored before because _contentEditableDiv was not defined due
+            // to the fact that we waited for the template to be made so we would know where to put it.
+            // as a consequence, we call them here:
+            OnAfterApplyHorizontalAlignmentAndWidth();
+            OnAfterApplyVerticalAlignmentAndWidth();
 
-                //Note about tabbing: In WPF and SL, the elements in the template other than the input field can have focus but the input field will get any keypress not handled by them
-                //                    For example, you can set the focus on a button included in the template by clicking on it and pressing space will cause a button press, but any character will be added to the Text of the PasswordBox (but the button retains the focus)
-                //                    WPF and SL are different in that in SL, every focusable control in the template can get focus through tabbing while in WPF, the whole control is considered as a single tab stop (tabbing into the PasswordBox will directly put the focus on the input element)
-                //                    BUT in SL, the input will be first in tabOrder (unless maybe if tabIndex is specifically set, I didn't try that) so if the template goes <Stackpanel><Button/><ContentPresenter/></StackPanel>, by tabbing it will go ContentPresenter first then the Button (example simplified without the names, and also WPF and SL do not use a ContentPresenter but a ScrollViewer or Decorator in which to put the input area)
-                //
-                //                    In our case, tabbing will go through the elements accessible through tabbing, without changing the order, and text will only be added when the <input> has focus. On click, the focus will be redirected to the <input>, unless the click was on an element that absorbs pointer events.
+            // Note about tabbing: In WPF and SL, the elements in the template other than the input
+            // field can have focus but the input field will get any keypress not handled by them.
+            // For example, you can set the focus on a button included in the template by clicking on
+            // it and pressing space will cause a button press, but any character will be added to the
+            // Text of the PasswordBox (but the button retains the focus).
+            // WPF and SL are different in that in SL, every focusable control in the template can get
+            // focus through tabbing while in WPF, the whole control is considered as a single tab stop
+            // (tabbing into the PasswordBox will directly put the focus on the input element).
+            // BUT in SL, the input will be first in tabOrder (unless maybe if tabIndex is specifically
+            // set, I didn't try that) so if the template goes :
+            //
+            // <Stackpanel>
+            //     <Button/>
+            //     <ContentPresenter/>
+            // </StackPanel>
+            //
+            // by tabbing it will go ContentPresenter first then the Button (example simplified without
+            // the names, and also WPF and SL do not use a ContentPresenter but a ScrollViewer or
+            // Decorator in which to put the input area).
+            // In our case, tabbing will go through the elements accessible through tabbing, without
+            // changing the order, and text will only be added when the <input> has focus. On click,
+            // the focus will be redirected to the <input>, unless the click was on an element that
+            // absorbs pointer events.
 
-                CSHTML5.Interop.ExecuteJavaScript(@"$0.addEventListener('click', $1)", this.INTERNAL_OuterDomElement, (Action<object>)TextBox_GotFocus);
-            }
+            CSHTML5.Interop.ExecuteJavaScript(@"$0.addEventListener('click', $1)", this.INTERNAL_OuterDomElement, (Action<object>)TextBox_GotFocus);
+            
             return outerDiv;
         }
 
@@ -1083,7 +1079,7 @@ var range,selection;
 
         /// <summary>
         /// Builds the visual tree for the
-        /// <see cref="T:System.Windows.Controls.TextBox" /> control when a new
+        /// <see cref="TextBox" /> control when a new
         /// template is applied.
         /// </summary>
 #if MIGRATION
@@ -1109,28 +1105,11 @@ var range,selection;
                 //AddTextAreaToVisualTree(TextAreaContainer.INTERNAL_InnerDomElement, out domElementWheretoPlaceChildren);
                 //Remember that the InnerDomElement is now the _contentEditableDiv rather than what was created to contain the template (Note: we need to do this because the _contentEditableDiv was added outside of the usual place we usually set the innerdomElement).
                 INTERNAL_InnerDomElement = _contentEditableDiv;
-                string text = Text; //this is probably more efficient than to use the property itself on 3 occasions.
-                if (!string.IsNullOrEmpty(text))
-                {
-                    Text_Changed(this, new DependencyPropertyChangedEventArgs(text, text, TextProperty));
-                }
-                UpdateDomText(this, text);
+                UpdateDomText(this, Text);
             }
         }
 
-        protected internal override void INTERNAL_OnDetachedFromVisualTree()
-        {
-            base.INTERNAL_OnDetachedFromVisualTree();
-
-            //if (this.Template != null)
-            //{
-            //    object local = this.ReadLocalValueInternal(TemplateProperty);
-            //    this.SetValue(TemplateProperty, null);
-            //    this.SetValue(TemplateProperty, local);
-            //}
-        }
-
-        #region Fix "input" event not working under IE.
+#region Fix "input" event not working under IE.
 
         string previousInnerText = null;
 
@@ -1158,7 +1137,7 @@ var range,selection;
 #endif
         }
 
-        #endregion
+#endregion
 
 #if !BRIDGE
         [JSReplacement("window.IE_VERSION")]
@@ -1180,7 +1159,7 @@ var range,selection;
             return false;
         }
 
-        #region Text Selection
+#region Text Selection
 
 
         public int SelectionStart
@@ -1299,9 +1278,9 @@ return globalIndexes;
             this.SelectionLength = this.Text.Length;
         }
 
-        #endregion
+#endregion
 
-        #region TextWrapping
+#region TextWrapping
 
         /// <summary>
         /// Gets or sets how the TextBow wraps text.
@@ -1311,28 +1290,24 @@ return globalIndexes;
             get { return (TextWrapping)GetValue(TextWrappingProperty); }
             set { SetValue(TextWrappingProperty, value); }
         }
+
         /// <summary>
         /// Identifies the TextWrapping dependency property.
         /// </summary>
         public static readonly DependencyProperty TextWrappingProperty =
-            DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBox), new PropertyMetadata(
-                TextWrapping.Wrap) // Note: we have made "Wrap" the default value because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
-            {
-                MethodToUpdateDom = TextWrapping_MethodToUpdateDom
-            });
-
-        static void TextWrapping_MethodToUpdateDom(DependencyObject d, object newValue)
+            DependencyProperty.Register(
+                nameof(TextWrapping), 
+                typeof(TextWrapping), 
+                typeof(TextBox), 
+                new PropertyMetadata(TextWrapping.Wrap) // Note: we have made "Wrap" the default value because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
+                {
+                    MethodToUpdateDom = TextWrapping_MethodToUpdateDom
+                });
+        private static void TextWrapping_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             var textBox = (TextBox)d;
-            TextWrapping newTextWrapping;
-            if (newValue is TextWrapping)
-            {
-                newTextWrapping = (TextWrapping)newValue;
-            }
-            else
-            {
-                newTextWrapping = (TextWrapping)TextWrappingProperty.GetTypeMetaData(typeof(TextBox)).DefaultValue; // Note: "TypeMetadata" is not null because declared above.
-            }
+            var newTextWrapping = (TextWrapping)newValue;
+
             if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(textBox._contentEditableDiv))
             {
                 switch (newTextWrapping)
@@ -1355,9 +1330,9 @@ return globalIndexes;
             }
         }
 
-        #endregion
+#endregion
 
-        #region HorizontalScrollBarVisibility
+#region HorizontalScrollBarVisibility
 
         /// <summary>
         /// Gets or sets a value that indicates whether a horizontal ScrollBar should
@@ -1375,16 +1350,19 @@ return globalIndexes;
         /// Identifies the HorizontalScrollBarVisibility dependency property.
         /// </summary>
         public static readonly DependencyProperty HorizontalScrollBarVisibilityProperty =
-            DependencyProperty.Register("HorizontalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(TextBox), new PropertyMetadata(
-                ScrollBarVisibility.Hidden)
-            {
-                MethodToUpdateDom = HorizontalScrollBarVisibility_MethodToUpdateDom
-            });
+            DependencyProperty.Register(
+                nameof(HorizontalScrollBarVisibility), 
+                typeof(ScrollBarVisibility), 
+                typeof(TextBox), 
+                new PropertyMetadata(ScrollBarVisibility.Hidden)
+                {
+                    MethodToUpdateDom = HorizontalScrollBarVisibility_MethodToUpdateDom
+                });
 
-        static void HorizontalScrollBarVisibility_MethodToUpdateDom(DependencyObject d, object newValue)
+        private static void HorizontalScrollBarVisibility_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             var textBox = (TextBox)d;
-            ScrollBarVisibility newVisibility = (ScrollBarVisibility)newValue;
+            var newVisibility = (ScrollBarVisibility)newValue;
 
             if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(textBox._contentEditableDiv))
             {
@@ -1410,9 +1388,9 @@ return globalIndexes;
             }
         }
 
-        #endregion
+#endregion
 
-        #region VerticalScrollBarVisibility
+#region VerticalScrollBarVisibility
 
         /// <summary>
         /// Gets or sets a value that indicates whether a vertical ScrollBar should be displayed.
@@ -1422,20 +1400,24 @@ return globalIndexes;
             get { return (ScrollBarVisibility)GetValue(VerticalScrollBarVisibilityProperty); }
             set { SetValue(VerticalScrollBarVisibilityProperty, value); }
         }
+
         /// <summary>
         /// Identifies the VerticalScrollBarVisibility dependency property.
         /// </summary>
         public static readonly DependencyProperty VerticalScrollBarVisibilityProperty =
-            DependencyProperty.Register("VerticalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(TextBox), new PropertyMetadata(
-                ScrollBarVisibility.Hidden)
-            {
-                MethodToUpdateDom = VerticalScrollBarVisibility_MethodToUpdateDom
-            });
+            DependencyProperty.Register(
+                nameof(VerticalScrollBarVisibility), 
+                typeof(ScrollBarVisibility), 
+                typeof(TextBox), 
+                new PropertyMetadata(ScrollBarVisibility.Hidden)
+                {
+                    MethodToUpdateDom = VerticalScrollBarVisibility_MethodToUpdateDom
+                });
 
-        static void VerticalScrollBarVisibility_MethodToUpdateDom(DependencyObject d, object newValue)
+        private static void VerticalScrollBarVisibility_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             var textBox = (TextBox)d;
-            ScrollBarVisibility newVisibility = (ScrollBarVisibility)newValue;
+            var newVisibility = (ScrollBarVisibility)newValue;
 
             if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(textBox._contentEditableDiv))
             {
@@ -1461,7 +1443,7 @@ return globalIndexes;
             }
         }
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Gets or sets the value that determines the maximum number of characters allowed
@@ -1477,8 +1459,15 @@ return globalIndexes;
         /// Identifies the MaxLength dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxLengthProperty =
-            DependencyProperty.Register("MaxLength", typeof(int), typeof(TextBox), new PropertyMetadata(0, MaxLength_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(MaxLength), 
+                typeof(int), 
+                typeof(TextBox), 
+                new PropertyMetadata(0, MaxLength_Changed)
+                { 
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
+                });
+       
         //Note: Setting MaxLength only keeps the user from typing any more characters when the count is reached. It does NOT remove any character that are already typed in.
         //      It also does NOT keep the text from being programmatically changed (so you can programmatically set the Text property to a longer text than normally authorized).
         //      if acceptsReturn is true, the new lines count as 2 characters.
@@ -1504,7 +1493,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             }
         }
 
-        #region TextDecorations
+#region TextDecorations
 #if MIGRATION
         /// <summary>
         /// Gets or sets the text decorations (underline, strikethrough...).
@@ -1528,7 +1517,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
                     MethodToUpdateDom = TextDecorations_MethodToUpdateDom
                 });
 
-        static void TextDecorations_MethodToUpdateDom(DependencyObject d, object newValue)
+        private static void TextDecorations_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             string cssValue = ((TextDecorationCollection)newValue)?.ToHtmlString() ?? string.Empty;
             INTERNAL_HtmlDomManager.GetDomElementStyleForModification(((TextBox)d).INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
@@ -1580,7 +1569,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBox.INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
         }
 #endif
-        #endregion
+#endregion
 
         protected override void OnAfterApplyHorizontalAlignmentAndWidth()
         {
@@ -1648,10 +1637,15 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             set { SetValue(IsReadOnlyProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for IsReadOnly.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsReadOnlyProperty =
-            DependencyProperty.Register("IsReadOnly", typeof(bool), typeof(TextBox), new PropertyMetadata(false, IsReadOnly_changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(IsReadOnly), 
+                typeof(bool), 
+                typeof(TextBox), 
+                new PropertyMetadata(false, IsReadOnly_changed)
+                { 
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
+                });
 
         private static void IsReadOnly_changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1692,7 +1686,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             SelectionLength = length;
         }
 
-        #region Not implemented yet (should we move this in WORKINPROGRESS ?)
+#region Not implemented yet (should we move this in WORKINPROGRESS ?)
 
         [OpenSilver.NotImplemented]
         public event RoutedEventHandler SelectionChanged;
@@ -1707,10 +1701,10 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             set { this.SetValue(TextBox.SelectionForegroundProperty, value); }
         }
 
-        #endregion
+#endregion
 
 #if WORKINPROGRESS
-        #region SelectionBackground
+#region SelectionBackground
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register("SelectionBackground", typeof(Brush), typeof(TextBox), null);
 
@@ -1720,7 +1714,7 @@ element.setAttribute(""data-maxlength"", ""{1}"");
             get { return (Brush)GetValue(SelectionBackgroundProperty); }
             set { SetValue(SelectionBackgroundProperty, value); }
         }
-        #endregion
+#endregion
 
         [OpenSilver.NotImplemented]
         public string SelectedText { get; set; }

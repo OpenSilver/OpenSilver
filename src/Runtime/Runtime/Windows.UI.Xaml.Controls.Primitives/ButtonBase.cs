@@ -117,6 +117,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 buttonBase.Click += ExecuteCommand;
             }
+
+            // Set IsEnabled value depending on CanExecute
+            if (buttonBase.Command != null)
+            {
+                buttonBase.SetCurrentValue(IsEnabledProperty, buttonBase.IsEnabled && buttonBase.Command.CanExecute(buttonBase.CommandParameter));
+            }
         }
 
         static void ExecuteCommand(object sender, RoutedEventArgs e)
@@ -204,10 +210,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 StopPointerCapture();
 
-                if (ClickMode == ClickMode.Release
-                    //&& IsPointerOverThisControl(eventArgs) //todo: uncomment this line!!!
-                    )
+                if (ClickMode == ClickMode.Release && this.IsMouseOver)
+                {
                     OnClick();
+                }
             }
 
             this.IsPressed = false;
@@ -228,27 +234,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             StopPointerCapture();
         }
 
-#if MIGRATION
-        private bool IsPointerOverThisControl(MouseButtonEventArgs e)
-#else
-        private bool IsPointerOverThisControl(PointerRoutedEventArgs e)
-#endif
-        {
-            Size actualSize = this.INTERNAL_GetActualWidthAndHeight();
-            var actualWidth = actualSize.Width;
-            var actualHeight = actualSize.Height;
-            if (!double.IsNaN(actualWidth) && !double.IsNaN(actualHeight))
-            {
-#if MIGRATION
-                var position = e.GetPosition(this);
-#else
-                var position = e.GetCurrentPoint(this).Position;
-#endif
-                return (position.X > 0 && position.Y > 0 && position.X < actualWidth && position.Y < actualHeight);
-            }
-            else
-                return false;
-        }
 
         #endregion
 
@@ -266,9 +251,21 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Identifies the IsPressed dependency property.
         /// </summary>
         public static readonly DependencyProperty IsPressedProperty =
-            DependencyProperty.Register("IsPressed", typeof(bool), typeof(ButtonBase), new PropertyMetadata(false));
+            DependencyProperty.Register("IsPressed", typeof(bool), typeof(ButtonBase), new PropertyMetadata(false, OnIsPressedChanged));
 
+        private static void OnIsPressedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ButtonBase)d).OnIsPressedChanged(e);
+        }
 
+        /// <summary>
+        /// Called when the value of the <see cref="ButtonBase.IsPressed"/> property changes.
+        /// </summary>
+        /// <param name="e">The data for <see cref="DependencyPropertyChangedEventArgs"/></param>
+        protected virtual void OnIsPressedChanged(DependencyPropertyChangedEventArgs e)
+        {
+            this.UpdateVisualStates();
+        }
 
         /// <summary>
         /// Gets or sets when the Click event occurs. The default value is ClickMode.Release.
@@ -398,6 +395,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                                         typeof(bool),
                                         typeof(ButtonBase),
                                         new PropertyMetadata(false));
+
         /// <summary>
         /// Gets a value indicating whether the mouse pointer is located over this button control.
         /// </summary>
@@ -419,7 +417,18 @@ namespace Windows.UI.Xaml.Controls.Primitives
             base.OnPointerEntered(eventArgs);
 #endif
             IsMouseOver = true;
-            UpdateVisualStates();
+
+            try
+            {
+                if (this.ClickMode != ClickMode.Hover || !this.IsEnabled) return;
+
+                this.IsPressed = true;
+                this.OnClick();
+            }
+            finally
+            {
+                this.UpdateVisualStates();
+            }
         }
 
 #if MIGRATION
@@ -433,50 +442,64 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #else
             base.OnPointerExited(eventArgs);
 #endif
-            IsMouseOver = false;
-            UpdateVisualStates();
-        }
 
-#if WORKINPROGRESS
+            IsMouseOver = false;
+
+            try
+            {
+                if (this.ClickMode != ClickMode.Hover || !this.IsEnabled) return;
+
+                this.IsPressed = false;
+            }
+            finally
+            {
+                this.UpdateVisualStates();
+            }
+        }
 
         /// <summary>
         /// Identifies the <see cref="ButtonBase.IsFocused"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty IsFocusedProperty =
             DependencyProperty.Register("IsFocused",
                                         typeof(bool),
                                         typeof(ButtonBase),
                                         new PropertyMetadata(false));
 
-       
-
         /// <summary>
         /// Gets a value that determines whether the button has focus.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public bool IsFocused
         {
-            get { return (bool)GetValue(IsFocusedProperty); }
+            get => (bool)GetValue(IsFocusedProperty);
+            private set => SetValue(IsFocusedProperty, value);
         }
 
-        
-
-       
-
-#if MIGRATION
-        /// <summary>
-        /// Called when the value of the <see cref="ButtonBase.IsPressed"/> property changes.
-        /// </summary>
-        /// <param name="e">The data for <see cref="DependencyPropertyChangedEventArgs"/></param>
-        [OpenSilver.NotImplemented]
-        protected virtual void OnIsPressedChanged(DependencyPropertyChangedEventArgs e)
+        /// <inheritdoc />
+        protected override void OnGotFocus(RoutedEventArgs e)
         {
-
+            base.OnGotFocus(e);
+            this.IsFocused = true;
+            this.UpdateVisualStates();
         }
-#endif
 
-#endif
+        /// <inheritdoc />
+        protected override void OnLostFocus(RoutedEventArgs e)
+        {
+            base.OnLostFocus(e);
+            this.IsFocused = false;
+
+            try
+            {
+                if (this.ClickMode == ClickMode.Hover) return;
+
+                this.IsPressed = false;
+            }
+            finally
+            {
+                this.UpdateVisualStates();
+            }
+        }
 
         internal override void UpdateVisualStates()
         {

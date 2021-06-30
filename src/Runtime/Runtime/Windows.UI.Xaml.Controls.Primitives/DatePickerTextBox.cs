@@ -12,6 +12,10 @@
 *  
 \*====================================================================================*/
 
+using System;
+using System.Diagnostics;
+using System.Globalization;
+
 #if MIGRATION
 using System.Windows.Input;
 #else
@@ -27,16 +31,28 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Represents the text input of a <see cref="DatePicker" />.
     /// </summary>
+    /// <QualityBand>Mature</QualityBand>
+    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateUnwatermarked, GroupName = VisualStates.GroupWatermark)]
+    [TemplateVisualState(Name = VisualStates.StateWatermarked, GroupName = VisualStates.GroupWatermark)]
+    [TemplatePart(Name = DatePickerTextBox.ElementContentName, Type = typeof(ContentControl))]
     public sealed class DatePickerTextBox : TextBox
     {
-        #region Constants
-        private const string ElementContentName = "Watermark";
-        private const string DefaultWaterMarkText = "<enter text here>";
-        #endregion
+        private const string DefaultWatermarkText = "<enter text here>";
 
-        #region Constructor
         /// <summary>
-        /// Initializes a new instance of the <see cref="DatePickerTextBox"/> class.
+        /// Inherited code: Requires comment.
+        /// </summary>
+        private const string ElementContentName = "Watermark";
+
+        /// <summary>
+        /// Initializes a new instance of the
+        /// <see cref="DatePickerTextBox" />
+        /// class.
         /// </summary>
         public DatePickerTextBox()
         {
@@ -56,26 +72,89 @@ namespace Windows.UI.Xaml.Controls.Primitives
             this.TextChanged += OnTextChanged;
             this.IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
         }
-#endregion
 
-#region Internal
+        /// <summary>
+        /// Gets or sets Inherited code: Requires comment.
+        /// </summary>
+        internal ContentControl ElementContent { get; set; }
 
-        internal ContentControl elementContent;
-        internal bool isHovered;
-        internal bool hasFocus;
+        /// <summary>
+        /// Gets or sets a value indicating whether Inherited code: Requires comment.
+        /// </summary>
+        internal bool IsHovered { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether Inherited code: Requires comment.
+        /// </summary>
+        internal bool HasFocusInternal { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <param name="sender">Inherited code: Requires comment 1.</param>
+        /// <param name="e">Inherited code: Requires comment 2.</param>
         internal void OnLoaded(object sender, RoutedEventArgs e)
         {
             ApplyTemplate();
-            UpdateVisualStates();
+            ChangeVisualState(false);
         }
 
-#endregion
-
-#region Protected
+        /// <summary>
+        /// Change to the correct visual state for the textbox.
+        /// </summary>
+        internal void ChangeVisualState()
+        {
+            ChangeVisualState(true);
+        }
 
         /// <summary>
-        /// Called when template is applied to the control.
+        /// Change to the correct visual state for the textbox.
+        /// </summary>
+        /// <param name="useTransitions">
+        /// True to use transitions when updating the visual state, false to
+        /// snap directly to the new visual state.
+        /// </param>
+        internal void ChangeVisualState(bool useTransitions)
+        {
+            // Update the CommonStates group
+            if (!IsEnabled)
+            {
+                VisualStates.GoToState(this, useTransitions, VisualStates.StateDisabled, VisualStates.StateNormal);
+            }
+            else if (IsHovered)
+            {
+                VisualStates.GoToState(this, useTransitions, VisualStates.StateMouseOver, VisualStates.StateNormal);
+            }
+            else
+            {
+                VisualStates.GoToState(this, useTransitions, VisualStates.StateNormal);
+            }
+
+            // Update the FocusStates group
+            if (HasFocusInternal && IsEnabled)
+            {
+                VisualStates.GoToState(this, useTransitions, VisualStates.StateFocused, VisualStates.StateUnfocused);
+            }
+            else
+            {
+                VisualStates.GoToState(this, useTransitions, VisualStates.StateUnfocused);
+            }
+
+            // Update the WatermarkStates group
+            if (this.Watermark != null && string.IsNullOrEmpty(this.Text))
+            {
+                VisualStates.GoToState(this, useTransitions, VisualStates.StateWatermarked, VisualStates.StateUnwatermarked);
+            }
+            else
+            {
+                VisualStates.GoToState(this, useTransitions, VisualStates.StateUnwatermarked);
+            }
+        }
+
+        /// <summary>
+        /// Builds the visual tree for the
+        /// <see cref="DatePickerTextBox" />
+        /// when a new template is applied.
         /// </summary>
 #if MIGRATION
         public override void OnApplyTemplate()
@@ -85,59 +164,16 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             base.OnApplyTemplate();
 
-            elementContent = ExtractTemplatePart<ContentControl>(ElementContentName);
+            ElementContent = ExtractTemplatePart<ContentControl>(ElementContentName);
+
             OnWatermarkChanged();
-            UpdateVisualStates();
+
+            ChangeVisualState(false);
         }
-
-        internal override void UpdateVisualStates()
-        {
-            if (!IsEnabled)
-            {
-                GoToState(VisualStates.StateDisabled);
-            }
-            else if (isHovered)
-            {
-                GoToState(VisualStates.StateMouseOver);
-            }
-            else
-            {
-                GoToState(VisualStates.StateNormal);
-            }
-
-            // Update the FocusStates group
-            if (hasFocus && IsEnabled)
-            {
-                GoToState(VisualStates.StateFocused);
-            }
-            else
-            {
-                GoToState(VisualStates.StateUnfocused);
-            }
-
-            // Update the WatermarkStates group
-            if (this.Watermark != null && string.IsNullOrEmpty(this.Text))
-            {
-                GoToState(VisualStates.StateWatermarked);
-            }
-            else
-            {
-                GoToState(VisualStates.StateUnwatermarked);
-            }
-        }
-#endregion
-
-#region Public
 
 #region Watermark
         /// <summary>
-        /// Watermark dependency property
-        /// </summary>
-        public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register(
-            "Watermark", typeof(object), typeof(DatePickerTextBox), new PropertyMetadata(OnWatermarkPropertyChanged));
-
-        /// <summary>
-        /// Watermark content
+        /// Gets or sets the Watermark content.
         /// </summary>
         /// <value>The watermark.</value>
         public object Watermark
@@ -146,93 +182,152 @@ namespace Windows.UI.Xaml.Controls.Primitives
             set { SetValue(WatermarkProperty, value); }
         }
 
+        /// <summary>
+        /// Watermark dependency property.
+        /// </summary>
+        public static readonly DependencyProperty WatermarkProperty =
+            DependencyProperty.Register(
+                nameof(Watermark),
+                typeof(object),
+                typeof(DatePickerTextBox),
+                new PropertyMetadata(OnWatermarkPropertyChanged));
 #endregion
 
-#endregion
-
-#region Private
-
-        private T ExtractTemplatePart<T>(string partName) where T : DependencyObject
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <typeparam name="T">Inherited code: Requires comment 1.</typeparam>
+        /// <param name="partName">Inherited code: Requires comment 2.</param>
+        /// <returns>Inherited code: Requires comment 3.</returns>
+        private T ExtractTemplatePart<T>(string partName)
+            where T : DependencyObject
         {
             DependencyObject obj = GetTemplateChild(partName);
             return ExtractTemplatePart<T>(partName, obj);
         }
 
-        private static T ExtractTemplatePart<T>(string partName, DependencyObject obj) where T : DependencyObject
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <typeparam name="T">Inherited code: Requires comment 1.</typeparam>
+        /// <param name="partName">Inherited code: Requires comment 2.</param>
+        /// <param name="obj">Inherited code: Requires comment 3.</param>
+        /// <returns>Inherited code: Requires comment 4.</returns>
+        private static T ExtractTemplatePart<T>(string partName, DependencyObject obj)
+            where T : DependencyObject
         {
+            Debug.Assert(
+                obj == null || typeof(T).IsInstanceOfType(obj),
+                string.Format(CultureInfo.InvariantCulture, "The template part {0} is not an instance of {1}.", partName, typeof(T).Name));
             return obj as T;
         }
 
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <param name="sender">Inherited code: Requires comment 1.</param>
+        /// <param name="e">Inherited code: Requires comment 2.</param>
         private void OnGotFocus(object sender, RoutedEventArgs e)
         {
             if (IsEnabled)
             {
-                hasFocus = true;
-                SelectAll();
-                UpdateVisualStates();
+                HasFocusInternal = true;
+
+                if (!string.IsNullOrEmpty(this.Text))
+                {
+#if WORKINPROGRESS
+                    //Select(0, this.Text.Length);
+#endif
+                }
+
+                ChangeVisualState();
             }
         }
 
         /// <summary>
         /// Called when the IsEnabled property changes.
         /// </summary>
-        /// <param name="sender">Sender object</param>
-        /// <param name="e">Property changed args</param>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Property changed args.</param>
         private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            Debug.Assert(e.NewValue is bool, "The new value should be a boolean!");
             bool isEnabled = (bool)e.NewValue;
 
             IsReadOnly = !isEnabled;
             if (!isEnabled)
             {
-                isHovered = false;
+                IsHovered = false;
             }
 
-            UpdateVisualStates();
+            ChangeVisualState();
         }
 
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <param name="sender">Inherited code: Requires comment 1.</param>
+        /// <param name="e">Inherited code: Requires comment 2.</param>
         private void OnLostFocus(object sender, RoutedEventArgs e)
         {
-            hasFocus = false;
-            UpdateVisualStates();
+            HasFocusInternal = false;
+            ChangeVisualState();
         }
 
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <param name="sender">Inherited code: Requires comment 1.</param>
+        /// <param name="e">Inherited code: Requires comment 2.</param>
 #if MIGRATION
         private void OnMouseEnter(object sender, MouseEventArgs e)
 #else
         private void OnMouseEnter(object sender, PointerRoutedEventArgs e)
 #endif
         {
-            isHovered = true;
+            IsHovered = true;
 
-            if (!hasFocus)
+            if (!HasFocusInternal)
             {
-                UpdateVisualStates();
+                ChangeVisualState();
             }
         }
 
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <param name="sender">Inherited code: Requires comment 1.</param>
+        /// <param name="e">Inherited code: Requires comment 2.</param>
 #if MIGRATION
         private void OnMouseLeave(object sender, MouseEventArgs e)
 #else
         private void OnMouseLeave(object sender, PointerRoutedEventArgs e)
 #endif
         {
-            isHovered = false;
+            IsHovered = false;
 
-            if (!hasFocus)
+            if (!HasFocusInternal)
             {
-                UpdateVisualStates();
+                ChangeVisualState();
             }
         }
 
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <param name="sender">Inherited code: Requires comment 1.</param>
+        /// <param name="e">Inherited code: Requires comment 2.</param>
         private void OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            UpdateVisualStates();
+            ChangeVisualState();
         }
 
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
         private void OnWatermarkChanged()
         {
-            if (elementContent != null)
+            if (ElementContent != null)
             {
                 Control watermarkControl = this.Watermark as Control;
                 if (watermarkControl != null)
@@ -247,20 +342,25 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Called when watermark property is changed.
         /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="args">The <see cref="System.Windows.DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
+        /// <param name="args">
+        /// The <see cref="DependencyPropertyChangedEventArgs"/>
+        /// instance containing the event data.
+        /// </param>
         private static void OnWatermarkPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
         {
             DatePickerTextBox datePickerTextBox = sender as DatePickerTextBox;
+            Debug.Assert(datePickerTextBox != null, "The source is not an instance of a DatePickerTextBox!");
             datePickerTextBox.OnWatermarkChanged();
-            datePickerTextBox.UpdateVisualStates();
+            datePickerTextBox.ChangeVisualState();
         }
 
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
         private void SetDefaults()
         {
             IsEnabled = true;
-            this.Watermark = DefaultWaterMarkText;
+            this.Watermark = DefaultWatermarkText;
         }
-
-#endregion
     }
 }
