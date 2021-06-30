@@ -104,6 +104,9 @@ namespace Windows.UI.Xaml
         public bool IsMeasureValid { get; private set; }
         public bool IsArrangeValid { get; private set; }
 
+        public bool IsRendered { get; private set; }
+        public Rect RenderedVisualBounds { get; private set; }
+
         public Rect PreviousFinalRect { get; private set; }
         public Size PreviousAvailableSize { get; private set; }
         private Size previousDesiredSize;
@@ -152,6 +155,25 @@ namespace Windows.UI.Xaml
             }
         }
 
+        public bool IsUnderCustomLayout
+        {
+            get
+            {
+                FrameworkElement child = this as FrameworkElement;
+                if (child.CustomLayout)
+                    return false;
+
+                while (child != null)
+                {
+                    if (child.CustomLayout)
+                        return true;
+                    child = child.INTERNAL_VisualParent as FrameworkElement;
+                }
+
+                return false;
+            }
+        }
+
         public UIElement()
         {
             DesiredSize = Size.Zero;
@@ -163,6 +185,7 @@ namespace Windows.UI.Xaml
             layoutProcessing = false;
             IsMeasureValid = false;
             IsArrangeValid = false;
+            IsRendered = false;
             visualLevel = -1;
 
             disableMeasureInvalidationToken = new Disposable(() => disableMeasureInvalidationRequests--);
@@ -1435,28 +1458,19 @@ namespace Windows.UI.Xaml
             if (this as Window == null && this as PopupRoot == null)
             {
                 INTERNAL_HtmlDomStyleReference uiStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement);
-                uiStyle.position = "absolute";
-                uiStyle.left = $"{VisualBounds.Left}px";
-                uiStyle.top = $"{VisualBounds.Top}px";
-                uiStyle.width = $"{VisualBounds.Width}px";
-                uiStyle.height = $"{VisualBounds.Height}px";
-                uiStyle.marginLeft = "0";
-                uiStyle.marginTop = "0";
-                uiStyle.marginRight = "0";
-                uiStyle.marginBottom = "0";
-
-                if (this.INTERNAL_AdditionalOutsideDivForMargins != null && this.INTERNAL_AdditionalOutsideDivForMargins != this.INTERNAL_OuterDomElement)
+                if (RenderedVisualBounds.Equals(VisualBounds) == false)
                 {
-                    //INTERNAL_HtmlDomElementReference domElementForMargin = (INTERNAL_HtmlDomElementReference)this.INTERNAL_AdditionalOutsideDivForMargins;
-                    //Console.WriteLine($"Set {domElementForMargin.UniqueIdentifier} padding&margin 0");
-                    INTERNAL_HtmlDomStyleReference uiMarginStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification((INTERNAL_HtmlDomElementReference)this.INTERNAL_AdditionalOutsideDivForMargins);
-                    uiMarginStyle.padding = "0";
-                    uiMarginStyle.marginLeft = "0";
-                    uiMarginStyle.marginTop = "0";
-                    uiMarginStyle.marginRight = "0";
-                    uiMarginStyle.marginBottom = "0";
-                    uiMarginStyle.position = "";    // FOR Grid
-                    uiMarginStyle.gridArea = "";    // FOR Grid
+                    RenderedVisualBounds = VisualBounds;
+
+                    if (this.IsRendered == false)
+                    {
+                        uiStyle.SetVisualBounds(VisualBounds, true, false, true);
+                        this.IsRendered = true;
+                    }
+                    else
+                    {
+                        uiStyle.SetVisualBounds(VisualBounds, false, false, false);
+                    }
                 }
             }
         }

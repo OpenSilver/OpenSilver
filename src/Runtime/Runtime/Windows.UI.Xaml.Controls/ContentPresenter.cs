@@ -340,6 +340,9 @@ namespace Windows.UI.Xaml.Controls
                 return elementChild.DesiredSize;
             }
 
+            if (this.Content == null)
+                return Size.Zero;
+
             Size actualSize = new Size(Double.IsNaN(Width) ? ActualWidth : Width, Double.IsNaN(Height) ? ActualHeight : Height);
             return actualSize;
         }

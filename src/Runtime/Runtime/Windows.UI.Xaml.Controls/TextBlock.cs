@@ -325,24 +325,26 @@ namespace Windows.UI.Xaml.Controls
 		}
 		protected override Size MeasureOverride(Size availableSize)
 		{
-			Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
+            Size actualSize = this.INTERNAL_GetActualWidthAndHeight();
+            return actualSize;
+            //Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
 
-			if (noWrapSize == Size.Empty)
-			{
-				noWrapSize = Application.Current.TextMeasurementService.MeasureTextBlock(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, /*FontStretch, */TextWrapping.NoWrap, Padding, Double.PositiveInfinity);
-				noWrapSize.Width = noWrapSize.Width + BorderThicknessSize.Width;
-				noWrapSize.Height = noWrapSize.Height + BorderThicknessSize.Height;
-			}
+			//if (noWrapSize == Size.Empty)
+			//{
+			//	noWrapSize = Application.Current.TextMeasurementService.MeasureTextBlock(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, /*FontStretch, */TextWrapping.NoWrap, Padding, Double.PositiveInfinity);
+			//	noWrapSize.Width = noWrapSize.Width + BorderThicknessSize.Width;
+			//	noWrapSize.Height = noWrapSize.Height + BorderThicknessSize.Height;
+			//}
 
-			if (TextWrapping == TextWrapping.NoWrap || noWrapSize.Width <= availableSize.Width)
-			{
-				return noWrapSize;
-			}
+			//if (TextWrapping == TextWrapping.NoWrap || noWrapSize.Width <= availableSize.Width)
+			//{
+			//	return noWrapSize;
+			//}
 
-			Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, /*FontStretch, */TextWrapping, Padding, (availableSize.Width - BorderThicknessSize.Width).Max(0));
-			TextSize.Width = TextSize.Width + BorderThicknessSize.Width;
-			TextSize.Height = TextSize.Height + BorderThicknessSize.Height;
-			return TextSize;
+			//Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, /*FontStretch, */TextWrapping, Padding, (availableSize.Width - BorderThicknessSize.Width).Max(0));
+			//TextSize.Width = TextSize.Width + BorderThicknessSize.Width;
+			//TextSize.Height = TextSize.Height + BorderThicknessSize.Height;
+			//return TextSize;
 		}
 
 		protected override Size ArrangeOverride(Size finalSize)

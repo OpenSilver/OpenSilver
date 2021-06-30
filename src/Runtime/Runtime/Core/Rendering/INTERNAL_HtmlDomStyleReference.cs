@@ -24,6 +24,7 @@ using Bridge;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Windows;
 
 namespace CSHTML5.Internal
 {
@@ -91,6 +92,44 @@ namespace CSHTML5.Internal
 #endif
 
             return true;
+        }
+
+        internal void SetVisualBounds(Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
+        {
+            string javaScriptCodeToExecute = string.Format(@"
+var element = document.getElementByIdSafe(""{0}"");
+if (element)
+{{
+element.style.left = ""{1}px"";
+element.style.top = ""{2}px"";
+element.style.width = ""{3}px"";
+element.style.height = ""{4}px"";
+{5}{6}{7}
+}}
+            ", _domElementUniqueIdentifier, visualBounds.Left, visualBounds.Top, visualBounds.Width, visualBounds.Height,
+            bSetPositionAbsolute ? "element.style.position=\"absolute\";" : "",
+            bSetZeroMargin ? "element.style.margin=\"0\";" : "",
+            bSetZeroPadding ? "element.style.padding=\"0\";" : "");
+
+            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+        }
+
+        internal void SetPosition(Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
+        {
+            string javaScriptCodeToExecute = string.Format(@"
+var element = document.getElementByIdSafe(""{0}"");
+if (element)
+{{
+element.style.left = ""{1}px"";
+element.style.top = ""{2}px"";
+{3}{4}{5}
+}}
+            ", _domElementUniqueIdentifier, visualBounds.Left, visualBounds.Top,
+            bSetPositionAbsolute ? "element.style.position=\"absolute\";" : "",
+            bSetZeroMargin ? "element.style.margin=\"0\";" : "",
+            bSetZeroPadding ? "element.style.padding=\"0\";" : "");
+
+            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
 
         void SetStylePropertyValue(string propertyName, string propertyValue)

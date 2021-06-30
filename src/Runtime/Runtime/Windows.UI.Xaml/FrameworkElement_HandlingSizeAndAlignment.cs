@@ -61,23 +61,28 @@ namespace Windows.UI.Xaml
 #endif
 
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
-
-            // Height:
-            if (!double.IsNaN(element.Height))
-                style.height = element.Height.ToInvariantString() + "px";
-            else if (element.VerticalAlignment == VerticalAlignment.Stretch && !(element.INTERNAL_VisualParent is Canvas) && !(element is CheckBox))
-                style.height = "100%";
+            if (element.IsUnderCustomLayout)
+            {
+                style.SetPosition(element.RenderedVisualBounds, false, true, false);
+            }
             else
-                style.height = "auto";
+            {
+                // Height:
+                if (!double.IsNaN(element.Height))
+                    style.height = element.Height.ToInvariantString() + "px";
+                else if (element.VerticalAlignment == VerticalAlignment.Stretch && !(element.INTERNAL_VisualParent is Canvas) && !(element is CheckBox))
+                    style.height = "100%";
+                else
+                    style.height = "auto";
 
-            // Width:
-            if (!double.IsNaN(element.Width))
-                style.width = element.Width.ToInvariantString() + "px";
-            else if (element.HorizontalAlignment == HorizontalAlignment.Stretch && !(element.INTERNAL_VisualParent is Canvas) && !(element is CheckBox))
-                style.width = "100%";
-            else
-                style.width = "auto";
-
+                // Width:
+                if (!double.IsNaN(element.Width))
+                    style.width = element.Width.ToInvariantString() + "px";
+                else if (element.HorizontalAlignment == HorizontalAlignment.Stretch && !(element.INTERNAL_VisualParent is Canvas) && !(element is CheckBox))
+                    style.width = "100%";
+                else
+                    style.width = "auto";
+            }
 #if PERFSTAT
             Performance.Counter("Size/Alignment: INTERNAL_InitializeOuterDomElementWidthAndHeight", t0);
 #endif
@@ -1630,7 +1635,7 @@ if ($0.tagName.toLowerCase() != 'span')
         private List<SizeChangedEventHandler> _sizeChangedEventHandlers;
         private object _resizeSensor;
 
-        private void HandleSizeChanged()
+        private void HandleSizeChanged(string obj)
         {
             if (this._sizeChangedEventHandlers != null
                && this._sizeChangedEventHandlers.Count > 0
@@ -1639,7 +1644,18 @@ if ($0.tagName.toLowerCase() != 'span')
             {
                 // In the current implementation, we raise the SizeChanged event only if the size has changed since the last time that we were supposed to raise the event:
 
-                Size currentSize = this.INTERNAL_GetActualWidthAndHeight();
+                Size currentSize;
+                int sepIndex = obj != null ? obj.IndexOf('|') : -1;
+                if (sepIndex > -1)
+                {
+                    string actualWidthAsString = obj.Substring(0, sepIndex);
+                    string actualHeightAsString = obj.Substring(sepIndex + 1);
+                    double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture);
+                    double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture);
+                    currentSize = new Size(actualWidth, actualHeight);
+                }
+                else
+                    currentSize = this.INTERNAL_GetActualWidthAndHeight();
 
                 if (!Size.Equals(this._valueOfLastSizeChanged, currentSize))
                 {
@@ -1658,13 +1674,15 @@ if ($0.tagName.toLowerCase() != 'span')
         {
             // We reset the previous size value so that the SizeChanged event can be called (see the comment in "HandleSizeChanged"):
             _valueOfLastSizeChanged = Size.Empty;
-            HandleSizeChanged();
+
+            if (this.IsUnderCustomLayout == false)
+                HandleSizeChanged(null);
 
             if (this._sizeChangedEventHandlers != null &&
                 this._sizeChangedEventHandlers.Count > 0 &&
                 this._resizeSensor == null)
             {
-                object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action)this.HandleSizeChanged);
+                object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
                 this._resizeSensor = sensor;
             }
         }
@@ -1679,7 +1697,7 @@ if ($0.tagName.toLowerCase() != 'span')
                 }
                 if (this._resizeSensor == null && this.INTERNAL_OuterDomElement != null)
                 {
-                    object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action)this.HandleSizeChanged);
+                    object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
                     this._resizeSensor = sensor;
                 }
                 this._sizeChangedEventHandlers.Add(value);

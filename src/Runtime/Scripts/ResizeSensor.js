@@ -254,7 +254,7 @@
                 lastHeight = size.height;
 
                 if (element.resizedAttached) {
-                    element.resizedAttached.call(size);
+                    element.resizedAttached.call(size.width + '|' + size.height);
                 }
             };
 

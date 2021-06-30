@@ -522,6 +522,9 @@ if(nextSibling != undefined) {
             bool isADivForMarginsNeeded = !(parent is Canvas) // Note: In a Canvas, we don't want to add the additional DIV because there are no margins and we don't want to interfere with the pointer events by creating an additional DIV.
                                             && !(child is Inline); // Note: inside a TextBlock we do not want the HTML DIV because we want to create HTML SPAN elements only (otherwise there would be unwanted line returns).
 
+            if (isADivForMarginsNeeded && (parent.IsCustomLayoutRoot || parent.IsUnderCustomLayout))
+                isADivForMarginsNeeded = false;
+
             if (isADivForMarginsNeeded)
             {
                 // Determine where to place it:
