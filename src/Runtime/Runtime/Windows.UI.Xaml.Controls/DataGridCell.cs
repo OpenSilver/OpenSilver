@@ -118,7 +118,7 @@ namespace Windows.UI.Xaml.Controls
             //todo: call event accordingly to the new Value + set the Background/Foreground
             DataGridCell dataGridCell = (DataGridCell)d;
             bool newValue = (bool)e.NewValue;
-            VisualStateManager.GoToState(dataGridCell, newValue ? "Selected" : "Normal", false);
+            VisualStateManager.GoToState(dataGridCell, newValue ? "Selected" : "Unselected", false);
         }
 
         // if the content of the cell is clickable, it will mark this cell as selected
