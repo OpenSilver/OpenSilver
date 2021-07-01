@@ -1,6 +1,6 @@
 
 
-Copyright (c) 2020 Userware (OpenSilver.net, CSHTML5.com)
+Copyright (c) 2021 Userware (OpenSilver.net, CSHTML5.com)
 
 This repository contains the source code of 2 products:
 
