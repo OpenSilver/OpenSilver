@@ -103,6 +103,8 @@ namespace Windows.UI.Xaml.Documents
 			get { return (TextAlignment)this.GetValue(TextAlignmentProperty); }
 			set { this.SetValue(TextAlignmentProperty, value); }
 		}
+
+		internal abstract string GetContainerText();
 	}
 }
 #endif

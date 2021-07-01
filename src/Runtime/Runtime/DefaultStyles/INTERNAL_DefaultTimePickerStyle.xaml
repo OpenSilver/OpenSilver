@@ -219,6 +219,7 @@
                         <TextBox x:Name="TextBox"
                                  Grid.Column="0"
                                  Background="{TemplateBinding Background}"
+                                 Foreground="{TemplateBinding Foreground}"
                                  BorderBrush="{TemplateBinding BorderBrush}"
                                  BorderThickness="{TemplateBinding BorderThickness}"
                                  Padding="{TemplateBinding Padding}"

@@ -130,6 +130,9 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridHyperlinkColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTemplateColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\PasswordBox.cs" />
+		<Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerParagraph.cs" />
+		<Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerRichTextBlock.cs" />
+		<Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerSection.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Typography.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\Polygon.cs" />
 		<Compile Include="Windows.UI.Xaml\Expression.cs" />
@@ -281,6 +284,12 @@
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationLifetimeObjectsCollection.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DataTemplate.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventHandler.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontEastAsianLanguage.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontEastAsianWidths.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontFraction.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontNumeralAlignment.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontNumeralStyle.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontVariants.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\LineStackingStrategy.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\RoutedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\UIElement.cs" />
