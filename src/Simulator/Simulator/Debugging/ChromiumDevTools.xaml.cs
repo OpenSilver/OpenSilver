@@ -7,11 +7,10 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.Debugging
     /// </summary>
     public partial class ChromiumDevTools : Window
     {
-        public ChromiumDevTools(Window owner, string debugUrl)
+        public ChromiumDevTools(string debugUrl)
         {
             InitializeComponent();
 
-            Owner = owner;
             DevToolsBrowser.Browser.LoadURL(debugUrl);
         }
     }

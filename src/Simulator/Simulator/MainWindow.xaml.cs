@@ -1519,7 +1519,7 @@ Click OK to continue.";
             DevToolsScreencastInfoWindow infoWindow = new DevToolsScreencastInfoWindow(this);
             infoWindow.ShowDialog();
 
-            _devTools = new ChromiumDevTools(this, MainWebBrowser.Browser.GetRemoteDebuggingURL());
+            _devTools = new ChromiumDevTools(MainWebBrowser.Browser.GetRemoteDebuggingURL());
             _devTools.Show();
 
             _devTools.Closing += ChromiumDevTools_Closing;
