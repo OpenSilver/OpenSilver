@@ -167,11 +167,14 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             return () =>
             {
-                if (isLastLoop && _animationID == callBackGuid)
+                if (!this._isUnapplied)
                 {
-                    AnimationHelpers.ApplyValue(target, propertyPath, value, parameters.IsVisualStateChange);
+                    if (isLastLoop && _animationID == callBackGuid)
+                    {
+                        AnimationHelpers.ApplyValue(target, propertyPath, value, parameters.IsVisualStateChange);
+                    }
+                    OnIterationCompleted(parameters);
                 }
-                OnIterationCompleted(parameters);
             };
         }
 
