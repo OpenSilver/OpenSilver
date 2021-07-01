@@ -122,8 +122,10 @@
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\SendCompletedEventArgs.cs" />
 		<Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
+		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\ExpanderAutomationPeer.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\CalendarExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DatePickerFormat.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\InteractionHelper.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridBoundColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridCheckBoxColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridComboBoxColumn.cs" />
@@ -202,12 +204,11 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridTextColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataPager.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePicker.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Expander.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\GridSplitter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\HeaderedItemsControl.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ITimeFormat.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\IUpdateVisualState.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\IUpdateVisualState.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ListTimePickerPopup.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MediaElement.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
@@ -1064,7 +1065,7 @@
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\Application.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\ApplicationUnhandledExceptionEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\EventTrigger.cs" />
-		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FlowDirection.cs" />
+		<Compile Include="Windows.UI.Xaml\FlowDirection.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontStretch.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\HierarchicalDataTemplate.cs" />
 		<Compile Include="Windows.UI.Xaml\PresentationFrameworkCollection_1.cs" />

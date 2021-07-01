@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,25 @@
 *  
 \*====================================================================================*/
 
-
 #if MIGRATION
 namespace System.Windows
 #else
 namespace Windows.UI.Xaml
 #endif
 {
-#if WORKINPROGRESS
-    /// <summary>Defines constants that specify the content flow direction for text and UI elements.</summary>
+    /// <summary>
+    /// Defines constants that specify the content flow direction for 
+    /// text and UI elements.
+    /// </summary>
     public enum FlowDirection
     {
-        /// <summary>Indicates that content should flow from left to right.</summary>
+        /// <summary>
+        /// Indicates that content should flow from left to right.
+        /// </summary>
         LeftToRight = 0,
-        /// <summary>Indicates that content should flow from right to left.</summary>
+        /// <summary>
+        /// Indicates that content should flow from right to left.
+        /// </summary>
         RightToLeft = 1,
     }
-#endif
 }
