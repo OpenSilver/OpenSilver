@@ -128,8 +128,10 @@
     <Compile Include="Windows.UI.Xaml.Controls\DataGridHeadersVisibility.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridRowDetailsVisibilityMode.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ExpandDirection.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\HeaderedItemsControl.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\InteractionHelper.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ItemsControlHelper.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\IUpdateVisualState.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\PopulatingEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\RangeObservableCollection.cs" />
@@ -872,6 +874,7 @@
     <Compile Include="Windows.UI.Xaml\GridLength.cs" />
     <Compile Include="Windows.UI.Xaml\GridLengthConverter.cs" />
     <Compile Include="Windows.UI.Xaml\GridUnitType.cs" />
+    <Compile Include="Windows.UI.Xaml\HierarchicalDataTemplate.cs" />
     <Compile Include="Windows.UI.Xaml\HorizontalAlignment.cs" />
     <Compile Include="Windows.UI.Xaml\Host.cs" />
     <Compile Include="Windows.UI.Xaml\ICanConvertToCSSValue.cs" />
@@ -938,7 +941,6 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\EventTrigger.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontStretch.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\HierarchicalDataTemplate.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\IDataObject.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\LineStackingStrategy.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\OutOfBrowserSettings.cs" />
@@ -1052,6 +1054,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultGridSplitterStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DefaultStyles\INTERNAL_DefaultHeaderedItemsControlStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

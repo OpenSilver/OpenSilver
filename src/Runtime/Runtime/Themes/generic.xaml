@@ -33,5 +33,6 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultBusyIndicatorStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerTextBoxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultListBoxStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultHeaderedItemsControlStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

@@ -126,6 +126,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\CalendarExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DatePickerFormat.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\InteractionHelper.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\ItemsControlHelper.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridBoundColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridCheckBoxColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGridComboBoxColumn.cs" />
@@ -206,7 +207,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePicker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\GridSplitter.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\HeaderedItemsControl.cs" />
+		<Compile Include="Windows.UI.Xaml.Controls\HeaderedItemsControl.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ITimeFormat.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\IUpdateVisualState.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ListTimePickerPopup.cs" />
@@ -1067,7 +1068,7 @@
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\EventTrigger.cs" />
 		<Compile Include="Windows.UI.Xaml\FlowDirection.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontStretch.cs" />
-		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\HierarchicalDataTemplate.cs" />
+		<Compile Include="Windows.UI.Xaml\HierarchicalDataTemplate.cs" />
 		<Compile Include="Windows.UI.Xaml\PresentationFrameworkCollection_1.cs" />
 		<Compile Include="Windows.UI.Xaml\TextDecorationCollection.cs" />
 		<Compile Include="Windows.UI.Xaml\TextTrimming.cs" />
@@ -1215,6 +1216,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="DefaultStyles\INTERNAL_DefaultContentControlStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultHeaderedItemsControlStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
 	</ItemGroup>
