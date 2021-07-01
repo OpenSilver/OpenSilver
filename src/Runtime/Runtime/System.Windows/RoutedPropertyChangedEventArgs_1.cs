@@ -12,9 +12,11 @@
 *  
 \*====================================================================================*/
 
-
 #if MIGRATION
 namespace System.Windows
+#else
+namespace Windows.UI.Xaml
+#endif
 {
     /// <summary>
     /// Provides data about a change in value to a dependency property as reported by
@@ -47,6 +49,3 @@ namespace System.Windows
         public T OldValue { get; private set; }
     }
 }
-#else
-// ----> See the class "RangeBaseValueChangedEventArgs"
-#endif

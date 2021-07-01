@@ -133,10 +133,14 @@
     <Compile Include="Windows.UI.Xaml.Controls\InteractionHelper.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ItemsControlHelper.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\IUpdateVisualState.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\NumericExtensions.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\PopulatingEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\RangeObservableCollection.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ScrollExtensions.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TileView.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TileViewItem.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\TreeView.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\TreeViewItem.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\BusyIndicator.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Calendar.cs" />
@@ -668,7 +672,6 @@
     <Compile Include="Windows.UI.Xaml.Controls\Viewbox.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\VisualStates.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WebView.cs" />
-    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TreeView.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\VirtualizationMode.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WrapPanel.cs" />
     <Compile Include="Windows.UI.Xaml.Data\Binding.cs" />
@@ -1126,6 +1129,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultToolTipStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DefaultStyles\INTERNAL_DefaultTreeViewItemStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DefaultStyles\INTERNAL_DefaultTreeViewStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
