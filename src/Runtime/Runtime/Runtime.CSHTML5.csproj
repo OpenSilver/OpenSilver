@@ -127,7 +127,10 @@
     <Compile Include="Windows.UI.Xaml.Controls\DataGridEditAction.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridHeadersVisibility.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\DataGridRowDetailsVisibilityMode.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\ExpandDirection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\InteractionHelper.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\IUpdateVisualState.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\PopulatingEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\RangeObservableCollection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\TileView.cs" />
@@ -861,6 +864,7 @@
     <Compile Include="Windows.UI.Xaml\DurationConverter.cs" />
     <Compile Include="Windows.UI.Xaml\ExceptionRoutedEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\ExceptionRoutedEventHandler.cs" />
+    <Compile Include="Windows.UI.Xaml\FlowDirection.cs" />
     <Compile Include="Windows.UI.Xaml\FontStyle.cs" />
     <Compile Include="Windows.UI.Xaml\FrameworkElement.cs" />
     <Compile Include="Windows.UI.Xaml\FrameworkElement_HandlingSizeAndAlignment.cs" />
@@ -933,7 +937,6 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventArgs.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\EventTrigger.cs" />
-    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FlowDirection.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontStretch.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\HierarchicalDataTemplate.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\IDataObject.cs" />
