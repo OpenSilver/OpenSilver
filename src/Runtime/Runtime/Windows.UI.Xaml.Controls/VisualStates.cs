@@ -12,6 +12,15 @@
 *  
 \*====================================================================================*/
 
+using System;
+using System.Diagnostics;
+using System.Linq;
+
+#if MIGRATION
+using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Media;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -409,6 +418,48 @@ namespace Windows.UI.Xaml.Controls
                     break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the implementation root of the Control.
+        /// </summary>
+        /// <param name="dependencyObject">The DependencyObject.</param>
+        /// <remarks>
+        /// Implements Silverlight's corresponding internal property on Control.
+        /// </remarks>
+        /// <returns>Returns the implementation root or null.</returns>
+        public static FrameworkElement GetImplementationRoot(DependencyObject dependencyObject)
+        {
+            Debug.Assert(dependencyObject != null, "DependencyObject should not be null.");
+            return (1 == VisualTreeHelper.GetChildrenCount(dependencyObject)) ?
+                VisualTreeHelper.GetChild(dependencyObject, 0) as FrameworkElement :
+                null;
+        }
+
+        /// <summary>
+        /// This method tries to get the named VisualStateGroup for the 
+        /// dependency object. The provided object's ImplementationRoot will be 
+        /// looked up in this call.
+        /// </summary>
+        /// <param name="dependencyObject">The dependency object.</param>
+        /// <param name="groupName">The visual state group's name.</param>
+        /// <returns>Returns null or the VisualStateGroup object.</returns>
+        public static VisualStateGroup TryGetVisualStateGroup(DependencyObject dependencyObject, string groupName)
+        {
+            FrameworkElement root = GetImplementationRoot(dependencyObject);
+            if (root == null)
+            {
+                return null;
+            }
+
+            return VisualStateManager.GetVisualStateGroups(root)
+                .OfType<VisualStateGroup>()
+#if NETSTANDARD
+                .Where(group => string.CompareOrdinal(groupName, group.Name) == 0)
+#elif BRIDGE
+                .Where(group => string.Compare(groupName, group.Name, StringComparison.Ordinal) == 0)
+#endif
+                .FirstOrDefault();
         }
     }
 }

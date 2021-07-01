@@ -12,9 +12,11 @@
 *  
 \*====================================================================================*/
 
-
 #if MIGRATION
 namespace System.Windows
+#else
+namespace Windows.UI.Xaml
+#endif
 {
     /// <summary>
     /// Represents methods that will handle various routed events that track property
@@ -27,6 +29,3 @@ namespace System.Windows
     /// constraint of a delegate implementation.</param>
     public delegate void RoutedPropertyChangedEventHandler<T>(object sender, RoutedPropertyChangedEventArgs<T> e);
 }
-#else
-// ----> See the class "RangeBaseValueChangedHandler"
-#endif

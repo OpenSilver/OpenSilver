@@ -34,5 +34,7 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerTextBoxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultListBoxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultHeaderedItemsControlStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTreeViewStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTreeViewItemStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
