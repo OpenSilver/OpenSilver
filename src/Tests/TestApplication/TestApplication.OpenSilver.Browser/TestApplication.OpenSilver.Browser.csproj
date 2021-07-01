@@ -11,8 +11,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-		<!-- Change this to upgrade the OpenSilver version -->
-		<OpenSilverVersion>1.0.0-alpha-018</OpenSilverVersion>
+    <!-- Change this to upgrade the OpenSilver version -->
+    <OpenSilverVersion>1.0.0-alpha-018</OpenSilverVersion>
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
@@ -74,7 +74,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Build" Version="3.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="3.2.0" />
     <PackageReference Include="OpenSilver" Version="$(OpenSilverVersion)" Condition="'$(Configuration)' == 'SL'" />
-	<PackageReference Include="OpenSilver.WorkInProgress" Version="$(OpenSilverVersion)" Condition="'$(Configuration)' == 'SL.WorkInProgress'" />
+    <PackageReference Include="OpenSilver.WorkInProgress" Version="$(OpenSilverVersion)" Condition="'$(Configuration)' == 'SL.WorkInProgress'" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TestApplication\TestApplication.OpenSilver.csproj" />

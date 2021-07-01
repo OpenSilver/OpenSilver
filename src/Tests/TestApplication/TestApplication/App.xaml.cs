@@ -19,8 +19,7 @@ namespace TestApplication
 
             // Enter construction logic here...
 
-            //this.RootVisual = new MainPage();
-            this.RootVisual = new TestPage();
+            this.RootVisual = new MainPage();
         }
     }
 }

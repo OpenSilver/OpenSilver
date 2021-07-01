@@ -11,8 +11,9 @@
 \*====================================================================================*/
 #if WORKINPROGRESS
 
-#if MIGRATION
 using CSHTML5.Internal;
+
+#if MIGRATION
 using System.Windows.Controls;
 #else
 using Windows.UI.Xaml.Controls;

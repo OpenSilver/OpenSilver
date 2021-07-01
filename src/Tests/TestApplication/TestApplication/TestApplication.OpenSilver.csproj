@@ -28,7 +28,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="OpenSilver" Version="$(OpenSilverVersion)" Condition="'$(Configuration)' == 'SL'" />
+		<PackageReference Include="OpenSilver" 				  Version="$(OpenSilverVersion)" Condition="'$(Configuration)' == 'SL'" />
 		<PackageReference Include="OpenSilver.WorkInProgress" Version="$(OpenSilverVersion)" Condition="'$(Configuration)' == 'SL.WorkInProgress'" />
 	</ItemGroup>
 
@@ -44,9 +44,6 @@
 		<Compile Include="MyCustomImageControl.cs" />
 		<Compile Include="SampleHeaderedContainer.xaml.cs" />
 		<Compile Include="TestingChildWindow\LoginWindow.xaml.cs" />
-		<Compile Include="TestPage.xaml.cs">
-			<DependentUpon>TestPage.xaml</DependentUpon>
-		</Compile>
 		<Compile Include="VideoPlayerControl.cs" />
 	</ItemGroup>
 
@@ -74,13 +71,6 @@
 		<Content Include="Images\arrow_right.png" />
 		<Content Include="Images\arrow_right_and_left.png" />
 		<Content Include="Images\Logo1.png" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Content Include="TestPage.xaml">
-		  <SubType>Designer</SubType>
-	    <Generator>MSBuild:Compile</Generator>
-	  </Content>
 	</ItemGroup>
 
 </Project>
