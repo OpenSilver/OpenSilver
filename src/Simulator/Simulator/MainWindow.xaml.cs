@@ -1516,7 +1516,10 @@ Click OK to continue.";
                 return;
             }
 
-            _devTools = new ChromiumDevTools(MainWebBrowser.Browser.GetRemoteDebuggingURL());
+            DevToolsScreencastInfoWindow infoWindow = new DevToolsScreencastInfoWindow(this);
+            infoWindow.ShowDialog();
+
+            _devTools = new ChromiumDevTools(this, MainWebBrowser.Browser.GetRemoteDebuggingURL());
             _devTools.Show();
 
             _devTools.Closing += ChromiumDevTools_Closing;
