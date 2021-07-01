@@ -40,6 +40,20 @@ namespace Windows.UI.Xaml.Documents
             {
                 container = new INTERNAL_TextContainerSpan((Span)parent);
             }
+#if WORKINPROGRESS
+            else if (parent is RichTextBlock)
+            {
+                container = new INTERNAL_TextContainerRichTextBlock((RichTextBlock)parent);
+            }
+            else if (parent is Paragraph)
+            {
+                container = new INTERNAL_TextContainerParagraph((Paragraph)parent);
+            }
+            else if (parent is Section)
+            {
+                container = new INTERNAL_TextContainerSection((Section)parent);
+            }
+#endif
             return container;
         }
     }

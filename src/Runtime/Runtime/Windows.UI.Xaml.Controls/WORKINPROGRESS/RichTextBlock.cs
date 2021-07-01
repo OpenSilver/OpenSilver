@@ -15,6 +15,7 @@
 
 using System;
 using System.Windows.Markup;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Documents;
@@ -185,6 +186,45 @@ namespace Windows.UI.Xaml.Controls
         #endregion Dependency Properties
 
         #endregion Public Properties
+
+        public RichTextBlock()
+        {
+            this.Blocks = new BlockCollection(this, false);
+        }
+
+        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        {
+            dynamic div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            dynamic divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+            divStyle.whiteSpace = TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap";
+            divStyle.overflow = "hidden"; //keeps the text from overflowing despite the RichTextBlock's size limitations.
+            divStyle.textAlign = "left"; // this is the default value.
+            domElementWhereToPlaceChildren = div;
+
+            return div;
+        }
+
+        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        {
+            base.INTERNAL_OnAttachedToVisualTree();
+            foreach (var block in this.Blocks)
+            {
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(block, this);
+            }
+        }
+
+        public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index = -1)
+        {
+            dynamic div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            dynamic divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+
+            divStyle.overflow = "hidden"; //keeps the text from overflowing despite the RichTextBlock's size limitations.
+            divStyle.textAlign = "left"; // this is the default value.
+            divStyle.width = "100%";
+            domElementWhereToPlaceChild = div;
+
+            return div;
+        }
     }
 }
 

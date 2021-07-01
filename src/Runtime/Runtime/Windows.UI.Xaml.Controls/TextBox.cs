@@ -418,7 +418,6 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                 CSHTML5.Interop.ExecuteJavaScript(@"$0.classList.add(""ie_set_p_margins_to_zero"")", contentEditableDiv);
             }
 
-            CSHTML5.Interop.ExecuteJavaScript(@"$0.classList.add(""single-line-input"")", contentEditableDiv);
 
 #if REVAMPPOINTEREVENTS
             contentEditableDivStyle.pointerEvents = this.INTERNAL_ArePointerEventsEnabled ? "auto" : "none";

@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Controls
         public DatePicker()
         {
             _defaultText = ""; // the text displayed when no date is selected
-            
+
             // Set default style:
             this.DefaultStyleKey = typeof(DatePicker);
             this.GotFocus += OnGotFocus;
@@ -85,7 +85,7 @@ namespace Windows.UI.Xaml.Controls
                 }
                 else
                 {
-                    if(this.SelectedDate != null)
+                    if (this.SelectedDate != null)
                     {
                         string selectedDate = SetTextFromDate(this.SelectedDate);
                         if (selectedDate == _textBox.Text)
@@ -104,6 +104,11 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnTextChanged()
         {
             SetSelectedDate();
+        }
+
+        protected override void OnEmptyText()
+        {
+            this.SetValueNoCallback(SelectedDateProperty, null);
         }
 
         protected override INTERNAL_CalendarOrClockBase GenerateCalendarOrClock()
@@ -191,7 +196,7 @@ namespace Windows.UI.Xaml.Controls
             this.SetValueNoCallback(TextProperty, _textBox.Text);
         }
 
-#region dependency property Selection for DatePicker
+        #region dependency property Selection for DatePicker
 
         /// <summary>
         /// Gets or sets the currently selected date.
@@ -240,13 +245,13 @@ namespace Windows.UI.Xaml.Controls
             typeof(DatePicker),
             new PropertyMetadata(DatePickerFormat.Short));
 
-        public DatePickerFormat SelectedDateFormat 
+        public DatePickerFormat SelectedDateFormat
         {
-            get => (DatePickerFormat) GetValue(SelectedDateFormatProperty);
+            get => (DatePickerFormat)GetValue(SelectedDateFormatProperty);
             set => SetValue(SelectedDateFormatProperty, value);
         }
 
-#endregion
+        #endregion
 
         protected override void SetWaterMarkText()
         {
@@ -380,14 +385,14 @@ namespace Windows.UI.Xaml.Controls
             else
             {
                 DateTime? date = ParseText(text);
-                if(date != null)
+                if (date != null)
                 {
                     SetValue(TextProperty, text);
                     return date;
                 }
                 else
                 {
-                    if(this.SelectedDate != null)
+                    if (this.SelectedDate != null)
                     {
                         string newText = SetTextFromDate(this.SelectedDate);
                         SetValue(TextProperty, newText);

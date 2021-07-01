@@ -159,6 +159,8 @@
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Page.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\RichTextBlock.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\RichTextBlockOverflow.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\RichTextBox.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\TextBlock.cs" />
     <Compile Include="Windows.UI.Xaml.Data\BindingExpressionBase.cs" />
@@ -167,6 +169,11 @@
     <Compile Include="Windows.UI.Xaml.Data\CollectionViewSource.cs" />
     <Compile Include="Windows.UI.Xaml.Data\DataExtensionMethods.cs" />
     <Compile Include="Windows.UI.Xaml.Data\EnumerableCollectionView.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerParagraph.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerRichTextBlock.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerSection.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Paragraph.cs" />
+    <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Section.cs" />
     <Compile Include="Windows.UI.Xaml.Media\Polygon.cs" />
     <Compile Include="Windows.UI.Xaml\Expression.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IndexedEnumerable.cs" />
