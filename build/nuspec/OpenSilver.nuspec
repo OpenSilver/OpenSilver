@@ -7,7 +7,7 @@
     <projectUrl>http://www.opensilver.net</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>OpenSilver is an open-source reimplementation of Silverlight that runs on current browsers via WebAssembly.</description>
-    <copyright>Copyright (c) 2020, Userware. All rights reserved.</copyright>
+    <copyright>Copyright (c) 2021, Userware. All rights reserved.</copyright>
     <tags>silverlight webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono uwp</tags>
     <!-- <iconUrl> is deprecated and replaced by <icon> -->
     <!--<iconUrl>https://opensilver.net/permalinks/images/OpenSilver_logo_128x128.png</iconUrl>-->
