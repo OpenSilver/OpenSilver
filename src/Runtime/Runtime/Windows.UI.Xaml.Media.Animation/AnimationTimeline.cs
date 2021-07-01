@@ -37,6 +37,11 @@ namespace Windows.UI.Xaml.Media.Animation
         internal DependencyProperty _propDp;
         internal bool _isInitialized = false;
         internal bool _cancelledAnimation = false;
+        /// <summary>
+        /// This variable is here to let us know when the animation has been cancelled before it ended and so it should not apply the final value to the C# when receiving the callback from Velocity.
+        ///  An example where it is useful is with a Control with a "MouseOver" VisualState that sets the opacity of an element to 1 though a DoubleAnimation (with a duration of 0) and we move the cursor in and out of the Control very quickly.
+        /// </summary>
+        internal bool _isUnapplied = true;
         protected override Duration GetNaturalDurationCore()
         {
             return new TimeSpan(0, 0, 1);

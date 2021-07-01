@@ -43,6 +43,21 @@ namespace Windows.UI.Xaml.Media.Animation
         private Dictionary<Tuple<string, string>, Timeline> INTERNAL_propertiesChanged; //todo: change this into a Hashset.
 
         internal bool isUnApplied = false; // Note: we set this variable because the animation start is done inside a Dispatcher, so if the user Starts then Stops the animation immediately (in the same thread), we want to cancel the start of the animation.
+        internal bool IsUnapplied
+        {
+            get { return isUnApplied; }
+            set
+            {
+                isUnApplied = value;
+                foreach (Timeline tl in _children)
+                {
+                    if (tl is AnimationTimeline)
+                    {
+                        ((AnimationTimeline)tl)._isUnapplied = value;
+                    }
+                }
+            }
+        }
 
 
         private TimelineCollection _children = new TimelineCollection();

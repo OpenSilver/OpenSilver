@@ -212,13 +212,16 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             return () =>
             {
-                if (_animationID == callBackGuid)
+                if (!this._isUnapplied)
                 {
-                    AnimationHelpers.ApplyValue(target, propertyPath, value, parameters.IsVisualStateChange);
-                    _appliedKeyFramesCount++;
-                    if (!CheckTimeLineEndAndRaiseCompletedEvent(_parameters))
+                    if (_animationID == callBackGuid)
                     {
-                        ApplyKeyFrame(GetNextKeyFrame(), isLastLoop);
+                        AnimationHelpers.ApplyValue(target, propertyPath, value, parameters.IsVisualStateChange);
+                        _appliedKeyFramesCount++;
+                        if (!CheckTimeLineEndAndRaiseCompletedEvent(_parameters))
+                        {
+                            ApplyKeyFrame(GetNextKeyFrame(), isLastLoop);
+                        }
                     }
                 }
             };
