@@ -76,6 +76,9 @@
     <Compile Include="Console\FileSource.cs" />
     <Compile Include="Console\IMessageSource.cs" />
     <Compile Include="Console\InteropSource.cs" />
+    <Compile Include="Debugging\DevToolsScreencastInfoWindow.xaml.cs">
+      <DependentUpon>DevToolsScreencastInfoWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DialogBoxes\MessageBoxScrollable.xaml.cs">
       <DependentUpon>MessageBoxScrollable.xaml</DependentUpon>
     </Compile>
@@ -127,6 +130,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Console\ConsoleMessageControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Debugging\DevToolsScreencastInfoWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -305,6 +312,7 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <Resource Include="Debugging\DevToolsScreencast.png" />
     <Content Include="interop_debug_root.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
