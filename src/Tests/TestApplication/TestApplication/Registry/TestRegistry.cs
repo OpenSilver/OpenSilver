@@ -1,41 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace TestApplication
 {
-    public interface ITreeItem
-    {
-        string Name { get; }
-    }
-
-    public class Test : ITreeItem
-    {
-        public string Name { get; }
-        public string FileName { get; }
-
-        public Test(string name, string fileName)
-        {
-            Name = name;
-            FileName = fileName;
-        }
-    }
-
-    public class TestCategory : ITreeItem
-    {
-        public string Name { get; }
-        public List<ITreeItem> Children { get; } = new List<ITreeItem>();
-
-        public TestCategory(string name)
-        {
-            Name = name;
-        }
-    }
-
-    public static class TestList
+    public static class TestRegistry
     {
         public static List<ITreeItem> Tests = new List<ITreeItem>();
 
-        static TestList()
+        static TestRegistry()
         {
             Tests.Add(new Test("Sandbox", "Sandbox"));
             Tests.Add(new Test("CheckBox indeterminate", "CheckBox indeterminate"));
@@ -56,12 +27,12 @@ namespace TestApplication
             Tests.Add(new Test("Frame", "Frame")); //TODO: fix it
 
             TestCategory events = new TestCategory("Events");
-            events.Children.Add(new Test("Grid with multiple elements", "Events/GridWithMultipleElements"));
-            events.Children.Add(new Test("Event 1", "Events/Event1"));
-            events.Children.Add(new Test("Event 2", "Events/Event2"));
-            events.Children.Add(new Test("Attach/Detach", "Events/AttachDetach"));
-            events.Children.Add(new Test("TextChanged", "Events/TextChanged"));
-            events.Children.Add(new Test("Focus", "Events/Focus"));
+            events.Add(new Test("Grid with multiple elements", "Events/GridWithMultipleElements"));
+            events.Add(new Test("Event 1", "Events/Event1"));
+            events.Add(new Test("Event 2", "Events/Event2"));
+            events.Add(new Test("Attach/Detach", "Events/AttachDetach"));
+            events.Add(new Test("TextChanged", "Events/TextChanged"));
+            events.Add(new Test("Focus", "Events/Focus"));
             Tests.Add(events);
 
             Tests.Add(new Test("Templated TextBox", "TemplatedTextBox"));
@@ -76,47 +47,47 @@ namespace TestApplication
             Tests.Add(new Test("WrapPanel", "WrapPanel"));
 
             TestCategory grids = new TestCategory("Grids");
-            grids.Children.Add(new Test("Grid", "Grids/Grid"));
-            grids.Children.Add(new Test("Grid canvas overlapping bug", "Grids/Grid_canvas_overlapping_bug"));
-            grids.Children.Add(new Test("Grid Span", "Grids/Grid_Span"));
-            grids.Children.Add(new Test("Grid Splitter", "Grids/GridSplitter"));
-            grids.Children.Add(new Test("Alignment", "Grids/Alignment"));
-            grids.Children.Add(new Test("Grid Without Columns/Rows", "Grids/GridWithoutColumnsRows"));
+            grids.Add(new Test("Grid", "Grids/Grid"));
+            grids.Add(new Test("Grid canvas overlapping bug", "Grids/Grid_canvas_overlapping_bug"));
+            grids.Add(new Test("Grid Span", "Grids/Grid_Span"));
+            grids.Add(new Test("Grid Splitter", "Grids/GridSplitter"));
+            grids.Add(new Test("Alignment", "Grids/Alignment"));
+            grids.Add(new Test("Grid Without Columns/Rows", "Grids/GridWithoutColumnsRows"));
             Tests.Add(grids);
 
             Tests.Add(new Test("DockPanel", "DockPanel"));
             Tests.Add(new Test("Canvas", "Canvas"));
             
             TestCategory alignments = new TestCategory("Alignments");
-            alignments.Children.Add(new Test("Bottom Right", "Alignments/BottomRight"));
-            alignments.Children.Add(new Test("Top Left", "Alignments/TopLeft"));
-            alignments.Children.Add(new Test("Center", "Alignments/Center"));
-            alignments.Children.Add(new Test("Stretch", "Alignments/Stretch"));
+            alignments.Add(new Test("Bottom Right", "Alignments/BottomRight"));
+            alignments.Add(new Test("Top Left", "Alignments/TopLeft"));
+            alignments.Add(new Test("Center", "Alignments/Center"));
+            alignments.Add(new Test("Stretch", "Alignments/Stretch"));
             Tests.Add(alignments);
 
             TestCategory stackpanels = new TestCategory("StackPanels");
-            stackpanels.Children.Add(new Test("Horizontal", "StackPanels/Horizontal"));
-            stackpanels.Children.Add(new Test("Vertical", "StackPanels/Vertical"));
+            stackpanels.Add(new Test("Horizontal", "StackPanels/Horizontal"));
+            stackpanels.Add(new Test("Vertical", "StackPanels/Vertical"));
             Tests.Add(stackpanels);
             
             Tests.Add(new Test("ScrollViewer", "ScrollViewer"));
             Tests.Add(new Test("ShadowDropEffect", "ShadowDropEffect"));
 
             TestCategory gradientBrushes = new TestCategory("GradientBrushes");
-            gradientBrushes.Children.Add(new Test("LinearGradientBrush", "GradientBrushes/LinearGradientBrush"));
-            gradientBrushes.Children.Add(new Test("RadialGradientBrush", "GradientBrushes/RadialGradientBrush"));
+            gradientBrushes.Add(new Test("LinearGradientBrush", "GradientBrushes/LinearGradientBrush"));
+            gradientBrushes.Add(new Test("RadialGradientBrush", "GradientBrushes/RadialGradientBrush"));
             Tests.Add(gradientBrushes);
 
             TestCategory paths = new TestCategory("Paths");
-            paths.Children.Add(new Test("Path", "Paths/Path"));
-            paths.Children.Add(new Test("Path Change", "Paths/PathChange"));
+            paths.Add(new Test("Path", "Paths/Path"));
+            paths.Add(new Test("Path Change", "Paths/PathChange"));
             Tests.Add(paths);
 
             Tests.Add(new Test("Style", "Style"));
 
             TestCategory listboxes = new TestCategory("ListBoxes");
-            listboxes.Children.Add(new Test("ListBox 1", "ListBoxes/ListBox1"));
-            listboxes.Children.Add(new Test("ListBox 2", "ListBoxes/ListBox2"));
+            listboxes.Add(new Test("ListBox 1", "ListBoxes/ListBox1"));
+            listboxes.Add(new Test("ListBox 2", "ListBoxes/ListBox2"));
             Tests.Add(listboxes);
 
             Tests.Add(new Test("IsolatedStorage", "IsolatedStorage"));
@@ -124,9 +95,9 @@ namespace TestApplication
             Tests.Add(new Test("Encoding.GetDecoder()", "Encoding_GetDecoder"));
 
             TestCategory datagrids = new TestCategory("DataGrids");
-            datagrids.Children.Add(new Test("DataGrid 1", "DataGrids/DataGrid1"));
-            datagrids.Children.Add(new Test("DataGrid 2", "DataGrids/DataGrid2"));
-            datagrids.Children.Add(new Test("DataGridColumn.Visibility", "DataGrids/DataGridColumn_Visibility"));
+            datagrids.Add(new Test("DataGrid 1", "DataGrids/DataGrid1"));
+            datagrids.Add(new Test("DataGrid 2", "DataGrids/DataGrid2"));
+            datagrids.Add(new Test("DataGridColumn.Visibility", "DataGrids/DataGridColumn_Visibility"));
             Tests.Add(datagrids);
 
             Tests.Add(new Test("ICommand", "ICommand"));
@@ -146,7 +117,7 @@ namespace TestApplication
             Tests.Add(new Test("TextBox Properties", "TextBoxProperties"));
 
 			TestCategory shapes = new TestCategory("Shapes");
-			shapes.Children.Add(new Test("Polygon", "Shapes/Polygon"));
+			shapes.Add(new Test("Polygon", "Shapes/Polygon"));
 			Tests.Add(shapes);
 		}
     }

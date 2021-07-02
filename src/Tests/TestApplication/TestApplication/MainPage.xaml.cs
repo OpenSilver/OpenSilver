@@ -10,7 +10,7 @@ namespace TestApplication
         {
             InitializeComponent();
 
-            foreach (ITreeItem i in TestList.Tests)
+            foreach (ITreeItem i in TestRegistry.Tests)
             {
                 CreateTreeItem(i, MenuContainer.Items);
             }
@@ -39,7 +39,7 @@ namespace TestApplication
 
                 parent.Add(treeViewItem);
 
-                foreach (ITreeItem i in testCategory.Children)
+                foreach (ITreeItem i in testCategory)
                 {
                     CreateTreeItem(i, treeViewItem.Items);
                 }

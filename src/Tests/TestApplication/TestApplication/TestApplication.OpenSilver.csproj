@@ -16,7 +16,10 @@
     </Compile>
     <Compile Include="HintBehavior.cs" />
     <Compile Include="LinqSamples.cs" />
-    <Compile Include="TestList.cs" />
+    <Compile Include="Registry\ITreeItem.cs" />
+    <Compile Include="Registry\Test.cs" />
+    <Compile Include="Registry\TestCategory.cs" />
+    <Compile Include="Registry\TestRegistry.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
