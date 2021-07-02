@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml.Controls
     /// Represents a <see cref="DataGrid"/> column that hosts <see cref="CheckBox"/>
     /// controls in its cells.
     /// </summary>
-    public partial class DataGridCheckBoxColumn 
+    public partial class DataGridCheckBoxColumn
     {
         [OpenSilver.NotImplemented]
         protected override FrameworkElement GenerateEditingElement(DataGridCell cell, object dataItem)
@@ -50,13 +50,8 @@ namespace Windows.UI.Xaml.Controls
         protected override object PrepareCellForEdit(FrameworkElement editingElement, RoutedEventArgs editingEventArgs)
         {
             return null;
-        }
+        }      
 
-        [OpenSilver.NotImplemented]
-        protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
-        {
-            return null;
-        }
     }
 }
 #endif

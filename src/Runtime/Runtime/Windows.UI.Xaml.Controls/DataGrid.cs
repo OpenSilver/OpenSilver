@@ -80,7 +80,7 @@ namespace Windows.UI.Xaml.Controls
     /// </example>
     public partial class DataGrid : MultiSelector
     {
-        #region Data
+        #region Data 
 
         private const string PART_MainGrid = "PART_MainGrid";
         private const string PART_Pager = "PART_Pager";
@@ -1179,7 +1179,7 @@ namespace Windows.UI.Xaml.Controls
                         cell.Item = childData;
                         cell.DataContext = childData;
                         cell.Column = column;
-                        FrameworkElement f = column.GenerateElement(childData);
+                        FrameworkElement f = column.GenerateElementInternal(cell, childData);
                         Grid.SetRow(cell, rowCount - 1);
                         Grid.SetColumn(cell, currentColumnIndex);
                         cell.Content = f;

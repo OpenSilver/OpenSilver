@@ -118,16 +118,11 @@ namespace Windows.UI.Xaml.Controls
         }
 
         [OpenSilver.NotImplemented]
-        protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
-        {
-            return null;
-        }
-
-        [OpenSilver.NotImplemented]
         protected override object PrepareCellForEdit(FrameworkElement editingElement, RoutedEventArgs editingEventArgs)
         {
             return null;
         }
+
     }
 }
 #endif

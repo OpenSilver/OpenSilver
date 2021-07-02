@@ -54,9 +54,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty CellTemplateProperty =
             DependencyProperty.Register(
-                nameof(CellTemplate), 
-                typeof(DataTemplate), 
-                typeof(DataGridTemplateColumn), 
+                nameof(CellTemplate),
+                typeof(DataTemplate),
+                typeof(DataGridTemplateColumn),
                 new PropertyMetadata(null, OnCellTemplateChanged));
 
         private static void OnCellTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -79,9 +79,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty CellEditingTemplateProperty =
             DependencyProperty.Register(
-                nameof(CellEditingTemplate), 
-                typeof(DataTemplate), 
-                typeof(DataGridTemplateColumn), 
+                nameof(CellEditingTemplate),
+                typeof(DataTemplate),
+                typeof(DataGridTemplateColumn),
                 new PropertyMetadata(null, OnCellEditingTemplateChanged));
 
         private static void OnCellEditingTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -89,7 +89,12 @@ namespace Windows.UI.Xaml.Controls
             //probably nothing to do here
         }
 
-        internal override FrameworkElement GenerateElement(object childData)
+        protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
+        {
+            return GenerateElement(dataItem);
+        }
+
+        private FrameworkElement GenerateElement(object childData)
         {
             if (CellTemplate != null)
             {

@@ -80,9 +80,12 @@ namespace Windows.UI.Xaml.Controls
             }
             return cb;
         }
+        protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
+        {
+            return GenerateElement(dataItem);
+        }
 
-
-        internal override FrameworkElement GenerateElement(object childData)
+        private FrameworkElement GenerateElement(object childData)
         {
             TextBlock textBlock = new TextBlock();
             //textBlock.DataContext = childData;
