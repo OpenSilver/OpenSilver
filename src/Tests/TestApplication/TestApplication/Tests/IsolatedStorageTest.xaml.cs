@@ -96,7 +96,11 @@ namespace TestApplication.Tests
         {
             public static void WriteTextToFile(string fileName, string fileContent)
             {
+#if OPENSILVER || SILVERLIGHT
                 using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
+#else
+                using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForAssembly())
+#endif
                 {
                     IsolatedStorageFileStream fs = null;
                     using (fs = storage.CreateFile(fileName))
@@ -118,7 +122,11 @@ namespace TestApplication.Tests
 
             public static void DeleteFile(string fileName)
             {
+#if OPENSILVER || SILVERLIGHT
                 using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
+#else
+                using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForAssembly())
+#endif
                 {
                     storage.DeleteFile(fileName);
                 }
@@ -126,7 +134,11 @@ namespace TestApplication.Tests
 
             public static string ReadTextFromFile(string fileName)
             {
+#if OPENSILVER || SILVERLIGHT
                 using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
+#else
+                using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForAssembly())
+#endif
                 {
                     if (storage.FileExists(fileName))
                     {
