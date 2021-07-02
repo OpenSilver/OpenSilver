@@ -51,6 +51,8 @@ namespace Windows.UI.Xaml.Controls
         protected virtual void OnNavigatedTo(NavigationEventArgs e)
         {
         }
+        
+        internal void INTERNAL_OnNavigatedTo(NavigationEventArgs e) => OnNavigatedTo(e);
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
