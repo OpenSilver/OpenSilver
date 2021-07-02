@@ -194,8 +194,8 @@ namespace Windows.UI.Xaml.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            dynamic div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
-            dynamic divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+            var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
             divStyle.whiteSpace = TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap";
             divStyle.overflow = "hidden"; //keeps the text from overflowing despite the RichTextBlock's size limitations.
             divStyle.textAlign = "left"; // this is the default value.
@@ -215,8 +215,8 @@ namespace Windows.UI.Xaml.Controls
 
         public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index = -1)
         {
-            dynamic div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
-            dynamic divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+            var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
 
             divStyle.overflow = "hidden"; //keeps the text from overflowing despite the RichTextBlock's size limitations.
             divStyle.textAlign = "left"; // this is the default value.
