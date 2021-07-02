@@ -45,12 +45,6 @@ namespace Windows.UI.Xaml.Controls
             //return GenerateElement(childData, true);
             return null;
         }
-
-        internal override FrameworkElement GenerateElement(object childData)
-        {
-            return GenerateElement(childData, false);
-        }
-
         private FrameworkElement GenerateElement(object childData, bool enable)
         {
             CheckBox checkBox = new CheckBox();
@@ -87,6 +81,11 @@ namespace Windows.UI.Xaml.Controls
         {
             //base.LeaveEditionMode(dataGridCell); //this does nothing but might do something in the future
             ((FrameworkElement)dataGridCell.Content).IsEnabled = false;
+        }
+
+        protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
+        {
+            return GenerateElement(dataItem, false);
         }
     }
 }

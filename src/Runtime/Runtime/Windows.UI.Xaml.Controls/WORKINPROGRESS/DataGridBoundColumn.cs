@@ -31,6 +31,7 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public partial class DataGridBoundColumn
     {
+        private Binding _clipboardContentBinding;
 
         protected DataGridBoundColumn()
         {
@@ -54,23 +55,38 @@ namespace Windows.UI.Xaml.Controls
             return null;
         }
 
-        [OpenSilver.NotImplemented]
-        internal override FrameworkElement GenerateElement(object childData)
-        {
-            return null;
-        }
-
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// When overridden in a derived class, gets an editing element that is bound to the column's <see cref="P:System.Windows.Controls.DataGridBoundColumn.Binding" /> property value.
+        /// </summary>
+        /// <param name="cell">
+        /// The cell that will contain the generated element.
+        /// </param>
+        /// <param name="dataItem">
+        /// The data item represented by the row that contains the intended cell.
+        /// </param>
+        /// <returns>
+        /// A new editing element that is bound to the column's <see cref="P:System.Windows.Controls.DataGridBoundColumn.Binding" /> property value.
+        /// </returns>
         protected abstract FrameworkElement GenerateEditingElement(DataGridCell cell, object dataItem);
 
         [OpenSilver.NotImplemented]
         protected abstract object PrepareCellForEdit(FrameworkElement editingElement, RoutedEventArgs editingEventArgs);
-        
-        [OpenSilver.NotImplemented]
-        protected abstract FrameworkElement GenerateElement(DataGridCell cell, object dataItem);
-        
-        [OpenSilver.NotImplemented]
-        public virtual Binding ClipboardContentBinding { get; set; }
+
+                /// <summary>
+        /// The binding that will be used to get or set cell content for the clipboard.
+        /// </summary>
+        public virtual Binding ClipboardContentBinding
+        {
+            get
+            {
+                return this._clipboardContentBinding;
+            }
+            set
+            {
+                this._clipboardContentBinding = value;
+            }
+        }
+
     }
 }
 #endif

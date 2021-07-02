@@ -77,7 +77,7 @@ namespace Windows.UI.Xaml.Controls
             return textBox;
         }
 
-        internal override FrameworkElement GenerateElement(object childData)
+        private FrameworkElement GenerateElement(object childData)
         {
             TextBlock textBlock = new TextBlock();
             //textBlock.DataContext = childData;
@@ -89,5 +89,11 @@ namespace Windows.UI.Xaml.Controls
                 textBlock.Text = (string)childData;
             return textBlock;
         }
+
+        protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
+        {
+            return GenerateElement(dataItem);
+        }
+
     }
 }
