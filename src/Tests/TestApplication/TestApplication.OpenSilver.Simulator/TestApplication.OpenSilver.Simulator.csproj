@@ -1,33 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <!-- Change this to upgrade the OpenSilver version -->
-    <OpenSilverVersion>1.0.0-alpha-018</OpenSilverVersion>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net472</TargetFramework>
+		<StartArguments>"..\..\..\..\TestApplication\bin\OpenSilver\$(Configuration)\netstandard2.0\TestApplication.OpenSilver.dll"</StartArguments>
+	</PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-    <OpenSilverPackageName>opensilver</OpenSilverPackageName>
-  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="OpenSilver.Simulator" Version="1.0.0-alpha-019" />
+	</ItemGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' ">
-    <OpenSilverPackageName>opensilver.workinprogress</OpenSilverPackageName>
-  </PropertyGroup>
-  
-  <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
-    <EnableDefaultItems>false</EnableDefaultItems>
-    <StartAction>Program</StartAction>
-    <Configurations>SL;SL.WorkInProgress;</Configurations>
-    <RootNamespace>TestApplication.OpenSilver.Simulator</RootNamespace>
-    <AssemblyName>TestApplication.OpenSilver.Simulator</AssemblyName>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <StartProgram>$(NuGetPackageRoot)\$(OpenSilverPackageName)\$(OpenSilverVersion)\tools\simulator\CSharpXamlForHtml5.Simulator.exe</StartProgram>
-    <StartArguments>"..\..\..\TestApplication\bin\OpenSilver\$(Configuration)\netstandard2.0\TestApplication.OpenSilver.dll"</StartArguments>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\TestApplication\TestApplication.OpenSilver.csproj" />
-  </ItemGroup>
-  
+	<ItemGroup>
+		<ProjectReference Include="..\TestApplication\TestApplication.OpenSilver.csproj" />
+	</ItemGroup>
+
 </Project>
-

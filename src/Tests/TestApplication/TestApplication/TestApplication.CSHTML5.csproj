@@ -17,36 +17,28 @@
 		<Cshtml5OutputType>Application</Cshtml5OutputType>
 		<StartAction>Program</StartAction>
 		<StartArguments>"TestApplication.CSHTML5.dll"</StartArguments>
-		<OutputPath>bin\CSHTML5\$(Configuration)\</OutputPath>
 	</PropertyGroup>
 
-	<PropertyGroup>
-		<!-- Change this to upgrade the CSHTML5 version -->
-		<!-- Also change the version in packages.config -->
-		<CSHTML5Version>2.0.0-alpha85-105</CSHTML5Version>
-	</PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\CSHTML5\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;CSHTML5;SLMIGRATION</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
 
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
-		<Optimize>false</Optimize>
-		<DefineConstants>DEBUG;TRACE;CSHTML5;SLMIGRATION</DefineConstants>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<NoStdLib>true</NoStdLib>
-	</PropertyGroup>
-
-	<!-- Cannot be used until we find a way to pick a different nuget packages per build config -->
-	<!-- Switching to PackageReference should allow to use Condition with the following workaround: https://github.com/dotnet/project-system/issues/4175#issuecomment-434080407, however, the CSHTML5 compiler doesn't seems to be very happy about that -->
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL.WIP|AnyCPU' ">
-		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
-		<Optimize>false</Optimize>
-		<DefineConstants>DEBUG;TRACE;CSHTML5;SLMIGRATION;WORKINPROGRESS</DefineConstants>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<NoStdLib>true</NoStdLib>
-	</PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\CSHTML5\Release\</OutputPath>
+    <DefineConstants>TRACE;CSHTML5;SLMIGRATION</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
 
 	<ItemGroup>
     <Compile Include="App.xaml.cs">
@@ -629,7 +621,6 @@
     </Page>
   </ItemGroup>
 
-	<!-- TODO: find a way to use $(CSHTML5Version) instead of hardcoded version for the following references -->
 	<ItemGroup>
 		<Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
 			<HintPath>..\packages\CSHTML5.Migration.2.0.0-alpha85-105\lib\net40\Bridge.dll</HintPath>
@@ -650,13 +641,13 @@
 		<None Include="packages.config" />
 	</ItemGroup>
 
-	<Import Project="..\packages\CSHTML5.Migration.$(CSHTML5Version)\build\CSHTML5.Migration.targets" Condition="Exists('..\packages\CSHTML5.Migration.$(CSHTML5Version)\build\CSHTML5.Migration.targets')" />
+	<Import Project="..\packages\CSHTML5.Migration.2.0.0-alpha85-105\build\CSHTML5.Migration.targets" Condition="Exists('..\packages\CSHTML5.Migration.2.0.0-alpha85-105\build\CSHTML5.Migration.targets')" />
 
 	<Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
 		<PropertyGroup>
 			<ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
 		</PropertyGroup>
-		<Error Condition="!Exists('..\packages\CSHTML5.Migration.$(CSHTML5Version)\build\CSHTML5.Migration.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CSHTML5.Migration.$(CSHTML5Version)\build\CSHTML5.Migration.targets'))" />
+		<Error Condition="!Exists('..\packages\CSHTML5.Migration.2.0.0-alpha85-105\build\CSHTML5.Migration.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CSHTML5.Migration.2.0.0-alpha85-105\build\CSHTML5.Migration.targets'))" />
 	</Target>
 	<!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 		 Other similar extension points exist, see Microsoft.Common.targets.
