@@ -95,36 +95,6 @@ namespace Windows.UI.Xaml
         /// </summary>
         internal Dictionary<BindingExpression, ValidationError> INTERNAL_ValidationErrorsDictionary;
 
-
-
-#region Special code for RadioButtons
-
-        private string _childrenRadioButtonDefaultName = null;
-        internal string INTERNAL_ChildrenRadioButtonDefaultName //this is used to define a name for the radio buttons contained inside this UIElement that have their GroupName property not defined. Mandatory because RadioButtons without GroupName inside a same UIElement are considered to be part of a same group.
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(_childrenRadioButtonDefaultName))
-                {
-                    _childrenRadioButtonDefaultName = GenerateRadioButtonsDefaultName();
-                }
-                return _childrenRadioButtonDefaultName;
-            }
-        }
-
-        private static Random _random;
-        private static string GenerateRadioButtonsDefaultName()
-        {
-            if (_random == null)
-            {
-                _random = new Random();
-            }
-            int i = _random.Next();
-            return "RadioButtonDefaultGroupName" + i.ToString();
-        }
-
-#endregion
-
         internal virtual object GetDomElementToSetContentString()
         {
             return INTERNAL_InnerDomElement;
