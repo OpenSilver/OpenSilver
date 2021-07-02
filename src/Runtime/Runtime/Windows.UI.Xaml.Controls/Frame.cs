@@ -756,12 +756,18 @@ namespace Windows.UI.Xaml.Controls
 
         void RaiseNavigatedEvent()
         {
+            object content = _isBrowserJournal ? Content : (_cache._currentItem != null ? _cache._currentItem._value : null);
+            Uri uri = _isBrowserJournal ? Source : (_cache._currentItem != null ? _cache._currentItem._uri : null);
+            
             if (Navigated != null)
             {
-                object content = (_isBrowserJournal ? this.Content : (_cache._currentItem != null ? _cache._currentItem._value : null));
-                Uri uri = (_isBrowserJournal ? this.Source : (_cache._currentItem != null ? _cache._currentItem._uri : null));
-
                 Navigated(this, new NavigationEventArgs(content, uri));
+            }
+            
+            Page newPage = content as Page;
+            if (newPage != null)
+            {
+                newPage.INTERNAL_OnNavigatedTo(new NavigationEventArgs(content, uri));
             }
         }
 
