@@ -29,16 +29,10 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal partial class DataGridComboBoxColumn 
+    internal partial class DataGridComboBoxColumn
     {
         [OpenSilver.NotImplemented]
         protected override FrameworkElement GenerateEditingElement(DataGridCell cell, object dataItem)
-        {
-            return null;
-        }
-
-        [OpenSilver.NotImplemented]
-        protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
         {
             return null;
         }
