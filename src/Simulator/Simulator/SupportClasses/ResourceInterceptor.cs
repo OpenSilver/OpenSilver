@@ -17,13 +17,8 @@
 
 using DotNetBrowser;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Shapes;
+using System.Text.RegularExpressions;
 using Path = System.IO.Path;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
@@ -36,7 +31,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         public ResourceInterceptor(string baseURL)
         {
             _baseURL = baseURL.ToLower();
-            _rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).Replace(@"\", "/");
+            _rootPath = Uri.EscapeDataString(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).Replace(@"\", "/"));
+            _rootPath = Regex.Replace(_rootPath, "%2F", "/", RegexOptions.IgnoreCase);
         }
 
         public override void OnBeforeURLRequest(BeforeURLRequestParams parameters)
