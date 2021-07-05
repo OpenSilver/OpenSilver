@@ -42,13 +42,13 @@ namespace Windows.UI.Xaml.Media.Animation
     {
         private Dictionary<Tuple<string, string>, Timeline> INTERNAL_propertiesChanged; //todo: change this into a Hashset.
 
-        internal bool isUnApplied = false; // Note: we set this variable because the animation start is done inside a Dispatcher, so if the user Starts then Stops the animation immediately (in the same thread), we want to cancel the start of the animation.
-        internal bool IsUnapplied
+        private bool _isUnApplied = false; // Note: we set this variable because the animation start is done inside a Dispatcher, so if the user Starts then Stops the animation immediately (in the same thread), we want to cancel the start of the animation.
+        internal bool IsUnApplied
         {
-            get { return isUnApplied; }
+            get { return _isUnApplied; }
             set
             {
-                isUnApplied = value;
+                _isUnApplied = value;
                 foreach (Timeline tl in _children)
                 {
                     if (tl is AnimationTimeline)
@@ -184,7 +184,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal void Begin(FrameworkElement target, bool useTransitions, string visualStateGroupName, bool isVisualStateChange)
         {
-            this.isUnApplied = false; // Note: we set this variable because the animation start is done inside a Dispatcher, so if the user synchronously Starts then Stops then Starts an animation, we want it to be in the started state.
+            this.IsUnApplied = false; // Note: we set this variable because the animation start is done inside a Dispatcher, so if the user synchronously Starts then Stops then Starts an animation, we want it to be in the started state.
 #if MIGRATION
             Dispatcher
 #else
@@ -197,7 +197,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 try
                 {
 #endif
-                    if (!this.isUnApplied) // Note: we use this variable because the animation start is done inside a Dispatcher, so if the user Starts then Stops the animation immediately (in the same thread), we want to cancel the start of the animation.
+                    if (!this._isUnApplied) // Note: we use this variable because the animation start is done inside a Dispatcher, so if the user Starts then Stops the animation immediately (in the same thread), we want to cancel the start of the animation.
                     {
                         Guid guid = Guid.NewGuid();
                         IterationParameters parameters = new IterationParameters()
