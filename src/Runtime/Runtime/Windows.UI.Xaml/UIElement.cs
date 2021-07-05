@@ -128,7 +128,7 @@ namespace Windows.UI.Xaml
             {
                 if (visualLevel == -1)
                 {
-                    visualLevel = ((VisualTreeHelper.GetParent(this) as UIElement)?.VisualLevel ?? 0) + 1;
+                    visualLevel = (VisualTreeHelper.GetParent(this) as UIElement)?.VisualLevel + 1 ?? 0;
                 }
 
                 return visualLevel;
