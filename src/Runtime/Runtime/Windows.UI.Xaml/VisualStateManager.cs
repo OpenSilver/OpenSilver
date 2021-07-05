@@ -280,7 +280,7 @@ namespace Windows.UI.Xaml
                                 formerPropertiesChanged[formerProp].UnApply(control);
                             }
                         }
-                        lastState.Storyboard.isUnApplied = true;
+                        lastState.Storyboard.IsUnApplied = true;
                     }
                 }
 
