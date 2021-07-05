@@ -1635,7 +1635,7 @@ if ($0.tagName.toLowerCase() != 'span')
         private List<SizeChangedEventHandler> _sizeChangedEventHandlers;
         private object _resizeSensor;
 
-        private void HandleSizeChanged(string obj)
+        private void HandleSizeChanged(string argSize)
         {
             if (this._sizeChangedEventHandlers != null
                && this._sizeChangedEventHandlers.Count > 0
@@ -1645,11 +1645,11 @@ if ($0.tagName.toLowerCase() != 'span')
                 // In the current implementation, we raise the SizeChanged event only if the size has changed since the last time that we were supposed to raise the event:
 
                 Size currentSize;
-                int sepIndex = obj != null ? obj.IndexOf('|') : -1;
+                int sepIndex = argSize != null ? argSize.IndexOf('|') : -1;
                 if (sepIndex > -1)
                 {
-                    string actualWidthAsString = obj.Substring(0, sepIndex);
-                    string actualHeightAsString = obj.Substring(sepIndex + 1);
+                    string actualWidthAsString = argSize.Substring(0, sepIndex);
+                    string actualHeightAsString = argSize.Substring(sepIndex + 1);
                     double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture);
                     double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture);
                     currentSize = new Size(actualWidth, actualHeight);
@@ -1676,14 +1676,16 @@ if ($0.tagName.toLowerCase() != 'span')
             _valueOfLastSizeChanged = Size.Empty;
 
             if (this.IsUnderCustomLayout == false)
+            {
                 HandleSizeChanged(null);
 
-            if (this._sizeChangedEventHandlers != null &&
-                this._sizeChangedEventHandlers.Count > 0 &&
-                this._resizeSensor == null)
-            {
-                object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
-                this._resizeSensor = sensor;
+                if (this._sizeChangedEventHandlers != null &&
+                    this._sizeChangedEventHandlers.Count > 0 &&
+                    this._resizeSensor == null)
+                {
+                    object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
+                    this._resizeSensor = sensor;
+                }
             }
         }
 
@@ -1697,8 +1699,11 @@ if ($0.tagName.toLowerCase() != 'span')
                 }
                 if (this._resizeSensor == null && this.INTERNAL_OuterDomElement != null)
                 {
-                    object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
-                    this._resizeSensor = sensor;
+                    if (this.IsUnderCustomLayout == false)
+                    {
+                        object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
+                        this._resizeSensor = sensor;
+                    }
                 }
                 this._sizeChangedEventHandlers.Add(value);
             }

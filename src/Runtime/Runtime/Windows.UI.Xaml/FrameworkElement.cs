@@ -963,6 +963,9 @@ namespace Windows.UI.Xaml
             Point visualOffset = new Point(alignedOffset.X - containingRect.Location.X, alignedOffset.Y - containingRect.Location.Y);
 
             VisualBounds = new Rect(visualOffset, arrangedSize);
+
+            // Call SizeChanged event handlers
+            this.HandleSizeChanged($"{VisualBounds.Width}|{VisualBounds.Height}");
         }
 
         private static Point GetAlignmentOffset(Rect container, Size alignedRectSize, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment)
