@@ -318,6 +318,7 @@ namespace Windows.UI.Xaml.Controls
             viewer.ScrollToHorizontalOffset(offset);
         }
 
+#if false
         /// <summary>
         /// Scroll the ScrollViewer up by a line.
         /// </summary>
@@ -488,6 +489,7 @@ namespace Windows.UI.Xaml.Controls
 
             viewer.ScrollToVerticalOffset(viewer.ExtentHeight);
         }
+#endif
 
         /// <summary>
         /// Scroll the ScrollViewer to the left.
