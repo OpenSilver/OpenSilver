@@ -1677,7 +1677,8 @@ if ($0.tagName.toLowerCase() != 'span')
 
             if (this.IsUnderCustomLayout == false)
             {
-                HandleSizeChanged(null);
+                if (this.IsCustomLayoutRoot == false)
+                    HandleSizeChanged(null);
 
                 if (this._sizeChangedEventHandlers != null &&
                     this._sizeChangedEventHandlers.Count > 0 &&
