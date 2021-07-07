@@ -297,15 +297,19 @@ namespace Windows.UI.Xaml.Controls
         private static void Padding_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             var border = (Border)d;
-            var newPadding = (Thickness)newValue;
-            var innerDomElement = border.INTERNAL_InnerDomElement;
-            var styleOfInnerDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDomElement);
 
-            // todo: if the container has a padding, add it to the margin
-            styleOfInnerDomElement.boxSizing = "border-box";
-            styleOfInnerDomElement.padding = string.Format(CultureInfo.InvariantCulture,
-                "{0}px {1}px {2}px {3}px",
-                newPadding.Top, newPadding.Right, newPadding.Bottom, newPadding.Left);
+            if (!border.IsUnderCustomLayout)
+            {
+                var newPadding = (Thickness)newValue;
+                var innerDomElement = border.INTERNAL_InnerDomElement;
+                var styleOfInnerDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDomElement);
+
+                // todo: if the container has a padding, add it to the margin
+                styleOfInnerDomElement.boxSizing = "border-box";
+                styleOfInnerDomElement.padding = string.Format(CultureInfo.InvariantCulture,
+                    "{0}px {1}px {2}px {3}px",
+                    newPadding.Top, newPadding.Right, newPadding.Bottom, newPadding.Left);
+            }
         }
 
         protected override Size MeasureOverride(Size availableSize)

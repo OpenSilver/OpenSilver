@@ -63,7 +63,7 @@ namespace Windows.UI.Xaml
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
             if (element.IsUnderCustomLayout)
             {
-                INTERNAL_HtmlDomManager.SetPosition(style, element.RenderedVisualBounds, false, true, false);
+                INTERNAL_HtmlDomManager.SetPosition(style, element.RenderedVisualBounds, false, true, true);
             }
             else
             {
@@ -1161,7 +1161,7 @@ if ($0.tagName.toLowerCase() != 'span')
             var frameworkElement = (FrameworkElement)d;
 
             Thickness newMargin = (Thickness)newValue;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement))
+            if (!frameworkElement.IsUnderCustomLayout && INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement))
             {
                 /*
                 // Display an error if the user is setting the Margin property AFTER adding the element to the Visual Tree.

@@ -1421,42 +1421,37 @@ namespace Windows.UI.Xaml
             using (Windows.UI.Core.CoreDispatcher.INTERNAL_GetCurrentDispatcher().DisableProcessing())
 #endif
             {
-                using (DisableMeasureInvalidation())
+                bool previousArrangeValid = IsArrangeValid;
+                Rect savedPreviousFinalRect = PreviousFinalRect;
+                PreviousFinalRect = finalRect;
+                IsArrangeValid = true;
+
+                LayoutManager.Current.RemoveArrange(this);
+
+                if (Visibility != Visibility.Visible ||
+                    (previousArrangeValid && finalRect.Location.IsClose(savedPreviousFinalRect.Location) && finalRect.Size.IsClose(savedPreviousFinalRect.Size)))
+                    return;
+
+                if (!IsMeasureValid)
                 {
-                    bool previousArrangeValid = IsArrangeValid;
-                    Rect savedPreviousFinalRect = PreviousFinalRect;
-                    PreviousFinalRect = finalRect;
-                    IsArrangeValid = true;
-
-                    LayoutManager.Current.RemoveArrange(this);
-
-                    if (Visibility != Visibility.Visible ||
-                        (previousArrangeValid && finalRect.Location.IsClose(savedPreviousFinalRect.Location) && finalRect.Size.IsClose(savedPreviousFinalRect.Size)))
+                    Size previousDesiredSizeInArrange = this.DesiredSize;
+                    Measure(this.PreviousAvailableSize);
+                    if (previousDesiredSizeInArrange != this.DesiredSize)
                     {
-                        //Console.WriteLine($"Arrange previousFinalRect {this}");
-                        return;
+                        this.InvalidateArrange();
+                        this.InvalidateParentMeasure();
+                        this.InvalidateParentArrange();
                     }
-
-                    if (!IsMeasureValid)
-                    {
-                        Size previousDesiredSize = this.DesiredSize;
-                        Measure(finalRect.Size);
-                        if (previousDesiredSize != this.DesiredSize)
-                        {
-                            this.InvalidateParentMeasure();
-                            this.InvalidateParentArrange();
-                        }
-                    }
-
-                    ArrangeCore(finalRect);
-
-                    PreviousFinalRect = finalRect;
-
-                    // Render with new size & location
-                    Render();
-
-                    LayoutManager.Current.AddUpdatedElement(this);
                 }
+
+                ArrangeCore(finalRect);
+
+                PreviousFinalRect = finalRect;
+
+                // Render with new size & location
+                Render();
+
+                LayoutManager.Current.AddUpdatedElement(this);
             }
         }
 
@@ -1477,7 +1472,7 @@ namespace Windows.UI.Xaml
 
                     if (this.IsRendered == false)
                     {
-                        INTERNAL_HtmlDomManager.SetVisualBounds(uiStyle, VisualBounds, true, false, true);
+                        INTERNAL_HtmlDomManager.SetVisualBounds(uiStyle, VisualBounds, true, false, false);
                         this.IsRendered = true;
                     }
                     else

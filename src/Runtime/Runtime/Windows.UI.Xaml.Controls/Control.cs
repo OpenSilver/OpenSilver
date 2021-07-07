@@ -539,7 +539,7 @@ namespace Windows.UI.Xaml.Controls
             var control = (Control)d;
             // if the parent is a canvas, we ignore this property and we want to ignore this
             // property if there is a ControlTemplate on this control.
-            if (!(control.INTERNAL_VisualParent is Canvas) && !control.HasTemplate) 
+            if (!(control.INTERNAL_VisualParent is Canvas) && !control.HasTemplate && !control.IsUnderCustomLayout) 
             {
                 var innerDomElement = control.INTERNAL_InnerDomElement;
                 if (innerDomElement != null)
