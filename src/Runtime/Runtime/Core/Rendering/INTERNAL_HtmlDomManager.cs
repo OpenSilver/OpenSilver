@@ -39,6 +39,7 @@ using DotNetBrowser;
 using System.Windows;
 using System.Windows.Controls;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 #endif
