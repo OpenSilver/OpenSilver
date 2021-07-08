@@ -1,4 +1,4 @@
-﻿
+
 
 /*===================================================================================
 * 
@@ -99,7 +99,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(HeaderStyle),
                 typeof(Style),
                 typeof(DataGridColumn),
-                new PropertyMetadata(null, OnHeaderStyleChanged));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnHeaderStyleChanged));
 
         private static void OnHeaderStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -155,7 +155,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(CellStyle),
                 typeof(Style),
                 typeof(DataGridColumn),
-                new PropertyMetadata(null, OnCellStyleChanged));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnCellStyleChanged));
 
         private static void OnCellStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -218,7 +218,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Width),
                 typeof(DataGridLength),
                 typeof(DataGridColumn),
-                new PropertyMetadata(DataGridLength.Auto, OnWidthChanged));
+                new FrameworkPropertyMetadata(DataGridLength.Auto, FrameworkPropertyMetadataOptions.AffectsMeasure, OnWidthChanged));
 
         private static void OnWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -271,7 +271,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Visibility),
                 typeof(Visibility),
                 typeof(DataGridColumn),
-                new PropertyMetadata(Visibility.Visible, OnVisibilityChanged));
+                new FrameworkPropertyMetadata(Visibility.Visible, FrameworkPropertyMetadataOptions.AffectsParentMeasure, OnVisibilityChanged));
 
         private static void OnVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

@@ -372,6 +372,43 @@ namespace Windows.UI.Xaml.Media
             return result;
         }
 
+        /// <summary>
+        /// Get the visual tree children of an element.
+        /// </summary>
+        /// <param name="element">The element.</param>
+        /// <returns>The visual tree children of an element.</returns>
+        /// <exception cref="T:System.ArgumentNullException">
+        /// <paramref name="element"/> is null.
+        /// </exception>
+        public static IEnumerable<DependencyObject> GetVisualChildren(DependencyObject element)
+        {
+            if (element == null)
+            {
+                throw new ArgumentNullException("element");
+            }
+
+            return GetVisualChildrenAndSelfIterator(element).Skip(1);
+            return null;
+        }
+
+        /// <summary>
+        /// Get the visual tree children of an element and the element itself.
+        /// </summary>
+        /// <param name="element">The element.</param>
+        /// <returns>
+        /// The visual tree children of an element and the element itself.
+        /// </returns>
+        private static IEnumerable<DependencyObject> GetVisualChildrenAndSelfIterator(DependencyObject element)
+        {
+            yield return element;
+
+            int count = GetChildrenCount(element);
+            for (int i = 0; i < count; i++)
+            {
+                yield return GetChild(element, i);
+            }
+        }
+
 #if WORKINPROGRESS
 
         [OpenSilver.NotImplemented]

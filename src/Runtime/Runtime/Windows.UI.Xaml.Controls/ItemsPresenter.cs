@@ -199,5 +199,16 @@ namespace Windows.UI.Xaml.Controls
             // Attach children to panel
             this.Owner.Refresh(false);
         }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (ItemsHost == null)
+            {
+                return new Size();
+            }
+
+            ItemsHost.Measure(availableSize);
+            return ItemsHost.DesiredSize;
+        }
     }
 }

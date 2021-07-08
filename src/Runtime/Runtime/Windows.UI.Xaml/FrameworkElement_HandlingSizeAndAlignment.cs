@@ -61,26 +61,70 @@ namespace Windows.UI.Xaml
 #endif
 
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
-
-            // Height:
-            if (!double.IsNaN(element.Height))
-                style.height = element.Height.ToInvariantString() + "px";
-            else if (element.VerticalAlignment == VerticalAlignment.Stretch && !(element.INTERNAL_VisualParent is Canvas) && !(element is CheckBox))
-                style.height = "100%";
+            if (element.IsUnderCustomLayout)
+            {
+                INTERNAL_HtmlDomManager.SetPosition(style, element.RenderedVisualBounds, false, true, true);
+            }
             else
-                style.height = "auto";
+            {
+                // Height:
+                if (!double.IsNaN(element.Height))
+                    style.height = element.Height.ToInvariantString() + "px";
+                else if (element.VerticalAlignment == VerticalAlignment.Stretch && !(element.INTERNAL_VisualParent is Canvas) && !(element is CheckBox))
+                    style.height = "100%";
+                else
+                    style.height = "auto";
 
-            // Width:
-            if (!double.IsNaN(element.Width))
-                style.width = element.Width.ToInvariantString() + "px";
-            else if (element.HorizontalAlignment == HorizontalAlignment.Stretch && !(element.INTERNAL_VisualParent is Canvas) && !(element is CheckBox))
-                style.width = "100%";
-            else
-                style.width = "auto";
-
+                // Width:
+                if (!double.IsNaN(element.Width))
+                    style.width = element.Width.ToInvariantString() + "px";
+                else if (element.HorizontalAlignment == HorizontalAlignment.Stretch && !(element.INTERNAL_VisualParent is Canvas) && !(element is CheckBox))
+                    style.width = "100%";
+                else
+                    style.width = "auto";
+            }
 #if PERFSTAT
             Performance.Counter("Size/Alignment: INTERNAL_InitializeOuterDomElementWidthAndHeight", t0);
 #endif
+        }
+
+        /// <summary>
+        /// Enable or disable measure/arrange layout system in a sub part
+        /// </summary>
+        public bool CustomLayout
+        {
+            get { return (bool)GetValue(CustomLayoutProperty); }
+            set { SetValue(CustomLayoutProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="FrameworkElement.CustomLayout"/> dependency 
+        /// property.
+        /// </summary>
+        public static readonly DependencyProperty CustomLayoutProperty =
+            DependencyProperty.Register(
+                nameof(CustomLayout),
+                typeof(bool),
+                typeof(FrameworkElement),
+                new PropertyMetadata(false, CustomLayout_Changed));
+
+        private static void CustomLayout_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            FrameworkElement fe = d as FrameworkElement;
+            if ((bool)e.NewValue == true)
+                fe.SizeChanged += Element_SizeChanged;
+            else
+                fe.SizeChanged -= Element_SizeChanged;
+        }
+
+        private static void Element_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            FrameworkElement fe = sender as FrameworkElement;
+
+            if (fe.IsCustomLayoutRoot == false)
+                return;
+
+            fe.UpdateCustomLayout(e.NewSize);
         }
 
         #region Height property
@@ -103,7 +147,7 @@ namespace Windows.UI.Xaml
                 nameof(Height),
                 typeof(double),
                 typeof(FrameworkElement),
-                new PropertyMetadata(double.NaN)
+                new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange)
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
@@ -191,7 +235,7 @@ namespace Windows.UI.Xaml
                 nameof(Width),
                 typeof(double),
                 typeof(FrameworkElement),
-                new PropertyMetadata(double.NaN)
+                new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange)
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
@@ -281,7 +325,7 @@ namespace Windows.UI.Xaml
                 nameof(HorizontalAlignment),
                 typeof(HorizontalAlignment),
                 typeof(FrameworkElement),
-                new PropertyMetadata(HorizontalAlignment.Stretch, HorizontalAlignment_Changed)
+                new FrameworkPropertyMetadata(HorizontalAlignment.Stretch, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, HorizontalAlignment_Changed)
                 {
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
@@ -683,7 +727,7 @@ if ($0.tagName.toLowerCase() != 'span')
                 nameof(VerticalAlignment),
                 typeof(VerticalAlignment),
                 typeof(FrameworkElement),
-                new PropertyMetadata(VerticalAlignment.Stretch, VerticalAlignment_Changed)
+                new FrameworkPropertyMetadata(VerticalAlignment.Stretch, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, VerticalAlignment_Changed)
                 {
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
@@ -1104,7 +1148,7 @@ if ($0.tagName.toLowerCase() != 'span')
                 nameof(Margin),
                 typeof(Thickness),
                 typeof(FrameworkElement),
-                new PropertyMetadata(new Thickness())
+                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange)
                 {
                     MethodToUpdateDom = Margin_MethodToUpdateDom,
                 });
@@ -1117,7 +1161,7 @@ if ($0.tagName.toLowerCase() != 'span')
             var frameworkElement = (FrameworkElement)d;
 
             Thickness newMargin = (Thickness)newValue;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement))
+            if (!frameworkElement.IsUnderCustomLayout && INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement))
             {
                 /*
                 // Display an error if the user is setting the Margin property AFTER adding the element to the Visual Tree.
@@ -1260,7 +1304,7 @@ if ($0.tagName.toLowerCase() != 'span')
                 nameof(MinHeight),
                 typeof(double),
                 typeof(FrameworkElement),
-                new PropertyMetadata(0d, MinHeight_Changed)
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, MinHeight_Changed)
                 {
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
@@ -1304,7 +1348,7 @@ if ($0.tagName.toLowerCase() != 'span')
                 nameof(MinWidth),
                 typeof(double),
                 typeof(FrameworkElement),
-                new PropertyMetadata(0d, MinWidth_Changed)
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, MinWidth_Changed)
                 {
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
@@ -1345,7 +1389,7 @@ if ($0.tagName.toLowerCase() != 'span')
                 nameof(MaxHeight),
                 typeof(double),
                 typeof(FrameworkElement),
-                new PropertyMetadata(double.PositiveInfinity, MaxHeight_Changed)
+                new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, MaxHeight_Changed)
                 {
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
@@ -1389,7 +1433,7 @@ if ($0.tagName.toLowerCase() != 'span')
                 nameof(MaxWidth),
                 typeof(double),
                 typeof(FrameworkElement),
-                new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed)
+                new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, MaxWidth_Changed)
                 {
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
@@ -1505,9 +1549,9 @@ if ($0.tagName.toLowerCase() != 'span')
 #endif
                     try
                     {
-                        // Hack to improve the Simulator performance by making only one interop call rather than two:
-                        string concatenated = CSHTML5.Interop.ExecuteJavaScript("$0['offsetWidth'].toFixed(3) + '|' + $0['offsetHeight'].toFixed(3)", this.INTERNAL_OuterDomElement).ToString();
-                        int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
+                    // Hack to improve the Simulator performance by making only one interop call rather than two:
+                    string concatenated = CSHTML5.Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null) ? '0|0' : $0['offsetWidth'].toFixed(3) + '|' + $0['offsetHeight'].toFixed(3)", this.INTERNAL_OuterDomElement).ToString();
+                    int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
                         if (sepIndex > -1)
                         {
                             string actualWidthAsString = concatenated.Substring(0, sepIndex);
@@ -1591,7 +1635,7 @@ if ($0.tagName.toLowerCase() != 'span')
         private List<SizeChangedEventHandler> _sizeChangedEventHandlers;
         private object _resizeSensor;
 
-        private void HandleSizeChanged()
+        private void HandleSizeChanged(string argSize)
         {
             if (this._sizeChangedEventHandlers != null
                && this._sizeChangedEventHandlers.Count > 0
@@ -1600,7 +1644,18 @@ if ($0.tagName.toLowerCase() != 'span')
             {
                 // In the current implementation, we raise the SizeChanged event only if the size has changed since the last time that we were supposed to raise the event:
 
-                Size currentSize = this.INTERNAL_GetActualWidthAndHeight();
+                Size currentSize;
+                int sepIndex = argSize != null ? argSize.IndexOf('|') : -1;
+                if (sepIndex > -1)
+                {
+                    string actualWidthAsString = argSize.Substring(0, sepIndex);
+                    string actualHeightAsString = argSize.Substring(sepIndex + 1);
+                    double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture);
+                    double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture);
+                    currentSize = new Size(actualWidth, actualHeight);
+                }
+                else
+                    currentSize = this.INTERNAL_GetActualWidthAndHeight();
 
                 if (!Size.Equals(this._valueOfLastSizeChanged, currentSize))
                 {
@@ -1619,14 +1674,19 @@ if ($0.tagName.toLowerCase() != 'span')
         {
             // We reset the previous size value so that the SizeChanged event can be called (see the comment in "HandleSizeChanged"):
             _valueOfLastSizeChanged = Size.Empty;
-            HandleSizeChanged();
 
-            if (this._sizeChangedEventHandlers != null &&
-                this._sizeChangedEventHandlers.Count > 0 &&
-                this._resizeSensor == null)
+            if (this.IsUnderCustomLayout == false)
             {
-                object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action)this.HandleSizeChanged);
-                this._resizeSensor = sensor;
+                if (this.IsCustomLayoutRoot == false)
+                    HandleSizeChanged(null);
+
+                if (this._sizeChangedEventHandlers != null &&
+                    this._sizeChangedEventHandlers.Count > 0 &&
+                    this._resizeSensor == null)
+                {
+                    object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
+                    this._resizeSensor = sensor;
+                }
             }
         }
 
@@ -1640,8 +1700,11 @@ if ($0.tagName.toLowerCase() != 'span')
                 }
                 if (this._resizeSensor == null && this.INTERNAL_OuterDomElement != null)
                 {
-                    object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action)this.HandleSizeChanged);
-                    this._resizeSensor = sensor;
+                    if (this.IsUnderCustomLayout == false)
+                    {
+                        object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
+                        this._resizeSensor = sensor;
+                    }
                 }
                 this._sizeChangedEventHandlers.Add(value);
             }

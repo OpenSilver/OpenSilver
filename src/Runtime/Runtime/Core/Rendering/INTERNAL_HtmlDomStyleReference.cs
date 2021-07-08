@@ -21,9 +21,17 @@ using JSIL.Meta;
 #else
 using Bridge;
 #endif
+
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
+
+#if MIGRATION
+using System.Windows;
+#else
+using Windows.Foundation;
+#endif
 
 namespace CSHTML5.Internal
 {
@@ -58,12 +66,12 @@ namespace CSHTML5.Internal
             }
         }
 
-        string _domElementUniqueIdentifier;
+        internal string Uid { get; }
 
         // Note: It's important that the constructor stays Private because we need to recycle the instances that correspond to the same ID using the "GetInstance" public static method, so thateach ID always corresponds to the same instance. This is useful to ensure that private fields such as "_display" work propertly.
         private INTERNAL_HtmlDomStyleReference(string elementId)
         {
-            _domElementUniqueIdentifier = elementId;
+            Uid = elementId;
         }
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
@@ -95,7 +103,7 @@ namespace CSHTML5.Internal
 
         void SetStylePropertyValue(string propertyName, string propertyValue)
         {
-            string javaScriptCodeToExecute = "var element = document.getElementByIdSafe(\"" + _domElementUniqueIdentifier + "\");if (element) { element.style." + propertyName + " = \"" + propertyValue + "\"; } ";
+            string javaScriptCodeToExecute = "var element = document.getElementByIdSafe(\"" + Uid + "\");if (element) { element.style." + propertyName + " = \"" + propertyValue + "\"; } ";
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
 
@@ -148,6 +156,7 @@ namespace CSHTML5.Internal
         public string height { set { SetStylePropertyValue("height", value); _height = value; } get { return _height; } }
         public string left { set { SetStylePropertyValue("left", value); } }
         public string lineHeight { set { SetStylePropertyValue("lineHeight", value); } }
+        public string margin { set { SetStylePropertyValue("margin", value); } }
         public string marginBottom { set { SetStylePropertyValue("marginBottom", value); } }
         public string marginLeft { set { SetStylePropertyValue("marginLeft", value); } }
         public string marginRight { set { SetStylePropertyValue("marginRight", value); } }
@@ -193,7 +202,9 @@ namespace CSHTML5.Internal
         public string whiteSpace { set { SetStylePropertyValue("whiteSpace", value); } }
         public string width { set { SetStylePropertyValue("width", value); _width = value; } get { return _width; } }
         public string zIndex { set { SetStylePropertyValue("zIndex", value); } }
-        
+        public string gridArea { set { SetStylePropertyValue("gridArea", value); } }
+        public string visibility { set { SetStylePropertyValue("visibility", value); } }
+
         //-----------------------------------------------------------------------
         // Usage stats for To-Do Calendar (number of types each property is set):
         //-----------------------------------------------------------------------

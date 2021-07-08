@@ -119,40 +119,6 @@ namespace Windows.UI.Xaml
                                         typeof(UIElement), 
                                         null);
 
-		[OpenSilver.NotImplemented]
-        public Size DesiredSize { get; private set; }
-		[OpenSilver.NotImplemented]
-        public Size RenderSize { get; private set; }
-
-		[OpenSilver.NotImplemented]
-        public void Arrange(Rect finalRect)
-        {
-
-        }
-
-		[OpenSilver.NotImplemented]
-        public void Measure(Size availableSize)
-        {
-
-        }
-
-		[OpenSilver.NotImplemented]
-        public void InvalidateArrange()
-        {
-
-        }
-
-		[OpenSilver.NotImplemented]
-        public void InvalidateMeasure()
-        {
-
-        }
-
-		[OpenSilver.NotImplemented]
-        public void UpdateLayout()
-        {
-
-        }
 
 #if OPENSILVER
 		//

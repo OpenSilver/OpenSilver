@@ -13,8 +13,11 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using System;
 using System.Windows.Markup;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
 
 #if MIGRATION
 using System.Windows.Data;
@@ -326,6 +329,34 @@ namespace Windows.UI.Xaml.Controls
         }
 
         #endregion Private classes
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);
+            if (childElements.Count() > 0)
+            {
+                UIElement elementChild = ((UIElement)childElements.ElementAt(0));
+                elementChild.Measure(availableSize);
+                return elementChild.DesiredSize;
+            }
+
+            if (this.Content == null)
+                return new Size();
+
+            Size actualSize = new Size(Double.IsNaN(Width) ? ActualWidth : Width, Double.IsNaN(Height) ? ActualHeight : Height);
+            return actualSize;
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);
+            if (childElements.Count() > 0)
+            {
+                UIElement elementChild = ((UIElement)childElements.ElementAt(0));
+                elementChild.Arrange(new Rect(finalSize));
+            }
+            return finalSize;
+        }
     }
 }
 

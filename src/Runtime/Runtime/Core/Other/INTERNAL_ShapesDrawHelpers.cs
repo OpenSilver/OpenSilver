@@ -127,7 +127,11 @@ namespace CSHTML5.Internal
             }
             else
             {
-                shapeActualSize = frameworkElement.INTERNAL_GetActualWidthAndHeight(); //Note: in case that the framework element is constrained, it won't take the size of its canvas2d content, so we then resize the canvas2d content so that the shape stretches.
+                if (frameworkElement.IsUnderCustomLayout == false)
+                    shapeActualSize = frameworkElement.INTERNAL_GetActualWidthAndHeight(); //Note: in case that the framework element is constrained, it won't take the size of its canvas2d content, so we then resize the canvas2d content so that the shape stretches.
+                else
+                    shapeActualSize = frameworkElement.VisualBounds.Size;
+
                 if (frameworkElementWidthWasSpecified)
                     shapeActualSize.Width = frameworkElementWidth;
                 if (frameworkElementHeightWasSpecified)

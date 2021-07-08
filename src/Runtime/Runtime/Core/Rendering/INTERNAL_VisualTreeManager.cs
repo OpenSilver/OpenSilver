@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -153,6 +153,10 @@ namespace CSHTML5.Internal
 
 
                     INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
+
+                    child.InvalidateMeasure();
+                    child.InvalidateArrange();
+                    parent.InvalidateArrange();
                 }
                 else
                 {
@@ -241,6 +245,9 @@ namespace CSHTML5.Internal
                 // position of the child. We have to iterate through all the
                 // child to find it.
                 MoveVisualChildInSameParent(child, parent, newIndex);
+
+                parent.InvalidateMeasure();
+                parent.InvalidateArrange();
                 return;
             }
 
@@ -286,6 +293,9 @@ namespace CSHTML5.Internal
                             domElementWhereToPlaceChildStuff,
                             domElementToMove);
                     }
+
+                    parent.InvalidateMeasure();
+                    parent.InvalidateArrange();
                 }
             }
         }
@@ -356,6 +366,11 @@ if(nextSibling != undefined) {
                 }
 
                 INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
+
+                child.InvalidateMeasure();
+                child.InvalidateArrange();
+                parent.InvalidateMeasure();
+                parent.InvalidateArrange();
             }
         }
 
@@ -506,6 +521,9 @@ if(nextSibling != undefined) {
             bool containsNegativeMargins = (margin.Left < 0d || margin.Top < 0d || margin.Right < 0d || margin.Bottom < 0d);
             bool isADivForMarginsNeeded = !(parent is Canvas) // Note: In a Canvas, we don't want to add the additional DIV because there are no margins and we don't want to interfere with the pointer events by creating an additional DIV.
                                             && !(child is Inline); // Note: inside a TextBlock we do not want the HTML DIV because we want to create HTML SPAN elements only (otherwise there would be unwanted line returns).
+
+            if (isADivForMarginsNeeded && (parent.IsCustomLayoutRoot || parent.IsUnderCustomLayout))
+                isADivForMarginsNeeded = false;
 
             if (isADivForMarginsNeeded)
             {

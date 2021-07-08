@@ -50,6 +50,7 @@ namespace Windows.Foundation
                 _width = double.NegativeInfinity,
                 _height = double.NegativeInfinity
             };
+
             TypeFromStringConverters.RegisterConverter(typeof(Size), s => Parse(s));
         }
 
@@ -61,18 +62,10 @@ namespace Windows.Foundation
         /// <param name="height">The initial height of the instance of Windows.Foundation.Size.</param>
         public Size(double width, double height)
         {
-#if !BRIDGE
-
-            if ((!double.IsNaN(width) && width < 0) || (!double.IsNaN(height) && height < 0))
-            {
-                throw new ArgumentException("Width and Height cannot be negative.");
-            }
-#else
             if(width < 0 || height < 0)
             {
                 throw new ArgumentException("Width and Height cannot be negative.");
             }
-#endif
             this._width = width;
             this._height = height;
         }
@@ -138,7 +131,7 @@ namespace Windows.Foundation
                 this._height = value;
             }
         }
-      
+
         /// <summary>
         /// Gets a value that indicates whether this instance of
         /// Windows.Foundation.Size is Windows.Foundation.Size.Empty.
@@ -150,7 +143,7 @@ namespace Windows.Foundation
                 return this._width < 0;
             }
         }
-      
+
         /// <summary>
         /// Gets or sets the width of this instance of Windows.Foundation.Size.
         /// </summary>
@@ -263,5 +256,147 @@ namespace Windows.Foundation
             throw new FormatException(sizeAsString + " is not an eligible value for a Size");
         }
 
+    }
+    
+    internal static class SizeExtensions
+    {
+        public static bool IsWidthAuto(this Size size)
+        {
+            return double.IsNaN(size.Width);
+        }
+
+        public static bool IsHeightAuto(this Size size)
+        {
+            return double.IsNaN(size.Height);
+        }
+
+        public static bool IsPartiallyAuto(this Size size)
+        {
+            return size.IsWidthAuto() || size.IsHeightAuto();
+        }
+
+        public static bool IsAuto(this Size size)
+        {
+            return size.IsHeightAuto() && size.IsHeightAuto();
+        }
+
+        public static Size Combine(this Size size, Size fallback)
+        {
+            if (!(Double.IsNaN(size.Width) || Double.IsNaN(size.Height)))
+            {
+                return size;
+            }
+
+            if (Double.IsNaN(size.Width) && Double.IsNaN(size.Height))
+            {
+                return fallback;
+            }
+
+            return new Size(
+                Double.IsNaN(size.Width) ? fallback.Width : size.Width,
+                Double.IsNaN(size.Height) ? fallback.Height : size.Height);
+        }
+
+        public static Size Bounds(this Size size, Size minimum, Size maximum)
+        {
+            if (minimum.Width > maximum.Width || minimum.Height > maximum.Height)
+            {
+                throw new Exception($"Invalid bounds (minimum: {minimum}, maximum: {maximum})");
+            }
+
+            return size.Max(minimum).Min(maximum);
+        }
+
+
+        public static bool IsClose(this Size @this, Size size)
+        {
+            return @this.Width.IsClose(size.Width) && @this.Height.IsClose(size.Height);
+        }
+
+        public static Size Min(this Size @this, Size size)
+        {
+            if (@this.IsAuto())
+            {
+                return size;
+            }
+
+            if (size.IsAuto())
+            {
+                return @this;
+            }
+
+            if (!@this.IsPartiallyAuto() && !@size.IsPartiallyAuto())
+            {
+                if (@this.Width < size.Width && @this.Height < size.Height)
+                {
+                    return @this;
+                }
+
+                if (@this.Width >= size.Width && @this.Height >= size.Height)
+                {
+                    return size;
+                }
+            }
+
+            return new Size(
+                @this.IsWidthAuto() ? size.Width : (size.IsWidthAuto() ? @this.Width : Math.Min(@this.Width, size.Width)),
+                @this.IsHeightAuto() ? size.Height : (size.IsHeightAuto() ? @this.Height : Math.Min(@this.Height, size.Height)));
+        }
+
+        public static Size Max(this Size @this, Size size)
+        {
+            if (@this.IsAuto())
+            {
+                return size;
+            }
+
+            if (size.IsAuto())
+            {
+                return @this;
+            }
+
+            if (!@this.IsPartiallyAuto() && !@size.IsPartiallyAuto())
+            {
+                if (@this.Width > size.Width && @this.Height > size.Height)
+                {
+                    return @this;
+                }
+
+                if (@this.Width <= size.Width && @this.Height <= size.Height)
+                {
+                    return size;
+                }
+            }
+
+            return new Size(
+                @this.IsWidthAuto() ? size.Width : (size.IsWidthAuto() ? @this.Width : Math.Max(@this.Width, size.Width)),
+                @this.IsHeightAuto() ? size.Height : (size.IsHeightAuto() ? @this.Height : Math.Max(@this.Height, size.Height)));
+        }
+
+        internal static Size Add(this Size left, Size right)
+        {
+            if (right == new Size())
+            {
+                return left;
+            }
+
+            return new Size(
+                left.Width + right.Width,
+                left.Height + right.Height
+            );
+        }
+
+        public static Size Subtract(this Size left, Size right)
+        {
+            if (right == new Size())
+            {
+                return left;
+            }
+
+            return new Size(
+                Math.Max(left.Width - right.Width, 0),
+                Math.Max(left.Height - right.Height, 0)
+            );
+        }
     }
 }

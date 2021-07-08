@@ -17,8 +17,10 @@ using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+#if !MIGRATION
+using Windows.Foundation;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -159,7 +161,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the HorizontalScrollBarVisibility dependency property.
         /// </summary>
         public static readonly DependencyProperty HorizontalScrollBarVisibilityProperty =
-            DependencyProperty.Register("HorizontalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer), new PropertyMetadata(ScrollBarVisibility.Disabled, HorizontalScrollBarVisibility_Changed)
+            DependencyProperty.Register("HorizontalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer),
+                new FrameworkPropertyMetadata(ScrollBarVisibility.Disabled, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, HorizontalScrollBarVisibility_Changed)
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         static void HorizontalScrollBarVisibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -508,7 +511,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the VerticalScrollBarVisibility dependency property.
         /// </summary>
         public static readonly DependencyProperty VerticalScrollBarVisibilityProperty =
-            DependencyProperty.Register("VerticalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer), new PropertyMetadata(ScrollBarVisibility.Visible, VerticalScrollBarVisibility_Changed)
+            DependencyProperty.Register("VerticalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer),
+                new FrameworkPropertyMetadata(ScrollBarVisibility.Visible, FrameworkPropertyMetadataOptions.AffectsMeasure, VerticalScrollBarVisibility_Changed)
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         
         static void VerticalScrollBarVisibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -1343,5 +1347,57 @@ namespace Windows.UI.Xaml.Controls
 
         }
 #endif
+
+        private double ScrollBarWidth
+        {
+            get { 
+                return 20;  // Default scrollbar width
+            }
+        }
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (Content as FrameworkElement == null)
+                return new Size();
+
+            double visibleHorizontalScrollBarWidth = 0;
+            double visibleVerticalScrollBarWidth = 0;
+
+            if (HorizontalScrollBarVisibility == ScrollBarVisibility.Visible)
+                visibleHorizontalScrollBarWidth = ScrollBarWidth;
+
+            if (VerticalScrollBarVisibility == ScrollBarVisibility.Visible)
+                visibleVerticalScrollBarWidth = ScrollBarWidth;
+
+            Size size = new Size((availableSize.Width - visibleVerticalScrollBarWidth).Max(0), (availableSize.Height - visibleHorizontalScrollBarWidth).Max(0));
+
+            FrameworkElement childElement = Content as FrameworkElement;
+            childElement.Measure(size);
+
+            Size extent = new Size(childElement.DesiredSize.Width + visibleVerticalScrollBarWidth, childElement.DesiredSize.Height + visibleHorizontalScrollBarWidth);
+            return extent;
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            if (Content as FrameworkElement == null)
+                return finalSize;
+
+            double visibleHorizontalScrollBarWidth = 0;
+            double visibleVerticalScrollBarWidth = 0;
+
+            if (HorizontalScrollBarVisibility == ScrollBarVisibility.Visible)
+                visibleHorizontalScrollBarWidth = ScrollBarWidth;
+
+            if (VerticalScrollBarVisibility == ScrollBarVisibility.Visible)
+                visibleVerticalScrollBarWidth = ScrollBarWidth;
+
+            Size size = new Size((finalSize.Width - visibleVerticalScrollBarWidth).Max(0), (finalSize.Height - visibleHorizontalScrollBarWidth).Max(0));
+
+            FrameworkElement childElement = Content as FrameworkElement;
+            childElement.Arrange(new Rect(size));
+
+            return finalSize;
+        }
+
     }
 }
