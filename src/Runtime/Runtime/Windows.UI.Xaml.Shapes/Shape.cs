@@ -137,8 +137,8 @@ namespace Windows.UI.Xaml.Shapes
             DependencyProperty.Register(
                 nameof(Stretch), 
                 typeof(Stretch), 
-                typeof(Shape), 
-                new PropertyMetadata(Stretch.None, Stretch_Changed));
+                typeof(Shape),
+                new FrameworkPropertyMetadata(Stretch.None, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, Stretch_Changed));
 
         internal protected static void Stretch_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -211,8 +211,8 @@ namespace Windows.UI.Xaml.Shapes
             DependencyProperty.Register(
                 nameof(Stroke), 
                 typeof(Brush), 
-                typeof(Shape), 
-                new PropertyMetadata(null, Stroke_Changed));
+                typeof(Shape),
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, Stroke_Changed));
 
         private static void Stroke_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -235,8 +235,8 @@ namespace Windows.UI.Xaml.Shapes
             DependencyProperty.Register(
                 nameof(StrokeThickness), 
                 typeof(double), 
-                typeof(Shape), 
-                new PropertyMetadata(1d, StrokeThickness_Changed));
+                typeof(Shape),
+                new FrameworkPropertyMetadata(1d, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, StrokeThickness_Changed));
 
         private static void StrokeThickness_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1164,8 +1164,12 @@ context.restore();
                 typeof(PenLineCap), 
                 typeof(Shape), 
                 new PropertyMetadata(PenLineCap.Flat));
-
 #endif
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            return new Size();
+        }
 
     }
 }

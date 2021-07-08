@@ -18,6 +18,7 @@
 #if MIGRATION
 using System.Windows.Navigation;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml.Navigation;
 #endif
 
@@ -67,6 +68,16 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         protected virtual void OnNavigatedFrom(NavigationEventArgs e)
         {
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            return base.MeasureOverride(availableSize);
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            return base.ArrangeOverride(finalSize);
         }
     }
 }

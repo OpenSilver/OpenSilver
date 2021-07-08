@@ -83,8 +83,8 @@ namespace Windows.UI.Xaml.Shapes
             DependencyProperty.Register(
                 nameof(Data), 
                 typeof(Geometry), 
-                typeof(Path), 
-                new PropertyMetadata(null, Data_Changed));
+                typeof(Path),
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, Data_Changed));
 
         private static void Data_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

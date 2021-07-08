@@ -73,6 +73,7 @@
     <Compile Include="PublicAPI\Internal\WebRequestsHelper.cs" />
     <Compile Include="PublicAPI\Native.Html.Controls\NativeComboBox.cs" />
     <Compile Include="PublicAPI\Performance\Performance.cs" />
+    <Compile Include="System.Collections.Generic\WORKINPROGRESS\PriorityQueue.cs" />
     <Compile Include="System.Collections.ObjectModel\WORKINPROGRESS\ReadOnlyObservableCollection_1.cs" />
     <Compile Include="System.ComponentModel\CurrentChangingEventArgs.cs" />
     <Compile Include="System.ComponentModel\GroupDescription.cs" />
@@ -113,6 +114,12 @@
     <Compile Include="System.Xaml\IMarkupExtension.cs" />
     <Compile Include="System.Xml\WORKINPROGRESS\XmlSerializer.cs" />
     <Compile Include="System\TypeExtensions.cs" />
+    <Compile Include="Windows.Foundation\Disposable.cs" />
+    <Compile Include="Windows.Foundation\DoubleExtensions.cs" />
+    <Compile Include="Windows.Foundation\EventHandlerExtensions.cs" />
+    <Compile Include="Windows.Foundation\IntExtensions.cs" />
+    <Compile Include="Windows.Foundation\LayoutManager.cs" />
+    <Compile Include="Windows.Foundation\PointExtensions.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\DatePickerTextBox.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\TabPanel.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\CalendarDayButton.cs" />
@@ -129,6 +136,7 @@
     <Compile Include="Windows.UI.Xaml.Controls\DataGridRowDetailsVisibilityMode.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ExpandDirection.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\HeaderedItemsControl.cs" />
+    <Compile Include="Windows.UI.Xaml.Controls\IDefinitionBase.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\InteractionHelper.cs" />
     <Compile Include="Windows.UI.Xaml.Controls\ItemsControlHelper.cs" />
@@ -873,6 +881,7 @@
     <Compile Include="Windows.UI.Xaml\FontStyle.cs" />
     <Compile Include="Windows.UI.Xaml\FrameworkElement.cs" />
     <Compile Include="Windows.UI.Xaml\FrameworkElement_HandlingSizeAndAlignment.cs" />
+    <Compile Include="Windows.UI.Xaml\FrameworkPropertyMetadata.cs" />
     <Compile Include="Windows.UI.Xaml\FrameworkTemplate.cs" />
     <Compile Include="Windows.UI.Xaml\GridLength.cs" />
     <Compile Include="Windows.UI.Xaml\GridLengthConverter.cs" />
@@ -900,6 +909,7 @@
     <Compile Include="Windows.UI.Xaml\TemplateBindingExpression.cs" />
     <Compile Include="Windows.UI.Xaml\TemplateBindingExtension.cs" />
     <Compile Include="Windows.UI.Xaml\TextDecorationCollection.cs" />
+    <Compile Include="Windows.UI.Xaml\TextMeasurementService.cs" />
     <Compile Include="Windows.UI.Xaml\TreeWalkHelper.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEvent.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEventArgs.cs" />

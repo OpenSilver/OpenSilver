@@ -600,7 +600,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Orientation dependency property.
         /// </summary>
         public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(Slider), new PropertyMetadata(Orientation.Vertical, Orientation_Changed));
+            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(Slider),
+                new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Orientation_Changed));
 
         private static void Orientation_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

@@ -36,13 +36,12 @@ namespace Windows.UI.Xaml.Documents
 		/// <summary>
 		/// Identifies the <see cref="Block.LineHeight" /> dependency property.
 		/// </summary>
-        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty LineHeightProperty =
 			DependencyProperty.Register(
 				"LineHeight",
 				typeof(double),
 				typeof(Block),
-				new PropertyMetadata(0d));
+				new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
 		/// <summary>
 		/// Gets or sets the height of each line of content.

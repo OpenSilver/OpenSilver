@@ -16,13 +16,18 @@
 using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 using System;
+using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
 using System.Windows.Markup;
 
 #if MIGRATION
 using System.Windows.Data;
+using System.Windows.Media;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -66,7 +71,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Content),
                 typeof(object),
                 typeof(ContentControl),
-                new PropertyMetadata(null, OnContentChanged));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, OnContentChanged));
 
         private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -222,6 +227,32 @@ namespace Windows.UI.Xaml.Controls
                 BindingOperations.SetBinding(presenter, ContentPresenter.ContentProperty, new Binding("Content") { Source = this });
                 this.TemplateChild = presenter;
             }
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);
+            if (childElements.Count() > 0)
+            {
+                UIElement elementChild = ((UIElement)childElements.ElementAt(0));
+                elementChild.Measure(availableSize);
+                return elementChild.DesiredSize;
+            }
+
+            Size actualSize = new Size(Double.IsNaN(Width) ? ActualWidth : Width, Double.IsNaN(Height) ? ActualHeight : Height);
+            return actualSize;
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+
+            IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);
+            if (childElements.Count() > 0)
+            {
+                UIElement elementChild = ((UIElement)childElements.ElementAt(0));
+                elementChild.Arrange(new Rect(finalSize));
+            }
+            return finalSize;
         }
     }
 }

@@ -131,8 +131,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             DependencyProperty.Register(
                 nameof(Placement), 
                 typeof(PlacementMode), 
-                typeof(Popup), 
-                new PropertyMetadata(PlacementMode.Right));
+                typeof(Popup),
+                new FrameworkPropertyMetadata(PlacementMode.Right, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
 
         /// <summary>
         /// This boolean determines whether the popup can force its content to catch clicks.
@@ -377,8 +377,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             DependencyProperty.Register(
                 nameof(HorizontalOffset), 
                 typeof(double), 
-                typeof(Popup), 
-                new PropertyMetadata(0d, HorizontalOffset_Changed)
+                typeof(Popup),
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsArrange, HorizontalOffset_Changed)
                 { 
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
                 });
@@ -409,8 +409,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             DependencyProperty.Register(
                 nameof(VerticalOffset), 
                 typeof(double), 
-                typeof(Popup), 
-                new PropertyMetadata(0d, VerticalOffset_Changed)
+                typeof(Popup),
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsArrange, VerticalOffset_Changed)
                 { 
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
                 });
@@ -496,8 +496,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             DependencyProperty.Register(
                 nameof(VerticalContentAlignment), 
                 typeof(VerticalAlignment), 
-                typeof(Popup), 
-                new PropertyMetadata(VerticalAlignment.Top, VerticalContentAlignment_Changed)
+                typeof(Popup),
+                new FrameworkPropertyMetadata(VerticalAlignment.Top, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, VerticalContentAlignment_Changed)
                 { 
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
                 });
@@ -700,5 +700,40 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         }
 #endif
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            return new Size();
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            UIElement targetElement = this.PlacementTarget;
+
+            if (targetElement != null)
+            {
+                Point placementTargetPosition = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(targetElement);
+
+                //we get the size of the element:
+                Size elementCurrentSize;
+                if (targetElement is FrameworkElement)
+                {
+                    elementCurrentSize = ((FrameworkElement)targetElement).INTERNAL_GetActualWidthAndHeightUsinggetboudingClientRect();
+                }
+                else
+                {
+                    elementCurrentSize = new Size();
+                }
+
+                //We put the popup at the calculated position:
+                RefreshPopupPosition(placementTargetPosition, elementCurrentSize);
+            }
+
+            if (_popupRoot != null)
+            {
+                _popupRoot.InvalidateMeasure();
+                _popupRoot.InvalidateArrange();
+            }
+            return finalSize;
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿
+
 
 /*===================================================================================
 * 
@@ -217,7 +217,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(ColumnHeaderStyle),
                 typeof(Style),
                 typeof(DataGrid),
-                new PropertyMetadata(null, OnColumnHeaderStyleChanged));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnColumnHeaderStyleChanged));
 
         private static void OnColumnHeaderStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -239,7 +239,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(ColumnHeaderHeight),
                 typeof(double),
                 typeof(DataGrid),
-                new PropertyMetadata(double.NaN));
+                new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
 
         /// <summary>
         /// Gets or sets the style applied to all cells in the <see cref="DataGrid"/>.

@@ -17,8 +17,10 @@ using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+#if !MIGRATION
+using Windows.Foundation;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -59,7 +61,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Orientation dependency property
         /// </summary>
         public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(StackPanel), new PropertyMetadata(Orientation.Vertical, Orientation_Changed)
+            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(StackPanel),
+                new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Orientation_Changed)
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         static void Orientation_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -256,5 +259,90 @@ namespace Windows.UI.Xaml.Controls
 
         //    return elementToReturn;
         //}
+
+        private double GetCrossLength(Size size)
+        {
+            return Orientation == Orientation.Horizontal ? size.Height : size.Width;
+        }
+
+        private double GetMainLength(Size size)
+        {
+            return Orientation == Orientation.Horizontal ? size.Width : size.Height;
+        }
+
+        private static Size CreateSize(Orientation orientation, double mainLength, double crossLength)
+        {
+            return orientation == Orientation.Horizontal ?
+                new Size(mainLength, crossLength) :
+                new Size(crossLength, mainLength);
+        }
+
+        private static Rect CreateRect(Orientation orientation, double mainStart, double crossStart, double mainLength, double crossLength)
+        {
+            return orientation == Orientation.Horizontal ?
+                new Rect(mainStart, crossStart, mainLength, crossLength) :
+                new Rect(crossStart, mainStart, crossLength, mainLength);
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            double availableCrossLength = GetCrossLength(availableSize);
+            Size measureSize = CreateSize(Orientation, Double.PositiveInfinity, availableCrossLength);
+
+            double mainLength = 0;
+            double crossLength = 0;
+
+            UIElement[] childrens = Children.ToArray();
+            foreach (UIElement child in childrens)
+            {
+                child.Measure(measureSize);
+
+                //INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)child.INTERNAL_OuterDomElement;
+                //Console.WriteLine($"MeasureOverride StackPanel Child desired Width {domElementReference.UniqueIdentifier} {child.DesiredSize.Width}, Height {child.DesiredSize.Height}");
+
+                mainLength += GetMainLength(child.DesiredSize);
+                crossLength = Math.Max(crossLength, GetCrossLength(child.DesiredSize));
+            }
+
+            // measuredCrossLength = availableCrossLength;
+
+            return CreateSize(Orientation, mainLength, crossLength);
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            double panelMainLength = Children.Select(child => GetMainLength(child.DesiredSize)).Sum();
+            double panelCrossLength = GetCrossLength(finalSize);
+
+            //Console.WriteLine($"StackPanel panelMainLength {panelMainLength}, panelCrossLength {panelCrossLength}");
+
+            Size measureSize = CreateSize(Orientation, Double.PositiveInfinity, panelCrossLength);
+            //Console.WriteLine($"StackPanel ArrangeOverride measureSize {measureSize.Width}, {measureSize.Height}");
+
+            UIElement[] childrens = Children.ToArray();
+            foreach (UIElement child in childrens)
+            {
+                child.Measure(measureSize);
+            }
+#if WORKINPROGRESS
+            bool isNormalFlow = FlowDirection == FlowDirection.LeftToRight;
+#else
+            bool isNormalFlow = true;
+#endif
+            double childrenMainLength = 0;
+            foreach (UIElement child in childrens)
+            {
+                double childMainLength = GetMainLength(child.DesiredSize);
+                double childMainStart = isNormalFlow ? childrenMainLength : panelMainLength - childrenMainLength - childMainLength;
+
+                //Console.WriteLine($"StackPanel ArrangeOverride childMainLength {childMainLength}, childMainStart {childMainStart}");
+
+                child.Arrange(CreateRect(Orientation, childMainStart, 0, childMainLength, panelCrossLength));
+
+                childrenMainLength += childMainLength;
+            }
+
+            return CreateSize(Orientation, GetMainLength(finalSize), panelCrossLength);
+        }
     }
 }

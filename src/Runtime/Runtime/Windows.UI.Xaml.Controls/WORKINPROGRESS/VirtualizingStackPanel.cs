@@ -93,6 +93,17 @@ namespace Windows.UI.Xaml.Controls
 		{
 			element.SetValue(VirtualizationModeProperty, value);
 		}
+
+        [OpenSilver.NotImplemented]
+		protected override Size MeasureOverride(Size availableSize)
+		{
+			throw new NotImplementedException("The method or operation is not implemented.");
+		}
+        [OpenSilver.NotImplemented]
+		protected override Size ArrangeOverride(Size finalSize)
+		{
+			throw new NotImplementedException("The method or operation is not implemented.");
+		}
 	}
 }
 #endif

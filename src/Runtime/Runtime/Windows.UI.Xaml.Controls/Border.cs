@@ -25,6 +25,7 @@ using System.Windows.Markup;
 #if MIGRATION
 using System.Windows.Media;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml.Media;
 #endif
 
@@ -221,8 +222,8 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(BorderThickness), 
                 typeof(Thickness), 
-                typeof(Border), 
-                new PropertyMetadata(new Thickness()) 
+                typeof(Border),
+                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
                 { 
                     MethodToUpdateDom = BorderThickness_MethodToUpdateDom
                 });
@@ -287,8 +288,8 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(Padding), 
                 typeof(Thickness), 
-                typeof(Border), 
-                new PropertyMetadata(new Thickness()) 
+                typeof(Border),
+                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
                 { 
                     MethodToUpdateDom = Padding_MethodToUpdateDom
                 });
@@ -296,15 +297,46 @@ namespace Windows.UI.Xaml.Controls
         private static void Padding_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             var border = (Border)d;
-            var newPadding = (Thickness)newValue;
-            var innerDomElement = border.INTERNAL_InnerDomElement;
-            var styleOfInnerDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDomElement);
 
-            // todo: if the container has a padding, add it to the margin
-            styleOfInnerDomElement.boxSizing = "border-box";
-            styleOfInnerDomElement.padding = string.Format(CultureInfo.InvariantCulture,
-                "{0}px {1}px {2}px {3}px",
-                newPadding.Top, newPadding.Right, newPadding.Bottom, newPadding.Left);
+            if (!border.IsUnderCustomLayout)
+            {
+                var newPadding = (Thickness)newValue;
+                var innerDomElement = border.INTERNAL_InnerDomElement;
+                var styleOfInnerDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDomElement);
+
+                // todo: if the container has a padding, add it to the margin
+                styleOfInnerDomElement.boxSizing = "border-box";
+                styleOfInnerDomElement.padding = string.Format(CultureInfo.InvariantCulture,
+                    "{0}px {1}px {2}px {3}px",
+                    newPadding.Top, newPadding.Right, newPadding.Bottom, newPadding.Left);
+            }
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (Child == null)
+            {
+                return new Size();
+            }
+
+            Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
+            Size PaddingSize = new Size(Padding.Left + Padding.Right, Padding.Top + Padding.Bottom);
+            Child.Measure(availableSize.Subtract(BorderThicknessSize).Subtract(PaddingSize).Max(new Size()));
+            return Child.DesiredSize.Add(BorderThicknessSize).Add(PaddingSize);
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            if (Child != null)
+            {
+                Point PaddingLocation = new Point(Padding.Left, Padding.Top);
+                Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
+                Size PaddingSize = new Size(Padding.Left + Padding.Right, Padding.Top + Padding.Bottom);
+                
+                Child.Arrange(new Rect(PaddingLocation, finalSize.Subtract(BorderThicknessSize).Subtract(PaddingSize).Max(new Size())));
+            }
+
+            return finalSize;
         }
     }
 }
