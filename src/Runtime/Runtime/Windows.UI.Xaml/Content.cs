@@ -15,6 +15,7 @@
 
 using CSHTML5;
 using System;
+using CSHTML5.Internal;
 
 #if MIGRATION
 #if WORKINPROGRESS
@@ -28,6 +29,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
 {
     public partial class Content
     {
+        private readonly IResizeObserver _sizeObserver;
         public Content() : this(false)
         {
         }
@@ -40,8 +42,10 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
                 CSHTML5.Interop.ExecuteJavaScript(@"document.addEventListener('fullscreenchange', $0)", new Action(FullScreenChangedCallback));
 
                 // Hooks the Resized event
-                CSHTML5.Interop.ExecuteJavaScript("new ResizeSensor(document.getElementById($0), $1)", Application.ApplicationRootDomElementId, new Action(WindowResizeCallback));
-
+                this._sizeObserver = ResizeObserverFactory.Create();
+                var applicationRoot = CSHTML5.Interop.ExecuteJavaScript("document.getElementById($0)", Application.ApplicationRootDomElementId);
+                this._sizeObserver.Observe(applicationRoot, WindowResizeCallback);
+                
                 // WORKINPROGRESS
                 // Add Zoomed event
             }
@@ -155,7 +159,7 @@ if (requestMethod) {
         /// Called when the window gets resized.
         /// Fires the <see cref="Resized"/> event.
         /// </summary>
-        private void WindowResizeCallback()
+        private void WindowResizeCallback(string width, string height)
         {
             this.Resized?.Invoke(this, EventArgs.Empty);
         }

@@ -1433,14 +1433,14 @@ if ($0.tagName.toLowerCase() != 'span')
                     else
                     {
 #endif
-                        try
-                        {
-                            return Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(this.INTERNAL_OuterDomElement, "offsetWidth"));
-                        }
-                        catch
-                        {
-                            return 0d;
-                        }
+                    try
+                    {
+                        return Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(this.INTERNAL_OuterDomElement, "offsetWidth"));
+                    }
+                    catch
+                    {
+                        return 0d;
+                    }
 #if !CSHTML5NETSTANDARD
                     }
 #endif
@@ -1468,14 +1468,14 @@ if ($0.tagName.toLowerCase() != 'span')
                     else
                     {
 #endif
-                        try
-                        {
-                            return Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(this.INTERNAL_OuterDomElement, "offsetHeight"));
-                        }
-                        catch
-                        {
-                            return 0d;
-                        }
+                    try
+                    {
+                        return Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(this.INTERNAL_OuterDomElement, "offsetHeight"));
+                    }
+                    catch
+                    {
+                        return 0d;
+                    }
 #if !CSHTML5NETSTANDARD
                     }
 #endif
@@ -1494,39 +1494,39 @@ if ($0.tagName.toLowerCase() != 'span')
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && this.INTERNAL_OuterDomElement != null)
             {
 #if !CSHTML5NETSTANDARD
-                if (IsRunningInJavaScript())
-                {
-                    double actualWidth = this.INTERNAL_OuterDomElement.offsetWidth;
-                    double actualHeight = this.INTERNAL_OuterDomElement.offsetHeight;
-                    return new Size(actualWidth, actualHeight);
-                }
-                else
-                {
+                            if (IsRunningInJavaScript())
+                            {
+                                double actualWidth = this.INTERNAL_OuterDomElement.offsetWidth;
+                                double actualHeight = this.INTERNAL_OuterDomElement.offsetHeight;
+                                return new Size(actualWidth, actualHeight);
+                            }
+                            else
+                            {
 #endif
-                    try
+                try
+                {
+                    // Hack to improve the Simulator performance by making only one interop call rather than two:
+                    string concatenated = CSHTML5.Interop.ExecuteJavaScript("$0['offsetWidth'].toFixed(3) + '|' + $0['offsetHeight'].toFixed(3)", this.INTERNAL_OuterDomElement).ToString();
+                    int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
+                    if (sepIndex > -1)
                     {
-                        // Hack to improve the Simulator performance by making only one interop call rather than two:
-                        string concatenated = CSHTML5.Interop.ExecuteJavaScript("$0['offsetWidth'].toFixed(3) + '|' + $0['offsetHeight'].toFixed(3)", this.INTERNAL_OuterDomElement).ToString();
-                        int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
-                        if (sepIndex > -1)
-                        {
-                            string actualWidthAsString = concatenated.Substring(0, sepIndex);
-                            string actualHeightAsString = concatenated.Substring(sepIndex + 1);
-                            double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
-                            double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
+                        string actualWidthAsString = concatenated.Substring(0, sepIndex);
+                        string actualHeightAsString = concatenated.Substring(sepIndex + 1);
+                        double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                        double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
                             return new Size(actualWidth, actualHeight);
-                        }
-                        else
-                        {
-                            return new Size(0d, 0d);
-                        }
                     }
-                    catch
+                    else
                     {
                         return new Size(0d, 0d);
                     }
-#if !CSHTML5NETSTANDARD
                 }
+                catch
+                {
+                    return new Size(0d, 0d);
+                }
+#if !CSHTML5NETSTANDARD
+                            }
 #endif
             }
             else
@@ -1542,40 +1542,40 @@ if ($0.tagName.toLowerCase() != 'span')
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && this.INTERNAL_OuterDomElement != null)
             {
 #if !CSHTML5NETSTANDARD
-                if (IsRunningInJavaScript())
-                {
-                    var rect = this.INTERNAL_OuterDomElement.getBoundingClientRect();
-                    double actualWidth = rect.width;
-                    double actualHeight = rect.height;
-                    return new Size(actualWidth, actualHeight);
-                }
-                else
-                {
+                            if (IsRunningInJavaScript())
+                            {
+                                var rect = this.INTERNAL_OuterDomElement.getBoundingClientRect();
+                                double actualWidth = rect.width;
+                                double actualHeight = rect.height;
+                                return new Size(actualWidth, actualHeight);
+                            }
+                            else
+                            {
 #endif
-                    try
+                try
+                {
+                    // Hack to improve the Simulator performance by making only one interop call rather than two:
+                    string concatenated = CSHTML5.Interop.ExecuteJavaScript("(function() { var v = $0.getBoundingClientRect(); return v.width.toFixed(3) + '|' + v.height.toFixed(3) })()", this.INTERNAL_OuterDomElement).ToString();
+                    int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
+                    if (sepIndex > -1)
                     {
-                        // Hack to improve the Simulator performance by making only one interop call rather than two:
-                        string concatenated = CSHTML5.Interop.ExecuteJavaScript("(function() { var v = $0.getBoundingClientRect(); return v.width.toFixed(3) + '|' + v.height.toFixed(3) })()", this.INTERNAL_OuterDomElement).ToString();
-                        int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
-                        if (sepIndex > -1)
-                        {
-                            string actualWidthAsString = concatenated.Substring(0, sepIndex);
-                            string actualHeightAsString = concatenated.Substring(sepIndex + 1);
-                            double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
-                            double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
-                            return new Size(actualWidth, actualHeight);
-                        }
-                        else
-                        {
-                            return new Size(0d, 0d);
-                        }
+                        string actualWidthAsString = concatenated.Substring(0, sepIndex);
+                        string actualHeightAsString = concatenated.Substring(sepIndex + 1);
+                        double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                        double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
+                        return new Size(actualWidth, actualHeight);
                     }
-                    catch
+                    else
                     {
                         return new Size(0d, 0d);
                     }
-#if !CSHTML5NETSTANDARD
                 }
+                catch
+                {
+                    return new Size(0d, 0d);
+                }
+#if !CSHTML5NETSTANDARD
+                            }
 #endif
             }
             else
@@ -1589,14 +1589,31 @@ if ($0.tagName.toLowerCase() != 'span')
 
         Size _valueOfLastSizeChanged = new Size(0d, 0d);
         private List<SizeChangedEventHandler> _sizeChangedEventHandlers;
-        private object _resizeSensor;
+        private static readonly IResizeObserver _resizeObserver = ResizeObserverFactory.Create();
+        private bool _isObserved = false;
 
-        private void HandleSizeChanged()
+        private void SizeChangedCallback(string width, string height)
         {
+            double.TryParse(width, out var widthValue);
+            double.TryParse(height, out var heightValue);
+            var currentSize = new Size(widthValue, heightValue);
+
+            // Raise the "SizeChanged" event of all the listeners:
+            foreach (var sizeChangedEventHandler in this._sizeChangedEventHandlers)
+            {
+                sizeChangedEventHandler(this, new SizeChangedEventArgs(currentSize));
+            }
+        }
+
+        internal void INTERNAL_SizeChangedWhenAttachedToVisualTree() // Intended to be called by the "VisualTreeManager" when the FrameworkElement is attached to the visual tree.
+        {
+            // We reset the previous size value so that the SizeChanged event can be called (see the comment in "HandleSizeChanged"):
+            _valueOfLastSizeChanged = Size.Empty;
+
             if (this._sizeChangedEventHandlers != null
-               && this._sizeChangedEventHandlers.Count > 0
-               && INTERNAL_VisualTreeManager.IsElementInVisualTree(this)
-               && this._isLoaded)
+   && this._sizeChangedEventHandlers.Count > 0
+   && INTERNAL_VisualTreeManager.IsElementInVisualTree(this)
+   && this._isLoaded)
             {
                 // In the current implementation, we raise the SizeChanged event only if the size has changed since the last time that we were supposed to raise the event:
 
@@ -1613,20 +1630,13 @@ if ($0.tagName.toLowerCase() != 'span')
                     }
                 }
             }
-        }
-
-        internal void INTERNAL_SizeChangedWhenAttachedToVisualTree() // Intended to be called by the "VisualTreeManager" when the FrameworkElement is attached to the visual tree.
-        {
-            // We reset the previous size value so that the SizeChanged event can be called (see the comment in "HandleSizeChanged"):
-            _valueOfLastSizeChanged = Size.Empty;
-            HandleSizeChanged();
 
             if (this._sizeChangedEventHandlers != null &&
                 this._sizeChangedEventHandlers.Count > 0 &&
-                this._resizeSensor == null)
+                !this._isObserved)
             {
-                object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action)this.HandleSizeChanged);
-                this._resizeSensor = sensor;
+                _resizeObserver.Observe(this.INTERNAL_OuterDomElement, this.SizeChangedCallback);
+                this._isObserved = true;
             }
         }
 
@@ -1638,11 +1648,13 @@ if ($0.tagName.toLowerCase() != 'span')
                 {
                     this._sizeChangedEventHandlers = new List<SizeChangedEventHandler>();
                 }
-                if (this._resizeSensor == null && this.INTERNAL_OuterDomElement != null)
+
+                if (!this._isObserved && this.INTERNAL_OuterDomElement != null)
                 {
-                    object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action)this.HandleSizeChanged);
-                    this._resizeSensor = sensor;
+                    _resizeObserver.Observe(this.INTERNAL_OuterDomElement, this.SizeChangedCallback);
+                    this._isObserved = true;
                 }
+
                 this._sizeChangedEventHandlers.Add(value);
             }
             remove
@@ -1654,10 +1666,10 @@ if ($0.tagName.toLowerCase() != 'span')
 
                 if (this._sizeChangedEventHandlers.Remove(value))
                 {
-                    if (this._sizeChangedEventHandlers.Count == 0 && this._resizeSensor != null)
+                    if (this._sizeChangedEventHandlers.Count == 0 && this._isObserved)
                     {
-                        CSHTML5.Interop.ExecuteJavaScript("$0.detach($1)", this._resizeSensor, this.INTERNAL_OuterDomElement);
-                        this._resizeSensor = null;
+                        _resizeObserver.Unobserve(this.INTERNAL_OuterDomElement);
+                        this._isObserved = false;
                     }
                 }
             }
