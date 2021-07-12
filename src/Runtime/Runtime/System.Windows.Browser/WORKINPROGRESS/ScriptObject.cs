@@ -38,7 +38,7 @@ namespace System.Windows.Browser
 
         }
 #endif
-   
+
         /// <summary>
         /// Gets an instance of the dispatcher.
         /// </summary>
@@ -46,7 +46,7 @@ namespace System.Windows.Browser
         /// The dispatcher associated with the user interface (UI) thread.
         /// </returns>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
 #if MIGRATION
         public Dispatcher Dispatcher { get; }
 #else
@@ -71,12 +71,12 @@ namespace System.Windows.Browser
         /// thread.
         /// </returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         public bool CheckAccess()
         {
             return false;
         }
-   
+
         /// <summary>
         /// Converts the current scriptable object to a specified type.
         /// </summary>
@@ -89,7 +89,7 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentException">
         /// The conversion failed or is not supported.
         /// </exception>
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         public T ConvertTo<T>()
         {
             return default(T);
@@ -106,12 +106,11 @@ namespace System.Windows.Browser
         /// A null reference if the property does not exist or
         /// if the underlying <see cref="ScriptObject"/> is a managed type.
         /// </returns>
-		[OpenSilver.NotImplemented]
         public object GetProperty(int index)
         {
-            return null;
+            return GetProperty(index.ToString());
         }
-     
+
         /// <summary>
         /// Gets the value of a property that is identified by name on the current scriptable
         /// object.
@@ -129,10 +128,29 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentException">
         /// name is an empty string.-or-name contains an embedded null character (\0).
         /// </exception>
-		[OpenSilver.NotImplemented]
         public virtual object GetProperty(string name)
         {
-            return null;
+            var result = default(object);
+
+            if (name is null)
+            {
+                throw new ArgumentNullException(name);
+            }
+            else if (string.IsNullOrEmpty(name) || name.Contains("\\0"))
+            {
+                throw new ArgumentException($"{nameof(name)} is an empty string or contains an embedded null character (\0)");
+            }
+
+            var jsObject = CSHTML5.Interop.ExecuteJavaScript(name);
+
+            if (!jsObject.ToString().Equals("undefined"))
+            {
+                result = jsObject;
+            }
+
+            // TODO: Check if the underlying ScriptObject is a managed type
+
+            return result;
         }
 
         /// <summary>
