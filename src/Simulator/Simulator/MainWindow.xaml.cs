@@ -45,6 +45,7 @@ using DotNetForHtml5.EmulatorWithoutJavascript.Debugging;
 using DotNetBrowser.Events;
 using DotNetForHtml5.EmulatorWithoutJavascript.Console;
 using System.Windows.Media.Imaging;
+using OpenSilver.Simulator;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
@@ -160,6 +161,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             context.NetworkService.NetworkDelegate = new ResourceInterceptor("http://cshtml5-simulator/");
             Browser browser = BrowserFactory.Create(context, BrowserType.LIGHTWEIGHT);
             MainWebBrowser = new WPFBrowserView(browser);
+            CookiesHelper.SetCustomCookies(MainWebBrowser);
             MainWebBrowser.Width = 150;
             MainWebBrowser.Height = 200;
             MainWebBrowser.SizeChanged += MainWebBrowser_SizeChanged;

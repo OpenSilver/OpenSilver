@@ -15,7 +15,9 @@
 
 
 
+using DotNetBrowser;
 using DotNetBrowser.WPF;
+using OpenSilver.Simulator;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -80,5 +82,24 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 MessageBox.Show(numberOfDeletedCookies.ToString() + " cookies have been deleted.");
             }
         }
+
+        public static void SetCustomCookies(WPFBrowserView wpfBrowserView)
+        {
+            if (SimulatorLauncher.CookiesData == null)
+                return;
+
+            foreach (CookieData data in SimulatorLauncher.CookiesData)
+            {
+                if (data.session)
+                {
+                    wpfBrowserView.Browser.CookieStorage.SetSessionCookie(data.url, data.name, data.value, data.domain, data.path, data.secure, data.httpOnly);
+                }
+                else
+                {
+                    wpfBrowserView.Browser.CookieStorage.SetCookie(data.url, data.name, data.value, data.domain, data.path, data.expirationTime, data.secure, data.httpOnly);
+                }
+            }
+        }
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DotNetForHtml5.EmulatorWithoutJavascript;
 using System;
+using System.Collections.Generic;
 
 #if OPENSILVER
 namespace OpenSilver.Simulator
@@ -9,8 +10,10 @@ namespace CSHTML5.Simulator
 {
     public static class SimulatorLauncher
     {
+        public static IList<CookieData> CookiesData { get; set; }
         public static int Start(SimulatorLaunchParameters parameters = null)
         {
+            CookiesData = parameters.CookiesData;
             App app = new App();
             app.InitializeComponent();
             return app.Run();
