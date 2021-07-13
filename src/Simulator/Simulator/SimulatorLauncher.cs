@@ -13,6 +13,7 @@ namespace CSHTML5.Simulator
 #if OPENSILVER
         public static int Start(Type userApplicationType, SimulatorLaunchParameters parameters = null)
         {
+            CookiesData = parameters.CookiesData;
             App app = new App();
             app.InitializeComponent();
             return app.Run(new MainWindow(userApplicationType, parameters));
