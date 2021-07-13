@@ -31,12 +31,6 @@ namespace System.Windows.Resources
     {
         /// <summary>
         /// Initializes a new instance of the System.Windows.Resources.StreamResourceInfo
-        /// class.
-        /// </summary>
-        public StreamResourceInfo(){ } //don't know what this is good for since Stream and ContentType are both read-only.
-       
-        /// <summary>
-        /// Initializes a new instance of the System.Windows.Resources.StreamResourceInfo
         /// class based on a provided stream.
         /// </summary>
         /// <param name="stream">The reference stream.</param>

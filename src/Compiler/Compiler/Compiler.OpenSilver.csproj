@@ -97,6 +97,7 @@
     <Compile Include="EntryPoints\BeforeXamlPreprocessor.cs" />
     <Compile Include="EntryPoints\AfterXamlPreprocessor.cs" />
     <Compile Include="EntryPoints\EntryPointGenerator.cs" />
+    <Compile Include="EntryPoints\ResourcesGenerator.cs" />
     <Compile Include="EntryPoints\ResXProcessor.cs" />
     <Compile Include="EntryPoints\Wrapper_BridgeVersion.cs" />
     <Compile Include="EntryPoints\OutputPathsEraser.cs" />

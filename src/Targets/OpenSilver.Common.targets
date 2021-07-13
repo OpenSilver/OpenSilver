@@ -37,6 +37,7 @@
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AfterXamlPreprocessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.OutputPathsEraser" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesExtractorAndCopier" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesGenerator" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.Wrapper_BridgeVersion" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.TypeScriptDefToCSharp" />
 
@@ -73,6 +74,13 @@
       CSharpXamlForHtml5BeforeBuild;
       $(BuildDependsOn);
     </BuildDependsOn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PrepareResourcesDependsOn>
+      MainResourcesGeneration;
+      $(PrepareResourcesDependsOn)
+    </PrepareResourcesDependsOn>
   </PropertyGroup>
 
   <!--============================================================
@@ -153,11 +161,48 @@
       Change the names of the EmbeddedResources so they keep their original names.
    ============================================================-->
   <Target Name="ModifyEmbeddedResourceNames" BeforeTargets="CreateManifestResourceNames">
+<!--    <ItemGroup>-->
+<!--      <EmbeddedResource>-->
+<!--        <LogicalName Condition="'%(EmbeddedResource.Extension)' != '.resx'">%(EmbeddedResource.Identity)</LogicalName>-->
+<!--      </EmbeddedResource>-->
+<!--    </ItemGroup>-->
+  </Target>
+
+  <!--============================================================
+  MainResourcesGeneration
+  ============================================================-->
+  
+  <Target Name="MainResourcesGeneration" Condition="'$(IsSecondPass)' == 'True' And '@(Resource)' != '' And '$(IsBrowserProject)' == 'false'">
+    
+    <PropertyGroup>
+      <ResourceNameInMainAssembly Condition="'$(UICulture)' == ''">$(AssemblyName).g.resources</ResourceNameInMainAssembly>
+      <ResourceNameInMainAssembly Condition="'$(UICulture)' != ''">$(AssemblyName).unlocalizable.g.resources</ResourceNameInMainAssembly>
+    </PropertyGroup>
+
+    <ResourcesGenerator
+        ResourceFiles="@(Resource)"
+        OutputResourcesFile="$(IntermediateOutputPath)$(ResourceNameInMainAssembly)">
+
+      <!--    ==== original code ====    -->
+      <!--    <ResourcesGenerator-->
+      <!--        ResourceFiles="@(MainEmbeddedFiles)"-->
+      <!--        OutputPath="$(IntermediateOutputPath)"-->
+      <!--        OutputResourcesFile="$(IntermediateOutputPath)$(_ResourceNameInMainAssembly)"-->
+      <!--        Condition="'@(MainEmbeddedFiles)' != ''">-->
+
+      <!-- Put the generated files in item FileWrites so that they can be cleaned up appropriately in a next Rebuild -->
+      <Output ItemName="FileWrites" TaskParameter="OutputResourcesFile" />
+    </ResourcesGenerator>
+
     <ItemGroup>
-      <EmbeddedResource>
-        <LogicalName Condition="'%(EmbeddedResource.Extension)' != '.resx'">%(EmbeddedResource.Identity)</LogicalName>
+      <EmbeddedResource Include="$(IntermediateOutputPath)$(ResourceNameInMainAssembly)">
+        <GenerateResource>false</GenerateResource>
+        <Type>Resx</Type>
+        <WithCulture>false</WithCulture>
+        <OutputResource>$(IntermediateOutputPath)$(ResourceNameInMainAssembly)</OutputResource>
       </EmbeddedResource>
     </ItemGroup>
+    
   </Target>
 
   <!--============================================================
@@ -263,8 +308,8 @@
       <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.js' Or '%(Content.Extension)'=='.css' Or '%(Content.Extension)'=='.png' Or '%(Content.Extension)'=='.jpg' Or '%(Content.Extension)'=='.gif' Or '%(Content.Extension)'=='.ico' Or '%(Content.Extension)'=='.mp4' Or '%(Content.Extension)'=='.ogv' Or '%(Content.Extension)'=='.webm' Or '%(Content.Extension)'=='.3gp' Or '%(Content.Extension)'=='.mp3' Or '%(Content.Extension)'=='.ogg' Or '%(Content.Extension)'=='.txt' Or '%(Content.Extension)'=='.xml' Or '%(Content.Extension)'=='.ttf' Or '%(Content.Extension)'=='.woff' Or '%(Content.Extension)'=='.cur' Or '%(Content.Extension)'=='.json' Or '%(Content.Extension)'=='.config' Or '%(Content.Extension)'=='.ClientConfig' Or '%(Content.Extension)'=='.htm' Or '%(Content.Extension)'=='.html' Or '%(Content.Extension)'=='.svg' Or '%(Content.Extension)'=='.resx'"/>
       <EmbeddedResource Include="@(None)" Condition="'%(None.Extension)'=='.config' Or '%(None.Extension)'=='.ClientConfig'"/>
       <None Remove="@(None)" Condition="'%(None.Extension)'=='.config' Or '%(None.Extension)'=='.ClientConfig'"/>
-      <EmbeddedResource Include="@(Resource)" Condition="'%(Resource.Extension)'=='.js' Or '%(Resource.Extension)'=='.css' Or '%(Resource.Extension)'=='.png' Or '%(Resource.Extension)'=='.jpg' Or '%(Resource.Extension)'=='.gif' Or '%(Resource.Extension)'=='.ico' Or '%(Resource.Extension)'=='.mp4' Or '%(Resource.Extension)'=='.ogv' Or '%(Resource.Extension)'=='.webm' Or '%(Resource.Extension)'=='.3gp' Or '%(Resource.Extension)'=='.mp3' Or '%(Resource.Extension)'=='.ogg' Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.ttf' Or '%(Resource.Extension)'=='.woff' Or '%(Resource.Extension)'=='.cur' Or '%(Resource.Extension)'=='.json' Or '%(Resource.Extension)'=='.config'  Or '%(Resource.Extension)'=='.ClientConfig' Or '%(Resource.Extension)'=='.htm' Or '%(Resource.Extension)'=='.html' Or '%(Resource.Extension)'=='.svg' Or '%(Resource.Extension)'=='.resx' "/>
-      <Resource Remove="@(Resource)" Condition="'%(Resource.Extension)'=='.js' Or '%(Resource.Extension)'=='.css' Or '%(Resource.Extension)'=='.png' Or '%(Resource.Extension)'=='.jpg' Or '%(Resource.Extension)'=='.gif' Or '%(Resource.Extension)'=='.ico' Or '%(Resource.Extension)'=='.mp4' Or '%(Resource.Extension)'=='.ogv' Or '%(Resource.Extension)'=='.webm' Or '%(Resource.Extension)'=='.3gp' Or '%(Resource.Extension)'=='.mp3' Or '%(Resource.Extension)'=='.ogg' Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.ttf' Or '%(Resource.Extension)'=='.woff' Or '%(Resource.Extension)'=='.cur' Or '%(Resource.Extension)'=='.json' Or '%(Resource.Extension)'=='.config'  Or '%(Resource.Extension)'=='.ClientConfig' Or '%(Resource.Extension)'=='.htm' Or '%(Resource.Extension)'=='.html' Or '%(Resource.Extension)'=='.svg' Or '%(Resource.Extension)'=='.resx'"/>
+      <!--<EmbeddedResource Include="@(Resource)" Condition="'%(Resource.Extension)'=='.js' Or '%(Resource.Extension)'=='.css' Or '%(Resource.Extension)'=='.png' Or '%(Resource.Extension)'=='.jpg' Or '%(Resource.Extension)'=='.gif' Or '%(Resource.Extension)'=='.ico' Or '%(Resource.Extension)'=='.mp4' Or '%(Resource.Extension)'=='.ogv' Or '%(Resource.Extension)'=='.webm' Or '%(Resource.Extension)'=='.3gp' Or '%(Resource.Extension)'=='.mp3' Or '%(Resource.Extension)'=='.ogg' Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.ttf' Or '%(Resource.Extension)'=='.woff' Or '%(Resource.Extension)'=='.cur' Or '%(Resource.Extension)'=='.json' Or '%(Resource.Extension)'=='.config'  Or '%(Resource.Extension)'=='.ClientConfig' Or '%(Resource.Extension)'=='.htm' Or '%(Resource.Extension)'=='.html' Or '%(Resource.Extension)'=='.svg' Or '%(Resource.Extension)'=='.resx' "/>
+      <Resource Remove="@(Resource)" Condition="'%(Resource.Extension)'=='.js' Or '%(Resource.Extension)'=='.css' Or '%(Resource.Extension)'=='.png' Or '%(Resource.Extension)'=='.jpg' Or '%(Resource.Extension)'=='.gif' Or '%(Resource.Extension)'=='.ico' Or '%(Resource.Extension)'=='.mp4' Or '%(Resource.Extension)'=='.ogv' Or '%(Resource.Extension)'=='.webm' Or '%(Resource.Extension)'=='.3gp' Or '%(Resource.Extension)'=='.mp3' Or '%(Resource.Extension)'=='.ogg' Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.ttf' Or '%(Resource.Extension)'=='.woff' Or '%(Resource.Extension)'=='.cur' Or '%(Resource.Extension)'=='.json' Or '%(Resource.Extension)'=='.config'  Or '%(Resource.Extension)'=='.ClientConfig' Or '%(Resource.Extension)'=='.htm' Or '%(Resource.Extension)'=='.html' Or '%(Resource.Extension)'=='.svg' Or '%(Resource.Extension)'=='.resx'"/>-->
     </ItemGroup>
 
     <!--============================================================

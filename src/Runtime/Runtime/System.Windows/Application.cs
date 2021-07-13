@@ -26,6 +26,11 @@ using System.Text;
 using System.Reflection;
 using DotNetForHtml5.Core;
 
+#if OPENSILVER
+using System.Resources;
+using OpenSilver.Internal;
+#endif
+
 #if MIGRATION
 using System.ApplicationModel.Activation;
 using System.Windows.Controls;
@@ -459,6 +464,74 @@ namespace Windows.UI.Xaml
         /// A System.Windows.Resources.StreamResourceInfo that contains a resource stream
         /// for resource data file that is located at the specified System.Uri.
         /// </returns>
+#if OPENSILVER
+        public static StreamResourceInfo GetResourceStream(Uri uriResource)
+        {
+            // This function retrieve files with a build action of Resource (if the uri is a component uri) or Content (if it is not).
+            // For files with a build action of EmbeddedResource, see Assembly.GetManifestResourceStream().
+            
+            if (uriResource == null)
+                throw new ArgumentNullException(nameof(uriResource));
+            if (uriResource.IsAbsoluteUri)
+                throw new ArgumentException("Expected relative Uri, found absolute.");
+
+            StreamResourceInfo streamResourceInfo = null;
+
+            if (IsComponentUri(uriResource))
+            {
+                // File is included as "Resource".
+                // In Silverlight this means it is present in the "AssemblyName.g.resources" file, in the assembly indicated in the path.
+                
+                DecomposeComponentUri(uriResource, out string assemblyName, out Uri relativeUri);
+
+                ResourceManager resourceManager = new ResourceManager($"{assemblyName}.g", Assembly.Load(assemblyName));
+                
+                Stream stream = resourceManager.GetStream(relativeUri.ToString());
+
+                if (stream != null)
+                {
+                    string mimeType = MimeTypeMapper.GetMimeType(relativeUri);
+                    streamResourceInfo = new StreamResourceInfo(stream, mimeType);
+                }
+            }
+            else
+            {
+                // File is included as "Content".
+                // This means in Silverlight it is directly present in the .xap file.
+                
+                // TODO: Figure out how to handle this case in OpenSilver
+            }
+
+            return streamResourceInfo;
+        }
+        
+        private static bool IsComponentUri(Uri uri)
+        {
+            string str = uri.ToString();
+
+            int startIndex = 0;
+            if (str[0] == '/')
+                startIndex = 1;
+            
+            int slashIndex = str.IndexOf('/', startIndex);
+            return slashIndex > 0 && str.Substring(startIndex, slashIndex - startIndex).EndsWith(";component", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static void DecomposeComponentUri(Uri uri, out string assemblyName, out Uri containedUri)
+        {
+            string str = uri.ToString();
+            
+            int startIndex = 0;
+            if (str[0] == '/')
+                startIndex = 1;
+            
+            int semicolonIndex = str.IndexOf(';', startIndex);
+            assemblyName = str.Substring(startIndex, semicolonIndex - startIndex);
+            
+            int containedUriBeginIndex = str.IndexOf('/', startIndex);
+            containedUri = new Uri(str.Substring(containedUriBeginIndex + 1), UriKind.Relative);
+        }
+#else
         public static async Task<StreamResourceInfo> GetResourceStream(Uri uriResource)
         {
             string resourceString = await GetResourceString(uriResource);
@@ -481,6 +554,7 @@ namespace Windows.UI.Xaml
             StreamResourceInfo resourceInfo = new StreamResourceInfo(stream, mimeType);
             return resourceInfo;
         }
+#endif
 
         public static event EventHandler INTERNAL_Reloaded;
 
