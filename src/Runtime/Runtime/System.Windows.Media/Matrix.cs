@@ -334,9 +334,12 @@ namespace Windows.UI.Xaml.Media
         /// </returns>
         public Point Transform(Point point)
         {
-            Point newPoint = point;
-            MultiplyPoint(ref newPoint._x, ref newPoint._y);
-            return newPoint;
+            var x = point.X;
+            var y = point.Y;
+
+            MultiplyPoint(ref x, ref y);
+
+            return new Point(x, y);
         }
 
         /// <summary>

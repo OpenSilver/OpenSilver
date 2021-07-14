@@ -182,7 +182,7 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             Point p = new Point(10, 25);
             Matrix m = Matrix.Identity;
-            m.MultiplyPoint(ref p._x, ref p._y);
+            m.MultiplyPoint(ref p.X, ref p.Y);
             p.Should().Be(new Point(10, 25));
         }
 
@@ -191,7 +191,7 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             Point p = new Point(10, 25);
             Matrix m = GetTranslateMatrix(-10, 5);
-            m.MultiplyPoint(ref p._x, ref p._y);
+            m.MultiplyPoint(ref p.X, ref p.Y);
             p.Should().Be(new Point(0, 30));
         }
 
@@ -200,7 +200,7 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             Point p = new Point(10, 25);
             Matrix m = GetScaleMatrix(0.8, -1.5);
-            m.MultiplyPoint(ref p._x, ref p._y);
+            m.MultiplyPoint(ref p.X, ref p.Y);
             p.Should().Be(new Point(8, -37.5));
         }
 
@@ -209,7 +209,7 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             Point p = new Point(10, 25);
             Matrix m = GetScaleTranslateMatrix(2, 3, 1, -3);
-            m.MultiplyPoint(ref p._x, ref p._y);
+            m.MultiplyPoint(ref p.X, ref p.Y);
             p.Should().Be(new Point(21, 72));
         }
 
@@ -218,7 +218,7 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             Point p = new Point(10, 25);
             Matrix m = GetIncrementalMatrix(2, 0.5);
-            m.MultiplyPoint(ref p._x, ref p._y);
+            m.MultiplyPoint(ref p.X, ref p.Y);
             p.Should().Be(new Point(99, 117));
         }
 
