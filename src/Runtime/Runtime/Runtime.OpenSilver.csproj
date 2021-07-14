@@ -123,6 +123,7 @@
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\SendCompletedEventArgs.cs" />
 		<Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
+		<Compile Include="Windows.Foundation\PointTypeConverter.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\ExpanderAutomationPeer.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\TreeViewAutomationPeer.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\TreeViewItemAutomationPeer.cs" />
@@ -654,7 +655,6 @@
 		<Compile Include="TypeScriptDefinitionsSupportFiles\UnionType_5.cs" />
 		<Compile Include="Windows.Devices.Input\PointerDeviceType.cs" />
 		<Compile Include="Windows.Foundation\Point.cs" />
-		<Compile Include="Windows.Foundation\PointConverter.cs" />
 		<Compile Include="Windows.Foundation\Rect.cs" />
 		<Compile Include="Windows.Foundation\Size.cs" />
 		<Compile Include="Windows.Foundation\SizeConverter.cs" />

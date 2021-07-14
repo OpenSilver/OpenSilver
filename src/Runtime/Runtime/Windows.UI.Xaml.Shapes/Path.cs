@@ -142,10 +142,10 @@ namespace Windows.UI.Xaml.Shapes
 
                         Point tmp1 = originalTransform.Transform(new Point(minX, minY));
                         Point tmp2 = originalTransform.Transform(new Point(maxX, maxY));
-                        minX = tmp1._x;
-                        minY = tmp1._y;
-                        maxX = tmp2._x;
-                        maxY = tmp2._y;
+                        minX = tmp1.X;
+                        minY = tmp1.Y;
+                        maxX = tmp2.X;
+                        maxY = tmp2.Y;
                     }
 
                     Size shapeActualSize;
