@@ -41,7 +41,8 @@ namespace Windows.UI.Xaml
         public static string TranslateXamlValueToCSharp(string xamlValue)
         {
             string convertedXamlValue;
-            string[] xamlValueSplittedOnComas = xamlValue.Split(',');
+            var xamlValueSplittedOnComas = xamlValue.Split(',');
+
             if (xamlValueSplittedOnComas.Length == 2)
             {
                 convertedXamlValue = xamlValue + "," + xamlValue;
@@ -70,7 +71,7 @@ namespace Windows.UI.Xaml
             Right = uniformLength;
             Bottom = uniformLength;
         }
-       
+
         /// <summary>
         /// [SECURITY CRITICAL] Initializes a Windows.UI.Xaml.Thickness structure that
         /// has specific lengths (supplied as a System.Double) applied to each side of
@@ -87,7 +88,7 @@ namespace Windows.UI.Xaml
             Right = right;
             Bottom = bottom;
         }
-        
+
         /// <summary>
         /// [SECURITY CRITICAL] Compares two Windows.UI.Xaml.Thickness structures for
         /// inequality.
@@ -102,7 +103,7 @@ namespace Windows.UI.Xaml
         {
             return t1.Left != t2.Left || t1.Top != t2.Top || t1.Bottom != t2.Bottom || t1.Right != t2.Right;
         }
-      
+
         /// <summary>
         /// [SECURITY CRITICAL] Compares the value of two Windows.UI.Xaml.Thickness structures
         /// for equality.</summary>
@@ -116,7 +117,7 @@ namespace Windows.UI.Xaml
         {
             return t1.Left == t2.Left && t1.Top == t2.Top && t1.Bottom == t2.Bottom && t1.Right == t2.Right;
         }
-       
+
         /// <summary>
         /// [SECURITY CRITICAL] Gets or sets the width, in pixels, of the lower side
         /// of the bounding rectangle.
@@ -134,7 +135,7 @@ namespace Windows.UI.Xaml
         /// of the bounding rectangle.
         /// </summary>
         public double Right { get; set; }
-        
+
         /// <summary>
         /// [SECURITY CRITICAL] Gets or sets the width, in pixels, of the upper side
         /// of the bounding rectangle.
@@ -192,13 +193,16 @@ namespace Windows.UI.Xaml
 
         internal static object INTERNAL_ConvertFromString(string thicknessAsString)
         {
-            char splitter = ',';
-            string trimmedThicknessAsString = thicknessAsString.Trim(); //we trim the string so that we don't get random spaces at the beginning and at the end act as separators (for example: Margin=" 5")
+            var splitter = ',';
+            var trimmedThicknessAsString = thicknessAsString.Trim(); //we trim the string so that we don't get random spaces at the beginning and at the end act as separators (for example: Margin=" 5")
+
             if (!trimmedThicknessAsString.Contains(','))
             {
                 splitter = ' ';
             }
-            string[] splittedString = trimmedThicknessAsString.Split(splitter);
+
+            var splittedString = trimmedThicknessAsString.Split(splitter);
+
             if (splittedString.Length == 1)
             {
                 if (double.TryParse(splittedString[0], out var thickness))
@@ -208,13 +212,15 @@ namespace Windows.UI.Xaml
             }
             else if (splittedString.Length == 2)
             {
-                double topAndBottom = 0d;
+                var topAndBottom = 0d;
 
-                bool isParseOK = double.TryParse(splittedString[0], out var leftAndRight);
+                var isParseOK = double.TryParse(splittedString[0], out var leftAndRight);
                 isParseOK = isParseOK && double.TryParse(splittedString[1], out topAndBottom);
 
                 if (isParseOK)
+                {
                     return new Thickness(leftAndRight, topAndBottom, leftAndRight, topAndBottom);
+                }
             }
             else if (splittedString.Length == 4)
             {
@@ -228,8 +234,11 @@ namespace Windows.UI.Xaml
                 isParseOK = isParseOK && double.TryParse(splittedString[3], out bottom);
 
                 if (isParseOK)
+                {
                     return new Thickness(left, top, right, bottom);
+                }
             }
+
             throw new FormatException(thicknessAsString + " is not an eligible value for Thickness");
         }
     }

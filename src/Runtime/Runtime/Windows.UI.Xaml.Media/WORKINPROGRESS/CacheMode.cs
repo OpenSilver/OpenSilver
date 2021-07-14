@@ -24,6 +24,7 @@ namespace Windows.UI.Xaml.Media
 {
 #if WORKINPROGRESS
     [TypeConverter(typeof(FontFamilyTypeConverter))]
+    [OpenSilver.NotImplemented]
     public abstract partial class CacheMode : DependencyObject
     {
         static CacheMode()

@@ -500,26 +500,31 @@ namespace Windows.Foundation
 
         public static Rect Parse(string rectAsString)
         {
-            string[] splittedString = rectAsString.Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries);
+            var result = default(Rect);
 
-            if (splittedString.Length == 4)
+            var split = rectAsString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (split.Length == 4)
             {
-                double x, y, width, height;
 #if OPENSILVER
-                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out x) &&
-                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out y) &&
-                    double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out width) &&
-                    double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out height))
+                if (double.TryParse(split[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var x) &&
+                    double.TryParse(split[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var y) &&
+                    double.TryParse(split[2], NumberStyles.Any, CultureInfo.InvariantCulture, out var width) &&
+                    double.TryParse(split[3], NumberStyles.Any, CultureInfo.InvariantCulture, out var height))
 #else
-                if (double.TryParse(splittedString[0], out x) &&
-                    double.TryParse(splittedString[1], out y) &&
-                    double.TryParse(splittedString[2], out width) &&
-                    double.TryParse(splittedString[3], out height))
+                if (double.TryParse(split[0], out x) &&
+                    double.TryParse(split[1], out y) &&
+                    double.TryParse(split[2], out width) &&
+                    double.TryParse(split[3], out height))
 #endif
-                    return new Rect(x, y, width, height);
+                    result = new Rect(x, y, width, height);
+            }
+            else
+            {
+                throw new FormatException($"{rectAsString} was not in the expected format: \"x, y, width, height\"");
             }
 
-            throw new FormatException(rectAsString + "is not an eligible value for Rect");
+            return result;
         }
 
         /// <summary>
