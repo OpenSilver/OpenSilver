@@ -92,7 +92,7 @@ namespace System.Windows
                 throw new NotSupportedException($"Conversion to {destinationType.FullName} is not supported.");
             }
 
-            return ((TextDecorationCollection)value).Decoration.ToString();
+            return ((TextDecorationCollection)value).Decoration.Location.ToString();
         }
     }
 }

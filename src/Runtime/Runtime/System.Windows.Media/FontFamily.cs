@@ -13,6 +13,7 @@
 \*====================================================================================*/
 
 
+using System.Collections.Generic;
 using System.ComponentModel;
 using DotNetForHtml5.Core;
 
@@ -61,6 +62,16 @@ namespace Windows.UI.Xaml.Media
         public override string ToString()
         {
             return Source;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is FontFamily family && Source == family.Source;
+        }
+
+        public override int GetHashCode()
+        {
+            return 924162744 + EqualityComparer<string>.Default.GetHashCode(Source);
         }
     }
 }
