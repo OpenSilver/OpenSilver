@@ -96,19 +96,14 @@ namespace Windows.UI.Text
             return this == fontWeight;
         }
 
-        public override bool Equals(object o)
+        public override bool Equals(object obj)
         {
-            if (o is FontWeight)
-            {
-                var fw = (FontWeight)o;
-                return this == fw;
-            }
-            return false;
+            return obj is FontWeight weight && Weight == weight.Weight;
         }
 
         public override int GetHashCode()
         {
-            return this.Weight;
+            return 1219257281 + Weight.GetHashCode();
         }
 
         public static bool operator ==(FontWeight left, FontWeight right)
