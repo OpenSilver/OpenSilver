@@ -34,19 +34,19 @@ namespace System.Windows
             Style = style;
         }
 
-        public override bool Equals(object o)
+        public override bool Equals(object obj)
         {
-            if (o is FontStyle)
-            {
-                var fs = (FontStyle)o;
-                return this == fs;
-            }
-            return false;
+            return obj is FontStyle style && Style == style.Style;
         }
 
         public bool Equals(FontStyle fontStyle)
         {
             return this == fontStyle;
+        }
+
+        public override int GetHashCode()
+        {
+            return -1755968282 + Style.GetHashCode();
         }
 
         public static bool operator ==(FontStyle left, FontStyle right)
