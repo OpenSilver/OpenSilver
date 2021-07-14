@@ -23,20 +23,6 @@ namespace Windows.UI.Text
             return sourceType == typeof(string);
         }
 
-        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
-        {
-            if (value == null)
-            {
-                throw GetConvertFromException(value);
-            }
-            else if (value is string exp)
-            {
-                return FontWeight.INTERNAL_ConvertFromString(exp);
-            }
-
-            return base.ConvertFrom(context, culture, value);
-        }
-
         /// <summary>
         /// Determines whether System.Windows.FontWeight values can be converted to
         /// the specified type.
@@ -52,14 +38,64 @@ namespace Windows.UI.Text
             return destinationType == typeof(string);
         }
 
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        // Exceptions:
+        //   System.ArgumentNullException:
+        //     source is null.
+        //
+        //   System.NotSupportedException:
+        //     source is not null and is not a valid type which can be converted to a System.Windows.FontWeight.
+        /// <summary>
+        /// Converts the specified object to a System.Windows.FontWeight.
+        /// </summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The object being converted.</param>
+        /// <returns>The System.Windows.FontWeight created from converting source.</returns>
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (destinationType != typeof(string))
+            if (value is null)
             {
-                throw new NotSupportedException($"Conversion to {destinationType.FullName} is not spported.");
+                throw new ArgumentNullException(nameof(value));
+            }
+            else if (value.GetType() != typeof(string))
+            {
+                throw GetConvertFromException(value);
             }
 
-            return value.ToString();
+            return FontWeight.INTERNAL_ConvertFromString((string)value);
+        }
+
+        // Exceptions:
+        //   System.ArgumentNullException:
+        //     value is null.
+        //
+        //   System.NotSupportedException:
+        //     value is not null and is not a System.Windows.FontWeight, or if destinationType
+        //     is not one of the valid destination types.
+        /// <summary>
+        /// Converts the specified System.Windows.ReFontWeightct to the specified type.
+        /// </summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The System.Windows.FontWeight to convert.</param>
+        /// <param name="destinationType">The type to convert the System.Windows.FontWeight to.</param>
+        /// <returns>The object created from converting this System.Windows.FontWeight (a string).</returns>
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        {
+            if (value is null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+            else if (!(value is FontWeight))
+            {
+                throw new NotSupportedException($"Conversion from {value.GetType().FullName} is not supported.");
+            }
+            else if (destinationType != typeof(string))
+            {
+                throw new NotSupportedException($"Conversion to {destinationType.FullName} is not supported.");
+            }
+
+            return ((FontWeight)value).Weight.ToString();
         }
     }
 }

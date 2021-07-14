@@ -62,7 +62,6 @@ namespace Windows.UI.Xaml
             BottomRight = bottomRight;
         }
 
-
         /// <summary>
         /// [SECURITY CRITICAL] Compares two Windows.UI.Xaml.CornerRadius structures
         /// for inequality.
@@ -172,6 +171,7 @@ namespace Windows.UI.Xaml
         internal static object INTERNAL_ConvertFromString(string cornerRadiusAsString)
         {
             char separator;
+
             if (cornerRadiusAsString.Contains(","))
             {
                 separator = ',';
@@ -180,23 +180,23 @@ namespace Windows.UI.Xaml
             {
                 separator = ' ';
             }
-            string[] splittedString = cornerRadiusAsString.Trim().Split(separator);
+
+            var splittedString = cornerRadiusAsString.Trim().Split(separator);
+
             if (splittedString.Length == 1)
             {
-                double radius = 0d;
-                if (double.TryParse(splittedString[0], out radius))
+                if (double.TryParse(splittedString[0], out var radius))
                 {
                     return new CornerRadius(radius);
                 }
             }
             else if (splittedString.Length == 4)
             {
-                double topLeft = 0d;
                 double topRight = 0d;
                 double bottomRight = 0d;
                 double bottomLeft = 0d;
 
-                bool isParseOK = double.TryParse(splittedString[0], out topLeft);
+                bool isParseOK = double.TryParse(splittedString[0], out var topLeft);
                 isParseOK = isParseOK && double.TryParse(splittedString[1], out topRight);
                 isParseOK = isParseOK && double.TryParse(splittedString[2], out bottomRight);
                 isParseOK = isParseOK && double.TryParse(splittedString[3], out bottomLeft);
@@ -206,6 +206,7 @@ namespace Windows.UI.Xaml
                     return new CornerRadius(topLeft, topRight, bottomRight, bottomLeft);
                 }
             }
+
             throw new FormatException(cornerRadiusAsString + "is not an eligible value for CornerRadius");
         }
     }

@@ -54,7 +54,7 @@ namespace Windows.Foundation
         /// </returns>
         public static bool operator !=(Point point1, Point point2)
         {
-            return (point1.X != point2.X || point1.Y != point2.Y);
+            return point1.X != point2.X || point1.Y != point2.Y;
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Windows.Foundation
         /// </returns>
         public static bool operator ==(Point point1, Point point2)
         {
-            return (point1.X == point2.X && point1.Y == point2.Y);
+            return point1.X == point2.X && point1.Y == point2.Y;
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace Windows.Foundation
         /// </returns>
         public override bool Equals(object o)
         {
-            return (o is Point && ((Point)o) == this);
+            return o is Point && ((Point)o) == this;
         }
 
         /// <summary>
@@ -118,9 +118,9 @@ namespace Windows.Foundation
         /// <returns>The hash code for this Windows.Foundation.Point.</returns>
         public override int GetHashCode()
         {
-            return (X.GetHashCode() ^ Y.GetHashCode());
+            return X.GetHashCode() ^ Y.GetHashCode();
         }
-     
+
         /// <summary>
         /// Creates a System.String representation of this Windows.Foundation.Point.
         /// </summary>
@@ -132,30 +132,37 @@ namespace Windows.Foundation
         {
             return string.Concat(X, ", ", Y);
         }
-        
+
         static Point()
         {
             TypeFromStringConverters.RegisterConverter(typeof(Point), s => Parse(s));
         }
+
         public static Point Parse(string pointAsString)
         {
-            string[] splittedString = pointAsString.Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries);
+            var result = default(Point);
 
-            if (splittedString.Length == 2)
+            var split = pointAsString.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (split.Length == 2)
             {
-                double x, y;
 #if OPENSILVER
-                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out x) && 
-                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out y))
+                if (double.TryParse(split[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var x) &&
+                    double.TryParse(split[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var y))
 #else
-                if (double.TryParse(splittedString[0], out x) &&
-                    double.TryParse(splittedString[1], out y))
+                if (double.TryParse(splittedString[0], out var x) &&
+                    double.TryParse(splittedString[1], out var y))
 #endif
-                    return new Point(x, y);
+                    result = new Point(x, y);
             }
-            
-            throw new FormatException(pointAsString + " is not an eligible value for a Point");
+            else
+            {
+                throw new FormatException($"{pointAsString} was not in the expected format: \"x, y\"");
+            }
+
+            return result;
         }
+
         public string ToString(string format, IFormatProvider formatProvider)
         {
             return null;

@@ -108,19 +108,19 @@ namespace Windows.UI
         {
             if (!(val > 0.0))       // Handles NaN case too
             {
-                return (0);
+                return 0;
             }
             else if (val <= 0.0031308)
             {
-                return ((byte)((255.0f * val * 12.92f) + 0.5f));
+                return (byte)((255.0f * val * 12.92f) + 0.5f);
             }
             else if (val < 1.0)
             {
-                return ((byte)((255.0f * ((1.055f * (float)Math.Pow((double)val, (1.0 / 2.4))) - 0.055f)) + 0.5f));
+                return (byte)((255.0f * ((1.055f * (float)Math.Pow(val, 1.0 / 2.4)) - 0.055f)) + 0.5f);
             }
             else
             {
-                return (255);
+                return 255;
             }
         }
 
@@ -128,12 +128,12 @@ namespace Windows.UI
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "rgba({0}, {1}, {2}, {3})",
-                this.R, this.G, this.B, opacity * this.A / 255d);
+                R, G, B, opacity * A / 255d);
         }
 
         internal static object INTERNAL_ConvertFromString(string colorString)
         {
-            string trimmedString = colorString.Trim();
+            var trimmedString = colorString.Trim();
             if (!string.IsNullOrEmpty(trimmedString) && (trimmedString[0] == '#'))
             {
                 string tokens = trimmedString.Substring(1);
@@ -164,9 +164,9 @@ namespace Windows.UI
             {
                 string tokens = trimmedString.Substring(3);
 
-                char[] separators = new char[1] { ',' };
-                string[] words = tokens.Split(separators);
-                float[] values = new float[4];
+                var separators = new char[1] { ',' };
+                var words = tokens.Split(separators);
+                var values = new float[4];
                 for (int i = 0; i < 3; i++)
                 {                    
                     values[i] = Convert.ToSingle(words[i]);
@@ -174,22 +174,22 @@ namespace Windows.UI
                 if (words.Length == 4)
                 {
                     values[3] = Convert.ToSingle(words[3]);
-                    return Color.FromScRgb(values[0], values[1], values[2], values[3]);
+                    return FromScRgb(values[0], values[1], values[2], values[3]);
                 }
                 else
                 {
-                    return Color.FromScRgb(1.0f, values[0], values[1], values[2]);
+                    return FromScRgb(1.0f, values[0], values[1], values[2]);
                 }
             }
             else
             {
                 // Check if the color is a named color
-                Colors.INTERNAL_ColorsEnum namedColor;
-                if (Enum.TryParse(trimmedString, true, out namedColor))
+                if (Enum.TryParse(trimmedString, true, out Colors.INTERNAL_ColorsEnum namedColor))
                 {
                     return INTERNAL_ConvertFromInt32((int)namedColor);
                 }
             }
+
             throw new Exception(string.Format("Invalid color: {0}", colorString));
         }
 
@@ -258,9 +258,9 @@ namespace Windows.UI
         {
             if (o is Color)
             {
-                Color color = (Color)o;
+                var color = (Color)o;
 
-                return (this == color);
+                return this == color;
             }
             else
             {

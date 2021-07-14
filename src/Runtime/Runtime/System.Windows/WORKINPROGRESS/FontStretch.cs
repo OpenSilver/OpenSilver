@@ -13,11 +13,9 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using System;
 using System.ComponentModel;
-using System.Windows.Markup;
 
 #if MIGRATION
 namespace System.Windows
@@ -28,6 +26,7 @@ namespace Windows.UI.Xaml
 #if WORKINPROGRESS
     #region Not supported yet
     [TypeConverter(typeof(FontStretchTypeConverter))]
+    [OpenSilver.NotImplemented]
     public partial struct FontStretch : IFormattable
     {
 		[OpenSilver.NotImplemented]
