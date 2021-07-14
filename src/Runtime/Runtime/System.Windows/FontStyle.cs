@@ -15,14 +15,14 @@
 
 #if MIGRATION
 using DotNetForHtml5.Core;
-using System.Windows.Markup;
+using System.ComponentModel;
 
 namespace System.Windows
 {
-    [SupportsDirectContentViaTypeFromStringConverters]
+    [TypeConverter(typeof(FontStyleTypeConverter))]
     public partial struct FontStyle
     {
-        private int _style;
+        private readonly int Style;
 
         static FontStyle()
         {
@@ -31,14 +31,14 @@ namespace System.Windows
 
         internal FontStyle(int style)
         {
-            this._style = style;
+            Style = style;
         }
 
         public override bool Equals(object o)
         {
             if (o is FontStyle)
             {
-                FontStyle fs = (FontStyle)o;
+                var fs = (FontStyle)o;
                 return this == fs;
             }
             return false;
@@ -49,24 +49,19 @@ namespace System.Windows
             return this == fontStyle;
         }
 
-        public override int GetHashCode()
-        {
-            return this._style;
-        }
-
         public static bool operator ==(FontStyle left, FontStyle right)
         {
-            return left._style == right._style;
+            return left.Style == right.Style;
         }
 
         public static bool operator !=(FontStyle left, FontStyle right)
         {
-            return left._style != right._style;
+            return left.Style != right.Style;
         }
 
         public override string ToString()
         {
-            switch (this._style)
+            switch (Style)
             {
                 case 0:
                     return "Normal";
@@ -75,7 +70,7 @@ namespace System.Windows
                 case 2:
                     return "Italic";
                 default:
-                    return ""; //should not be possible
+                    return string.Empty; //should not be possible
             }
         }
 

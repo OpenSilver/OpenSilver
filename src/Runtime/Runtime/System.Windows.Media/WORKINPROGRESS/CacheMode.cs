@@ -13,11 +13,8 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
 using DotNetForHtml5.Core;
-using System;
-using System.Windows;
-using System.Windows.Markup;
+using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -26,8 +23,7 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
 #if WORKINPROGRESS
-    [SupportsDirectContentViaTypeFromStringConverters]
-    [OpenSilver.NotImplemented]
+    [TypeConverter(typeof(FontFamilyTypeConverter))]
     public abstract partial class CacheMode : DependencyObject
     {
         static CacheMode()

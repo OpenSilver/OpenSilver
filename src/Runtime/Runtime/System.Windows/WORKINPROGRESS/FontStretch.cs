@@ -16,6 +16,7 @@
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using System;
+using System.ComponentModel;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -26,8 +27,7 @@ namespace Windows.UI.Xaml
 {
 #if WORKINPROGRESS
     #region Not supported yet
-    [SupportsDirectContentViaTypeFromStringConverters]
-	[OpenSilver.NotImplemented]
+    [TypeConverter(typeof(FontStretchTypeConverter))]
     public partial struct FontStretch : IFormattable
     {
 		[OpenSilver.NotImplemented]
