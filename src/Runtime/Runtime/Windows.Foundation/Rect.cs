@@ -13,12 +13,9 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
 using DotNetForHtml5.Core;
-using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
-using System.Windows.Markup;
 
 #if MIGRATION
 namespace System.Windows
@@ -29,26 +26,13 @@ namespace Windows.Foundation
     /// <summary>
     /// Describes the width, height, and point origin of a rectangle.
     /// </summary>
-    [SupportsDirectContentViaTypeFromStringConverters]
-    public partial struct Rect// : IFormattable
+    [TypeConverter(typeof(RectTypeConverter))]
+    public partial struct Rect
     {
-        //todo: Add the interface IFormattable
-
-
         internal double _x;
         internal double _y;
         internal double _width;
         internal double _height;
-
-
-        //public Rect()
-        //{
-        //    //setting the elements of the struct to their default value 
-        //    _x = 0;
-        //    _y = 0;
-        //    _width = 0;
-        //    _height = 0;
-        //}
 
         /// <summary>
         /// Initializes a Windows.Foundation.Rect structure that
@@ -149,8 +133,8 @@ namespace Windows.Foundation
         /// </returns>
         public static bool operator !=(Rect rect1, Rect rect2)
         {
-            return (rect1.X != rect2.X || rect1.Y != rect2.Y ||
-                rect1.Width != rect2.Width || rect1.Height != rect2.Height);
+            return rect1.X != rect2.X || rect1.Y != rect2.Y ||
+                rect1.Width != rect2.Width || rect1.Height != rect2.Height;
         }
 
         /// <summary>
@@ -164,8 +148,8 @@ namespace Windows.Foundation
         /// </returns>
         public static bool operator ==(Rect rect1, Rect rect2)
         {
-            return (rect1.X == rect2.X && rect1.Y == rect2.Y &&
-                rect1.Width == rect2.Width && rect1.Height == rect2.Height);
+            return rect1.X == rect2.X && rect1.Y == rect2.Y &&
+                rect1.Width == rect2.Width && rect1.Height == rect2.Height;
         }
 
         /// <summary>
@@ -252,7 +236,7 @@ namespace Windows.Foundation
         {
             get
             {
-                if (this.IsEmpty)
+                if (IsEmpty)
                 {
                     return double.NegativeInfinity;
                 }
@@ -283,7 +267,7 @@ namespace Windows.Foundation
         {
             get
             {
-                if (this.IsEmpty)
+                if (IsEmpty)
                 {
                     return double.NegativeInfinity;
                 }
@@ -314,7 +298,7 @@ namespace Windows.Foundation
         {
             get
             {
-                if (this.IsEmpty)
+                if (IsEmpty)
                 {
                     return double.NegativeInfinity;
                 }
@@ -464,7 +448,6 @@ namespace Windows.Foundation
             return X.GetHashCode() ^ Y.GetHashCode() ^ Width.GetHashCode() ^ Height.GetHashCode();
         }
 
-
         /// <summary>
         /// Finds the intersection of the rectangle represented by the current <see cref="Rect" />
         /// and the rectangle represented by the specified <see cref="Rect" />,
@@ -549,7 +532,7 @@ namespace Windows.Foundation
         /// </returns>
         public override string ToString()
         {
-            return X + "," + Y + "," + Width + "," + Height;
+            return string.Concat(X, ", ", Y, ", ", Width, ", ", Height);
         }
 
         //

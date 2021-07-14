@@ -13,14 +13,7 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel;
-using System.Windows.Markup;
 using DotNetForHtml5.Core;
 
 #if MIGRATION
@@ -29,15 +22,11 @@ namespace System.Windows
 namespace Windows.UI.Text
 #endif
 {
-
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(FontWeightConverter))]
-#endif
     /// <summary>
     /// Refers to the density of a typeface, in terms of the lightness or heaviness
     /// of the strokes.
     /// </summary>
-    [SupportsDirectContentViaTypeFromStringConverters]
+    [TypeConverter(typeof(FontWeightTypeConverter))]
     public partial struct FontWeight
     {
         /// <summary>
@@ -111,7 +100,7 @@ namespace Windows.UI.Text
         {
             if (o is FontWeight)
             {
-                FontWeight fw = (FontWeight)o;
+                var fw = (FontWeight)o;
                 return this == fw;
             }
             return false;

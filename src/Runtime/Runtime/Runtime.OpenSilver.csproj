@@ -123,6 +123,8 @@
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\SendCompletedEventArgs.cs" />
 		<Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
+		<Compile Include="Windows.Foundation\RectTypeConverter.cs" />
+		<Compile Include="Windows.UI.Text\FontWeightTypeConverter.cs" />
 		<Compile Include="Windows.Foundation\PointTypeConverter.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\ExpanderAutomationPeer.cs" />
 		<Compile Include="Windows.UI.Xaml.Automation.Peers\WORKINPROGRESS\TreeViewAutomationPeer.cs" />
@@ -146,9 +148,16 @@
 		<Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerRichTextBlock.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerSection.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Typography.cs" />
+		<Compile Include="Windows.UI.Xaml.Media\FontFamilyTypeConverter.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\Polygon.cs" />
+		<Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\CacheModeTypeConverter.cs" />
+		<Compile Include="Windows.UI.Xaml\CornerRadiusTypeConverter.cs" />
 		<Compile Include="Windows.UI.Xaml\Expression.cs" />
+		<Compile Include="Windows.UI.Xaml\FontStyleTypeConverter.cs" />
+		<Compile Include="Windows.UI.Xaml\GridLengthTypeConverter.cs" />
 		<Compile Include="Windows.UI.Xaml\TemplateBindingExtension.cs" />
+		<Compile Include="Windows.UI.Xaml\TextDecorationCollectionTypeConverter.cs" />
+		<Compile Include="Windows.UI.Xaml\ThicknessTypeConverter.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontCapitals.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontStretches.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\NotificationWindow.cs" />
@@ -305,12 +314,14 @@
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontFraction.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontNumeralAlignment.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontNumeralStyle.cs" />
+		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontStretchTypeConverter.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontVariants.cs" />
 		<Compile Include="Windows.UI.Xaml\TextMeasurementService.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\LineStackingStrategy.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\RoutedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml\FrameworkPropertyMetadata.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\UIElement.cs" />
+		<Compile Include="Windows.UI\ColorTypeConverter.cs" />
 		<Compile Include="Windows.UI\WORKINPROGRESS\Color.cs" />
 		<Compile Include="Empty Namespaces\WORKINPROGRESS\SystemXaml.cs" />
 		<Compile Include="System\WORKINPROGRESS\AppDomainExtensions.cs" />
@@ -666,7 +677,6 @@
 		<Compile Include="Windows.UI.Input\PointerPoint.cs" />
 		<Compile Include="Windows.UI.Text\FontStyles.cs" />
 		<Compile Include="Windows.UI.Text\FontWeight.cs" />
-		<Compile Include="Windows.UI.Text\FontWeightConverter.cs" />
 		<Compile Include="Windows.UI.Text\FontWeights.cs" />
 		<Compile Include="Windows.UI.Text\TextDecorations.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\ItemsChangedEventArgs.cs" />
@@ -941,7 +951,6 @@
 		<Compile Include="Windows.UI.Xaml.Media\EllipseGeometry.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\FillRule.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\FontFamily.cs" />
-		<Compile Include="Windows.UI.Xaml.Media\FontFamilyConverter.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\GeneralTransform.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\Geometry.cs" />
 		<Compile Include="Windows.UI.Xaml.Media\GeometryConverter.cs" />
@@ -1009,7 +1018,6 @@
 		<Compile Include="Windows.UI.Xaml\Content.cs" />
 		<Compile Include="Windows.UI.Xaml\ControlToWatch.cs" />
 		<Compile Include="Windows.UI.Xaml\CornerRadius.cs" />
-		<Compile Include="Windows.UI.Xaml\CornerRadiusConverter.cs" />
 		<Compile Include="Windows.UI.Xaml\CSSEquivalent.cs" />
 		<Compile Include="Windows.UI.Xaml\DataTemplate.cs" />
 		<Compile Include="Windows.UI.Xaml\DependencyObject.cs" />
@@ -1026,7 +1034,6 @@
 		<Compile Include="Windows.UI.Xaml\FrameworkElement_HandlingSizeAndAlignment.cs" />
 		<Compile Include="Windows.UI.Xaml\FrameworkTemplate.cs" />
 		<Compile Include="Windows.UI.Xaml\GridLength.cs" />
-		<Compile Include="Windows.UI.Xaml\GridLengthConverter.cs" />
 		<Compile Include="Windows.UI.Xaml\GridUnitType.cs" />
 		<Compile Include="Windows.UI.Xaml\HorizontalAlignment.cs" />
 		<Compile Include="Windows.UI.Xaml\Host.cs" />
@@ -1062,7 +1069,6 @@
 		<Compile Include="Windows.UI.Xaml\TextAlignment.cs" />
 		<Compile Include="Windows.UI.Xaml\TextWrapping.cs" />
 		<Compile Include="Windows.UI.Xaml\Thickness.cs" />
-		<Compile Include="Windows.UI.Xaml\ThicknessConverter.cs" />
 		<Compile Include="Windows.UI.Xaml\UIElement.cs" />
 		<Compile Include="Windows.UI.Xaml\UIElement_Events.cs" />
 		<Compile Include="Windows.UI.Xaml\ValueToHtmlConverter.cs" />
@@ -1103,7 +1109,6 @@
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\AssemblyPart.cs" />
 		<Compile Include="Windows.UI.Xaml\WORKINPROGRESS\AssemblyPartCollection.cs" />
 		<Compile Include="Windows.UI\Color.cs" />
-		<Compile Include="Windows.UI\ColorConverter.cs" />
 		<Compile Include="Windows.UI\Colors.cs" />
 		<Compile Include="__COMPATIBILITY__\JSIL.Meta.dll ASSEMBLY\JSIL.Meta\JSIgnoreAttribute.cs" />
 		<Compile Include="__COMPATIBILITY__\JSIL.Meta.dll ASSEMBLY\JSIL.Meta\JSReplacementAttribute.cs" />

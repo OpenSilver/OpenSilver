@@ -13,13 +13,12 @@
 \*====================================================================================*/
 
 using DotNetForHtml5.Core;
-using System;
-using System.Windows.Markup;
+using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows
 {
-    [SupportsDirectContentViaTypeFromStringConverters]
+    [TypeConverter(typeof(TextDecorationCollectionTypeConverter))]
     public sealed partial class TextDecorationCollection
     {
         static TextDecorationCollection()
@@ -77,7 +76,7 @@ namespace System.Windows
     {
         internal TextDecoration(TextDecorationLocation location)
         {
-            this.Location = location;
+            Location = location;
         }
 
         internal TextDecorationLocation Location { get; private set; }

@@ -13,11 +13,8 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
-using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Windows.Markup;
 using DotNetForHtml5.Core;
 using OpenSilver.Internal;
 #if !MIGRATION
@@ -33,18 +30,11 @@ namespace System.Windows.Media
 namespace Windows.UI
 #endif
 {
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(ColorConverter))]
-#endif
     /// <summary>
     /// Describes a color in terms of alpha, red, green, and blue channels.
     /// </summary>
-    [SupportsDirectContentViaTypeFromStringConverters]
-#if WORKINPROGRESS
+    [TypeConverter(typeof(ColorTypeConverter))]
     public partial struct Color : IFormattable
-#else
-    public partial struct Color //todo: this is supposed to inherit from IFormattable
-#endif
     {
         /// <summary>
         /// Gets or sets the sRGB alpha channel value of the color.
@@ -70,7 +60,6 @@ namespace Windows.UI
         {
             TypeFromStringConverters.RegisterConverter(typeof(Color), INTERNAL_ConvertFromString);
         }
-
 
         /// <summary>
         /// Creates a new Windows.UI.Color structure by using the specified sRGB alpha
@@ -148,7 +137,7 @@ namespace Windows.UI
             if (!string.IsNullOrEmpty(trimmedString) && (trimmedString[0] == '#'))
             {
                 string tokens = trimmedString.Substring(1);
-                if (tokens.Length == 6) // This is becaue XAML is tolerant when the user has forgot the alpha channel (eg. #DDDDDD for Gray).
+                if (tokens.Length == 6) // This is because XAML is tolerant when the user has forgot the alpha channel (eg. #DDDDDD for Gray).
                     tokens = "FF" + tokens;
 
 #if NETSTANDARD
