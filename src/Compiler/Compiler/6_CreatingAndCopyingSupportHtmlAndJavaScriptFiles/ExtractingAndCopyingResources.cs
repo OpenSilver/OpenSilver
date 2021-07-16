@@ -37,80 +37,87 @@ namespace DotNetForHtml5.Compiler
 
             foreach (string assemblySimpleName in assemblySimpleNames)
             {
-                if (!simpleNameOfAssembliesToIgnore.Contains(assemblySimpleName))
+                if (simpleNameOfAssembliesToIgnore.Contains(assemblySimpleName))
                 {
-                    //-----------------------------------------------
-                    // Process JavaScript, CSS, Image, Video, Audio files:
-                    //-----------------------------------------------
+                    continue;
+                }
+
+                if (reflectionOnSeparateAppDomain.GetCSharpXamlForHtml5CompilerVersionNumberOrNull(assemblySimpleName) == null)
+                {
+                    continue;
+                }
+                
+                //-----------------------------------------------
+                // Process JavaScript, CSS, Image, Video, Audio files:
+                //-----------------------------------------------
 
 #if !CSHTML5BLAZOR
-                    Dictionary<string, byte[]> jsAndCssFiles = reflectionOnSeparateAppDomain.GetResources(assemblySimpleName, supportedExtensionsLowercase);
+                Dictionary<string, byte[]> jsAndCssFiles = reflectionOnSeparateAppDomain.GetResources(assemblySimpleName, supportedExtensionsLowercase);
 #else
-                    Dictionary<string, byte[]> jsAndCssFiles = reflectionOnSeparateAppDomain.GetManifestResources(assemblySimpleName, supportedExtensionsLowercase);
+                Dictionary<string, byte[]> jsAndCssFiles = reflectionOnSeparateAppDomain.GetManifestResources(assemblySimpleName, supportedExtensionsLowercase);
 #endif
-                    // Copy files:
-                    foreach (KeyValuePair<string, byte[]> file in jsAndCssFiles)
+                // Copy files:
+                foreach (KeyValuePair<string, byte[]> file in jsAndCssFiles)
+                {
+                    string fileName = file.Key;
+                    byte[] fileContent = file.Value;
+
+                    // Combine the root output path and the relative "resources" folder path, while also ensuring that there is no forward slash, and that the path ends with a backslash:
+                    string absoluteOutputResourcesPath = PathsHelper.CombinePathsWhileEnsuringEndingBackslashAndMore(outputPathAbsolute, outputResourcesPath);
+
+                    // Create the destination folders hierarchy if it does not already exist:
+                    string destinationFile = Path.Combine(absoluteOutputResourcesPath, assemblySimpleName + "\\", fileName);
+                    if (destinationFile.Length < 256)
                     {
-                        string fileName = file.Key;
-                        byte[] fileContent = file.Value;
+                        string destinationDirectory = Path.GetDirectoryName(destinationFile);
+                        if (!Directory.Exists(destinationDirectory))
+                            Directory.CreateDirectory(destinationDirectory);
 
-                        // Combine the root output path and the relative "resources" folder path, while also ensuring that there is no forward slash, and that the path ends with a backslash:
-                        string absoluteOutputResourcesPath = PathsHelper.CombinePathsWhileEnsuringEndingBackslashAndMore(outputPathAbsolute, outputResourcesPath);
+                        // Create the file:
+                        File.WriteAllBytes(destinationFile, fileContent);
 
-                        // Create the destination folders hierarchy if it does not already exist:
-                        string destinationFile = Path.Combine(absoluteOutputResourcesPath, assemblySimpleName + "\\", fileName);
-                        if (destinationFile.Length < 256)
+                        //put the file name in the list of files:
+                        if (fileName.EndsWith(".resx.js"))
                         {
-                            string destinationDirectory = Path.GetDirectoryName(destinationFile);
-                            if (!Directory.Exists(destinationDirectory))
-                                Directory.CreateDirectory(destinationDirectory);
-
-                            // Create the file:
-                            File.WriteAllBytes(destinationFile, fileContent);
-
-                            //put the file name in the list of files:
-                            if (fileName.EndsWith(".resx.js"))
-                            {
-                                resXFilesCopied.Add(destinationFile);
-                            }
-                        }
-                        else
-                        {
-                            logger.WriteWarning("Could not create the following output file because its path is too long: " + destinationFile);
+                            resXFilesCopied.Add(destinationFile);
                         }
                     }
-
-
-                    #region Commented because this operation is now done in the "JavaScriptGenerator" build task ("ConvertingResXFilesToJavaScript.cs").
-                    ////-----------------------------------------------
-                    //// Process RESX files:
-                    ////-----------------------------------------------
-
-                    //Dictionary<string, byte[]> resXFiles = reflectionOnSeparateAppDomain.GetManifestResources(assemblySimpleName,
-                    //    (fn) => fn.ToLower().EndsWith(".resources") && !fn.ToLower().EndsWith(".g.resources"));
-
-                    //foreach (KeyValuePair<string, byte[]> file in resXFiles)
-                    //{
-                    //    string fileName = file.Key;
-                    //    byte[] fileContent = file.Value;
-
-                    //    // Create destination folders hierarchy:
-                    //    string destinationFile = Path.Combine(outputPath, ResourceCopier.NAME_OF_FOLDER_THAT_CONTAINS_RESOURCES + "\\", Path.GetFileNameWithoutExtension(fileName) + ".resj");
-                    //    string destinationDirectory = Path.GetDirectoryName(destinationFile);
-                    //    Directory.CreateDirectory(destinationDirectory);
-
-                    //    // Create JSON from RESX:
-                    //    string json = "";
-                    //    using (Stream stream = new MemoryStream(fileContent))
-                    //    {
-                    //        json = ConvertingResXFilesToJavaScript.ConvertResources(stream);
-                    //    }
-
-                    //    // Save file:
-                    //    File.WriteAllText(destinationFile, json);
-                    //}
-                    #endregion
+                    else
+                    {
+                        logger.WriteWarning("Could not create the following output file because its path is too long: " + destinationFile);
+                    }
                 }
+
+
+                #region Commented because this operation is now done in the "JavaScriptGenerator" build task ("ConvertingResXFilesToJavaScript.cs").
+                ////-----------------------------------------------
+                //// Process RESX files:
+                ////-----------------------------------------------
+
+                //Dictionary<string, byte[]> resXFiles = reflectionOnSeparateAppDomain.GetManifestResources(assemblySimpleName,
+                //    (fn) => fn.ToLower().EndsWith(".resources") && !fn.ToLower().EndsWith(".g.resources"));
+
+                //foreach (KeyValuePair<string, byte[]> file in resXFiles)
+                //{
+                //    string fileName = file.Key;
+                //    byte[] fileContent = file.Value;
+
+                //    // Create destination folders hierarchy:
+                //    string destinationFile = Path.Combine(outputPath, ResourceCopier.NAME_OF_FOLDER_THAT_CONTAINS_RESOURCES + "\\", Path.GetFileNameWithoutExtension(fileName) + ".resj");
+                //    string destinationDirectory = Path.GetDirectoryName(destinationFile);
+                //    Directory.CreateDirectory(destinationDirectory);
+
+                //    // Create JSON from RESX:
+                //    string json = "";
+                //    using (Stream stream = new MemoryStream(fileContent))
+                //    {
+                //        json = ConvertingResXFilesToJavaScript.ConvertResources(stream);
+                //    }
+
+                //    // Save file:
+                //    File.WriteAllText(destinationFile, json);
+                //}
+                #endregion
             }
 
             return true;

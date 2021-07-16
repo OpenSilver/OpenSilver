@@ -1449,29 +1449,37 @@ namespace DotNetForHtml5.Compiler
 
             public string GetCSharpXamlForHtml5CompilerVersionNumberOrNull(string assemblySimpleName)
             {
-                if (_loadedAssemblySimpleNameToAssembly.ContainsKey(assemblySimpleName))
+                try
                 {
-                    var assembly = _loadedAssemblySimpleNameToAssembly[assemblySimpleName];
-
-#if BRIDGE || CSHTML5BLAZOR
-                    Type attributeType = this.FindType("CSHTML5.Internal.Attributes", "CompilerVersionNumberAttribute");
-#else
-                    Type attributeType = typeof(DotNetForHtml5Core::CompilerVersionNumberAttribute);
-#endif
-                    var attribute = assembly.GetCustomAttributes(attributeType, true).SingleOrDefault();
-
-                    if (attribute != null)
+                    if (_loadedAssemblySimpleNameToAssembly.ContainsKey(assemblySimpleName))
                     {
-                        string result = (attributeType.GetProperty("VersionNumber").GetValue(attribute) ?? "").ToString();
-                        if (string.IsNullOrEmpty(result))
-                            throw new Exception("Incorrect CompilerVersionNumberAttribute.VersionNumber");
-                        return result;
+                        var assembly = _loadedAssemblySimpleNameToAssembly[assemblySimpleName];
+
+                        Type attributeType = FindType("CSHTML5.Internal.Attributes", "CompilerVersionNumberAttribute");
+                        
+                        foreach (CustomAttributeData data in assembly.GetCustomAttributesData())
+                        {
+                            if (data.AttributeType == attributeType)
+                            {
+                                if (data.ConstructorArguments.Count == 1)
+                                {
+                                    string result = data.ConstructorArguments[0].Value?.ToString();
+                                    if (string.IsNullOrEmpty(result))
+                                        throw new Exception("Incorrect CompilerVersionNumberAttribute.VersionNumber");
+                                    return result;
+                                }
+                            }
+                        }
                     }
                     else
-                        return null;
+                        throw new Exception(ASSEMBLY_NOT_IN_LIST_OF_LOADED_ASSEMBLIES);
                 }
-                else
-                    throw new Exception(ASSEMBLY_NOT_IN_LIST_OF_LOADED_ASSEMBLIES);
+                catch (Exception)
+                {
+                    // ignored
+                }
+
+                return null;
             }
 
             public string GetCSharpXamlForHtml5CompilerVersionFriendlyNameOrNull(string assemblySimpleName)

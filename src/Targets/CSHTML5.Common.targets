@@ -203,6 +203,7 @@
     <AssemblyAttributesGenerator
       Condition="'$(SkipAssemblyAttributesGenerator)'!='true'"
       IsSLMigration="$(IsSLMigration)"
+      ProductName="CSHTML5"
       OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)CSharpXamlForHtml5_AssemblyAttributes.cs"
       IntermediateOutputAbsolutePath="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)"
       />
