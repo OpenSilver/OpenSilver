@@ -30,7 +30,7 @@
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.EntryPointGenerator" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AssemblyAttributesGenerator" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ServiceReferenceFixer" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesProcessor" />
+<!--  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesProcessor" />-->
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResXProcessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.BeforeXamlPreprocessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.XamlPreprocessor" />
@@ -156,17 +156,6 @@
     <OutputAssemblyDirectory Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(OutputPath)', '^.:.*'))"
         >$(OutputPath)</OutputAssemblyDirectory>
   </PropertyGroup>
-
-  <!--============================================================
-      Change the names of the EmbeddedResources so they keep their original names.
-   ============================================================-->
-  <Target Name="ModifyEmbeddedResourceNames" BeforeTargets="CreateManifestResourceNames">
-<!--    <ItemGroup>-->
-<!--      <EmbeddedResource>-->
-<!--        <LogicalName Condition="'%(EmbeddedResource.Extension)' != '.resx'">%(EmbeddedResource.Identity)</LogicalName>-->
-<!--      </EmbeddedResource>-->
-<!--    </ItemGroup>-->
-  </Target>
 
   <!--============================================================
   MainResourcesGeneration
@@ -313,6 +302,15 @@
     </ItemGroup>
 
     <!--============================================================
+      Change the names of the EmbeddedResources so they keep their original names.
+   ============================================================-->
+    <ItemGroup>
+      <EmbeddedResource>
+        <LogicalName Condition="'%(EmbeddedResource.Extension)' != '.resx'">%(EmbeddedResource.Identity)</LogicalName>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <!--============================================================
       Validate that XAML files have "MSBuild:Compile" set for their "Custom Tool" property (useful for always-up-to-date Intellisense) (only during Pass 1):
       ============================================================-->
     <Error
@@ -375,7 +373,7 @@
     <!--============================================================
       ResourcesProcessor (only during Pass 2)
       ============================================================-->
-    <ResourcesProcessor
+    <!-- <ResourcesProcessor
       Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'"
       SourceFile="%(Resource.FullPath)"
       OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Resource.RelativeDir)%(Resource.Filename)%(Resource.Extension).g.js"
@@ -385,7 +383,7 @@
       <Resource Remove="@(Resource)" Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
       <Resource Include="@(ResourcesProcessorProcessedFiles)" />
       <FileWrites Include="@(ResourcesProcessorProcessedFiles)"/>
-    </ItemGroup>
+    </ItemGroup> -->
 
     <!--============================================================
       ResXProcessor (only during Pass 2)

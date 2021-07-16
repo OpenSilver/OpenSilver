@@ -101,7 +101,6 @@
     <Compile Include="EntryPoints\ResXProcessor.cs" />
     <Compile Include="EntryPoints\Wrapper_BridgeVersion.cs" />
     <Compile Include="EntryPoints\OutputPathsEraser.cs" />
-    <Compile Include="EntryPoints\ResourcesProcessor.cs" />
     <Compile Include="OtherHelpersAndHandlers\OpenSilverHelper.cs" />
     <Compile Include="OtherHelpersAndHandlers\ExceptionOnlyDisplayTheMessage.cs" />
     <Compile Include="OtherHelpersAndHandlers\PathsHelper.cs" />
