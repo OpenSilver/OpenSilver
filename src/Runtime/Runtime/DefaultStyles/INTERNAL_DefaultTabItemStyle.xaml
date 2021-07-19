@@ -27,7 +27,16 @@
                                 <VisualState x:Name="Normal" />
                                 <VisualState x:Name="MouseOver">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="PointerOverBorder" Storyboard.TargetProperty="Background">
+                                        <ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="PointerOverBorderTop" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="#FFCFCFCF"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="PointerOverBorderBottom" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="#FFCFCFCF"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="PointerOverBorderLeft" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="#FFCFCFCF"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="PointerOverBorderRight" Storyboard.TargetProperty="Background">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="#FFCFCFCF"/>
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
@@ -43,7 +52,7 @@
                         <Border
                                 x:Name="TemplateTopSelected" Visibility="Collapsed"
                                 BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="1,0,1,0" 
+                                BorderThickness="1,0,1,0"
                                 Background="{TemplateBinding SelectedBackground}"
                                 CornerRadius="3,3,0,0"
                                 Cursor="Arrow">
@@ -57,17 +66,105 @@
                         </Border>
                         <Border x:Name="TemplateTopUnselected" Visibility="Collapsed"
                                     BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="1,1,1,0" 
+                                    BorderThickness="1,1,1,0"
                                     Background="{TemplateBinding Background}"
                                     CornerRadius="3,3,0,0"
                                     Cursor="{TemplateBinding Cursor}">
                             <StackPanel>
-                                <Border x:Name="PointerOverBorder" Height="2" CornerRadius="3,3,0,0" Background="Transparent"/>
+                                <Border x:Name="PointerOverBorderTop" Height="2" CornerRadius="3,3,0,0" Background="Transparent"/>
                                 <ContentControl x:Name="HeaderTopUnselected"
                                             Foreground="{TemplateBinding Foreground}"
                                             Margin="{TemplateBinding Padding}"/>
                             </StackPanel>
                         </Border>
+
+                        <Border
+                                x:Name="TemplateBottomSelected" Visibility="Collapsed"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1,0,1,0"
+                                Background="{TemplateBinding SelectedBackground}"
+                                CornerRadius="0,0,3,3"
+                                Cursor="Arrow">
+                            <StackPanel>
+                                <ContentControl x:Name="HeaderBottomSelected"
+                                            Foreground="{TemplateBinding SelectedForeground}"
+                                            Margin="{TemplateBinding Padding}"
+                                            />
+                                <Border Height="3" CornerRadius="0,0,3,3" Background="{TemplateBinding SelectedAccent}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="TemplateBottomUnselected" Visibility="Collapsed"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="1,0,1,1"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="0,0,3,3"
+                                    Cursor="{TemplateBinding Cursor}">
+                            <StackPanel>
+                                <ContentControl x:Name="HeaderBottomUnselected"
+                                            Foreground="{TemplateBinding Foreground}"
+                                            Margin="{TemplateBinding Padding}"/>
+                                <Border x:Name="PointerOverBorderBottom" Height="2" CornerRadius="0,0,3,3" Background="Transparent"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border
+                                x:Name="TemplateLeftSelected" Visibility="Collapsed"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="0,1,0,1"
+                                Background="{TemplateBinding SelectedBackground}"
+                                CornerRadius="3,0,0,3"
+                                Cursor="Arrow">
+                            <StackPanel Orientation="Horizontal">
+                                <Border Width="3" CornerRadius="3,0,0,3" Background="{TemplateBinding SelectedAccent}"/>
+                                <ContentControl x:Name="HeaderLeftSelected"
+                                            Foreground="{TemplateBinding SelectedForeground}"
+                                            Margin="{TemplateBinding Padding}"
+                                            />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="TemplateLeftUnselected" Visibility="Collapsed"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="1,1,0,1"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="3,0,0,3"
+                                    Cursor="{TemplateBinding Cursor}">
+                            <StackPanel Orientation="Horizontal">
+                                <Border x:Name="PointerOverBorderLeft" Width="2" CornerRadius="3,0,0,3" Background="Transparent"/>
+                                <ContentControl x:Name="HeaderLeftUnselected"
+                                            Foreground="{TemplateBinding Foreground}"
+                                            Margin="{TemplateBinding Padding}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border
+                                x:Name="TemplateRightSelected" Visibility="Collapsed"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="0,1,0,1"
+                                Background="{TemplateBinding SelectedBackground}"
+                                CornerRadius="0,3,3,0"
+                                Cursor="Arrow">
+                            <StackPanel Orientation="Horizontal">
+                                <ContentControl x:Name="HeaderRightSelected"
+                                            Foreground="{TemplateBinding SelectedForeground}"
+                                            Margin="{TemplateBinding Padding}"
+                                            />
+                                <Border Width="3" CornerRadius="0,3,3,0" Background="{TemplateBinding SelectedAccent}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="TemplateRightUnselected" Visibility="Collapsed"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="0,1,1,1"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="0,3,3,0"
+                                    Cursor="{TemplateBinding Cursor}">
+                            <StackPanel Orientation="Horizontal">
+                                <ContentControl x:Name="HeaderRightUnselected"
+                                            Foreground="{TemplateBinding Foreground}"
+                                            Margin="{TemplateBinding Padding}"/>
+                                <Border x:Name="PointerOverBorderRight" Width="2" CornerRadius="0,3,3,0" Background="Transparent"/>
+                            </StackPanel>
+                        </Border>
+
                     </StackPanel>
                 </ControlTemplate>
             </Setter.Value>
