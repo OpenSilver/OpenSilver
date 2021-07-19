@@ -171,6 +171,94 @@ document.getElementByIdSafe = function (id) {
     return element;
 }
 
+document.setGridCollapsedDuetoHiddenColumn = function (id) {
+	var element = document.getElementByIdSafe(id);
+	if (element.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
+		element.style.overflow = 'visible';
+		element.setAttribute('data-isCollapsedDueToHiddenColumn', false);
+	}
+}
+
+document.setDisplayTableCell = function (id) {
+	var element = document.getElementByIdSafe(id);
+	if (element.tagName.toLowerCase() != 'span')
+	{
+		element.style.display = 'table-cell';
+	}
+}
+
+document.getActualWidthAndHeight = function (element) {
+	return (typeof element === 'undefined' || element === null) ? '0|0' : element['offsetWidth'].toFixed(3) + '|' + element['offsetHeight'].toFixed(3);
+}
+
+document.createElementSafe = function (tagName, id, parentElement, index) {
+	var newElement = document.createElement(tagName);
+	newElement.setAttribute("id", id);
+	if(index < 0 || index >= parentElement.children.length)	{
+		parentElement.appendChild(newElement);
+	}
+	else {
+		var nextSibling = parentElement.children[index];
+		parentElement.insertBefore(newElement, nextSibling);
+	}
+}
+
+document.set2dContextProperty = function (id, propertyName, propertyValue) {
+	var element = document.getElementByIdSafe(id);
+	if (element) { 
+		eval("element.getContext('2d')." + propertyName + " = \"" + propertyValue + "\""); 
+	}
+}
+
+document.invoke2dContextMethod = function (id, methodName, args) {
+	var element = document.getElementByIdSafe(id);
+	var returnValue;
+	if (element) {
+		returnValue = eval("element.getContext('2d')[methodName](" + args + ");");
+	}
+	return returnValue;
+}
+
+document.setDomStyleProperty = function (id, propertyName, value) {
+	var element = document.getElementByIdSafe(id);
+	if (element) {
+		eval("element.style." + propertyName + "=\"" + value + "\"");
+	}
+}
+
+document.removeEventListenerSafe = function (element, method, func) {
+	if (element){
+		element.removeEventListener(method, func);
+	}
+}
+
+document.addEventListenerSafe = function (element, method, func) {
+	if (element){
+		element.addEventListener(method, func);
+	}
+}
+
+document.eventCallback = function (callbackId, arguments) {
+	var argsArray = arguments;
+	var idWhereCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
+	document.jsSimulatorObjectReferences[idWhereCallbackArgsAreStored] = argsArray;
+	setTimeout(
+		function() 
+		{{
+		   window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray);
+		}}
+		, 1);
+}
+
+document.errorCallback = function (error, IndexOfNextUnmodifiedJSCallInList) {
+	var idWhereErrorCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
+	var argsArr = [];
+	argsArr[0] = error.message;
+	argsArr[1] = IndexOfNextUnmodifiedJSCallInList;
+	document.jsSimulatorObjectReferences[idWhereErrorCallbackArgsAreStored] = argsArr;
+	window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);
+}
+
 window.ViewInteropErrors = function () {
     for (var key in document.interopErrors) {
         console.log(`Unable to find element with id '${key}' (${document.interopErrors[key]} time(s)).`);

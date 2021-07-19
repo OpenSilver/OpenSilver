@@ -152,17 +152,7 @@ namespace CSHTML5
 
                     // Change the JS code to point to that callback:
                     javascript = javascript.Replace("$" + i.ToString(), string.Format(
-                                       @"(function() {{
-                        var argsArray = {1};
-                        var idWhereCallbackArgsAreStored = ""callback_args_"" + document.callbackCounterForSimulator++;
-                        document.jsSimulatorObjectReferences[idWhereCallbackArgsAreStored] = argsArray;
-                        setTimeout(
-                            function() 
-                            {{
-                               window.onCallBack.OnCallbackFromJavaScript({0}, idWhereCallbackArgsAreStored, argsArray);
-                            }}
-                            , 1);
-                      }})", callbackId,
+                                       @"(function() {{ document.eventCallback({0}, {1});}})", callbackId,
 #if OPENSILVER
                                        Interop.IsRunningInTheSimulator_WorkAround ? "arguments" : "Array.prototype.slice.call(arguments)"
 #elif BRIDGE
@@ -207,13 +197,7 @@ namespace CSHTML5
 
             // Change the JS code to call ShowErrorMessage in case of error:
             string errorCallBack = string.Format(
-            @"var idWhereErrorCallbackArgsAreStored = ""callback_args_"" + document.callbackCounterForSimulator++;
-                var argsArr = [];
-                argsArr[0] = error.message;
-                argsArr[1] = {0};
-                document.jsSimulatorObjectReferences[idWhereErrorCallbackArgsAreStored] = argsArr;
-                window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);"
-                , IndexOfNextUnmodifiedJSCallInList);
+            @"document.errorCallback(error, {0})", IndexOfNextUnmodifiedJSCallInList);
             ++IndexOfNextUnmodifiedJSCallInList;
 
             // Surround the javascript code with some code that will store the
@@ -223,14 +207,11 @@ namespace CSHTML5
             javascript = string.Format(
 @"
 try {{
-var result = eval(""{0}"");
-document.jsSimulatorObjectReferences[""{1}""] = result;
-result;
+document.jsSimulatorObjectReferences[""{1}""] = eval(""{0}"");
 }}
 catch (error) {{
-    eval(""{2}"");
+    {2};
 }}
-result;
 ", INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript), referenceId, INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(errorCallBack));
 
             // Execute the javascript code:
