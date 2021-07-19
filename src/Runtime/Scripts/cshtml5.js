@@ -172,7 +172,10 @@ document.getElementByIdSafe = function (id) {
 }
 
 document.setGridCollapsedDuetoHiddenColumn = function (id) {
-	var element = document.getElementByIdSafe(id);
+    const element = document.getElementById(id);
+    if (!element)
+        return;
+
 	if (element.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
 		element.style.overflow = 'visible';
 		element.setAttribute('data-isCollapsedDueToHiddenColumn', false);
@@ -180,11 +183,11 @@ document.setGridCollapsedDuetoHiddenColumn = function (id) {
 }
 
 document.setDisplayTableCell = function (id) {
-	var element = document.getElementByIdSafe(id);
-	if (element.tagName.toLowerCase() != 'span')
-	{
-		element.style.display = 'table-cell';
-	}
+    const element = document.getElementById(id);
+    if (!element || element.tagName != 'SPAN')
+        return;
+
+    element.style.display = 'table-cell';
 }
 
 document.getActualWidthAndHeight = function (element) {
@@ -192,7 +195,8 @@ document.getActualWidthAndHeight = function (element) {
 }
 
 document.createElementSafe = function (tagName, id, parentElement, index) {
-	var newElement = document.createElement(tagName);
+	const newElement = document.createElement(tagName);
+
 	newElement.setAttribute("id", id);
 	if(index < 0 || index >= parentElement.children.length)	{
 		parentElement.appendChild(newElement);
@@ -204,26 +208,29 @@ document.createElementSafe = function (tagName, id, parentElement, index) {
 }
 
 document.set2dContextProperty = function (id, propertyName, propertyValue) {
-	var element = document.getElementByIdSafe(id);
-	if (element) { 
-		eval("element.getContext('2d')." + propertyName + " = \"" + propertyValue + "\""); 
-	}
+    const element = document.getElementById(id);
+    if (!element || element.tagName !== 'CANVAS')
+        return;
+
+    element.getContext('2d')[propertyName] = propertyValue;
 }
 
 document.invoke2dContextMethod = function (id, methodName, args) {
-	var element = document.getElementByIdSafe(id);
-	var returnValue;
-	if (element) {
-		returnValue = eval("element.getContext('2d')[methodName](" + args + ");");
-	}
-	return returnValue;
+    const element = document.getElementById(id);
+    if (!element || element.tagName !== 'CANVAS')
+        return undefined;
+    return CanvasRenderingContext2D.prototype[methodName].apply(element.getContext('2d'),
+        args.split(',')
+            .map(Function.prototype.call, String.prototype.trim)
+            .filter(i => i.length > 0));
 }
 
 document.setDomStyleProperty = function (id, propertyName, value) {
-	var element = document.getElementByIdSafe(id);
-	if (element) {
-		eval("element.style." + propertyName + "=\"" + value + "\"");
-	}
+    const element = document.getElementById(id);
+    if (!element)
+        return;
+
+    element.style[propertyName] = value;
 }
 
 document.removeEventListenerSafe = function (element, method, func) {
@@ -239,8 +246,8 @@ document.addEventListenerSafe = function (element, method, func) {
 }
 
 document.eventCallback = function (callbackId, arguments) {
-	var argsArray = arguments;
-	var idWhereCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
+	const argsArray = arguments;
+	const idWhereCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
 	document.jsSimulatorObjectReferences[idWhereCallbackArgsAreStored] = argsArray;
 	setTimeout(
 		function() 
@@ -251,8 +258,8 @@ document.eventCallback = function (callbackId, arguments) {
 }
 
 document.errorCallback = function (error, IndexOfNextUnmodifiedJSCallInList) {
-	var idWhereErrorCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
-	var argsArr = [];
+	const idWhereErrorCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
+	const argsArr = [];
 	argsArr[0] = error.message;
 	argsArr[1] = IndexOfNextUnmodifiedJSCallInList;
 	document.jsSimulatorObjectReferences[idWhereErrorCallbackArgsAreStored] = argsArr;
@@ -736,7 +743,7 @@ if (!Array.from) {
 
             // 16. Let k be 0.
             var k = 0;
-            // 17. Repeat, while k < len… (also steps a - h)
+            // 17. Repeat, while k < lenÂ… (also steps a - h)
             var kValue;
             while (k < len) {
                 kValue = items[k];
@@ -906,4 +913,3 @@ var jsilConfig = {
       "index"
     ]
 };
-
