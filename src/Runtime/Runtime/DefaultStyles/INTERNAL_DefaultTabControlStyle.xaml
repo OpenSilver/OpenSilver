@@ -15,7 +15,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabControl">
-                    <Border>
+                    <Grid>
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal" />
@@ -44,7 +44,71 @@
                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                             </Border>
                         </Grid>
-                    </Border>
+
+                        <Grid x:Name="TemplateBottom" Visibility="Collapsed">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TabPanel x:Name="TabPanelBottom" Grid.Row="1" />
+
+                            <Border
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="3,3,0,0"
+                                MinWidth="10"
+                                MinHeight="10">
+                                <ContentPresenter
+                                    x:Name="ContentBottom"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                        </Grid>
+
+                        <Grid x:Name="TemplateLeft" Visibility="Collapsed">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TabPanel x:Name="TabPanelLeft" />
+
+                            <Border
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                Grid.Column="1"
+                                CornerRadius="0,3,3,0">
+                                <ContentPresenter
+                                    x:Name="ContentLeft"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                        </Grid>
+
+                        <Grid x:Name="TemplateRight" Visibility="Collapsed">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TabPanel x:Name="TabPanelRight" Grid.Column="1" />
+
+                            <Border
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="3,0,0,3">
+                                <ContentPresenter
+                                    x:Name="ContentRight"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                        </Grid>
+
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
