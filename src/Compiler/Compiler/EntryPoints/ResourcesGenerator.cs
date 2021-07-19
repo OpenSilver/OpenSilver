@@ -35,7 +35,7 @@ namespace DotNetForHtml5.Compiler
 						long length = _sourceStream.Length;
 						if (length > int.MaxValue)
 						{
-							throw new ApplicationException($"Resource {_sourcePath} is bigger than the max allowed size ({int.MaxValue})");
+							throw new ApplicationException($"RG1001: Input resource file '{_sourcePath}' exceeds maximum size of {int.MaxValue} bytes.");
 						}
 					}
 
@@ -96,117 +96,47 @@ namespace DotNetForHtml5.Compiler
 			}
 		}
 
-		public ResourcesGenerator()
-		{
-			// SourceDir = $"{Directory.GetCurrentDirectory()}/";
-		}
-
 		[Required]
 		public ITaskItem[] ResourceFiles { get; set; }
 
 		[Output]
 		[Required]
-		public ITaskItem[] OutputResourcesFile { get; set; }
-
-		// private string SourceDir { get; set; }
+		public ITaskItem OutputResourcesFile { get; set; }
 
 		public override bool Execute()
 		{
-			string resourcesFile = OutputResourcesFile[0].ItemSpec;
-
-			using (ResourceWriter resWriter = new ResourceWriter(resourcesFile))
+			try
 			{
-				foreach (ITaskItem resourceFile in ResourceFiles)
+				using (ResourceWriter resWriter = new ResourceWriter(OutputResourcesFile.ItemSpec))
 				{
-					string resFileName = resourceFile.ItemSpec;
-					// string resourceId = GetResourceIdForResourceFile(resourceFile);
+					foreach (ITaskItem resourceFile in ResourceFiles)
+					{
+						string resFileName = resourceFile.ItemSpec;
+					
+						// We're handing off lifetime management for the stream.
+						// True for the third argument tells resWriter to dispose of the stream when it's done.
+						resWriter.AddResource(resFileName, new LazyFileStream(resFileName), true);
+					}
 
-					// We're handing off lifetime management for the stream.
-					// True for the third argument tells resWriter to dispose of the stream when it's done.
-					resWriter.AddResource(resFileName, new LazyFileStream(resFileName), true);
+					// Generate the .resources file.
+					resWriter.Generate();
+				}
+			}
+			catch (Exception e)
+			{
+				string errorId = Log.ExtractMessageCode(e.Message, out string message);
 
-					// Log.LogMessageFromResources(MessageImportance.Low, SRID.ReadResourceFile, resFileName);
-					// Log.LogMessageFromResources(MessageImportance.Low, SRID.ResourceId, resourceId);
+				if (string.IsNullOrEmpty(errorId))
+				{
+					errorId = "RG1000";
+					message = $"Unknown build error, '{message}' ";
 				}
 
-				// Generate the .resources file.
-				resWriter.Generate();
+				Log.LogError(null, errorId, null, null, 0, 0, 0, 0, message, null);
+				return false;
 			}
 
 			return true;
 		}
-
-		// private string GetResourceIdForResourceFile(ITaskItem resFile)
-		// {
-		// 	return GetResourceIdForResourceFile(
-		// 		resFile.ItemSpec,
-		// 		resFile.GetMetadata("Link"),
-		// 		resFile.GetMetadata("LogicalName"),
-		// 		SourceDir);
-		// }
-		//
-		// internal static string GetResourceIdForResourceFile(
-		// 	string filePath,
-		// 	string linkAlias,
-		// 	string logicalName,
-		// 	string sourceDir)
-		// {
-		// 	string relPath = string.Empty;
-		//
-		// 	// Please note the subtle distinction between <Link /> and <LogicalName />. 
-		// 	// <Link /> is treated as a fully resolvable path and is put through the same 
-		// 	// transformations as the original file path. <LogicalName /> on the other hand 
-		// 	// is treated as an alias for the given resource and is used as is. Whether <Link /> 
-		// 	// was meant to be treated thus is debatable. Nevertheless in .Net 4.5 it would 
-		// 	// amount to a breaking change to have to change the behavior of <Link /> and 
-		// 	// hence the choice to support <LogicalName /> with the desired semantics. All 
-		// 	// said in most of the regular scenarios using <Link /> or <Logical /> will result in 
-		// 	// the same resourceId being picked.
-		//
-		// 	if (!string.IsNullOrEmpty(logicalName))
-		// 	{
-		// 		// Use the LogicalName when there is one
-		// 		relPath = logicalName;
-		// 	}
-		// 	else
-		// 	{
-		// 		// Always use the Link tag if it's specified.
-		// 		// This is the way the resource appears in the project.
-		// 		linkAlias = ReplaceXAMLWithBAML(filePath, linkAlias, requestExtensionChange);
-		// 		filePath = !string.IsNullOrEmpty(linkAlias) ? linkAlias : filePath;
-		// 		string fullFilePath = Path.GetFullPath(filePath);
-		//
-		// 		//
-		// 		// If the resFile, or it's perceived path, is relative to the StagingDir
-		// 		// (OutputPath here) take the relative path as resource id.
-		// 		// If the resFile is not relative to StagingDir, but relative
-		// 		// to the project directory, take this relative path as resource id.
-		// 		// Otherwise, just take the file name as resource id.
-		// 		//
-		//
-		// 		relPath = TaskHelper.GetRootRelativePath(outputPath, fullFilePath);
-		//
-		// 		if (string.IsNullOrEmpty(relPath))
-		// 		{
-		// 			relPath = TaskHelper.GetRootRelativePath(sourceDir, fullFilePath);
-		// 		}
-		//
-		// 		if (string.IsNullOrEmpty(relPath))
-		// 		{
-		// 			relPath = Path.GetFileName(fullFilePath);
-		// 		}
-		// 	}
-		//
-		// 	// Modify resource ID to correspond to canonicalized Uri format
-		// 	// i.e. - all lower case, use "/" as separator
-		// 	// ' ' is converted to escaped version %20
-		// 	//
-		//
-		// 	// string resourceId = ResourceIDHelper.GetResourceIDFromRelativePath(relPath);
-		//
-		// 	string resourceId = relPath;
-		//
-		// 	return resourceId;
-		// }
 	}
 }
