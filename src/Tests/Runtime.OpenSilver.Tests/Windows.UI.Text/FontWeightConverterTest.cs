@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.ComponentModel.Design.Serialization;
 
 #if MIGRATION
 namespace System.Windows.Tests
@@ -8,12 +9,12 @@ namespace Windows.UI.Text.Tests
 #endif
 {
     [TestClass]
-    public class FontWeightTypeConverterTest
+    public class FontWeightConverterTest
     {
         [TestMethod]
         public void CanConvertFrom_String_ShouldReturnTrue()
         {
-            var fontWeightConverter = new FontWeightTypeConverter();
+            var fontWeightConverter = new FontWeightConverter();
             var test = fontWeightConverter.CanConvertFrom(typeof(string));
             test.Should().BeTrue();
         }
@@ -21,7 +22,7 @@ namespace Windows.UI.Text.Tests
         [TestMethod]
         public void CanConvertFrom_Bool_ShouldReturnFalse()
         {
-            var fontWeightConverter = new FontWeightTypeConverter();
+            var fontWeightConverter = new FontWeightConverter();
             var test = fontWeightConverter.CanConvertFrom(typeof(bool));
             test.Should().BeFalse();
         }
@@ -29,7 +30,7 @@ namespace Windows.UI.Text.Tests
         [TestMethod]
         public void CanConvertTo_String_ShouldReturnTrue()
         {
-            var fontWeightConverter = new FontWeightTypeConverter();
+            var fontWeightConverter = new FontWeightConverter();
             var test = fontWeightConverter.CanConvertTo(typeof(string));
             test.Should().BeTrue();
         }
@@ -37,7 +38,7 @@ namespace Windows.UI.Text.Tests
         [TestMethod]
         public void CanConvertTo_Bool_ShouldReturnFalse()
         {
-            var fontWeightConverter = new FontWeightTypeConverter();
+            var fontWeightConverter = new FontWeightConverter();
             var test = fontWeightConverter.CanConvertTo(typeof(bool));
             test.Should().BeFalse();
         }
@@ -45,7 +46,7 @@ namespace Windows.UI.Text.Tests
         [TestMethod]
         public void ConvertFrom_String_ShouldReturnFontWeight()
         {
-            var fontWeightConverter = new FontWeightTypeConverter();
+            var fontWeightConverter = new FontWeightConverter();
             var test = fontWeightConverter.ConvertFrom("100");
             test.Should().Be(new FontWeight { Weight = 100 });
         }
@@ -53,21 +54,21 @@ namespace Windows.UI.Text.Tests
         [TestMethod]
         public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
         {
-            var fontWeightConverter = new FontWeightTypeConverter();
+            var fontWeightConverter = new FontWeightConverter();
             Assert.ThrowsException<ArgumentNullException>(() => fontWeightConverter.ConvertFrom(null));
         }
 
         [TestMethod]
         public void ConvertFrom_Bool_ShouldThrow_NotSupportedException()
         {
-            var fontWeightConverter = new FontWeightTypeConverter();
+            var fontWeightConverter = new FontWeightConverter();
             Assert.ThrowsException<NotSupportedException>(() => fontWeightConverter.ConvertFrom(true));
         }
 
         [TestMethod]
         public void ConvertTo_String()
         {
-            var fontWeightConverter = new FontWeightTypeConverter();
+            var fontWeightConverter = new FontWeightConverter();
             var fontWeight = new FontWeight { Weight = 100 };
             var test = fontWeightConverter.ConvertTo(fontWeight, typeof(string));
             test.Should().Be("100");
@@ -76,16 +77,33 @@ namespace Windows.UI.Text.Tests
         [TestMethod]
         public void ConvertTo_String_ShouldThrow_ArgumentNullException()
         {
-            var fontWeightConverter = new FontWeightTypeConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => fontWeightConverter.ConvertTo(null, typeof(string)));
+            var fontWeightConverter = new FontWeightConverter();
+            Assert.ThrowsException<ArgumentNullException>(() => fontWeightConverter.ConvertTo(new FontWeight(), null));
         }
 
         [TestMethod]
         public void ConvertTo_String_ShouldThrow_NotSupportedException()
         {
-            var fontWeightConverter = new FontWeightTypeConverter();
-            Assert.ThrowsException<NotSupportedException>(() => fontWeightConverter.ConvertTo(true, typeof(string)));
-            Assert.ThrowsException<NotSupportedException>(() => fontWeightConverter.ConvertTo(new FontWeight(), typeof(bool)));
+            var fontWeightConverter = new FontWeightConverter();
+            var notSupportedType = typeof(bool);
+            Assert.ThrowsException<NotSupportedException>(() => fontWeightConverter.ConvertTo(new FontWeight(), notSupportedType));
+        }
+
+        [TestMethod]
+        public void ConvertTo_String_FromBool()
+        {
+            var cursorConverter = new FontWeightConverter();
+            var test = cursorConverter.ConvertTo(true, typeof(string));
+            test.Should().Be("True");
+        }
+
+        [TestMethod]
+        public void ConvertTo_InstanceDescriptor()
+        {
+            var cursorConverter = new FontWeightConverter();
+            var fontWeight = new FontWeight();
+            var test = cursorConverter.ConvertTo(fontWeight, typeof(InstanceDescriptor));
+            test.Should().BeOfType(typeof(InstanceDescriptor));
         }
     }
 }

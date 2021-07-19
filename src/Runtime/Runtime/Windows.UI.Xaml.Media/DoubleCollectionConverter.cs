@@ -13,13 +13,8 @@
 \*====================================================================================*/
 
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -27,86 +22,86 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    #if FOR_DESIGN_TIME
     /// <summary>
-    /// Used to convert a System.Windows.Media.DoubleCollection object to or from another object
-    /// type.
+    /// Converts a <see cref="T:System.Windows.Media.DoubleCollection" /> object to and from other types.
     /// </summary>
     public sealed partial class DoubleCollectionConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether this class can convert an object of a given type to a
-        /// System.Windows.Media.DoubleCollection object.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Media.DoubleCollection" />.
         /// </summary>
-        /// <param name="context">The conversion context.</param>
-        /// <param name="sourceType">The type from which to convert.</param>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="sourceType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// Returns true if conversion is possible (object is string type); otherwise,
-        /// false.
-        /// </returns>
+        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-            {
-                return true;
-            }
-
-            return base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(string);
         }
-        
+
         /// <summary>
-        /// Determines whether this class can convert an object of a given type to the
-        /// specified destination type.
+        /// Determines whether an instance of <see cref="T:System.Windows.Media.DoubleCollection" /> can be converted to the specified type.
         /// </summary>
-        /// <param name="context">The conversion context.</param>
-        /// <param name="destinationType">The destination type.</param>
-        /// <returns>Returns true if conversion is possible; otherwise, false.</returns>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="destinationType">The type being evaluated for conversion.</param>
+        /// <returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
-        
+
         // Exceptions:
+        //   System.ArgumentNullException:
+        //     source is null.
+        //
         //   System.NotSupportedException:
-        //     value is NULL or cannot be converted to a System.Windows.Media.DoubleCollection.
+        //     source is not null and is not a valid type which can be converted to a System.Windows.Media.DoubleCollection.
         /// <summary>
-        /// Converts from an object of a given type to a System.Windows.Media.DoubleCollection object.
+        /// Converts the specified object to a System.Windows.Media.DoubleCollection.
         /// </summary>
-        /// <param name="context">The conversion context.</param>
-        /// <param name="culture">The culture information that applies to the conversion.</param>
-        /// <param name="value">The object to convert.</param>
-        /// <returns>
-        /// Returns a new System.Windows.Media.DoubleCollection object if successful; otherwise,
-        /// NULL.
-        /// </returns>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The object being converted.</param>
+        /// <returns>The System.Windows.Media.DoubleCollection created from converting source.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
+            if (value is null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+            else if (value.GetType() != typeof(string))
+            {
                 throw GetConvertFromException(value);
+            }
 
-            if (value is string)
-                return DoubleCollection.INTERNAL_ConvertFromString((string)value);
-
-            return base.ConvertFrom(context, culture, value);
+            return DoubleCollection.INTERNAL_ConvertFromString((string)value);
         }
-   
-        // Exceptions:
-        //   System.NotSupportedException:
-        //     value is NULL or it is not a System.Windows.Media.DoubleCollection-or-destinationType
-        //     is not a valid destination type.
-        /// <summary>
-        /// Converts a System.Windows.Media.DoubleCollection object to a specified type, using the
-        /// specified context and culture information.
-        /// </summary>
-        /// <param name="context">The conversion context.</param>
-        /// <param name="culture">The current culture information.</param>
-        /// <param name="value">The System.Windows.Media.DoubleCollection to convert.</param>
-        /// <param name="destinationType">The destination type that the value object is converted to.</param>
-        /// <returns>An object that represents the converted value.</returns>
+
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.DoubleCollection" /> to a specified type. </summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The <see cref="T:System.Windows.Media.DoubleCollection" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Media.DoubleCollection" /> to.</param>
+        /// <returns>The object created from converting this <see cref="T:System.Windows.Media.DoubleCollection" />.</returns>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            object result = null;
+
+            if (destinationType != null && value is DoubleCollection collection)
+            {
+                if (destinationType == typeof(string))
+                {
+                    result = collection.ToString(null, culture);
+                }
+            }
+
+            if (result is null)
+            {
+                result = base.ConvertTo(context, culture, value, destinationType);
+            }
+
+            return result;
         }
     }
-#endif
 }

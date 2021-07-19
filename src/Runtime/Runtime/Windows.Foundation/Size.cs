@@ -13,15 +13,9 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
 using DotNetForHtml5.Core;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows
@@ -32,9 +26,7 @@ namespace Windows.Foundation
     /// <summary>
     /// Describes the width and height of an object.
     /// </summary>
-#if FOR_DESIGN_TIME
     [TypeConverter(typeof(SizeConverter))]
-#endif
     public partial struct Size
     {
         // Caching is actually over twice faster than creating a new Size, even though it is a Value Type
@@ -229,11 +221,13 @@ namespace Windows.Foundation
         /// <returns>A string representation of this Windows.Foundation.Size.</returns>
         public override string ToString()
         {
-            if (this.IsEmpty)
+            var result = "Empty";
+            if (!IsEmpty)
             {
-                return "Empty";
+                result = string.Concat(Width, ", ", Height);
             }
-            return Width + "," + Height;
+
+            return result;
         }
 
         public static Size Parse(string sizeAsString)

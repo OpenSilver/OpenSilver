@@ -16,11 +16,12 @@
 #if MIGRATION
 using DotNetForHtml5.Core;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace System.Windows
 {
-    [TypeConverter(typeof(FontStyleTypeConverter))]
-    public partial struct FontStyle
+    [TypeConverter(typeof(FontStyleConverter))]
+    public partial struct FontStyle : IFormattable
     {
         private readonly int Style;
 
@@ -87,6 +88,22 @@ namespace System.Windows
                 default:
                     throw new Exception(string.Format("Invalid FontStyle: '{0}'", fontStyleAsString));
             }
+        }
+
+        internal int GetStyleForInternalConstruction()
+        {
+            Debug.Assert(0 <= Style && Style <= 2);
+            return Style;
+        }
+
+        public string ToString(string format, IFormatProvider formatProvider)
+        {
+            if (Style == 0)
+                return "Normal";
+            if (Style == 1)
+                return "Oblique";
+            Debug.Assert(Style == 2);
+            return "Italic";
         }
     }
 }

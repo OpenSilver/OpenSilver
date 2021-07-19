@@ -23,7 +23,7 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
 #if WORKINPROGRESS
-    [TypeConverter(typeof(FontFamilyTypeConverter))]
+    [TypeConverter(typeof(FontFamilyConverter))]
     [OpenSilver.NotImplemented]
     public abstract partial class CacheMode : DependencyObject
     {

@@ -139,6 +139,11 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
+        internal object ToString(object p, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Gets or sets the value of the first row and second column of this <see cref="Matrix"/>
         /// structure. The default value is 0.

@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -104,6 +105,16 @@ namespace Windows.UI.Xaml.Media
                 }
             }
             return doubleCollection;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is DoubleCollection;
+        }
+
+        internal object ToString(object p, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -28,9 +28,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if FOR_DESIGN_TIME
     [TypeConverter(typeof(DurationConverter))]
-#endif
     /// <summary>
     /// Represents the duration of time that a Windows.UI.Xaml.Media.Animation.Timeline
     /// is active.

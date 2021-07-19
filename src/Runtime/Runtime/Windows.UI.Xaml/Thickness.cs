@@ -16,6 +16,7 @@
 using DotNetForHtml5.Core;
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Markup;
 
@@ -34,7 +35,7 @@ namespace Windows.UI.Xaml
 #if WORKINPROGRESS
     [MethodToTranslateXamlValueToCSharp("TranslateXamlValueToCSharp")]
 #endif
-    [TypeConverter(typeof(ThicknessTypeConverter))]
+    [TypeConverter(typeof(ThicknessConverter))]
     public partial struct Thickness
     {
 #if WORKINPROGRESS
@@ -116,6 +117,11 @@ namespace Windows.UI.Xaml
         public static bool operator ==(Thickness t1, Thickness t2)
         {
             return t1.Left == t2.Left && t1.Top == t2.Top && t1.Bottom == t2.Bottom && t1.Right == t2.Right;
+        }
+
+        internal object ToString(Thickness thickness, CultureInfo cultureInfo)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

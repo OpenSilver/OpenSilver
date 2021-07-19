@@ -14,9 +14,10 @@
 
 
 using DotNetForHtml5.Core;
-using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 #if MIGRATION
 using CSHTML5.Internal.System.Windows.Data;
@@ -34,9 +35,7 @@ namespace Windows.UI.Xaml
     /// Implements a data structure for describing a property as a path below another
     /// property, or below an owning type. Property paths are used in data binding to objects.
     /// </summary>
-#if FOR_DESIGN_TIME
     [TypeConverter(typeof(PropertyPathConverter))]
-#endif
     public sealed partial class PropertyPath : DependencyObject
     {
         internal DependencyProperty INTERNAL_DependencyProperty; //this is only defined when the user uses the PropertyPath(DependencyProperty dependencyProperty) constructor.
@@ -280,6 +279,15 @@ namespace Windows.UI.Xaml
                 return _path;
             }
         }
+
+        /// <summary>
+        /// The list of parameters to use when the
+        /// path refers to indexed parameters.
+        /// Each parameter in the list should be a DependencyProperty,
+        /// a PropertyInfo, or a PropertyDescriptor.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public Collection<object> PathParameters { get; }
 
         static PropertyPath()
         {

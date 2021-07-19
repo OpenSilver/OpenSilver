@@ -140,6 +140,11 @@ namespace Windows.UI.Xaml.Media
             this.NotifyCollectionChanged();
         }
 
+        internal object ToString(object p, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
         internal override Point GetItemOverride(int index)
         {
             return this.GetItemInternal(index);

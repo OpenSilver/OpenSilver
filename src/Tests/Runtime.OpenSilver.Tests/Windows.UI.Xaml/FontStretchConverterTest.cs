@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.ComponentModel.Design.Serialization;
 
 #if MIGRATION
 namespace System.Windows.Tests
@@ -8,12 +9,12 @@ namespace Windows.UI.Xaml.Tests
 #endif
 {
     [TestClass]
-    public class FontStretchTypeConverterTest
+    public class FontStretchConverterTest
     {
         [TestMethod]
         public void CanConvertFrom_String_ShouldReturnTrue()
         {
-            var fontStretchConverter = new FontStretchTypeConverter();
+            var fontStretchConverter = new FontStretchConverter();
             var test = fontStretchConverter.CanConvertFrom(typeof(string));
             test.Should().BeTrue();
         }
@@ -21,7 +22,7 @@ namespace Windows.UI.Xaml.Tests
         [TestMethod]
         public void CanConvertFrom_Bool_ShouldReturnFalse()
         {
-            var fontStretchConverter = new FontStretchTypeConverter();
+            var fontStretchConverter = new FontStretchConverter();
             var test = fontStretchConverter.CanConvertFrom(typeof(bool));
             test.Should().BeFalse();
         }
@@ -29,7 +30,7 @@ namespace Windows.UI.Xaml.Tests
         [TestMethod]
         public void CanConvertTo_String_ShouldReturnTrue()
         {
-            var fontStretchConverter = new FontStretchTypeConverter();
+            var fontStretchConverter = new FontStretchConverter();
             var test = fontStretchConverter.CanConvertTo(typeof(string));
             test.Should().BeTrue();
         }
@@ -37,7 +38,7 @@ namespace Windows.UI.Xaml.Tests
         [TestMethod]
         public void CanConvertTo_Bool_ShouldReturnFalse()
         {
-            var fontStretchConverter = new FontStretchTypeConverter();
+            var fontStretchConverter = new FontStretchConverter();
             var test = fontStretchConverter.CanConvertTo(typeof(bool));
             test.Should().BeFalse();
         }
@@ -45,7 +46,7 @@ namespace Windows.UI.Xaml.Tests
         [TestMethod]
         public void ConvertFrom_String_ShouldReturnFontStretch()
         {
-            var fontStretchConverter = new FontStretchTypeConverter();
+            var fontStretchConverter = new FontStretchConverter();
             throw new NotImplementedException();
             var test = fontStretchConverter.ConvertFrom("");
             test.Should().Be(new FontStretch());
@@ -54,39 +55,55 @@ namespace Windows.UI.Xaml.Tests
         [TestMethod]
         public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
         {
-            var fontStretchConverter = new FontStretchTypeConverter();
+            var fontStretchConverter = new FontStretchConverter();
             Assert.ThrowsException<ArgumentNullException>(() => fontStretchConverter.ConvertFrom(null));
         }
 
         [TestMethod]
         public void ConvertFrom_Bool_ShouldThrow_NotSupportedException()
         {
-            var fontStretchConverter = new FontStretchTypeConverter();
+            var fontStretchConverter = new FontStretchConverter();
             Assert.ThrowsException<NotSupportedException>(() => fontStretchConverter.ConvertFrom(true));
         }
 
         [TestMethod]
         public void ConvertTo_String()
         {
-            var fontStretchConverter = new FontStretchTypeConverter();
+            var fontStretchConverter = new FontStretchConverter();
             var test = fontStretchConverter.ConvertTo(new FontStretch(), typeof(string));
-            throw new NotImplementedException();
             test.Should().Be("");
         }
 
         [TestMethod]
         public void ConvertTo_String_ShouldThrow_ArgumentNullException()
         {
-            var fontStretchConverter = new FontStretchTypeConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => fontStretchConverter.ConvertTo(null, typeof(string)));
+            var fontStretchConverter = new FontStretchConverter();
+            Assert.ThrowsException<ArgumentNullException>(() => fontStretchConverter.ConvertTo(new FontStretch(), null));
         }
 
         [TestMethod]
         public void ConvertTo_String_ShouldThrow_NotSupportedException()
         {
-            var fontStretchConverter = new FontStretchTypeConverter();
-            Assert.ThrowsException<NotSupportedException>(() => fontStretchConverter.ConvertTo(true, typeof(string)));
-            Assert.ThrowsException<NotSupportedException>(() => fontStretchConverter.ConvertTo(new FontStretch(), typeof(bool)));
+            var fontStretchConverter = new FontStretchConverter();
+            var notSupportedType = typeof(bool);
+            Assert.ThrowsException<NotSupportedException>(() => fontStretchConverter.ConvertTo(new FontStretch(), notSupportedType));
+        }
+
+        [TestMethod]
+        public void ConvertTo_String_FromBool()
+        {
+            var cursorConverter = new FontStretchConverter();
+            var test = cursorConverter.ConvertTo(true, typeof(string));
+            test.Should().Be("True");
+        }
+
+        [TestMethod]
+        public void ConvertTo_InstanceDescriptor()
+        {
+            var cursorConverter = new FontStretchConverter();
+            var fontStretch = new FontStretch();
+            var test = cursorConverter.ConvertTo(fontStretch, typeof(InstanceDescriptor));
+            test.Should().BeOfType(typeof(InstanceDescriptor));
         }
     }
 }

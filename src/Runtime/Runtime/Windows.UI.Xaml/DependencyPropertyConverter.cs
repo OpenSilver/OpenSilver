@@ -13,13 +13,8 @@
 \*====================================================================================*/
 
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows
@@ -27,50 +22,35 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if FOR_DESIGN_TIME
     /// <summary>
-    /// Converts instances of Windows.UI.Xaml.DependencyProperty to and from other data types.
+    /// Converts a <see cref="T:System.Windows.DependencyProperty" /> object to and from other types.
     /// </summary>
     public sealed partial class DependencyPropertyConverter : TypeConverter
     {
         /// <summary>
-        /// Returns a value that indicates whether this converter can convert an object
-        /// of the given type to an instance of Windows.UI.Xaml.DependencyProperty.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.DependencyProperty" />.
         /// </summary>
-        /// <param name="context">Context information of a type.</param>
-        /// <param name="sourceType">The type of the source that is being evaluated for conversion.</param>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="sourceType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// true if the converter can convert the provided type to an instance of Windows.UI.Xaml.DependencyProperty;
-        /// otherwise, false.
-        /// </returns>
+        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-            {
-                return true;
-            }
-
-            return base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(string);
         }
-       
+
         /// <summary>
-        /// Determines whether an instance of Windows.UI.Xaml.DependencyProperty can be converted
-        /// to a different type.
+        /// Determines whether an instance of <see cref="T:System.Windows.DependencyProperty" /> can be converted to the specified type.
         /// </summary>
-        /// <param name="context">Context information of a type.</param>
-        /// <param name="destinationType">
-        /// The desired type that that this instance of Windows.UI.Xaml.DependencyProperty is
-        /// being evaluated for conversion to.
-        /// </param>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// true if the converter can convert this instance of Windows.UI.Xaml.DependencyProperty;
-        /// otherwise, false.
-        /// </returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
-      
+
         // Exceptions:
         //   System.NotSupportedException:
         //     value is null or is not a valid type for conversion.
@@ -91,24 +71,17 @@ namespace Windows.UI.Xaml
 
             return base.ConvertFrom(context, culture, value);
         }
-        
-        // Exceptions:
-        //   System.NotSupportedException:
-        //     value is null-or-value i is not an instance of Windows.UI.Xaml.DependencyProperty-or-destinationType
-        //     is not a valid destination type.
-        /// <summary>
-        /// Attempts to convert an instance of Windows.UI.Xaml.DependencyProperty to a specified
-        /// type.
-        /// </summary>
+
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.DependencyProperty" /> to a specified type. </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The instance of Windows.UI.Xaml.DependencyProperty to convert.</param>
-        /// <param name="destinationType">The type this instance of Windows.UI.Xaml.DependencyProperty is converted to.</param>
-        /// <returns>The object created from the converted instance of Windows.UI.Xaml.DependencyProperty.</returns>
+        /// <param name="value">The <see cref="T:System.Windows.DependencyProperty" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.DependencyProperty" /> to.</param>
+        /// <returns>Always throws an exception.</returns>
+        /// <exception cref="T:System.NotSupportedException">In all cases.</exception>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            throw GetConvertToException(value, destinationType);
         }
     }
-#endif
 }
