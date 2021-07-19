@@ -25,7 +25,7 @@ namespace Windows.UI.Xaml
 {
 #if WORKINPROGRESS
     #region Not supported yet
-    [TypeConverter(typeof(FontStretchTypeConverter))]
+    [TypeConverter(typeof(FontStretchConverter))]
     [OpenSilver.NotImplemented]
     public partial struct FontStretch : IFormattable
     {
@@ -43,6 +43,11 @@ namespace Windows.UI.Xaml
         internal static object INTERNAL_ConvertFromString(string fontStretchAsString)
         {
             return new FontStretch();
+        }
+
+        internal object ToOpenTypeStretch()
+        {
+            throw new NotImplementedException();
         }
     }
     #endregion

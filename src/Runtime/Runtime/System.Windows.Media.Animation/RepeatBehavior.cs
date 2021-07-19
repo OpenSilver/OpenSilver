@@ -19,9 +19,7 @@
 //using System.Text;
 //using System.Threading.Tasks;
 
-using CSHTML5.Internal;
 using DotNetForHtml5.Core;
-using System;
 using System.ComponentModel;
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -29,9 +27,7 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if FOR_DESIGN_TIME
     [TypeConverter(typeof(RepeatBehaviorConverter))]
-#endif
     /// <summary>
     /// Describes how a Windows.UI.Xaml.Media.Animation.Timeline repeats its simple
     /// duration.

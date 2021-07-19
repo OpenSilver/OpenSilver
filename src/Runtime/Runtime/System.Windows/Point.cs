@@ -27,7 +27,7 @@ namespace Windows.Foundation
     /// Represents an {X, Y} coordinate pair in two-dimensional space. 
     /// Can also represent a logical point for certain property usages.
     /// </summary>
-    [TypeConverter(typeof(PointTypeConverter))]
+    [TypeConverter(typeof(PointConverter))]
     public partial struct Point : IFormattable
     {
         /// <summary>

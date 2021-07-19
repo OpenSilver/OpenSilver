@@ -15,6 +15,7 @@
 
 using DotNetForHtml5.Core;
 using System.ComponentModel;
+using System.Globalization;
 
 #if MIGRATION
 namespace System.Windows
@@ -26,7 +27,7 @@ namespace Windows.UI.Xaml
     /// [SECURITY CRITICAL] Describes the characteristics of a rounded corner, such
     /// as can be applied to a Windows.UI.Xaml.Controls.Border.
     /// </summary>
-    [TypeConverter(typeof(CornerRadiusTypeConverter))]
+    [TypeConverter(typeof(CornerRadiusConverter))]
     public partial struct CornerRadius
     {
         /// <summary>
@@ -102,6 +103,11 @@ namespace Windows.UI.Xaml
         /// applied.
         /// </summary>
         public double BottomRight { get; set; }
+
+        internal object ToString(CornerRadius radius, CultureInfo cultureInfo)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// [SECURITY CRITICAL] Gets or sets the radius of rounding, in pixels, of the

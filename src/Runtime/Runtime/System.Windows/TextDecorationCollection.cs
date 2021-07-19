@@ -19,7 +19,7 @@ using System.ComponentModel;
 #if MIGRATION
 namespace System.Windows
 {
-    [TypeConverter(typeof(TextDecorationCollectionTypeConverter))]
+    [TypeConverter(typeof(TextDecorationCollectionConverter))]
     public sealed partial class TextDecorationCollection
     {
         static TextDecorationCollection()

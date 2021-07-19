@@ -33,7 +33,7 @@ namespace Windows.UI
     /// <summary>
     /// Describes a color in terms of alpha, red, green, and blue channels.
     /// </summary>
-    [TypeConverter(typeof(ColorTypeConverter))]
+    [TypeConverter(typeof(ColorConverter))]
     public partial struct Color : IFormattable
     {
         /// <summary>

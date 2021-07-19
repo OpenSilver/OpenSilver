@@ -13,13 +13,7 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
-using System;
 using System.ComponentModel;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DotNetForHtml5.Core;
 
 #if MIGRATION
@@ -31,9 +25,7 @@ namespace Windows.UI.Xaml.Controls
     // Summary:
     //     Represents the lengths of elements within the System.Windows.Controls.DataGrid
     //     control.
-#if FOR_DESIGN_TIME
     [TypeConverter(typeof(DataGridLengthConverter))]
-#endif
     /// <summary>
     /// Represents the lengths of elements within the System.Windows.Controls.DataGrid
     /// control.

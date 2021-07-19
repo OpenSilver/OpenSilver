@@ -26,7 +26,7 @@ namespace Windows.Foundation
     /// <summary>
     /// Describes the width, height, and point origin of a rectangle.
     /// </summary>
-    [TypeConverter(typeof(RectTypeConverter))]
+    [TypeConverter(typeof(RectConverter))]
     public partial struct Rect
     {
         internal double _x;

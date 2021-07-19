@@ -13,14 +13,8 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
 using DotNetForHtml5.Core;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -28,9 +22,7 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if FOR_DESIGN_TIME
     [TypeConverter(typeof(KeyTimeConverter))]
-#endif
     /// <summary>
     /// Specifies when a particular key frame should take place during an animation.
     /// </summary>

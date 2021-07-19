@@ -8,12 +8,12 @@ namespace Windows.UI.Xaml.Media.Tests
 #endif
 {
     [TestClass]
-    public class FontFamilyTypeConverterTest
+    public class FontFamilyConverterTest
     {
         [TestMethod]
         public void CanConvertFrom_String_ShouldReturnTrue()
         {
-            var fontFamilyConverter = new FontFamilyTypeConverter();
+            var fontFamilyConverter = new FontFamilyConverter();
             var test = fontFamilyConverter.CanConvertFrom(typeof(string));
             test.Should().BeTrue();
         }
@@ -21,7 +21,7 @@ namespace Windows.UI.Xaml.Media.Tests
         [TestMethod]
         public void CanConvertFrom_Bool_ShouldReturnFalse()
         {
-            var fontFamilyConverter = new FontFamilyTypeConverter();
+            var fontFamilyConverter = new FontFamilyConverter();
             var test = fontFamilyConverter.CanConvertFrom(typeof(bool));
             test.Should().BeFalse();
         }
@@ -29,7 +29,7 @@ namespace Windows.UI.Xaml.Media.Tests
         [TestMethod]
         public void CanConvertTo_String_ShouldReturnTrue()
         {
-            var fontFamilyConverter = new FontFamilyTypeConverter();
+            var fontFamilyConverter = new FontFamilyConverter();
             var test = fontFamilyConverter.CanConvertTo(typeof(string));
             test.Should().BeTrue();
         }
@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml.Media.Tests
         [TestMethod]
         public void CanConvertTo_Bool_ShouldReturnFalse()
         {
-            var fontFamilyConverter = new FontFamilyTypeConverter();
+            var fontFamilyConverter = new FontFamilyConverter();
             var test = fontFamilyConverter.CanConvertTo(typeof(bool));
             test.Should().BeFalse();
         }
@@ -45,7 +45,7 @@ namespace Windows.UI.Xaml.Media.Tests
         [TestMethod]
         public void ConvertFrom_String_ShouldReturnFontFamily()
         {
-            var fontFamilyConverter = new FontFamilyTypeConverter();
+            var fontFamilyConverter = new FontFamilyConverter();
             var test = fontFamilyConverter.ConvertFrom("Verdana");
             test.Should().Be(new FontFamily("Verdana"));
         }
@@ -53,21 +53,21 @@ namespace Windows.UI.Xaml.Media.Tests
         [TestMethod]
         public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
         {
-            var fontFamilyConverter = new FontFamilyTypeConverter();
+            var fontFamilyConverter = new FontFamilyConverter();
             Assert.ThrowsException<ArgumentNullException>(() => fontFamilyConverter.ConvertFrom(null));
         }
 
         [TestMethod]
         public void ConvertFrom_Bool_ShouldThrow_NotSupportedException()
         {
-            var fontFamilyConverter = new FontFamilyTypeConverter();
+            var fontFamilyConverter = new FontFamilyConverter();
             Assert.ThrowsException<NotSupportedException>(() => fontFamilyConverter.ConvertFrom(true));
         }
 
         [TestMethod]
         public void ConvertTo_String()
         {
-            var fontFamilyConverter = new FontFamilyTypeConverter();
+            var fontFamilyConverter = new FontFamilyConverter();
             var test = fontFamilyConverter.ConvertTo(new FontFamily("Verdana"), typeof(string));
             test.Should().Be("Verdana");
         }
@@ -75,14 +75,14 @@ namespace Windows.UI.Xaml.Media.Tests
         [TestMethod]
         public void ConvertTo_String_ShouldThrow_ArgumentNullException()
         {
-            var fontFamilyConverter = new FontFamilyTypeConverter();
+            var fontFamilyConverter = new FontFamilyConverter();
             Assert.ThrowsException<ArgumentNullException>(() => fontFamilyConverter.ConvertTo(null, typeof(string)));
         }
 
         [TestMethod]
         public void ConvertTo_String_ShouldThrow_NotSupportedException()
         {
-            var fontFamilyConverter = new FontFamilyTypeConverter();
+            var fontFamilyConverter = new FontFamilyConverter();
             Assert.ThrowsException<NotSupportedException>(() => fontFamilyConverter.ConvertTo(true, typeof(string)));
             Assert.ThrowsException<NotSupportedException>(() => fontFamilyConverter.ConvertTo(new FontFamily("Verdana"), typeof(bool)));
         }

@@ -15,6 +15,7 @@
 
 using DotNetForHtml5.Core;
 using System.ComponentModel;
+using System.Globalization;
 
 #if MIGRATION
 namespace System.Windows
@@ -26,7 +27,7 @@ namespace Windows.UI.Xaml
     /// Represents the length of elements that explicitly support Windows.UI.Xaml.GridUnitType.Star
     /// unit types.
     /// </summary>
-    [TypeConverter(typeof(GridLengthTypeConverter))]
+    [TypeConverter(typeof(GridLengthConverter))]
     public partial struct GridLength
     {
         /// <summary>
@@ -121,7 +122,12 @@ namespace Windows.UI.Xaml
                 return _type;
             }
         }
-        
+
+        internal object ToString(GridLength length, CultureInfo cultureInfo)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Gets a value that indicates whether the Windows.UI.Xaml.GridLength
         /// holds a value that is expressed in pixels.

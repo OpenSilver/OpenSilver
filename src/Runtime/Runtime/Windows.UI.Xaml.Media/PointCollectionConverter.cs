@@ -1,19 +1,4 @@
-﻿
-
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
-
-
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Globalization;
 
 #if MIGRATION
@@ -23,12 +8,12 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.Media.Geometry" /> object to and from other types.
+    /// Converts a <see cref="T:System.Windows.Point" /> object to and from other types.
     /// </summary>
-    public sealed partial class GeometryConverter : TypeConverter
+    public class PointCollectionConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Media.Geometry" />.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Point" />.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="sourceType">The type being evaluated for conversion.</param>
@@ -40,7 +25,7 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.Media.Geometry" /> can be converted to the specified type.
+        /// Determines whether an instance of <see cref="T:System.Windows.Point" /> can be converted to the specified type.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
@@ -56,14 +41,14 @@ namespace Windows.UI.Xaml.Media
         //     source is null.
         //
         //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Media.Geometry.
+        //     source is not null and is not a valid type which can be converted to a System.Windows.Media.PointCollection.
         /// <summary>
-        /// Converts the specified object to a System.Windows.Media.Geometry.
+        /// Converts the specified object to a System.Windows.Media.PointCollection.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Media.Geometry created from converting source.</returns>
+        /// <returns>The System.Windows.Media.PointCollection created from converting source.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value is null)
@@ -75,31 +60,25 @@ namespace Windows.UI.Xaml.Media
                 throw GetConvertFromException(value);
             }
 
-            return Geometry.INTERNAL_ConvertFromString((string)value);
+            return PointCollection.Parse((string)value);
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.Geometry" /> to a specified type. </summary>
+
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.PointCollection" /> to a specified type. </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.Media.Geometry" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Media.Geometry" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.Media.Geometry" />.</returns>
-        /// <exception cref="T:System.NotSupportedException">
-        /// <paramref name="value" /> is <see langword="null" />, <paramref name="value" /> is not a <see cref="T:System.Windows.Media.Geometry" />, or <paramref name="destinationType" /> is not a string.</exception>
+        /// <param name="value">The <see cref="T:System.Windows.Media.PointCollection" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Media.PointCollection" /> to.</param>
+        /// <returns>The object created from converting this <see cref="T:System.Windows.Media.PointCollection" />.</returns>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
             object result = null;
 
-            if (destinationType != null && value is Geometry geometry)
+            if (destinationType != null && value is PointCollection collection)
             {
                 if (destinationType == typeof(string))
                 {
-                    if (context != null && context.Instance != null)
-                    {
-                        throw new NotSupportedException($"Conversion to {destinationType.FullName} is not supported.");
-                    }
-
-                    result = geometry.ToString();
+                    result = collection.ToString(null, culture);
                 }
             }
 

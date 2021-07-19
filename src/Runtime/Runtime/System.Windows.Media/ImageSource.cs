@@ -37,9 +37,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Provides an object source type for Source and ImageSource.
     /// </summary>
-#if FOR_DESIGN_TIME
     [TypeConverter(typeof(ImageSourceConverter))]
-#endif
 #if WORKINPROGRESS
     [ContentProperty("UriSource")]
 #endif

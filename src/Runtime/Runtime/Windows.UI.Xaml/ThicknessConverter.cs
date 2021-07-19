@@ -1,19 +1,5 @@
-﻿
-
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
-
-
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using System.ComponentModel.Design.Serialization;
 using System.Globalization;
 
 #if MIGRATION
@@ -23,12 +9,12 @@ namespace Windows.UI.Xaml
 #endif
 {
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.PropertyPath" /> object to and from other types.
+    /// Converts a <see cref="T:System.Windows.Thickness" /> object to and from other types.
     /// </summary>
-    public sealed partial class PropertyPathConverter : TypeConverter
+    public class ThicknessConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.PropertyPath" />.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Thickness" />.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="sourceType">The type being evaluated for conversion.</param>
@@ -40,7 +26,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.PropertyPath" /> can be converted to the specified type.
+        /// Determines whether an instance of <see cref="T:System.Windows.Thickness" /> can be converted to the specified type.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
@@ -56,14 +42,14 @@ namespace Windows.UI.Xaml
         //     source is null.
         //
         //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.PropertyPath.
+        //     source is not null and is not a valid type which can be converted to a System.Windows.Thickness.
         /// <summary>
-        /// Converts the specified object to a System.Windows.PropertyPath.
+        /// Converts the specified object to a System.Windows.Thickness.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.PropertyPath created from converting source.</returns>
+        /// <returns>The System.Windows.Thickness created from converting source.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value is null)
@@ -75,20 +61,20 @@ namespace Windows.UI.Xaml
                 throw GetConvertFromException(value);
             }
 
-            return PropertyPath.INTERNAL_ConvertFromString((string)value);
+            return Thickness.INTERNAL_ConvertFromString((string)value);
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.PropertyPath" /> to a specified type. </summary>
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.Thickness" /> to a specified type. </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="cultureInfo">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.PropertyPath" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.PropertyPath" /> to.</param>
-        /// <returns>The converted destination <see cref="T:System.String" />.</returns>
-        /// <exception cref="T:System.ArgumentNullException">The <paramref name="value" /> was provided as <see langword="null" />.</exception>
-        /// <exception cref="T:System.ArgumentException">The <paramref name="value" /> was not <see langword="null" />, but was not of the expected <see cref="T:System.Windows.PropertyPath" /> type 
-        /// or the <paramref name="destinationType" /> was not the <see cref="T:System.String" /> type.</exception>
+        /// <param name="value">The <see cref="T:System.Windows.Thickness" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Thickness" /> to.</param>
+        /// <returns>The object created from converting this <see cref="T:System.Windows.Thickness" />.</returns>
+        /// <exception cref="T:System.ArgumentNullException">The <paramref name="value" /> object is not <see langword="null" /> and is not a Brush, or the <paramref name="destinationType" /> is not one of the valid types for conversion.</exception>
+        /// <exception cref="T:System.ArgumentException">The <paramref name="value" /> object is <see langword="null" />.</exception>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo cultureInfo, object value, Type destinationType)
         {
+            object result = null;
             if (value is null)
             {
                 throw new ArgumentNullException(nameof(value));
@@ -98,22 +84,29 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException(nameof(destinationType));
             }
 
-            if (value is PropertyPath path)
+            if (value is Thickness thickness)
             {
-                if (path.PathParameters.Count == 0)
-                {
-                    // if the path didn't use paramaters, just write it out as it is
-                    return path.Path;
+                if (destinationType == typeof(string)) 
+                { 
+                    result = thickness.ToString(thickness, cultureInfo); 
                 }
-                else
+                if (destinationType == typeof(InstanceDescriptor))
                 {
-                    throw new NotImplementedException();
+                    var ci = typeof(Thickness).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double), typeof(double) });
+                    result = new InstanceDescriptor(ci, new object[] { thickness.Left, thickness.Top, thickness.Right, thickness.Bottom });
                 }
             }
             else
             {
-                throw new ArgumentException($"Unexpected parameter type {value.GetType().FullName}.");
+                throw new ArgumentException($"Unexpected paramenter type {value.GetType().FullName}.");
             }
+
+            if (result is null)
+            {
+                throw new ArgumentException($"Cannot convert type {nameof(CornerRadius)} to {destinationType.FullName}.");
+            }
+
+            return result;
         }
     }
 }

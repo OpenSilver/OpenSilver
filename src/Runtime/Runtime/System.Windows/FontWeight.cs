@@ -26,8 +26,8 @@ namespace Windows.UI.Text
     /// Refers to the density of a typeface, in terms of the lightness or heaviness
     /// of the strokes.
     /// </summary>
-    [TypeConverter(typeof(FontWeightTypeConverter))]
-    public partial struct FontWeight
+    [TypeConverter(typeof(FontWeightConverter))]
+    public partial struct FontWeight : IFormattable
     {
         /// <summary>
         /// The font weight expressed as a numeric value. See Remarks.
@@ -104,6 +104,16 @@ namespace Windows.UI.Text
         public override int GetHashCode()
         {
             return 1219257281 + Weight.GetHashCode();
+        }
+
+        public string ToString(string format, IFormatProvider formatProvider)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int ToOpenTypeWeight()
+        {
+            throw new NotImplementedException();
         }
 
         public static bool operator ==(FontWeight left, FontWeight right)

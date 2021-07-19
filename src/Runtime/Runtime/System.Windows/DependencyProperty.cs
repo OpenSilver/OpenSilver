@@ -32,9 +32,7 @@ namespace Windows.UI.Xaml
     /// system. Dependency properties provide support for value expressions, data
     /// binding, animation, and property change notification.
     /// </summary>
-#if FOR_DESIGN_TIME
     [TypeConverter(typeof(DependencyPropertyConverter))]
-#endif
     public partial class DependencyProperty
     {
         private static readonly Type nullableType;

@@ -29,9 +29,7 @@ namespace Windows.UI.Xaml.Media
     /// Defines objects used to paint graphical objects. Classes that derive from
     /// Brush describe how the area is painted.
     /// </summary>
-#if FOR_DESIGN_TIME
     [TypeConverter(typeof(BrushConverter))]
-#endif
     public partial class Brush : DependencyObject, IHasAccessToPropertiesWhereItIsUsed
     {
         static Brush()

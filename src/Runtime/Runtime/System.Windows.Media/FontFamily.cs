@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents a family of related fonts.
     /// </summary>
-    [TypeConverter(typeof(FontFamilyTypeConverter))]
+    [TypeConverter(typeof(FontFamilyConverter))]
     public partial class FontFamily
     {
         static FontFamily()

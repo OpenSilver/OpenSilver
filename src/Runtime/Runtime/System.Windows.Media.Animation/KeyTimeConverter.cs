@@ -13,13 +13,8 @@
 \*====================================================================================*/
 
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -27,75 +22,71 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if FOR_DESIGN_TIME
     /// <summary>
-    /// Converts instances of System.Windows.Media.Animation.KeyTime to and from
-    /// other types.
+    /// Converts a <see cref="T:System.Windows.Media.Animation.KeyTime" /> object to and from other types.
     /// </summary>
     public partial class KeyTimeConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object can be converted from a given type to an instance
-        /// of a System.Windows.Media.Animation.KeyTime.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Media.Animation.KeyTime" />.
         /// </summary>
-        /// <param name="typeDescriptorContext">Contextual information required for conversion.</param>
-        /// <param name="type">Type being evaluated for conversion.</param>
-        /// <returns>true if this type can be converted; otherwise, false.</returns>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="sourceType">The type being evaluated for conversion.</param>
+        /// <returns>
+        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-            {
-                return true;
-            }
-
-            return base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(string);
         }
-  
+
         /// <summary>
-        /// Determines if a given type can be converted to an instance of System.Windows.Media.Animation.KeyTime.
+        /// Determines whether an instance of <see cref="T:System.Windows.Media.Animation.KeyTime" /> can be converted to the specified type.
         /// </summary>
-        /// <param name="typeDescriptorContext">Contextual information required for conversion.</param>
-        /// <param name="type">Type being evaluated for conversion.</param>
-        /// <returns>true if this type can be converted; otherwise, false.</returns>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="destinationType">The type being evaluated for conversion.</param>
+        /// <returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
-      
+
+        // Exceptions:
+        //   System.ArgumentNullException:
+        //     source is null.
+        //
+        //   System.NotSupportedException:
+        //     source is not null and is not a valid type which can be converted to a System.Windows.Media.Animation.KeyTime.
         /// <summary>
-        /// Attempts to convert a given object to an instance of System.Windows.Media.Animation.KeyTime.
+        /// Converts the specified object to a System.Windows.Media.Animation.KeyTime.
         /// </summary>
-        /// <param name="typeDescriptorContext">Context information required for conversion.</param>
-        /// <param name="cultureInfo">Cultural information that is respected during conversion.</param>
-        /// <param name="value">The object being converted to an instance of System.Windows.Media.Animation.KeyTime.</param>
-        /// <returns>
-        /// A new instance of System.Windows.Media.Animation.KeyTime, based on the supplied
-        /// value.
-        /// </returns>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The object being converted.</param>
+        /// <returns>The System.Windows.Media.Animation.KeyTime created from converting source.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
+            if (value is null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+            else if (value.GetType() != typeof(string))
+            {
                 throw GetConvertFromException(value);
+            }
 
-            if (value is string)
-                return KeyTime.INTERNAL_ConvertFromString((string)value);
-
-            return base.ConvertFrom(context, culture, value);
+            return KeyTime.INTERNAL_ConvertFromString((string)value);
         }
 
-        /// <summary>
-        /// Attempts to convert an instance of System.Windows.Media.Animation.KeyTime
-        /// to another type.
-        /// </summary>
-        /// <param name="typeDescriptorContext">Context information required for conversion.</param>
-        /// <param name="cultureInfo">Cultural information that is respected during conversion.</param>
-        /// <param name="value">System.Windows.Media.Animation.KeyTime value to convert from.</param>
-        /// <param name="destinationType">Type being evaluated for conversion.</param>
-        /// <returns>A new object, based on value.</returns>
-        public override object ConvertTo(ITypeDescriptorContext typeDescriptorContext, CultureInfo cultureInfo, object value, Type destinationType)
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.Animation.KeyTime" /> to a specified type. </summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The <see cref="T:System.Windows.Media.Animation.KeyTime" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Media.Animation.KeyTime" /> to.</param>
+        /// <returns>The object created from converting this <see cref="T:System.Windows.Media.Animation.KeyTime" />.</returns>
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
             throw new NotImplementedException();
         }
     }
-#endif
 }

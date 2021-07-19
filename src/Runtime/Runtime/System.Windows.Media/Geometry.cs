@@ -12,8 +12,8 @@
 *  
 \*====================================================================================*/
 
-using System;
 using DotNetForHtml5.Core;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Shapes;
@@ -33,9 +33,7 @@ namespace Windows.UI.Xaml.Media
     /// objects can be used for clipping regions and as geometry definitions for
     /// rendering two-dimensional graphical data as a Path.
     /// </summary>
-#if FOR_DESIGN_TIME
     [TypeConverter(typeof(GeometryConverter))]
-#endif
     public abstract partial class Geometry : DependencyObject
     {
         static Geometry()

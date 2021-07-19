@@ -8,31 +8,29 @@ namespace Windows.Foundation
 #endif
 {
     /// <summary>
-    /// Converts instances of System.Windows.Rect to and from other data types.
+    /// Converts a <see cref="T:System.Windows.Rect" /> object to and from other types.
     /// </summary>
-    public class RectTypeConverter : TypeConverter
+    public class RectConverter : TypeConverter
     {
         /// <summary>
-        /// Indicates whether an object can be converted from a given type to a System.Windows.Rect.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Rect" />.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="sourceType">The source System.Type that is being queried for conversion support.</param>
-        /// <returns>true if sourceType is of type System.String; otherwise, false.</returns>
+        /// <param name="sourceType">The type being evaluated for conversion.</param>
+        /// <returns>
+        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             return sourceType == typeof(string);
         }
 
         /// <summary>
-        /// Determines whether System.Windows.Rect values can be converted to
-        /// the specified type.
+        /// Determines whether an instance of <see cref="T:System.Windows.Rect" /> can be converted to the specified type.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">
-        /// The desired type this System.Windows.Rect is being evaluated to be
-        /// converted to.
-        /// </param>
-        /// <returns>true if destinationType is of type System.String; otherwise, false.</returns>
+        /// <param name="destinationType">The type being evaluated for conversion.</param>
+        /// <returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
             return destinationType == typeof(string);
@@ -65,37 +63,29 @@ namespace Windows.Foundation
             return Rect.Parse((string)value);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     value is null.
-        //
-        //   System.NotSupportedException:
-        //     value is not null and is not a System.Windows.Rect, or if destinationType
-        //     is not one of the valid destination types.
-        /// <summary>
-        /// Converts the specified System.Windows.Rect to the specified type.
-        /// </summary>
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.Rect" /> to a specified type. </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The System.Windows.Rect to convert.</param>
-        /// <param name="destinationType">The type to convert the System.Windows.Rect to.</param>
-        /// <returns>The object created from converting this System.Windows.Rect (a string).</returns>
+        /// <param name="value">The <see cref="T:System.Windows.Rect" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Rect" /> to.</param>
+        /// <returns>The object created from converting this <see cref="T:System.Windows.Rect" />.</returns>
+        /// <exception cref="T:System.NotSupportedException">
+        /// Thrown if <paramref name="value" /> is <see langword="null" /> or not a <see cref="T:System.Windows.Rect" />,
+        /// or if the <paramref name="destinationType" /> is not one of the valid types for conversion.</exception>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if (value is null)
+            object result;
+
+            if (destinationType != null && destinationType == typeof(string) && value is Rect rect)
             {
-                throw new ArgumentNullException(nameof(value));
+                result = rect.ToString();
             }
-            else if (!(value is Rect))
+            else
             {
-                throw new NotSupportedException($"Conversion from {value.GetType().FullName} is not supported.");
-            }
-            else if (destinationType != typeof(string))
-            {
-                throw new NotSupportedException($"Conversion to {destinationType.FullName} is not supported.");
+                result = base.ConvertTo(context, culture, value, destinationType);
             }
 
-            return value.ToString();
+            return result;
         }
     }
 }
