@@ -918,43 +918,15 @@ function(){
 
             string uniqueIdentifier = INTERNAL_HtmlDomUniqueIdentifiers.CreateNew();
 
+            Interop.ExecuteJavaScriptAsync(@"document.createElementSafe($0, $1, $2, $3)", domElementTag, uniqueIdentifier, parentRef, index);
+            INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
+
             if (parentRef is INTERNAL_HtmlDomElementReference)
             {
-                string parentUniqueIdentifier = ((INTERNAL_HtmlDomElementReference)parentRef).UniqueIdentifier;
-                string javaScriptToExecute = string.Format(@"
-var newElement = document.createElement(""{0}"");
-newElement.setAttribute(""id"", ""{1}"");
-var parentElement = document.getElementByIdSafe(""{2}"");
-if({3} < 0 || {3} >= parentElement.children.length)
-{{
-    parentElement.appendChild(newElement);
-}}
-else
-{{
-    var nextSibling = parentElement.children[{3}];
-    parentElement.insertBefore(newElement,nextSibling);
-}}
-", domElementTag, uniqueIdentifier, parentUniqueIdentifier, index);
-                ExecuteJavaScript(javaScriptToExecute);
-                INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
                 return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, (INTERNAL_HtmlDomElementReference)parentRef);
             }
             else
             {
-                Interop.ExecuteJavaScriptAsync(@"
-var newElement = document.createElement($0);
-newElement.setAttribute(""id"", $1);
-if($3 < 0 || $3 >= $2.children.length)
-{
-    $2.appendChild(newElement);
-}
-else
-{
-    var nextSibling = $2.children[$3];
-    $2.insertBefore(newElement,nextSibling);
-}
-", domElementTag, uniqueIdentifier, parentRef,index);
-                INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
                 return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, null); //todo: this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
             }
         }

@@ -445,12 +445,7 @@ namespace Windows.UI.Xaml
                                             if (styleOfChildOfOuterDomElement.display != "table") //Note: this test was added to prevent a bug that happened when both horizontal and vertical alignment were set, which lead to this line overriding the change of display that happened on a same dom element when the parent did not have a wrapper for its children (I think).
                                             {
                                                 // Note: the "if != 'span'" condition below prevents adding "display: table-cell" to elements inside a TextBlock, such as <Run>, <Span>, <Bold>, etc.
-                                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-if ($0.tagName.toLowerCase() != 'span')
-{
-    $0.style.display = 'table-cell';
-}
-", childOfOuterDomElement);
+                                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.setDisplayTableCell($0)", childOfOuterDomElement.UniqueIdentifier);
                                             }
                                         }
                                     }
@@ -475,12 +470,7 @@ if ($0.tagName.toLowerCase() != 'span')
                                             if (styleOfChildOfOuterDomElement.display != "table") //Note: this test was added to prevent a bug that happened when both horizontal and vertical alignment were set, which lead to this line overriding the change of display that happened on a same dom element when the parent did not have a wrapper for its children (I think).
                                             {
                                                 // Note: the "if != 'span'" condition below prevents adding "display: table-cell" to elements inside a TextBlock, such as <Run>, <Span>, <Bold>, etc.
-                                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-if ($0.tagName.toLowerCase() != 'span')
-{
-    $0.style.display = 'table-cell';
-}
-", childOfOuterDomElement);
+                                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.setDisplayTableCell($0)", childOfOuterDomElement.UniqueIdentifier);
                                             }
                                         }
                                     }
@@ -505,12 +495,7 @@ if ($0.tagName.toLowerCase() != 'span')
                                             if (styleOfChildOfOuterDomElement.display != "table") //Note: this test was added to prevent a bug that happened when both horizontal and vertical alignment were set, which lead to this line overriding the change of display that happened on a same dom element when the parent did not have a wrapper for its children (I think).
                                             {
                                                 // Note: the "if != 'span'" condition below prevents adding "display: table-cell" to elements inside a TextBlock, such as <Run>, <Span>, <Bold>, etc.
-                                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-if ($0.tagName.toLowerCase() != 'span')
-{
-    $0.style.display = 'table-cell';
-}
-", childOfOuterDomElement);
+                                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.setDisplayTableCell($0)", childOfOuterDomElement.UniqueIdentifier);
                                             }
                                         }
                                     }
@@ -1550,7 +1535,7 @@ if ($0.tagName.toLowerCase() != 'span')
                     try
                     {
                     // Hack to improve the Simulator performance by making only one interop call rather than two:
-                    string concatenated = CSHTML5.Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null) ? '0|0' : $0['offsetWidth'].toFixed(3) + '|' + $0['offsetHeight'].toFixed(3)", this.INTERNAL_OuterDomElement).ToString();
+                    string concatenated = CSHTML5.Interop.ExecuteJavaScript("document.getActualWidthAndHeight($0)", this.INTERNAL_OuterDomElement).ToString();
                     int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
                         if (sepIndex > -1)
                         {

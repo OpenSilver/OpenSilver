@@ -789,11 +789,9 @@ namespace Windows.UI.Xaml.Controls
                         else
                         {
                             // Note: we set to Visible only if it was previously Hidden due to the fact that a Grid column is hidden, to avoid conflicts such as replacing the "overflow" property set by the ScrollViewer or by the "ClipToBounds" property.
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-if ($0.getAttribute('data-isCollapsedDueToHiddenColumn') == true) {
-    $0.style.overflow = 'visible';
-    $0.setAttribute('data-isCollapsedDueToHiddenColumn', false);
-}", child.INTERNAL_OuterDomElement);
+                            // setAttribute('data-isCollapsedDueToHiddenColumn', false)
+                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.setGridCollapsedDuetoHiddenColumn($0)",
+                                ((INTERNAL_HtmlDomElementReference)child.INTERNAL_OuterDomElement).UniqueIdentifier);
                         }
                     }
                 }

@@ -55,8 +55,7 @@ namespace CSHTML5.Internal
         static void AttachEvent(string eventName, object domElementRef, HtmlEventProxy newProxy, Action<object> originalEventHandler)
         {
 #if !BUILDINGDOCUMENTATION
-
-            Interop.ExecuteJavaScriptAsync(@"$0.addEventListener($1, $2)", domElementRef, eventName, (Action<object>)newProxy.OnEvent);
+            Interop.ExecuteJavaScriptAsync(@"document.addEventListenerSafe($0, $1, $2)", domElementRef, eventName, (Action<object>)newProxy.OnEvent);
 
             /*
             DOMEventType eventType;
@@ -85,12 +84,7 @@ namespace CSHTML5.Internal
         internal static void DetachEvent(string eventName, object domElementRef, HtmlEventProxy proxy, Action<object> originalEventHandler)
         {
 #if !BUILDINGDOCUMENTATION
-
-            Interop.ExecuteJavaScriptAsync(@"
-                var element = $0;
-                if (element) {
-                    element.removeEventListener($1, $2)
-                }", domElementRef, eventName, (Action<object>)proxy.OnEvent);
+            Interop.ExecuteJavaScriptAsync(@"document.removeEventListenerSafe($0, $1, $2)", domElementRef, eventName, (Action<object>)proxy.OnEvent);
 
             /*
             DOMEventType eventType;
