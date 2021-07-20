@@ -48,37 +48,47 @@ namespace Windows.UI.Xaml
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />
+        /// or <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(string);
+            return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Duration.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.Duration.
-        /// </summary>
+        /// <summary>Converts a given string value to an instance of <see cref="T:System.Windows.Duration" />.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Duration created from converting source.</returns>
+        /// <returns>A new instance of <see cref="T:System.Windows.Duration" />.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                var duration = value.ToString();
 
-            return Duration.INTERNAL_ConvertFromString((string)value);
+                if (duration.ToLower() == "forever")
+                    return Duration.Forever;
+                if (duration.ToLower() == "automatic")
+                    return Duration.Automatic;
+#if BRIDGE
+            TimeSpan timeSpan = INTERNAL_BridgeWorkarounds.TimeSpanParse(duration);
+#else
+                TimeSpan timeSpan = TimeSpan.Parse(duration);
+#endif
+                result = new Duration(timeSpan);
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
+
+            return result;
         }
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Duration" /> to a specified type. </summary>

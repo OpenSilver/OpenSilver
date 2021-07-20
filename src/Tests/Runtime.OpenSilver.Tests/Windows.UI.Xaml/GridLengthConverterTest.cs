@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.ComponentModel.Design.Serialization;
 
 #if MIGRATION
 namespace System.Windows.Tests
@@ -52,10 +53,25 @@ namespace Windows.UI.Xaml.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_String_ShouldReturnGridLengthAuto()
         {
             var gridLengthConverter = new GridLengthConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => gridLengthConverter.ConvertFrom(null));
+            var test = gridLengthConverter.ConvertFrom("auto");
+            test.Should().Be(new GridLength(1.0, GridUnitType.Auto));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_String_ShouldThrow_Exception()
+        {
+            var gridLengthConverter = new GridLengthConverter();
+            Assert.ThrowsException<Exception>(() => gridLengthConverter.ConvertFrom("*"));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
+        {
+            var gridLengthConverter = new GridLengthConverter();
+            Assert.ThrowsException<NotSupportedException>(() => gridLengthConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -77,7 +93,7 @@ namespace Windows.UI.Xaml.Tests
         public void ConvertTo_String_ShouldThrow_ArgumentNullException()
         {
             var gridLengthConverter = new GridLengthConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => gridLengthConverter.ConvertTo(null, typeof(string)));
+            Assert.ThrowsException<ArgumentNullException>(() => gridLengthConverter.ConvertTo(new GridLength(100), null));
         }
 
         [TestMethod]
@@ -86,6 +102,15 @@ namespace Windows.UI.Xaml.Tests
             var gridLengthConverter = new GridLengthConverter();
             Assert.ThrowsException<NotSupportedException>(() => gridLengthConverter.ConvertTo(true, typeof(string)));
             Assert.ThrowsException<NotSupportedException>(() => gridLengthConverter.ConvertTo(new GridLength(100), typeof(bool)));
+        }
+
+        [TestMethod]
+        public void ConvertTo_InstanceDescriptor()
+        {
+            var gridLengthConverter = new GridLengthConverter();
+            var fontStyle = new GridLength();
+            var test = gridLengthConverter.ConvertTo(fontStyle, typeof(InstanceDescriptor));
+            test.Should().BeOfType(typeof(InstanceDescriptor));
         }
     }
 }

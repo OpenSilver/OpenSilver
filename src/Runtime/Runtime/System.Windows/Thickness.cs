@@ -13,11 +13,8 @@
 \*====================================================================================*/
 
 
-using DotNetForHtml5.Core;
-using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -119,11 +116,6 @@ namespace Windows.UI.Xaml
             return t1.Left == t2.Left && t1.Top == t2.Top && t1.Bottom == t2.Bottom && t1.Right == t2.Right;
         }
 
-        internal object ToString(Thickness thickness, CultureInfo cultureInfo)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// [SECURITY CRITICAL] Gets or sets the width, in pixels, of the lower side
         /// of the bounding rectangle.
@@ -190,62 +182,6 @@ namespace Windows.UI.Xaml
         public override string ToString()
         {
             return string.Concat(Left, ", ", Top, ", ", Right, ", ", Bottom);
-        }
-
-        static Thickness()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(Thickness), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string thicknessAsString)
-        {
-            var splitter = ',';
-            var trimmedThicknessAsString = thicknessAsString.Trim(); //we trim the string so that we don't get random spaces at the beginning and at the end act as separators (for example: Margin=" 5")
-
-            if (!trimmedThicknessAsString.Contains(','))
-            {
-                splitter = ' ';
-            }
-
-            var splittedString = trimmedThicknessAsString.Split(splitter);
-
-            if (splittedString.Length == 1)
-            {
-                if (double.TryParse(splittedString[0], out var thickness))
-                {
-                    return new Thickness(thickness);
-                }
-            }
-            else if (splittedString.Length == 2)
-            {
-                var topAndBottom = 0d;
-
-                var isParseOK = double.TryParse(splittedString[0], out var leftAndRight);
-                isParseOK = isParseOK && double.TryParse(splittedString[1], out topAndBottom);
-
-                if (isParseOK)
-                {
-                    return new Thickness(leftAndRight, topAndBottom, leftAndRight, topAndBottom);
-                }
-            }
-            else if (splittedString.Length == 4)
-            {
-                double top = 0d;
-                double right = 0d;
-                double bottom = 0d;
-
-                bool isParseOK = double.TryParse(splittedString[0], out var left);
-                isParseOK = isParseOK && double.TryParse(splittedString[1], out top);
-                isParseOK = isParseOK && double.TryParse(splittedString[2], out right);
-                isParseOK = isParseOK && double.TryParse(splittedString[3], out bottom);
-
-                if (isParseOK)
-                {
-                    return new Thickness(left, top, right, bottom);
-                }
-            }
-
-            throw new FormatException(thicknessAsString + " is not an eligible value for Thickness");
         }
     }
 }

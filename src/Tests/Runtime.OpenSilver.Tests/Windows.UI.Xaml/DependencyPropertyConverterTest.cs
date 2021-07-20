@@ -27,34 +27,26 @@ namespace Windows.UI.Xaml.Tests
         }
 
         [TestMethod]
-        public void CanConvertTo_String_ShouldReturnTrue()
+        public void CanConvertTo_String_ShouldFalse()
         {
             var dependencyPropertyConverter = new DependencyPropertyConverter();
             var test = dependencyPropertyConverter.CanConvertTo(typeof(string));
-            test.Should().BeTrue();
-        }
-
-        [TestMethod]
-        public void CanConvertTo_Bool_ShouldReturnFalse()
-        {
-            var dependencyPropertyConverter = new DependencyPropertyConverter();
-            var test = dependencyPropertyConverter.CanConvertTo(typeof(bool));
             test.Should().BeFalse();
         }
 
         [TestMethod]
-        public void ConvertFrom_String_ShouldReturnDependencyProperty()
+        public void ConvertFrom_String_ShouldReturnNull()
         {
             var dependencyPropertyConverter = new DependencyPropertyConverter();
             var test = dependencyPropertyConverter.ConvertFrom("0,0,100,100");
-            test.Should().Be(new DependencyProperty());
+            test.Should().BeNull();
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
         {
             var dependencyPropertyConverter = new DependencyPropertyConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => dependencyPropertyConverter.ConvertFrom(null));
+            Assert.ThrowsException<NotSupportedException>(() => dependencyPropertyConverter.ConvertFrom(null));
         }
 
         [TestMethod]

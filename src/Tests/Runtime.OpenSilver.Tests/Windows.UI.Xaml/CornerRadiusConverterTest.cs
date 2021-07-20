@@ -47,15 +47,31 @@ namespace Windows.UI.Xaml.Tests
         public void ConvertFrom_String_ShouldReturnCornerRadius()
         {
             var cornerRadiusConverter = new CornerRadiusConverter();
-            var test = cornerRadiusConverter.ConvertFrom("1,1,1,1");
+            var test = cornerRadiusConverter.ConvertFrom("1,2,3,4");
+            test.Should().Be(new CornerRadius(1, 2, 3, 4));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_String_ShouldReturnCornerRadius_WithUniformRadius()
+        {
+            var cornerRadiusConverter = new CornerRadiusConverter();
+            var test = cornerRadiusConverter.ConvertFrom("1");
             test.Should().Be(new CornerRadius(1));
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_InvalidRadius_ShouldThrow_FormatException()
         {
             var cornerRadiusConverter = new CornerRadiusConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => cornerRadiusConverter.ConvertFrom(null));
+            var invalidRadius = "1,2,3";
+            Assert.ThrowsException<FormatException>(() => cornerRadiusConverter.ConvertFrom(invalidRadius));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
+        {
+            var cornerRadiusConverter = new CornerRadiusConverter();
+            Assert.ThrowsException<NotSupportedException>(() => cornerRadiusConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -70,7 +86,7 @@ namespace Windows.UI.Xaml.Tests
         {
             var cornerRadiusConverter = new CornerRadiusConverter();
             var test = cornerRadiusConverter.ConvertTo(new CornerRadius(1), typeof(string));
-            test.Should().Be("1, 1, 1, 1");
+            test.Should().Be("1,1,1,1");
         }
 
         [TestMethod]
@@ -82,11 +98,11 @@ namespace Windows.UI.Xaml.Tests
         }
 
         [TestMethod]
-        public void ConvertTo_String_ShouldThrow_NotSupportedException()
+        public void ConvertTo_String_ShouldThrow_ArgumentException()
         {
             var cornerRadiusConverter = new CornerRadiusConverter();
-            Assert.ThrowsException<NotSupportedException>(() => cornerRadiusConverter.ConvertTo(true, typeof(string)));
-            Assert.ThrowsException<NotSupportedException>(() => cornerRadiusConverter.ConvertTo(new CornerRadius(1), typeof(bool)));
+            Assert.ThrowsException<ArgumentException>(() => cornerRadiusConverter.ConvertTo(true, typeof(string)));
+            Assert.ThrowsException<ArgumentException>(() => cornerRadiusConverter.ConvertTo(new CornerRadius(1), typeof(bool)));
         }
 
         [TestMethod]

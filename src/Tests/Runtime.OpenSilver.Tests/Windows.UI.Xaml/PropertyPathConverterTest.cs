@@ -47,15 +47,15 @@ namespace Windows.UI.Xaml.Tests
         public void ConvertFrom_String_ShouldReturnPropertyPath()
         {
             var propertyPathConverter = new PropertyPathConverter();
-            var test = propertyPathConverter.ConvertFrom("0,0,100,100");
+            var test = propertyPathConverter.ConvertFrom("testpath");
             test.Should().Be(new PropertyPath("testpath"));
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
         {
             var propertyPathConverter = new PropertyPathConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => propertyPathConverter.ConvertFrom(null));
+            Assert.ThrowsException<NotSupportedException>(() => propertyPathConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -78,14 +78,14 @@ namespace Windows.UI.Xaml.Tests
         {
             var propertyPathConverter = new PropertyPathConverter();
             Assert.ThrowsException<ArgumentNullException>(() => propertyPathConverter.ConvertTo(null, typeof(string)));
+            Assert.ThrowsException<ArgumentNullException>(() => propertyPathConverter.ConvertTo(new PropertyPath("testpath"), null));
         }
 
         [TestMethod]
-        public void ConvertTo_String_ShouldThrow_NotSupportedException()
+        public void ConvertTo_String_ShouldThrow_ArgumentException()
         {
             var propertyPathConverter = new PropertyPathConverter();
-            Assert.ThrowsException<NotSupportedException>(() => propertyPathConverter.ConvertTo(true, typeof(string)));
-            Assert.ThrowsException<NotSupportedException>(() => propertyPathConverter.ConvertTo(new PropertyPath("testpath"), typeof(bool)));
+            Assert.ThrowsException<ArgumentException>(() => propertyPathConverter.ConvertTo(true, typeof(string)));
         }
     }
 }

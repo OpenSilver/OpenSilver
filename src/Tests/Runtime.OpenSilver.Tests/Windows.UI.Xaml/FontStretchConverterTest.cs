@@ -47,16 +47,15 @@ namespace Windows.UI.Xaml.Tests
         public void ConvertFrom_String_ShouldReturnFontStretch()
         {
             var fontStretchConverter = new FontStretchConverter();
-            throw new NotImplementedException();
             var test = fontStretchConverter.ConvertFrom("");
             test.Should().Be(new FontStretch());
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
         {
             var fontStretchConverter = new FontStretchConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => fontStretchConverter.ConvertFrom(null));
+            Assert.ThrowsException<NotSupportedException>(() => fontStretchConverter.ConvertFrom(null));
         }
 
         [TestMethod]
