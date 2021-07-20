@@ -50,40 +50,40 @@ namespace System.Windows.Input
             return destinationType == typeof(string);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Input.Cursor.
         /// <summary>
         /// Attempts to convert the specified object to a <see cref="T:System.Windows.Input.Cursor" />.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Culture specific information.</param>
         /// <param name="value">The object to convert.</param>
-        /// <returns>The System.Windows.Input.Cursor created from converting source.</returns>
+        /// <returns>The converted object, or <see langword="null" /> if <paramref name="value" /> is an empty string.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                if (Enum.TryParse(value.ToString(), out CursorType cursorType) && (int)cursorType >= (int)CursorType.None && (int)cursorType <= (int)CursorType.Eraser)
+                {
+                    result = Cursors.EnsureCursor(cursorType);
+                }
+                else
+                {
+                    throw new ArgumentException(string.Format("'{0}' cursor type is not valid.", value.ToString()));
+                }
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
 
-            return Cursor.INTERNAL_ConvertFromString((string)value);
+            return result;
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     value is null.
-        //
-        //   System.NotSupportedException:
-        //     value is not null and is not a System.Windows.Input.Cursor, or if destinationType
-        //     is not one of the valid destination types.
         /// <summary>
         /// Attempts to convert a <see cref="T:System.Windows.Input.Cursor" /> to the specified type.
         /// </summary>
