@@ -51,31 +51,47 @@ namespace Windows.UI.Xaml.Media
             return destinationType == typeof(string);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Media.DoubleCollection.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.Media.DoubleCollection.
-        /// </summary>
+        /// <summary>Attempts to convert the specified object to a <see cref="T:System.Windows.Media.DoubleCollection" />.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Media.DoubleCollection created from converting source.</returns>
+        /// <returns>The <see cref="T:System.Windows.Media.DoubleCollection" /> that is created from converting <paramref name="value" />.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                var doubleCollectionAsString = value.ToString();
 
-            return DoubleCollection.INTERNAL_ConvertFromString((string)value);
+                var separator = ' ';
+                if (doubleCollectionAsString.Trim().Contains(","))
+                {
+                    separator = ',';
+                }
+
+                var split = doubleCollectionAsString.Split(separator);
+                var doubleCollection = new DoubleCollection();
+
+                foreach (string element in split)
+                {
+                    if (!string.IsNullOrWhiteSpace(element))
+                    {
+                        doubleCollection.Add(double.Parse(element));
+                    }
+                }
+                result = doubleCollection;
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
+
+            return result;
         }
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.DoubleCollection" /> to a specified type. </summary>

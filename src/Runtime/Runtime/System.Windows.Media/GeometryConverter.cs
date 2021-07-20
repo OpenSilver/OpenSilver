@@ -48,34 +48,50 @@ namespace Windows.UI.Xaml.Media
         /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(string);
+            if (destinationType == typeof(string))
+            {
+                // When invoked by the serialization engine we can convert to string only for some instances
+                if (context != null && context.Instance != null)
+                {
+                    if (!(context.Instance is Geometry))
+                    {
+                        throw new ArgumentException($"Expected type of {nameof(Geometry)}.");
+                    }
+
+                    return false;
+                }
+
+                return true;
+            }
+
+            return base.CanConvertTo(context, destinationType);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Media.Geometry.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.Media.Geometry.
-        /// </summary>
+        /// <summary>Converts the specified object to a <see cref="T:System.Windows.Media.Geometry" />.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Media.Geometry created from converting source.</returns>
+        /// <returns>The <see cref="T:System.Windows.Media.Geometry" /> created from converting <paramref name="value" />.</returns>
+        /// <exception cref="T:System.NotSupportedException">Thrown if <paramref name="value" /> is <see langword="null" /> or is not a valid type which can be converted to a <see cref="T:System.Windows.Media.Geometry" />.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                result = GeometryParser.ParseGeometry(value.ToString());
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
 
-            return Geometry.INTERNAL_ConvertFromString((string)value);
+            return result;
+
         }
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.Geometry" /> to a specified type. </summary>

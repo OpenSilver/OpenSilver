@@ -1,4 +1,19 @@
-﻿using System.ComponentModel;
+﻿
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+
+using System.ComponentModel;
 using System.Globalization;
 
 #if MIGRATION
@@ -8,12 +23,12 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.Point" /> object to and from other types.
+    /// Converts a <see cref="T:System.Windows.Media.PointCollection" /> object to and from other types.
     /// </summary>
     public class PointCollectionConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Point" />.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Media.PointCollection" />.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="sourceType">The type being evaluated for conversion.</param>
@@ -25,7 +40,7 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.Point" /> can be converted to the specified type.
+        /// Determines whether an instance of <see cref="T:System.Windows.Media.PointCollection" /> can be converted to the specified type.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
@@ -36,33 +51,58 @@ namespace Windows.UI.Xaml.Media
             return destinationType == typeof(string);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Media.PointCollection.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.Media.PointCollection.
-        /// </summary>
+        /// <summary>Attempts to convert the specified object to a <see cref="T:System.Windows.Media.PointCollection" />.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Media.PointCollection created from converting source.</returns>
+        /// <returns>The <see cref="T:System.Windows.Media.PointCollection" /> that is created from converting <paramref name="value" />.</returns>
+        /// <exception cref="T:System.NotSupportedException">The specified object is null or is a type that cannot be converted to a <see cref="T:System.Windows.Media.PointCollection" />.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                var pointsAsString = value.ToString();
 
-            return PointCollection.Parse((string)value);
+                var splittedString = pointsAsString.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var collection = new PointCollection();
+
+                // Points count needs to be even number
+                if (splittedString.Length % 2 == 0)
+                {
+                    for (int i = 0; i < splittedString.Length; i += 2)
+                    {
+#if OPENSILVER
+                        if (double.TryParse(splittedString[i], NumberStyles.Any, CultureInfo.InvariantCulture, out var x) &&
+                            double.TryParse(splittedString[i + 1], NumberStyles.Any, CultureInfo.InvariantCulture, out var y))
+#else
+                    if (double.TryParse(splittedString[i], out var x) &&
+                        double.TryParse(splittedString[i + 1], out var y))
+#endif
+                        {
+                            collection.Add(new Point(x, y));
+                        }
+                    }
+
+                    result = collection;
+                }
+                else
+                {
+                    throw new FormatException(pointsAsString + " is not an eligible value for a PointCollection");
+                }
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
+
+            return result;
         }
-
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.PointCollection" /> to a specified type. </summary>
         /// <param name="context">Describes the context information of a type.</param>

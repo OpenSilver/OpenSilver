@@ -12,7 +12,6 @@
 *  
 \*====================================================================================*/
 
-using DotNetForHtml5.Core;
 using System.ComponentModel;
 
 #if MIGRATION
@@ -36,11 +35,6 @@ namespace Windows.UI.Xaml.Media
     [TypeConverter(typeof(GeometryConverter))]
     public abstract partial class Geometry : DependencyObject
     {
-        static Geometry()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(Geometry), INTERNAL_ConvertFromString);
-        }
-
         internal Geometry()
         {
 
@@ -74,11 +68,6 @@ namespace Windows.UI.Xaml.Media
         internal virtual string GetFillRuleAsString()
         {
             return "evenodd";
-        }
-
-        internal static object INTERNAL_ConvertFromString(string pathAsString)
-        {
-            return PathGeometry.INTERNAL_ConvertFromString(pathAsString);
         }
 
         public static readonly DependencyProperty TransformProperty = 

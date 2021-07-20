@@ -13,14 +13,9 @@
 \*====================================================================================*/
 
 
-using DotNetForHtml5.Core;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 #if MIGRATION
 using System.Windows.Shapes;
 #else
@@ -34,6 +29,7 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+    [TypeConverter(typeof(PointCollectionConverter))]
     public sealed partial class PointCollection : PresentationFrameworkCollection<Point>
     {
         #region Data
@@ -43,39 +39,6 @@ namespace Windows.UI.Xaml.Media
         #endregion
 
         #region Constructor
-
-        static PointCollection()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(PointCollection), s => Parse(s));
-        }
-
-        public static PointCollection Parse(string pointsAsString)
-        {
-            string[] splittedString = pointsAsString.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            PointCollection result = new PointCollection();
-
-            // Points count needs to be even number
-            if (splittedString.Length % 2 == 0)
-            {
-                for (int i = 0; i < splittedString.Length; i += 2)
-                {
-                    double x, y;
-#if OPENSILVER
-                    if (double.TryParse(splittedString[i], NumberStyles.Any, CultureInfo.InvariantCulture, out x) &&
-                        double.TryParse(splittedString[i + 1], NumberStyles.Any, CultureInfo.InvariantCulture, out y))
-#else
-                    if (double.TryParse(splittedString[i], out x) &&
-                        double.TryParse(splittedString[i + 1], out y))
-#endif
-                    {
-                        result.Add(new Point(x, y));
-                    }
-                }
-                return result;
-            }
-
-            throw new FormatException(pointsAsString + " is not an eligible value for a PointCollection");
-        }
 
         /// <summary>
         /// Initializes a new instance that is empty.
@@ -143,6 +106,16 @@ namespace Windows.UI.Xaml.Media
         internal object ToString(object p, CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PointCollection collection;
+        }
+
+        public override int GetHashCode()
+        {
+            return 0;
         }
 
         internal override Point GetItemOverride(int index)

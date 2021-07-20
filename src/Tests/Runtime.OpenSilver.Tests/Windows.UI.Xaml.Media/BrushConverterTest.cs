@@ -43,29 +43,18 @@ namespace Windows.UI.Xaml.Media.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_String_ShouldReturnBrush()
+        public void ConvertFrom_String_ShouldReturnSolidColorBrush()
         {
             var brushConverter = new BrushConverter();
-            var expected = new SolidColorBrush
-            {
-                Color = new Color
-                {
-                    A = 170,
-                    B = 221,
-                    G = 204,
-                    R = 187
-                }
-            };
             var test = brushConverter.ConvertFrom("#AABBCCDD");
-            throw new NotImplementedException();
-            test.Should().Be(expected);
+            test.Should().BeOfType(typeof(SolidColorBrush));
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
         {
             var brushConverter = new BrushConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => brushConverter.ConvertFrom(null));
+            Assert.ThrowsException<NotSupportedException>(() => brushConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -80,7 +69,6 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             var brushConverter = new BrushConverter();
             var test = brushConverter.ConvertTo(new Brush(), typeof(string));
-            throw new NotImplementedException();
             test.Should().Be("");
         }
 
@@ -88,14 +76,14 @@ namespace Windows.UI.Xaml.Media.Tests
         public void ConvertTo_String_ShouldThrow_ArgumentNullException()
         {
             var brushConverter = new BrushConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => brushConverter.ConvertTo(null, typeof(string)));
+            Assert.ThrowsException<ArgumentNullException>(() => brushConverter.ConvertTo(new Brush(), null));
         }
 
         [TestMethod]
         public void ConvertTo_String_ShouldThrow_NotSupportedException()
         {
             var brushConverter = new BrushConverter();
-            Assert.ThrowsException<NotSupportedException>(() => brushConverter.ConvertTo(true, typeof(string)));
+            Assert.ThrowsException<NotSupportedException>(() => brushConverter.ConvertTo(true, typeof(bool)));
             Assert.ThrowsException<NotSupportedException>(() => brushConverter.ConvertTo(new Brush(), typeof(bool)));
         }
     }

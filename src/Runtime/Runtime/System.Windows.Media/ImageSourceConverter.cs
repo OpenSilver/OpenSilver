@@ -15,6 +15,7 @@
 
 using System.ComponentModel;
 using System.Globalization;
+using System.Windows.Media.Imaging;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -48,34 +49,53 @@ namespace Windows.UI.Xaml.Media
         /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(string);
+            if (destinationType == typeof(string))
+            {
+                // When invoked by the serialization engine we can convert to string only for some instances
+                if (context != null && context.Instance != null)
+                {
+                    if (!(context.Instance is ImageSource))
+                    {
+                        throw new ArgumentException($"Expected type of {nameof(ImageSource)}.");
+                    }
+
+                    return false;
+                }
+
+                return true;
+            }
+
+            return base.CanConvertTo(context, destinationType);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Media.ImageSource.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.Media.ImageSource.
-        /// </summary>
+        /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.Media.ImageSource" />.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Media.ImageSource created from converting source.</returns>
+        /// <returns>A new instance of <see cref="T:System.Windows.Media.ImageSource" />.</returns>
+        /// <exception cref="T:System.NotSupportedException">
+        /// <paramref name="value" /> is <see langword="null" /> or is an invalid type.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                var str = value.ToString();
 
-            return ImageSource.INTERNAL_ConvertFromString((string)value);
+                var uriKind = str.Contains(@":/") ? UriKind.Absolute : UriKind.Relative;
+                result = new BitmapImage(new Uri(str, uriKind));
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
+
+            return result;
         }
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.ImageSource" /> to a specified type. </summary>

@@ -12,7 +12,7 @@
 *  
 \*====================================================================================*/
 
-using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -26,17 +26,13 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+    [TypeConverter(typeof(MatrixConverter))]
     /// <summary>
     /// Represents a 3x3 affine transformation matrix used for transformations in two-dimensional
     /// space.
     /// </summary>
     public struct Matrix : IFormattable
     {
-        static Matrix()
-        {
-            DotNetForHtml5.Core.TypeFromStringConverters.RegisterConverter(typeof(Matrix), (m => Parse(m)));
-        }
-
         // the transform is identity by default
         private static Matrix s_identity = CreateIdentity();
 
@@ -139,9 +135,20 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        internal object ToString(object p, CultureInfo culture)
+        internal object ToString(object format, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            if (IsIdentity)
+            {
+                return "Identity";
+            }
+
+            var listOperator = ',';
+            NumberFormatInfo instance = NumberFormatInfo.GetInstance(culture);
+            if (instance.NumberDecimalSeparator.Length > 0 && listOperator == instance.NumberDecimalSeparator[0])
+            {
+                listOperator = ';';
+            }
+            return string.Format(culture, "{1:" + format + "}{0}{2:" + format + "}{0}{3:" + format + "}{0}{4:" + format + "}{0}{5:" + format + "}{0}{6:" + format + "}", listOperator, _m11, _m12, _m21, _m22, _offsetX, _offsetY);
         }
 
         /// <summary>
@@ -443,42 +450,6 @@ namespace Windows.UI.Xaml.Media
         {
             // Delegate to the internal method which implements all ToString calls.
             return ConvertToString(format, provider);
-        }
-
-        /// <summary>
-        /// Parse - returns an instance converted from the provided string using
-        /// the culture "en-US"
-        /// <param name="source"> string with Matrix data </param>
-        /// </summary>
-        public static Matrix Parse(string source)
-        {
-            if (source == "Identity")
-                return Identity;
-
-            string[] splittedString = source.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (splittedString.Length == 6)
-            {
-                double m11, m12, m21, m22, offsetX, offsetY;
-#if NETSTANDARD
-                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out m11) &&
-                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out m12) &&
-                    double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out m21) &&
-                    double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out m22) &&
-                    double.TryParse(splittedString[4], NumberStyles.Any, CultureInfo.InvariantCulture, out offsetX) &&
-                    double.TryParse(splittedString[5], NumberStyles.Any, CultureInfo.InvariantCulture, out offsetY))
-#elif BRIDGE
-                if (double.TryParse(splittedString[0], out m11) &&
-                    double.TryParse(splittedString[1], out m12) &&
-                    double.TryParse(splittedString[2], out m21) &&
-                    double.TryParse(splittedString[3], out m22) &&
-                    double.TryParse(splittedString[4], out offsetX) &&
-                    double.TryParse(splittedString[5], out offsetY))
-#endif
-                    return new Matrix(m11, m12, m21, m22, offsetX, offsetY);
-            }
-
-            throw new FormatException(source + " is not an eligible value for a Matrix");
         }
 
         #endregion Public Methods

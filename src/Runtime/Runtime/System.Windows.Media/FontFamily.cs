@@ -15,7 +15,6 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
-using DotNetForHtml5.Core;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -29,11 +28,6 @@ namespace Windows.UI.Xaml.Media
     [TypeConverter(typeof(FontFamilyConverter))]
     public partial class FontFamily
     {
-        static FontFamily()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(FontFamily), INTERNAL_ConvertFromString);
-        }
-
         // Parameters:
         //   familyName:
         //     The family name of the font to represent. This can include a hashed suffix.
@@ -52,11 +46,6 @@ namespace Windows.UI.Xaml.Media
         internal string INTERNAL_ToHtmlString()
         {
             return Source;
-        }
-
-        internal static object INTERNAL_ConvertFromString(string fontCode)
-        {
-            return new FontFamily(fontCode);
         }
 
         public override string ToString()

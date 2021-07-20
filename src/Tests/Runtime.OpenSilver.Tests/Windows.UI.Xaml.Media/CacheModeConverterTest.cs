@@ -43,19 +43,26 @@ namespace Windows.UI.Xaml.Media.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_String_ShouldReturnCacheMode()
+        public void ConvertFrom_String_ShouldReturnBitmapCache()
         {
             var cacheModeConverter = new CacheModeConverter();
-            throw new NotImplementedException();
-            var test = cacheModeConverter.ConvertFrom("");
-            test.Should().Be(new BitmapCache());
+            var test = cacheModeConverter.ConvertFrom("bitmapcache");
+            test.Should().BeOfType(typeof(BitmapCache));
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_InvalidCacheMode_ShouldThrow_Exception()
         {
             var cacheModeConverter = new CacheModeConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => cacheModeConverter.ConvertFrom(null));
+            var invalidcacheMode = "invalid cache mode";
+            Assert.ThrowsException<Exception>(() => cacheModeConverter.ConvertFrom(invalidcacheMode));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
+        {
+            var cacheModeConverter = new CacheModeConverter();
+            Assert.ThrowsException<NotSupportedException>(() => cacheModeConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -70,7 +77,6 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             var cacheModeConverter = new CacheModeConverter();
             var test = cacheModeConverter.ConvertTo(new BitmapCache(), typeof(string));
-            throw new NotImplementedException();
             test.Should().Be("");
         }
 
@@ -78,14 +84,14 @@ namespace Windows.UI.Xaml.Media.Tests
         public void ConvertTo_String_ShouldThrow_ArgumentNullException()
         {
             var cacheModeConverter = new CacheModeConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => cacheModeConverter.ConvertTo(null, typeof(string)));
+            Assert.ThrowsException<ArgumentNullException>(() => cacheModeConverter.ConvertTo(new BitmapCache(), null));
         }
 
         [TestMethod]
         public void ConvertTo_String_ShouldThrow_NotSupportedException()
         {
             var cacheModeConverter = new CacheModeConverter();
-            Assert.ThrowsException<NotSupportedException>(() => cacheModeConverter.ConvertTo(true, typeof(string)));
+            Assert.ThrowsException<NotSupportedException>(() => cacheModeConverter.ConvertTo(true, typeof(bool)));
             Assert.ThrowsException<NotSupportedException>(() => cacheModeConverter.ConvertTo(new BitmapCache(), typeof(bool)));
         }
     }

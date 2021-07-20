@@ -14,8 +14,6 @@
 
 
 using CSHTML5.Internal;
-using DotNetForHtml5.Core;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -32,16 +30,6 @@ namespace Windows.UI.Xaml.Media
     [TypeConverter(typeof(BrushConverter))]
     public partial class Brush : DependencyObject, IHasAccessToPropertiesWhereItIsUsed
     {
-        static Brush()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(Brush), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string colorcode)
-        {
-            return new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString(colorcode));
-        }
-
         /// <summary>
         /// Gets or sets the degree of opacity of a Brush.
         /// The value of the Opacity property is expressed as a value between 0 and 1.0.

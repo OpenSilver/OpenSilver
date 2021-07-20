@@ -1,6 +1,4 @@
-﻿
-
-/*===================================================================================
+﻿/*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
 *      
@@ -17,21 +15,19 @@ using Windows.Foundation;
 #endif
 
 #if MIGRATION
+using System.ComponentModel;
+
 namespace System.Windows.Media
 #else
 namespace Windows.UI.Xaml.Media
 #endif
 {
+    [TypeConverter(typeof(TransformConverter))]
     /// <summary>
     /// Defines functionality that enables transformations in a two-dimensional plane.
     /// </summary>
     public abstract partial class Transform : GeneralTransform
     {
-        static Transform()
-        {
-            DotNetForHtml5.Core.TypeFromStringConverters.RegisterConverter(typeof(Transform), s => Parse(s));
-        }
-
         internal Transform()
         {
         }
@@ -87,18 +83,6 @@ namespace Windows.UI.Xaml.Media
                 matrix.Invert();
                 return new MatrixTransform(matrix);
             }
-        }
-
-        /// <summary>
-        /// Parse - returns an instance converted from the provided string
-        /// using the current culture
-        /// <param name="source"> string with Transform data </param>
-        /// </summary>
-        internal static Transform Parse(string source)
-        {
-            Matrix matrix = Matrix.Parse(source);
-
-            return new MatrixTransform(matrix);
         }
 
         // Must be implemented by the concrete class:
