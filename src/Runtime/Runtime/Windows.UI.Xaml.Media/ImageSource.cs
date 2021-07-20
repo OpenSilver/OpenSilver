@@ -43,23 +43,6 @@ namespace Windows.UI.Xaml.Media
 #endif
     public partial class ImageSource : DependencyObject
     {
-        static ImageSource()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(ImageSource), INTERNAL_ConvertFromString);
-        }
-
-
-        internal static object INTERNAL_ConvertFromString(string str)
-        {
-            UriKind uriKind;
-            if (str.Contains(@":/"))
-                uriKind = UriKind.Absolute;
-            else
-                uriKind = UriKind.Relative;
-            BitmapImage returnValue = new BitmapImage(new Uri(str, uriKind));
-            return returnValue;
-        }
-
 #if WORKINPROGRESS
         //todo: the following property is used in conjuction with the [ContentProperty("UriSource")] attribute to allow to compile the following syntax: <ImageSource x:Key="AppointmentItem_Exception">/Telerik.Windows.Controls.ScheduleView;component/Themes/Images/AppointmentRecurrence.png</ImageSource>
         //However, it is currently not functional because a BitmapImage needs to be created instead of an ImageSource.

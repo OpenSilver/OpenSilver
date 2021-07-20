@@ -49,34 +49,50 @@ namespace Windows.UI.Xaml.Media
         /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(string);
+            if (destinationType == typeof(string))
+            {
+                // When invoked by the serialization engine we can convert to string only for some instances
+                if (context != null && context.Instance != null)
+                {
+                    if (!(context.Instance is Brush))
+                    {
+                        throw new ArgumentException($"Expected type of {nameof(Brush)}.");
+                    }
+
+                    return false;
+                }
+
+                return true;
+            }
+
+            return base.CanConvertTo(context, destinationType);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Media.Brush.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.Media.Brush.
-        /// </summary>
+        /// <summary>Converts from an object of a given type to a <see cref="T:System.Windows.Media.Brush" /> object.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Media.Brush created from converting source.</returns>
+        /// <returns>Returns a new <see cref="T:System.Windows.Media.Brush" /> object if successful; otherwise, NULL.</returns>
+        /// <exception cref="T:System.NotSupportedException">
+        /// <paramref name="value" /> is <see langword="null" /> or cannot be converted to a <see cref="T:System.Windows.Media.Brush" />.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                result = new SolidColorBrush((Color)TypeDescriptor.GetConverter(typeof(Color)).ConvertFrom(value.ToString()));
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
 
-            return Brush.INTERNAL_ConvertFromString((string)value);
+            return result;
         }
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.Brush" /> to a specified type. </summary>

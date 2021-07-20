@@ -52,31 +52,63 @@ namespace Windows.UI.Xaml.Media
             return destinationType == typeof(string);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Media.Matrix.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.Media.Matrix.
-        /// </summary>
+        /// <summary>Attempts to convert the specified object to a <see cref="T:System.Windows.Media.Matrix" />. </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Media.Matrix created from converting source.</returns>
+        /// <returns>The <see cref="T:System.Windows.Media.Matrix" /> created from converting <paramref name="value" />.</returns>
+        /// <exception cref="T:System.NotSupportedException">The specified object is null or is a type that cannot be converted to a <see cref="T:System.Windows.Media.Matrix" />.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result = null;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                var source = value.ToString();
 
-            return Matrix.Parse((string)value);
+                if (source == "Identity")
+                {
+                    result = Matrix.Identity;
+                }
+                else
+                {
+                    var splittedString = source.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (splittedString.Length == 6)
+                    {
+#if NETSTANDARD
+                        if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var m11) &&
+                            double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var m12) &&
+                            double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out var m21) &&
+                            double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out var m22) &&
+                            double.TryParse(splittedString[4], NumberStyles.Any, CultureInfo.InvariantCulture, out var offsetX) &&
+                            double.TryParse(splittedString[5], NumberStyles.Any, CultureInfo.InvariantCulture, out var offsetY))
+#elif BRIDGE
+                if (double.TryParse(splittedString[0], out var m11) &&
+                    double.TryParse(splittedString[1], out var m12) &&
+                    double.TryParse(splittedString[2], out var m21) &&
+                    double.TryParse(splittedString[3], out var m22) &&
+                    double.TryParse(splittedString[4], out var offsetX) &&
+                    double.TryParse(splittedString[5], out var offsetY))
+#endif
+                            result = new Matrix(m11, m12, m21, m22, offsetX, offsetY);
+                    }
+                    else
+                    {
+                        throw new FormatException(source + " is not an eligible value for a Matrix");
+                    }
+                }
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
+
+            return result;
         }
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.Matrix" /> to a specified type. </summary>

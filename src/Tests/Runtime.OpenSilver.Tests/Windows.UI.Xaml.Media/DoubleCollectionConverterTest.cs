@@ -52,10 +52,10 @@ namespace Windows.UI.Xaml.Media.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
         {
             var doubleCollectionConverter = new DoubleCollectionConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => doubleCollectionConverter.ConvertFrom(null));
+            Assert.ThrowsException<NotSupportedException>(() => doubleCollectionConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -77,14 +77,14 @@ namespace Windows.UI.Xaml.Media.Tests
         public void ConvertTo_String_ShouldThrow_ArgumentNullException()
         {
             var doubleCollectionConverter = new DoubleCollectionConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => doubleCollectionConverter.ConvertTo(null, typeof(string)));
+            Assert.ThrowsException<ArgumentNullException>(() => doubleCollectionConverter.ConvertTo(new DoubleCollection(), null));
         }
 
         [TestMethod]
         public void ConvertTo_String_ShouldThrow_NotSupportedException()
         {
             var doubleCollectionConverter = new DoubleCollectionConverter();
-            Assert.ThrowsException<NotSupportedException>(() => doubleCollectionConverter.ConvertTo(true, typeof(string)));
+            Assert.ThrowsException<NotSupportedException>(() => doubleCollectionConverter.ConvertTo(true, typeof(bool)));
             Assert.ThrowsException<NotSupportedException>(() => doubleCollectionConverter.ConvertTo(new DoubleCollection(), typeof(bool)));
         }
     }

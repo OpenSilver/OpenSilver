@@ -1,4 +1,19 @@
-﻿using System.ComponentModel;
+﻿
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+
+using System.ComponentModel;
 using System.Globalization;
 
 #if MIGRATION
@@ -8,12 +23,12 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.CacheMode" /> object to and from other types.
+    /// Converts a <see cref="T:System.Windows.Media.CacheMode" /> object to and from other types.
     /// </summary>
     public class CacheModeConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.CacheMode" />.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Media.CacheMode" />.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="sourceType">The type being evaluated for conversion.</param>
@@ -25,7 +40,7 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.CacheMode" /> can be converted to the specified type.
+        /// Determines whether an instance of <see cref="T:System.Windows.Media.CacheMode" /> can be converted to the specified type.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
@@ -33,34 +48,60 @@ namespace Windows.UI.Xaml.Media
         /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(string);
+            if (destinationType == typeof(string))
+            {
+                // When invoked by the serialization engine we can convert to string only for some instances
+                if (context != null && context.Instance != null)
+                {
+                    if (!(context.Instance is CacheMode))
+                    {
+                        throw new ArgumentException($"Expected type of {nameof(CacheMode)}.");
+                    }
+
+                    return false;
+                }
+
+                return true;
+            }
+
+            return base.CanConvertTo(context, destinationType);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Media.CacheMode.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.Media.CacheMode.
-        /// </summary>
+        /// <summary>Converts a specified object to a <see cref="T:System.Windows.Media.CacheMode" />.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Media.CacheMode created from converting source.</returns>
+        /// <returns>The <see cref="T:System.Windows.Media.CacheMode" /> that is created by converting <paramref name="value" />; otherwise, an exception is raised.</returns>
+        /// <exception cref="T:System.NotSupportedException">
+        ///   <paramref name="value" /> is <see langword="null" /> or not a type that can be converted to <see cref="T:System.Windows.Media.CacheMode" />.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                var cacheModeAsString = value.ToString();
 
-            return CacheMode.INTERNAL_ConvertFromString((string)value);
+                string cacheModeAsStringToLower = cacheModeAsString.ToLower();
+                switch (cacheModeAsStringToLower)
+                {
+                    case "bitmapcache":
+                        result = new BitmapCache();
+                        break;
+                    default:
+                        throw new Exception("\"" + cacheModeAsString + "\"" + " is not a supported type.");
+                }
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
+
+            return result;
         }
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.CacheMode" /> to a specified type. </summary>

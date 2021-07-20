@@ -13,16 +13,8 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -30,17 +22,13 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+    [TypeConverter(typeof(DoubleCollectionConverter))]
     /// <summary>
     /// Represents an ordered collection of Double values.
     /// </summary>
     public sealed class DoubleCollection : PresentationFrameworkCollection<double>
     {
         #region Constructor
-
-        static DoubleCollection()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(DoubleCollection), INTERNAL_ConvertFromString);
-        }
 
         public DoubleCollection()
         {
@@ -87,25 +75,6 @@ namespace Windows.UI.Xaml.Media
         }
 
         #endregion
-
-        internal static object INTERNAL_ConvertFromString(string doubleCollectionAsString)
-        {
-            char separator = ' ';
-            if (doubleCollectionAsString.Trim().Contains(","))
-            {
-                separator = ',';
-            }
-            string[] split = doubleCollectionAsString.Split(separator);
-            DoubleCollection doubleCollection = new DoubleCollection();
-            foreach (string element in split)
-            {
-                if (!string.IsNullOrWhiteSpace(element))
-                {
-                    doubleCollection.Add(double.Parse(element));
-                }
-            }
-            return doubleCollection;
-        }
 
         public override bool Equals(object obj)
         {

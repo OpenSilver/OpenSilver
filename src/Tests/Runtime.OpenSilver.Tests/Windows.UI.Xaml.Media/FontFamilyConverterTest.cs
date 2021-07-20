@@ -51,10 +51,10 @@ namespace Windows.UI.Xaml.Media.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
         {
             var fontFamilyConverter = new FontFamilyConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => fontFamilyConverter.ConvertFrom(null));
+            Assert.ThrowsException<NotSupportedException>(() => fontFamilyConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -76,15 +76,15 @@ namespace Windows.UI.Xaml.Media.Tests
         public void ConvertTo_String_ShouldThrow_ArgumentNullException()
         {
             var fontFamilyConverter = new FontFamilyConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => fontFamilyConverter.ConvertTo(null, typeof(string)));
+            Assert.ThrowsException<ArgumentNullException>(() => fontFamilyConverter.ConvertTo(null, null));
+            Assert.ThrowsException<ArgumentNullException>(() => fontFamilyConverter.ConvertTo(new FontFamily("Verdana"), null));
         }
 
         [TestMethod]
-        public void ConvertTo_String_ShouldThrow_NotSupportedException()
+        public void ConvertTo_String_ShouldThrow_ArgumentException()
         {
             var fontFamilyConverter = new FontFamilyConverter();
-            Assert.ThrowsException<NotSupportedException>(() => fontFamilyConverter.ConvertTo(true, typeof(string)));
-            Assert.ThrowsException<NotSupportedException>(() => fontFamilyConverter.ConvertTo(new FontFamily("Verdana"), typeof(bool)));
+            Assert.ThrowsException<ArgumentException>(() => fontFamilyConverter.ConvertTo(true, typeof(string)));
         }
     }
 }
