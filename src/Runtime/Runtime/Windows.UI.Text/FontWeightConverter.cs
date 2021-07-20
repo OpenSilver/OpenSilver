@@ -1,4 +1,19 @@
-﻿using System.ComponentModel;
+﻿
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+
+using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
 using System.Globalization;
 
@@ -31,37 +46,53 @@ namespace Windows.UI.Text
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />
+        /// or <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(string);
+            return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.FontWeight.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.FontWeight.
-        /// </summary>
+        /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.FontWeight" />.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.FontWeight created from converting source.</returns>
+        /// <returns>The instance of <see cref="T:System.Windows.FontWeight" /> created from the converted <paramref name="value" />.</returns>
+        /// <exception cref="T:System.NotSupportedException">
+        ///   <paramref name="value" /> is <see langword="null" /> or is not a valid type for conversion.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                var fontCode = value.ToString();
 
-            return FontWeight.INTERNAL_ConvertFromString((string)value);
+                try
+                {
+                    // Check if the font is a named font:
+                    if (!ushort.TryParse(fontCode, out var code))
+                    {
+                        FontWeights.INTERNAL_FontweightsEnum namedFont = (FontWeights.INTERNAL_FontweightsEnum)Enum.Parse(typeof(FontWeights.INTERNAL_FontweightsEnum), fontCode); // Note: "TryParse" does not seem to work in JSIL.
+                        result = (ushort)namedFont;
+                    }
+                    result = FontWeight.INTERNAL_ConvertFromUshort(code);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Invalid font: " + fontCode, ex);
+                }
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
+
+            return result;
         }
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.FontWeight" /> to a specified type. </summary>
@@ -69,7 +100,7 @@ namespace Windows.UI.Text
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The <see cref="T:System.Windows.FontWeight" /> to convert.</param>
         /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.FontWeight" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.FontWeight" /> (a string).</returns>
+        /// <returns>The object created from converting this <see cref="T:System.Windows.FontWeight" />.</returns>
         /// <exception cref="T:System.NotSupportedException">
         /// Thrown if <paramref name="value" /> is <see langword="null" /> or not a <see cref="T:System.Windows.FontWeight" />,
         /// or if the <paramref name="destinationType" /> is not one of the valid types for conversion.</exception>
@@ -82,10 +113,12 @@ namespace Windows.UI.Text
                 if (destinationType == typeof(InstanceDescriptor))
                 {
                     var mi = typeof(FontWeight).GetMethod("FromOpenTypeWeight", new Type[] { typeof(int) });
+                    // TODO: Implement ToOpenTypeWeight()
                     result = new InstanceDescriptor(mi, new object[] { fontWeight.ToOpenTypeWeight() });
                 }
                 else if (destinationType == typeof(string))
                 {
+                    // TODO: Implement this ToString() overload
                     result = ((IFormattable)fontWeight).ToString(null, culture);
                 }
             }

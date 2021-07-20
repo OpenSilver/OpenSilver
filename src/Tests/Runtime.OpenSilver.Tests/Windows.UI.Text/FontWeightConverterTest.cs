@@ -52,10 +52,10 @@ namespace Windows.UI.Text.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
         {
             var fontWeightConverter = new FontWeightConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => fontWeightConverter.ConvertFrom(null));
+            Assert.ThrowsException<NotSupportedException>(() => fontWeightConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -63,6 +63,14 @@ namespace Windows.UI.Text.Tests
         {
             var fontWeightConverter = new FontWeightConverter();
             Assert.ThrowsException<NotSupportedException>(() => fontWeightConverter.ConvertFrom(true));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_InvalidFontWeight_ShouldThrow_Exception()
+        {
+            var fontWeightConverter = new FontWeightConverter();
+            var invalidFontWeight = "-5";
+            Assert.ThrowsException<Exception>(() => fontWeightConverter.ConvertFrom(invalidFontWeight));
         }
 
         [TestMethod]

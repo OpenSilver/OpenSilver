@@ -14,7 +14,6 @@
 
 
 using System.ComponentModel;
-using DotNetForHtml5.Core;
 
 #if MIGRATION
 namespace System.Windows
@@ -34,33 +33,9 @@ namespace Windows.UI.Text
         /// </summary>
         public ushort Weight;
 
-        static FontWeight()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(FontWeight), INTERNAL_ConvertFromString);
-        }
-
         internal string INTERNAL_ToHtmlString()
         {
             return Weight.ToString();
-        }
-
-        internal static object INTERNAL_ConvertFromString(string fontCode)
-        {
-            try
-            {
-                // Check if the font is a named font:
-                ushort result;
-                if (!ushort.TryParse(fontCode, out result))
-                {
-                    FontWeights.INTERNAL_FontweightsEnum namedFont = (FontWeights.INTERNAL_FontweightsEnum)Enum.Parse(typeof(FontWeights.INTERNAL_FontweightsEnum), fontCode); // Note: "TryParse" does not seem to work in JSIL.
-                    result = (ushort)namedFont;
-                }
-                return INTERNAL_ConvertFromUshort(result);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Invalid font: " + fontCode, ex);
-            }
         }
 
         internal static FontWeight INTERNAL_ConvertFromUshort(ushort fontWeightAsUshort)
