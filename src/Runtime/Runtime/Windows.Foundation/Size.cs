@@ -13,9 +13,7 @@
 \*====================================================================================*/
 
 
-using DotNetForHtml5.Core;
 using System.ComponentModel;
-using System.Globalization;
 
 #if MIGRATION
 namespace System.Windows
@@ -42,8 +40,6 @@ namespace Windows.Foundation
                 _width = double.NegativeInfinity,
                 _height = double.NegativeInfinity
             };
-
-            TypeFromStringConverters.RegisterConverter(typeof(Size), s => Parse(s));
         }
 
         /// <summary>
@@ -229,27 +225,6 @@ namespace Windows.Foundation
 
             return result;
         }
-
-        public static Size Parse(string sizeAsString)
-        {
-            string[] splittedString = sizeAsString.Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries);
-
-            if (splittedString.Length == 2)
-            {
-                double width, height;
-#if OPENSILVER
-                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out width) && 
-                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out height))
-#else
-                if (double.TryParse(splittedString[0], out width) &&
-                    double.TryParse(splittedString[1], out height))
-#endif
-                    return new Size(width, height);
-            }
-            
-            throw new FormatException(sizeAsString + " is not an eligible value for a Size");
-        }
-
     }
     
     internal static class SizeExtensions

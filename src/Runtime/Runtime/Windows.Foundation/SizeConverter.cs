@@ -51,33 +51,41 @@ namespace Windows.Foundation
             return destinationType == typeof(string);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Size.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.Size.
-        /// </summary>
+        /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.Size" />.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Size created from converting source.</returns>
+        /// <returns>The instance of <see cref="T:System.Windows.Size" /> that is created from the converted <paramref name="source" />.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value is null)
             {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
-            {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                var sizeAsString = value.ToString();
 
-            return Size.Parse((string)value);
+                var splittedString = sizeAsString.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (splittedString.Length == 2)
+                {
+                    double width, height;
+#if OPENSILVER
+                    if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out width) &&
+                        double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out height))
+#else
+                if (double.TryParse(splittedString[0], out width) &&
+                    double.TryParse(splittedString[1], out height))
+#endif
+                        return new Size(width, height);
+                }
+
+                throw new FormatException(sizeAsString + " is not an eligible value for a Size");
+            }
+
+            return base.ConvertFrom(context, culture, value);
         }
-
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Size" /> to a specified type. </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>

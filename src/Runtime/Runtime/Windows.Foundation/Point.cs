@@ -13,9 +13,7 @@
 \*====================================================================================*/
 
 
-using DotNetForHtml5.Core;
 using System.ComponentModel;
-using System.Globalization;
 
 #if MIGRATION
 namespace System.Windows
@@ -131,36 +129,6 @@ namespace Windows.Foundation
         public override string ToString()
         {
             return string.Concat(X, ", ", Y);
-        }
-
-        static Point()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(Point), s => Parse(s));
-        }
-
-        public static Point Parse(string pointAsString)
-        {
-            var result = default(Point);
-
-            var split = pointAsString.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (split.Length == 2)
-            {
-#if OPENSILVER
-                if (double.TryParse(split[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var x) &&
-                    double.TryParse(split[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var y))
-#else
-                if (double.TryParse(splittedString[0], out var x) &&
-                    double.TryParse(splittedString[1], out var y))
-#endif
-                    result = new Point(x, y);
-            }
-            else
-            {
-                throw new FormatException($"{pointAsString} was not in the expected format: \"x, y\"");
-            }
-
-            return result;
         }
 
         public string ToString(string format, IFormatProvider formatProvider)

@@ -51,10 +51,10 @@ namespace Windows.Foundation.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
         {
             var sizeConverter = new SizeConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => sizeConverter.ConvertFrom(null));
+            Assert.ThrowsException<NotSupportedException>(() => sizeConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -62,6 +62,14 @@ namespace Windows.Foundation.Tests
         {
             var sizeConverter = new SizeConverter();
             Assert.ThrowsException<NotSupportedException>(() => sizeConverter.ConvertFrom(true));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_InvalidSize_ShouldThrow_FormatException()
+        {
+            var sizeConverter = new SizeConverter();
+            var invalidSize = "100, 100, 100";
+            Assert.ThrowsException<FormatException>(() => sizeConverter.ConvertFrom(invalidSize));
         }
 
         [TestMethod]
