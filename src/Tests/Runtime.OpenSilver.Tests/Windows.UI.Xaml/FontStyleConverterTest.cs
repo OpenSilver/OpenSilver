@@ -49,10 +49,10 @@ namespace System.Windows.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
         {
             var fontStyleConverter = new FontStyleConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => fontStyleConverter.ConvertFrom(null));
+            Assert.ThrowsException<NotSupportedException>(() => fontStyleConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -60,6 +60,14 @@ namespace System.Windows.Tests
         {
             var fontStyleConverter = new FontStyleConverter();
             Assert.ThrowsException<NotSupportedException>(() => fontStyleConverter.ConvertFrom(true));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Bool_ShouldThrow_Exception()
+        {
+            var fontStyleConverter = new FontStyleConverter();
+            var invalidFontStyle = "invalid font style";
+            Assert.ThrowsException<Exception>(() => fontStyleConverter.ConvertFrom(invalidFontStyle));
         }
 
         [TestMethod]
@@ -88,17 +96,17 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_String_FromBool()
         {
-            var cursorConverter = new FontStyleConverter();
-            var test = cursorConverter.ConvertTo(true, typeof(string));
+            var fontStyleConverter = new FontStyleConverter();
+            var test = fontStyleConverter.ConvertTo(true, typeof(string));
             test.Should().Be("True");
         }
 
         [TestMethod]
         public void ConvertTo_InstanceDescriptor()
         {
-            var cursorConverter = new FontStyleConverter();
+            var fontStyleConverter = new FontStyleConverter();
             var fontStyle = new FontStyle();
-            var test = cursorConverter.ConvertTo(fontStyle, typeof(InstanceDescriptor));
+            var test = fontStyleConverter.ConvertTo(fontStyle, typeof(InstanceDescriptor));
             test.Should().BeOfType(typeof(InstanceDescriptor));
         }
     }

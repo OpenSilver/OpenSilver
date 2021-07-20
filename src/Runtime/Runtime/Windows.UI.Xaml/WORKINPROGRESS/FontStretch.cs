@@ -13,8 +13,6 @@
 \*====================================================================================*/
 
 
-using DotNetForHtml5.Core;
-using System;
 using System.ComponentModel;
 
 #if MIGRATION
@@ -33,16 +31,6 @@ namespace Windows.UI.Xaml
         public string ToString(string format, IFormatProvider formatProvider)
         {
             throw new NotImplementedException();
-        }
-
-        static FontStretch()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(FontStretch), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string fontStretchAsString)
-        {
-            return new FontStretch();
         }
 
         internal object ToOpenTypeStretch()

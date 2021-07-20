@@ -13,9 +13,7 @@
 \*====================================================================================*/
 
 
-using DotNetForHtml5.Core;
 using System.ComponentModel;
-using System.Globalization;
 
 #if MIGRATION
 namespace System.Windows
@@ -41,36 +39,6 @@ namespace Windows.UI.Xaml
                 _type = this._type,
                 _value = this._value
             };
-        }
-        static GridLength()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(GridLength), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string gridLengthAsString)
-        {
-            string trimmedLowercase = gridLengthAsString.Trim().ToLower();
-            if (trimmedLowercase.EndsWith("*"))
-            {
-                string valueAsString = trimmedLowercase.Substring(0, trimmedLowercase.Length - 1);
-                double value;
-                if (valueAsString == "")
-                    return new GridLength(1.0, GridUnitType.Star);
-                if (double.TryParse(valueAsString, out value))
-                    return new GridLength(value, GridUnitType.Star);
-                else
-                    throw new Exception("Invalid GridLength: " + gridLengthAsString);
-            }
-            else if (trimmedLowercase == "auto")
-                return new GridLength(1.0, GridUnitType.Auto);
-            else
-            {
-                double value;
-                if (double.TryParse(trimmedLowercase, out value))
-                    return new GridLength(value, GridUnitType.Pixel);
-                else
-                    throw new Exception("Invalid GridLength: " + gridLengthAsString);
-            }
         }
 
         private double _value;
@@ -121,11 +89,6 @@ namespace Windows.UI.Xaml
             {
                 return _type;
             }
-        }
-
-        internal object ToString(GridLength length, CultureInfo cultureInfo)
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>

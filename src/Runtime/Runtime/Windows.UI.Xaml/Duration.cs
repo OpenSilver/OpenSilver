@@ -13,14 +13,7 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows
@@ -55,11 +48,6 @@ namespace Windows.UI.Xaml
             {
                 throw new ArgumentException("The TimeSpan cannot be a negative TimeSpan.");
             }
-        }
-
-        static Duration()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(Duration), INTERNAL_ConvertFromString);
         }
 
         // Returns:
@@ -363,24 +351,24 @@ namespace Windows.UI.Xaml
         ///// <returns>The subtracted Windows.UI.Xaml.Duration.</returns>
         //public Duration Subtract(Duration duration);
 
-        ///// <summary>
-        ///// Converts a Windows.UI.Xaml.Duration to a System.String representation.
-        ///// </summary>
-        ///// <returns>A System.String representation of this Windows.UI.Xaml.Duration.</returns>
-        //public override string ToString();
-
-        internal static object INTERNAL_ConvertFromString(string p)
+        /// <summary>
+        /// Converts a Windows.UI.Xaml.Duration to a System.String representation.
+        /// </summary>
+        /// <returns>A System.String representation of this Windows.UI.Xaml.Duration.</returns>
+        public override string ToString()
         {
-            if (p.ToLower() == "forever")
-                return Duration.Forever;
-            if (p.ToLower() == "automatic")
-                return Duration.Automatic;
-#if BRIDGE
-            TimeSpan timeSpan = INTERNAL_BridgeWorkarounds.TimeSpanParse(p);
-#else
-            TimeSpan timeSpan = TimeSpan.Parse(p);
-#endif
-            return new Duration(timeSpan);
+            if (HasTimeSpan)
+            {
+                return TypeDescriptor.GetConverter(_timeSpan).ConvertToString(_timeSpan);
+            }
+            else if (_durationType == DurationType.Forever)
+            {
+                return "Forever";
+            }
+            else // IsAutomatic
+            {
+                return "Automatic";
+            }
         }
 
         /// <summary>

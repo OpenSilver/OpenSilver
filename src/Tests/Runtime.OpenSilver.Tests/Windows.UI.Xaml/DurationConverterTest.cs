@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.ComponentModel.Design.Serialization;
 
 #if MIGRATION
 namespace System.Windows.Tests
@@ -51,10 +52,10 @@ namespace Windows.UI.Xaml.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
         {
             var durationConverter = new DurationConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => durationConverter.ConvertFrom(null));
+            Assert.ThrowsException<NotSupportedException>(() => durationConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -69,22 +70,30 @@ namespace Windows.UI.Xaml.Tests
         {
             var durationConverter = new DurationConverter();
             var test = durationConverter.ConvertTo(new Duration(TimeSpan.FromDays(3)), typeof(string));
-            test.Should().Be("3");
+            test.Should().Be("3.00:00:00");
         }
 
         [TestMethod]
         public void ConvertTo_String_ShouldThrow_ArgumentNullException()
         {
             var durationConverter = new DurationConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => durationConverter.ConvertTo(null, typeof(string)));
+            Assert.ThrowsException<ArgumentNullException>(() => durationConverter.ConvertTo(new Duration(), null));
         }
 
         [TestMethod]
-        public void ConvertTo_String_ShouldThrow_NotSupportedException()
+        public void ConvertTo_String_FromBool()
         {
             var durationConverter = new DurationConverter();
-            Assert.ThrowsException<NotSupportedException>(() => durationConverter.ConvertTo(true, typeof(string)));
-            Assert.ThrowsException<NotSupportedException>(() => durationConverter.ConvertTo(new Duration(TimeSpan.FromSeconds(30)), typeof(bool)));
+            var test = durationConverter.ConvertTo(true, typeof(string));
+            test.Should().Be("True");
+        }
+
+        [TestMethod]
+        public void ConvertTo_InstanceDescriptor()
+        {
+            var durationConverter = new DurationConverter();
+            var test = durationConverter.ConvertTo(new Duration(), typeof(InstanceDescriptor));
+            test.Should().BeOfType(typeof(InstanceDescriptor));
         }
     }
 }

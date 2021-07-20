@@ -13,7 +13,6 @@
 \*====================================================================================*/
 
 
-using DotNetForHtml5.Core;
 using System.Collections.Generic;
 using System.Reflection;
 using System.ComponentModel;
@@ -212,7 +211,17 @@ namespace Windows.UI.Xaml
                 throw new InvalidOperationException("The constructor: PropertyPath(string path) for storyboards is not supported yet. Please use PropertyPath(DependencyProperty dependencyProperty) or define your storyboard in the XAML.");
             }
         }
-#endregion
+
+        public override bool Equals(object obj)
+        {
+            return obj is PropertyPath path && Path == path.Path;
+        }
+
+        public override int GetHashCode()
+        {
+            return 467214278 + EqualityComparer<string>.Default.GetHashCode(Path);
+        }
+        #endregion
 
         /// <summary>
         /// Initializes a new Instance of the PropertyPath class based on methods to access the property from a DependencyObject.
@@ -288,16 +297,6 @@ namespace Windows.UI.Xaml
         /// </summary>
         [OpenSilver.NotImplemented]
         public Collection<object> PathParameters { get; }
-
-        static PropertyPath()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(PropertyPath), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string path)
-        {
-            return new PropertyPath(path);
-        }
 
         public PropertyPath(string path, params object[] pathParameters) : this(path)
         {

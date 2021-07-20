@@ -1,5 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.ComponentModel.Design.Serialization;
+using System.Linq;
 
 namespace System.Windows.Tests
 {
@@ -26,7 +28,7 @@ namespace System.Windows.Tests
         public void CanConvertTo_String_ShouldReturnTrue()
         {
             var textDecorationCollectionConverter = new TextDecorationCollectionConverter();
-            var test = textDecorationCollectionConverter.CanConvertTo(typeof(string));
+            var test = textDecorationCollectionConverter.CanConvertTo(typeof(InstanceDescriptor));
             test.Should().BeTrue();
         }
 
@@ -48,10 +50,10 @@ namespace System.Windows.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
         {
             var textDecorationCollectionConverter = new TextDecorationCollectionConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => textDecorationCollectionConverter.ConvertFrom(null));
+            Assert.ThrowsException<NotSupportedException>(() => textDecorationCollectionConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -62,27 +64,27 @@ namespace System.Windows.Tests
         }
 
         [TestMethod]
-        public void ConvertTo_String()
+        public void ConvertFrom_Null_ShouldThrow_InvalidOperationException()
         {
             var textDecorationCollectionConverter = new TextDecorationCollectionConverter();
-            var textDecoration = new TextDecorationCollection { Decoration = new TextDecoration(TextDecorationLocation.Underline) };
-            var test = textDecorationCollectionConverter.ConvertTo(textDecoration, typeof(string));
-            test.Should().Be("Underline");
+            var invalidTextDecoration = "invalid text decoration";
+            Assert.ThrowsException<InvalidOperationException>(() => textDecorationCollectionConverter.ConvertFrom(invalidTextDecoration));
         }
 
         [TestMethod]
-        public void ConvertTo_String_ShouldThrow_ArgumentNullException()
+        public void ConvertTo_InstanceDescriptor()
         {
             var textDecorationCollectionConverter = new TextDecorationCollectionConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => textDecorationCollectionConverter.ConvertTo(null, typeof(string)));
+            var test = textDecorationCollectionConverter.ConvertTo(Enumerable.Empty<TextDecoration>(), typeof(InstanceDescriptor));
+            test.Should().BeOfType(typeof(InstanceDescriptor));
         }
 
         [TestMethod]
-        public void ConvertTo_String_ShouldThrow_NotSupportedException()
+        public void ConvertTo_ShouldThrow_NotSupportedException()
         {
             var textDecorationCollectionConverter = new TextDecorationCollectionConverter();
-            Assert.ThrowsException<NotSupportedException>(() => textDecorationCollectionConverter.ConvertTo(true, typeof(string)));
-            Assert.ThrowsException<NotSupportedException>(() => textDecorationCollectionConverter.ConvertTo(new TextDecorationCollection(), typeof(bool)));
+            Assert.ThrowsException<NotSupportedException>(() => textDecorationCollectionConverter.ConvertTo(Enumerable.Empty<TextDecoration>(), typeof(bool)));
+            Assert.ThrowsException<NotSupportedException>(() => textDecorationCollectionConverter.ConvertTo(new TextDecorationCollectionConverter(), typeof(InstanceDescriptor)));
         }
     }
 }

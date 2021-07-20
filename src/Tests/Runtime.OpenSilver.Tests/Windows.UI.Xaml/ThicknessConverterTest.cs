@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.ComponentModel.Design.Serialization;
 
 #if MIGRATION
 namespace System.Windows.Tests
@@ -43,7 +44,7 @@ namespace Windows.UI.Xaml.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_String_ShouldReturnThickness()
+        public void ConvertFrom_String_ShouldReturnUniformThickness()
         {
             var thicknessConverter = new ThicknessConverter();
             var test = thicknessConverter.ConvertFrom("1");
@@ -51,10 +52,33 @@ namespace Windows.UI.Xaml.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_String_ShouldReturnLeftRightTopBottomThickness()
         {
             var thicknessConverter = new ThicknessConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => thicknessConverter.ConvertFrom(null));
+            var test = thicknessConverter.ConvertFrom("1,2");
+            test.Should().Be(new Thickness(1,2,1,2));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_String_ShouldReturnThickness()
+        {
+            var thicknessConverter = new ThicknessConverter();
+            var test = thicknessConverter.ConvertFrom("1,2,3,4");
+            test.Should().Be(new Thickness(1,2,3,4));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_InvalidThickness_ShouldThrow_FormatException()
+        {
+            var thicknessConverter = new ThicknessConverter();
+            Assert.ThrowsException<FormatException>(() => thicknessConverter.ConvertFrom("1,2,3"));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
+        {
+            var thicknessConverter = new ThicknessConverter();
+            Assert.ThrowsException<NotSupportedException>(() => thicknessConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -69,7 +93,15 @@ namespace Windows.UI.Xaml.Tests
         {
             var thicknessConverter = new ThicknessConverter();
             var test = thicknessConverter.ConvertTo(new Thickness(1), typeof(string));
-            test.Should().Be("1, 1, 1, 1");
+            test.Should().Be("1,1,1,1");
+        }
+
+        [TestMethod]
+        public void ConvertTo_InstanceDescriptor()
+        {
+            var thicknessConverter = new ThicknessConverter();
+            var test = thicknessConverter.ConvertTo(new Thickness(1), typeof(InstanceDescriptor));
+            test.Should().BeOfType(typeof(InstanceDescriptor));
         }
 
         [TestMethod]
@@ -77,14 +109,15 @@ namespace Windows.UI.Xaml.Tests
         {
             var thicknessConverter = new ThicknessConverter();
             Assert.ThrowsException<ArgumentNullException>(() => thicknessConverter.ConvertTo(null, typeof(string)));
+            Assert.ThrowsException<ArgumentNullException>(() => thicknessConverter.ConvertTo(new Thickness(), null));
         }
 
         [TestMethod]
-        public void ConvertTo_String_ShouldThrow_NotSupportedException()
+        public void ConvertTo_String_ShouldThrow_ArgumentException()
         {
             var thicknessConverter = new ThicknessConverter();
-            Assert.ThrowsException<NotSupportedException>(() => thicknessConverter.ConvertTo(true, typeof(string)));
-            Assert.ThrowsException<NotSupportedException>(() => thicknessConverter.ConvertTo(new Thickness(1), typeof(bool)));
+            Assert.ThrowsException<ArgumentException>(() => thicknessConverter.ConvertTo(true, typeof(string)));
+            Assert.ThrowsException<ArgumentException>(() => thicknessConverter.ConvertTo(new Thickness(), typeof(bool)));
         }
     }
 }

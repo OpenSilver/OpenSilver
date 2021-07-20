@@ -13,9 +13,7 @@
 \*====================================================================================*/
 
 
-using DotNetForHtml5.Core;
 using System.ComponentModel;
-using System.Globalization;
 
 #if MIGRATION
 namespace System.Windows
@@ -104,11 +102,6 @@ namespace Windows.UI.Xaml
         /// </summary>
         public double BottomRight { get; set; }
 
-        internal object ToString(CornerRadius radius, CultureInfo cultureInfo)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// [SECURITY CRITICAL] Gets or sets the radius of rounding, in pixels, of the
         /// top left corner of the object where a Windows.UI.Xaml.CornerRadius is applied.
@@ -167,53 +160,6 @@ namespace Windows.UI.Xaml
         public override string ToString()
         {
             return string.Concat(TopLeft, ", ", TopRight, ", ", BottomRight, ", ", BottomLeft);
-        }
-
-        static CornerRadius()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(CornerRadius), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string cornerRadiusAsString)
-        {
-            char separator;
-
-            if (cornerRadiusAsString.Contains(","))
-            {
-                separator = ',';
-            }
-            else
-            {
-                separator = ' ';
-            }
-
-            var splittedString = cornerRadiusAsString.Trim().Split(separator);
-
-            if (splittedString.Length == 1)
-            {
-                if (double.TryParse(splittedString[0], out var radius))
-                {
-                    return new CornerRadius(radius);
-                }
-            }
-            else if (splittedString.Length == 4)
-            {
-                double topRight = 0d;
-                double bottomRight = 0d;
-                double bottomLeft = 0d;
-
-                bool isParseOK = double.TryParse(splittedString[0], out var topLeft);
-                isParseOK = isParseOK && double.TryParse(splittedString[1], out topRight);
-                isParseOK = isParseOK && double.TryParse(splittedString[2], out bottomRight);
-                isParseOK = isParseOK && double.TryParse(splittedString[3], out bottomLeft);
-
-                if (isParseOK)
-                {
-                    return new CornerRadius(topLeft, topRight, bottomRight, bottomLeft);
-                }
-            }
-
-            throw new FormatException(cornerRadiusAsString + "is not an eligible value for CornerRadius");
         }
     }
 }
