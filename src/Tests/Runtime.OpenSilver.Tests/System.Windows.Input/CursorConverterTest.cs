@@ -47,17 +47,26 @@ namespace System.Windows.Input.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_InvalidCursorString_ShouldThrow_ArgumentException()
         {
             var cursorConverter = new CursorConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => cursorConverter.ConvertFrom(null));
+            var invalidCursor = "invalidCursor";
+            Assert.ThrowsException<ArgumentException>(() => cursorConverter.ConvertFrom(invalidCursor));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
+        {
+            var cursorConverter = new CursorConverter();
+            Assert.ThrowsException<NotSupportedException>(() => cursorConverter.ConvertFrom(null));
         }
 
         [TestMethod]
         public void ConvertFrom_Bool_ShouldThrow_NotSupportedException()
         {
             var cursorConverter = new CursorConverter();
-            Assert.ThrowsException<NotSupportedException>(() => cursorConverter.ConvertFrom(true));
+            var booleanValue = true;
+            Assert.ThrowsException<NotSupportedException>(() => cursorConverter.ConvertFrom(booleanValue));
         }
 
         [TestMethod]
