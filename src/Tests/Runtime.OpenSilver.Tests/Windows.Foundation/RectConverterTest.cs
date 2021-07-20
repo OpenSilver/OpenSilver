@@ -51,10 +51,10 @@ namespace Windows.Foundation.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
         {
             var rectConverter = new RectConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => rectConverter.ConvertFrom(null));
+            Assert.ThrowsException<NotSupportedException>(() => rectConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -62,6 +62,14 @@ namespace Windows.Foundation.Tests
         {
             var rectConverter = new RectConverter();
             Assert.ThrowsException<NotSupportedException>(() => rectConverter.ConvertFrom(true));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_InvalidRect_ShouldThrow_FormatException()
+        {
+            var rectConverter = new RectConverter();
+            var invalidRect = "1,1,1";
+            Assert.ThrowsException<FormatException>(() => rectConverter.ConvertFrom(invalidRect));
         }
 
         [TestMethod]

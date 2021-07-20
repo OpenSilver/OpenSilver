@@ -13,9 +13,7 @@
 \*====================================================================================*/
 
 
-using DotNetForHtml5.Core;
 using System.ComponentModel;
-using System.Globalization;
 
 #if MIGRATION
 namespace System.Windows
@@ -498,35 +496,6 @@ namespace Windows.Foundation
         }
 #endif
 
-        public static Rect Parse(string rectAsString)
-        {
-            var result = default(Rect);
-
-            var split = rectAsString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (split.Length == 4)
-            {
-#if OPENSILVER
-                if (double.TryParse(split[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var x) &&
-                    double.TryParse(split[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var y) &&
-                    double.TryParse(split[2], NumberStyles.Any, CultureInfo.InvariantCulture, out var width) &&
-                    double.TryParse(split[3], NumberStyles.Any, CultureInfo.InvariantCulture, out var height))
-#else
-                if (double.TryParse(split[0], out x) &&
-                    double.TryParse(split[1], out y) &&
-                    double.TryParse(split[2], out width) &&
-                    double.TryParse(split[3], out height))
-#endif
-                    result = new Rect(x, y, width, height);
-            }
-            else
-            {
-                throw new FormatException($"{rectAsString} was not in the expected format: \"x, y, width, height\"");
-            }
-
-            return result;
-        }
-
         /// <summary>
         /// Returns a string representation of the Windows.Foundation.Rect
         /// structure.
@@ -613,7 +582,6 @@ namespace Windows.Foundation
                 _x = double.PositiveInfinity,
                 _y = double.PositiveInfinity
             };
-            TypeFromStringConverters.RegisterConverter(typeof(Rect), s => Parse(s));
         }
     }
 }

@@ -1,4 +1,19 @@
-﻿using System.ComponentModel;
+﻿
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+
+using System.ComponentModel;
 using System.Globalization;
 
 #if MIGRATION
@@ -36,31 +51,48 @@ namespace Windows.Foundation
             return destinationType == typeof(string);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Point.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.Point.
-        /// </summary>
+        /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.Point" />.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Point created from converting source.</returns>
+        /// <returns>The <see cref="T:System.Windows.Point" /> created from converting <paramref name="value" />.</returns>
+        /// <exception cref="T:System.NotSupportedException">Thrown if the specified object is <see langword="null" /> or is a type that cannot be converted to a <see cref="T:System.Windows.Point" />.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result = null;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                var pointAsString = value.ToString();
 
-            return Point.Parse((string)value);
+                var split = pointAsString.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (split.Length == 2)
+                {
+#if OPENSILVER
+                    if (double.TryParse(split[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var x) &&
+                        double.TryParse(split[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var y))
+#else
+                if (double.TryParse(splittedString[0], out var x) &&
+                    double.TryParse(splittedString[1], out var y))
+#endif
+                        result = new Point(x, y);
+                }
+                else
+                {
+                    throw new FormatException($"{pointAsString} was not in the expected format: \"x, y\"");
+                }
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
+
+            return result;
         }
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Point" /> to a specified type. </summary>

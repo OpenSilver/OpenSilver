@@ -51,10 +51,10 @@ namespace Windows.Foundation.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
         {
             var pointConverter = new PointConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => pointConverter.ConvertFrom(null));
+            Assert.ThrowsException<NotSupportedException>(() => pointConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -62,6 +62,14 @@ namespace Windows.Foundation.Tests
         {
             var pointConverter = new PointConverter();
             Assert.ThrowsException<NotSupportedException>(() => pointConverter.ConvertFrom(true));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_InvalidPoint_ShouldThrow_FormatException()
+        {
+            var pointConverter = new PointConverter();
+            var invalidPoint = "1,1,1";
+            Assert.ThrowsException<FormatException>(() => pointConverter.ConvertFrom(invalidPoint));
         }
 
         [TestMethod]
