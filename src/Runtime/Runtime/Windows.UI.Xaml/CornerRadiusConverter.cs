@@ -121,7 +121,7 @@ namespace Windows.UI.Xaml
         /// <param name="cultureInfo">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The <see cref="T:System.Windows.CornerRadius" /> to convert.</param>
         /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.CornerRadius" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.CornerRadius" /> (a string).</returns>
+        /// <returns>The object created from converting this <see cref="T:System.Windows.CornerRadius" />.</returns>
         /// <exception cref="T:System.ArgumentNullException">
         ///         <paramref name="value" /> is <see langword="null" />.</exception>
         /// <exception cref="T:System.ArgumentException">

@@ -58,8 +58,8 @@ namespace Windows.UI.Xaml
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>An instance of <see cref="T:System.Windows.Thickness" /> created from the converted <paramref name="source" />.</returns>
-        /// <exception cref="T:System.ArgumentNullException">The <paramref name="source" /> object is a null reference (<see langword="Nothing" /> in Visual Basic).</exception>
+        /// <returns>An instance of <see cref="T:System.Windows.Thickness" /> created from the converted <paramref name="value" />.</returns>
+        /// <exception cref="T:System.ArgumentNullException">The <paramref name="value" /> object is <see langword="null" />.</exception>
         /// <exception cref="T:System.ArgumentException">The example object is not a null reference and is not a valid type that can be converted to a <see cref="T:System.Windows.Thickness" />.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {

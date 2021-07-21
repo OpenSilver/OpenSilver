@@ -120,12 +120,12 @@ namespace Windows.UI
             return result;
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.Color" /> to a specified type. </summary>
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.Color" /> to a specified type. </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.Color" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Color" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.Color" />.</returns>
+        /// <param name="value">The <see cref="T:System.Windows.Media.Color" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Media.Color" /> to.</param>
+        /// <returns>The object created from converting this <see cref="T:System.Windows.Media.Color" />.</returns>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
             object result = null;

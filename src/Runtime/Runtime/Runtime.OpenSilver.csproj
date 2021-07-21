@@ -145,6 +145,7 @@
 		<Compile Include="Windows.UI.Xaml.Controls\TreeView.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TreeViewItem.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ScrollViewerExtensions.cs" />
+		<Compile Include="Windows.UI.Xaml.Data\RelativeSourceConverter.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerParagraph.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerRichTextBlock.cs" />
 		<Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerSection.cs" />
