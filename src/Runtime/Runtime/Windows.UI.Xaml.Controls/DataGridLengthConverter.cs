@@ -24,12 +24,12 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.DataGridLength" /> object to and from other types.
+    /// Converts a <see cref="T:System.Windows.Controls.DataGridLength" /> object to and from other types.
     /// </summary>
     public sealed partial class DataGridLengthConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.DataGridLength" />.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Controls.DataGridLength" />.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="sourceType">The type being evaluated for conversion.</param>
@@ -41,42 +41,86 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.DataGridLength" /> can be converted to the specified type.
+        /// Determines whether an instance of <see cref="T:System.Windows.Controls.DataGridLength" /> can be converted to the specified type.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />
+        /// or <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(string);
+            return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Controls.DataGridLength.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.Controls.DataGridLength.
-        /// </summary>
+        /// <summary>Converts the specified object to an instance of the <see cref="T:System.Windows.Controls.DataGridLength" /> class.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Controls.DataGridLength created from converting source.</returns>
+        /// <returns>The converted value.</returns>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///         <paramref name="value" /> is <see langword="null" />.</exception>
+        /// <exception cref="T:System.ArgumentException">
+        ///         <paramref name="value" /> is not a valid type that can be converted to type <see cref="T:System.Windows.Controls.DataGridLength" />.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                var gridLengthAsString = value.ToString();
 
-            return DataGridLength.INTERNAL_ConvertFromString((string)value);
+                var trimmedLowercase = gridLengthAsString.Trim().ToLower();
+                if (trimmedLowercase.EndsWith("*"))
+                {
+                    var valueAsString = trimmedLowercase.Substring(0, trimmedLowercase.Length - 1);
+                    if (valueAsString == string.Empty)
+                    {
+                        result = new DataGridLength(1.0, DataGridLengthUnitType.Star);
+                    }
+                    else if (double.TryParse(valueAsString, out var size))
+                    {
+                        result = new DataGridLength(size, DataGridLengthUnitType.Star);
+                    }
+                    else
+                    {
+                        throw new Exception("Invalid GridLength: " + gridLengthAsString);
+                    }
+                }
+                else if (trimmedLowercase == "auto")
+                {
+                    result = new DataGridLength(1.0, DataGridLengthUnitType.Auto);
+                }
+                else if (trimmedLowercase == "sizetocells")
+                {
+                    result = new DataGridLength(1.0, DataGridLengthUnitType.Auto);
+                }
+                else if (trimmedLowercase == "sizetoheader")
+                {
+                    result = new DataGridLength(1.0, DataGridLengthUnitType.Auto);
+                }
+                else
+                {
+                    if (double.TryParse(trimmedLowercase, out var size))
+                    {
+                        result = new DataGridLength(size, DataGridLengthUnitType.Pixel);
+                    }
+                    else
+                    {
+                        throw new Exception("Invalid GridLength: " + gridLengthAsString);
+                    }
+                }
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
+
+            return result;
         }
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Controls.DataGridLength" /> to a specified type. </summary>
