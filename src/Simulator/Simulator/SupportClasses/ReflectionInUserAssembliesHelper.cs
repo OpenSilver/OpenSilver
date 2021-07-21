@@ -145,7 +145,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 return false;
         }
 
-        static bool TryGetCoreAssembly(out Assembly coreAssembly)
+        internal static bool TryGetCoreAssembly(out Assembly coreAssembly)
         {
             // Read from cache if previously found:
             if (_coreAssembly != null)

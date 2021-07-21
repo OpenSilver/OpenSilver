@@ -87,7 +87,11 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
         LicenseChecker LicenseChecker = null;
 
+#if OPENSILVER
+        public MainWindow(Type userApplicationType)
+#elif BRIDGE
         public MainWindow()
+#endif
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
@@ -120,6 +124,13 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             LoggerProvider.Instance.OutputFile = @"C:\temp\DotNetBrowser.log";
             LoggerProvider.Instance.ChromiumLogFile = @"C:\temp\chromium.log";
             BrowserPreferences.SetChromiumSwitches("--v=1");
+#endif
+            
+#if OPENSILVER
+            _applicationType = userApplicationType ?? throw new ArgumentNullException(nameof(userApplicationType));
+            ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out _coreAssembly);
+            _entryPointAssembly = _applicationType.Assembly;
+            _pathOfAssemblyThatContainsEntryPoint = _entryPointAssembly.Location;
 #endif
 
 #if BRIDGE
@@ -928,7 +939,50 @@ Click OK to continue.";
                 }
             }
         }
+        
+#if OPENSILVER
+        bool InitializeApplication()
+        {
+            // In OpenSilver we already have the user application type passed to the constructor, so we do not need to retrieve it here
+            try
+            {
+                // Create the JavaScriptExecutionHandler that will be called by the "Core" project to interact with the Emulator:
+                _javaScriptExecutionHandler = new JavaScriptExecutionHandler(MainWebBrowser);
 
+                // Create the HTML DOM MANAGER proxy and pass it to the "Core" project:
+                JSValue htmlDocument = (JSObject)MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue("document");
+
+                InteropHelpers.InjectDOMDocument(MainWebBrowser.Browser.GetDocument(), _coreAssembly);
+                InteropHelpers.InjectHtmlDocument(htmlDocument, _coreAssembly);//no need for this line right ?
+                InteropHelpers.InjectWebControlDispatcherBeginInvoke(MainWebBrowser, _coreAssembly);
+                InteropHelpers.InjectJavaScriptExecutionHandler(_javaScriptExecutionHandler, _coreAssembly);
+                InteropHelpers.InjectWpfMediaElementFactory(_coreAssembly);
+                InteropHelpers.InjectWebClientFactory(_coreAssembly);
+                InteropHelpers.InjectClipboardHandler(_coreAssembly);
+                InteropHelpers.InjectSimulatorProxy(new SimulatorProxy(MainWebBrowser, Console), _coreAssembly);
+                
+                // In the OpenSilver Version, we use this work-around to know if we're in the simulator
+                InteropHelpers.InjectIsRunningInTheSimulator_WorkAround(_coreAssembly);
+
+                WpfMediaElementFactory._gridWhereToPlaceMediaElements = GridForAudioMediaElements;
+
+                // Inject the code to display the message box in the simulator:
+                InteropHelpers.InjectCodeToDisplayTheMessageBox(
+                    (message, title, showCancelButton) => { return MessageBox.Show(message, title, showCancelButton ? MessageBoxButton.OKCancel : MessageBoxButton.OK) == MessageBoxResult.OK; },
+                    _coreAssembly);
+
+                // Ensure the static constructor of all common types is called so that the type converters are initialized:
+                StaticConstructorsCaller.EnsureStaticConstructorOfCommonTypesIsCalled(_coreAssembly);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error while loading the application: " + Environment.NewLine + Environment.NewLine + ex.Message);
+                HideLoadingMessage();
+                return false;
+            }
+        }
+#elif BRIDGE
         bool InitializeApplication()
         {
             // Read the path of the assembly that contains the entry point:
@@ -965,10 +1019,6 @@ Click OK to continue.";
                         InteropHelpers.InjectWebClientFactory(_coreAssembly);
                         InteropHelpers.InjectClipboardHandler(_coreAssembly);
                         InteropHelpers.InjectSimulatorProxy(new SimulatorProxy(MainWebBrowser, Console), _coreAssembly);
-#if OPENSILVER
-                        // In the OpenSilver Version, we use this work-around to know if we're in the simulator
-                        InteropHelpers.InjectIsRunningInTheSimulator_WorkAround(_coreAssembly);
-#endif
 
                         WpfMediaElementFactory._gridWhereToPlaceMediaElements = GridForAudioMediaElements;
 
@@ -1003,6 +1053,9 @@ Click OK to continue.";
                 return false;
             }
         }
+#endif
+
+        
 
         void ReloadAppAfterRedirect(string urlFragment)
         {

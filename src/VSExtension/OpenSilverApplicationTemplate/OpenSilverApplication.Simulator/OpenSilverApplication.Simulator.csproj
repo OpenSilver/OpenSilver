@@ -3,7 +3,6 @@
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net472</TargetFramework>
-		<StartArguments>"..\..\..\..\$ext_safeprojectname$\bin\$(Configuration)\netstandard2.0\$ext_safeprojectname$.dll"</StartArguments>
 	</PropertyGroup>
 
 	<ItemGroup>
