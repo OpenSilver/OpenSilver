@@ -158,7 +158,6 @@ namespace Windows.UI.Xaml.Media
                             }
                         }
 
-                        // TODO: Implement FontFamily.FamilyNames and FontFamily.FamilyMaps
                         throw new NotImplementedException();
 
                         return name;

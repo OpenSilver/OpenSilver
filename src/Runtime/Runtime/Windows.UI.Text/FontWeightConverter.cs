@@ -113,12 +113,10 @@ namespace Windows.UI.Text
                 if (destinationType == typeof(InstanceDescriptor))
                 {
                     var mi = typeof(FontWeight).GetMethod("FromOpenTypeWeight", new Type[] { typeof(int) });
-                    // TODO: Implement ToOpenTypeWeight()
                     result = new InstanceDescriptor(mi, new object[] { fontWeight.ToOpenTypeWeight() });
                 }
                 else if (destinationType == typeof(string))
                 {
-                    // TODO: Implement this ToString() overload
                     result = ((IFormattable)fontWeight).ToString(null, culture);
                 }
             }

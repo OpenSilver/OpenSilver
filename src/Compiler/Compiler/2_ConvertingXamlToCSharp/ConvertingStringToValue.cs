@@ -121,7 +121,7 @@ namespace DotNetForHtml5.Compiler
                         break;
                     default:
                         //return after escaping (note: we use valueAsString and not trimmedValueAsString because it can be a string that starts or ends with spaces):
-                        result = string.Format("({0})global::DotNetForHtml5.Core.TypeFromStringConverters.ConvertFromInvariantString(typeof({0}), {1})",
+                        result = string.Format("({0})global::DotNetForHtml5.Core.ObjectGenerator.Current.Parse<{0}>({1})",
                         nonNullableElementTypeInCSharp,
                         GetQuotedVerbatimString(valueAsString)); // Note: we use verbatim string (ie. a string that starts with "@") so that the only character we have to escape is the quote (we need to double it).
                         break;
