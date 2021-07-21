@@ -467,7 +467,7 @@
 		<Compile Include="Core\Main\INTERNAL_TypeToStringToDependencyProperty.cs" />
 		<Compile Include="Core\Main\INTERNAL_UriHelper.cs" />
 		<Compile Include="Core\Main\NamespacesDocumentation.cs" />
-		<Compile Include="Core\Main\SupportsDirectContentViaTypeFromStringConvertersAttribute.cs" />
+		<Compile Include="Core\Main\TypeFromStringConverters.cs" />
 		<Compile Include="Core\Other\HashSet2_1.cs" />
 		<Compile Include="Core\Other\INTERNAL_DispatcherHelpers.cs" />
 		<Compile Include="Core\Other\INTERNAL_FontsHelper.cs" />
