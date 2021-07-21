@@ -47,9 +47,7 @@ namespace Windows.UI.Xaml.Media.Tests
         public void ConvertFrom_String_ShouldReturnBitmapImage()
         {
             var imageSourceConverter = new ImageSourceConverter();
-            // TODO: Pass valid BitmapImage
-            var test = imageSourceConverter.ConvertFrom("");
-            throw new NotImplementedException();
+            var test = imageSourceConverter.ConvertFrom("ms-appx:/Images/Logo1.png");
             test.Should().BeOfType(typeof(BitmapImage));
         }
 
@@ -71,7 +69,8 @@ namespace Windows.UI.Xaml.Media.Tests
         public void ConvertTo_String()
         {
             var imageSourceConverter = new ImageSourceConverter();
-            var test = imageSourceConverter.ConvertTo(new BitmapImage(), typeof(string));
+            var str = "ms-appx:/Images/Logo1.png";
+            var test = imageSourceConverter.ConvertTo(new BitmapImage(new Uri(str, UriKind.Absolute)), typeof(string));
             test.Should().Be("");
         }
 

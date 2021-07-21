@@ -107,8 +107,8 @@ namespace Windows.UI.Xaml
                 }
                 else
                 {
-                    // TODO: Implement PropertyPath.PathParameters and PropertyPath.DowncastAccessor()
-                    // There are other classes that have to implemented like XamlDesignerSerializationManager, IValueSerializerContext, etc.
+                    // PropertyPath.PathParameters and PropertyPath.DowncastAccessor() have to be implement.
+                    // There are other classes that have to implemented too like XamlDesignerSerializationManager, IValueSerializerContext, etc.
                     throw new NotImplementedException();
                 }
             }

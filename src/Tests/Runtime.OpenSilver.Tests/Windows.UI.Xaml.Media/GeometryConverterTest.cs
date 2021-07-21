@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 
 #if MIGRATION
 namespace System.Windows.Media.Tests
@@ -46,10 +47,13 @@ namespace Windows.UI.Xaml.Media.Tests
         public void ConvertFrom_String_ShouldReturnGeometry()
         {
             var geometryConverter = new GeometryConverter();
-            // TODO: Pass valid geometry
-            var test = geometryConverter.ConvertFrom("");
-            throw new NotImplementedException();
-            test.Should().BeOfType(typeof(Geometry));
+            var points = new List<Point> { new Point(20, 0), new Point(20, 10), new Point(50, 30), new Point(50, 40), new Point(20, 40), };
+            var lineSegment = new PolyLineSegment { Points = new PointCollection(points) };
+            var segments = new PathSegmentCollection { lineSegment };
+
+            var expected = new PathGeometry(new List<PathFigure> { new PathFigure { Segments = segments, StartPoint = new Point(10, 10), } });
+            var test = geometryConverter.ConvertFrom("M 10,10 20,0 20,10 L 50,30 50,40 20,40");
+            test.Should().Be(expected);
         }
 
         [TestMethod]
