@@ -13,13 +13,6 @@
 \*====================================================================================*/
 
 
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-
-using DotNetForHtml5.Core;
 using System.ComponentModel;
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -27,14 +20,13 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-    [TypeConverter(typeof(RepeatBehaviorConverter))]
     /// <summary>
     /// Describes how a Windows.UI.Xaml.Media.Animation.Timeline repeats its simple
     /// duration.
     /// </summary>
+    [TypeConverter(typeof(RepeatBehaviorConverter))]
     public partial struct RepeatBehavior// : IFormattable
     {
-
         //for details on how the animations are supposed to behave depending on RepeatBehavior, see: https://msdn.microsoft.com/en-us/library/system.windows.media.animation.timeline.repeatbehavior(v=vs.100).aspx
         //
         // Exceptions:
@@ -58,35 +50,6 @@ namespace Windows.UI.Xaml.Media.Animation
             HasDuration = false;
             Duration = new TimeSpan();
 #endif
-        }
-
-        static RepeatBehavior()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(RepeatBehavior), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string arg)
-        {
-            //BRIDGETODO : verify the code below matchs
-#if !BRIDGE
-            string loweredArg = arg.ToLowerInvariant();
-#else
-            string loweredArg = arg.ToLower();
-#endif
-            if (loweredArg == "forever")
-            {
-                return RepeatBehavior.Forever;
-            }
-            else if (loweredArg.EndsWith("x"))
-            {
-                double repeatCount = double.Parse(loweredArg.Substring(0, loweredArg.Length - 1));
-                return new RepeatBehavior(repeatCount);
-            }
-            else
-            {
-                throw new FormatException("The string: \"" + arg + "\" could not be parsed into a RepeatBehavior. Note: The duration is not supported yet as a RepeatBehavior.");
-            }
-            //todo: else duration.
         }
 
         //// Exceptions:

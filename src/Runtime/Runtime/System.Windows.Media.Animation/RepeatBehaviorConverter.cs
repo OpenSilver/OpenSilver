@@ -49,37 +49,57 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />
+        /// or <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(string);
+            return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Media.Animation.RepeatBehavior.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.Media.Animation.RepeatBehavior.
-        /// </summary>
+        /// <summary>Converts a given string value to an instance of <see cref="T:System.Windows.Media.Animation.RepeatBehaviorConverter" />.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Media.Animation.RepeatBehavior created from converting source.</returns>
+        /// <returns>A new <see cref="T:System.Windows.Media.Animation.RepeatBehavior" /> object based on <paramref name="value" />.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                var arg = value.ToString();
 
-            return RepeatBehavior.INTERNAL_ConvertFromString((string)value);
+                //BRIDGETODO : verify the code below matchs
+#if !BRIDGE
+                var loweredArg = arg.ToLowerInvariant();
+#else
+                var loweredArg = arg.ToLower();
+#endif
+                if (loweredArg == "forever")
+                {
+                    result = RepeatBehavior.Forever;
+                }
+                else if (loweredArg.EndsWith("x"))
+                {
+                    var repeatCount = double.Parse(loweredArg.Substring(0, loweredArg.Length - 1));
+                    result = new RepeatBehavior(repeatCount);
+                }
+                else
+                {
+                    throw new FormatException("The string: \"" + arg + "\" could not be parsed into a RepeatBehavior. Note: The duration is not supported yet as a RepeatBehavior.");
+                }
+                //TODO: else duration.
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
+
+            return result;
         }
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.Animation.RepeatBehavior" /> to a specified type. </summary>
@@ -127,7 +147,7 @@ namespace Windows.UI.Xaml.Media.Animation
                             break;
                         case RepeatBehaviorType.Count:
                             var sb = new StringBuilder();
-                            sb.AppendFormat(cultureInfo, "{0:null}x", behavior.Count);
+                            sb.AppendFormat(cultureInfo, "{0:}x", behavior.Count);
                             result = sb.ToString();
                             break;
                         default:
