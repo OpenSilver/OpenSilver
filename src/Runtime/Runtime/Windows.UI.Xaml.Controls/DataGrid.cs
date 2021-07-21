@@ -19,6 +19,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
@@ -154,7 +155,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(AlternatingRowBackground),
                 typeof(Brush),
                 typeof(DataGrid),
-                new PropertyMetadata(new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString("#AAEAEFF4"))));
+                new PropertyMetadata(new SolidColorBrush((Color)TypeDescriptor.GetConverter(typeof(Color)).ConvertFrom("#AAEAEFF4"))));
 
         /// <summary>
         /// Gets or sets the vertical padding in all cells

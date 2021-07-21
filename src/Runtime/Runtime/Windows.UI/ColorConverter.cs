@@ -31,37 +31,93 @@ namespace Windows.UI
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(string);
+            return destinationType == typeof(InstanceDescriptor);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Media.Color.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.Media.Color.
-        /// </summary>
+        /// <summary>Attempts to convert the specified object to a <see cref="T:System.Windows.Media.Color" />.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Media.Color created from converting source.</returns>
+        /// <returns>The <see cref="T:System.Windows.Media.Color" /> created from converting <paramref name="value" />.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                var colorString = value.ToString();
 
-            return Color.INTERNAL_ConvertFromString((string)value);
+                var trimmedString = colorString.Trim();
+                if (!string.IsNullOrEmpty(trimmedString) && (trimmedString[0] == '#'))
+                {
+                    var tokens = trimmedString.Substring(1);
+                    if (tokens.Length == 6) // This is because XAML is tolerant when the user has forgot the alpha channel (eg. #DDDDDD for Gray).
+                        tokens = "FF" + tokens;
+
+#if NETSTANDARD
+                    if (int.TryParse(tokens, NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo, out var color))
+                    {
+                        return Color.INTERNAL_ConvertFromInt32(color);
+                    }
+#else // BRIDGE
+                int color;
+                if (CSHTML5.Interop.IsRunningInTheSimulator)
+                {
+                    color = INTERNAL_BridgeWorkarounds.HexToInt_SimulatorOnly(tokens);
+                }
+                else
+                {
+                    color = Script.Write<int>("parseInt({0}, 16);", tokens);
+                }
+
+                return INTERNAL_ConvertFromInt32(color);
+#endif
+                }
+                else if (trimmedString != null && trimmedString.StartsWith("sc#", StringComparison.Ordinal))
+                {
+                    var tokens = trimmedString.Substring(3);
+
+                    var separators = new char[1] { ',' };
+                    var words = tokens.Split(separators);
+                    var values = new float[4];
+                    for (int i = 0; i < 3; i++)
+                    {
+                        values[i] = Convert.ToSingle(words[i]);
+                    }
+                    if (words.Length == 4)
+                    {
+                        values[3] = Convert.ToSingle(words[3]);
+                        return Color.FromScRgb(values[0], values[1], values[2], values[3]);
+                    }
+                    else
+                    {
+                        return Color.FromScRgb(1.0f, values[0], values[1], values[2]);
+                    }
+                }
+                else
+                {
+                    // Check if the color is a named color
+                    if (Enum.TryParse(trimmedString, true, out Colors.INTERNAL_ColorsEnum namedColor))
+                    {
+                        return Color.INTERNAL_ConvertFromInt32((int)namedColor);
+                    }
+                }
+
+                throw new Exception(string.Format("Invalid color: {0}", colorString));
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
+
+            return result;
         }
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Color" /> to a specified type. </summary>

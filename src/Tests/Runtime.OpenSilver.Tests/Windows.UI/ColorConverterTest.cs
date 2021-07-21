@@ -32,7 +32,7 @@ namespace Windows.UI.Tests
         public void CanConvertTo_String_ShouldReturnTrue()
         {
             var colorConverter = new ColorConverter();
-            var test = colorConverter.CanConvertTo(typeof(string));
+            var test = colorConverter.CanConvertTo(typeof(InstanceDescriptor));
             test.Should().BeTrue();
         }
 
@@ -45,7 +45,7 @@ namespace Windows.UI.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_String_ShouldReturnColor()
+        public void ConvertFrom_Hex_ShouldReturnColor()
         {
             var colorConverter = new ColorConverter();
             var expected = new Color { A = 18, B = 120, G = 86, R = 52 };
@@ -54,10 +54,37 @@ namespace Windows.UI.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_ArgumentNullException()
+        public void ConvertFrom_NamedColor_ShouldReturnColor()
         {
             var colorConverter = new ColorConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => colorConverter.ConvertFrom(null));
+            var expected = new Color { A = 255, B = 0, G = 255, R = 255 };
+            var test = colorConverter.ConvertFrom("Yellow");
+            test.Should().Be(expected);
+        }
+
+        [TestMethod]
+        public void ConvertFrom_SC_ShouldReturnColor()
+        {
+            var colorConverter = new ColorConverter();
+            var expected = new Color { A = 0, B = 255, G = 255, R = 255 };
+            throw new NotImplementedException();
+            var test = colorConverter.ConvertFrom("sc#12345678");
+            test.Should().Be(expected);
+        }
+
+        [TestMethod]
+        public void ConvertFrom_InvalidColor_ShouldThrow_Exception()
+        {
+            var colorConverter = new ColorConverter();
+            var invalidColor = "invalid color";
+            Assert.ThrowsException<Exception>(() => colorConverter.ConvertFrom(invalidColor));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
+        {
+            var colorConverter = new ColorConverter();
+            Assert.ThrowsException<NotSupportedException>(() => colorConverter.ConvertFrom(null));
         }
 
         [TestMethod]
@@ -73,7 +100,6 @@ namespace Windows.UI.Tests
             var colorConverter = new ColorConverter();
             var color = new Color { A = 18, B = 120, G = 86, R = 52 };
             var test = colorConverter.ConvertTo(color, typeof(string));
-            throw new NotImplementedException();
             test.Should().Be("#12345678");
         }
 
@@ -90,14 +116,7 @@ namespace Windows.UI.Tests
             var colorConverter = new ColorConverter();
             var notSupportedType = typeof(bool);
             Assert.ThrowsException<NotSupportedException>(() => colorConverter.ConvertTo(new Color(), notSupportedType));
-        }
-
-        [TestMethod]
-        public void ConvertTo_String_FromBool()
-        {
-            var cursorConverter = new ColorConverter();
-            var test = cursorConverter.ConvertTo(true, typeof(string));
-            test.Should().Be("True");
+            Assert.ThrowsException<NotSupportedException>(() => colorConverter.ConvertTo(true, typeof(bool)));
         }
 
         [TestMethod]
