@@ -14,6 +14,7 @@
 
 
 using System.ComponentModel;
+using System.ComponentModel.Design.Serialization;
 using System.Globalization;
 
 #if MIGRATION
@@ -45,48 +46,101 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />
+        /// or <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(string);
+            return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.NotSupportedException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.Media.Animation.KeyTime.
-        /// <summary>
-        /// Converts the specified object to a System.Windows.Media.Animation.KeyTime.
-        /// </summary>
+        /// <summary>Attempts to convert a given object to an instance of <see cref="T:System.Windows.Media.Animation.KeyTime" />.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Media.Animation.KeyTime created from converting source.</returns>
+        /// <returns>A new instance of <see cref="T:System.Windows.Media.Animation.KeyTime" />, based on the supplied <paramref name="value" />.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result;
+
             if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (value.GetType() != typeof(string))
             {
                 throw GetConvertFromException(value);
             }
+            else if (value is string)
+            {
+                var keyTimeCode = value.ToString();
 
-            return KeyTime.INTERNAL_ConvertFromString((string)value);
+                try
+                {
+                    if (keyTimeCode == "Uniform")
+                    {
+                        throw new NotImplementedException("The Value \"Uniform\" for keyTime is not supported yet.");
+                    }
+                    else if (keyTimeCode == "Paced")
+                    {
+                        throw new NotImplementedException("The Value \"Paced\" for keyTime is not supported yet.");
+                    }
+                    else if (keyTimeCode.EndsWith("%"))
+                    {
+                        throw new NotImplementedException("The percentage values for keyTime are not supported yet.");
+                    }
+                    else
+                    {
+#if BRIDGE
+                    TimeSpan timeSpan = INTERNAL_BridgeWorkarounds.TimeSpanParse(keyTimeCode, false);
+#else
+                        TimeSpan timeSpan = TimeSpan.Parse(keyTimeCode);
+#endif
+                        result = new KeyTime(timeSpan);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Invalid KeyTime: " + keyTimeCode, ex);
+                }
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
+
+            return result;
         }
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.Animation.KeyTime" /> to a specified type. </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="typeDescriptorContext">Describes the context information of a type.</param>
+        /// <param name="cultureInfo">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The <see cref="T:System.Windows.Media.Animation.KeyTime" /> to convert.</param>
         /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Media.Animation.KeyTime" /> to.</param>
         /// <returns>The object created from converting this <see cref="T:System.Windows.Media.Animation.KeyTime" />.</returns>
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        public override object ConvertTo(ITypeDescriptorContext typeDescriptorContext, CultureInfo cultureInfo, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            object result = null;
+
+            if (value != null && value is KeyTime keyTime)
+            {
+                if (destinationType == typeof(InstanceDescriptor))
+                {
+                    var mi = typeof(KeyTime).GetMethod("FromTimeSpan", new Type[] { typeof(TimeSpan) });
+
+                    result = new InstanceDescriptor(mi, new object[] { keyTime.TimeSpan });
+                }
+                else if (destinationType == typeof(string))
+                {
+                    result = TypeDescriptor.GetConverter(typeof(TimeSpan)).ConvertTo(
+                       typeDescriptorContext,
+                       cultureInfo,
+                       keyTime.TimeSpan,
+                       destinationType);
+                }
+            }
+
+            if (result is null)
+            {
+                result = base.ConvertTo(typeDescriptorContext, cultureInfo, value, destinationType);
+            }
+
+            return result;
         }
     }
 }
