@@ -8,6 +8,7 @@ namespace System.Windows.Tests
 namespace Windows.UI.Xaml.Tests
 #endif
 {
+    #if WORKINPROGRESS
     [TestClass]
     public class FontStretchConverterTest
     {
@@ -105,4 +106,5 @@ namespace Windows.UI.Xaml.Tests
             test.Should().BeOfType(typeof(InstanceDescriptor));
         }
     }
+#endif
 }

@@ -78,7 +78,7 @@ namespace Windows.UI.Xaml.Media.Tests
         public void ConvertTo_String_ShouldThrow_ArgumentNullException()
         {
             var imageSourceConverter = new ImageSourceConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => imageSourceConverter.ConvertTo(new BitmapCache(), null));
+            Assert.ThrowsException<ArgumentNullException>(() => imageSourceConverter.ConvertTo(new ImageSource(), null));
         }
 
         [TestMethod]
@@ -86,7 +86,7 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             var imageSourceConverter = new ImageSourceConverter();
             Assert.ThrowsException<NotSupportedException>(() => imageSourceConverter.ConvertTo(true, typeof(bool)));
-            Assert.ThrowsException<NotSupportedException>(() => imageSourceConverter.ConvertTo(new BitmapCache(), typeof(bool)));
+            Assert.ThrowsException<NotSupportedException>(() => imageSourceConverter.ConvertTo(new ImageSource(), typeof(bool)));
         }
     }
 }

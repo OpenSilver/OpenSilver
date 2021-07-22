@@ -128,11 +128,13 @@ namespace Windows.UI.Xaml.Media.Animation
                         mi = typeof(RepeatBehavior).GetConstructor(new Type[] { typeof(double) });
                         result = new InstanceDescriptor(mi, new object[] { behavior.Count });
                     }
+#if WORKINPROGRESS
                     else if (behavior.HasDuration)
                     {
                         mi = typeof(RepeatBehavior).GetConstructor(new Type[] { typeof(TimeSpan) });
                         result = new InstanceDescriptor(mi, new object[] { behavior.Duration });
                     }
+#endif
                     else
                     {
                         Debug.Fail("Unknown type of RepeatBehavior passed to RepeatBehaviorConverter.");

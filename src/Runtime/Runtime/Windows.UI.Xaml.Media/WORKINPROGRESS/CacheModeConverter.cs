@@ -22,6 +22,7 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+#if WORKINPROGRESS
     /// <summary>
     /// Converts a <see cref="T:System.Windows.Media.CacheMode" /> object to and from other types.
     /// </summary>
@@ -137,4 +138,5 @@ namespace Windows.UI.Xaml.Media
             return result;
         }
     }
+#endif
 }

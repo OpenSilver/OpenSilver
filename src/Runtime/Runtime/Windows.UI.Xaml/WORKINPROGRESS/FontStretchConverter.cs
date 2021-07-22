@@ -23,6 +23,7 @@ namespace System.Windows
 namespace Windows.UI.Text
 #endif
 {
+    #if WORKINPROGRESS
     /// <summary>
     /// Converts a <see cref="T:System.Windows.FontStretch" /> object to and from other types.
     /// </summary>
@@ -114,4 +115,5 @@ namespace Windows.UI.Text
             return result;
         }
     }
+#endif
 }
