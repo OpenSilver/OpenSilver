@@ -146,7 +146,7 @@ namespace Windows.UI.Xaml.Data
             }
             catch (Exception)
             {
-               _parsedIndex = ObjectGenerator.Current.Parse(_index, indexType);
+               _parsedIndex = ObjectBuilder.Singleton.Parse(_index, indexType);
             }
         }
     }

@@ -124,7 +124,7 @@ namespace System.Windows.Markup
             }
             else if (itemType == typeof(string))
             {
-                return ObjectGenerator.Current.Parse((string)item, targetType);
+                return ObjectBuilder.Singleton.Parse((string)item, targetType);
             }
             else
             {

@@ -188,7 +188,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
                 else
                 {
-                    value = ObjectGenerator.Current.Parse((string)value, _propDp.PropertyType);
+                    value = ObjectBuilder.Singleton.Parse((string)value, _propDp.PropertyType);
                 }
             }
 

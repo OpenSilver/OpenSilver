@@ -696,7 +696,7 @@ namespace Windows.UI.Xaml.Controls
             StackPanel stackPanelInPopUp = new StackPanel();
             iconStop = new Path()
             {
-                Data = (Geometry)ObjectGenerator.Current.Parse(@"M13.4005,19.7645 L13.3231,19.8886 C11.5316,22.8369 10.5,26.298 10.5,30 C10.5,40.7696 19.2305,49.5 30,49.5 C33.702,49.5 37.1631,48.4684 40.1115,46.6769 L40.2355,46.5995 z M30,10.5 C26.298,10.5 22.8369,11.5316 19.8886,13.3231 L19.7645,13.4005 L46.5995,40.2355 L46.6769,40.1115 C48.4684,37.1631 49.5,33.702 49.5,30 C49.5,19.2305 40.7696,10.5 30,10.5 z M30,0.5 C46.2924,0.5 59.5,13.7076 59.5,30 C59.5,46.2924 46.2924,59.5 30,59.5 C13.7076,59.5 0.5,46.2924 0.5,30 C0.5,13.7076 13.7076,0.5 30,0.5 z", typeof(Geometry)),
+                Data = (Geometry)ObjectBuilder.Singleton.Parse(@"M13.4005,19.7645 L13.3231,19.8886 C11.5316,22.8369 10.5,26.298 10.5,30 C10.5,40.7696 19.2305,49.5 30,49.5 C33.702,49.5 37.1631,48.4684 40.1115,46.6769 L40.2355,46.5995 z M30,10.5 C26.298,10.5 22.8369,11.5316 19.8886,13.3231 L19.7645,13.4005 L46.5995,40.2355 L46.6769,40.1115 C48.4684,37.1631 49.5,33.702 49.5,30 C49.5,19.2305 40.7696,10.5 30,10.5 z M30,0.5 C46.2924,0.5 59.5,13.7076 59.5,30 C59.5,46.2924 46.2924,59.5 30,59.5 C13.7076,59.5 0.5,46.2924 0.5,30 C0.5,13.7076 13.7076,0.5 30,0.5 z", typeof(Geometry)),
                 Fill = new SolidColorBrush(Colors.Red),
                 Height = 10,
                 Width = 10,
@@ -706,7 +706,7 @@ namespace Windows.UI.Xaml.Controls
             };
             iconArrow = new Path()
             {
-                Data = (Geometry)ObjectGenerator.Current.Parse(@"M120,60 L120,80 L160,80 L160,90 L180,70 L160,50 L160,60 z", typeof(Geometry)),
+                Data = (Geometry)ObjectBuilder.Singleton.Parse(@"M120,60 L120,80 L160,80 L160,90 L180,70 L160,50 L160,60 z", typeof(Geometry)),
                 Fill = new SolidColorBrush(Colors.Blue),
                 Height = 7.057,
                 Width = 10.5,
