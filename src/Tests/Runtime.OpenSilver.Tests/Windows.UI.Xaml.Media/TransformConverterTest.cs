@@ -75,14 +75,14 @@ namespace Windows.UI.Xaml.Media.Tests
         [TestMethod]
         public void ConvertTo_String_ShouldThrow_ArgumentNullException()
         {
-            var cacheModeConverter = new CacheModeConverter();
+            var cacheModeConverter = new TransformConverter();
             Assert.ThrowsException<ArgumentNullException>(() => cacheModeConverter.ConvertTo(new MatrixTransform(), null));
         }
 
         [TestMethod]
         public void ConvertTo_String_ShouldThrow_NotSupportedException()
         {
-            var cacheModeConverter = new CacheModeConverter();
+            var cacheModeConverter = new TransformConverter();
             Assert.ThrowsException<NotSupportedException>(() => cacheModeConverter.ConvertTo(true, typeof(bool)));
             Assert.ThrowsException<NotSupportedException>(() => cacheModeConverter.ConvertTo(new MatrixTransform(), typeof(bool)));
         }

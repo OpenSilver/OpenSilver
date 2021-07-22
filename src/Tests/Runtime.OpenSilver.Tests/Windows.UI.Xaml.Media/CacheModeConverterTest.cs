@@ -7,6 +7,7 @@ namespace System.Windows.Media.Tests
 namespace Windows.UI.Xaml.Media.Tests
 #endif
 {
+#if WORKINPROGRESS
     [TestClass]
     public class CacheModeConverterTest
     {
@@ -95,4 +96,5 @@ namespace Windows.UI.Xaml.Media.Tests
             Assert.ThrowsException<NotSupportedException>(() => cacheModeConverter.ConvertTo(new BitmapCache(), typeof(bool)));
         }
     }
+#endif
 }

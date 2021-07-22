@@ -200,6 +200,27 @@ namespace Windows.UI
             }
         }
 
+        //
+        // Summary:
+        //     Creates a string representation of the color by using the ARGB channels and the
+        //     specified format provider.
+        //
+        // Parameters:
+        //   provider:
+        //     Culture-specific formatting information.
+        //
+        // Returns:
+        //     The string representation of the color.
+        public string ToString(IFormatProvider provider)
+        {
+            return default(string);
+        }
+
+        public string ToString(string format, IFormatProvider formatProvider)
+        {
+            throw new NotImplementedException();
+        }
+
         public static bool operator ==(Color color1, Color color2)
         {
             if (color1.R != color2.R)
