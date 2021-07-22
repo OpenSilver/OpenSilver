@@ -1,4 +1,6 @@
-﻿using DotNetForHtml5.EmulatorWithoutJavascript;
+﻿using DotNetBrowser.WPF;
+using DotNetForHtml5.EmulatorWithoutJavascript;
+using System;
 
 #if OPENSILVER
 namespace OpenSilver.Simulator
@@ -9,5 +11,7 @@ namespace CSHTML5.Simulator
     public class SimulatorLaunchParameters
     {
         // Add stuff as needed, like cookies, etc.
+
+        public Action<WPFBrowserView> BrowserCreatedCallback { get; set; }
     }
 }
