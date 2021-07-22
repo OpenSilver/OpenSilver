@@ -14,7 +14,7 @@ namespace CSHTML5.Simulator
         {
             App app = new App();
             app.InitializeComponent();
-            return app.Run(new MainWindow(userApplicationType));
+            return app.Run(new MainWindow(userApplicationType, parameters));
         }
 #elif BRIDGE
         [STAThread]
