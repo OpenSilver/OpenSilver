@@ -144,7 +144,7 @@ namespace DotNetForHtml5.Compiler
 
                             if (canSetAttribute)
                             {
-                                // Add the attribute that will tell the compiler to later intialize the type by converting from the string using the "TypeFromStringConverters" class.
+                                // Add the attribute that will tell the compiler to later intialize the type by converting from the string.
                                 currentElement.SetAttributeValue(AttributeNameForTypesToBeInitializedFromString, contentValue);
 
                                 // Remove the direct text content:

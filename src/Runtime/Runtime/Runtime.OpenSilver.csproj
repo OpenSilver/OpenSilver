@@ -51,9 +51,8 @@
 		<Compile Include="Core\Main\EmptyEnumerator.cs" />
 		<Compile Include="Core\Main\InheritablePropertyChangeInfo.cs" />
 		<Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
-		<Compile Include="Core\Main\ObjectGenerator.cs" />
+		<Compile Include="Core\Main\ObjectBuilder.cs" />
 		<Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
-		<Compile Include="Core\Main\TypeFromStringConverters.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ChangePropertyAction.cs" />
@@ -482,7 +481,6 @@
 		<Compile Include="Core\Main\INTERNAL_TypeToStringToDependencyProperty.cs" />
 		<Compile Include="Core\Main\INTERNAL_UriHelper.cs" />
 		<Compile Include="Core\Main\NamespacesDocumentation.cs" />
-		<Compile Include="Core\Main\TypeFromStringConverters.cs" />
 		<Compile Include="Core\Other\HashSet2_1.cs" />
 		<Compile Include="Core\Other\INTERNAL_DispatcherHelpers.cs" />
 		<Compile Include="Core\Other\INTERNAL_FontsHelper.cs" />
