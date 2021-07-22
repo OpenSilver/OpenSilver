@@ -177,6 +177,8 @@ namespace Windows.UI.Xaml
 #else
             RefreshHeight(frameworkElement);
 #endif
+            if (!double.IsNaN(frameworkElement.Width) && !double.IsNaN(frameworkElement.Height))
+                frameworkElement.HandleSizeChanged(null);
         }
 
 #if PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
@@ -265,6 +267,8 @@ namespace Windows.UI.Xaml
 #else
             RefreshWidth(frameworkElement);
 #endif
+            if (!double.IsNaN(frameworkElement.Width) && !double.IsNaN(frameworkElement.Height))
+                frameworkElement.HandleSizeChanged(null);
         }
 
 #if PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
@@ -1532,6 +1536,8 @@ namespace Windows.UI.Xaml
                 else
                 {
 #endif
+                    if (!double.IsNaN(this.Width) && !double.IsNaN(this.Height))
+                        return new Size(this.Width, this.Height);
                     try
                     {
                     // Hack to improve the Simulator performance by making only one interop call rather than two:
@@ -1669,8 +1675,11 @@ namespace Windows.UI.Xaml
                     this._sizeChangedEventHandlers.Count > 0 &&
                     this._resizeSensor == null)
                 {
-                    object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
-                    this._resizeSensor = sensor;
+                    if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
+                    {
+                        object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
+                        this._resizeSensor = sensor;
+                    }
                 }
             }
         }
@@ -1687,8 +1696,15 @@ namespace Windows.UI.Xaml
                 {
                     if (this.IsUnderCustomLayout == false)
                     {
-                        object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
-                        this._resizeSensor = sensor;
+                        if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
+                        {
+                            object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
+                            this._resizeSensor = sensor;
+                        } 
+                        else
+                        {
+                            HandleSizeChanged(null);
+                        }
                     }
                 }
                 this._sizeChangedEventHandlers.Add(value);
