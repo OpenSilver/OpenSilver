@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>$ext_blazortargetframework$</TargetFramework>
     <NoXamlPreprocessor>True</NoXamlPreprocessor>
-    <OpenSilverType>3</OpenSilverType>
+    <OpenSilverType>4</OpenSilverType>
 	<PublishTrimmed>true</PublishTrimmed>
 	<!-- Uncomment to enable AOT compilation when publishing -->
 	<!--<RunAOTCompilation Condition="'$(IsSecondPass)'=='True'">true</RunAOTCompilation>-->
