@@ -222,7 +222,12 @@ namespace Windows.UI.Xaml
 #else
                     _pointerPressedEventManager = new INTERNAL_EventManager<PointerEventHandler, PointerRoutedEventArgs>(() => this.INTERNAL_OuterDomElement, eventsNames, (jsEventArg) =>
                     {
-                        ProcessPointerEvent(jsEventArg, (Action<PointerRoutedEventArgs>)OnPointerPressed, (Action<PointerRoutedEventArgs>)OnPointerPressed_ForHandledEventsToo, preventTextSelectionWhenPointerIsCaptured: true, checkForDivsThatAbsorbEvents: true, refreshClickCount: true);
+                        int mouseBtn = 0;
+                        int.TryParse((CSHTML5.Interop.ExecuteJavaScript("$0.buttons", jsEventArg) ?? 0).ToString(), out mouseBtn);
+                        if (mouseBtn != 2)
+                        {
+                            ProcessPointerEvent(jsEventArg, (Action<PointerRoutedEventArgs>)OnPointerPressed, (Action<PointerRoutedEventArgs>)OnPointerPressed_ForHandledEventsToo, preventTextSelectionWhenPointerIsCaptured: true, checkForDivsThatAbsorbEvents: true, refreshClickCount: true);
+                        }
                     });
 #endif
                 }
