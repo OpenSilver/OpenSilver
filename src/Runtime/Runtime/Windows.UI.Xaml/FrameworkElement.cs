@@ -579,9 +579,28 @@ namespace Windows.UI.Xaml
             styleOfOuterDomElement.cursor = ((Cursor)newValue)?.ToHtmlString() ?? "inherit";
         }
 
-#endregion
+        #endregion
 
-#region IsEnabled
+        #region IsEnabled
+
+        /// <summary>
+        ///     Fetches the value that IsEnabled should be coerced to.
+        /// </summary>
+        /// <remarks>
+        ///     This method is virtual is so that controls derived from UIElement
+        ///     can combine additional requirements into the coersion logic.
+        ///     <P/>
+        ///     It is important for anyone overriding this property to also
+        ///     call CoerceValue when any of their dependencies change.
+        /// </remarks>
+        internal virtual bool IsEnabledCore
+        {
+            get
+            {
+                // ButtonBase.IsEnabledCore: CanExecute
+                return true;
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the user can interact with the control.
@@ -601,7 +620,7 @@ namespace Windows.UI.Xaml
                 nameof(IsEnabled),
                 typeof(bool),
                 typeof(FrameworkElement),
-                new PropertyMetadata(true, IsEnabled_Changed, CoerceIsEnabledProperty)
+                new PropertyMetadata(true, IsEnabled_Changed, CoerceIsEnabled)
                 {
                     MethodToUpdateDom = IsEnabled_MethodToUpdateDom,
                 });
@@ -616,7 +635,7 @@ namespace Windows.UI.Xaml
             fe.InvalidateForceInheritPropertyOnChildren(e.Property);
         }
 
-        private static object CoerceIsEnabledProperty(DependencyObject d, object baseValue)
+        private static object CoerceIsEnabled(DependencyObject d, object baseValue)
         {
             FrameworkElement fe = (FrameworkElement)d;
 
@@ -642,7 +661,7 @@ namespace Windows.UI.Xaml
                 DependencyObject parent = fe.Parent ?? VisualTreeHelper.GetParent(fe);
                 if (parent == null || (bool)parent.GetValue(IsEnabledProperty))
                 {
-                    return true;
+                    return fe.IsEnabledCore;
                 }
                 else
                 {
