@@ -40,86 +40,86 @@ namespace CSHTML5.Internal
                 return new ResizeObserver();
             }
         }
-    }
 
-    internal class ResizeSensor : IResizeObserver
-    {
-        private const string ADD_SENSOR_JS_TEMPLATE = "new ResizeSensor($1, $2)";
-        private const string REMOVE_SENSOR_JS_TEMPLATE = "$0.detach($1)";
-
-        private readonly IDictionary<HtmlElementReferenceWrapper, object> _sensors;
-
-        public ResizeSensor()
+        private class ResizeSensor : IResizeObserver
         {
-            this._sensors = new Dictionary<HtmlElementReferenceWrapper, object>();
-        }
+            private const string ADD_SENSOR_JS_TEMPLATE = "new ResizeSensor($1, $2)";
+            private const string REMOVE_SENSOR_JS_TEMPLATE = "$0.detach($1)";
 
-        public void Observe(object elementReference, Action<string, string> callback)
-        {
-            var sensor = Interop.ExecuteJavaScript(ADD_SENSOR_JS_TEMPLATE, elementReference, callback);
-            this._sensors.Add(new HtmlElementReferenceWrapper((INTERNAL_HtmlDomElementReference)elementReference), sensor);
-        }
+            private readonly IDictionary<HtmlElementReferenceWrapper, object> _sensors;
 
-        public void Unobserve(object elementReference)
-        {
-            Interop.ExecuteJavaScript(REMOVE_SENSOR_JS_TEMPLATE, this._sensors[new HtmlElementReferenceWrapper((INTERNAL_HtmlDomElementReference)elementReference)], elementReference);
-            this._sensors.Remove(new HtmlElementReferenceWrapper((INTERNAL_HtmlDomElementReference)elementReference));
-        }
-
-        /// <summary>
-        /// Used to store a HtmlDomElementReference as a key in the dictionary.
-        /// </summary>
-        private class HtmlElementReferenceWrapper
-        {
-            public HtmlElementReferenceWrapper(INTERNAL_HtmlDomElementReference reference)
+            public ResizeSensor()
             {
-                this.Reference = reference;
+                this._sensors = new Dictionary<HtmlElementReferenceWrapper, object>();
             }
 
-            public INTERNAL_HtmlDomElementReference Reference { get; }
-
-            public override int GetHashCode()
+            public void Observe(object elementReference, Action<string, string> callback)
             {
-                return Reference.UniqueIdentifier.GetHashCode();
+                var sensor = Interop.ExecuteJavaScript(ADD_SENSOR_JS_TEMPLATE, elementReference, callback);
+                this._sensors.Add(new HtmlElementReferenceWrapper((INTERNAL_HtmlDomElementReference)elementReference), sensor);
             }
 
-            public override bool Equals(object obj)
+            public void Unobserve(object elementReference)
             {
-                if (obj is null)
+                Interop.ExecuteJavaScript(REMOVE_SENSOR_JS_TEMPLATE, this._sensors[new HtmlElementReferenceWrapper((INTERNAL_HtmlDomElementReference)elementReference)], elementReference);
+                this._sensors.Remove(new HtmlElementReferenceWrapper((INTERNAL_HtmlDomElementReference)elementReference));
+            }
+
+            /// <summary>
+            /// Used to store a HtmlDomElementReference as a key in the dictionary.
+            /// </summary>
+            private class HtmlElementReferenceWrapper
+            {
+                public HtmlElementReferenceWrapper(INTERNAL_HtmlDomElementReference reference)
                 {
+                    this.Reference = reference;
+                }
+
+                public INTERNAL_HtmlDomElementReference Reference { get; }
+
+                public override int GetHashCode()
+                {
+                    return Reference.UniqueIdentifier.GetHashCode();
+                }
+
+                public override bool Equals(object obj)
+                {
+                    if (obj is null)
+                    {
+                        return false;
+                    }
+
+                    if (obj is HtmlElementReferenceWrapper wrapper)
+                    {
+                        return wrapper.Reference.Equals(this);
+                    }
+
                     return false;
                 }
-
-                if (obj is HtmlElementReferenceWrapper wrapper)
-                {
-                    return wrapper.Reference.Equals(this);
-                }
-
-                return false;
             }
         }
-    }
-    internal class ResizeObserver : IResizeObserver
-    {
-        private const string CREATE_OBSERVER_JS = "new ResizeObserverAdapter()";
-        private const string ADD_OBSERVER_JS_TEMPLATE = "$0.observe($1, $2)";
-        private const string REMOVE_OBSERVER_JS_TEMPLATE = "$0.unobserve($1)";
-
-        private readonly object _observerJsReference;
-
-        public ResizeObserver()
+        private class ResizeObserver : IResizeObserver
         {
-            this._observerJsReference = Interop.ExecuteJavaScript(CREATE_OBSERVER_JS);
-        }
+            private const string CREATE_OBSERVER_JS = "new ResizeObserverAdapter()";
+            private const string ADD_OBSERVER_JS_TEMPLATE = "$0.observe($1, $2)";
+            private const string REMOVE_OBSERVER_JS_TEMPLATE = "$0.unobserve($1)";
 
-        public void Observe(object elementReference, Action<string, string> callback)
-        {
-            Interop.ExecuteJavaScript(ADD_OBSERVER_JS_TEMPLATE, this._observerJsReference, elementReference, callback);
-        }
+            private readonly object _observerJsReference;
 
-        public void Unobserve(object elementReference)
-        {
-            Interop.ExecuteJavaScript(REMOVE_OBSERVER_JS_TEMPLATE, this._observerJsReference, elementReference);
+            public ResizeObserver()
+            {
+                this._observerJsReference = Interop.ExecuteJavaScript(CREATE_OBSERVER_JS);
+            }
+
+            public void Observe(object elementReference, Action<string, string> callback)
+            {
+                Interop.ExecuteJavaScript(ADD_OBSERVER_JS_TEMPLATE, this._observerJsReference, elementReference, callback);
+            }
+
+            public void Unobserve(object elementReference)
+            {
+                Interop.ExecuteJavaScript(REMOVE_OBSERVER_JS_TEMPLATE, this._observerJsReference, elementReference);
+            }
         }
     }
 }
