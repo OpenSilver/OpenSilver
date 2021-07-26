@@ -201,12 +201,33 @@ namespace Windows.UI.Xaml
 #if MIGRATION
                     _pointerPressedEventManager = new INTERNAL_EventManager<MouseButtonEventHandler, MouseButtonEventArgs>(() => this.INTERNAL_OuterDomElement, eventsNames, (jsEventArg) =>
                         {
-                            ProcessPointerEvent(jsEventArg, (Action<MouseButtonEventArgs>)OnMouseLeftButtonDown, (Action<MouseButtonEventArgs>)OnMouseLeftButtonDown_ForHandledEventsToo, preventTextSelectionWhenPointerIsCaptured: true, checkForDivsThatAbsorbEvents: true, refreshClickCount: true);
+                            /*
+                            We shouldn't trigger OnMouseLeftButtonDown if only right mouse button has been triggered, continue as before otherwise
+
+                            Javascript Mouse events have a buttons property that can be a bitmask of:
+
+                            0 : No button or un-initialized
+                            1 : Primary button (usually the left button)
+                            2 : Secondary button (usually the right button)
+                            4 : Auxiliary button (usually the mouse wheel button or middle button)
+                            8 : 4th button (typically the "Browser Back" button)
+                            16 : 5th button (typically the "Browser Forward" button)*/
+                            int mouseBtn = 0;
+                            int.TryParse((CSHTML5.Interop.ExecuteJavaScript("$0.buttons", jsEventArg) ?? 0).ToString(), out mouseBtn);
+                            if (mouseBtn != 2)
+                            {
+                                ProcessPointerEvent(jsEventArg, (Action<MouseButtonEventArgs>)OnMouseLeftButtonDown, (Action<MouseButtonEventArgs>)OnMouseLeftButtonDown_ForHandledEventsToo, preventTextSelectionWhenPointerIsCaptured: true, checkForDivsThatAbsorbEvents: true, refreshClickCount: true);
+                            }
                         });
 #else
                     _pointerPressedEventManager = new INTERNAL_EventManager<PointerEventHandler, PointerRoutedEventArgs>(() => this.INTERNAL_OuterDomElement, eventsNames, (jsEventArg) =>
                     {
-                        ProcessPointerEvent(jsEventArg, (Action<PointerRoutedEventArgs>)OnPointerPressed, (Action<PointerRoutedEventArgs>)OnPointerPressed_ForHandledEventsToo, preventTextSelectionWhenPointerIsCaptured: true, checkForDivsThatAbsorbEvents: true, refreshClickCount: true);
+                        int mouseBtn = 0;
+                        int.TryParse((CSHTML5.Interop.ExecuteJavaScript("$0.buttons", jsEventArg) ?? 0).ToString(), out mouseBtn);
+                        if (mouseBtn != 2)
+                        {
+                            ProcessPointerEvent(jsEventArg, (Action<PointerRoutedEventArgs>)OnPointerPressed, (Action<PointerRoutedEventArgs>)OnPointerPressed_ForHandledEventsToo, preventTextSelectionWhenPointerIsCaptured: true, checkForDivsThatAbsorbEvents: true, refreshClickCount: true);
+                        }
                     });
 #endif
                 }
@@ -1591,7 +1612,7 @@ namespace Windows.UI.Xaml
                 {
                     INTERNAL_OriginalJSEventArg = jsEventArg,
                     Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
-                };
+            };
 
                 if (!eventArgs.Handled && checkForDivsThatAbsorbEvents)
                 {

@@ -3,11 +3,10 @@
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net472</TargetFramework>
-		<StartArguments>"..\..\..\..\$ext_safeprojectname$\bin\$(Configuration)\netstandard2.0\$ext_safeprojectname$.dll"</StartArguments>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="OpenSilver.Simulator" Version="1.0.0-alpha-019" />
+		<PackageReference Include="OpenSilver.Simulator" Version="$ext_opensilverpackageversion$" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -73,22 +73,21 @@ namespace Windows.UI.Xaml.Controls
             base.OnApplyTemplate();
 
             // if previous items exist, we want to clear
-            if (ElementTabPanelTop != null)
+            TabPanel panel = GetElementTabPanel();
+            if (panel != null)
             {
-                ElementTabPanelTop.Children.Clear();
+                panel.Children.Clear();
             }
 
             // also clear the content if it is set to a ContentPresenter
-            ContentPresenter contentHost = ElementContentTop;
+            ContentPresenter contentHost = GetElementContent();
             if (contentHost != null)
             {
                 contentHost.Content = null;
             }
 
             // Get the parts
-            ElementTemplateTop = GetTemplateChild(ElementTemplateTopName) as FrameworkElement;
-            ElementTabPanelTop = GetTemplateChild(ElementTabPanelTopName) as TabPanel;
-            ElementContentTop = GetTemplateChild(ElementContentTopName) as ContentPresenter;
+            GetElements();
 
             foreach (object item in Items)
             {
@@ -112,7 +111,39 @@ namespace Windows.UI.Xaml.Controls
             ChangeVisualState(false);
         }
 
-#region SelectedItem
+        public Dock TabStripPlacement
+        {
+            get { return (Dock)GetValue(TabStripPlacementProperty); }
+            set { SetValue(TabStripPlacementProperty, value); }
+        }
+
+        public static readonly DependencyProperty TabStripPlacementProperty =
+            DependencyProperty.Register(
+                "TabStripPlacement",
+                typeof(Dock),
+                typeof(TabControl),
+                new PropertyMetadata(Dock.Top, OnTabStripPlacementPropertyChanged));
+
+        private static void OnTabStripPlacementPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TabControl tc = (TabControl)d;
+            if (tc == null)
+            {
+                throw new ArgumentException(string.Format("TabControl should not be null!"));
+            }
+            tc.UpdateTabPanelLayout();
+
+            foreach (object o in tc.Items)
+            {
+                TabItem tabItem = o as TabItem;
+                if (tabItem != null)
+                {
+                    tabItem.UpdateVisualState();
+                }
+            }
+        }
+
+        #region SelectedItem
         /// <summary>
         /// Gets or sets the currently selected TabItem.
         /// </summary>
@@ -252,7 +283,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (newItem == null)
             {
-                ContentPresenter contentHost = ElementContentTop;
+                ContentPresenter contentHost = GetElementContent();
                 if (contentHost != null)
                 {
                     contentHost.Content = null;
@@ -348,9 +379,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void UpdateTabPanelLayout()
         {
-            FrameworkElement newTemplate = ElementTemplateTop;
-            TabPanel newPanel = ElementTabPanelTop;
-            ContentPresenter newContentHost = ElementContentTop;
+            FrameworkElement newTemplate = GetElementTemplate();
+            TabPanel newPanel = GetElementTabPanel();
+            ContentPresenter newContentHost = GetElementContent();
 
             if (newPanel != null)
             {
@@ -654,7 +685,7 @@ namespace Windows.UI.Xaml.Controls
             TabItem tabItem = SelectedItem as TabItem;
             if (tabItem != null)
             {
-                ContentPresenter contentHost = ElementContentTop;
+                ContentPresenter contentHost = GetElementContent();
                 if (contentHost != null)
                 {
                     contentHost.HorizontalAlignment = tabItem.HorizontalContentAlignment;
@@ -671,7 +702,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="tabItem">Inherited code: Requires comment 1.</param>
         private void AddToTabPanel(TabItem tabItem)
         {
-            TabPanel panel = ElementTabPanelTop;
+            TabPanel panel = GetElementTabPanel();
             if (panel != null && !panel.Children.Contains(tabItem))
             {
                 panel.Children.Add(tabItem);
@@ -685,7 +716,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="tabItem">Inherited code: Requires comment 2.</param>
         private void InsertIntoTabPanel(int index, TabItem tabItem)
         {
-            TabPanel panel = ElementTabPanelTop;
+            TabPanel panel = GetElementTabPanel();
             if (panel != null && !panel.Children.Contains(tabItem))
             {
                 panel.Children.Insert(index, tabItem);
@@ -698,7 +729,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="tabItem">Inherited code: Requires comment 1.</param>
         private void RemoveFromTabPanel(TabItem tabItem)
         {
-            TabPanel panel = ElementTabPanelTop;
+            TabPanel panel = GetElementTabPanel();
             if (panel != null && panel.Children.Contains(tabItem))
             {
                 panel.Children.Remove(tabItem);
@@ -710,12 +741,88 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void ClearTabPanel()
         {
-            TabPanel panel = ElementTabPanelTop;
+            TabPanel panel = GetElementTabPanel();
             if (panel != null)
             {
                 panel.Children.Clear();
             }
         }
+
+        private TabPanel GetElementTabPanel()
+        {
+            switch (TabStripPlacement)
+            {
+                case Dock.Top:
+                    return ElementTabPanelTop;
+                case Dock.Bottom:
+                    return ElementTabPanelBottom;
+                case Dock.Left:
+                    return ElementTabPanelLeft;
+                case Dock.Right:
+                    return ElementTabPanelRight;
+                default:
+                    return ElementTabPanelTop;
+            }
+        }
+
+        private ContentPresenter GetElementContent()
+        {
+            switch (TabStripPlacement)
+            {
+                case Dock.Top:
+                    return ElementContentTop;
+                case Dock.Bottom:
+                    return ElementContentBottom;
+                case Dock.Left:
+                    return ElementContentLeft;
+                case Dock.Right:
+                    return ElementContentRight;
+                default:
+                    return ElementContentTop;
+            }
+        }
+
+        private FrameworkElement GetElementTemplate()
+        {
+            switch (TabStripPlacement)
+            {
+                case Dock.Top:
+                    return ElementTemplateTop;
+                case Dock.Bottom:
+                    return ElementTemplateBottom;
+                case Dock.Left:
+                    return ElementTemplateLeft;
+                case Dock.Right:
+                    return ElementTemplateRight;
+                default:
+                    return ElementTemplateTop;
+            }
+        }
+
+        private void GetElements()
+        {
+            ElementTemplateTop = GetTemplateChild(ElementTemplateTopName) as FrameworkElement;
+            ElementTabPanelTop = GetTemplateChild(ElementTabPanelTopName) as TabPanel;
+            ElementContentTop = GetTemplateChild(ElementContentTopName) as ContentPresenter;
+            ElementTabPanelTop.Orientation = Orientation.Horizontal;
+
+            ElementTemplateBottom = GetTemplateChild(ElementTemplateBottomName) as FrameworkElement;
+            ElementTabPanelBottom = GetTemplateChild(ElementTabPanelBottomName) as TabPanel;
+            ElementContentBottom = GetTemplateChild(ElementContentBottomName) as ContentPresenter;
+            ElementTabPanelBottom.Orientation = Orientation.Horizontal;
+
+            ElementTemplateLeft = GetTemplateChild(ElementTemplateLeftName) as FrameworkElement;
+            ElementTabPanelLeft = GetTemplateChild(ElementTabPanelLeftName) as TabPanel;
+            ElementContentLeft = GetTemplateChild(ElementContentLeftName) as ContentPresenter;
+            ElementTabPanelLeft.Orientation = Orientation.Vertical;
+
+            ElementTemplateRight = GetTemplateChild(ElementTemplateRightName) as FrameworkElement;
+            ElementTabPanelRight = GetTemplateChild(ElementTabPanelRightName) as TabPanel;
+            ElementContentRight = GetTemplateChild(ElementContentRightName) as ContentPresenter;
+            ElementTabPanelRight.Orientation = Orientation.Vertical;
+        }
+
+        #region TopPlacement
 
         /// <summary>
         /// Gets or sets the TabStripPlacement Top template.
@@ -723,7 +830,7 @@ namespace Windows.UI.Xaml.Controls
         internal FrameworkElement ElementTemplateTop { get; set; }
 
         /// <summary>
-        /// Inherited code: Requires comment.
+        /// The name of Top template.
         /// </summary>
         internal const string ElementTemplateTopName = "TemplateTop";
 
@@ -733,7 +840,7 @@ namespace Windows.UI.Xaml.Controls
         internal TabPanel ElementTabPanelTop { get; set; }
 
         /// <summary>
-        /// Inherited code: Requires comment.
+        /// The name of TabPanel Top template.
         /// </summary>
         internal const string ElementTabPanelTopName = "TabPanelTop";
 
@@ -743,9 +850,113 @@ namespace Windows.UI.Xaml.Controls
         internal ContentPresenter ElementContentTop { get; set; }
 
         /// <summary>
-        /// Inherited code: Requires comment.
+        /// The name of Top ContentHost.
         /// </summary>
         internal const string ElementContentTopName = "ContentTop";
+
+        #endregion
+
+        #region BottomPlacement
+
+        /// <summary>
+        /// Gets or sets the TabStripPlacement Bottom template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateBottom { get; set; }
+
+        /// <summary>
+        /// The name of Bottom template.
+        /// </summary>
+        internal const string ElementTemplateBottomName = "TemplateBottom";
+
+        /// <summary>
+        /// Gets or sets the TabPanel of the TabStripPlacement Bottom template.
+        /// </summary>
+        internal TabPanel ElementTabPanelBottom { get; set; }
+
+        /// <summary>
+        /// The name of TabPanel Bottom template.
+        /// </summary>
+        internal const string ElementTabPanelBottomName = "TabPanelBottom";
+
+        /// <summary>
+        /// Gets or sets the ContentHost of the TabStripPlacement Bottom template.
+        /// </summary>
+        internal ContentPresenter ElementContentBottom { get; set; }
+
+        /// <summary>
+        /// The name of Bottom ContentHost.
+        /// </summary>
+        internal const string ElementContentBottomName = "ContentBottom";
+
+        #endregion
+
+        #region LeftPlacement
+
+        /// <summary>
+        /// Gets or sets the TabStripPlacement Left template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateLeft { get; set; }
+
+        /// <summary>
+        /// The name of Left template.
+        /// </summary>
+        internal const string ElementTemplateLeftName = "TemplateLeft";
+
+        /// <summary>
+        /// Gets or sets the TabPanel of the TabStripPlacement Left template.
+        /// </summary>
+        internal TabPanel ElementTabPanelLeft { get; set; }
+
+        /// <summary>
+        /// The name of TabPanel Left template.
+        /// </summary>
+        internal const string ElementTabPanelLeftName = "TabPanelLeft";
+
+        /// <summary>
+        /// Gets or sets the ContentHost of the TabStripPlacement Left template.
+        /// </summary>
+        internal ContentPresenter ElementContentLeft { get; set; }
+
+        /// <summary>
+        /// The name of Left ContentHost.
+        /// </summary>
+        internal const string ElementContentLeftName = "ContentLeft";
+
+        #endregion
+
+        #region RightPlacement
+
+        /// <summary>
+        /// Gets or sets the TabStripPlacement Right template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateRight { get; set; }
+
+        /// <summary>
+        /// The name of Right template.
+        /// </summary>
+        internal const string ElementTemplateRightName = "TemplateRight";
+
+        /// <summary>
+        /// Gets or sets the TabPanel of the TabStripPlacement Right template.
+        /// </summary>
+        internal TabPanel ElementTabPanelRight { get; set; }
+
+        /// <summary>
+        /// The name of TabPanel Right template.
+        /// </summary>
+        internal const string ElementTabPanelRightName = "TabPanelRight";
+
+        /// <summary>
+        /// Gets or sets the ContentHost of the TabStripPlacement Right template.
+        /// </summary>
+        internal ContentPresenter ElementContentRight { get; set; }
+
+        /// <summary>
+        /// The name of Right ContentHost.
+        /// </summary>
+        internal const string ElementContentRightName = "ContentRight";
+
+        #endregion
 
         /// <summary>
         /// Inherited code: Requires comment.

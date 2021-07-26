@@ -58,7 +58,7 @@ namespace Windows.UI.Xaml.Controls
                 "FontSize",
                 typeof(double),
                 typeof(RichTextBlock),
-                new PropertyMetadata(11d));
+                new FrameworkPropertyMetadata(11d, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         /// <summary>
         /// Gets or sets the size of the text in this control.
@@ -80,7 +80,7 @@ namespace Windows.UI.Xaml.Controls
                 "FontWeight",
                 typeof(FontWeight),
                 typeof(RichTextBlock),
-                new PropertyMetadata(FontWeights.Normal));
+                new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         /// <summary>
         /// Gets or sets the thickness of the specified font.
@@ -102,7 +102,7 @@ namespace Windows.UI.Xaml.Controls
                 "FontFamily",
                 typeof(FontFamily),
                 typeof(RichTextBlock),
-                new PropertyMetadata((object)null));
+                new FrameworkPropertyMetadata((object)null, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         /// <summary>
         /// Gets or sets the font used to display text in the control.
@@ -143,7 +143,7 @@ namespace Windows.UI.Xaml.Controls
                 "TextWrapping",
                 typeof(TextWrapping),
                 typeof(RichTextBlock),
-                new PropertyMetadata(TextWrapping.Wrap));
+                new FrameworkPropertyMetadata(TextWrapping.Wrap, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         /// <summary>
         /// Gets or sets how text wrapping occurs if a line of text extends beyond the available
@@ -166,7 +166,7 @@ namespace Windows.UI.Xaml.Controls
                 "LineHeight",
                 typeof(double),
                 typeof(RichTextBlock),
-                new PropertyMetadata(0d));
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         /// <summary>
         ///  Gets or sets the height of each line of content.
@@ -194,8 +194,8 @@ namespace Windows.UI.Xaml.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            dynamic div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
-            dynamic divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+            var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
             divStyle.whiteSpace = TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap";
             divStyle.overflow = "hidden"; //keeps the text from overflowing despite the RichTextBlock's size limitations.
             divStyle.textAlign = "left"; // this is the default value.
@@ -215,8 +215,8 @@ namespace Windows.UI.Xaml.Controls
 
         public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index = -1)
         {
-            dynamic div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
-            dynamic divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+            var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
 
             divStyle.overflow = "hidden"; //keeps the text from overflowing despite the RichTextBlock's size limitations.
             divStyle.textAlign = "left"; // this is the default value.

@@ -119,7 +119,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the System.Windows.Controls.Frame.Source dependency property.
         /// </summary>
         public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register("Source", typeof(Uri), typeof(Frame), new PropertyMetadata(null, Source_Changed)
+            DependencyProperty.Register("Source", typeof(Uri), typeof(Frame),
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Source_Changed)
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         private static void Source_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -756,12 +757,18 @@ namespace Windows.UI.Xaml.Controls
 
         void RaiseNavigatedEvent()
         {
+            object content = _isBrowserJournal ? Content : (_cache._currentItem != null ? _cache._currentItem._value : null);
+            Uri uri = _isBrowserJournal ? Source : (_cache._currentItem != null ? _cache._currentItem._uri : null);
+            
             if (Navigated != null)
             {
-                object content = (_isBrowserJournal ? this.Content : (_cache._currentItem != null ? _cache._currentItem._value : null));
-                Uri uri = (_isBrowserJournal ? this.Source : (_cache._currentItem != null ? _cache._currentItem._uri : null));
-
                 Navigated(this, new NavigationEventArgs(content, uri));
+            }
+            
+            Page newPage = content as Page;
+            if (newPage != null)
+            {
+                newPage.INTERNAL_OnNavigatedTo(new NavigationEventArgs(content, uri));
             }
         }
 
@@ -817,6 +824,9 @@ namespace Windows.UI.Xaml.Controls
                 }
                 );
             }
+
+            InvalidateMeasure();
+            InvalidateArrange();
         }
 
         private bool CheckIfThisIsATopLevelFrame()

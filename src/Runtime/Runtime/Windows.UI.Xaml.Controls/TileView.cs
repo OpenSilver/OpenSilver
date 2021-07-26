@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Windows.Data;
 using System.Windows.Controls.Primitives;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Controls.Primitives;
 #endif
@@ -265,6 +266,24 @@ namespace Windows.UI.Xaml.Controls
             {
                 this._owner.MaximizeTile((TileViewItem)this.Children[maximizedTileIndex]);
             }
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (_contentGrid == null)
+                return new Size();
+
+            _contentGrid.Measure(availableSize);
+            return _contentGrid.DesiredSize;
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            if (_contentGrid == null)
+                return finalSize;
+
+            _contentGrid.Arrange(new Rect(finalSize));
+            return finalSize;
         }
     }
 }

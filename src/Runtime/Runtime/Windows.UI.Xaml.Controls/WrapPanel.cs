@@ -79,22 +79,18 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the Orientation dependency property.
         /// </summary>
         public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(WrapPanel), new PropertyMetadata(Orientation.Horizontal, Orientation_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(WrapPanel),
+                new FrameworkPropertyMetadata(Orientation.Horizontal, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Orientation_Changed)
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         static void Orientation_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var wrapPanel = (WrapPanel)d;
             Orientation newValue = (Orientation)e.NewValue;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(wrapPanel))
-                if (newValue == Orientation.Vertical)
-                {
-                    throw new NotSupportedException("Vertical orientation is not yet supported for the WrapPanel");
-                }
-                else
-                {
-                    //todo: change all the wrappers of the children to set their style.display to inline-block
-                    INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(wrapPanel).textAlign = "left";
-                }
+            {
+                //todo: change all the wrappers of the children to set their style.display to inline-block
+                INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(wrapPanel).textAlign = "left";
+            }
         }
 
 
@@ -150,10 +146,13 @@ namespace Windows.UI.Xaml.Controls
                 domElementWhereToPlaceChild = div;
                 return div;
             }
-            else
+            else // Orientation == Controls.Orientation.Vertical
             {
-                domElementWhereToPlaceChild = null;
-                return null;
+                var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this, index);
+                var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+                divStyle.lineHeight = "initial";
+                domElementWhereToPlaceChild = div;
+                return div;
             }
         }
         //internal override dynamic ShowChild(UIElement child)

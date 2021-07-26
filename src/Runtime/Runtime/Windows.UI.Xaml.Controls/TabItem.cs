@@ -79,17 +79,14 @@ namespace Windows.UI.Xaml.Controls
             base.OnApplyTemplate();
 
             // Clear previous content from old ContentControl
-            ContentControl cc = (IsSelected ? ElementHeaderTopSelected : ElementHeaderTopUnselected);
+            ContentControl cc = GetElementHeader();
             if (cc != null)
             {
                 cc.Content = null;
             }
 
             // Get the parts
-            ElementTemplateTopSelected = GetTemplateChild(ElementTemplateTopSelectedName) as FrameworkElement;
-            ElementTemplateTopUnselected = GetTemplateChild(ElementTemplateTopUnselectedName) as FrameworkElement;
-            ElementHeaderTopSelected = GetTemplateChild(ElementHeaderTopSelectedName) as ContentControl;
-            ElementHeaderTopUnselected = GetTemplateChild(ElementHeaderTopUnselectedName) as ContentControl;
+            GetElements();
 
             // Load Header
             UpdateHeaderVisuals();
@@ -168,7 +165,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void UpdateHeaderVisuals()
         {
-            ContentControl header = (IsSelected ? ElementHeaderTopSelected : ElementHeaderTopUnselected);
+            ContentControl header = GetElementHeader();
             if (header != null)
             {
                 header.ContentTemplate = this.HeaderTemplate;
@@ -406,7 +403,7 @@ namespace Windows.UI.Xaml.Controls
         {
             //Debug.Assert(e.NewValue is bool, "New value should be a Boolean!");
             bool isEnabled = (bool)e.NewValue;
-            ContentControl header = (IsSelected ? ElementHeaderTopSelected : ElementHeaderTopUnselected);
+            ContentControl header =  GetElementHeader();
             if (header != null)
             {
                 if (!isEnabled)
@@ -534,7 +531,7 @@ namespace Windows.UI.Xaml.Controls
         private void UpdateTabItemVisuals()
         {
             // update the template that is displayed
-            FrameworkElement currentTemplate = (IsSelected ? ElementTemplateTopSelected : ElementTemplateTopUnselected);
+            FrameworkElement currentTemplate = GetElementTemplate();
 
             if (_previousTemplate != null && _previousTemplate != currentTemplate)
             {
@@ -547,7 +544,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             // update the ContentControl's header
-            ContentControl currentHeader = (IsSelected ? ElementHeaderTopSelected : ElementHeaderTopUnselected);
+            ContentControl currentHeader = GetElementHeader();
 
             if (_previousHeader != null && _previousHeader != currentHeader)
             {
@@ -641,6 +638,79 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        private ContentControl GetElementHeader()
+        {
+            if (TabControlParent != null)
+            {
+                if (TabControlParent.TabStripPlacement == Dock.Top)
+                {
+                    return IsSelected ? ElementHeaderTopSelected : ElementHeaderTopUnselected;
+                }
+                else if (TabControlParent.TabStripPlacement == Dock.Bottom)
+                {
+                    return IsSelected ? ElementHeaderBottomSelected : ElementHeaderBottomUnselected;
+                }
+                else if (TabControlParent.TabStripPlacement == Dock.Left)
+                {
+                    return IsSelected ? ElementHeaderLeftSelected : ElementHeaderLeftUnselected;
+                }
+                else if (TabControlParent.TabStripPlacement == Dock.Right)
+                {
+                    return IsSelected ? ElementHeaderRightSelected : ElementHeaderRightUnselected;
+                }
+            }
+            return IsSelected ? ElementHeaderTopSelected : ElementHeaderTopUnselected;
+        }
+
+        private FrameworkElement GetElementTemplate()
+        {
+            if (TabControlParent != null)
+            {
+                if (TabControlParent.TabStripPlacement == Dock.Top)
+                {
+                    return IsSelected ? ElementTemplateTopSelected : ElementTemplateTopUnselected;
+                }
+                else if (TabControlParent.TabStripPlacement == Dock.Bottom)
+                {
+                    return IsSelected ? ElementTemplateBottomSelected : ElementTemplateBottomUnselected;
+                }
+                else if (TabControlParent.TabStripPlacement == Dock.Left)
+                {
+                    return IsSelected ? ElementTemplateLeftSelected : ElementTemplateLeftUnselected;
+                }
+                else if (TabControlParent.TabStripPlacement == Dock.Right)
+                {
+                    return IsSelected ? ElementTemplateRightSelected : ElementTemplateRightUnselected;
+                }
+            }
+            return IsSelected ? ElementTemplateTopSelected : ElementTemplateTopUnselected;
+        }
+
+        private void GetElements()
+        {
+            ElementTemplateTopSelected = GetTemplateChild(ElementTemplateTopSelectedName) as FrameworkElement;
+            ElementTemplateTopUnselected = GetTemplateChild(ElementTemplateTopUnselectedName) as FrameworkElement;
+            ElementHeaderTopSelected = GetTemplateChild(ElementHeaderTopSelectedName) as ContentControl;
+            ElementHeaderTopUnselected = GetTemplateChild(ElementHeaderTopUnselectedName) as ContentControl;
+
+            ElementTemplateBottomSelected = GetTemplateChild(ElementTemplateBottomSelectedName) as FrameworkElement;
+            ElementTemplateBottomUnselected = GetTemplateChild(ElementTemplateBottomUnselectedName) as FrameworkElement;
+            ElementHeaderBottomSelected = GetTemplateChild(ElementHeaderBottomSelectedName) as ContentControl;
+            ElementHeaderBottomUnselected = GetTemplateChild(ElementHeaderBottomUnselectedName) as ContentControl;
+
+            ElementTemplateLeftSelected = GetTemplateChild(ElementTemplateLeftSelectedName) as FrameworkElement;
+            ElementTemplateLeftUnselected = GetTemplateChild(ElementTemplateLeftUnselectedName) as FrameworkElement;
+            ElementHeaderLeftSelected = GetTemplateChild(ElementHeaderLeftSelectedName) as ContentControl;
+            ElementHeaderLeftUnselected = GetTemplateChild(ElementHeaderLeftUnselectedName) as ContentControl;
+
+            ElementTemplateRightSelected = GetTemplateChild(ElementTemplateRightSelectedName) as FrameworkElement;
+            ElementTemplateRightUnselected = GetTemplateChild(ElementTemplateRightUnselectedName) as FrameworkElement;
+            ElementHeaderRightSelected = GetTemplateChild(ElementHeaderRightSelectedName) as ContentControl;
+            ElementHeaderRightUnselected = GetTemplateChild(ElementHeaderRightUnselectedName) as ContentControl;
+        }
+
+        #region Top
+
         /// <summary>
         /// Gets or sets the TabStripPlacement Top Selected template.
         /// </summary>
@@ -682,6 +752,146 @@ namespace Windows.UI.Xaml.Controls
         /// Inherited code: Requires comment.
         /// </summary>
         internal const string ElementHeaderTopUnselectedName = "HeaderTopUnselected";
+
+        #endregion
+
+        #region Bottom
+
+        /// <summary>
+        /// Gets or sets the TabStripPlacement Bottom Selected template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateBottomSelected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTemplateBottomSelectedName = "TemplateBottomSelected";
+
+        /// <summary>
+        /// Gets or sets the TabStripPlacement Bottom Unselected template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateBottomUnselected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTemplateBottomUnselectedName = "TemplateBottomUnselected";
+
+        /// <summary>
+        /// Gets or sets the Header of the TabStripPlacement Bottom Selected
+        /// template.
+        /// </summary>
+        internal ContentControl ElementHeaderBottomSelected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementHeaderBottomSelectedName = "HeaderBottomSelected";
+
+        /// <summary>
+        /// Gets or sets the Header of the TabStripPlacement Bottom Unselected
+        /// template.
+        /// </summary>
+        internal ContentControl ElementHeaderBottomUnselected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementHeaderBottomUnselectedName = "HeaderBottomUnselected";
+
+        #endregion
+
+        #region Left
+
+        /// <summary>
+        /// Gets or sets the TabStripPlacement Left Selected template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateLeftSelected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTemplateLeftSelectedName = "TemplateLeftSelected";
+
+        /// <summary>
+        /// Gets or sets the TabStripPlacement Left Unselected template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateLeftUnselected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTemplateLeftUnselectedName = "TemplateLeftUnselected";
+
+        /// <summary>
+        /// Gets or sets the Header of the TabStripPlacement Left Selected
+        /// template.
+        /// </summary>
+        internal ContentControl ElementHeaderLeftSelected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementHeaderLeftSelectedName = "HeaderLeftSelected";
+
+        /// <summary>
+        /// Gets or sets the Header of the TabStripPlacement Left Unselected
+        /// template.
+        /// </summary>
+        internal ContentControl ElementHeaderLeftUnselected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementHeaderLeftUnselectedName = "HeaderLeftUnselected";
+
+        #endregion
+
+        #region Right
+
+        /// <summary>
+        /// Gets or sets the TabStripPlacement Right Selected template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateRightSelected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTemplateRightSelectedName = "TemplateRightSelected";
+
+        /// <summary>
+        /// Gets or sets the TabStripPlacement Right Unselected template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateRightUnselected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTemplateRightUnselectedName = "TemplateRightUnselected";
+
+        /// <summary>
+        /// Gets or sets the Header of the TabStripPlacement Right Selected
+        /// template.
+        /// </summary>
+        internal ContentControl ElementHeaderRightSelected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementHeaderRightSelectedName = "HeaderRightSelected";
+
+        /// <summary>
+        /// Gets or sets the Header of the TabStripPlacement Right Unselected
+        /// template.
+        /// </summary>
+        internal ContentControl ElementHeaderRightUnselected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementHeaderRightUnselectedName = "HeaderRightUnselected";
+
+        #endregion
 
         /// <summary>
         /// Gets or sets a value indicating whether Inherited code: Requires comment.

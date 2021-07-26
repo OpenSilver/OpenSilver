@@ -73,7 +73,7 @@ namespace CSHTML5.Internal
 
         void SetPropertyValue(string propertyName, string propertyValue)
         {
-            string javaScriptCodeToExecute = "var element = document.getElementByIdSafe(\"" + _domElementUniqueIdentifier + "\");if (element) { element.getContext('2d')." + propertyName + " = \"" + propertyValue + "\"; } ";
+            string javaScriptCodeToExecute = "document.set2dContextProperty(\"" + _domElementUniqueIdentifier + "\",\"" + propertyName + "\",\"" + propertyValue + "\")";
             //INTERNAL_SimulatorPerformanceOptimizer.QueueJavaScriptCode(javaScriptCodeToExecute);
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
@@ -82,13 +82,8 @@ namespace CSHTML5.Internal
         {
             string methodArgumentsFormattedForJavaScript = string.Join(", ", args.Select(x => INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(x)));
             string javaScriptCodeToExecute =
-                string.Format(@"
-var element = document.getElementByIdSafe(""{0}"");
-var returnValue;
-if (element) {{
-    returnValue = element.getContext('2d')[""{1}""]({2});
-}} 
-returnValue;", _domElementUniqueIdentifier, methodName, methodArgumentsFormattedForJavaScript);
+                string.Format(@"document.invoke2dContextMethod(""{0}"" , ""{1}"", ""{2}"")", 
+                        _domElementUniqueIdentifier, methodName, methodArgumentsFormattedForJavaScript);
             var result = CSHTML5.Interop.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
             return result;
             //INTERNAL_SimulatorPerformanceOptimizer.QueueJavaScriptCode(javaScriptCodeToExecute);

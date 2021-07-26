@@ -36,6 +36,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Markup;
+using System.Windows.Controls.Primitives;
 #else
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -121,6 +122,14 @@ namespace Windows.UI.Xaml
 
             // Raise the "Loaded" event:
             this.INTERNAL_RaiseLoadedEvent();
+            
+            this.SizeChanged += WindowSizeChangedEventHandler;
+        }
+
+        private void WindowSizeChangedEventHandler(object sender, WindowSizeChangedEventArgs e)
+        {
+            InvalidateMeasure();
+            InvalidateArrange();
         }
 
         #region Bounds and SizeChanged event
@@ -232,6 +241,24 @@ namespace Windows.UI.Xaml
                         CSHTML5.Native.Html.Printing.PrintManager.ResetPrintArea();
                     }
                 }
+
+                Application.Current.TextMeasurementService.CreateMeasurementText(this);
+
+                /*
+                // Invalidate when content changed
+                InvalidateMeasure();
+                InvalidateArrange();
+
+                // At the first contentChanged, InvaliateMeasure/Arrange does not work because IsArrangeValid and IsMeasureValid is false.
+                if (CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
+                {
+                    Debug.WriteLine("Delayed CalculateWindowLayout");
+                    // On the simulator, Window Bounds height is zero at the startup.
+                    Task.Delay(500).ContinueWith(t => CalculateWindowLayout());
+                }
+                else
+                    CalculateWindowLayout();*/
+                // Disabled for CustomLayout
             }
         }
 
@@ -445,5 +472,36 @@ namespace Windows.UI.Xaml
 
         }
 #endif
+        private void CalculateWindowLayout()
+        {
+            if (Current.INTERNAL_VisualChildrenInformation == null)
+                return;
+
+            Rect windowBounds = this.Bounds;
+            double width = windowBounds.Width;
+            double height = windowBounds.Height;
+            Debug.WriteLine($"CalculateWindowLayout {width}, {height}");
+            Current.Measure(new Size(width, height));
+            Current.Arrange(windowBounds);
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (this.Content as FrameworkElement == null)
+                return new Size();
+
+            FrameworkElement _content = this.Content as FrameworkElement;
+            Rect windowBounds = this.Bounds;
+            availableSize = new Size(windowBounds.Width, windowBounds.Height);
+            _content.Measure(availableSize);
+            return _content.DesiredSize;
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            Rect windowBounds = this.Bounds;
+            finalSize = new Size(windowBounds.Width, windowBounds.Height);
+            return base.ArrangeOverride(finalSize);
+        }
     }
 }

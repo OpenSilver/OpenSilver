@@ -28,10 +28,24 @@
   <files>
     <!-- OpenSilver.Simulator libs -->
     <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.dll" target="lib/net45" />
+    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.pdb" target="lib/net45" />
+
+    <!-- OpenSilver targets -->
+    <file src="../src/Targets/OpenSilver.Simulator.targets" target="build/OpenSilver.Simulator.targets" />
 
     <!-- OpenSilver HTML files -->
     <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/simulator_root.html" target="contentFiles/any/net45" />
     <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/interop_debug_root.html" target="contentFiles/any/net45" />
+
+    <!-- OpenSilver compiler -->
+    <file src="../src/Compiler/Compiler/bin/OpenSilver/SL/OpenSilver.Compiler.dll" target="tools/OpenSilver.Compiler.dll" />
+    <file src="../src/Compiler/Compiler/bin/OpenSilver/SL/OpenSilver.Compiler.pdb" target="tools/OpenSilver.Compiler.pdb" />
+    <file src="../src/Compiler/Compiler.Common/bin/OpenSilver/SL/OpenSilver.Compiler.Common.dll" target="tools/OpenSilver.Compiler.Common.dll" />
+    <file src="../src/Compiler/Compiler.Common/bin/OpenSilver/SL/OpenSilver.Compiler.Common.pdb" target="tools/OpenSilver.Compiler.Common.pdb" />
+    <file src="../src/Compiler/Compiler.ProgressDialog/bin/OpenSilver/SL/OpenSilver.Compiler.ProgressDialog.dll" target="tools/OpenSilver.Compiler.ProgressDialog.dll" />
+    <file src="../src/Compiler/Compiler.ProgressDialog/bin/OpenSilver/SL/OpenSilver.Compiler.ProgressDialog.pdb" target="tools/OpenSilver.Compiler.ProgressDialog.pdb" />
+    <file src="../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/OpenSilver/SL/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" target="tools/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" />
+    <file src="../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/OpenSilver/SL/OpenSilver.Compiler.TypeScriptDefToCSharp.pdb" target="tools/OpenSilver.Compiler.TypeScriptDefToCSharp.pdb" />
 
     <!-- OpenSilver JS and CSS files -->
     <file src="../src/Runtime/Scripts/opensilver.js" target="contentFiles/any/net45/js_css" />

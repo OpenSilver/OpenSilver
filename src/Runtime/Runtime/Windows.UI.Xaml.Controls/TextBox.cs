@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Windows.Data;
 using System.Windows.Media;
 #else
+using Windows.Foundation;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
@@ -217,15 +218,9 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
         /// Identifies the Text dependency property.
         /// </summary>
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register(
-                nameof(Text), 
-                typeof(string), 
-                typeof(TextBox), 
-                new PropertyMetadata(string.Empty, Text_Changed, CoerceText) 
-                { 
-                    MethodToUpdateDom = UpdateDomText 
-                });
-        
+            DependencyProperty.Register("Text", typeof(string), typeof(TextBox),
+                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, Text_Changed, CoerceText)
+                { MethodToUpdateDom = UpdateDomText });
         private static void Text_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((TextBox)d).OnTextChanged(new TextChangedEventArgs() { OriginalSource = d });
@@ -234,7 +229,16 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
         private static void UpdateDomText(DependencyObject d, object newValue)
         {
             var textBox = (TextBox)d;
+            if (textBox.INTERNAL_OuterDomElement != null &&
+                Application.Current.TextMeasurementService.IsTextMeasureDivID(((INTERNAL_HtmlDomElementReference)textBox.INTERNAL_OuterDomElement).UniqueIdentifier))
+            {
+                if (textBox._isUpdatingDOM || textBox._contentEditableDiv == null)
+                    return;
 
+                INTERNAL_HtmlDomManager.SetContentString(textBox, textBox.Text);
+                return;
+            }
+            
             if (textBox._isUpdatingDOM || textBox._contentEditableDiv == null)
                 return;
 
@@ -1294,14 +1298,12 @@ return globalIndexes;
         /// Identifies the TextWrapping dependency property.
         /// </summary>
         public static readonly DependencyProperty TextWrappingProperty =
-            DependencyProperty.Register(
-                nameof(TextWrapping), 
-                typeof(TextWrapping), 
-                typeof(TextBox), 
-                new PropertyMetadata(TextWrapping.Wrap) // Note: we have made "Wrap" the default value because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
-                {
-                    MethodToUpdateDom = TextWrapping_MethodToUpdateDom
-                });
+            DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBox),
+                new FrameworkPropertyMetadata(TextWrapping.Wrap, FrameworkPropertyMetadataOptions.AffectsMeasure) // Note: we have made "Wrap" the default value because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
+            {
+                MethodToUpdateDom = TextWrapping_MethodToUpdateDom
+            });
+
         private static void TextWrapping_MethodToUpdateDom(DependencyObject d, object newValue)
         {
             var textBox = (TextBox)d;
@@ -1594,7 +1596,8 @@ element.setAttribute(""data-maxlength"", ""{1}"");
                     }
                     else
                     {
-                        contentEditableStyle.maxWidth = outerDomStyle.width;  //note: this might be incorrect as it does not take into consideration any padding, margin, or other elements that happens between outerDomElement and contentEditableDiv.
+                        double contentEditableMaxWidth = Math.Max(0, Width - BorderThickness.Left - BorderThickness.Right);
+                        contentEditableStyle.maxWidth = contentEditableMaxWidth + "px";  //note: this might be incorrect as it does not take into consideration any padding, margin, or other elements that happens between outerDomElement and contentEditableDiv.
                     }
                 }
             }
@@ -1721,6 +1724,15 @@ element.setAttribute(""data-maxlength"", ""{1}"");
         [OpenSilver.NotImplemented]
         public double LineHeight { get; set; }
 #endif
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
+            Size TextSize = Application.Current.TextMeasurementService.Measure(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, /*FontStretch, */TextWrapping, Padding, (availableSize.Width - BorderThicknessSize.Width).Max(0));
+            TextSize.Width = TextSize.Width + BorderThicknessSize.Width;
+            TextSize.Height = TextSize.Height + BorderThicknessSize.Height;
+            return TextSize;
+        }
 
         internal override void UpdateVisualStates()
         {

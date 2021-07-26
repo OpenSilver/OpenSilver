@@ -375,12 +375,11 @@ namespace Windows.UI.Xaml.Controls
             get { return (string)GetValue(TextProperty); }
             set { SetValue(TextProperty, value); }
         }
-
         public static readonly DependencyProperty TextProperty =
             DependencyProperty.Register("Text", 
                                         typeof(string), 
-                                        typeof(AutoCompleteBox), 
-                                        new PropertyMetadata(string.Empty, OnTextChanged));
+                                        typeof(AutoCompleteBox),
+                                        new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextChanged));
 
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

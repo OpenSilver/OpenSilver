@@ -25,6 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Targets", "Targets", "{AA67
 		Targets\OpenSilver.Common.targets = Targets\OpenSilver.Common.targets
 		Targets\OpenSilver.targets = Targets\OpenSilver.targets
 		Targets\OpenSilver.UwpCompatible.targets = Targets\OpenSilver.UwpCompatible.targets
+		Targets\OpenSilver.Simulator.targets = Targets\OpenSilver.Simulator.targets
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataForm.Toolkit.OpenSilver", "Runtime\DataForm.Toolkit\DataForm.Toolkit.OpenSilver.csproj", "{2D8E03A2-A9E2-4CD7-81A4-A268D0E28BD8}"

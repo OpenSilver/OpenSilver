@@ -9,18 +9,20 @@ namespace CSHTML5.Simulator
 {
     public static class SimulatorLauncher
     {
-        public static int Start(SimulatorLaunchParameters parameters = null)
+#if OPENSILVER
+        public static int Start(Type userApplicationType, SimulatorLaunchParameters parameters = null)
         {
             App app = new App();
             app.InitializeComponent();
-            return app.Run();
+            return app.Run(new MainWindow(userApplicationType, parameters));
         }
-
-#if BRIDGE
+#elif BRIDGE
         [STAThread]
         public static int Main(string[] args)
         {
-            return Start();
+            App app = new App();
+            app.InitializeComponent();
+            return app.Run(new MainWindow());
         }
 #endif
     }

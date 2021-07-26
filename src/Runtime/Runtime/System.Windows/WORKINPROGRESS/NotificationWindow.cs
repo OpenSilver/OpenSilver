@@ -26,6 +26,7 @@ namespace System.Windows
 										typeof(FrameworkElement),
 										typeof(NotificationWindow),
 										null);
+
 		//
 		// Summary:
 		//     Identifies the System.Windows.NotificationWindow.Height dependency property.
@@ -38,6 +39,7 @@ namespace System.Windows
 										typeof(double),
 										typeof(NotificationWindow),
 										null);
+
 		//
 		// Summary:
 		//     Identifies the System.Windows.NotificationWindow.Width dependency property.
@@ -57,7 +59,7 @@ namespace System.Windows
 		[OpenSilver.NotImplemented]
 		public NotificationWindow()
 		{
-			
+
 		}
 
 		//

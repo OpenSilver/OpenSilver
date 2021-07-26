@@ -25,6 +25,7 @@ using Bridge;
 using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -38,6 +39,7 @@ using DotNetBrowser;
 using System.Windows;
 using System.Windows.Controls;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 #endif
@@ -916,43 +918,15 @@ function(){
 
             string uniqueIdentifier = INTERNAL_HtmlDomUniqueIdentifiers.CreateNew();
 
+            Interop.ExecuteJavaScriptAsync(@"document.createElementSafe($0, $1, $2, $3)", domElementTag, uniqueIdentifier, parentRef, index);
+            INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
+
             if (parentRef is INTERNAL_HtmlDomElementReference)
             {
-                string parentUniqueIdentifier = ((INTERNAL_HtmlDomElementReference)parentRef).UniqueIdentifier;
-                string javaScriptToExecute = string.Format(@"
-var newElement = document.createElement(""{0}"");
-newElement.setAttribute(""id"", ""{1}"");
-var parentElement = document.getElementByIdSafe(""{2}"");
-if({3} < 0 || {3} >= parentElement.children.length)
-{{
-    parentElement.appendChild(newElement);
-}}
-else
-{{
-    var nextSibling = parentElement.children[{3}];
-    parentElement.insertBefore(newElement,nextSibling);
-}}
-", domElementTag, uniqueIdentifier, parentUniqueIdentifier, index);
-                ExecuteJavaScript(javaScriptToExecute);
-                INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
                 return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, (INTERNAL_HtmlDomElementReference)parentRef);
             }
             else
             {
-                Interop.ExecuteJavaScriptAsync(@"
-var newElement = document.createElement($0);
-newElement.setAttribute(""id"", $1);
-if($3 < 0 || $3 >= $2.children.length)
-{
-    $2.appendChild(newElement);
-}
-else
-{
-    var nextSibling = $2.children[$3];
-    $2.insertBefore(newElement,nextSibling);
-}
-", domElementTag, uniqueIdentifier, parentRef,index);
-                INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
                 return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, null); //todo: this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
             }
         }
@@ -1318,5 +1292,85 @@ parentElement.appendChild(child);
             else
                 return false;
         }
+
+#if OPENSILVER
+        internal static void SetVisualBounds(INTERNAL_HtmlDomStyleReference style, Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
+        {
+            string javaScriptCodeToExecute = string.Format(CultureInfo.InvariantCulture, @"
+var element = document.getElementByIdSafe(""{0}"");
+if (element)
+{{
+element.style.left = ""{1}px"";
+element.style.top = ""{2}px"";
+element.style.width = ""{3}px"";
+element.style.height = ""{4}px"";
+{5}{6}{7}
+}}
+            ", style.Uid, visualBounds.Left, visualBounds.Top, visualBounds.Width, visualBounds.Height,
+            bSetPositionAbsolute ? "element.style.position=\"absolute\";" : "",
+            bSetZeroMargin ? "element.style.margin=\"0\";" : "",
+            bSetZeroPadding ? "element.style.padding=\"0\";" : "");
+
+            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+        }
+#elif BRIDGE
+        internal static void SetVisualBounds(dynamic style, Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
+        {
+            style.left = visualBounds.Left.ToInvariantString() + "px";
+            style.top = visualBounds.Top.ToInvariantString() + "px";
+            style.width = visualBounds.Width.ToInvariantString() + "px";
+            style.height = visualBounds.Height.ToInvariantString() + "px";
+            if (bSetPositionAbsolute)
+            {
+                style.position = "absolute";
+            }
+            if (bSetZeroMargin)
+            {
+                style.margin = "0";
+            }
+            if (bSetZeroPadding)
+            {
+                style.padding = "0";
+            }
+        }
+#endif
+
+#if OPENSILVER
+        internal static void SetPosition(INTERNAL_HtmlDomStyleReference style, Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
+        {
+            string javaScriptCodeToExecute = string.Format(CultureInfo.InvariantCulture, @"
+var element = document.getElementByIdSafe(""{0}"");
+if (element)
+{{
+element.style.left = ""{1}px"";
+element.style.top = ""{2}px"";
+{3}{4}{5}
+}}
+            ", style.Uid, visualBounds.Left, visualBounds.Top,
+            bSetPositionAbsolute ? "element.style.position=\"absolute\";" : "",
+            bSetZeroMargin ? "element.style.margin=\"0\";" : "",
+            bSetZeroPadding ? "element.style.padding=\"0\";" : "");
+
+            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+        }
+#elif BRIDGE
+        internal static void SetPosition(dynamic style, Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
+        {
+            style.left = visualBounds.Left.ToInvariantString() + "px";
+            style.top = visualBounds.Top.ToInvariantString() + "px";
+            if (bSetPositionAbsolute)
+            {
+                style.position = "absolute";
+            }
+            if (bSetZeroMargin)
+            {
+                style.margin = "0";
+            }
+            if (bSetZeroPadding)
+            {
+                style.padding = "0";
+            }
+        }
+#endif
     }
 }

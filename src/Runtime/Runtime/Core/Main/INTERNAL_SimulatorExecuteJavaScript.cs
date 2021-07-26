@@ -231,11 +231,17 @@ namespace CSHTML5.Internal
 #endif
         static object PerformActualInteropCall(string javaScriptToExecute, string reasonForPerformingTheCallNow)
         {
-            javaScriptToExecute = "//---- START INTEROP (" + reasonForPerformingTheCallNow + ") ----"
-                + Environment.NewLine
-                + javaScriptToExecute
-                + Environment.NewLine
-                + "//---- END INTEROP (" + reasonForPerformingTheCallNow + ") ----";
+            if (EnableInteropLogging)
+            {
+                javaScriptToExecute = "//---- START INTEROP (" + reasonForPerformingTheCallNow + ") ----"
+                    + Environment.NewLine
+                    + javaScriptToExecute
+                    + Environment.NewLine
+                    + "//---- END INTEROP (" + reasonForPerformingTheCallNow + ") ----";
+            }
+            else
+                javaScriptToExecute = Environment.NewLine + javaScriptToExecute + Environment.NewLine;
+
             try
             {
 #if CSHTML5BLAZOR

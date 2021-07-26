@@ -171,6 +171,101 @@ document.getElementByIdSafe = function (id) {
     return element;
 }
 
+document.setGridCollapsedDuetoHiddenColumn = function (id) {
+    const element = document.getElementById(id);
+    if (!element)
+        return;
+
+	if (element.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
+		element.style.overflow = 'visible';
+		element.setAttribute('data-isCollapsedDueToHiddenColumn', false);
+	}
+}
+
+document.setDisplayTableCell = function (id) {
+    const element = document.getElementById(id);
+    if (!element || element.tagName != 'SPAN')
+        return;
+
+    element.style.display = 'table-cell';
+}
+
+document.getActualWidthAndHeight = function (element) {
+	return (typeof element === 'undefined' || element === null) ? '0|0' : element['offsetWidth'].toFixed(3) + '|' + element['offsetHeight'].toFixed(3);
+}
+
+document.createElementSafe = function (tagName, id, parentElement, index) {
+	const newElement = document.createElement(tagName);
+
+	newElement.setAttribute("id", id);
+	if(index < 0 || index >= parentElement.children.length)	{
+		parentElement.appendChild(newElement);
+	}
+	else {
+		var nextSibling = parentElement.children[index];
+		parentElement.insertBefore(newElement, nextSibling);
+	}
+}
+
+document.set2dContextProperty = function (id, propertyName, propertyValue) {
+    const element = document.getElementById(id);
+    if (!element || element.tagName !== 'CANVAS')
+        return;
+
+    element.getContext('2d')[propertyName] = propertyValue;
+}
+
+document.invoke2dContextMethod = function (id, methodName, args) {
+    const element = document.getElementById(id);
+    if (!element || element.tagName !== 'CANVAS')
+        return undefined;
+    return CanvasRenderingContext2D.prototype[methodName].apply(element.getContext('2d'),
+        args.split(',')
+            .map(Function.prototype.call, String.prototype.trim)
+            .filter(i => i.length > 0));
+}
+
+document.setDomStyleProperty = function (id, propertyName, value) {
+    const element = document.getElementById(id);
+    if (!element)
+        return;
+
+    element.style[propertyName] = value;
+}
+
+document.removeEventListenerSafe = function (element, method, func) {
+	if (element){
+		element.removeEventListener(method, func);
+	}
+}
+
+document.addEventListenerSafe = function (element, method, func) {
+	if (element){
+		element.addEventListener(method, func);
+	}
+}
+
+document.eventCallback = function (callbackId, arguments) {
+	const argsArray = arguments;
+	const idWhereCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
+	document.jsSimulatorObjectReferences[idWhereCallbackArgsAreStored] = argsArray;
+	setTimeout(
+		function() 
+		{{
+		   window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray);
+		}}
+		, 1);
+}
+
+document.errorCallback = function (error, IndexOfNextUnmodifiedJSCallInList) {
+	const idWhereErrorCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
+	const argsArr = [];
+	argsArr[0] = error.message;
+	argsArr[1] = IndexOfNextUnmodifiedJSCallInList;
+	document.jsSimulatorObjectReferences[idWhereErrorCallbackArgsAreStored] = argsArr;
+	window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);
+}
+
 window.ViewInteropErrors = function () {
     for (var key in document.interopErrors) {
         console.log(`Unable to find element with id '${key}' (${document.interopErrors[key]} time(s)).`);
@@ -648,7 +743,7 @@ if (!Array.from) {
 
             // 16. Let k be 0.
             var k = 0;
-            // 17. Repeat, while k < len… (also steps a - h)
+            // 17. Repeat, while k < lenÂ… (also steps a - h)
             var kValue;
             while (k < len) {
                 kValue = items[k];
@@ -818,4 +913,3 @@ var jsilConfig = {
       "index"
     ]
 };
-

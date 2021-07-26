@@ -17,16 +17,12 @@ using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
-using System.Collections;
 
 #if MIGRATION
 using System.Windows.Documents;
 #else
-using Windows.UI.Text;
-using Windows.UI.Xaml.Navigation;
+using Windows.Foundation;
 using Windows.UI.Xaml.Documents;
 #endif
 
@@ -65,6 +61,7 @@ namespace Windows.UI.Xaml.Controls
             divStyle.whiteSpace = TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap";
             divStyle.overflow = "hidden"; //keeps the text from overflowing despite the TextBlock's size limitations.
             divStyle.textAlign = "left"; // this is the default value.
+            divStyle.boxSizing = "border-box";
             domElementWhereToPlaceChildren = div;
             return div;
         }
@@ -86,7 +83,7 @@ namespace Windows.UI.Xaml.Controls
                 "Text",
                 typeof(string),
                 typeof(TextBlock),
-                new PropertyMetadata(string.Empty, OnTextPropertyChanged));
+                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextPropertyChanged));
 
         private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -169,7 +166,8 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the TextWrapping dependency property.
         /// </summary>
         public static readonly DependencyProperty TextWrappingProperty =
-            DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBlock), new PropertyMetadata(TextWrapping.NoWrap)
+            DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBlock),
+                new FrameworkPropertyMetadata(TextWrapping.NoWrap, FrameworkPropertyMetadataOptions.AffectsMeasure)
             {
                 GetCSSEquivalent = (instance) =>
                 {
@@ -219,7 +217,7 @@ namespace Windows.UI.Xaml.Controls
                 "TextTrimming",
                 typeof(TextTrimming),
                 typeof(TextBlock),
-                new PropertyMetadata(TextTrimming.None)
+                new FrameworkPropertyMetadata(TextTrimming.None, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
                     MethodToUpdateDom = OnTextTrimmedChangedUpdateDOM
                 });
@@ -302,5 +300,52 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+		private Size noWrapSize = Size.Empty;
+
+		internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			// Skip when loading or changed on TextMeasurement Div.
+			if (this.INTERNAL_OuterDomElement == null || Application.Current.TextMeasurementService.IsTextMeasureDivID(((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier))
+				return;
+
+			FrameworkPropertyMetadata metadata = e.Property.GetMetadata(GetType()) as FrameworkPropertyMetadata;
+
+			if (metadata != null)
+			{
+				if (metadata.AffectsMeasure)
+				{
+					noWrapSize = Size.Empty;
+				}
+			}
+			base.OnPropertyChanged(e);
+		}
+
+		protected override Size MeasureOverride(Size availableSize)
+		{
+            //Size actualSize = this.INTERNAL_GetActualWidthAndHeight();
+            //return actualSize;
+            Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
+
+            if (noWrapSize == Size.Empty)
+            {
+                noWrapSize = Application.Current.TextMeasurementService.MeasureTextBlock(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, /*FontStretch, */TextWrapping.NoWrap, Padding, Double.PositiveInfinity);
+                noWrapSize = noWrapSize.Add(BorderThicknessSize);
+            }
+
+            if (TextWrapping == TextWrapping.NoWrap || noWrapSize.Width <= availableSize.Width)
+            {
+                return noWrapSize;
+            }
+
+            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, /*FontStretch, */TextWrapping, Padding, (availableSize.Width - BorderThicknessSize.Width).Max(0));
+            TextSize = TextSize.Add(BorderThicknessSize);
+
+            return TextSize;
+        }
+
+		protected override Size ArrangeOverride(Size finalSize)
+		{
+			return finalSize;
+		}
     }
 }

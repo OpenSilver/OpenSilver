@@ -56,7 +56,7 @@ namespace Windows.UI.Xaml.Controls
                 "FontFamily",
                 typeof(FontFamily),
                 typeof(DataGridTextColumn),
-                new PropertyMetadata(OnFontFamilyPropertyChanged));
+                new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure, OnFontFamilyPropertyChanged));
 
         private static void OnFontFamilyPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -118,16 +118,11 @@ namespace Windows.UI.Xaml.Controls
         }
 
         [OpenSilver.NotImplemented]
-        protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
-        {
-            return null;
-        }
-
-        [OpenSilver.NotImplemented]
         protected override object PrepareCellForEdit(FrameworkElement editingElement, RoutedEventArgs editingEventArgs)
         {
             return null;
         }
+
     }
 }
 #endif

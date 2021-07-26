@@ -146,7 +146,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.Children[i], this, i);
                 }
-            }            
+            }
         }
 
         internal virtual void OnChildrenAdded(UIElement newChild, int index)

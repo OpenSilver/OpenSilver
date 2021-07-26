@@ -466,7 +466,6 @@ namespace Windows.UI.Xaml.Controls
                 VisualStates.GoToState(this, useTransitions, VisualStates.StateCollapsed);
             }
 
-#if false
             switch (ExpandDirection)
             {
                 case ExpandDirection.Down:
@@ -484,9 +483,6 @@ namespace Windows.UI.Xaml.Controls
                     VisualStates.GoToState(this, useTransitions, VisualStates.StateExpandRight);
                     break;
             }
-#else
-            VisualStates.GoToState(this, useTransitions, VisualStates.StateExpandDown);
-#endif
 
             // Handle the Common and Focused states
             Interaction.UpdateVisualStateBase(useTransitions);

@@ -1,4 +1,4 @@
-﻿
+
 
 /*===================================================================================
 * 
@@ -80,7 +80,7 @@ namespace Windows.UI.Xaml.Controls
     /// </example>
     public partial class DataGrid : MultiSelector
     {
-        #region Data
+        #region Data 
 
         private const string PART_MainGrid = "PART_MainGrid";
         private const string PART_Pager = "PART_Pager";
@@ -217,7 +217,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(ColumnHeaderStyle),
                 typeof(Style),
                 typeof(DataGrid),
-                new PropertyMetadata(null, OnColumnHeaderStyleChanged));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnColumnHeaderStyleChanged));
 
         private static void OnColumnHeaderStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -239,7 +239,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(ColumnHeaderHeight),
                 typeof(double),
                 typeof(DataGrid),
-                new PropertyMetadata(double.NaN));
+                new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
 
         /// <summary>
         /// Gets or sets the style applied to all cells in the <see cref="DataGrid"/>.
@@ -1179,7 +1179,7 @@ namespace Windows.UI.Xaml.Controls
                         cell.Item = childData;
                         cell.DataContext = childData;
                         cell.Column = column;
-                        FrameworkElement f = column.GenerateElement(childData);
+                        FrameworkElement f = column.GenerateElementInternal(cell, childData);
                         Grid.SetRow(cell, rowCount - 1);
                         Grid.SetColumn(cell, currentColumnIndex);
                         cell.Content = f;

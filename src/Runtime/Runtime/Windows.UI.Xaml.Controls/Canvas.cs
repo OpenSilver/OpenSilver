@@ -16,6 +16,11 @@ using CSHTML5.Internal;
 using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+
+#if !MIGRATION
+using Windows.Foundation;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -214,5 +219,33 @@ namespace Windows.UI.Xaml.Controls
             */
 
         }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            var childConstraint = new Size(double.PositiveInfinity, double.PositiveInfinity);
+
+            UIElement[] childrens = Children.ToArray();
+            foreach (UIElement child in childrens)
+            {
+                child.Measure(childConstraint);
+            }
+
+            return new Size();
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            UIElement[] childrens = Children.ToArray();
+            foreach (UIElement child in childrens)
+            {
+                double x = GetLeft(child).DefaultIfNaN(0);
+                double y = GetTop(child).DefaultIfNaN(0);
+
+                child.Arrange(new Rect(new Point(x, y), child.DesiredSize));
+            }
+
+            return finalSize;
+        }
+
     }
 }

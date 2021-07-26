@@ -3,13 +3,16 @@
   <PropertyGroup>
     <TargetFramework>$ext_blazortargetframework$</TargetFramework>
     <NoXamlPreprocessor>True</NoXamlPreprocessor>
-    <OpenSilverType>3</OpenSilverType>
+    <OpenSilverType>4</OpenSilverType>
+	<PublishTrimmed>true</PublishTrimmed>
+	<!-- Uncomment to enable AOT compilation when publishing -->
+	<!--<RunAOTCompilation Condition="'$(IsSecondPass)'=='True'">true</RunAOTCompilation>-->
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$ext_blazorpackagesversion$" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$ext_blazorpackagesversion$" PrivateAssets="all" />
-    <PackageReference Include="$ext_opensilverpackagename$" Version="1.0.0-alpha-019" />
+    <PackageReference Include="$ext_opensilverpackagename$" Version="$ext_opensilverpackageversion$" />
   </ItemGroup>
 
   <ItemGroup>

@@ -88,7 +88,11 @@ namespace Windows.UI.Xaml.Controls
             return textBox;
         }
 
-        internal override FrameworkElement GenerateElement(object childData)
+        protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
+        {
+            return GenerateElement(dataItem);
+        }
+        private FrameworkElement GenerateElement(object childData)
         {
             HyperlinkButton hyperlink = new HyperlinkButton();
             hyperlink.DataContext = childData;

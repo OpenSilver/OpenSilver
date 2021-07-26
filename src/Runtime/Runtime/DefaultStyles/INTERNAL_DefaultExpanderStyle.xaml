@@ -267,10 +267,23 @@
                                                     <TransformGroup>
                                                         <TransformGroup.Children>
                                                             <TransformCollection>
-                                                                <RotateTransform Angle="180" />
                                                                 <!-- #if WORKINPROGRESS -->
-                                                                <!-- CenterX="9.5"
-                                                                     CenterY="9.5" -->
+                                                                <!-- 
+                                                                <RotateTransform Angle="180"
+                                                                                 CenterX="9.5"
+                                                                                 CenterY="9.5" />
+                                                                -->
+                                                                <!-- #else -->
+                                                                <MatrixTransform>
+                                                                    <MatrixTransform.Matrix>
+                                                                        <Matrix M11="-1"
+                                                                                M12="0"
+                                                                                M21="0"
+                                                                                M22="-1"
+                                                                                OffsetX="19"
+                                                                                OffsetY="19" />
+                                                                    </MatrixTransform.Matrix>
+                                                                </MatrixTransform>
                                                                 <!-- #endif -->
                                                             </TransformCollection>
                                                         </TransformGroup.Children>
@@ -404,10 +417,23 @@
                                                     <TransformGroup>
                                                         <TransformGroup.Children>
                                                             <TransformCollection>
-                                                                <RotateTransform Angle="90" />
                                                                 <!-- #if WORKINPROGRESS -->
-                                                                <!-- CenterX="9.5"
-                                                                     CenterY="9.5" -->
+                                                                <!--
+                                                                <RotateTransform Angle="90"
+                                                                                 CenterX="9.5"
+                                                                                 CenterY="9.5" />
+                                                                -->
+                                                                <!-- #else -->
+                                                                <MatrixTransform>
+                                                                    <MatrixTransform.Matrix>
+                                                                        <Matrix M11="0"
+                                                                                M12="1"
+                                                                                M21="-1"
+                                                                                M22="0"
+                                                                                OffsetX="19"
+                                                                                OffsetY="0" />
+                                                                    </MatrixTransform.Matrix>
+                                                                </MatrixTransform>
                                                                 <!-- #endif -->
                                                             </TransformCollection>
                                                         </TransformGroup.Children>
@@ -541,10 +567,23 @@
                                                     <TransformGroup>
                                                         <TransformGroup.Children>
                                                             <TransformCollection>
-                                                                <RotateTransform Angle="270" />
                                                                 <!-- #if WORKINPROGRESS -->
-                                                                <!-- CenterX="9.5"
-                                                                     CenterY="9.5" -->
+                                                                <!--
+                                                                <RotateTransform Angle="270"
+                                                                                 CenterX="9.5"
+                                                                                 CenterY="9.5" />
+                                                                -->
+                                                                <!-- #else -->
+                                                                <MatrixTransform>
+                                                                    <MatrixTransform.Matrix>
+                                                                        <Matrix M11="0"
+                                                                                M12="-1"
+                                                                                M21="1"
+                                                                                M22="0"
+                                                                                OffsetX="0"
+                                                                                OffsetY="19" />
+                                                                    </MatrixTransform.Matrix>
+                                                                </MatrixTransform>
                                                                 <!-- #endif -->
                                                             </TransformCollection>
                                                         </TransformGroup.Children>
