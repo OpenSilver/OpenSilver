@@ -123,6 +123,7 @@
 		<Compile Include="System.Windows.Markup\ContentWrapperAttribute.cs" />
 		<Compile Include="System.Windows.Markup\IProvideValueTarget.cs" />
 		<Compile Include="System.Windows.Markup\MarkupExtension.cs" />
+		<Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguageConverter.cs" />
 		<Compile Include="System.Windows.Markup\XmlnsDefinitionAttribute.cs" />
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\BlurEffect.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\ListenFailedException.cs" />
