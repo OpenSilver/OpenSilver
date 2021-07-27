@@ -804,22 +804,34 @@ namespace Windows.UI.Xaml.Controls
             ElementTemplateTop = GetTemplateChild(ElementTemplateTopName) as FrameworkElement;
             ElementTabPanelTop = GetTemplateChild(ElementTabPanelTopName) as TabPanel;
             ElementContentTop = GetTemplateChild(ElementContentTopName) as ContentPresenter;
-            ElementTabPanelTop.Orientation = Orientation.Horizontal;
+            if (ElementTabPanelTop != null)
+            {
+                ElementTabPanelTop.Orientation = Orientation.Horizontal;
+            }
 
             ElementTemplateBottom = GetTemplateChild(ElementTemplateBottomName) as FrameworkElement;
             ElementTabPanelBottom = GetTemplateChild(ElementTabPanelBottomName) as TabPanel;
             ElementContentBottom = GetTemplateChild(ElementContentBottomName) as ContentPresenter;
-            ElementTabPanelBottom.Orientation = Orientation.Horizontal;
+            if (ElementTabPanelBottom != null)
+            {
+                ElementTabPanelBottom.Orientation = Orientation.Horizontal;
+            }
 
             ElementTemplateLeft = GetTemplateChild(ElementTemplateLeftName) as FrameworkElement;
             ElementTabPanelLeft = GetTemplateChild(ElementTabPanelLeftName) as TabPanel;
             ElementContentLeft = GetTemplateChild(ElementContentLeftName) as ContentPresenter;
-            ElementTabPanelLeft.Orientation = Orientation.Vertical;
+            if (ElementTabPanelLeft != null)
+            {
+                ElementTabPanelLeft.Orientation = Orientation.Vertical;
+            }
 
             ElementTemplateRight = GetTemplateChild(ElementTemplateRightName) as FrameworkElement;
             ElementTabPanelRight = GetTemplateChild(ElementTabPanelRightName) as TabPanel;
             ElementContentRight = GetTemplateChild(ElementContentRightName) as ContentPresenter;
-            ElementTabPanelRight.Orientation = Orientation.Vertical;
+            if (ElementTabPanelRight != null)
+            {
+                ElementTabPanelRight.Orientation = Orientation.Vertical;
+            }
         }
 
         #region TopPlacement
