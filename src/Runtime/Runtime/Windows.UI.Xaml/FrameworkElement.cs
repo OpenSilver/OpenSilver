@@ -969,7 +969,7 @@ namespace Windows.UI.Xaml
             VisualBounds = new Rect(visualOffset, arrangedSize);
 
             // Call SizeChanged event handlers
-            this.HandleSizeChanged($"{VisualBounds.Width}|{VisualBounds.Height}");
+            this.HandleSizeChanged(arrangedSize);
         }
 
         private static Point GetAlignmentOffset(Rect container, Size alignedRectSize, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows;
 
 namespace CSHTML5.Internal
 {
@@ -14,7 +15,7 @@ namespace CSHTML5.Internal
         /// </summary>
         /// <param name="elementReference">The element to observe.</param>
         /// <param name="callback">The action to call when resizing occurs.</param>
-        void Observe(object elementReference, Action<string, string> callback);
+        void Observe(object elementReference, Action<Size> callback);
 
         /// <summary>
         /// Remove the specified element from the list of observed elements.
@@ -23,7 +24,7 @@ namespace CSHTML5.Internal
         void Unobserve(object elementReference);
     }
 
-    public static class ResizeObserverFactory
+    internal static class ResizeObserverFactory
     {
         /// <summary>
         /// Factory method which instantiates a <see cref="IResizeObserver"/>.
@@ -41,85 +42,92 @@ namespace CSHTML5.Internal
             }
         }
 
+        /// <summary>
+        /// An implementation of the <see cref="IResizeObserver"/> using the ResizeSensor js library.
+        /// </summary>
         private class ResizeSensor : IResizeObserver
         {
-            private const string ADD_SENSOR_JS_TEMPLATE = "new ResizeSensor($1, $2)";
+            private const string ADD_SENSOR_JS_TEMPLATE = "new ResizeSensor($0, $1)";
             private const string REMOVE_SENSOR_JS_TEMPLATE = "$0.detach($1)";
 
-            private readonly IDictionary<HtmlElementReferenceWrapper, object> _sensors;
-
-            public ResizeSensor()
-            {
-                this._sensors = new Dictionary<HtmlElementReferenceWrapper, object>();
-            }
-
-            public void Observe(object elementReference, Action<string, string> callback)
-            {
-                var sensor = Interop.ExecuteJavaScript(ADD_SENSOR_JS_TEMPLATE, elementReference, callback);
-                this._sensors.Add(new HtmlElementReferenceWrapper((INTERNAL_HtmlDomElementReference)elementReference), sensor);
-            }
-
-            public void Unobserve(object elementReference)
-            {
-                Interop.ExecuteJavaScript(REMOVE_SENSOR_JS_TEMPLATE, this._sensors[new HtmlElementReferenceWrapper((INTERNAL_HtmlDomElementReference)elementReference)], elementReference);
-                this._sensors.Remove(new HtmlElementReferenceWrapper((INTERNAL_HtmlDomElementReference)elementReference));
-            }
+            // Contains all the registered ResizeSensors and their corresponding identifiers.
+            private readonly IDictionary<string, object> _sensors;
 
             /// <summary>
-            /// Used to store a HtmlDomElementReference as a key in the dictionary.
+            /// Initializes a new instance of the <see cref="ResizeSensor"/>.
             /// </summary>
-            private class HtmlElementReferenceWrapper
+            public ResizeSensor()
             {
-                public HtmlElementReferenceWrapper(INTERNAL_HtmlDomElementReference reference)
-                {
-                    this.Reference = reference;
-                }
+                this._sensors = new Dictionary<string, object>();
+            }
 
-                public INTERNAL_HtmlDomElementReference Reference { get; }
+            /// <inheritdoc />
+            public void Observe(object elementReference, Action<Size> callback)
+            {
+                var sensor = Interop.ExecuteJavaScript(ADD_SENSOR_JS_TEMPLATE, elementReference, new Action<string>((string arg) => callback(ParseSize(arg))));
+                this._sensors.Add(((INTERNAL_HtmlDomElementReference)elementReference).UniqueIdentifier, sensor);
+            }
 
-                public override int GetHashCode()
-                {
-                    return Reference.UniqueIdentifier.GetHashCode();
-                }
-
-                public override bool Equals(object obj)
-                {
-                    if (obj is null)
-                    {
-                        return false;
-                    }
-
-                    if (obj is HtmlElementReferenceWrapper wrapper)
-                    {
-                        return wrapper.Reference.Equals(this);
-                    }
-
-                    return false;
-                }
+            /// <inheritdoc />
+            public void Unobserve(object elementReference)
+            {
+                Interop.ExecuteJavaScript(REMOVE_SENSOR_JS_TEMPLATE, this._sensors[((INTERNAL_HtmlDomElementReference)elementReference).UniqueIdentifier], elementReference);
+                this._sensors.Remove(((INTERNAL_HtmlDomElementReference)elementReference).UniqueIdentifier);
             }
         }
+
+        /// <summary>
+        /// An implementation of the <see cref="IResizeObserver"/> using the standard ResizeObserver API.
+        /// </summary>
         private class ResizeObserver : IResizeObserver
         {
             private const string CREATE_OBSERVER_JS = "new ResizeObserverAdapter()";
             private const string ADD_OBSERVER_JS_TEMPLATE = "$0.observe($1, $2)";
             private const string REMOVE_OBSERVER_JS_TEMPLATE = "$0.unobserve($1)";
 
+            // Holds the reference to the observer js object.
             private readonly object _observerJsReference;
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ResizeObserver"/>.
+            /// </summary>
             public ResizeObserver()
             {
                 this._observerJsReference = Interop.ExecuteJavaScript(CREATE_OBSERVER_JS);
             }
 
-            public void Observe(object elementReference, Action<string, string> callback)
+            /// <inheritdoc />
+            public void Observe(object elementReference, Action<Size> callback)
             {
-                Interop.ExecuteJavaScript(ADD_OBSERVER_JS_TEMPLATE, this._observerJsReference, elementReference, callback);
+                Interop.ExecuteJavaScript(ADD_OBSERVER_JS_TEMPLATE, this._observerJsReference, elementReference, new Action<string>((string arg) => callback(ParseSize(arg))));
             }
 
+            /// <inheritdoc />
             public void Unobserve(object elementReference)
             {
                 Interop.ExecuteJavaScript(REMOVE_OBSERVER_JS_TEMPLATE, this._observerJsReference, elementReference);
             }
+        }
+
+        /// <summary>
+        /// Helper method used to parse size string "Height|Width".
+        /// </summary>
+        /// <param name="argSize">The size string to parse.</param>
+        /// <returns>The parsed <see cref="Size"/>, or <see cref="Size.Empty"/> if the parse fails.</returns>
+        internal static Size ParseSize(string argSize)
+        {
+            int sepIndex = argSize != null ? argSize.IndexOf('|') : -1;
+
+            if (sepIndex == -1)
+            {
+                return Size.Empty;
+            }
+
+            string actualWidthAsString = argSize.Substring(0, sepIndex);
+            string actualHeightAsString = argSize.Substring(sepIndex + 1);
+            double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture);
+            double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture);
+            return new Size(actualWidth, actualHeight);
         }
     }
 }

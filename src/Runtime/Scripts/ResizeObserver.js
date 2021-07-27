@@ -15,14 +15,14 @@ class ResizeObserverAdapter {
     unobserve(element) {
 
         this.observer.unobserve(element);
-        delete this.callbacks(element);
+        delete this.callbacks[element];
     }
 
     onResize(resizedElements) {
 
         for (const element of resizedElements) {
 
-            this.callbacks[element.target](element.contentRect.width, element.contentRect.height);
+            this.callbacks[element.target](element.contentRect.width + '|' + element.contentRect.height);
         }
     }
 }

@@ -178,7 +178,7 @@ namespace Windows.UI.Xaml
             RefreshHeight(frameworkElement);
 #endif
             if (!double.IsNaN(frameworkElement.Width) && !double.IsNaN(frameworkElement.Height))
-                frameworkElement.HandleSizeChanged(null);
+                frameworkElement.HandleSizeChanged(Size.Empty);
         }
 
 #if PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
@@ -268,7 +268,7 @@ namespace Windows.UI.Xaml
             RefreshWidth(frameworkElement);
 #endif
             if (!double.IsNaN(frameworkElement.Width) && !double.IsNaN(frameworkElement.Height))
-                frameworkElement.HandleSizeChanged(null);
+                frameworkElement.HandleSizeChanged(Size.Empty);
         }
 
 #if PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
@@ -364,8 +364,8 @@ namespace Windows.UI.Xaml
                 // If the element is inside a Canvas, we ignore alignment and only apply the Width/Height:
                 if (fe.INTERNAL_VisualParent is Canvas || isParentAViewBox) //todo: replace the second part of this test with something meaning "logical parent is ViewBox" instead once we will have the logical tree (we cannot do that yet since we cannot access the ViewBox from frameworkElement).
                 {
-                    styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ? 
-                        fe.Width.ToInvariantString() + "px" : 
+                    styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ?
+                        fe.Width.ToInvariantString() + "px" :
                         "auto";
                 }
                 else // Otherwise we handle both alignment and Width/Height:
@@ -860,7 +860,7 @@ namespace Windows.UI.Xaml
                             break;
                         case VerticalAlignment.Bottom:
                             if (!isParentAWrapPanelOrAVerticalStackPanel)
-                            { 
+                            {
                                 if (isCSSGrid && (VisualTreeHelper.GetParent(fe) is Grid))
                                 {
                                     //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
@@ -1172,7 +1172,7 @@ namespace Windows.UI.Xaml
                 // Note: this is used to avoid overwriting the value set for the vertical
                 // alignment when in a css Grid, but the msGrid uses another way to set it
                 // so we do not need to change what happens here in this case.
-                bool isInsideACSSBasedGrid = isCSSGrid && !isMsGrid && frameworkElement.INTERNAL_VisualParent is Grid; 
+                bool isInsideACSSBasedGrid = isCSSGrid && !isMsGrid && frameworkElement.INTERNAL_VisualParent is Grid;
 
                 var boxSizingElement = frameworkElement.INTERNAL_AdditionalOutsideDivForMargins;
                 var styleOfBoxSizingElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(boxSizingElement);
@@ -1191,13 +1191,13 @@ namespace Windows.UI.Xaml
                     styleOfBoxSizingElement.paddingLeft = newMargin.Left.ToInvariantString() + "px";
                     // This is to "undo" the value that was previously set in case we are
                     // moving from negative margin to positive margin.
-                    styleOfBoxSizingElement.marginLeft = ""; 
+                    styleOfBoxSizingElement.marginLeft = "";
                 }
                 else
                 {
                     // This is to "undo" the value that was previously set in case we are
                     // moving from positive margin to negative margin.
-                    styleOfBoxSizingElement.paddingLeft = ""; 
+                    styleOfBoxSizingElement.paddingLeft = "";
                     styleOfBoxSizingElement.marginLeft = newMargin.Left.ToInvariantString() + "px";
                 }
 
@@ -1207,7 +1207,7 @@ namespace Windows.UI.Xaml
                     styleOfBoxSizingElement.paddingTop = newMargin.Top.ToInvariantString() + "px";
                     // This is to "undo" the value that was previously set in case we are
                     // moving from negative margin to positive margin.
-                    styleOfOuterDomElement.marginTop = ""; 
+                    styleOfOuterDomElement.marginTop = "";
                 }
                 else
                 {
@@ -1216,15 +1216,15 @@ namespace Windows.UI.Xaml
                     styleOfBoxSizingElement.paddingTop = "";
                     // In case of CSS-based Grid, we cannot mess with the margin proprty
                     // because it is used for vertical alignment (margin "auto").
-                    if (!isInsideACSSBasedGrid || 
-                        frameworkElement.VerticalAlignment == VerticalAlignment.Top || 
-                        frameworkElement.VerticalAlignment == VerticalAlignment.Stretch) 
+                    if (!isInsideACSSBasedGrid ||
+                        frameworkElement.VerticalAlignment == VerticalAlignment.Top ||
+                        frameworkElement.VerticalAlignment == VerticalAlignment.Stretch)
                     {
                         // Note: vertically we apply negative margins to the "outer dom element"
                         // instead of the "box sizing" element in order to not mess with the CSS
                         // Grid Layout vertical alignment, which uses the margins of the "box sizing"
                         // to apply vertical alignment.
-                        styleOfOuterDomElement.marginTop = newMargin.Top.ToInvariantString() + "px"; 
+                        styleOfOuterDomElement.marginTop = newMargin.Top.ToInvariantString() + "px";
                     }
                 }
 
@@ -1234,13 +1234,13 @@ namespace Windows.UI.Xaml
                     styleOfBoxSizingElement.paddingRight = newMargin.Right.ToInvariantString() + "px";
                     // This is to "undo" the value that was previously set in case we are
                     // moving from negative margin to positive margin.
-                    styleOfBoxSizingElement.marginRight = ""; 
+                    styleOfBoxSizingElement.marginRight = "";
                 }
                 else
                 {
                     // This is to "undo" the value that was previously set in case we are
                     // moving from positive margin to negative margin.
-                    styleOfBoxSizingElement.paddingRight = ""; 
+                    styleOfBoxSizingElement.paddingRight = "";
                     styleOfBoxSizingElement.marginRight = newMargin.Right.ToInvariantString() + "px";
                 }
 
@@ -1250,7 +1250,7 @@ namespace Windows.UI.Xaml
                     styleOfBoxSizingElement.paddingBottom = newMargin.Bottom.ToInvariantString() + "px";
                     // This is to "undo" the value that was previously set in case we are
                     // moving from negative margin to positive margin.
-                    styleOfOuterDomElement.marginBottom = ""; 
+                    styleOfOuterDomElement.marginBottom = "";
                 }
                 else
                 {
@@ -1261,7 +1261,7 @@ namespace Windows.UI.Xaml
                     // instead of the "box sizing" element in order to not mess with the CSS
                     // Grid Layout vertical alignment, which uses the margins of the "box sizing"
                     // to apply vertical alignment.
-                    styleOfOuterDomElement.marginBottom = newMargin.Bottom.ToInvariantString() + "px"; 
+                    styleOfOuterDomElement.marginBottom = newMargin.Bottom.ToInvariantString() + "px";
                 }
             }
 
@@ -1466,14 +1466,14 @@ namespace Windows.UI.Xaml
                     else
                     {
 #endif
-                        try
-                        {
-                            return Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(this.INTERNAL_OuterDomElement, "offsetWidth"));
-                        }
-                        catch
-                        {
-                            return 0d;
-                        }
+                    try
+                    {
+                        return Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(this.INTERNAL_OuterDomElement, "offsetWidth"));
+                    }
+                    catch
+                    {
+                        return 0d;
+                    }
 #if !CSHTML5NETSTANDARD
                     }
 #endif
@@ -1501,14 +1501,14 @@ namespace Windows.UI.Xaml
                     else
                     {
 #endif
-                        try
-                        {
-                            return Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(this.INTERNAL_OuterDomElement, "offsetHeight"));
-                        }
-                        catch
-                        {
-                            return 0d;
-                        }
+                    try
+                    {
+                        return Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(this.INTERNAL_OuterDomElement, "offsetHeight"));
+                    }
+                    catch
+                    {
+                        return 0d;
+                    }
 #if !CSHTML5NETSTANDARD
                     }
 #endif
@@ -1536,30 +1536,30 @@ namespace Windows.UI.Xaml
                 else
                 {
 #endif
-                    if (!double.IsNaN(this.Width) && !double.IsNaN(this.Height))
-                        return new Size(this.Width, this.Height);
-                    try
-                    {
+                if (!double.IsNaN(this.Width) && !double.IsNaN(this.Height))
+                    return new Size(this.Width, this.Height);
+                try
+                {
                     // Hack to improve the Simulator performance by making only one interop call rather than two:
                     string concatenated = CSHTML5.Interop.ExecuteJavaScript("document.getActualWidthAndHeight($0)", this.INTERNAL_OuterDomElement).ToString();
                     int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
-                        if (sepIndex > -1)
-                        {
-                            string actualWidthAsString = concatenated.Substring(0, sepIndex);
-                            string actualHeightAsString = concatenated.Substring(sepIndex + 1);
-                            double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
-                            double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
-                            return new Size(actualWidth, actualHeight);
-                        }
-                        else
-                        {
-                            return new Size(0d, 0d);
-                        }
+                    if (sepIndex > -1)
+                    {
+                        string actualWidthAsString = concatenated.Substring(0, sepIndex);
+                        string actualHeightAsString = concatenated.Substring(sepIndex + 1);
+                        double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                        double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
+                        return new Size(actualWidth, actualHeight);
                     }
-                    catch
+                    else
                     {
                         return new Size(0d, 0d);
                     }
+                }
+                catch
+                {
+                    return new Size(0d, 0d);
+                }
 #if !CSHTML5NETSTANDARD
                 }
 #endif
@@ -1587,28 +1587,28 @@ namespace Windows.UI.Xaml
                 else
                 {
 #endif
-                    try
+                try
+                {
+                    // Hack to improve the Simulator performance by making only one interop call rather than two:
+                    string concatenated = CSHTML5.Interop.ExecuteJavaScript("(function() { var v = $0.getBoundingClientRect(); return v.width.toFixed(3) + '|' + v.height.toFixed(3) })()", this.INTERNAL_OuterDomElement).ToString();
+                    int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
+                    if (sepIndex > -1)
                     {
-                        // Hack to improve the Simulator performance by making only one interop call rather than two:
-                        string concatenated = CSHTML5.Interop.ExecuteJavaScript("(function() { var v = $0.getBoundingClientRect(); return v.width.toFixed(3) + '|' + v.height.toFixed(3) })()", this.INTERNAL_OuterDomElement).ToString();
-                        int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
-                        if (sepIndex > -1)
-                        {
-                            string actualWidthAsString = concatenated.Substring(0, sepIndex);
-                            string actualHeightAsString = concatenated.Substring(sepIndex + 1);
-                            double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
-                            double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
-                            return new Size(actualWidth, actualHeight);
-                        }
-                        else
-                        {
-                            return new Size(0d, 0d);
-                        }
+                        string actualWidthAsString = concatenated.Substring(0, sepIndex);
+                        string actualHeightAsString = concatenated.Substring(sepIndex + 1);
+                        double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                        double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
+                        return new Size(actualWidth, actualHeight);
                     }
-                    catch
+                    else
                     {
                         return new Size(0d, 0d);
                     }
+                }
+                catch
+                {
+                    return new Size(0d, 0d);
+                }
 #if !CSHTML5NETSTANDARD
                 }
 #endif
@@ -1624,29 +1624,18 @@ namespace Windows.UI.Xaml
 
         Size _valueOfLastSizeChanged = new Size(0d, 0d);
         private List<SizeChangedEventHandler> _sizeChangedEventHandlers;
-        private object _resizeSensor;
+        private static readonly IResizeObserver _resizeObserver = ResizeObserverFactory.Create();
+        private bool _isObserved;
 
-        private void HandleSizeChanged(string argSize)
+        private void HandleSizeChanged(Size currentSize)
         {
-            if (this._sizeChangedEventHandlers != null
-               && this._sizeChangedEventHandlers.Count > 0
-               && INTERNAL_VisualTreeManager.IsElementInVisualTree(this)
-               && this._isLoaded)
+            if (this._sizeChangedEventHandlers?.Count > 0 && 
+                INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && this._isLoaded)
             {
-                // In the current implementation, we raise the SizeChanged event only if the size has changed since the last time that we were supposed to raise the event:
-
-                Size currentSize;
-                int sepIndex = argSize != null ? argSize.IndexOf('|') : -1;
-                if (sepIndex > -1)
+                if (currentSize == Size.Empty)
                 {
-                    string actualWidthAsString = argSize.Substring(0, sepIndex);
-                    string actualHeightAsString = argSize.Substring(sepIndex + 1);
-                    double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture);
-                    double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture);
-                    currentSize = new Size(actualWidth, actualHeight);
-                }
-                else
                     currentSize = this.INTERNAL_GetActualWidthAndHeight();
+                }
 
                 if (!Size.Equals(this._valueOfLastSizeChanged, currentSize))
                 {
@@ -1669,16 +1658,16 @@ namespace Windows.UI.Xaml
             if (this.IsUnderCustomLayout == false)
             {
                 if (this.IsCustomLayoutRoot == false)
-                    HandleSizeChanged(null);
+                    this.HandleSizeChanged(Size.Empty);
 
                 if (this._sizeChangedEventHandlers != null &&
                     this._sizeChangedEventHandlers.Count > 0 &&
-                    this._resizeSensor == null)
+                    !this._isObserved)
                 {
                     if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
                     {
-                        object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
-                        this._resizeSensor = sensor;
+                        _resizeObserver.Observe(this.INTERNAL_OuterDomElement, this.HandleSizeChanged);
+                        this._isObserved = true;
                     }
                 }
             }
@@ -1692,18 +1681,18 @@ namespace Windows.UI.Xaml
                 {
                     this._sizeChangedEventHandlers = new List<SizeChangedEventHandler>();
                 }
-                if (this._resizeSensor == null && this.INTERNAL_OuterDomElement != null)
+                if (!this._isObserved && this.INTERNAL_OuterDomElement != null)
                 {
                     if (this.IsUnderCustomLayout == false)
                     {
                         if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
                         {
-                            object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
-                            this._resizeSensor = sensor;
-                        } 
+                            _resizeObserver.Observe(this.INTERNAL_OuterDomElement, this.HandleSizeChanged);
+                            this._isObserved = true;
+                        }
                         else
                         {
-                            HandleSizeChanged(null);
+                            this.HandleSizeChanged(Size.Empty);
                         }
                     }
                 }
@@ -1718,10 +1707,10 @@ namespace Windows.UI.Xaml
 
                 if (this._sizeChangedEventHandlers.Remove(value))
                 {
-                    if (this._sizeChangedEventHandlers.Count == 0 && this._resizeSensor != null)
+                    if (this._sizeChangedEventHandlers.Count == 0 && this._isObserved)
                     {
-                        CSHTML5.Interop.ExecuteJavaScript("$0.detach($1)", this._resizeSensor, this.INTERNAL_OuterDomElement);
-                        this._resizeSensor = null;
+                        _resizeObserver.Unobserve(this.INTERNAL_OuterDomElement);
+                        this._isObserved = false;
                     }
                 }
             }
