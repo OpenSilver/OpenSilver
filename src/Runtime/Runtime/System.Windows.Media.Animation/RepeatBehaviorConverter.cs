@@ -13,6 +13,9 @@
 \*====================================================================================*/
 
 
+#if BRIDGE
+using System;
+#endif
 using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
@@ -149,7 +152,11 @@ namespace Windows.UI.Xaml.Media.Animation
                             break;
                         case RepeatBehaviorType.Count:
                             var sb = new StringBuilder();
+#if BRIDGE
+                            sb.AppendFormat("{0:}x", behavior.Count);
+#else
                             sb.AppendFormat(cultureInfo, "{0:}x", behavior.Count);
+#endif
                             result = sb.ToString();
                             break;
                         default:

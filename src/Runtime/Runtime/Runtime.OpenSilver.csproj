@@ -82,6 +82,8 @@
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\DeploymentCatalog.cs" />
 		<Compile Include="System.ComponentModel.Composition\WORKINPROGRESS\CompositionInitializer.cs" />
 		<Compile Include="System.ComponentModel\IItemProperties.cs" />
+		<Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettings.cs" />
+		<Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettingsForCSharp.cs" />
 		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageException.cs" />
 		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageFile.cs" />
 		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageFileStream.cs" />
@@ -561,7 +563,6 @@
 		<Compile Include="System.ComponentModel\GroupDescription.cs" />
 		<Compile Include="System.ComponentModel\SortDescription.cs" />
 		<Compile Include="System.ComponentModel\SortDescriptionCollection.cs" />
-		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageSettingsForCSharp.cs" />
 		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageSettings.cs" />
 		<Compile Include="System.Net\CredentialsMode.cs" />
 		<Compile Include="System.Net\WebClientWithCredentials.cs" />

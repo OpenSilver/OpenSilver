@@ -13,6 +13,9 @@
 \*====================================================================================*/
 
 
+#if BRIDGE
+using System;
+#endif
 using System.ComponentModel;
 using System.Globalization;
 
@@ -77,8 +80,8 @@ namespace Windows.Foundation
                     if (double.TryParse(split[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var x) &&
                         double.TryParse(split[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var y))
 #else
-                if (double.TryParse(splittedString[0], out var x) &&
-                    double.TryParse(splittedString[1], out var y))
+                if (double.TryParse(split[0], out var x) &&
+                    double.TryParse(split[1], out var y))
 #endif
                         result = new Point(x, y);
                 }

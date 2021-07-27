@@ -21,6 +21,7 @@ using Windows.UI.Xaml.Media;
 #endif
 #if BRIDGE
 using Bridge;
+using System;
 #endif
 
 #if MIGRATION

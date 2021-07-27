@@ -13,6 +13,9 @@
 \*====================================================================================*/
 
 
+#if BRIDGE
+using System;
+#endif
 using System.ComponentModel;
 using System.Globalization;
 
@@ -139,24 +142,6 @@ namespace Windows.UI.Xaml.Media
                         // true always, even though we don't have access to the FontFamily instance; so
                         // we need to be able to return some kind of family name even if Source==null.
                         string name = null;
-
-                        CultureInfo parentCulture = null;
-                        if (culture != null)
-                        {
-                            if (culture.Equals(CultureInfo.InvariantCulture))
-                            {
-                                culture = null;
-                            }
-                            else
-                            {
-                                parentCulture = culture.Parent;
-                                if (parentCulture != null &&
-                                    (parentCulture.Equals(CultureInfo.InvariantCulture) || parentCulture == culture))
-                                {
-                                    parentCulture = null;
-                                }
-                            }
-                        }
 
                         throw new NotImplementedException();
 

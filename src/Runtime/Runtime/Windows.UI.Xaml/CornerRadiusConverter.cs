@@ -12,7 +12,9 @@
 *  
 \*====================================================================================*/
 
-
+#if BRIDGE
+using System;
+#endif
 using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
 using System.Globalization;
@@ -144,11 +146,13 @@ namespace Windows.UI.Xaml
                 if (destinationType == typeof(string))
                 {
                     var listSeparator = ',';
+#if !BRIDGE
                     var instance = NumberFormatInfo.GetInstance(cultureInfo);
                     if (instance.NumberDecimalSeparator.Length > 0 && listSeparator  == instance.NumberDecimalSeparator[0])
                     {
                         listSeparator = ';';
                     }
+#endif
 
                     // Initial capacity [64] is an estimate based on a sum of:
                     // 48 = 4x double (twelve digits is generous for the range of values likely)

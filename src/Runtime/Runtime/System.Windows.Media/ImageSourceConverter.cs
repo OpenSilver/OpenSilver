@@ -15,7 +15,12 @@
 
 using System.ComponentModel;
 using System.Globalization;
+#if BRIDGE
+using System;
+using Windows.UI.Xaml.Media.Imaging;
+#else
 using System.Windows.Media.Imaging;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Media

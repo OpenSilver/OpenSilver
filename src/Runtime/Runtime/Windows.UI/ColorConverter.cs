@@ -1,4 +1,8 @@
-﻿using System.ComponentModel;
+﻿#if BRIDGE
+using Bridge;
+using System;
+#endif
+using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
 using System.Globalization;
 
@@ -77,7 +81,7 @@ namespace Windows.UI
                     color = Script.Write<int>("parseInt({0}, 16);", tokens);
                 }
 
-                return INTERNAL_ConvertFromInt32(color);
+                return Color.INTERNAL_ConvertFromInt32(color);
 #endif
                 }
                 else if (trimmedString != null && trimmedString.StartsWith("sc#", StringComparison.Ordinal))
