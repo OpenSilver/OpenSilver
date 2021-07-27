@@ -32,7 +32,7 @@ namespace CSHTML5.Internal
         /// <returns></returns>
         public static IResizeObserver Create()
         {
-            if (Interop.IsRunningInTheSimulator_WorkAround)
+            if (Interop.IsRunningInTheSimulator_WorkAround || IsRunningOnInternetExplorer())
             {
                 return new ResizeSensor();
             }
@@ -40,6 +40,37 @@ namespace CSHTML5.Internal
             {
                 return new ResizeObserver();
             }
+        }
+
+        /// <summary>
+        /// Helper method used to parse size string "Height|Width".
+        /// </summary>
+        /// <param name="argSize">The size string to parse.</param>
+        /// <returns>The parsed <see cref="Size"/>, or <see cref="Size.Empty"/> if the parse fails.</returns>
+        internal static Size ParseSize(string argSize)
+        {
+            int sepIndex = argSize != null ? argSize.IndexOf('|') : -1;
+
+            if (sepIndex == -1)
+            {
+                return Size.Empty;
+            }
+
+            string actualWidthAsString = argSize.Substring(0, sepIndex);
+            string actualHeightAsString = argSize.Substring(sepIndex + 1);
+            double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture);
+            double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture);
+            return new Size(actualWidth, actualHeight);
+        }
+
+#if !BRIDGE
+        [JSIL.Meta.JSReplacement("window.IE_VERSION")]
+#else
+        [Bridge.Template("window.IE_VERSION")]
+#endif
+        private static bool IsRunningOnInternetExplorer()
+        {
+            return false;
         }
 
         /// <summary>
@@ -107,27 +138,6 @@ namespace CSHTML5.Internal
             {
                 Interop.ExecuteJavaScript(REMOVE_OBSERVER_JS_TEMPLATE, this._observerJsReference, elementReference);
             }
-        }
-
-        /// <summary>
-        /// Helper method used to parse size string "Height|Width".
-        /// </summary>
-        /// <param name="argSize">The size string to parse.</param>
-        /// <returns>The parsed <see cref="Size"/>, or <see cref="Size.Empty"/> if the parse fails.</returns>
-        internal static Size ParseSize(string argSize)
-        {
-            int sepIndex = argSize != null ? argSize.IndexOf('|') : -1;
-
-            if (sepIndex == -1)
-            {
-                return Size.Empty;
-            }
-
-            string actualWidthAsString = argSize.Substring(0, sepIndex);
-            string actualHeightAsString = argSize.Substring(sepIndex + 1);
-            double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture);
-            double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture);
-            return new Size(actualWidth, actualHeight);
         }
     }
 }
