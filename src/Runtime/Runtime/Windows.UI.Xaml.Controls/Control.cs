@@ -384,6 +384,7 @@ namespace Windows.UI.Xaml.Controls
                 typeof(Control),
                 new FrameworkPropertyMetadata(11d, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 { 
+                    Inherits = true,
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
                         Value = (inst, value) =>
