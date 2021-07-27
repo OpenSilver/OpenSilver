@@ -13,7 +13,11 @@
 \*====================================================================================*/
 
 
+#if BRIDGE
+using System;
+#endif
 using System.ComponentModel;
+
 #if MIGRATION
 namespace System.Windows.Media.Animation
 #else

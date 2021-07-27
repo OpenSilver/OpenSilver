@@ -12,6 +12,10 @@
 *  
 \*====================================================================================*/
 
+
+#if BRIDGE
+using System;
+#endif
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -143,11 +147,13 @@ namespace Windows.UI.Xaml.Media
             }
 
             var listOperator = ',';
+#if !BRIDGE
             NumberFormatInfo instance = NumberFormatInfo.GetInstance(culture);
             if (instance.NumberDecimalSeparator.Length > 0 && listOperator == instance.NumberDecimalSeparator[0])
             {
                 listOperator = ';';
             }
+#endif
             return string.Format(culture, "{1:" + format + "}{0}{2:" + format + "}{0}{3:" + format + "}{0}{4:" + format + "}{0}{5:" + format + "}{0}{6:" + format + "}", listOperator, _m11, _m12, _m21, _m22, _offsetX, _offsetY);
         }
 
@@ -330,9 +336,9 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        #endregion Public Properties
+#endregion Public Properties
 
-        #region Public Methods
+#region Public Methods
 
         /// <summary>
         /// Transforms the specified point by the <see cref="Matrix"/> and returns
@@ -452,9 +458,9 @@ namespace Windows.UI.Xaml.Media
             return ConvertToString(format, provider);
         }
 
-        #endregion Public Methods
+#endregion Public Methods
 
-        #region Operators
+#region Operators
 
         public static bool operator ==(Matrix matrix1, Matrix matrix2)
         {
@@ -478,9 +484,9 @@ namespace Windows.UI.Xaml.Media
             return !(matrix1 == matrix2);
         }
 
-        #endregion Operators
+#endregion Operators
 
-        #region Internal Properties
+#region Internal Properties
 
         /// <summary>
         /// The determinant of this matrix
@@ -519,9 +525,9 @@ namespace Windows.UI.Xaml.Media
             return Math.Abs(value) < 10.0 * DBL_EPSILON;
         }
 
-        #endregion Internal Properties
+#endregion Internal Properties
 
-        #region Internal Methods
+#region Internal Methods
 
         /// <summary>
         /// Replaces matrix with the inverse of the transformation.  This will throw an InvalidOperationException
@@ -805,9 +811,9 @@ namespace Windows.UI.Xaml.Media
             return matrix;
         }
 
-        #endregion Internal Methods
+#endregion Internal Methods
 
-        #region Private Methods
+#region Private Methods
 
         /// <summary>
         /// Sets the transformation to the identity.
@@ -909,9 +915,9 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        #endregion Private Methods
+#endregion Private Methods
 
-        #region Private Properties and Fields
+#region Private Properties and Fields
 
         /// <summary>
         /// Efficient but conservative test for identity.  Returns
@@ -932,7 +938,7 @@ namespace Windows.UI.Xaml.Media
 
         private const double DBL_EPSILON = 2.2204460492503131e-016;
 
-        #endregion Private Properties and Fields
+#endregion Private Properties and Fields
 
         internal double _m11;
         internal double _m12;

@@ -55,6 +55,7 @@
     <Compile Include="Core\Main\EmptyEnumerator.cs" />
     <Compile Include="Core\Main\InheritablePropertyChangeInfo.cs" />
     <Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
+    <Compile Include="Core\Main\ObjectBuilder.cs" />
     <Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Windows.Foundation\IntExtensions.cs" />
     <Compile Include="Windows.Foundation\LayoutManager.cs" />
     <Compile Include="Windows.Foundation\PointExtensions.cs" />
+    <Compile Include="Windows.Foundation\RectConverter.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\DatePickerTextBox.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\TabPanel.cs" />
     <Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\CalendarDayButton.cs" />
@@ -186,12 +188,16 @@
     <Compile Include="Windows.UI.Xaml.Data\CollectionViewSource.cs" />
     <Compile Include="Windows.UI.Xaml.Data\DataExtensionMethods.cs" />
     <Compile Include="Windows.UI.Xaml.Data\EnumerableCollectionView.cs" />
+    <Compile Include="Windows.UI.Xaml.Data\RelativeSourceConverter.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerParagraph.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerRichTextBlock.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\INTERNAL_TextContainerSection.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Paragraph.cs" />
     <Compile Include="Windows.UI.Xaml.Documents\WORKINPROGRESS\Section.cs" />
+    <Compile Include="Windows.UI.Xaml.Media\PointCollectionConverter.cs" />
     <Compile Include="Windows.UI.Xaml.Media\Polygon.cs" />
+    <Compile Include="Windows.UI.Xaml.Media\TransformConverter.cs" />
+    <Compile Include="Windows.UI.Xaml.Media\WORKINPROGRESS\CacheModeConverter.cs" />
     <Compile Include="Windows.UI.Xaml\Expression.cs" />
     <Compile Include="Windows.UI.Xaml.Data\IndexedEnumerable.cs" />
     <Compile Include="Windows.UI.Xaml.Data\INTERNAL_PagedCollectionView.cs" />
@@ -229,8 +235,6 @@
     <Compile Include="Core\Main\INTERNAL_TypeToStringToDependencyProperty.cs" />
     <Compile Include="Core\Main\INTERNAL_UriHelper.cs" />
     <Compile Include="Core\Main\NamespacesDocumentation.cs" />
-    <Compile Include="Core\Main\SupportsDirectContentViaTypeFromStringConvertersAttribute.cs" />
-    <Compile Include="Core\Main\TypeFromStringConverters.cs" />
     <Compile Include="Core\Events\HtmlEventProxy.cs" />
     <Compile Include="Core\Events\INTERNAL_EventManager_2.cs" />
     <Compile Include="Core\Events\INTERNAL_EventsHelper.cs" />
@@ -341,10 +345,6 @@
     <Compile Include="System.ComponentModel\CancelEventArgs.cs" />
     <Compile Include="System.ComponentModel\ClosingEventArgs.cs" />
     <Compile Include="System.ComponentModel\DesignerProperties.cs" />
-    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageFile.cs" />
-    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageFileStream.cs" />
-    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettings.cs" />
-    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettingsForCSharp.cs" />
     <Compile Include="System.Net\CredentialsMode.cs" />
     <Compile Include="System.Net\DownloadStringCompletedEventArgs.cs" />
     <Compile Include="System.Net\DownloadStringCompletedEventHandler.cs" />
@@ -954,6 +954,7 @@
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\DragEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\EventTrigger.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontStretch.cs" />
+    <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\FontStretchConverter.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\IDataObject.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\LineStackingStrategy.cs" />
     <Compile Include="Windows.UI.Xaml\WORKINPROGRESS\OutOfBrowserSettings.cs" />

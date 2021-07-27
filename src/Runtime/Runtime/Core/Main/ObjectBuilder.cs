@@ -67,7 +67,9 @@ namespace DotNetForHtml5.Core
 
             if (converter is null)
             {
+#if !BRIDGE
                 throw new TargetException($"The type converter for {targetType.FullName} was not found. Make sure to decorate the {targetType.FullName} class with a {nameof(TypeConverterAttribute)}.");
+#endif
             }
             else
             {

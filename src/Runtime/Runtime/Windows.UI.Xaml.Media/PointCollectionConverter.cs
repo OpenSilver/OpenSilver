@@ -13,6 +13,10 @@
 \*====================================================================================*/
 
 
+#if BRIDGE
+using System;
+using Windows.Foundation;
+#endif
 using System.ComponentModel;
 using System.Globalization;
 

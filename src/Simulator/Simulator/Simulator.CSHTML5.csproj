@@ -66,10 +66,6 @@
       <HintPath>..\..\packages\Microsoft.Web.Administration.7.0.0.0\lib\net20\Microsoft.Web.Administration.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\..\packages\MahApps.Metro.1.2.4.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -208,7 +204,7 @@
     </Compile>
     <Page Include="Debugging\ChromiumDevTools.xaml">
       <SubType>Designer</SubType>
-		<Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="XamlInspection\XamlInspectionTreeView.xaml">
       <SubType>Designer</SubType>
@@ -390,6 +386,11 @@
     <ProjectReference Include="..\..\Compiler\Compiler.Common\Compiler.Common.CSHTML5.csproj">
       <Project>{4ecad5cd-91df-48f6-9e9f-ae0a6e7622a8}</Project>
       <Name>Compiler.Common.CSHTML5</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Runtime\Runtime.CSHTML5.csproj">
+      <Project>{03dfd03a-5639-4523-901a-8310296a4317}</Project>
+      <Name>Runtime.CSHTML5</Name>
+      <Aliases>OpenSilver</Aliases>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

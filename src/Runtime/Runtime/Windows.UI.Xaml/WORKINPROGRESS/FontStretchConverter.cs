@@ -13,6 +13,9 @@
 \*====================================================================================*/
 
 
+#if BRIDGE
+using System;
+#endif
 using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
 using System.Globalization;
@@ -20,7 +23,7 @@ using System.Globalization;
 #if MIGRATION
 namespace System.Windows
 #else
-namespace Windows.UI.Text
+namespace Windows.UI.Xaml
 #endif
 {
     #if WORKINPROGRESS

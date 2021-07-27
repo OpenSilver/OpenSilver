@@ -1,4 +1,6 @@
-﻿/*===================================================================================
+﻿
+
+/*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
 *      
@@ -10,15 +12,13 @@
 *  
 \*====================================================================================*/
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
 
-#if MIGRATION
 using System.ComponentModel;
 
+#if MIGRATION
 namespace System.Windows.Media
 #else
+using Windows.Foundation;
 namespace Windows.UI.Xaml.Media
 #endif
 {

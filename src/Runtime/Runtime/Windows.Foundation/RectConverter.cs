@@ -13,6 +13,9 @@
 \*====================================================================================*/
 
 
+#if BRIDGE
+using System;
+#endif
 using System.ComponentModel;
 using System.Globalization;
 
@@ -69,7 +72,7 @@ namespace Windows.Foundation
             {
                 var rectAsString = value.ToString();
 
-                var split = rectAsString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var split = rectAsString.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                 if (split.Length == 4)
                 {
@@ -79,10 +82,10 @@ namespace Windows.Foundation
                         double.TryParse(split[2], NumberStyles.Any, CultureInfo.InvariantCulture, out var width) &&
                         double.TryParse(split[3], NumberStyles.Any, CultureInfo.InvariantCulture, out var height))
 #else
-                if (double.TryParse(split[0], out x) &&
-                    double.TryParse(split[1], out y) &&
-                    double.TryParse(split[2], out width) &&
-                    double.TryParse(split[3], out height))
+                if (double.TryParse(split[0], out var x) &&
+                    double.TryParse(split[1], out var y) &&
+                    double.TryParse(split[2], out var width) &&
+                    double.TryParse(split[3], out var height))
 #endif
                         result = new Rect(x, y, width, height);
                 }
