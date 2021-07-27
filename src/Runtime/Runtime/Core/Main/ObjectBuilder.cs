@@ -75,7 +75,16 @@ namespace DotNetForHtml5.Core
             {
                 if (converter.CanConvertFrom(typeof(string)))
                 {
-                    result = converter.ConvertFrom(expression);
+                    try
+                    {
+                        result = converter.ConvertFrom(expression);
+                    }
+                    catch (Exception)
+                    {
+                        // TODO: Create a ticket for implementing the CommandConverter into TelerikForOpenSilver and use the TileViewCommands class to recognize the ToggleTileState command
+                        // TODO: Log?
+                        result = default;
+                    }
                 }
                 else if (targetType.IsAssignableFrom(typeof(string)))
                 {
