@@ -81,8 +81,6 @@ namespace DotNetForHtml5.Core
                     }
                     catch (Exception)
                     {
-                        // TODO: Create a ticket for implementing the CommandConverter into TelerikForOpenSilver and use the TileViewCommands class to recognize the ToggleTileState command
-                        // TODO: Log?
                         result = default;
                     }
                 }

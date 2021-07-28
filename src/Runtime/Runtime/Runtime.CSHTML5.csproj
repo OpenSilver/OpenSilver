@@ -907,6 +907,7 @@
     <Compile Include="Windows.UI.Xaml\ResourceDictionary.cs" />
     <Compile Include="Windows.UI.Xaml\ResourceDictionaryCollection.cs" />
     <Compile Include="Windows.UI.Xaml\ResourcesChangeInfo.cs" />
+    <Compile Include="Windows.UI.Xaml\RoutedEventConverter.cs" />
     <Compile Include="Windows.UI.Xaml\TemplateBindingExpression.cs" />
     <Compile Include="Windows.UI.Xaml\TemplateBindingExtension.cs" />
     <Compile Include="Windows.UI.Xaml\TextDecorationCollection.cs" />
