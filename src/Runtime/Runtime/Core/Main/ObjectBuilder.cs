@@ -61,7 +61,7 @@ namespace DotNetForHtml5.Core
         /// </returns>
         public object Parse(string expression, Type targetType)
         {
-            object result = null;
+            var result = default(object);
 
             var converter = TypeDescriptor.GetConverter(targetType);
 
@@ -90,7 +90,7 @@ namespace DotNetForHtml5.Core
                 }
                 else
                 {
-                    throw new NotSupportedException($"The converter for {targetType.FullName} is unable to convert from {nameof(String)}.");
+                    //throw new NotSupportedException($"The converter for {targetType.FullName} is unable to convert from {nameof(String)}.");
                 }
             }
 
