@@ -45,7 +45,9 @@ using DotNetForHtml5.EmulatorWithoutJavascript.Debugging;
 using DotNetBrowser.Events;
 using DotNetForHtml5.EmulatorWithoutJavascript.Console;
 using System.Windows.Media.Imaging;
+#if OPENSILVER
 using OpenSilver.Simulator;
+#endif
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
@@ -175,7 +177,9 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             MainWebBrowser.Width = 150;
             MainWebBrowser.Height = 200;
             MainWebBrowser.SizeChanged += MainWebBrowser_SizeChanged;
+#if OPENSILVER
             simulatorLaunchParameters?.BrowserCreatedCallback?.Invoke(MainWebBrowser);
+#endif
 
             //Note: The following line was an attempt to persist the Microsoft login cookies (for use by user applications that required AAD login), but it is no longer necessary because we changed the DotNetBrowser "StorageType" from "MEMORY" to "DISK", so cookies are now automatically persisted.
             //CookiesHelper.LoadMicrosoftCookies(MainWebBrowser, NAME_FOR_STORING_COOKIES);
