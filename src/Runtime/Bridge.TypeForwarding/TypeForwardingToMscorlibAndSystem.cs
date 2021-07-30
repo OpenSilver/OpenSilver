@@ -549,6 +549,7 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(TypeAttributes))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(TypeBinaryExpression))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(TypeCode))] //RequiredToRun
+[assembly: TypeForwardedToAttribute(typeof(TypeConverterAttribute))]
 [assembly: TypeForwardedToAttribute(typeof(TypeFilter))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(TypeForwardedFromAttribute))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(UIHintAttribute))] // Generation Added
