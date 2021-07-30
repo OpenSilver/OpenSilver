@@ -15,7 +15,6 @@
 
 #if BRIDGE
 using System;
-using Windows.Foundation;
 #endif
 using System.ComponentModel;
 using System.Globalization;
@@ -23,6 +22,7 @@ using System.Globalization;
 #if MIGRATION
 namespace System.Windows.Media
 #else
+using Windows.Foundation;
 namespace Windows.UI.Xaml.Media
 #endif
 {

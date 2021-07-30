@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.ComponentModel.Design.Serialization;
 using System.Linq;
 
+#if MIGRATION
 namespace System.Windows.Tests
 {
     [TestClass]
@@ -88,3 +89,4 @@ namespace System.Windows.Tests
         }
     }
 }
+#endif

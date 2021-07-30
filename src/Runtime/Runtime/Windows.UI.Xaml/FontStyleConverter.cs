@@ -12,7 +12,7 @@
 *  
 \*====================================================================================*/
 
-
+#if MIGRATION
 using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
 using System.Globalization;
@@ -127,3 +127,4 @@ namespace System.Windows
         }
     }
 }
+#endif
