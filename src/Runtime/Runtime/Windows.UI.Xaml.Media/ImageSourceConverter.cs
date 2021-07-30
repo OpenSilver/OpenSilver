@@ -17,14 +17,14 @@ using System.ComponentModel;
 using System.Globalization;
 #if BRIDGE
 using System;
-using Windows.UI.Xaml.Media.Imaging;
 #else
-using System.Windows.Media.Imaging;
 #endif
 
 #if MIGRATION
+using System.Windows.Media.Imaging;
 namespace System.Windows.Media
 #else
+using Windows.UI.Xaml.Media.Imaging;
 namespace Windows.UI.Xaml.Media
 #endif
 {

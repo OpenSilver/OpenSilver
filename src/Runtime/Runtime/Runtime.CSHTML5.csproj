@@ -880,6 +880,7 @@
     <Compile Include="Windows.UI.Xaml\ExceptionRoutedEventHandler.cs" />
     <Compile Include="Windows.UI.Xaml\FlowDirection.cs" />
     <Compile Include="Windows.UI.Xaml\FontStyle.cs" />
+    <Compile Include="Windows.UI.Xaml\FontStyleConverter.cs" />
     <Compile Include="Windows.UI.Xaml\FrameworkElement.cs" />
     <Compile Include="Windows.UI.Xaml\FrameworkElement_HandlingSizeAndAlignment.cs" />
     <Compile Include="Windows.UI.Xaml\FrameworkPropertyMetadata.cs" />
@@ -911,6 +912,7 @@
     <Compile Include="Windows.UI.Xaml\TemplateBindingExpression.cs" />
     <Compile Include="Windows.UI.Xaml\TemplateBindingExtension.cs" />
     <Compile Include="Windows.UI.Xaml\TextDecorationCollection.cs" />
+    <Compile Include="Windows.UI.Xaml\TextDecorationCollectionConverter.cs" />
     <Compile Include="Windows.UI.Xaml\TextMeasurementService.cs" />
     <Compile Include="Windows.UI.Xaml\TreeWalkHelper.cs" />
     <Compile Include="Windows.UI.Xaml\RoutedEvent.cs" />
