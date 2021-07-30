@@ -8,7 +8,7 @@ namespace CSHTML5.Internal
     /// <summary>
     /// Abstract definition of a observer which monitors the resizing of elements.
     /// </summary>
-    public interface IResizeObserver
+    internal interface IResizeObserver
     {
         /// <summary>
         /// Monitors the specified <paramref name="elementReference"/> for resize, and calls the specified action.
@@ -63,9 +63,7 @@ namespace CSHTML5.Internal
             return new Size(actualWidth, actualHeight);
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("window.IE_VERSION")]
-#else
+#if BRIDGE
         [Bridge.Template("window.IE_VERSION")]
 #endif
         private static bool IsRunningOnInternetExplorer()

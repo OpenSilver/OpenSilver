@@ -54,7 +54,7 @@ velocityScript.setAttribute('src', 'libs/flatpickr.js');
 document.getElementsByTagName('head')[0].appendChild(velocityScript);
 
 
-.//new Element("script", { src: "ResizeSensor.js", type: "application/javascript" });
+//new Element("script", { src: "ResizeSensor.js", type: "application/javascript" });
 var velocityScript = document.createElement('script');
 velocityScript.setAttribute('type', 'application/javascript');
 velocityScript.setAttribute('src', 'libs/ResizeSensor.js');
