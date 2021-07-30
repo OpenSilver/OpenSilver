@@ -67,7 +67,11 @@ namespace Windows.UI.Xaml
             {
                 throw GetConvertFromException(value);
             }
+#if BRIDGE
+            else if (value is string routedEventName)
+#else
             else if (value is string routedEventName && typeDescriptorContext is IServiceProvider serviceProvider)
+#endif
             {
                 throw new NotImplementedException();
             }
