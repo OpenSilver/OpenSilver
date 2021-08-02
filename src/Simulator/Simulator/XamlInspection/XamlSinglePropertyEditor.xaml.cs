@@ -11,9 +11,10 @@
 *  
 \*====================================================================================*/
 
-
+#if OPENSILVER
 extern alias OpenSilver;
 using OpenSilver::DotNetForHtml5.Core;
+#endif
 using System;
 using System.Reflection;
 using System.Windows;
@@ -59,7 +60,11 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
 
                 // Set property appearance depending on whether there exists a converter from String to the property type:
                 Type propertyType = _propertyInfo.PropertyType;
+#if OPENSILVER
                 bool isItPossibleToConvertFromString = ObjectBuilder.Singleton.CanParse(propertyType);
+#else
+                bool isItPossibleToConvertFromString = IsItPossibleToConvertFromString(propertyType);
+#endif
 
                 SetIsReadOnly(!isItPossibleToConvertFromString);
 
@@ -138,6 +143,27 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             Refresh();
         }
 
+        bool IsItPossibleToConvertFromString(Type typeToWhichWeWouldLikeToConvert)
+        {
+            // If it is a string or an Enum, we can convert from string, otherwise, we need to look for a converter in the Core assembly:
+            if (typeToWhichWeWouldLikeToConvert == typeof(string)
+                || typeToWhichWeWouldLikeToConvert.IsEnum)
+            {
+                return true;
+            }
+            else
+            {
+                // Get a reference to the "ObjectBuilder" class in the Core assembly:
+                ReflectionInUserAssembliesHelper.TryGetTypeInCoreAssembly("DotNetForHtml5.Core", null, "ObjectBuilder", out var typeConverter, out var coreAssembly);
+
+                // Call the "CanParse" method:
+                var canTypeBeConvertedMethod = typeConverter.GetMethod("CanParse");
+                var canTypeBeConverted = (bool)canTypeBeConvertedMethod.Invoke(null, new object[] { typeToWhichWeWouldLikeToConvert });
+
+                return canTypeBeConverted;
+            }
+        }
+
         object ConvertFromString(string valueAsString, Type targetType)
         {
             // If it is a string or an Enum, convert directly, otherwise call the appropriate converter from the Core assembly:
@@ -151,8 +177,16 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             }
             else
             {
+#if OPENSILVER
                 var convertedValue = ObjectBuilder.Singleton.Parse(valueAsString, targetType);
+#else
+                // Get a reference to the "ObjectBuilder" class in the Core assembly:
+                ReflectionInUserAssembliesHelper.TryGetTypeInCoreAssembly("DotNetForHtml5.Core", null, "ObjectBuilder", out var typeConverter, out var coreAssembly);
 
+                // Call the "Parse" method:
+                var convertFromInvariantStringMethod = typeConverter.GetMethod("Parse");
+                var convertedValue = convertFromInvariantStringMethod.Invoke(null, new object[] { targetType, valueAsString });
+#endif
                 return convertedValue;
             }
         }

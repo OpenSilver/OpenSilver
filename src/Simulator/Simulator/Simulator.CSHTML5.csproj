@@ -387,11 +387,6 @@
       <Project>{4ecad5cd-91df-48f6-9e9f-ae0a6e7622a8}</Project>
       <Name>Compiler.Common.CSHTML5</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\Runtime\Runtime.CSHTML5.csproj">
-      <Project>{03dfd03a-5639-4523-901a-8310296a4317}</Project>
-      <Name>Runtime.CSHTML5</Name>
-      <Aliases>OpenSilver</Aliases>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
