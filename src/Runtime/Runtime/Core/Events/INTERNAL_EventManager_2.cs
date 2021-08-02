@@ -205,7 +205,7 @@ namespace CSHTML5.Internal
         {
             if (!_isListeningToDomEvents)
             {
-                dynamic domElement = _domElementProvider();
+                var domElement = _domElementProvider();
                 if (domElement != null)
                 {
                     if (_htmlEventProxies == null)

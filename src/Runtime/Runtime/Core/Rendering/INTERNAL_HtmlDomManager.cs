@@ -87,11 +87,11 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return rootDomElement;
         }
 
-        public static void RemoveFromDom(dynamic domNode, string commentForDebugging = null)
+        public static void RemoveFromDom(object domNode, string commentForDebugging = null)
         {
             if (IsRunningInJavaScript())
             {
-                domNode.parentNode.removeChild(domNode);
+                ((dynamic)domNode).parentNode.removeChild(domNode);
             }
 
             else
@@ -108,7 +108,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         }
 
 #if CSHTML5NETSTANDARD
-        public static INTERNAL_HtmlDomElementReference GetParentDomElement(dynamic domElementRef)
+        public static INTERNAL_HtmlDomElementReference GetParentDomElement(object domElementRef)
         {
             var parent = ((INTERNAL_HtmlDomElementReference)domElementRef).Parent;
             return parent;
@@ -140,7 +140,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 #endif
 
 #if CSHTML5NETSTANDARD
-        public static INTERNAL_HtmlDomElementReference GetFirstChildDomElement(dynamic domElementRef)
+        public static INTERNAL_HtmlDomElementReference GetFirstChildDomElement(object domElementRef)
         {
             return ((INTERNAL_HtmlDomElementReference)domElementRef).FirstChild;
         }
@@ -199,7 +199,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         }
 
         // Note: JSReplacement does not work here (for some unknown reason)
-        public static bool IsNotUndefinedOrNull(dynamic obj)
+        public static bool IsNotUndefinedOrNull(object obj)
         {
             if (IsRunningInJavaScript())
             {
@@ -217,7 +217,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
-                dynamic domElementRefConcernedByFocus = element.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? element.INTERNAL_OuterDomElement;
+                var domElementRefConcernedByFocus = element.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? element.INTERNAL_OuterDomElement;
 #if CSHTML5BLAZOR
                 // In the OpenSilver we can never be running in javascript but we may not be in the simulator
                 // todo: find a way to use a more generic method (see: IsRunningInTheSimulator)
@@ -240,7 +240,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 #else
         [External]
 #endif
-        static void SetFocus_SimulatorOnly(dynamic domElementRef)
+        static void SetFocus_SimulatorOnly(object domElementRef)
         {
             ExecuteJavaScript(string.Format(@"var domElement = document.getElementByIdSafe(""{0}"");
                                         setTimeout(function() {{ 
@@ -594,12 +594,12 @@ element.remove({1});
         }
 
         // Note: "forceSimulatorExecuteImmediately" will disable the simulator optimization that consists in deferring the execution of the JavaScript code to a later time so as to group the JavaScript calls into a single call. Disabling deferral can be useful for example in the cases where we may read the value back immediately after setting it.
-        public static void SetDomElementProperty(dynamic domElementRef, string attributeName, object attributeValue, bool forceSimulatorExecuteImmediately = false)
+        public static void SetDomElementProperty(object domElementRef, string attributeName, object attributeValue, bool forceSimulatorExecuteImmediately = false)
         {
             if (IsRunningInJavaScript())
             {
                 //domElementRef.selectedIndex = attributeValue;
-                domElementRef[attributeName] = attributeValue; //todo-perfs: to improve performance on some browsers, we may want to declare the "INTERNAL_HtmlDomElementReference" as a "DynamicObject" and use the property assignment syntax everywhere in the solution instead of the "setAttribute" syntax. However in this case it may be more difficult to refact the code with the "Find All References" command.
+                ((dynamic)domElementRef)[attributeName] = attributeValue; //todo-perfs: to improve performance on some browsers, we may want to declare the "INTERNAL_HtmlDomElementReference" as a "DynamicObject" and use the property assignment syntax everywhere in the solution instead of the "setAttribute" syntax. However in this case it may be more difficult to refact the code with the "Find All References" command.
                 //domElementRef.setAttribute(attributeName, attributeValue); //todo-perfs: to improve performance on some browsers, we may want to declare the "INTERNAL_HtmlDomElementReference" as a "DynamicObject" and use the property assignment syntax everywhere in the solution instead of the "setAttribute" syntax. However in this case it may be more difficult to refact the code with the "Find All References" command.
             }
             else
@@ -617,12 +617,12 @@ element.remove({1});
         }
 
         // Note: "forceSimulatorExecuteImmediately" will disable the simulator optimization that consists in deferring the execution of the JavaScript code to a later time so as to group the JavaScript calls into a single call. Disabling deferral can be useful for example in the cases where we may read the value back immediately after setting it.
-        public static void SetDomElementAttribute(dynamic domElementRef, string attributeName, object attributeValue, bool forceSimulatorExecuteImmediately = false)
+        public static void SetDomElementAttribute(object domElementRef, string attributeName, object attributeValue, bool forceSimulatorExecuteImmediately = false)
         {
             if (IsRunningInJavaScript())
             {
                 //domElementRef[attributeName] = attributeValue; //todo-perfs: to improve performance on some browsers, we may want to declare the "INTERNAL_HtmlDomElementReference" as a "DynamicObject" and use the property assignment syntax everywhere in the solution instead of the "setAttribute" syntax. However in this case it may be more difficult to refact the code with the "Find All References" command.
-                domElementRef.setAttribute(attributeName, attributeValue); //todo-perfs: to improve performance on some browsers, we may want to declare the "INTERNAL_HtmlDomElementReference" as a "DynamicObject" and use the property assignment syntax everywhere in the solution instead of the "setAttribute" syntax. However in this case it may be more difficult to refact the code with the "Find All References" command.
+                ((dynamic)domElementRef).setAttribute(attributeName, attributeValue); //todo-perfs: to improve performance on some browsers, we may want to declare the "INTERNAL_HtmlDomElementReference" as a "DynamicObject" and use the property assignment syntax everywhere in the solution instead of the "setAttribute" syntax. However in this case it may be more difficult to refact the code with the "Find All References" command.
             }
             else
             {
@@ -640,7 +640,7 @@ element.remove({1});
         }
 
         // Note: "forceSimulatorExecuteImmediately" will disable the simulator optimization that consists in deferring the execution of the JavaScript code to a later time so as to group the JavaScript calls into a single call. Disabling deferral can be useful for example in the cases where we may read the value back immediately after setting it.
-        public static void SetDomElementStyleProperty(dynamic domElementRef, List<string> propertyCSSNames, object attributeValue, bool forceSimulatorExecuteImmediately = false)
+        public static void SetDomElementStyleProperty(object domElementRef, List<string> propertyCSSNames, object attributeValue, bool forceSimulatorExecuteImmediately = false)
         {
             //Note: the following implementation gives the same result as the following commented line but is more efficient. Since the style is often changed, we chose performance over simplicity on the implementation.
             //CSHTML5.Interop.ExecuteJavaScript("$0.style[$1] = $2;", domElementRef, propertyName, attributeValue);
@@ -650,7 +650,7 @@ element.remove({1});
             {
                 foreach (string propertyName in propertyCSSNames)
                 {
-                    domElementRef.style[propertyName] = attributeValue;
+                    ((dynamic)domElementRef).style[propertyName] = attributeValue;
                 }
             }
             else
@@ -698,11 +698,11 @@ element.remove({1});
 
 
         // Note: "forceSimulatorExecuteImmediately" will disable the simulator optimization that consists in deferring the execution of the JavaScript code to a later time so as to group the JavaScript calls into a single call. Disabling deferral can be useful for example in the cases where we may read the value back immediately after setting it.
-        public static void RemoveDomElementAttribute(dynamic domElementRef, string attributeName, bool forceSimulatorExecuteImmediately = false)
+        public static void RemoveDomElementAttribute(object domElementRef, string attributeName, bool forceSimulatorExecuteImmediately = false)
         {
             if (IsRunningInJavaScript())
             {
-                domElementRef.removeAttribute(attributeName); //todo-perfs: to improve performance on some browsers, we may want to declare the "INTERNAL_HtmlDomElementReference" as a "DynamicObject" and use the property assignment syntax everywhere in the solution instead of the "setAttribute" syntax. However in this case it may be more difficult to refact the code with the "Find All References" command.
+                ((dynamic)domElementRef).removeAttribute(attributeName); //todo-perfs: to improve performance on some browsers, we may want to declare the "INTERNAL_HtmlDomElementReference" as a "DynamicObject" and use the property assignment syntax everywhere in the solution instead of the "setAttribute" syntax. However in this case it may be more difficult to refact the code with the "Find All References" command.
             }
             else
             {
@@ -718,7 +718,7 @@ element.remove({1});
             }
         }
 
-        public static object GetDomElementAttribute(dynamic domElementRef, string attributeName)
+        public static object GetDomElementAttribute(object domElementRef, string attributeName)
         {
             return Interop.ExecuteJavaScript("$0[$1]", domElementRef, attributeName);
 
@@ -737,8 +737,7 @@ element.remove({1});
             //            }
         }
 
-        public static object CallDomMethod(dynamic domElementRef, string methodName, params object[] args)
-
+        public static object CallDomMethod(object domElementRef, string methodName, params object[] args)
         {
             if (IsRunningInJavaScript())
             {
