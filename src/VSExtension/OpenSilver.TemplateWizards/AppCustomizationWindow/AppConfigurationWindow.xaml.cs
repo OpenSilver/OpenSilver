@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace OpenSilver.TemplateConfiguration
+namespace OpenSilver.TemplateWizards.AppCustomizationWindow
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

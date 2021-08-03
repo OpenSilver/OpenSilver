@@ -1,4 +1,4 @@
-﻿namespace OpenSilver.TemplateConfiguration
+﻿namespace OpenSilver.TemplateWizards.AppCustomizationWindow
 {
     public enum BlazorVersion
     {
