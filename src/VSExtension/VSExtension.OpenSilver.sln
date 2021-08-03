@@ -1,17 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31515.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSilver.VSIX", "OpenSilver.VSIX\OpenSilver.VSIX.csproj", "{87A492A1-DF7F-411C-ABF8-33E0FA0F3522}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor", "DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor\DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor.csproj", "{756A216F-62A2-4277-8F48-D1CE0D5565AF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetForHtml5.VisualStudioExtension.ShellIntegration", "DotNetForHtml5.VisualStudioExtension.ShellIntegration\DotNetForHtml5.VisualStudioExtension.ShellIntegration.csproj", "{F97EBEAB-6CFF-4243-A6F2-C7C368CB6870}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetForHtml5.VisualStudioExtension.Editor.XamlDesigner", "DotNetForHtml5.VisualStudioExtension.Editor.XamlDesigner\DotNetForHtml5.VisualStudioExtension.Editor.XamlDesigner.csproj", "{239BBB6C-1322-411A-8D60-B86AD62AC466}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetForHtml5.MigrationWizard", "DotNetForHtml5.MigrationWizard\DotNetForHtml5.MigrationWizard.csproj", "{0813BD0B-E7B5-49AC-8C7C-28C880A50BD5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSilverApplicationTemplate", "OpenSilverApplicationTemplate\OpenSilverApplicationTemplate.csproj", "{ED7A89B5-CD09-4697-8CEA-69EC1546D1DF}"
 EndProject
@@ -35,22 +27,6 @@ Global
 		{87A492A1-DF7F-411C-ABF8-33E0FA0F3522}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87A492A1-DF7F-411C-ABF8-33E0FA0F3522}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87A492A1-DF7F-411C-ABF8-33E0FA0F3522}.Release|Any CPU.Build.0 = Release|Any CPU
-		{756A216F-62A2-4277-8F48-D1CE0D5565AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{756A216F-62A2-4277-8F48-D1CE0D5565AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{756A216F-62A2-4277-8F48-D1CE0D5565AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{756A216F-62A2-4277-8F48-D1CE0D5565AF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F97EBEAB-6CFF-4243-A6F2-C7C368CB6870}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F97EBEAB-6CFF-4243-A6F2-C7C368CB6870}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F97EBEAB-6CFF-4243-A6F2-C7C368CB6870}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F97EBEAB-6CFF-4243-A6F2-C7C368CB6870}.Release|Any CPU.Build.0 = Release|Any CPU
-		{239BBB6C-1322-411A-8D60-B86AD62AC466}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{239BBB6C-1322-411A-8D60-B86AD62AC466}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{239BBB6C-1322-411A-8D60-B86AD62AC466}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{239BBB6C-1322-411A-8D60-B86AD62AC466}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0813BD0B-E7B5-49AC-8C7C-28C880A50BD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0813BD0B-E7B5-49AC-8C7C-28C880A50BD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0813BD0B-E7B5-49AC-8C7C-28C880A50BD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0813BD0B-E7B5-49AC-8C7C-28C880A50BD5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ED7A89B5-CD09-4697-8CEA-69EC1546D1DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ED7A89B5-CD09-4697-8CEA-69EC1546D1DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED7A89B5-CD09-4697-8CEA-69EC1546D1DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
