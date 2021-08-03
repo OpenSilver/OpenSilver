@@ -76,14 +76,18 @@ namespace Windows.UI.Xaml.Controls
             return new UIElementCollection(this, logicalParent);
         }
 
-#if REVAMPPOINTEREVENTS
-        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        internal override bool EnablePointerEventsCore
         {
-            // We only check the Background property even if BorderBrush not null + BorderThickness > 0 is a sufficient condition to enable pointer events on the borders of the control.
-            // There is no way right now to differentiate the Background and BorderBrush as they are both defined on the same DOM element.
-            return Background != null;
+            get
+            {
+                // We only check the Background property even if BorderBrush not null
+                // and BorderThickness > 0 is a sufficient condition to enable pointer
+                // events on the borders of the control.
+                // There is no way right now to differentiate the Background and BorderBrush
+                // as they are both defined on the same DOM element.
+                return this.Background != null;
+            }
         }
-#endif
 
         private UIElementCollection _children;
 
@@ -181,34 +185,30 @@ namespace Windows.UI.Xaml.Controls
             get { return (Brush)GetValue(BackgroundProperty); }
             set { SetValue(BackgroundProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the Background dependency property.
+        /// Identifies the <see cref="Panel.Background"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BackgroundProperty =
-            DependencyProperty.Register("Background", typeof(Brush), typeof(Panel), new PropertyMetadata(null
-#if REVAMPPOINTEREVENTS
-                , Background_Changed
-#endif
-                )
-            {
-                GetCSSEquivalent = (instance) =>
+            DependencyProperty.Register(
+                nameof(Background), 
+                typeof(Brush), 
+                typeof(Panel), 
+                new PropertyMetadata((object)null)
                 {
-                    return new CSSEquivalent()
+                    GetCSSEquivalent = (instance) =>
                     {
-                        Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
-                    };
-                },
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            }
-            );
-
-#if REVAMPPOINTEREVENTS
-        private static void Background_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            UIElement element = (UIElement)d;
-            INTERNAL_UpdateCssPointerEvents(element);
-        }
-#endif
+                        return new CSSEquivalent()
+                        {
+                            Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
+                        };
+                    },
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        UIElement.SetPointerEvents((Panel)d);
+                    },
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                });
 
         /// <summary>
         /// Gets the collection of child elements of the panel.

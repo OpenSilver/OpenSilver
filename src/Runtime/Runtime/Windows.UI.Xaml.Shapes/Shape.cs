@@ -108,18 +108,20 @@ namespace Windows.UI.Xaml.Shapes
         /// </summary>
         public static readonly DependencyProperty FillProperty =
             DependencyProperty.Register(
-                nameof(Fill), 
-                typeof(Brush), 
-                typeof(Shape), 
-                new PropertyMetadata(null, Fill_Changed));
+                nameof(Fill),
+                typeof(Brush),
+                typeof(Shape),
+                new PropertyMetadata(null, Fill_Changed)
+                {
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        UIElement.SetPointerEvents((Shape)d);
+                    },
+                });
 
         private static void Fill_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var shape = (Shape)d;
-#if REVAMPPOINTEREVENTS
-            INTERNAL_UpdateCssPointerEvents(shape);
-#endif
-            shape.ScheduleRedraw();
+            ((Shape)d).ScheduleRedraw();
         }
 
         /// <summary>
@@ -449,12 +451,10 @@ namespace Windows.UI.Xaml.Shapes
 
         #region Internal API
 
-#if REVAMPPOINTEREVENTS
-        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        internal override bool EnablePointerEventsCore
         {
-            return Fill != null;
+            get { return this.Fill != null; }
         }
-#endif
 
         internal virtual void RefreshOverride()
         {

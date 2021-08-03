@@ -555,9 +555,6 @@ namespace Windows.UI.Xaml
             // Set the CSS to make the DOM element visible/collapsed:
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
             {
-#if REVAMPPOINTEREVENTS
-                INTERNAL_UpdateCssPointerEvents(uiElement);
-#endif
                 // Get a reference to the most outer DOM element to show/hide:
                 object mostOuterDomElement = null;
                 if (uiElement.INTERNAL_VisualParent is UIElement)
@@ -731,26 +728,16 @@ namespace Windows.UI.Xaml
                 typeof(UIElement),
                 new PropertyMetadata(true, OnIsHitTestVisiblePropertyChanged, CoerceIsHitTestVisibleProperty)
                 {
-                    MethodToUpdateDom = IsHitTestVisible_MethodToUpdateDom,
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        SetPointerEvents((UIElement)d);
+                    },
                 });
 
         private static void OnIsHitTestVisiblePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             // Invalidate the children so that they will inherit the new value.
             ((UIElement)d).InvalidateForceInheritPropertyOnChildren(e.Property);
-        }
-
-        private static void IsHitTestVisible_MethodToUpdateDom(DependencyObject d, object newValue)
-        {
-            UIElement element = (UIElement)d;
-#if REVAMPPOINTEREVENTS
-            INTERNAL_UpdateCssPointerEvents(element);
-#else
-            INTERNAL_UpdateCssPointerEventsPropertyBasedOnIsHitTestVisibleAndIsEnabled(element,
-               isHitTestVisible: (bool)newValue,
-               isEnabled: element is FrameworkElement ? ((FrameworkElement)element).IsEnabled : true);
-#endif
-
         }
 
         private static object CoerceIsHitTestVisibleProperty(DependencyObject d, object baseValue)
@@ -783,53 +770,46 @@ namespace Windows.UI.Xaml
             }
         }
 
-#if REVAMPPOINTEREVENTS
-        internal bool INTERNAL_ArePointerEventsEnabled
+        #endregion
+
+        #region pointer-events
+
+        internal static bool EnablePointerEventsBase(UIElement uie)
+        {
+            return (bool)uie.GetValue(FrameworkElement.IsEnabledProperty) &&
+                   uie.IsHitTestVisible;
+        }
+
+        /// <summary>
+        /// Fetches the value that pointer-events (css) should be coerced to.
+        /// </summary>
+        internal virtual bool EnablePointerEventsCore
         {
             get
             {
-                return INTERNAL_ManagePointerEventsAvailability();
+                return false;
             }
         }
 
-        internal virtual bool INTERNAL_ManagePointerEventsAvailability()
+        internal bool EnablePointerEvents
         {
-            return false;
+            get
+            {
+                return this.EnablePointerEventsCore &&
+                       EnablePointerEventsBase(this);
+            }
         }
-#endif
 
-#endregion
+        #endregion pointer-events
 
-#if REVAMPPOINTEREVENTS
-        internal static void INTERNAL_UpdateCssPointerEvents(UIElement element)
+        internal static void SetPointerEvents(UIElement element)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
                 var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
-                style.pointerEvents = element.INTERNAL_ArePointerEventsEnabled ? "auto" : "none";
+                style.pointerEvents = element.EnablePointerEvents ? "auto" : "none";
             }
         }
-#else
-
-        internal static void INTERNAL_UpdateCssPointerEventsPropertyBasedOnIsHitTestVisibleAndIsEnabled(UIElement element, bool isHitTestVisible, bool isEnabled)
-        {
-            //todo: at the moment, the "IsEnabled" property is implemented with the CSS property "PointerEvents=none" (just like "IsHitTestVisible"). However, this is not good because "PointerEvents=none" makes the element transparent to click, meaning that the user's click will go to the element that is under it. Instead, the click event should be "absorbed" and lost (or bubbled up? but not go behind).
-
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
-            {
-                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
-                if (isHitTestVisible && isEnabled)
-                {
-                    style.pointerEvents = "auto";
-                }
-                else
-                {
-                    style.pointerEvents = "none";
-                }
-            }
-        }
-#endif
-
 
         internal bool INTERNAL_IsChildOf(UIElement element)
         {

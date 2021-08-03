@@ -254,21 +254,6 @@ namespace Windows.UI.Xaml
             }
         }
 
-#if REVAMPPOINTEREVENTS
-        internal virtual bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
-        {
-            return false;
-        }
-
-        internal sealed override bool INTERNAL_ManagePointerEventsAvailability()
-        {
-            return INTERNAL_ManageFrameworkElementPointerEventsAvailability()
-                && Visibility == Visibility.Visible
-                && IsEnabled  //todo: at the moment, the "IsEnabled" property is implemented with the CSS property "PointerEvents=none" (just like "IsHitTestVisible"). However, this is not good because "PointerEvents=none" makes the element transparent to click, meaning that the user's click will go to the element that is under it. Instead, the click event should be "absorbed" and lost (or bubbled up? but not go behind).
-                && IsHitTestVisible;
-        }
-#endif
-
 #region Resources
 
         /// <summary>
@@ -681,14 +666,8 @@ namespace Windows.UI.Xaml
 
         private static void IsEnabled_MethodToUpdateDom(DependencyObject d, object newValue)
         {
-            FrameworkElement element = (FrameworkElement)d;
-#if REVAMPPOINTEREVENTS
-            UIElement.INTERNAL_UpdateCssPointerEvents(element);
-#else
-            INTERNAL_UpdateCssPointerEventsPropertyBasedOnIsHitTestVisibleAndIsEnabled(element,
-                isHitTestVisible: element.IsHitTestVisible,
-                isEnabled: (bool)newValue);
-#endif
+            var element = (FrameworkElement)d;
+            SetPointerEvents(element);
             element.ManageIsEnabled(newValue != null ? (bool)newValue : true);
         }
 

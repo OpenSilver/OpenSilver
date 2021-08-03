@@ -39,12 +39,10 @@ namespace CSHTML5.Native.Html.Controls
         private object _jsDiv;
         private string _htmlContent;
 
-#if REVAMPPOINTEREVENTS
-        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        internal override bool EnablePointerEventsCore
         {
-            return true;
+            get { return true; }
         }
-#endif
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
