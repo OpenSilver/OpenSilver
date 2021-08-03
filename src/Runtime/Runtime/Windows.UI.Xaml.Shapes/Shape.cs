@@ -54,7 +54,7 @@ namespace Windows.UI.Xaml.Shapes
 
         private bool _redrawWhenBecomeVisible = true;
 
-        private bool _suspendRendering = false;
+        internal bool _suspendRendering = false;
 
         #endregion
 
