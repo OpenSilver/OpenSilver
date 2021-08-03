@@ -30,7 +30,7 @@ namespace CSHTML5.Native.Html.Controls
     {
         #region Data
 
-        private dynamic _nativeComboBoxDomElement;
+        private object _nativeComboBoxDomElement;
         private HtmlEventProxy _changeEventProxy;
         private bool _changingSelectionProgrammatically;
         private bool _changingSelectionInHtml;
