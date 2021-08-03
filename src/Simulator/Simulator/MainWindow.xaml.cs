@@ -161,7 +161,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             context.NetworkService.NetworkDelegate = new ResourceInterceptor("http://cshtml5-simulator/");
             Browser browser = BrowserFactory.Create(context, BrowserType.LIGHTWEIGHT);
             MainWebBrowser = new WPFBrowserView(browser);
-            CookiesHelper.SetCustomCookies(MainWebBrowser);
+            CookiesHelper.SetCustomCookies(MainWebBrowser, SimulatorLauncher.LaunchParameters?.CookiesData);
             MainWebBrowser.Width = 150;
             MainWebBrowser.Height = 200;
             MainWebBrowser.SizeChanged += MainWebBrowser_SizeChanged;

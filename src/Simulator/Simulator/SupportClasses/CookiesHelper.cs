@@ -83,12 +83,12 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             }
         }
 
-        public static void SetCustomCookies(WPFBrowserView wpfBrowserView)
+        public static void SetCustomCookies(WPFBrowserView wpfBrowserView, IList<CookieData> cookies)
         {
-            if (SimulatorLauncher.CookiesData == null)
+            if (cookies == null)
                 return;
 
-            foreach (CookieData data in SimulatorLauncher.CookiesData)
+            foreach (CookieData data in cookies)
             {
                 if (data.session)
                 {
