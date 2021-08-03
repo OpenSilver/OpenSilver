@@ -106,7 +106,7 @@
               </VisualStateGroup>
             </VisualStateManager.VisualStateGroups>
             <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2">
-              <ScrollViewer x:Name="ScrollViewer" BorderBrush="Transparent" BorderThickness="0" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+              <ScrollViewer x:Name="ScrollViewer" BorderBrush="Transparent" BorderThickness="0" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
                 <ItemsPresenter/>
               </ScrollViewer>
             </Border>
