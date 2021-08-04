@@ -72,7 +72,7 @@ namespace Windows.UI.Xaml
         internal object INTERNAL_RootDomElement;
 
         /// <summary>
-        /// Set the DOM element that will host the window. This can be set only to new windows. The MainWindow looks for a DIV that has the ID "cshtml5-root".
+        /// Set the DOM element that will host the window. This can be set only to new windows. The MainWindow looks for a DIV that has the ID "cshtml5-root" or "opensilver-root".
         /// </summary>
         /// <param name="rootDomElement">The DOM element that will host the window</param>
         public void AttachToDomElement(object rootDomElement)
