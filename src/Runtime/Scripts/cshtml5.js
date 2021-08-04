@@ -120,6 +120,10 @@ document.onkeyup = function (evt) {
     document.refreshKeyModifiers(evt);
 };
 
+document.isRunningOpenSilver = false;
+document.isRunningInTheSimulator = false;
+document.jsCallBackFunctionsReference = new Array();
+
 document.jsSimulatorObjectReferences = new Array();
 document.callbackCounterForSimulator = 0;
 
@@ -255,15 +259,26 @@ document.addEventListenerSafe = function (element, method, func) {
 	}
 }
 
+document.getCallbackFunc = function (callbackId) {
+	if (document.jsCallBackFunctionsReference[callbackId] === undefined) {
+		document.jsCallBackFunctionsReference[callbackId] = function() {
+			document.eventCallback(callbackId, 
+                (document.isRunningOpenSilver == false || document.isRunningInTheSimulator == false) ? Array.prototype.slice.call(arguments) : arguments);
+		}
+	}
+
+	return document.jsCallBackFunctionsReference[callbackId];
+}
+
 document.eventCallback = function (callbackId, arguments) {
 	const argsArray = arguments;
 	const idWhereCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
 	document.jsSimulatorObjectReferences[idWhereCallbackArgsAreStored] = argsArray;
 	setTimeout(
 		function() 
-		{{
+		{
 		   window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray);
-		}}
+		}
 		, 1);
 }
 

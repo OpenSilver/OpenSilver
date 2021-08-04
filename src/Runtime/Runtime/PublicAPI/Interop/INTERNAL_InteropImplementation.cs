@@ -47,6 +47,18 @@ namespace CSHTML5
             };
         }
 
+        private static int GetCallbackId(Delegate callback)
+        {
+            int callbackId = CallbacksDictionary.FirstOrDefault(x => x.Value == callback).Key;
+            if (callbackId == 0)
+            {
+                // Add the callback to the document:
+                callbackId = ReferenceIDGenerator.GenerateId();
+                CallbacksDictionary.Add(callbackId, callback);
+            }
+            return callbackId;
+        }
+
 #if BRIDGE
         [Bridge.Template("null")]
 #endif
@@ -146,19 +158,10 @@ namespace CSHTML5
 
                     Delegate callback = (Delegate)variable;
 
-                    // Add the callback to the document:
-                    int callbackId = ReferenceIDGenerator.GenerateId();
-                    CallbacksDictionary.Add(callbackId, callback);
+                    int callbackId = GetCallbackId(callback);
 
                     // Change the JS code to point to that callback:
-                    javascript = javascript.Replace("$" + i.ToString(), string.Format(
-                                       @"(function() {{ document.eventCallback({0}, {1});}})", callbackId,
-#if OPENSILVER
-                                       Interop.IsRunningInTheSimulator_WorkAround ? "arguments" : "Array.prototype.slice.call(arguments)"
-#elif BRIDGE
-                                       "Array.prototype.slice.call(arguments)"
-#endif
-                                       ));
+                    javascript = javascript.Replace("$" + i.ToString(), $"document.getCallbackFunc({callbackId})");
 
                     // Note: generating the random number in JS rather than C# is important in order
                     // to be able to put this code inside a JavaScript "for" statement (cf.
