@@ -179,11 +179,11 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             Browser browser = BrowserFactory.Create(context, BrowserType.LIGHTWEIGHT);
             MainWebBrowser = new WPFBrowserView(browser);
 
-            CookiesHelper.SetCustomCookies(MainWebBrowser, simulatorLaunchParameters?.CookiesData);
             MainWebBrowser.Width = 150;
             MainWebBrowser.Height = 200;
             MainWebBrowser.SizeChanged += MainWebBrowser_SizeChanged;
 #if OPENSILVER
+            CookiesHelper.SetCustomCookies(MainWebBrowser, simulatorLaunchParameters?.CookiesData);
             simulatorLaunchParameters?.BrowserCreatedCallback?.Invoke(MainWebBrowser);
 #endif
 
