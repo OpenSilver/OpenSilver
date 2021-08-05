@@ -254,21 +254,6 @@ namespace Windows.UI.Xaml
             }
         }
 
-#if REVAMPPOINTEREVENTS
-        internal virtual bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
-        {
-            return false;
-        }
-
-        internal sealed override bool INTERNAL_ManagePointerEventsAvailability()
-        {
-            return INTERNAL_ManageFrameworkElementPointerEventsAvailability()
-                && Visibility == Visibility.Visible
-                && IsEnabled  //todo: at the moment, the "IsEnabled" property is implemented with the CSS property "PointerEvents=none" (just like "IsHitTestVisible"). However, this is not good because "PointerEvents=none" makes the element transparent to click, meaning that the user's click will go to the element that is under it. Instead, the click event should be "absorbed" and lost (or bubbled up? but not go behind).
-                && IsHitTestVisible;
-        }
-#endif
-
 #region Resources
 
         /// <summary>
@@ -579,9 +564,28 @@ namespace Windows.UI.Xaml
             styleOfOuterDomElement.cursor = ((Cursor)newValue)?.ToHtmlString() ?? "inherit";
         }
 
-#endregion
+        #endregion
 
-#region IsEnabled
+        #region IsEnabled
+
+        /// <summary>
+        ///     Fetches the value that IsEnabled should be coerced to.
+        /// </summary>
+        /// <remarks>
+        ///     This method is virtual is so that controls derived from UIElement
+        ///     can combine additional requirements into the coersion logic.
+        ///     <P/>
+        ///     It is important for anyone overriding this property to also
+        ///     call CoerceValue when any of their dependencies change.
+        /// </remarks>
+        internal virtual bool IsEnabledCore
+        {
+            get
+            {
+                // ButtonBase.IsEnabledCore: CanExecute
+                return true;
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the user can interact with the control.
@@ -601,7 +605,7 @@ namespace Windows.UI.Xaml
                 nameof(IsEnabled),
                 typeof(bool),
                 typeof(FrameworkElement),
-                new PropertyMetadata(true, IsEnabled_Changed, CoerceIsEnabledProperty)
+                new PropertyMetadata(true, IsEnabled_Changed, CoerceIsEnabled)
                 {
                     MethodToUpdateDom = IsEnabled_MethodToUpdateDom,
                 });
@@ -616,7 +620,7 @@ namespace Windows.UI.Xaml
             fe.InvalidateForceInheritPropertyOnChildren(e.Property);
         }
 
-        private static object CoerceIsEnabledProperty(DependencyObject d, object baseValue)
+        private static object CoerceIsEnabled(DependencyObject d, object baseValue)
         {
             FrameworkElement fe = (FrameworkElement)d;
 
@@ -642,7 +646,7 @@ namespace Windows.UI.Xaml
                 DependencyObject parent = fe.Parent ?? VisualTreeHelper.GetParent(fe);
                 if (parent == null || (bool)parent.GetValue(IsEnabledProperty))
                 {
-                    return true;
+                    return fe.IsEnabledCore;
                 }
                 else
                 {
@@ -662,14 +666,8 @@ namespace Windows.UI.Xaml
 
         private static void IsEnabled_MethodToUpdateDom(DependencyObject d, object newValue)
         {
-            FrameworkElement element = (FrameworkElement)d;
-#if REVAMPPOINTEREVENTS
-            UIElement.INTERNAL_UpdateCssPointerEvents(element);
-#else
-            INTERNAL_UpdateCssPointerEventsPropertyBasedOnIsHitTestVisibleAndIsEnabled(element,
-                isHitTestVisible: element.IsHitTestVisible,
-                isEnabled: (bool)newValue);
-#endif
+            var element = (FrameworkElement)d;
+            SetPointerEvents(element);
             element.ManageIsEnabled(newValue != null ? (bool)newValue : true);
         }
 

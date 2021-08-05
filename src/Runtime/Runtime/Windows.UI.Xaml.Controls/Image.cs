@@ -59,7 +59,7 @@ namespace Windows.UI.Xaml.Controls
     public sealed partial class Image : FrameworkElement
     {
         private const string TransparentGifOnePixel = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-        dynamic _imageDiv = null;
+        object _imageDiv = null;
         double imgWidth = 0; //might be useless, might be useful.
         double imgHeight = 0;
 

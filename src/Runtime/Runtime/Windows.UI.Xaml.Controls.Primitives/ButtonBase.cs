@@ -75,21 +75,42 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <summary>
+        ///     Fetches the value of the IsEnabled property
+        /// </summary>
+        /// <remarks>
+        ///     The reason this property is overridden is so that Button
+        ///     can infuse the value for CanExecute into it.
+        /// </remarks>
+        internal override bool IsEnabledCore
+        {
+            get
+            {
+                return base.IsEnabledCore && CanExecute;
+            }
+        }
+
+        #region Command, CommandParameter Properties
+
+        /// <summary>
         /// Gets or sets the parameter to pass to the <see cref="Command"/> property.
         /// </summary>
         public object CommandParameter
         {
-            get { return (object)GetValue(CommandParameterProperty); }
+            get { return GetValue(CommandParameterProperty); }
             set { SetValue(CommandParameterProperty, value); }
         }
 
         /// <summary>
-        /// Identifies the CommandParameter dependency property.
+        /// Identifies the <see cref="ButtonBase.CommandParameter"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty CommandParameterProperty =
-            DependencyProperty.Register("CommandParameter", typeof(object), typeof(ButtonBase), new PropertyMetadata(null));
+            DependencyProperty.Register(
+                nameof(CommandParameter),
+                typeof(object),
+                typeof(ButtonBase),
+                new PropertyMetadata(null));
 
-        
         /// <summary>
         /// Gets or sets the command to invoke when this button is pressed. 
         /// </summary>
@@ -100,39 +121,90 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <summary>
-        /// Identifies the Command dependency property.
+        /// Identifies the <see cref="ButtonBase.Command"/> dependency 
+        /// property.
         /// </summary>
         public static readonly DependencyProperty CommandProperty =
-            DependencyProperty.Register("Command", typeof(ICommand), typeof(ButtonBase), new PropertyMetadata(null, Command_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(Command),
+                typeof(ICommand),
+                typeof(ButtonBase),
+                new PropertyMetadata(null, OnCommandChanged));
 
-        static void Command_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ButtonBase buttonBase = (ButtonBase)d;
-            if (e.OldValue != null && e.NewValue == null)
-            {
-                buttonBase.Click -= ExecuteCommand;
-            }
-            if (e.OldValue == null && e.NewValue != null)
-            {
-                buttonBase.Click += ExecuteCommand;
-            }
+            ButtonBase b = (ButtonBase)d;
+            b.OnCommandChanged((ICommand)e.OldValue, (ICommand)e.NewValue);
+        }
 
-            // Set IsEnabled value depending on CanExecute
-            if (buttonBase.Command != null)
+        private void OnCommandChanged(ICommand oldCommand, ICommand newCommand)
+        {
+            if (oldCommand != null)
             {
-                buttonBase.SetCurrentValue(IsEnabledProperty, buttonBase.IsEnabled && buttonBase.Command.CanExecute(buttonBase.CommandParameter));
+                UnhookCommand(oldCommand);
+            }
+            if (newCommand != null)
+            {
+                HookCommand(newCommand);
             }
         }
 
-        static void ExecuteCommand(object sender, RoutedEventArgs e)
+        private void UnhookCommand(ICommand command)
         {
-            ButtonBase buttonBase = (ButtonBase)sender;
-            if (buttonBase.Command.CanExecute(buttonBase.CommandParameter))
+            command.CanExecuteChanged -= new EventHandler(OnCanExecuteChanged);
+            UpdateCanExecute();
+        }
+
+        private void HookCommand(ICommand command)
+        {
+            command.CanExecuteChanged += new EventHandler(OnCanExecuteChanged);
+            UpdateCanExecute();
+        }
+
+        private void OnCanExecuteChanged(object sender, EventArgs e)
+        {
+            UpdateCanExecute();
+        }
+
+        private void UpdateCanExecute()
+        {
+            if (Command != null)
             {
-                buttonBase.Command.Execute(buttonBase.CommandParameter);
+                CanExecute = Command.CanExecute(CommandParameter);
+            }
+            else
+            {
+                CanExecute = true;
             }
         }
+
+        private void ExecuteCommand()
+        {
+            if (Command != null)
+            {
+                if (Command.CanExecute(CommandParameter))
+                {
+                    Command.Execute(CommandParameter);
+                }
+            }
+        }
+
+        private bool CanExecute
+        {
+            get { return !CommandDisabled; }
+            set
+            {
+                if (value != CanExecute)
+                {
+                    CommandDisabled = !value;
+                    CoerceValue(IsEnabledProperty);
+                }
+            }
+        }
+
+        private bool CommandDisabled;
+
+        #endregion Command, CommandParameter Properties
 
         #region Click event
 
@@ -153,10 +225,17 @@ namespace Windows.UI.Xaml.Controls.Primitives
         protected virtual void OnClick()
         {
             if (Click != null)
+            {
                 Click(this, new RoutedEventArgs()
                 {
-                    OriginalSource = this //todo: the OriginalSource should not aways be the button itself: if the button contains inner elements, it is supposed to be the inner element on which the user has clicked.
+                    // todo: the OriginalSource should not aways be the button itself: if the button
+                    // contains inner elements, it is supposed to be the inner element on which the
+                    // user has clicked.
+                    OriginalSource = this 
                 });
+            }
+
+            ExecuteCommand();
         }
 
 #if MIGRATION

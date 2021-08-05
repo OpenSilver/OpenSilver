@@ -184,7 +184,7 @@ document.setGridCollapsedDuetoHiddenColumn = function (id) {
 
 document.setDisplayTableCell = function (id) {
     const element = document.getElementById(id);
-    if (!element || element.tagName != 'SPAN')
+    if (!element || element.tagName == 'SPAN')
         return;
 
     element.style.display = 'table-cell';

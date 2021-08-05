@@ -1,6 +1,6 @@
 ﻿using EnvDTE;
 using Microsoft.VisualStudio.TemplateWizard;
-using OpenSilver.TemplateConfiguration;
+using OpenSilver.TemplateWizards.AppCustomizationWindow;
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;

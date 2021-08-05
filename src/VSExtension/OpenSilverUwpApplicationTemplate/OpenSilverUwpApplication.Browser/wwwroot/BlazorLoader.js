@@ -1,9 +1,4 @@
-﻿function onResourceLoaded(resourceIndex, totalResources)
-{
-    document.getElementById("silverlight-loading-percentage").innerHTML = Math.round((resourceIndex / totalResources) * 100) + "%";
-}
-
-var i = 0;
+﻿var i = 0;
 var allResourcesBeingLoaded = [];
 Blazor.start({ // start manually with loadBootResource
     loadBootResource: function (type, name, defaultUri, integrity) {
@@ -21,7 +16,9 @@ Blazor.start({ // start manually with loadBootResource
         fetchResources.then((r) => {
             i++;
             var total = allResourcesBeingLoaded.length;
-            onResourceLoaded(i, total);
+            if (typeof onResourceLoaded === "function") {
+                onResourceLoaded(i, total);
+            }
         });
         return fetchResources;
     }

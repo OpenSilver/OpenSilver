@@ -1,5 +1,6 @@
 ﻿using DotNetForHtml5.EmulatorWithoutJavascript;
 using System;
+using System.Collections.Generic;
 
 #if OPENSILVER
 namespace OpenSilver.Simulator

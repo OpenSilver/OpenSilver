@@ -436,7 +436,8 @@ namespace DotNetForHtml5.Compiler
                     {
                         subAttributeValue = subAttributeValue.Trim('\'');
                         subAttributeValue = UnescapeString(subAttributeValue);
-                        if (subAttributeValue.StartsWith("{"))
+                        if (subAttributeValue.StartsWith("{") && 
+                            !subAttributeValue.StartsWith("{}"))
                         {
                             subAttributeValue = "{}" + subAttributeValue;
                         }

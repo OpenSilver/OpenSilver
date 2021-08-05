@@ -42,12 +42,10 @@ namespace Windows.UI.Xaml.Controls
         object _iFrame;
         string _htmlString;
 
-#if REVAMPPOINTEREVENTS
-        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        internal override bool EnablePointerEventsCore
         {
-            return true;
+            get { return true; }
         }
-#endif
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {

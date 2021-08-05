@@ -45,8 +45,8 @@
     <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/DotNetBrowser.dll" target="tools/simulator/DotNetBrowser.dll" />
     <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/MahApps.Metro.dll" target="tools/simulator/MahApps.Metro.dll" />
     <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/System.Windows.Interactivity.dll" target="tools/simulator/System.Windows.Interactivity.dll" />
-    <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/simulator_root.html" target="tools/simulator/simulator_root.html" />
-    <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/interop_debug_root.html" target="tools/simulator/interop_debug_root.html" />
+    <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/simulator_root_cshtml5.html" target="tools/simulator/simulator_root.html" />
+    <file src="../../src/Simulator/Simulator/bin/CSHTML5/$Configuration$/interop_debug_root_cshtml5.html" target="tools/simulator/interop_debug_root.html" />
     <file src="../../src/Simulator/LocalServer/bin/CSHTML5/$Configuration$/CSharpXamlForHtml5.LocalServer.exe" target="tools/simulator/CSharpXamlForHtml5.LocalServer.exe" />
     <file src="../../src/Simulator/LocalServer/bin/CSHTML5/$Configuration$/Microsoft.Web.Administration.dll" target="tools/simulator/Microsoft.Web.Administration.dll" />
     <file src="../../src/Simulator/LocalServer/bin/CSHTML5/$Configuration$/Install_IIS.bat" target="tools/simulator/Install_IIS.bat" />

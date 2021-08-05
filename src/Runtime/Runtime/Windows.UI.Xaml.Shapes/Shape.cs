@@ -54,6 +54,8 @@ namespace Windows.UI.Xaml.Shapes
 
         private bool _redrawWhenBecomeVisible = true;
 
+        internal bool _suspendRendering = false;
+
         #endregion
 
         #region Constructor
@@ -106,18 +108,20 @@ namespace Windows.UI.Xaml.Shapes
         /// </summary>
         public static readonly DependencyProperty FillProperty =
             DependencyProperty.Register(
-                nameof(Fill), 
-                typeof(Brush), 
-                typeof(Shape), 
-                new PropertyMetadata(null, Fill_Changed));
+                nameof(Fill),
+                typeof(Brush),
+                typeof(Shape),
+                new PropertyMetadata(null, Fill_Changed)
+                {
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        UIElement.SetPointerEvents((Shape)d);
+                    },
+                });
 
         private static void Fill_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var shape = (Shape)d;
-#if REVAMPPOINTEREVENTS
-            INTERNAL_UpdateCssPointerEvents(shape);
-#endif
-            shape.ScheduleRedraw();
+            ((Shape)d).ScheduleRedraw();
         }
 
         /// <summary>
@@ -336,7 +340,9 @@ namespace Windows.UI.Xaml.Shapes
                 if (collection == null)
                 {
                     collection = new DoubleCollection();
+                    _suspendRendering = true;
                     SetValue(StrokeDashArrayProperty, collection);
+                    _suspendRendering = false;
                 }
                 return collection;
             }
@@ -445,12 +451,10 @@ namespace Windows.UI.Xaml.Shapes
 
         #region Internal API
 
-#if REVAMPPOINTEREVENTS
-        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        internal override bool EnablePointerEventsCore
         {
-            return Fill != null;
+            get { return this.Fill != null; }
         }
-#endif
 
         internal virtual void RefreshOverride()
         {
@@ -462,6 +466,9 @@ namespace Windows.UI.Xaml.Shapes
         /// </summary>
         internal void ScheduleRedraw()
         {
+            if (_suspendRendering)
+                return;
+
             if (!_redrawPending) // This ensures that the "BeginInvoke" method is only called once, and it is not called again until its delegate has been executed.
             {
                 if (_isLoaded)
@@ -630,6 +637,7 @@ namespace Windows.UI.Xaml.Shapes
             // FillStyle:
             double opacity = shape.Fill == null ? 1 : shape.Fill.Opacity;
             object fillValue = GetHtmlBrush(shape, 
+                                            context, 
                                             shape.Fill, 
                                             opacity, 
                                             minX, 
@@ -664,6 +672,7 @@ namespace Windows.UI.Xaml.Shapes
             //stroke
             opacity = shape.Stroke == null ? 1 : shape.Stroke.Opacity;
             object strokeValue = GetHtmlBrush(shape, 
+                                              context, 
                                               shape.Stroke, 
                                               opacity, 
                                               minX, 
@@ -723,6 +732,7 @@ namespace Windows.UI.Xaml.Shapes
         }
 
         internal static object GetHtmlBrush(Shape shape, 
+                                            object context, 
                                             Brush brush, 
                                             double opacity, 
                                             double minX, 
@@ -735,10 +745,6 @@ namespace Windows.UI.Xaml.Shapes
                                             double yOffsetToApplyBeforeMultiplication, 
                                             Size shapeActualSize)
         {
-            // Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need 
-            // to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
-            object context = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", shape._canvasDomElement);
-
             object returnValue = null;
             // todo: make sure we want the same behaviour when it is null and when it is a SolidColorBrush 
             // (basically, check if null means default value)

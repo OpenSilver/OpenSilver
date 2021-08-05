@@ -34,8 +34,8 @@
     <file src="../src/Targets/OpenSilver.Simulator.targets" target="build/OpenSilver.Simulator.targets" />
 
     <!-- OpenSilver HTML files -->
-    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/simulator_root.html" target="contentFiles/any/net45" />
-    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/interop_debug_root.html" target="contentFiles/any/net45" />
+    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/simulator_root_opensilver.html" target="contentFiles/any/net45/simulator_root.html" />
+    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/interop_debug_root_opensilver.html" target="contentFiles/any/net45/interop_debug_root.html" />
 
     <!-- OpenSilver compiler -->
     <file src="../src/Compiler/Compiler/bin/OpenSilver/SL/OpenSilver.Compiler.dll" target="tools/OpenSilver.Compiler.dll" />

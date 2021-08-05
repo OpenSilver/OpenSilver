@@ -82,16 +82,20 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private UIElement _child;
-
-#if REVAMPPOINTEREVENTS
-        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        internal override bool EnablePointerEventsCore
         {
-            // We only check the Background property even if BorderBrush not null + BorderThickness > 0 is a sufficient condition to enable pointer events on the borders of the control.
-            // There is no way right now to differentiate the Background and BorderBrush as they are both defined on the same DOM element.
-            return Background != null;
+            // We only check the Background property even if BorderBrush not null
+            // and BorderThickness > 0 is a sufficient condition to enable pointer
+            // events on the borders of the control.
+            // There is no way right now to differentiate the Background and BorderBrush
+            // as they are both defined on the same DOM element.
+            get
+            {
+                return this.Background != null;
+            }
         }
-#endif
+
+        private UIElement _child;
 
         /// <summary>
         /// Gets or sets the child element to draw the border around.
@@ -164,21 +168,17 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Background), 
                 typeof(Brush), 
                 typeof(Border), 
-                new PropertyMetadata(null, Background_Changed)
+                new PropertyMetadata((object)null)
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
                         Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
-                    }
+                    },
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        UIElement.SetPointerEvents((Border)d);
+                    },
                 });
-
-        private static void Background_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-#if REVAMPPOINTEREVENTS
-            UIElement element = (UIElement)d;
-            INTERNAL_UpdateCssPointerEvents(element);
-#endif
-        }
 
         /// <summary>
         /// Gets or sets a brush that describes the border background of a control.

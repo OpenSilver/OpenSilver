@@ -93,11 +93,7 @@ namespace Windows.UI.Xaml.Controls
                 this._contentEditableDiv != null)
             {
                 INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this._contentEditableDiv).pointerEvents =
-#if REVAMPPOINTEREVENTS
-                    this.INTERNAL_ArePointerEventsEnabled ? "auto" : "none";
-#else
-                    this.IsHitTestVisible && this.IsEnabled ? "auto" : "none";
-#endif
+                    this.EnablePointerEvents ? "auto" : "none";
             }
         }
 
@@ -422,12 +418,7 @@ element.setAttribute(""data-acceptsreturn"", ""{1}"");
                 CSHTML5.Interop.ExecuteJavaScript(@"$0.classList.add(""ie_set_p_margins_to_zero"")", contentEditableDiv);
             }
 
-
-#if REVAMPPOINTEREVENTS
-            contentEditableDivStyle.pointerEvents = this.INTERNAL_ArePointerEventsEnabled ? "auto" : "none";
-#else
-            contentEditableDivStyle.pointerEvents = this.IsHitTestVisible && this.IsEnabled ? "auto" : "none";
-#endif
+            contentEditableDivStyle.pointerEvents = this.EnablePointerEvents ? "auto" : "none";
             contentEditableDivStyle.width = "100%";
             contentEditableDivStyle.height = "100%";
             contentEditableDivStyle.whiteSpace = "pre-wrap"; // Because by default we have decided to make the TextBox wrap, because the no-wrap mode does not work well (it enlarges the parent container, as of 2015.08.06)
