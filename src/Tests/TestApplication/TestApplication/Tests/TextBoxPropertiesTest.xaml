@@ -1,0 +1,26 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.TextBoxPropertiesTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <TextBlock Text="- No alignment set (should stretch horizontally, and auto-size vertically), single line whatever happens:" TextWrapping="Wrap" Margin="0,10,0,0"/>
+        <TextBox/>
+        <TextBlock Text="- Same with AcceptsReturn true" TextWrapping="Wrap" Margin="0,10,0,0"/>
+        <TextBox AcceptsReturn="True"/>
+        <TextBlock Text="- Left alignment, no size set, no AcceptsReturn:" TextWrapping="Wrap" Margin="0,10,0,0"/>
+        <TextBox x:Name="TextBoxForWrapping" HorizontalAlignment="Left"/>
+        <CheckBox x:Name="CheckBoxForWrapping" Content="Option: Wrap text above" IsChecked="True" Checked="CheckBoxForWrapping_Checked" Unchecked="CheckBoxForWrapping_Unchecked"/>
+        <TextBlock Text="- Left alignment, fixed size (width 100px height 50px), no AcceptsReturn:"  TextWrapping="Wrap" Margin="0,10,0,0"/>
+        <TextBox HorizontalAlignment="Left" Width="100" Height="50"/>
+        <TextBlock Text="- Left alignment, fixed size (width 100px height 50px), accepts return true, textwrap:" TextWrapping="Wrap" Margin="0,10,0,0"/>
+        <TextBox HorizontalAlignment="Left" Width="100" Height="50" AcceptsReturn="True" TextWrapping="Wrap"/>
+        <TextBlock Text="- Left alignment, fixed size (width 100px height 50px), accepts return true, nowrap:" TextWrapping="Wrap" Margin="0,10,0,0"/>
+        <TextBox HorizontalAlignment="Left" Width="100" Height="50" AcceptsReturn="True" TextWrapping="NoWrap"/>
+        <TextBlock Text="- Left alignment, fixed size (width 100px height 50px), accepts return true, nowrap, both scrollbars visible" TextWrapping="Wrap" Margin="0,10,0,0"/>
+        <TextBox HorizontalAlignment="Left" Width="100" Height="50" AcceptsReturn="True" TextWrapping="NoWrap" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible"/>
+        <TextBlock Text="At the time of writing, for a better user experience (because result is unfortunately not perfectly identical) the TextBox in CSHTML5 has the following difference compared to that of WPF: TextWrapping is Wrap by default." TextWrapping="Wrap" Width="400" Margin="0,10,0,0"/>
+    </StackPanel>
+</sdk:Page>

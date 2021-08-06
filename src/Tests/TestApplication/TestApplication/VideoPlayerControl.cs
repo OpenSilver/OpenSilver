@@ -1,9 +1,5 @@
 ﻿using System;
-#if SLMIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace TestApplication
 {

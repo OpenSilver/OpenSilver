@@ -1,0 +1,43 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.ContextMenuTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <!--SLDISABLED-->
+        <!--<Border CornerRadius="5" Background="LightGray" Padding="10" HorizontalAlignment="Center">
+                <Border.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Content="Menu Item 1" Click="MenuItem1_Click"/>
+                        <MenuItem Content="Menu Item 2" Click="MenuItem2_Click"/>
+                        <MenuItem Content="Menu Item 3" Click="MenuItem3_Click"/>
+                    </ContextMenu>
+                </Border.ContextMenu>
+                <TextBlock Text="Right-click to display menu without icons."/>
+            </Border>
+            <Border CornerRadius="5" Background="LightGray" Padding="10" HorizontalAlignment="Center">
+                <Border.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Content="Menu Item 1" Click="MenuItem1_Click">
+                            <MenuItem.Icon>
+                                <Image Source="/Images/Logo1.png" Width="20" Height="20" Stretch="Fill"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Content="Menu Item 2" Click="MenuItem2_Click">
+                            <MenuItem.Icon>
+                                <Image Source="/Images/Logo1.png" Width="20" Height="20" Stretch="Fill"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Content="Menu Item 3 (longer name)" Click="MenuItem3_Click">
+                            <MenuItem.Icon>
+                                <Image Source="/Images/Logo1.png" Width="20" Height="20" Stretch="Fill"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </Border.ContextMenu>
+                <TextBlock Text="Right-click to display menu with icons."/>
+            </Border>-->
+    </StackPanel>
+</sdk:Page>

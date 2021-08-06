@@ -1,0 +1,27 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.StackPanels.VerticalTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Vertical" Background="#DDDDDD" HorizontalAlignment="Left">
+            <Border Background="#FFFFFFAA" HorizontalAlignment="Stretch" Margin="2">
+                <TextBlock Text="This element is the largest element (Stretch)"/>
+            </Border>
+            <Border Background="#FFAAFFAA" HorizontalAlignment="Center" Margin="2">
+                <TextBlock Text="This element is centered"/>
+            </Border>
+            <Border Background="#FFFFAAAA" HorizontalAlignment="Left" Margin="2">
+                <TextBlock Text="This element is left"/>
+            </Border>
+            <Border Background="#FFFFAAFF" HorizontalAlignment="Right" Margin="2">
+                <TextBlock Text="This element is right"/>
+            </Border>
+            <Border Background="#FFAAFFFF" HorizontalAlignment="Stretch" Margin="2">
+                <TextBlock Text="This element is stretch"/>
+            </Border>
+        </StackPanel>
+    </StackPanel>
+</sdk:Page>

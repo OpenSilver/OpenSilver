@@ -313,10 +313,10 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <Resource Include="Debugging\DevToolsScreencast.png" />
-    <Content Include="interop_debug_root.html">
+    <Content Include="interop_debug_root_opensilver.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="simulator_root.html">
+    <Content Include="simulator_root_opensilver.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

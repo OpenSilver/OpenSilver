@@ -1,0 +1,19 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.Events.TextChangedTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <Border BorderBrush="Gray" BorderThickness="2" Margin="3" HorizontalAlignment="Left">
+            <StackPanel Width="250">
+                <TextBlock Text="Testing TEXTCHANGED event:"/>
+                <TextBlock TextWrapping="Wrap">At every TextChange the pink counter should increase by one, and the yellow TextBlock should contain the same text as the one you type.</TextBlock>
+                <TextBox x:Name="TestTextChanged_TextBox" TextChanged="TestTextChanged_TextBox_TextChanged"/>
+                <TextBlock x:Name="TestTextChanged_Count" Text="0" />
+                <TextBlock x:Name="TestTextChanged_TextBlock" Text="{Binding ElementName=TestTextChanged_TextBox, Path=Text}" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</sdk:Page>

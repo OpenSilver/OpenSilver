@@ -1,0 +1,35 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.ViewboxTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <Border Background="Blue" Width="100" Height="50">
+            <Viewbox>
+                <Ellipse Width="200" Height="200" Fill="Red"/>
+            </Viewbox>
+        </Border>
+        <Border Background="LightGreen" Width="100" Height="50">
+            <Viewbox Stretch="Fill">
+                <Ellipse Width="200" Height="200" Fill="Red"/>
+            </Viewbox>
+        </Border>
+        <Border Background="Yellow" Width="100" Height="50">
+            <Viewbox Stretch="UniformToFill">
+                <Ellipse Width="200" Height="200" Fill="Red"/>
+            </Viewbox>
+        </Border>
+        <Border Background="Purple" Width="100" Height="50">
+            <Viewbox Stretch="None">
+                <Ellipse Width="200" Height="200" Fill="Red"/>
+            </Viewbox>
+        </Border>
+        <Border x:Name="BorderWithoutHeight" Width="150">
+            <Viewbox Stretch="Uniform">
+                <Ellipse Width="25" Height="25" Fill="Blue"/>
+            </Viewbox>
+        </Border>
+    </StackPanel>
+</sdk:Page>

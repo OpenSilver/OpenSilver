@@ -1,0 +1,154 @@
+﻿@keyframes loading-indicator-ball-anim {
+	0% {
+		transform: translate(-50%, -50%) scale(0);
+		opacity: 0;
+	}
+
+	25% {
+		transform: translate(-50%, -50%) scale(1);
+		opacity: 1;
+	}
+
+	32% {
+		transform: translate(-50%, -50%) scale(0.5);
+		opacity: 0;
+	}
+
+	100% {
+		transform: translate(-50%, -50%) scale(0);
+		opacity: 0;
+	}
+}
+
+.loading-indicator-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.loading-indicator {
+	position: relative;
+	width: 80px;
+	height: 80px;
+	pointer-events: none;
+}
+
+.loading-indicator-ball {
+	will-change: transform, opacity;
+	position: absolute;
+	width: 16%;
+	height: 16%;
+	border-radius: 50%;
+	background: #41afe6;
+	filter: blur(4px);
+	opacity: 0;
+	animation: loading-indicator-ball-anim 9s infinite;
+}
+
+	.loading-indicator-ball:nth-child(1) {
+		left: 85.3553390593%;
+		top: 85.3553390593%;
+		animation-delay: 0s;
+	}
+
+	.loading-indicator-ball:nth-child(2) {
+		left: 100%;
+		top: 50%;
+		animation-delay: 0.2s;
+	}
+
+	.loading-indicator-ball:nth-child(3) {
+		left: 85.3553390593%;
+		top: 14.6446609407%;
+		--rotation: calc(-45deg * 3);
+		animation-delay: 0.4s;
+	}
+
+	.loading-indicator-ball:nth-child(4) {
+		left: 50%;
+		top: 0%;
+		animation-delay: 0.6s;
+	}
+
+	.loading-indicator-ball:nth-child(5) {
+		left: 14.6446609407%;
+		top: 14.6446609407%;
+		animation-delay: 0.8s;
+	}
+
+	.loading-indicator-ball:nth-child(6) {
+		left: 0%;
+		top: 50%;
+		animation-delay: 1.0s;
+	}
+
+	.loading-indicator-ball:nth-child(7) {
+		left: 14.6446609407%;
+		top: 85.3553390593%;
+		animation-delay: 1.2s;
+	}
+
+	.loading-indicator-ball:nth-child(8) {
+		left: 50%;
+		top: 100%;
+		animation-delay: 1.4s;
+	}
+
+	.loading-indicator-ball:nth-child(9) {
+		left: 50%;
+		top: 100%;
+		animation-delay: 4.5s;
+	}
+
+	.loading-indicator-ball:nth-child(10) {
+		left: 14.6446609407%;
+		top: 85.3553390593%;
+		animation-delay: 4.7s;
+	}
+
+	.loading-indicator-ball:nth-child(11) {
+		left: 0%;
+		top: 50%;
+		animation-delay: 4.9s;
+	}
+
+	.loading-indicator-ball:nth-child(12) {
+		left: 14.6446609407%;
+		top: 14.6446609407%;
+		animation-delay: 5.1s;
+	}
+
+	.loading-indicator-ball:nth-child(13) {
+		left: 50%;
+		top: 0%;
+		animation-delay: 5.3s;
+	}
+
+	.loading-indicator-ball:nth-child(14) {
+		left: 85.3553390593%;
+		top: 14.6446609407%;
+		animation-delay: 5.5s;
+	}
+
+	.loading-indicator-ball:nth-child(15) {
+		left: 100%;
+		top: 50%;
+		animation-delay: 5.7s;
+	}
+
+	.loading-indicator-ball:nth-child(16) {
+		left: 85.3553390593%;
+		top: 85.3553390593%;
+		animation-delay: 5.9s;
+	}
+
+.loading-indicator-percentage-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+}

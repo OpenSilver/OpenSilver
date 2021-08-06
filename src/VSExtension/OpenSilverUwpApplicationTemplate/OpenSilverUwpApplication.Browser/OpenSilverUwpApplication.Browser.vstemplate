@@ -12,7 +12,8 @@
                 <ProjectItem ReplaceParameters="false" TargetFileName="BlazorLoader.js">BlazorLoader.js</ProjectItem>
                 <ProjectItem ReplaceParameters="false" TargetFileName="favicon.ico">favicon.ico</ProjectItem>
                 <ProjectItem ReplaceParameters="true" TargetFileName="index.html">index.html</ProjectItem>
-                <ProjectItem ReplaceParameters="false" TargetFileName="silverlight-loading.css">silverlight-loading.css</ProjectItem>
+				<ProjectItem ReplaceParameters="false" TargetFileName="loading-indicator.css">loading-indicator.css</ProjectItem>
+				<ProjectItem ReplaceParameters="false" TargetFileName="loading-indicator.js">loading-indicator.js</ProjectItem>
             </Folder>
             <Folder Name="Interop" TargetFolderName="Interop">
                 <ProjectItem ReplaceParameters="true" TargetFileName="UnmarshalledJavaScriptExecutionHandler.cs">UnmarshalledJavaScriptExecutionHandler.cs</ProjectItem>

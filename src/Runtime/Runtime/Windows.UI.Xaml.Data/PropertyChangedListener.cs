@@ -29,7 +29,7 @@ namespace Windows.UI.Xaml.Data
     internal partial class PropertyChangedListener : IPropertyChangedListener
     {
         
-        public DependencyProperty Property {get; set;}
+        public DependencyProperty Property { get; set; }
         private INTERNAL_PropertyStorage _storage;
         private Action<object, IDependencyPropertyChangedEventArgs> _sourceCallBack;
 
@@ -42,12 +42,13 @@ namespace Windows.UI.Xaml.Data
         public void Detach()
         {
             _storage.PropertyListeners.Remove(this);
+            _sourceCallBack = null;
         }
 
 
         public void OnPropertyChanged(DependencyObject sender, IDependencyPropertyChangedEventArgs args)
         {
-            _sourceCallBack.Invoke(sender, args);
+            _sourceCallBack?.Invoke(sender, args);
         }
     }
 }

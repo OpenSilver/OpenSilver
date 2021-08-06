@@ -1,0 +1,33 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.ComboBoxTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <ComboBox x:Name="ComboBox1" Width="150"/>
+        <Button Content="Items.Add" Click="ButtonTestComboBox_ItemsAdd_Click"/>
+        <Button Content="Items.Add String" Click="ButtonTestComboBox_ItemsAddString_Click"/>
+        <Button Content="Items.Clear" Click="ButtonTestComboBox_ItemsClear_Click"/>
+        <Button Content="Items.Remove First" Click="ButtonTestComboBox_ItemsRemoveFirst_Click"/>
+        <Button Content="Set new ItemsSource" Click="ButtonTestComboBox_SetNewItemsSource_Click"/>
+        <Button Content="ItemsSource.Add" Click="ButtonTestComboBox_ItemsSourceAdd_Click"/>
+        <Button Content="ItemsSource.Clear" Click="ButtonTestComboBox_ItemsSourceClear_Click"/>
+        <Button Content="ItemsSource.Remove first" Click="ButtonTestComboBox_ItemsSourceRemove_Click"/>
+        <Button Content="Set ItemsSource to null" Click="ButtonTestComboBox_SetItemsSourceToNull_Click"/>
+        <Button Content="Select second item" Click="ButtonTestComboBox_SelectSecondItem_Click"/>
+        <Button Content="Select second index" Click="ButtonTestComboBox_SelectSecondIndex_Click"/>
+        <Button Content="SelectedItem=null" Click="ButtonTestComboBox_SelectItemNull_Click"/>
+        <Button Content="SelectedIndex=-1" Click="ButtonTestComboBox_SelectedIndexMinusOne_Click"/>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="SelectedIndex:"/>
+            <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=ComboBox1, Path=SelectedIndex}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="SelectedItem:"/>
+            <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=ComboBox1, Path=SelectedItem}"/>
+        </StackPanel>
+    </StackPanel>
+    
+</sdk:Page>

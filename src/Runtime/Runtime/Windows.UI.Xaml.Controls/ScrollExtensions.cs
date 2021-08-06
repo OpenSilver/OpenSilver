@@ -27,7 +27,11 @@ namespace Windows.UI.Xaml.Controls
     /// The ScrollExtensions class provides utility methods for scrolling items
     /// ScrollViewers.
     /// </summary>
-    internal static partial class ScrollExtensions
+    // Note: This class should be internal, but due to conflicts with the
+    // ScrollViewerExtensions class, this has been changed to public.
+    // TODO: change back to internal when theses classes will be moved to
+    // separate projects.
+    public static partial class ScrollExtensions
     {
         /// <summary>
         /// The amount to scroll a ScrollViewer for a line change.

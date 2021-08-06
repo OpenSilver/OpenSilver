@@ -89,12 +89,15 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         protected bool DisableBaseControlHandlingOfVisualStates = false;
 
-#if REVAMPPOINTEREVENTS
-        internal override bool INTERNAL_ManageFrameworkElementPointerEventsAvailability()
+        internal override bool EnablePointerEventsCore
         {
-            return true;
+            get
+            {
+                // Note: this should always be false, but we return true to prevent issue with
+                // controls that do not have template (like ScrollViewer).
+                return true;
+            }
         }
-#endif
 
         //-----------------------
         // ISENABLED (OVERRIDE)
@@ -131,20 +134,17 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(Background), typeof(Brush), 
                 typeof(Control), 
-                new PropertyMetadata(null, Background_Changed)
+                new PropertyMetadata((object)null)
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
                         Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
-                    }
+                    },
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        UIElement.SetPointerEvents((Control)d);
+                    },
                 });
-
-        private static void Background_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-#if REVAMPPOINTEREVENTS
-            INTERNAL_UpdateCssPointerEvents((Control)d);
-#endif
-        }
 
         internal bool INTERNAL_IsLegacyVisualStates
         {
@@ -384,6 +384,7 @@ namespace Windows.UI.Xaml.Controls
                 typeof(Control),
                 new FrameworkPropertyMetadata(11d, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 { 
+                    Inherits = true,
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
                         Value = (inst, value) =>

@@ -7,14 +7,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApplication.CSHTML5", "
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		SL.WIP (disabled, see csproj)|Any CPU = SL.WIP (disabled, see csproj)|Any CPU
-		SL|Any CPU = SL|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BA5BB6E1-5F2B-475A-85C6-EAAC3F1173B1}.SL.WIP (disabled, see csproj)|Any CPU.ActiveCfg = SL.WIP|Any CPU
-		{BA5BB6E1-5F2B-475A-85C6-EAAC3F1173B1}.SL.WIP (disabled, see csproj)|Any CPU.Build.0 = SL.WIP|Any CPU
-		{BA5BB6E1-5F2B-475A-85C6-EAAC3F1173B1}.SL|Any CPU.ActiveCfg = SL|Any CPU
-		{BA5BB6E1-5F2B-475A-85C6-EAAC3F1173B1}.SL|Any CPU.Build.0 = SL|Any CPU
+		{BA5BB6E1-5F2B-475A-85C6-EAAC3F1173B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA5BB6E1-5F2B-475A-85C6-EAAC3F1173B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA5BB6E1-5F2B-475A-85C6-EAAC3F1173B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA5BB6E1-5F2B-475A-85C6-EAAC3F1173B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -232,7 +232,7 @@ namespace Windows.UI.Xaml.Shapes
 
                 //todo: if possible, manage strokeStyle and lineWidth in their respective methods (Stroke_Changed and StrokeThickness_Changed) then use context.save() and context.restore() (can't get it to work yet).
                 double opacity = Stroke == null ? 1 : Stroke.Opacity;
-                object strokeValue = GetHtmlBrush(this, Stroke, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
+                object strokeValue = GetHtmlBrush(this, context, Stroke, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
 
                 //we set the StrokeDashArray:
                 if (strokeValue != null && StrokeThickness > 0)

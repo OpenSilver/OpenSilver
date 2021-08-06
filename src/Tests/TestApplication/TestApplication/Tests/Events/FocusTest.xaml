@@ -1,0 +1,17 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.Events.FocusTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal" >
+            <TextBlock Text="LOST FOCUS:"/>
+            <TextBox x:Name="FocusTextBox1" Width="60" LostFocus="FocusTextBox1_LostFocus" />
+            <TextBlock Text="GOT FOCUS:" />
+            <TextBox x:Name="FocusTextBox2" Width="60" GotFocus="FocusTextBox2_GotFocus"/>
+        </StackPanel>
+        <TextBlock x:Name="FocusTextBlockLog" Text="log:" Margin="0,0,0,0"/>
+    </StackPanel>
+</sdk:Page>

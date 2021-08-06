@@ -1,0 +1,54 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.TransformTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal">
+            <Button Width="100" Height="30" Content="Translate"  Click="ButtonTranslate_Click"/>
+            <Button Width="100" Height="30" Content="Rotate"  Click="ButtonRotate_Click"/>
+        </StackPanel>
+        <Canvas Width="200" Height="200" Background="#DDDDDD">
+            <Button x:Name="TestTransformBorder" Canvas.ZIndex="10"  Width="30" Height="30" Background="Blue" Click="TransformButton_Click"/>
+            <Rectangle Width="30" Height="30" Fill="Red">
+                <Rectangle.RenderTransform>
+                    <TranslateTransform X="20" Y="50"/>
+                </Rectangle.RenderTransform>
+            </Rectangle>
+        </Canvas>
+        <Canvas Height="200" Width="200" Background="#DDDDDD" Margin="0,20,0,0">
+            <TextBox Text="ScaleTransform" BorderThickness="2" BorderBrush="Black">
+                <TextBox.RenderTransform>
+                    <ScaleTransform ScaleX="1.5" ScaleY="3"/>
+                </TextBox.RenderTransform>
+            </TextBox>
+            <TextBox Text="TranslateTransform" RenderTransformOrigin="0.5,0.5" BorderThickness="2" BorderBrush="Black">
+                <TextBox.RenderTransform>
+                    <TranslateTransform X="30" Y="100"/>
+                </TextBox.RenderTransform>
+            </TextBox>
+            <TextBox Text="RotateTransform" RenderTransformOrigin="1,0" BorderThickness="2" BorderBrush="Black">
+                <TextBox.RenderTransform>
+                    <RotateTransform Angle="-65"/>
+                </TextBox.RenderTransform>
+            </TextBox>
+            <TextBox Text="SkewTransform" BorderThickness="2" BorderBrush="Black">
+                <TextBox.RenderTransform>
+                    <SkewTransform AngleX="15" AngleY="5"/>
+                </TextBox.RenderTransform>
+            </TextBox>
+            <TextBox Text="CompositeTransform" RenderTransformOrigin="0.5,0.5" BorderThickness="2" BorderBrush="Black">
+                <TextBox.RenderTransform>
+                    <CompositeTransform TranslateX="40" TranslateY="112" Rotation="18" ScaleX="0.8" SkewY="-25" ScaleY="1.25"/>
+                </TextBox.RenderTransform>
+            </TextBox>
+            <TextBox Text="MatrixTransform" RenderTransformOrigin="0.5,0.5" BorderThickness="2" BorderBrush="Black">
+                <TextBox.RenderTransform>
+                    <MatrixTransform Matrix="1.3,0.5,0,1,25,80"/>
+                </TextBox.RenderTransform>
+            </TextBox>
+        </Canvas>
+    </StackPanel>
+</sdk:Page>

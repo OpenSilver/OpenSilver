@@ -1,5 +1,4 @@
-﻿using DotNetForHtml5;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net.Http;
@@ -10,9 +9,8 @@ namespace TestApplication.OpenSilver.Browser
 {
     public class Program
     {
-        public async static Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            Cshtml5Initializer.Initialize();
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
 
@@ -25,9 +23,9 @@ namespace TestApplication.OpenSilver.Browser
         public static void RunApplication()
         {
             Application.RunApplication(() =>
-                {
-                    var app = new TestApplication.App();
-                });
+            {
+                var app = new TestApplication.App();
+            });
         }
     }
 }

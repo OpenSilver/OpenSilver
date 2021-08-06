@@ -1,0 +1,16 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.AsyncAwaitTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <!--SLDISABLED-->
+        <!--<StackPanel Orientation="Vertical" Background="White">
+                <Button Content="Normal call of async method" BorderThickness="5" BorderBrush="Red" FontWeight="600"  Background="White" Click="Button_Click"/>
+                <Button Content="Awaited call of async method" BorderThickness="5" BorderBrush="Red" FontWeight="600"  Background="White" Click="Button2_Click"/>
+                <TextBlock x:Name="TextBlock2" Text="Results here" Margin="20,30, 0,0"/>
+            </StackPanel>-->
+    </StackPanel>
+</sdk:Page>
