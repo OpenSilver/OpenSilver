@@ -611,13 +611,6 @@ namespace Windows.UI.Xaml.Data
         /// <returns></returns>
         internal static string GetEffectiveStringFormat(string stringFormat)
         {
-            if (string.IsNullOrEmpty(stringFormat))
-                return null;
-
-            //remove {} escape sequence in stringFormat, for example StringFormat='{}{0: MM/dd/yyyy}'
-            if (stringFormat.StartsWith("{}"))
-                stringFormat = stringFormat.Substring(2);
-
             if (stringFormat.IndexOf('{') < 0)
             {
                 stringFormat = @"{0:" + stringFormat + @"}";

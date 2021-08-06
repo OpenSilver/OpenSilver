@@ -148,7 +148,7 @@
         <Setter Property="VerticalContentAlignment" Value="Top" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="TabNavigation" Value="Local" />
+        <!--<Setter Property="TabNavigation" Value="Local" />-->
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
@@ -196,8 +196,10 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         
-                        <Rectangle x:Name="FillColor" Opacity="0" Fill="#FFBADDE9" IsHitTestVisible="False" RadiusX="1" RadiusY="1"/>
-                        <Rectangle x:Name="FillColor2" Opacity="0" Fill="#FFBADDE9" IsHitTestVisible="False" RadiusX="1" RadiusY="1"/>
+                        <!--RadiusX="1" RadiusY="1"!-->
+                        <Rectangle x:Name="FillColor" Opacity="0" Fill="#FFBADDE9" IsHitTestVisible="False"/>
+                        <Rectangle x:Name="FillColor2" Opacity="0" Fill="#FFBADDE9" IsHitTestVisible="False"/>
+                        
                         <ContentPresenter x:Name="ContentPresenter"
                                           Content="{TemplateBinding Content}"
                                           ContentTemplate="{TemplateBinding ContentTemplate}"
