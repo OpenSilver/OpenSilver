@@ -36,7 +36,11 @@ using System.Windows;
 using Windows.UI.Xaml;
 #endif
 
+#if OPENSILVER
+namespace OpenSilver.IO.IsolatedStorage
+#else
 namespace System.IO.IsolatedStorage
+#endif
 {
     //Note: we remove the interfaces because they are useless for now.
     //
@@ -467,7 +471,7 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
             }
         }
 
-        #region for the interfaces that we remove for now
+#region for the interfaces that we remove for now
         //public void Add(KeyValuePair<string, object> item)
         //{
         //    throw new NotImplementedException();
@@ -594,6 +598,6 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         //{
         //    get { throw new NotImplementedException(); }
         //}
-        #endregion
+#endregion
     }
 }
