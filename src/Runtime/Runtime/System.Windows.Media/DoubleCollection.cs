@@ -13,9 +13,7 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
 using System.Globalization;
 
@@ -25,10 +23,10 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    [TypeConverter(typeof(DoubleCollectionConverter))]
     /// <summary>
     /// Represents an ordered collection of Double values.
     /// </summary>
+    [TypeConverter(typeof(DoubleCollectionConverter))]
     public sealed class DoubleCollection : PresentationFrameworkCollection<double>
     {
         #region Constructor
@@ -78,15 +76,5 @@ namespace Windows.UI.Xaml.Media
         }
 
         #endregion
-
-        public override bool Equals(object obj)
-        {
-            return obj is DoubleCollection;
-        }
-
-        internal object ToString(object p, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

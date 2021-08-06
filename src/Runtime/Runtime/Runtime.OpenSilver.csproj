@@ -51,9 +51,9 @@
 		<Compile Include="Core\Main\EmptyEnumerator.cs" />
 		<Compile Include="Core\Main\InheritablePropertyChangeInfo.cs" />
 		<Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
-		<Compile Include="Core\Main\ObjectBuilder.cs" />
 		<Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
-		<Compile Include="Core\Main\WeakReferenceList.cs" />
+    <Compile Include="Core\Main\TypeFromStringConverters.cs" />
+    <Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ChangePropertyAction.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ComparisonConditionType.cs" />
@@ -84,12 +84,6 @@
 		<Compile Include="System.ComponentModel\IItemProperties.cs" />
 		<Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettings.cs" />
 		<Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettingsForCSharp.cs" />
-		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageException.cs" />
-		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageFile.cs" />
-		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageFileStream.cs" />
-		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageScope.cs" />
-		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageSecurityOptions.cs" />
-		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsoletedStorage.cs" />
 		<Compile Include="System.Linq\WORKINPROGRESS\FunctionalProgramming.cs" />
 		<Compile Include="System.Net\DownloadStringCompletedEventArgs.cs" />
 		<Compile Include="System.Net\DownloadStringCompletedEventHandler.cs" />
@@ -138,7 +132,6 @@
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\SendCompletedEventArgs.cs" />
 		<Compile Include="System.Windows\FontStyleConverter.cs" />
 		<Compile Include="System.Windows\RectConverter.cs" />
-		<Compile Include="System.Windows\RoutedEventConverter.cs" />
 		<Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
 		<Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
@@ -179,7 +172,6 @@
 		<Compile Include="System.Windows\Disposable.cs" />
 		<Compile Include="System.Windows\PointExtensions.cs" />
 		<Compile Include="System.Windows\DoubleExtensions.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\Point.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\RangeBaseAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\ScrollBarAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Provider\WORKINPROGRESS\IDockProvider.cs" />
@@ -330,7 +322,6 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\RoutedEventArgs.cs" />
 		<Compile Include="System.Windows\FrameworkPropertyMetadata.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\UIElement.cs" />
-		<Compile Include="System.Windows.Media\WORKINPROGRESS\Color.cs" />
 		<Compile Include="Empty Namespaces\WORKINPROGRESS\SystemXaml.cs" />
 		<Compile Include="System\WORKINPROGRESS\AppDomainExtensions.cs" />
 		<Compile Include="System.Collections.Generic\WORKINPROGRESS\SynchronizedReadOnlyCollection.cs" />
@@ -354,7 +345,6 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\ApplicationServiceContext.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\DataFormats.cs" />
 		<Compile Include="System.Windows\DependencyObjectCollection_1.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\DurationConverter.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\IApplicationLifetimeAware.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\IApplicationService.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\INativeCollectionWrapper.cs" />
@@ -1032,7 +1022,6 @@
 		<Compile Include="System.Windows\DependencyProperty.cs" />
 		<Compile Include="System.Windows\DependencyPropertyChangedEventArgs.cs" />
 		<Compile Include="System.Windows\DependencyPropertyChangedEventHandler.cs" />
-		<Compile Include="System.Windows\DependencyPropertyConverter.cs" />
 		<Compile Include="System.Windows\DispatcherTimer.cs" />
 		<Compile Include="System.Windows\Duration.cs" />
 		<Compile Include="System.Windows\DurationConverter.cs" />

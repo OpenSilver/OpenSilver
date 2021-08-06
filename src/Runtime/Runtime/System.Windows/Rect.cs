@@ -13,9 +13,7 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
 
 #if MIGRATION
@@ -498,6 +496,12 @@ namespace Windows.Foundation
             return default(string);
         }
 #endif
+
+        public static Rect Parse(string rectAsString)
+        {
+            return (Rect)TypeDescriptor.GetConverter(typeof(Rect))
+                .ConvertFromInvariantString(rectAsString);
+        }
 
         /// <summary>
         /// Returns a string representation of the Windows.Foundation.Rect

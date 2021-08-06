@@ -33,14 +33,6 @@ namespace System.Windows.Markup.Tests
         }
 
         [TestMethod]
-        public void CanConvertTo_InstanceDescriptor_ShouldReturnTrue()
-        {
-            var xmlLanguageConverter = new XmlLanguageConverter();
-            var test = xmlLanguageConverter.CanConvertTo(typeof(InstanceDescriptor));
-            test.Should().BeTrue();
-        }
-
-        [TestMethod]
         public void CanConvertTo_Bool_ShouldReturnFalse()
         {
             var xmlLanguageConverter = new XmlLanguageConverter();
@@ -76,14 +68,6 @@ namespace System.Windows.Markup.Tests
             var xmlLanguageConverter = new XmlLanguageConverter();
             var test = xmlLanguageConverter.ConvertTo(new XmlLanguage(), typeof(string));
             test.Should().Be("");
-        }
-
-        [TestMethod]
-        public void ConvertTo_InstanceDescriptor()
-        {
-            var xmlLanguageConverter = new XmlLanguageConverter();
-            var test = xmlLanguageConverter.ConvertTo(new XmlLanguage(), typeof(InstanceDescriptor));
-            test.Should().BeOfType(typeof(InstanceDescriptor));
         }
 
         [TestMethod]

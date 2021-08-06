@@ -31,7 +31,32 @@ namespace System.ComponentModel
 
         public virtual object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            throw new NotImplementedException();
+            throw GetConvertFromException(value);
+        }
+
+        public object ConvertFromInvariantString(string text)
+        {
+            return ConvertFromString(null, CultureInfo.InvariantCulture, text);
+        }
+
+        public object ConvertFromInvariantString(ITypeDescriptorContext context, string text)
+        {
+            return ConvertFromString(context, CultureInfo.InvariantCulture, text);
+        }
+
+        public object ConvertFromString(string text)
+        {
+            return ConvertFrom(null, null, text);
+        }
+
+        public object ConvertFromString(ITypeDescriptorContext context, string text)
+        {
+            return ConvertFrom(context, CultureInfo.CurrentCulture, text);
+        }
+
+        public object ConvertFromString(ITypeDescriptorContext context, CultureInfo culture, string text)
+        {
+            return ConvertFrom(context, culture, text);
         }
 
         public object ConvertTo(object value, Type destinationType)
@@ -91,15 +116,16 @@ namespace System.ComponentModel
 
             if (value == null)
             {
-                //valueTypeName = SR.GetString(SR.ToStringNull);
-                throw new NotImplementedException();
+                valueTypeName = "(null)";
             }
             else
             {
                 valueTypeName = value.GetType().FullName;
             }
 
-            throw new NotSupportedException("");
+            throw new NotSupportedException(
+                string.Format("{0} cannot convert from {1}.", GetType().Name, valueTypeName)
+            );
         }
 
         protected Exception GetConvertToException(object value, Type destinationType)
@@ -108,15 +134,16 @@ namespace System.ComponentModel
 
             if (value == null)
             {
-                //valueTypeName = SR.GetString(SR.ToStringNull);
-                throw new NotImplementedException();
+                valueTypeName = "(null)";
             }
             else
             {
                 valueTypeName = value.GetType().FullName;
             }
 
-            throw new NotSupportedException("");
+            throw new NotSupportedException(
+                string.Format("'{0}' is unable to convert '{1}' to '{2}'.", GetType().Name, valueTypeName, destinationType.FullName)
+            );
         }
     }
 }

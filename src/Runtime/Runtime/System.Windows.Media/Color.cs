@@ -12,16 +12,17 @@
 *  
 \*====================================================================================*/
 
-
-using OpenSilver.Internal;
-using System.ComponentModel;
-using System.Globalization;
-#if !MIGRATION
-using Windows.UI.Xaml.Media;
-#endif
 #if BRIDGE
 using Bridge;
+#endif
+
+using OpenSilver.Internal;
 using System;
+using System.ComponentModel;
+using System.Globalization;
+
+#if !MIGRATION
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -103,19 +104,19 @@ namespace Windows.UI
         {
             if (!(val > 0.0))       // Handles NaN case too
             {
-                return 0;
+                return (0);
             }
             else if (val <= 0.0031308)
             {
-                return (byte)((255.0f * val * 12.92f) + 0.5f);
+                return ((byte)((255.0f * val * 12.92f) + 0.5f));
             }
             else if (val < 1.0)
             {
-                return (byte)((255.0f * ((1.055f * (float)Math.Pow(val, 1.0 / 2.4)) - 0.055f)) + 0.5f);
+                return ((byte)((255.0f * ((1.055f * (float)Math.Pow((double)val, (1.0 / 2.4))) - 0.055f)) + 0.5f));
             }
             else
             {
-                return 255;
+                return (255);
             }
         }
 
@@ -123,7 +124,7 @@ namespace Windows.UI
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "rgba({0}, {1}, {2}, {3})",
-                R, G, B, opacity * A / 255d);
+                this.R, this.G, this.B, opacity * this.A / 255d);
         }
 
         internal static Color INTERNAL_ConvertFromInt32(int colorAsInt32)
@@ -177,6 +178,31 @@ namespace Windows.UI
                 B.ToInvariantString("X2"));
         }
 
+        /// <summary>
+        /// Creates a string representation of the color by using the ARGB channels and the
+        /// specified format provider.
+        /// </summary>
+        /// <param name="provider">
+        /// Culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// The string representation of the color.
+        /// </returns>
+        public string ToString(IFormatProvider provider)
+        {
+            return string.Format("#{0}{1}{2}{3}",
+                A.ToString("X2", provider),
+                R.ToString("X2", provider),
+                G.ToString("X2", provider),
+                B.ToString("X2", provider));
+        }
+
+        [OpenSilver.NotImplemented]
+        string IFormattable.ToString(string format, IFormatProvider formatProvider)
+        {
+            return default(string);
+        }
+
         public override int GetHashCode()
         {
             return BitConverter.ToInt32(new byte[] { A, R, G, B }, 0); //A.GetHashCode() ^ R.GetHashCode() ^ G.GetHashCode() ^ B.GetHashCode();
@@ -191,35 +217,14 @@ namespace Windows.UI
         {
             if (o is Color)
             {
-                var color = (Color)o;
+                Color color = (Color)o;
 
-                return this == color;
+                return (this == color);
             }
             else
             {
                 return false;
             }
-        }
-
-        //
-        // Summary:
-        //     Creates a string representation of the color by using the ARGB channels and the
-        //     specified format provider.
-        //
-        // Parameters:
-        //   provider:
-        //     Culture-specific formatting information.
-        //
-        // Returns:
-        //     The string representation of the color.
-        public string ToString(IFormatProvider provider)
-        {
-            return default(string);
-        }
-
-        public string ToString(string format, IFormatProvider formatProvider)
-        {
-            throw new NotImplementedException();
         }
 
         public static bool operator ==(Color color1, Color color2)

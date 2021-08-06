@@ -23,9 +23,9 @@ namespace System.Windows.Markup
     public sealed partial class XmlLanguage
     {
 		[OpenSilver.NotImplemented]
-        public string IetfLanguageTag { get; }
+        public string IetfLanguageTag { get; private set; }
 
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         public static XmlLanguage GetLanguage(string ietfLanguageTag)
         {
             return null;

@@ -12,9 +12,7 @@
 *  
 \*====================================================================================*/
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
 using System.Globalization;
 

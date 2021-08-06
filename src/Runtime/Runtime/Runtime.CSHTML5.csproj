@@ -55,8 +55,8 @@
     <Compile Include="Core\Main\EmptyEnumerator.cs" />
     <Compile Include="Core\Main\InheritablePropertyChangeInfo.cs" />
     <Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
-    <Compile Include="Core\Main\ObjectBuilder.cs" />
     <Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
+    <Compile Include="Core\Main\TypeFromStringConverters.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
     <Compile Include="OpenSilver\NotImplementedAttribute.cs" />
@@ -87,6 +87,10 @@
     <Compile Include="System.ComponentModel\ReadOnlyAttribute.cs" />
     <Compile Include="System.ComponentModel\SortDescription.cs" />
     <Compile Include="System.ComponentModel\SortDescriptionCollection.cs" />
+    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageFile.cs" />
+    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageFileStream.cs" />
+    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettings.cs" />
+    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettingsForCSharp.cs" />
     <Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageSettings.cs" />
     <Compile Include="System.Net\SecurityProtocolType.cs" />
     <Compile Include="System.Net\ServicePointManager.cs" />
@@ -876,7 +880,6 @@
     <Compile Include="System.Windows\DependencyProperty.cs" />
     <Compile Include="System.Windows\DependencyPropertyChangedEventArgs.cs" />
     <Compile Include="System.Windows\DependencyPropertyChangedEventHandler.cs" />
-    <Compile Include="System.Windows\DependencyPropertyConverter.cs" />
     <Compile Include="System.Windows\DispatcherTimer.cs" />
     <Compile Include="System.Windows\Duration.cs" />
     <Compile Include="System.Windows\DurationConverter.cs" />
@@ -978,7 +981,6 @@
     <Compile Include="System.Windows.Media\Color.cs" />
     <Compile Include="System.Windows.Media\ColorConverter.cs" />
     <Compile Include="System.Windows.Media\Colors.cs" />
-    <Compile Include="System.Windows.Media\WORKINPROGRESS\Color.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bridge.json" />

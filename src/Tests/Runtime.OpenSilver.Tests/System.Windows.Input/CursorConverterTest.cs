@@ -43,7 +43,7 @@ namespace System.Windows.Input.Tests
         {
             var cursorConverter = new CursorConverter();
             var test = cursorConverter.ConvertFrom("None");
-            test.Should().Be(new Cursor(CursorType.None));
+            test.Should().Be(Cursors.None);
         }
 
         [TestMethod]
@@ -73,7 +73,7 @@ namespace System.Windows.Input.Tests
         public void ConvertTo_String()
         {
             var cursorConverter = new CursorConverter();
-            var test = cursorConverter.ConvertTo(new Cursor(CursorType.Arrow), typeof(string));
+            var test = cursorConverter.ConvertTo(Cursors.Arrow, typeof(string));
             test.Should().Be("Arrow");
         }
 
@@ -89,7 +89,7 @@ namespace System.Windows.Input.Tests
         {
             var cursorConverter = new CursorConverter();
             var notSupportedType = typeof(bool);
-            Assert.ThrowsException<NotSupportedException>(() => cursorConverter.ConvertTo(new Cursor(CursorType.No), notSupportedType));
+            Assert.ThrowsException<NotSupportedException>(() => cursorConverter.ConvertTo(Cursors.No, notSupportedType));
         }
 
         [TestMethod]

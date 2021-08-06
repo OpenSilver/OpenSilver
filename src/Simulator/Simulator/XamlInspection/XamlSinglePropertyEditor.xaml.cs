@@ -1,4 +1,6 @@
-﻿/*===================================================================================
+﻿
+
+/*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
 *      
@@ -11,16 +13,23 @@
 *  
 \*====================================================================================*/
 
-#if OPENSILVER
-extern alias OpenSilver;
-using OpenSilver::DotNetForHtml5.Core;
-#endif
+
+
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
 {
@@ -56,31 +65,27 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                 ButtonOK.Visibility = Visibility.Collapsed;
 
                 // Read property name:
-                PropertyNameTextBlock.Text = _propertyInfo.Name + ":";
+                this.PropertyNameTextBlock.Text = _propertyInfo.Name + ":";
 
                 // Set property appearance depending on whether there exists a converter from String to the property type:
                 Type propertyType = _propertyInfo.PropertyType;
-#if OPENSILVER
-                bool isItPossibleToConvertFromString = ObjectBuilder.Singleton.CanParse(propertyType);
-#else
                 bool isItPossibleToConvertFromString = IsItPossibleToConvertFromString(propertyType);
-#endif
-
                 SetIsReadOnly(!isItPossibleToConvertFromString);
 
                 // Set "AcceptsReturn" only if it is a string:
-                PropertyValueTextBox.AcceptsReturn = propertyType == typeof(string);
+                bool isString = (propertyType == typeof(string));
+                this.PropertyValueTextBox.AcceptsReturn = isString;
 
                 // Attempt to read the property value:
                 _isChangingTextProgrammatically = true;
                 try
                 {
                     object value = _propertyInfo.GetValue(_targetElement);
-                    PropertyValueTextBox.Text = ConvertToString(value);
+                    this.PropertyValueTextBox.Text = ConvertToString(value);
                 }
-                catch
+                catch (Exception)
                 {
-                    PropertyValueTextBox.Text = "Err";
+                    this.PropertyValueTextBox.Text = "Err";
                 }
                 _isChangingTextProgrammatically = false;
             }
@@ -153,12 +158,14 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             }
             else
             {
-                // Get a reference to the "ObjectBuilder" class in the Core assembly:
-                ReflectionInUserAssembliesHelper.TryGetTypeInCoreAssembly("DotNetForHtml5.Core", null, "ObjectBuilder", out var typeConverter, out var coreAssembly);
+                // Get a reference to the "TypeFromStringConverters" class in the Core assembly:
+                Assembly coreAssembly;
+                Type typeFromStringConverter;
+                ReflectionInUserAssembliesHelper.TryGetTypeInCoreAssembly("DotNetForHtml5.Core", null, "TypeFromStringConverters", out typeFromStringConverter, out coreAssembly);
 
-                // Call the "CanParse" method:
-                var canTypeBeConvertedMethod = typeConverter.GetMethod("CanParse");
-                var canTypeBeConverted = (bool)canTypeBeConvertedMethod.Invoke(null, new object[] { typeToWhichWeWouldLikeToConvert });
+                // Call the "CanTypeBeConverted" method:
+                MethodInfo canTypeBeConvertedMethod = typeFromStringConverter.GetMethod("CanTypeBeConverted");
+                bool canTypeBeConverted = (bool)canTypeBeConvertedMethod.Invoke(null, new object[] { typeToWhichWeWouldLikeToConvert });
 
                 return canTypeBeConverted;
             }
@@ -177,16 +184,15 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             }
             else
             {
-#if OPENSILVER
-                var convertedValue = ObjectBuilder.Singleton.Parse(valueAsString, targetType);
-#else
-                // Get a reference to the "ObjectBuilder" class in the Core assembly:
-                ReflectionInUserAssembliesHelper.TryGetTypeInCoreAssembly("DotNetForHtml5.Core", null, "ObjectBuilder", out var typeConverter, out var coreAssembly);
+                // Get a reference to the "TypeFromStringConverters" class in the Core assembly:
+                Type typeFromStringConverter;
+                Assembly coreAssembly;
+                ReflectionInUserAssembliesHelper.TryGetTypeInCoreAssembly("DotNetForHtml5.Core", null, "TypeFromStringConverters", out typeFromStringConverter, out coreAssembly);
 
-                // Call the "Parse" method:
-                var convertFromInvariantStringMethod = typeConverter.GetMethod("Parse");
-                var convertedValue = convertFromInvariantStringMethod.Invoke(null, new object[] { targetType, valueAsString });
-#endif
+                // Call the "ConvertFromInvariantString" method:
+                MethodInfo convertFromInvariantStringMethod = typeFromStringConverter.GetMethod("ConvertFromInvariantString");
+                object convertedValue = convertFromInvariantStringMethod.Invoke(null, new object[] { targetType, valueAsString });
+
                 return convertedValue;
             }
         }
@@ -195,16 +201,14 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
         {
             if (value == null)
             {
-                return string.Empty;
+                return "";
             }
-            else if (value is double number && double.IsNaN(number))
+            else if (value is double && double.IsNaN((double)value))
             {
                 return "Auto";
             }
             else
-            {
                 return value.ToString();
-            }
         }
     }
 }

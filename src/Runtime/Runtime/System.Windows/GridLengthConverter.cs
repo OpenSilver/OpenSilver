@@ -13,11 +13,8 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
 using System.Globalization;
 
 #if MIGRATION
@@ -49,11 +46,11 @@ namespace Windows.UI.Xaml
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />
-        /// or <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; 
+        /// otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
+            return destinationType == typeof(string);
         }
 
         /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.GridLength" />. </summary>
@@ -85,7 +82,7 @@ namespace Windows.UI.Xaml
                     {
                         result = new GridLength(1.0, GridUnitType.Star);
                     }
-                    if (double.TryParse(valueAsString, out var length))
+                    else if (double.TryParse(valueAsString, out var length))
                     {
                         result = new GridLength(length, GridUnitType.Star);
                     }
@@ -150,7 +147,7 @@ namespace Windows.UI.Xaml
                         //  Star has one special case when value is "1.0".
                         //  in this case drop value part and print only "Star"
                         case GridUnitType.Star:
-                            result = Math.Abs(length.Value - 1.0) < 2.2204460492503131E-15
+                            result = Math.Abs(length.Value - 1.0) < 2.2204460492503131E-015
                                 ? "*"
                                 : Convert.ToString(length.Value, cultureInfo) + "*";
                             break;
@@ -160,12 +157,6 @@ namespace Windows.UI.Xaml
                             result = Convert.ToString(length.Value, cultureInfo);
                             break;
                     }
-                }
-
-                if (destinationType == typeof(InstanceDescriptor))
-                {
-                    var ci = typeof(GridLength).GetConstructor(new Type[] { typeof(double), typeof(GridUnitType) });
-                    result = new InstanceDescriptor(ci, new object[] { length.Value, length.GridUnitType });
                 }
             }
 

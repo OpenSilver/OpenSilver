@@ -13,11 +13,8 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -51,11 +48,11 @@ namespace Windows.UI.Xaml
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />
-        /// or <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />;
+        /// otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
+            return destinationType == typeof(string);
         }
 
         /// <summary>Converts a given string value to an instance of <see cref="T:System.Windows.Duration" />.</summary>
@@ -80,7 +77,7 @@ namespace Windows.UI.Xaml
                 if (duration.ToLower() == "automatic")
                     return Duration.Automatic;
 #if BRIDGE
-            TimeSpan timeSpan = INTERNAL_BridgeWorkarounds.TimeSpanParse(duration);
+                TimeSpan timeSpan = INTERNAL_BridgeWorkarounds.TimeSpanParse(duration);
 #else
                 TimeSpan timeSpan = TimeSpan.Parse(duration);
 #endif
@@ -106,32 +103,7 @@ namespace Windows.UI.Xaml
 
             if (destinationType != null && value is Duration dur)
             {
-                if (destinationType == typeof(InstanceDescriptor))
-                {
-                    MemberInfo mi;
-
-                    if (dur.HasTimeSpan)
-                    {
-                        mi = typeof(Duration).GetConstructor(new Type[] { typeof(TimeSpan) });
-
-                        result = new InstanceDescriptor(mi, new object[] { dur.TimeSpan });
-                    }
-                    else if (dur == Duration.Forever)
-                    {
-                        mi = typeof(Duration).GetProperty("Forever");
-
-                        result = new InstanceDescriptor(mi, null);
-                    }
-                    else
-                    {
-                        Debug.Assert(dur == Duration.Automatic);  // Only other legal duration type
-
-                        mi = typeof(Duration).GetProperty("Automatic");
-
-                        result = new InstanceDescriptor(mi, null);
-                    }
-                }
-                else if (destinationType == typeof(string))
+                if (destinationType == typeof(string))
                 {
                     result = dur.ToString();
                 }

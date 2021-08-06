@@ -43,6 +43,11 @@ namespace Windows.UI.Xaml.Media
 
         #region Constructor
 
+        public static PointCollection Parse(string pointsAsString)
+        {
+            return (PointCollection)TypeDescriptor.GetConverter(typeof(PointCollection)).ConvertFromInvariantString(pointsAsString);
+        }
+
         /// <summary>
         /// Initializes a new instance that is empty.
         /// </summary>
@@ -104,21 +109,6 @@ namespace Windows.UI.Xaml.Media
         {
             this.InsertInternal(index, point);
             this.NotifyCollectionChanged();
-        }
-
-        internal object ToString(object p, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is PointCollection collection;
-        }
-
-        public override int GetHashCode()
-        {
-            return 0;
         }
 
         internal override Point GetItemOverride(int index)

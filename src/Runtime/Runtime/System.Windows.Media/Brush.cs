@@ -12,9 +12,7 @@
 *  
 \*====================================================================================*/
 
-#if BRIDGE
 using System;
-#endif
 using CSHTML5.Internal;
 using System.Collections.Generic;
 using System.ComponentModel;

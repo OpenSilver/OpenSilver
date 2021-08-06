@@ -142,11 +142,18 @@ namespace Windows.UI.Xaml.Data
             Type indexType = indexer.GetIndexParameters().First().ParameterType;
             try
             {
-                _parsedIndex = Convert.ChangeType(_index, indexType);
+                this._parsedIndex = Convert.ChangeType(this._index, indexType);
             }
             catch (Exception)
             {
-               _parsedIndex = ObjectBuilder.Singleton.Parse(_index, indexType);
+                if (TypeFromStringConverters.CanTypeBeConverted(indexType))
+                {
+                    this._parsedIndex = TypeFromStringConverters.ConvertFromInvariantString(indexType, this._index); //todo: maybe in try / catch ?
+                }
+                else
+                {
+                    this._parsedIndex = this._index; //todo: maybe null ?
+                }
             }
         }
     }

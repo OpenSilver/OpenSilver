@@ -13,9 +13,7 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
 using System.Globalization;
 
@@ -71,40 +69,7 @@ namespace Windows.UI.Xaml.Media
             }
             else if (value is string)
             {
-                var source = value.ToString();
-
-                if (source == "Identity")
-                {
-                    result = Matrix.Identity;
-                }
-                else
-                {
-                    var splittedString = source.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                    if (splittedString.Length == 6)
-                    {
-#if NETSTANDARD
-                        if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var m11) &&
-                            double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var m12) &&
-                            double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out var m21) &&
-                            double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out var m22) &&
-                            double.TryParse(splittedString[4], NumberStyles.Any, CultureInfo.InvariantCulture, out var offsetX) &&
-                            double.TryParse(splittedString[5], NumberStyles.Any, CultureInfo.InvariantCulture, out var offsetY))
-#elif BRIDGE
-                if (double.TryParse(splittedString[0], out var m11) &&
-                    double.TryParse(splittedString[1], out var m12) &&
-                    double.TryParse(splittedString[2], out var m21) &&
-                    double.TryParse(splittedString[3], out var m22) &&
-                    double.TryParse(splittedString[4], out var offsetX) &&
-                    double.TryParse(splittedString[5], out var offsetY))
-#endif
-                            result = new Matrix(m11, m12, m21, m22, offsetX, offsetY);
-                    }
-                    else
-                    {
-                        throw new FormatException(source + " is not an eligible value for a Matrix");
-                    }
-                }
+                result = Matrix.Parse(value.ToString());
             }
             else
             {
@@ -128,7 +93,7 @@ namespace Windows.UI.Xaml.Media
             {
                 if (destinationType == typeof(string))
                 {
-                    result = matrix.ToString(null, culture);
+                    result = matrix.ConvertToString(null, culture);
                 }
             }
 

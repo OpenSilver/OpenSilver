@@ -12,14 +12,12 @@
 *  
 \*====================================================================================*/
 
-
-
 #if BRIDGE
 using Bridge;
-using System;
 #endif
+
+using System;
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
 using System.Globalization;
 
 #if MIGRATION
@@ -51,10 +49,10 @@ namespace Windows.UI
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(InstanceDescriptor);
+            return destinationType == typeof(string);
         }
 
         /// <summary>Attempts to convert the specified object to a <see cref="T:System.Windows.Media.Color" />.</summary>
@@ -152,12 +150,7 @@ namespace Windows.UI
 
             if (destinationType != null && value is Color color)
             {
-                if (destinationType == typeof(InstanceDescriptor))
-                {
-                    var mi = typeof(Color).GetMethod("FromArgb", new Type[] { typeof(byte), typeof(byte), typeof(byte), typeof(byte) });
-                    result = new InstanceDescriptor(mi, new object[] { color.A, color.R, color.G, color.B });
-                }
-                else if (destinationType == typeof(string))
+                if (destinationType == typeof(string))
                 {
                     result = color.ToString(culture);
                 }

@@ -47,7 +47,8 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             var fontFamilyConverter = new FontFamilyConverter();
             var test = fontFamilyConverter.ConvertFrom("Verdana");
-            test.Should().Be(new FontFamily("Verdana"));
+            test.Should().BeOfType<FontFamily>();
+            ((FontFamily)test).Source.Should().Be("Verdana");
         }
 
         [TestMethod]

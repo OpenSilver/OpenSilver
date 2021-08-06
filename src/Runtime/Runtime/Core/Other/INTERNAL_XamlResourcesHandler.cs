@@ -349,18 +349,16 @@ namespace CSHTML5.Internal
             }
 
             var colorConverter = TypeDescriptor.GetConverter(typeof(Color));
-
-            _defaultResources = new ResourceDictionary
-            {
-                ["ContentControlThemeFontFamily"] = new FontFamily("Segoe UI"),
-                ["SymbolThemeFontFamily"] = new FontFamily("Segoe UI Symbol"),
-                ["ControlContentThemeFontSize"] = 14.667,
-                ["ThumbBorderThemeBrush"] = new SolidColorBrush((Color)colorConverter.ConvertFrom("#3B555555")),
-                ["SystemAccentColor"] = colorConverter.ConvertFrom("#FF0078D7"),// this is the default blue value but it can be changed in windows so yeah...
-                ["SystemColorButtonFaceColor"] = colorConverter.ConvertFrom("#FF000000"),// todo: find what the value is supposed to be by default, coudln't find it so I put black and we'll see if it's ok.
-                ["ScrollBarThumbBackgroundColor"] = colorConverter.ConvertFrom("#FF333333"),// todo: find what the value is supposed to be by default, coudln't find it so I put black and we'll see if it's ok.
-                ["ScrollBarPanningThumbBackgroundColor"] = colorConverter.ConvertFrom("#00333333")// todo: find what the value is supposed to be by default, coudln't find it so I put black and we'll see if it's ok.
-            };
+            
+            _defaultResources = new ResourceDictionary();
+            _defaultResources["ContentControlThemeFontFamily"] = new FontFamily("Segoe UI");
+            _defaultResources["SymbolThemeFontFamily"] = new FontFamily("Segoe UI Symbol");
+            _defaultResources["ControlContentThemeFontSize"] = 14.667;
+            _defaultResources["ThumbBorderThemeBrush"] = new SolidColorBrush((Color)colorConverter.ConvertFrom("#3B555555"));
+            _defaultResources["SystemAccentColor"] = (Color)colorConverter.ConvertFrom("#FF0078D7");// this is the default blue value but it can be changed in windows so yeah...
+            _defaultResources["SystemColorButtonFaceColor"] = (Color)colorConverter.ConvertFrom("#FF000000");// todo: find what the value is supposed to be by default, coudln't find it so I put black and we'll see if it's ok.
+            _defaultResources["ScrollBarThumbBackgroundColor"] = (Color)colorConverter.ConvertFrom("#FF333333");// todo: find what the value is supposed to be by default, coudln't find it so I put black and we'll see if it's ok.
+            _defaultResources["ScrollBarPanningThumbBackgroundColor"] = (Color)colorConverter.ConvertFrom("#00333333");// todo: find what the value is supposed to be by default, coudln't find it so I put black and we'll see if it's ok.
         }
 
         void EnsureDefaultThemeResources()

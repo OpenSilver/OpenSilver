@@ -71,7 +71,7 @@ namespace Windows.UI.Xaml.Media.Tests
             var imageSourceConverter = new ImageSourceConverter();
             var str = "ms-appx:/Images/Logo1.png";
             var test = imageSourceConverter.ConvertTo(new BitmapImage(new Uri(str, UriKind.Absolute)), typeof(string));
-            test.Should().Be("");
+            test.Should().Be(new BitmapImage().ToString());
         }
 
         [TestMethod]

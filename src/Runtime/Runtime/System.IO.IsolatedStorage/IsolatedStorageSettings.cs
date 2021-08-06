@@ -36,7 +36,7 @@ using System.Windows;
 using Windows.UI.Xaml;
 #endif
 
-namespace OpenSilver.IO.IsolatedStorage
+namespace System.IO.IsolatedStorage
 {
     //Note: we remove the interfaces because they are useless for now.
     //

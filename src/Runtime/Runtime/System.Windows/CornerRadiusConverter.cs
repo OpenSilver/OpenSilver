@@ -12,12 +12,8 @@
 *  
 \*====================================================================================*/
 
-
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
 using System.Globalization;
 using System.Text;
 
@@ -50,11 +46,11 @@ namespace Windows.UI.Xaml
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />
-        /// or <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; 
+        /// otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
+            return destinationType == typeof(string);
         }
 
         /// <summary>Converts the specified object to a <see cref="T:System.Windows.CornerRadius" />.</summary>
@@ -147,7 +143,7 @@ namespace Windows.UI.Xaml
                 if (destinationType == typeof(string))
                 {
                     var listSeparator = ',';
-#if !BRIDGE
+#if NETSTANDARD
                     var instance = NumberFormatInfo.GetInstance(cultureInfo);
                     if (instance.NumberDecimalSeparator.Length > 0 && listSeparator == instance.NumberDecimalSeparator[0])
                     {
@@ -170,11 +166,6 @@ namespace Windows.UI.Xaml
                     sb.Append(radius.BottomLeft.ToString(cultureInfo));
 
                     result = sb.ToString();
-                }
-                if (destinationType == typeof(InstanceDescriptor))
-                {
-                    var ci = typeof(CornerRadius).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double), typeof(double) });
-                    result = new InstanceDescriptor(ci, new object[] { radius.TopLeft, radius.TopRight, radius.BottomRight, radius.BottomLeft });
                 }
             }
             else

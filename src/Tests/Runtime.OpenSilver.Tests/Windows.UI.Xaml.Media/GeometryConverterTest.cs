@@ -47,13 +47,22 @@ namespace Windows.UI.Xaml.Media.Tests
         public void ConvertFrom_String_ShouldReturnGeometry()
         {
             var geometryConverter = new GeometryConverter();
-            var points = new List<Point> { new Point(20, 0), new Point(20, 10), new Point(50, 30), new Point(50, 40), new Point(20, 40), };
-            var lineSegment = new PolyLineSegment { Points = new PointCollection(points) };
-            var segments = new PathSegmentCollection { lineSegment };
-
-            var expected = new PathGeometry(new List<PathFigure> { new PathFigure { Segments = segments, StartPoint = new Point(10, 10), } });
             var test = geometryConverter.ConvertFrom("M 10,10 20,0 20,10 L 50,30 50,40 20,40");
-            test.Should().Be(expected);
+
+            test.Should().BeOfType<PathGeometry>();
+            
+            var pg = (PathGeometry)test;
+            pg.Figures.Count.Should().Be(1);
+            pg.Figures[0].Segments.Count.Should().Be(1);
+            pg.Figures[0].Segments[0].Should().BeOfType<PolyLineSegment>();
+
+            var segments = (PolyLineSegment)pg.Figures[0].Segments[0];
+            segments.Points.Count.Should().Be(5);
+            segments.Points[0].Should().Be(new Point(20, 0));
+            segments.Points[1].Should().Be(new Point(20, 10));
+            segments.Points[2].Should().Be(new Point(50, 30));
+            segments.Points[3].Should().Be(new Point(50, 40));
+            segments.Points[4].Should().Be(new Point(20, 40));
         }
 
         [TestMethod]
@@ -75,7 +84,7 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             var geometryConverter = new GeometryConverter();
             var test = geometryConverter.ConvertTo(new PathGeometry(), typeof(string));
-            test.Should().Be("");
+            test.Should().Be(new PathGeometry().ToString());
         }
 
         [TestMethod]

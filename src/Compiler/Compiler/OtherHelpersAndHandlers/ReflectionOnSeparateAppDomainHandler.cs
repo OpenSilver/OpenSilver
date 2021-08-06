@@ -877,6 +877,11 @@ namespace DotNetForHtml5.Compiler
             {
                 var type = FindType(namespaceName, localTypeName, assemblyNameIfAny);
 
+                //var typeConverterAttr = FindType("System.ComponentModel", "TypeConverterAttribute");
+                //var attribute = Attribute.GetCustomAttribute(type, typeConverterAttr);
+
+                //return attribute != null;
+
                 var converter = TypeDescriptor.GetConverter(type);
 
                 return converter?.CanConvertFrom(typeof(string)) ?? false;

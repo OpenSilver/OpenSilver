@@ -13,11 +13,8 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
 using System.Globalization;
 
 #if MIGRATION
@@ -49,11 +46,11 @@ namespace Windows.UI.Text
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />
-        /// or <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; 
+        /// otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
+            return destinationType == typeof(string);
         }
 
         /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.FontWeight" />.</summary>
@@ -113,12 +110,7 @@ namespace Windows.UI.Text
 
             if (destinationType != null && value is FontWeight fontWeight)
             {
-                if (destinationType == typeof(InstanceDescriptor))
-                {
-                    var mi = typeof(FontWeight).GetMethod("FromOpenTypeWeight", new Type[] { typeof(int) });
-                    result = new InstanceDescriptor(mi, new object[] { fontWeight.ToOpenTypeWeight() });
-                }
-                else if (destinationType == typeof(string))
+                if (destinationType == typeof(string))
                 {
                     result = ((IFormattable)fontWeight).ToString(null, culture);
                 }

@@ -52,15 +52,5 @@ namespace Windows.UI.Xaml.Media
         {
             return Source;
         }
-
-        public override bool Equals(object obj)
-        {
-            return obj is FontFamily family && Source == family.Source;
-        }
-
-        public override int GetHashCode()
-        {
-            return 924162744 + EqualityComparer<string>.Default.GetHashCode(Source);
-        }
     }
 }

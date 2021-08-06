@@ -12,11 +12,8 @@
 *  
 \*====================================================================================*/
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
 using System.Globalization;
 
 #if MIGRATION
@@ -48,11 +45,11 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />
-        /// or <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; 
+        /// otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
+            return destinationType == typeof(string);
         }
 
         /// <summary>Converts the specified object to an instance of the <see cref="T:System.Windows.Controls.DataGridLength" /> class.</summary>
@@ -162,11 +159,6 @@ namespace Windows.UI.Xaml.Controls
                             result = Convert.ToString(length.Value, culture);
                             break;
                     }
-                }
-                else if (destinationType == typeof(InstanceDescriptor))
-                {
-                    var ci = typeof(DataGridLength).GetConstructor(new Type[] { typeof(double), typeof(DataGridLengthUnitType) });
-                    result = new InstanceDescriptor(ci, new object[] { length.Value, length.UnitType });
                 }
             }
 

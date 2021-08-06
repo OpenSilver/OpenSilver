@@ -12,9 +12,7 @@
 *  
 \*====================================================================================*/
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
 
 #if MIGRATION
@@ -23,11 +21,11 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    [TypeConverter(typeof(DurationConverter))]
     /// <summary>
     /// Represents the duration of time that a Windows.UI.Xaml.Media.Animation.Timeline
     /// is active.
     /// </summary>
+    [TypeConverter(typeof(DurationConverter))]
     public partial struct Duration
     {
         private DurationType _durationType;

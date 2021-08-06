@@ -82,26 +82,11 @@ namespace Windows.UI.Xaml.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Bool_ShouldThrow_NotSupportedException()
-        {
-            var thicknessConverter = new ThicknessConverter();
-            Assert.ThrowsException<NotSupportedException>(() => thicknessConverter.ConvertFrom(true));
-        }
-
-        [TestMethod]
         public void ConvertTo_String()
         {
             var thicknessConverter = new ThicknessConverter();
             var test = thicknessConverter.ConvertTo(new Thickness(1), typeof(string));
             test.Should().Be("1,1,1,1");
-        }
-
-        [TestMethod]
-        public void ConvertTo_InstanceDescriptor()
-        {
-            var thicknessConverter = new ThicknessConverter();
-            var test = thicknessConverter.ConvertTo(new Thickness(1), typeof(InstanceDescriptor));
-            test.Should().BeOfType(typeof(InstanceDescriptor));
         }
 
         [TestMethod]

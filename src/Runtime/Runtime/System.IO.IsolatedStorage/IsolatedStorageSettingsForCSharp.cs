@@ -18,6 +18,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Runtime.Serialization;
 #if !BRIDGE
@@ -26,7 +27,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenSilver.IO.IsolatedStorage
+namespace System.IO.IsolatedStorage
 {
     internal partial class IsolatedStorageSettingsForCSharp : IDictionary<string, Object>
     {
@@ -91,7 +92,7 @@ namespace OpenSilver.IO.IsolatedStorage
                 // DeSerialize the Dictionary from stream.    
                 object bytes = Formatter.Deserialize(stream);
 
-                var appData = (Dictionary<string, object>)bytes;
+                var appData = (Dictionary<string, object>) bytes;
 
                 // Enumerate through the collection and load our Dictionary.            
                 IDictionaryEnumerator enumerator = appData.GetEnumerator();
@@ -154,7 +155,7 @@ namespace OpenSilver.IO.IsolatedStorage
             finally
             {
                 stream.Close();
-            }
+            }      
 #endif
         }
 

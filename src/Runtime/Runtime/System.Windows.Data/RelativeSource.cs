@@ -12,10 +12,7 @@
 *  
 \*====================================================================================*/
 
-
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
 using System.Windows.Markup;
 
@@ -95,16 +92,6 @@ namespace Windows.UI.Xaml.Data
         {
             // Not implemented
             return null;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is RelativeSource source && Mode == source.Mode;
-        }
-
-        public override int GetHashCode()
-        {
-            return 851357954 + Mode.GetHashCode();
         }
     }
 }

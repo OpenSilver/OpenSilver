@@ -67,7 +67,8 @@ namespace System.Windows.Input
             }
             else if (value is string)
             {
-                if (Enum.TryParse(value.ToString(), out CursorType cursorType) && (int)cursorType >= (int)CursorType.None && (int)cursorType <= (int)CursorType.Eraser)
+                if (Enum.TryParse(value.ToString(), true, out CursorType cursorType) && 
+                    (int)cursorType >= (int)CursorType.None && (int)cursorType <= (int)CursorType.Eraser)
                 {
                     result = Cursors.EnsureCursor(cursorType);
                 }

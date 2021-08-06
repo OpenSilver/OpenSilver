@@ -101,15 +101,6 @@ namespace System.Windows.Tests
             var test = fontStyleConverter.ConvertTo(true, typeof(string));
             test.Should().Be("True");
         }
-
-        [TestMethod]
-        public void ConvertTo_InstanceDescriptor()
-        {
-            var fontStyleConverter = new FontStyleConverter();
-            var fontStyle = new FontStyle();
-            var test = fontStyleConverter.ConvertTo(fontStyle, typeof(InstanceDescriptor));
-            test.Should().BeOfType(typeof(InstanceDescriptor));
-        }
     }
 }
 #endif

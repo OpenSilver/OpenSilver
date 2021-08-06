@@ -13,9 +13,7 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
 using System.Collections.Generic;
 using System.Reflection;
 using System.ComponentModel;
@@ -219,15 +217,6 @@ namespace Windows.UI.Xaml
             }
         }
 
-        public override bool Equals(object obj)
-        {
-            return obj is PropertyPath path && Path == path.Path;
-        }
-
-        public override int GetHashCode()
-        {
-            return 467214278 + EqualityComparer<string>.Default.GetHashCode(Path);
-        }
         #endregion
 
         /// <summary>
@@ -295,15 +284,6 @@ namespace Windows.UI.Xaml
                 return _path;
             }
         }
-
-        /// <summary>
-        /// The list of parameters to use when the
-        /// path refers to indexed parameters.
-        /// Each parameter in the list should be a DependencyProperty,
-        /// a PropertyInfo, or a PropertyDescriptor.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public Collection<object> PathParameters { get; }
 
         public PropertyPath(string path, params object[] pathParameters) : this(path)
         {

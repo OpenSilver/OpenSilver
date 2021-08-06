@@ -77,7 +77,7 @@ namespace Windows.Foundation.Tests
         {
             var pointConverter = new PointConverter();
             var test = pointConverter.ConvertTo(new Point(1, 1), typeof(string));
-            test.Should().Be("1, 1");
+            test.Should().Be("1,1");
         }
 
         [TestMethod]

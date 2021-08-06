@@ -181,10 +181,8 @@ namespace Windows.UI.Xaml.Media.Tests
         public void MultiplyPoint_When_Identity()
         {
             Point p = new Point(10, 25);
-            var x = p.X;
-            var y = p.Y;
             Matrix m = Matrix.Identity;
-            m.MultiplyPoint(ref x, ref y);
+            m.MultiplyPoint(ref p._x, ref p._y);
             p.Should().Be(new Point(10, 25));
         }
 
@@ -192,10 +190,8 @@ namespace Windows.UI.Xaml.Media.Tests
         public void MultiplyPoint_When_Translation()
         {
             Point p = new Point(10, 25);
-            var x = p.X;
-            var y = p.Y;
             Matrix m = GetTranslateMatrix(-10, 5);
-            m.MultiplyPoint(ref x, ref y);
+            m.MultiplyPoint(ref p._x, ref p._y);
             p.Should().Be(new Point(0, 30));
         }
 
@@ -203,10 +199,8 @@ namespace Windows.UI.Xaml.Media.Tests
         public void MultiplyPoint_When_Scaling()
         {
             Point p = new Point(10, 25);
-            var x = p.X;
-            var y = p.Y;
             Matrix m = GetScaleMatrix(0.8, -1.5);
-            m.MultiplyPoint(ref x, ref y);
+            m.MultiplyPoint(ref p._x, ref p._y);
             p.Should().Be(new Point(8, -37.5));
         }
 
@@ -214,10 +208,8 @@ namespace Windows.UI.Xaml.Media.Tests
         public void MultiplyPoint_When_Translation_And_Scaling()
         {
             Point p = new Point(10, 25);
-            var x = p.X;
-            var y = p.Y;
             Matrix m = GetScaleTranslateMatrix(2, 3, 1, -3);
-            m.MultiplyPoint(ref x, ref y);
+            m.MultiplyPoint(ref p._x, ref p._y);
             p.Should().Be(new Point(21, 72));
         }
 
@@ -225,10 +217,8 @@ namespace Windows.UI.Xaml.Media.Tests
         public void MultiplyPoint_When_Unknown()
         {
             Point p = new Point(10, 25);
-            var x = p.X;
-            var y = p.Y;
             Matrix m = GetIncrementalMatrix(2, 0.5);
-            m.MultiplyPoint(ref x, ref y);
+            m.MultiplyPoint(ref p._x, ref p._y);
             p.Should().Be(new Point(99, 117));
         }
 

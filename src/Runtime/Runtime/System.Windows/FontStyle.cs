@@ -22,16 +22,21 @@ namespace System.Windows
     [TypeConverter(typeof(FontStyleConverter))]
     public partial struct FontStyle : IFormattable
     {
-        private readonly int Style;
+        private int _style;
 
         internal FontStyle(int style)
         {
-            Style = style;
+            _style = style;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object o)
         {
-            return obj is FontStyle style && Style == style.Style;
+            if (o is FontStyle)
+            {
+                FontStyle fs = (FontStyle)o;
+                return this == fs;
+            }
+            return false;
         }
 
         public bool Equals(FontStyle fontStyle)
@@ -41,47 +46,45 @@ namespace System.Windows
 
         public override int GetHashCode()
         {
-            return -1755968282 + Style.GetHashCode();
+            return this._style;
         }
 
         public static bool operator ==(FontStyle left, FontStyle right)
         {
-            return left.Style == right.Style;
+            return left._style == right._style;
         }
 
         public static bool operator !=(FontStyle left, FontStyle right)
         {
-            return left.Style != right.Style;
+            return left._style != right._style;
         }
 
         public override string ToString()
         {
-            switch (Style)
-            {
-                case 0:
-                    return "Normal";
-                case 1:
-                    return "Oblique";
-                case 2:
-                    return "Italic";
-                default:
-                    return string.Empty; //should not be possible
-            }
+            return ConvertToString(null, null);
         }
 
-        internal int GetStyleForInternalConstruction()
+        string IFormattable.ToString(string format, IFormatProvider formatProvider)
         {
-            Debug.Assert(0 <= Style && Style <= 2);
-            return Style;
+            return ConvertToString(format, formatProvider);
         }
 
-        public string ToString(string format, IFormatProvider formatProvider)
+        /// <summary>
+        /// Creates a string representation of this object based on the format string 
+        /// and IFormatProvider passed in.  
+        /// If the provider is null, the CurrentCulture is used.
+        /// See the documentation for IFormattable for more information.
+        /// </summary>
+        /// <returns>
+        /// A string representation of this object.
+        /// </returns>
+        private string ConvertToString(string format, IFormatProvider provider)
         {
-            if (Style == 0)
+            if (_style == 0)
                 return "Normal";
-            if (Style == 1)
+            if (_style == 1)
                 return "Oblique";
-            Debug.Assert(Style == 2);
+            Debug.Assert(_style == 2);
             return "Italic";
         }
     }

@@ -51,9 +51,9 @@ namespace Windows.UI.Xaml.Data.Tests
         public void ConvertFrom_String()
         {
             var relativeSourceConverter = new RelativeSourceConverter();
-            var expected = new RelativeSource { Mode = RelativeSourceMode.Self };
             var test = relativeSourceConverter.ConvertFrom("Self");
-            test.Should().Be(expected);
+            test.Should().BeOfType<RelativeSource>();
+            ((RelativeSource)test).Mode.Should().Be(RelativeSourceMode.Self);
         }
 
         [TestMethod]

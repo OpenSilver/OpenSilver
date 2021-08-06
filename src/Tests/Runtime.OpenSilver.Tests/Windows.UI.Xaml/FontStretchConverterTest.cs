@@ -96,15 +96,6 @@ namespace Windows.UI.Xaml.Tests
             var test = cursorConverter.ConvertTo(true, typeof(string));
             test.Should().Be("True");
         }
-
-        [TestMethod]
-        public void ConvertTo_InstanceDescriptor()
-        {
-            var cursorConverter = new FontStretchConverter();
-            var fontStretch = new FontStretch();
-            var test = cursorConverter.ConvertTo(fontStretch, typeof(InstanceDescriptor));
-            test.Should().BeOfType(typeof(InstanceDescriptor));
-        }
     }
 #endif
 }

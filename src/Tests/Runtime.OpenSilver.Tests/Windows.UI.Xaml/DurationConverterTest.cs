@@ -87,13 +87,5 @@ namespace Windows.UI.Xaml.Tests
             var test = durationConverter.ConvertTo(true, typeof(string));
             test.Should().Be("True");
         }
-
-        [TestMethod]
-        public void ConvertTo_InstanceDescriptor()
-        {
-            var durationConverter = new DurationConverter();
-            var test = durationConverter.ConvertTo(new Duration(), typeof(InstanceDescriptor));
-            test.Should().BeOfType(typeof(InstanceDescriptor));
-        }
     }
 }

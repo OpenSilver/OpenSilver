@@ -13,14 +13,13 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
+using System.ComponentModel;
+using System.Globalization;
+
 #if !MIGRATION
 using Windows.Foundation;
 #endif
-using System.ComponentModel;
-using System.Globalization;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -124,7 +123,7 @@ namespace Windows.UI.Xaml.Media
             {
                 if (destinationType == typeof(string))
                 {
-                    result = collection.ToString(null, culture);
+                    result = collection.ToString();
                 }
             }
 

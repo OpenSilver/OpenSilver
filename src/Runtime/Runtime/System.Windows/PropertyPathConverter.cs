@@ -13,9 +13,7 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
 using System.Globalization;
 
@@ -103,17 +101,7 @@ namespace Windows.UI.Xaml
 
             if (value is PropertyPath path)
             {
-                if (path.PathParameters.Count == 0)
-                {
-                    // if the path didn't use paramaters, just write it out as it is
-                    return path.Path;
-                }
-                else
-                {
-                    // PropertyPath.PathParameters and PropertyPath.DowncastAccessor() have to be implement.
-                    // There are other classes that have to implemented too like XamlDesignerSerializationManager, IValueSerializerContext, etc.
-                    throw new NotImplementedException();
-                }
+                return path.Path;
             }
             else
             {

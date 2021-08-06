@@ -13,10 +13,12 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
+using CSHTML5.Internal;
+using DotNetForHtml5.Core;
 using System;
-#endif
 using System.ComponentModel;
+using System.Globalization;
+using System.Windows.Markup;
 
 #if MIGRATION
 namespace System.Windows
@@ -25,12 +27,15 @@ namespace Windows.Foundation
 #endif
 {
     /// <summary>
-    /// Represents an {X, Y} coordinate pair in two-dimensional space. 
-    /// Can also represent a logical point for certain property usages.
+    /// Represents an x- and y-coordinate pair in two-dimensional
+    /// space. Can also represent a logical point for certain property usages.
     /// </summary>
     [TypeConverter(typeof(PointConverter))]
     public partial struct Point : IFormattable
     {
+        internal double _x;
+        internal double _y;
+
         /// <summary>
         /// Initializes a Windows.Foundation.Point structure that
         /// contains the specified values.
@@ -39,8 +44,8 @@ namespace Windows.Foundation
         /// <param name="y">The y-coordinate value of the Windows.Foundation.Point structure.</param>
         public Point(double x, double y)
         {
-            X = x;
-            Y = y;
+            _x = x;
+            _y = y;
         }
 
         /// <summary>
@@ -57,7 +62,7 @@ namespace Windows.Foundation
         {
             return point1.X != point2.X || point1.Y != point2.Y;
         }
-
+       
         /// <summary>
         /// Compares two Windows.Foundation.Point structures for equality
         /// </summary>
@@ -76,14 +81,35 @@ namespace Windows.Foundation
         /// Gets or sets the Windows.Foundation.Point.X-coordinate
         /// value of this Windows.Foundation.Point structure.
         /// </summary>
-        public double X { get; set; }
+        public double X 
+        {
+            get
+            {
+                return _x;
+            }
+            set
+            {
+                _x = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the Windows.Foundation.Point.Y-coordinate
         /// value of this Windows.Foundation.Point.
         /// </summary>
-        public double Y { get; set; }
+        public double Y
+        {
+            get
+            {
+                return _y;
+            }
+            set
+            {
+                _y = value;
+            }
+        }
 
+       
         /// <summary>
         /// Determines whether the specified object is a Windows.Foundation.Point
         /// and whether it contains the same values as this Windows.Foundation.Point.
@@ -131,12 +157,79 @@ namespace Windows.Foundation
         /// </returns>
         public override string ToString()
         {
-            return string.Concat(X, ", ", Y);
+            return ConvertToString(null /* format string */, null /* format provider */);
         }
 
-        public string ToString(string format, IFormatProvider formatProvider)
+        public string ToString(IFormatProvider provider)
         {
-            return null;
+            return ConvertToString(null /* format string */, provider);
+        }
+
+        string IFormattable.ToString(string format, IFormatProvider provider)
+        {
+            return ConvertToString(format, provider);
+        }
+
+        public static Point Parse(string pointAsString)
+        {
+            string[] splittedString = pointAsString.Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries);
+
+            if (splittedString.Length == 2)
+            {
+                double x, y;
+#if OPENSILVER
+                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out x) && 
+                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out y))
+#else
+                if (double.TryParse(splittedString[0], out x) &&
+                    double.TryParse(splittedString[1], out y))
+#endif
+                    return new Point(x, y);
+            }
+            
+            throw new FormatException(pointAsString + " is not an eligible value for a Point");
+        }
+
+        /// <summary>
+        /// Creates a string representation of this object based on the format string
+        /// and IFormatProvider passed in.
+        /// If the provider is null, the CurrentCulture is used.
+        /// See the documentation for IFormattable for more information.
+        /// </summary>
+        /// <returns>
+        /// A string representation of this object.
+        /// </returns>
+        internal string ConvertToString(string format, IFormatProvider provider)
+        {
+            // Helper to get the numeric list separator for a given culture.
+            char separator = GetNumericListSeparator(provider);
+
+            return string.Format(provider,
+                                 "{1:" + format + "}{0}{2:" + format + "}",
+                                 separator,
+                                 _x,
+                                 _y);
+        }
+
+        private static char GetNumericListSeparator(IFormatProvider provider)
+        {
+            char numericSeparator = ',';
+
+#if NETSTANDARD
+            // Get the NumberFormatInfo out of the provider, if possible
+            // If the IFormatProvider doesn't not contain a NumberFormatInfo, then
+            // this method returns the current culture's NumberFormatInfo.
+            var numberFormat = NumberFormatInfo.GetInstance(provider);
+
+            // Is the decimal separator is the same as the list separator?
+            // If so, we use the ";".
+            if ((numberFormat.NumberDecimalSeparator.Length > 0) && (numericSeparator == numberFormat.NumberDecimalSeparator[0]))
+            {
+                numericSeparator = ';';
+            }
+#endif
+
+            return numericSeparator;
         }
     }
 }

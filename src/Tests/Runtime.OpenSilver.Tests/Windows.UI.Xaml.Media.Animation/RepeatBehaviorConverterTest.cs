@@ -97,14 +97,6 @@ namespace Windows.UI.Xaml.Media.Animation.Tests
         }
 
         [TestMethod]
-        public void ConvertTo_InstanceDescriptor()
-        {
-            var repeatBehaviorConverter = new RepeatBehaviorConverter();
-            var test = repeatBehaviorConverter.ConvertTo(new RepeatBehavior(), typeof(InstanceDescriptor));
-            test.Should().BeOfType(typeof(InstanceDescriptor));
-        }
-
-        [TestMethod]
         public void ConvertTo_String_ShouldThrow_ArgumentNullException()
         {
             var repeatBehaviorConverter = new RepeatBehaviorConverter();

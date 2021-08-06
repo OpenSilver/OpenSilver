@@ -66,13 +66,23 @@
     <Compile Include="DotNetBrowser\JSString.cs" />
     <Compile Include="DotNetBrowser\JSStringObject.cs" />
     <Compile Include="DotNetBrowser\JSValue.cs" />
+    <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\BaseNumberConverter.cs" />
+    <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\BooleanConverter.cs" />
+    <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\CharConverter.cs" />
     <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\CompilerGeneratedAttribute.cs" />
-    <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\InstanceDescriptor.cs" />
+    <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\DateTimeConverter.cs" />
+    <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\DateTimeOffsetConverter.cs" />
+    <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\EnumConverter.cs" />
+    <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\GuidConverter.cs" />
     <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\ITypeDescriptorContext.cs" />
+    <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\NullableConverter.cs" />
     <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\OptionalFieldAttribute.cs" />
+    <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\StringConverter.cs" />
+    <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\TimeSpanConverter.cs" />
     <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\TypeConverter.cs" />
     <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\TypeConverterAttribute.cs" />
     <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\TypeDescriptor.cs" />
+    <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\UriTypeConverter.cs" />
     <Compile Include="MscorlibStuff_ToBeMovedIntoBridge\WeakReference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypesRequiredByTheSimulator\DynamicMetaObject.cs" />
@@ -84,7 +94,7 @@
     <Compile Include="TypesRequiredByTheSimulator\SetMemberBinder.cs" />
   </ItemGroup>
   <ItemGroup>
-      <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
     </Reference>
     <Reference Include="CSHTML5, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

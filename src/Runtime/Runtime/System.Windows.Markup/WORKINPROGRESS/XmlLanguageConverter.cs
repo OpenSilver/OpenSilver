@@ -15,7 +15,6 @@
 
 #if WORKINPROGRESS
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
 using System.Globalization;
 using System.Reflection;
 
@@ -44,11 +43,11 @@ namespace System.Windows.Markup
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />
-        /// or <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; 
+        /// otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
+            return destinationType == typeof(string);
         }
 
         /// <summary>Converts the specified string value to the <see cref="T:System.Windows.Markup.XmlLanguage" /> type supported by this converter.</summary>
@@ -99,21 +98,6 @@ namespace System.Windows.Markup
                 if (destinationType == typeof(string))
                 {
                     result = language.IetfLanguageTag;
-                }
-                else if (destinationType == typeof(InstanceDescriptor))
-                {
-#if BRIDGE
-                    var method = typeof(XmlLanguage).GetMethod("GetLanguage", BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod, new Type[1]
-                    {
-                        typeof(string)
-                    });
-#else
-                    var method = typeof(XmlLanguage).GetMethod("GetLanguage", BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod, null, new Type[1]
-                    {
-                        typeof(string)
-                    }, null);
-#endif
-                    result = new InstanceDescriptor(method, new object[1] { language.IetfLanguageTag });
                 }
             }
 

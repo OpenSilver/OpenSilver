@@ -13,7 +13,7 @@
 \*====================================================================================*/
 
 
-using System.ComponentModel;
+using System;
 
 #if MIGRATION
 namespace System.Windows
@@ -21,7 +21,6 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    [TypeConverter(typeof(RoutedEventConverter))]
     public partial class RoutedEvent
     {
         string _eventName;

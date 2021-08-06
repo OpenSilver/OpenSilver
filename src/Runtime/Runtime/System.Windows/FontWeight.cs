@@ -12,9 +12,7 @@
 *  
 \*====================================================================================*/
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
 
 #if MIGRATION
@@ -53,6 +51,11 @@ namespace Windows.UI.Text
             return Weight.ToString();
         }
 
+        string IFormattable.ToString(string format, IFormatProvider formatProvider)
+        {
+            return Weight.ToString(format, formatProvider);
+        }
+
         /// <summary>
         /// Compares two font weight values and returns an indication of their relative values.
         /// </summary>
@@ -73,24 +76,19 @@ namespace Windows.UI.Text
             return this == fontWeight;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object o)
         {
-            return obj is FontWeight weight && Weight == weight.Weight;
+            if (o is FontWeight)
+            {
+                FontWeight fw = (FontWeight)o;
+                return this == fw;
+            }
+            return false;
         }
 
         public override int GetHashCode()
         {
-            return 1219257281 + Weight.GetHashCode();
-        }
-
-        public string ToString(string format, IFormatProvider formatProvider)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int ToOpenTypeWeight()
-        {
-            throw new NotImplementedException();
+            return this.Weight;
         }
 
         public static bool operator ==(FontWeight left, FontWeight right)

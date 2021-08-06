@@ -13,9 +13,7 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -137,24 +135,6 @@ namespace Windows.UI.Xaml.Media
                     }
                 }
             }
-        }
-
-        internal object ToString(object format, CultureInfo culture)
-        {
-            if (IsIdentity)
-            {
-                return "Identity";
-            }
-
-            var listOperator = ',';
-#if !BRIDGE
-            NumberFormatInfo instance = NumberFormatInfo.GetInstance(culture);
-            if (instance.NumberDecimalSeparator.Length > 0 && listOperator == instance.NumberDecimalSeparator[0])
-            {
-                listOperator = ';';
-            }
-#endif
-            return string.Format(culture, "{1:" + format + "}{0}{2:" + format + "}{0}{3:" + format + "}{0}{4:" + format + "}{0}{5:" + format + "}{0}{6:" + format + "}", listOperator, _m11, _m12, _m21, _m22, _offsetX, _offsetY);
         }
 
         /// <summary>
@@ -336,9 +316,9 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-#endregion Public Properties
+        #endregion Public Properties
 
-#region Public Methods
+        #region Public Methods
 
         /// <summary>
         /// Transforms the specified point by the <see cref="Matrix"/> and returns
@@ -352,12 +332,9 @@ namespace Windows.UI.Xaml.Media
         /// </returns>
         public Point Transform(Point point)
         {
-            var x = point.X;
-            var y = point.Y;
-
-            MultiplyPoint(ref x, ref y);
-
-            return new Point(x, y);
+            Point newPoint = point;
+            MultiplyPoint(ref newPoint._x, ref newPoint._y);
+            return newPoint;
         }
 
         /// <summary>
@@ -458,9 +435,45 @@ namespace Windows.UI.Xaml.Media
             return ConvertToString(format, provider);
         }
 
+        /// <summary>
+        /// Parse - returns an instance converted from the provided string using
+        /// the culture "en-US"
+        /// <param name="source"> string with Matrix data </param>
+        /// </summary>
+        public static Matrix Parse(string source)
+        {
+            if (source == "Identity")
+                return Identity;
+
+            string[] splittedString = source.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (splittedString.Length == 6)
+            {
+                double m11, m12, m21, m22, offsetX, offsetY;
+#if NETSTANDARD
+                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out m11) &&
+                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out m12) &&
+                    double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out m21) &&
+                    double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out m22) &&
+                    double.TryParse(splittedString[4], NumberStyles.Any, CultureInfo.InvariantCulture, out offsetX) &&
+                    double.TryParse(splittedString[5], NumberStyles.Any, CultureInfo.InvariantCulture, out offsetY))
+#elif BRIDGE
+                if (double.TryParse(splittedString[0], out m11) &&
+                    double.TryParse(splittedString[1], out m12) &&
+                    double.TryParse(splittedString[2], out m21) &&
+                    double.TryParse(splittedString[3], out m22) &&
+                    double.TryParse(splittedString[4], out offsetX) &&
+                    double.TryParse(splittedString[5], out offsetY))
+#endif
+                    return new Matrix(m11, m12, m21, m22, offsetX, offsetY);
+            }
+
+            throw new FormatException(source + " is not an eligible value for a Matrix");
+        }
+
 #endregion Public Methods
 
-#region Operators
+        #region Operators
 
         public static bool operator ==(Matrix matrix1, Matrix matrix2)
         {
@@ -661,6 +674,13 @@ namespace Windows.UI.Xaml.Media
             }
 
             char separator = ',';
+#if NETSTANDARD
+            NumberFormatInfo instance = NumberFormatInfo.GetInstance(provider);
+            if (instance.NumberDecimalSeparator.Length > 0 && separator == instance.NumberDecimalSeparator[0])
+            {
+                separator = ';';
+            }
+#endif
 
             return String.Format(provider,
                                  "{1:" + format + "}{0}{2:" + format + "}{0}{3:" + format + "}{0}{4:" + format + "}{0}{5:" + format + "}{0}{6:" + format + "}",

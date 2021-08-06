@@ -26,17 +26,6 @@ namespace System.Windows
 
         internal TextDecoration Decoration { get; set; }
 
-        public override bool Equals(object obj)
-        {
-            return obj is TextDecorationCollection collection &&
-                   EqualityComparer<TextDecoration>.Default.Equals(Decoration, collection.Decoration);
-        }
-
-        public override int GetHashCode()
-        {
-            return -1836063205 + EqualityComparer<TextDecoration>.Default.GetHashCode(Decoration);
-        }
-
         internal string ToHtmlString()
         {
             if (Decoration != null)
@@ -66,16 +55,6 @@ namespace System.Windows
         }
 
         internal TextDecorationLocation Location { get; private set; }
-
-        public override bool Equals(object obj)
-        {
-            return obj is TextDecoration decoration && Location == decoration.Location;
-        }
-
-        public override int GetHashCode()
-        {
-            return 1369928374 + Location.GetHashCode();
-        }
     }
 }
 #endif

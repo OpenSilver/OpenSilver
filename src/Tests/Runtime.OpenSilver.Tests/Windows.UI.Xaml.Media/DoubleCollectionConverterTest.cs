@@ -46,9 +46,12 @@ namespace Windows.UI.Xaml.Media.Tests
         public void ConvertFrom_String_ShouldReturnDoubleCollection()
         {
             var doubleCollectionConverter = new DoubleCollectionConverter();
-            var expected = new DoubleCollection { 1.0, 2.0 };
             var test = doubleCollectionConverter.ConvertFrom("1.0, 2.0");
-            test.Should().Be(expected);
+            test.Should().BeOfType<DoubleCollection>();
+            var db = (DoubleCollection)test;
+            db.Count.Should().Be(2);
+            db[0].Should().Be(1.0);
+            db[1].Should().Be(2.0);
         }
 
         [TestMethod]
@@ -70,7 +73,7 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             var doubleCollectionConverter = new DoubleCollectionConverter();
             var test = doubleCollectionConverter.ConvertTo(new DoubleCollection { 1.0, 2.0 }, typeof(string));
-            test.Should().Be("1.0, 2.0");
+            test.Should().Be(new DoubleCollection().ToString());
         }
 
         [TestMethod]

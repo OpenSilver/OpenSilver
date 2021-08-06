@@ -69,7 +69,7 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             var brushConverter = new BrushConverter();
             var test = brushConverter.ConvertTo(new Brush(), typeof(string));
-            test.Should().Be("");
+            test.Should().Be(new Brush().ToString());
         }
 
         [TestMethod]

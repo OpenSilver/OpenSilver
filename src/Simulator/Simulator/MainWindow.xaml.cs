@@ -48,7 +48,6 @@ using System.Windows.Media.Imaging;
 #if OPENSILVER
 using OpenSilver.Simulator;
 #endif
-
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
     /// <summary>

@@ -61,10 +61,19 @@ namespace Windows.UI.Xaml.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_String_ShouldThrow_Exception()
+        public void ConvertFrom_String_ShouldReturnGridLengthStar()
         {
             var gridLengthConverter = new GridLengthConverter();
-            Assert.ThrowsException<Exception>(() => gridLengthConverter.ConvertFrom("*"));
+            var test = gridLengthConverter.ConvertFrom("*");
+            test.Should().Be(new GridLength(1.0, GridUnitType.Star));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_String_ShouldReturnGridLengthStar2()
+        {
+            var gridLengthConverter = new GridLengthConverter();
+            var test = gridLengthConverter.ConvertFrom("0.33*");
+            test.Should().Be(new GridLength(0.33, GridUnitType.Star));
         }
 
         [TestMethod]
@@ -102,15 +111,6 @@ namespace Windows.UI.Xaml.Tests
             var gridLengthConverter = new GridLengthConverter();
             Assert.ThrowsException<NotSupportedException>(() => gridLengthConverter.ConvertTo(true, typeof(string)));
             Assert.ThrowsException<NotSupportedException>(() => gridLengthConverter.ConvertTo(new GridLength(100), typeof(bool)));
-        }
-
-        [TestMethod]
-        public void ConvertTo_InstanceDescriptor()
-        {
-            var gridLengthConverter = new GridLengthConverter();
-            var fontStyle = new GridLength();
-            var test = gridLengthConverter.ConvertTo(fontStyle, typeof(InstanceDescriptor));
-            test.Should().BeOfType(typeof(InstanceDescriptor));
         }
     }
 }

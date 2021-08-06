@@ -47,10 +47,13 @@ namespace Windows.UI.Xaml.Media.Tests
         public void ConvertFrom_String_ShouldReturnPointCollection()
         {
             var pointCollectionConverter = new PointCollectionConverter();
-            var points = new List<Point> { new Point(1, 1), new Point(2, 2) };
-            var expected = new PointCollection(points);
             var test = pointCollectionConverter.ConvertFrom("1, 1, 2, 2");
-            test.Should().Be(expected);
+            test.Should().BeOfType<PointCollection>();
+
+            var pc = (PointCollection)test;
+            pc.Count.Should().Be(2);
+            pc[0].Should().Be(new Point(1, 1));
+            pc[1].Should().Be(new Point(2, 2));
         }
 
         [TestMethod]
@@ -79,7 +82,7 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             var pointCollectionConverter = new PointCollectionConverter();
             var test = pointCollectionConverter.ConvertTo(new PointCollection(), typeof(string));
-            test.Should().Be("1.0, 2.0");
+            test.Should().Be(new PointCollection().ToString());
         }
 
         [TestMethod]

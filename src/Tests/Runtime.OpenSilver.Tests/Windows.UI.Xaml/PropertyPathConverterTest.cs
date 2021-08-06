@@ -48,7 +48,8 @@ namespace Windows.UI.Xaml.Tests
         {
             var propertyPathConverter = new PropertyPathConverter();
             var test = propertyPathConverter.ConvertFrom("testpath");
-            test.Should().Be(new PropertyPath("testpath"));
+            test.Should().BeOfType<PropertyPath>();
+            ((PropertyPath)test).Path.Should().Be("testpath");
         }
 
         [TestMethod]
@@ -70,7 +71,7 @@ namespace Windows.UI.Xaml.Tests
         {
             var propertyPathConverter = new PropertyPathConverter();
             var test = propertyPathConverter.ConvertTo(new PropertyPath("testpath"), typeof(string));
-            test.Should().Be("0, 0, 100, 100");
+            test.Should().Be("testpath");
         }
 
         [TestMethod]

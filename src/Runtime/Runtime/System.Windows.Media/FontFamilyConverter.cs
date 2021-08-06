@@ -13,9 +13,7 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
 using System.Globalization;
 
@@ -109,12 +107,12 @@ namespace Windows.UI.Xaml.Media
             return result;
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.DoubleCollection" /> to a specified type. </summary>
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.FontFamily" /> to a specified type. </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.Media.DoubleCollection" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Media.DoubleCollection" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.Media.DoubleCollection" />.</returns>
+        /// <param name="value">The <see cref="T:System.Windows.Media.FontFamily" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Media.FontFamily" /> to.</param>
+        /// <returns>The object created from converting this <see cref="T:System.Windows.Media.FontFamily" />.</returns>
         /// <exception cref="T:System.ArgumentException">Occurs if <paramref name="value" /> or <paramref name="destinationType" /> is not a valid type for conversion.</exception>
         /// <exception cref="T:System.ArgumentNullException">Occurs if <paramref name="value" /> or <paramref name="destinationType" /> is <see langword="null" />.</exception>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
@@ -144,8 +142,6 @@ namespace Windows.UI.Xaml.Media
                         string name = null;
 
                         throw new NotImplementedException();
-
-                        return name;
                     }
                 }
             }

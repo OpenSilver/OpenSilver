@@ -13,11 +13,8 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
 using System.Globalization;
 using System.Text;
 
@@ -41,7 +38,25 @@ namespace Windows.UI.Xaml
         /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            return sourceType == typeof(string);
+            // We can only handle strings, integral and floating types
+            TypeCode tc = Type.GetTypeCode(sourceType);
+            switch (tc)
+            {
+                case TypeCode.String:
+                case TypeCode.Decimal:
+                case TypeCode.Single:
+                case TypeCode.Double:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                    return true;
+
+                default:
+                    return false;
+            }
         }
 
         /// <summary>
@@ -50,11 +65,11 @@ namespace Windows.UI.Xaml
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />
-        /// or <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; 
+        /// otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
+            return destinationType == typeof(string);
         }
 
         /// <summary>Attempts to create an instance of <see cref="T:System.Windows.Thickness" /> from a specified object. </summary>
@@ -66,73 +81,23 @@ namespace Windows.UI.Xaml
         /// <exception cref="T:System.ArgumentException">The example object is not a null reference and is not a valid type that can be converted to a <see cref="T:System.Windows.Thickness" />.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            object result = null;
-
-            if (value is null)
+            if (value != null)
             {
-                throw GetConvertFromException(value);
-            }
-            else if (value is string)
-            {
-                var thicknessAsString = value.ToString();
-
-                var splitter = ',';
-                var trimmedThicknessAsString = thicknessAsString.Trim(); //we trim the string so that we don't get random spaces at the beginning and at the end act as separators (for example: Margin=" 5")
-
-                if (!trimmedThicknessAsString.Contains(","))
+                if (value is string)
                 {
-                    splitter = ' ';
+                    return FromString(value.ToString(), culture);
                 }
-
-                var splittedString = trimmedThicknessAsString.Split(splitter);
-
-                if (splittedString.Length == 1)
+                else if (value is double)
                 {
-                    if (double.TryParse(splittedString[0], out var thickness))
-                    {
-                        result = new Thickness(thickness);
-                    }
+                    return new Thickness((double)value);
                 }
-                else if (splittedString.Length == 2)
+                else
                 {
-                    var topAndBottom = 0d;
-
-                    var isParseOK = double.TryParse(splittedString[0], out var leftAndRight);
-                    isParseOK = isParseOK && double.TryParse(splittedString[1], out topAndBottom);
-
-                    if (isParseOK)
-                    {
-                        result = new Thickness(leftAndRight, topAndBottom, leftAndRight, topAndBottom);
-                    }
-                }
-                else if (splittedString.Length == 4)
-                {
-                    double top = 0d;
-                    double right = 0d;
-                    double bottom = 0d;
-
-                    bool isParseOK = double.TryParse(splittedString[0], out var left);
-                    isParseOK = isParseOK && double.TryParse(splittedString[1], out top);
-                    isParseOK = isParseOK && double.TryParse(splittedString[2], out right);
-                    isParseOK = isParseOK && double.TryParse(splittedString[3], out bottom);
-
-                    if (isParseOK)
-                    {
-                        result = new Thickness(left, top, right, bottom);
-                    }
-                }
-
-                if (result is null)
-                {
-                    throw new FormatException(thicknessAsString + " is not an eligible value for Thickness");
+                    return new Thickness(Convert.ToDouble(value, culture));
                 }
             }
-            else
-            {
-                result = base.ConvertFrom(context, culture, value);
-            }
 
-            return result;
+            throw GetConvertFromException(value);
         }
 
         /// <summary>Attempts to convert a <see cref="T:System.Windows.Thickness" /> to a specified type. </summary>
@@ -161,7 +126,7 @@ namespace Windows.UI.Xaml
                 if (destinationType == typeof(string))
                 {
                     var listSeparator = ',';
-#if !BRIDGE
+#if NETSTANDARD
                     var instance = NumberFormatInfo.GetInstance(cultureInfo);
                     if (instance.NumberDecimalSeparator.Length > 0 && listSeparator == instance.NumberDecimalSeparator[0])
                     {
@@ -185,11 +150,6 @@ namespace Windows.UI.Xaml
 
                     result = sb.ToString();
                 }
-                else if (destinationType == typeof(InstanceDescriptor))
-                {
-                    var ci = typeof(Thickness).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double), typeof(double) });
-                    result = new InstanceDescriptor(ci, new object[] { thickness.Left, thickness.Top, thickness.Right, thickness.Bottom });
-                }
             }
             else
             {
@@ -202,6 +162,57 @@ namespace Windows.UI.Xaml
             }
 
             return result;
+        }
+
+        internal static Thickness FromString(string s, CultureInfo cultureInfo)
+        {
+            var splitter = ',';
+            var trimmedThicknessAsString = s.Trim(); //we trim the string so that we don't get random spaces at the beginning and at the end act as separators (for example: Margin=" 5")
+
+            if (!trimmedThicknessAsString.Contains(","))
+            {
+                splitter = ' ';
+            }
+
+            var splittedString = trimmedThicknessAsString.Split(splitter);
+
+            if (splittedString.Length == 1)
+            {
+                if (double.TryParse(splittedString[0], out var thickness))
+                {
+                    return new Thickness(thickness);
+                }
+            }
+            else if (splittedString.Length == 2)
+            {
+                var topAndBottom = 0d;
+
+                var isParseOK = double.TryParse(splittedString[0], out var leftAndRight);
+                isParseOK = isParseOK && double.TryParse(splittedString[1], out topAndBottom);
+
+                if (isParseOK)
+                {
+                    return new Thickness(leftAndRight, topAndBottom, leftAndRight, topAndBottom);
+                }
+            }
+            else if (splittedString.Length == 4)
+            {
+                double top = 0d;
+                double right = 0d;
+                double bottom = 0d;
+
+                bool isParseOK = double.TryParse(splittedString[0], out var left);
+                isParseOK = isParseOK && double.TryParse(splittedString[1], out top);
+                isParseOK = isParseOK && double.TryParse(splittedString[2], out right);
+                isParseOK = isParseOK && double.TryParse(splittedString[3], out bottom);
+
+                if (isParseOK)
+                {
+                    return new Thickness(left, top, right, bottom);
+                }
+            }
+
+            throw new FormatException(s + " is not an eligible value for Thickness");
         }
     }
 }

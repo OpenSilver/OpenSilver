@@ -13,11 +13,8 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
 using System.Globalization;
 
 #if MIGRATION
@@ -49,11 +46,11 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />
-        /// or <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; 
+        /// otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
+            return destinationType == typeof(string);
         }
 
         /// <summary>Attempts to convert a given object to an instance of <see cref="T:System.Windows.Media.Animation.KeyTime" />.</summary>
@@ -122,13 +119,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
             if (value != null && value is KeyTime keyTime)
             {
-                if (destinationType == typeof(InstanceDescriptor))
-                {
-                    var mi = typeof(KeyTime).GetMethod("FromTimeSpan", new Type[] { typeof(TimeSpan) });
-
-                    result = new InstanceDescriptor(mi, new object[] { keyTime.TimeSpan });
-                }
-                else if (destinationType == typeof(string))
+                if (destinationType == typeof(string))
                 {
                     result = TypeDescriptor.GetConverter(typeof(TimeSpan)).ConvertTo(
                        typeDescriptorContext,

@@ -13,11 +13,8 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -52,11 +49,11 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />
-        /// or <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />; otherwise, <see langword="false" />.</returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; 
+        /// otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
+            return destinationType == typeof(string);
         }
 
         /// <summary>Converts a given string value to an instance of <see cref="T:System.Windows.Media.Animation.RepeatBehaviorConverter" />.</summary>
@@ -77,7 +74,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 var arg = value.ToString();
 
                 //BRIDGETODO : verify the code below matchs
-#if !BRIDGE
+#if NETSTANDARD
                 var loweredArg = arg.ToLowerInvariant();
 #else
                 var loweredArg = arg.ToLower();
@@ -117,33 +114,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
             if (value is RepeatBehavior behavior && destinationType != null)
             {
-                if (destinationType == typeof(InstanceDescriptor))
-                {
-                    MemberInfo mi;
-
-                    if (behavior == RepeatBehavior.Forever)
-                    {
-                        mi = typeof(RepeatBehavior).GetProperty("Forever");
-                        result = new InstanceDescriptor(mi, null);
-                    }
-                    else if (behavior.HasCount)
-                    {
-                        mi = typeof(RepeatBehavior).GetConstructor(new Type[] { typeof(double) });
-                        result = new InstanceDescriptor(mi, new object[] { behavior.Count });
-                    }
-#if WORKINPROGRESS
-                    else if (behavior.HasDuration)
-                    {
-                        mi = typeof(RepeatBehavior).GetConstructor(new Type[] { typeof(TimeSpan) });
-                        result = new InstanceDescriptor(mi, new object[] { behavior.Duration });
-                    }
-#endif
-                    else
-                    {
-                        Debug.Fail("Unknown type of RepeatBehavior passed to RepeatBehaviorConverter.");
-                    }
-                }
-                else if (destinationType == typeof(string))
+                if (destinationType == typeof(string))
                 {
                     switch (behavior.Type)
                     {

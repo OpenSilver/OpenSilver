@@ -26,14 +26,6 @@ namespace System.Windows.Tests
         }
 
         [TestMethod]
-        public void CanConvertTo_String_ShouldReturnTrue()
-        {
-            var textDecorationCollectionConverter = new TextDecorationCollectionConverter();
-            var test = textDecorationCollectionConverter.CanConvertTo(typeof(InstanceDescriptor));
-            test.Should().BeTrue();
-        }
-
-        [TestMethod]
         public void CanConvertTo_Bool_ShouldReturnFalse()
         {
             var textDecorationCollectionConverter = new TextDecorationCollectionConverter();
@@ -45,9 +37,8 @@ namespace System.Windows.Tests
         public void ConvertFrom_String_ShouldReturnTextDecorationCollection()
         {
             var textDecorationCollectionConverter = new TextDecorationCollectionConverter();
-            var expected = new TextDecorationCollection { Decoration = new TextDecoration(TextDecorationLocation.Underline) };
             var test = textDecorationCollectionConverter.ConvertFrom("Underline");
-            test.Should().Be(expected);
+            test.Should().Be(TextDecorations.Underline);
         }
 
         [TestMethod]
@@ -73,19 +64,10 @@ namespace System.Windows.Tests
         }
 
         [TestMethod]
-        public void ConvertTo_InstanceDescriptor()
-        {
-            var textDecorationCollectionConverter = new TextDecorationCollectionConverter();
-            var test = textDecorationCollectionConverter.ConvertTo(Enumerable.Empty<TextDecoration>(), typeof(InstanceDescriptor));
-            test.Should().BeOfType(typeof(InstanceDescriptor));
-        }
-
-        [TestMethod]
         public void ConvertTo_ShouldThrow_NotSupportedException()
         {
             var textDecorationCollectionConverter = new TextDecorationCollectionConverter();
             Assert.ThrowsException<NotSupportedException>(() => textDecorationCollectionConverter.ConvertTo(Enumerable.Empty<TextDecoration>(), typeof(bool)));
-            Assert.ThrowsException<NotSupportedException>(() => textDecorationCollectionConverter.ConvertTo(new TextDecorationCollectionConverter(), typeof(InstanceDescriptor)));
         }
     }
 }

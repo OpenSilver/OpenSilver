@@ -15,7 +15,6 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
 using System.Globalization;
 
 #if MIGRATION
@@ -44,11 +43,11 @@ namespace System.Windows
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.ComponentModel.Design.Serialization.InstanceDescriptor" />;
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />;
         /// otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(InstanceDescriptor);
+            return destinationType == typeof(string);
         }
 
         /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.TextDecorationCollection" />.</summary>
@@ -98,20 +97,7 @@ namespace System.Windows
         /// <see langword="null" /> is always returned because <see cref="T:System.Windows.TextDecorationCollection" /> cannot be converted to any other type.</returns>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            object result;
-
-            if (destinationType == typeof(InstanceDescriptor) && value is IEnumerable<TextDecoration>)
-            {
-                var ci = typeof(TextDecorationCollection).GetConstructor(new Type[] { typeof(IEnumerable<TextDecoration>) });
-
-                result = new InstanceDescriptor(ci, new object[] { value });
-            }
-            else
-            {
-                result = base.ConvertTo(context, culture, value, destinationType);
-            }
-
-            return result;
+            return base.ConvertTo(context, culture, value, destinationType);
         }
     }
 }

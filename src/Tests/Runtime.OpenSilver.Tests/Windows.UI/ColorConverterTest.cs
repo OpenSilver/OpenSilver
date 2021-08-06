@@ -29,14 +29,6 @@ namespace Windows.UI.Tests
         }
 
         [TestMethod]
-        public void CanConvertTo_String_ShouldReturnTrue()
-        {
-            var colorConverter = new ColorConverter();
-            var test = colorConverter.CanConvertTo(typeof(InstanceDescriptor));
-            test.Should().BeTrue();
-        }
-
-        [TestMethod]
         public void CanConvertTo_Bool_ShouldReturnFalse()
         {
             var colorConverter = new ColorConverter();
@@ -59,16 +51,6 @@ namespace Windows.UI.Tests
             var colorConverter = new ColorConverter();
             var expected = new Color { A = 255, B = 0, G = 255, R = 255 };
             var test = colorConverter.ConvertFrom("Yellow");
-            test.Should().Be(expected);
-        }
-
-        [TestMethod]
-        public void ConvertFrom_SC_ShouldReturnColor()
-        {
-            var colorConverter = new ColorConverter();
-            var expected = new Color { A = 0, B = 255, G = 255, R = 255 };
-            throw new NotImplementedException();
-            var test = colorConverter.ConvertFrom("sc#12345678");
             test.Should().Be(expected);
         }
 
@@ -117,15 +99,6 @@ namespace Windows.UI.Tests
             var notSupportedType = typeof(bool);
             Assert.ThrowsException<NotSupportedException>(() => colorConverter.ConvertTo(new Color(), notSupportedType));
             Assert.ThrowsException<NotSupportedException>(() => colorConverter.ConvertTo(true, typeof(bool)));
-        }
-
-        [TestMethod]
-        public void ConvertTo_InstanceDescriptor()
-        {
-            var cursorConverter = new ColorConverter();
-            var color = new Color { A = 18, B = 120, G = 86, R = 52 };
-            var test = cursorConverter.ConvertTo(color, typeof(InstanceDescriptor));
-            test.Should().BeOfType(typeof(InstanceDescriptor));
         }
     }
 }

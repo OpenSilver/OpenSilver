@@ -568,10 +568,11 @@ namespace Windows.UI.Xaml.Data
                         }
 
                         //todo: partially merge this "if" and the previous one.
-                        if (!typeFound && stringValue is string)
+                        if (!typeFound && TypeFromStringConverters.CanTypeBeConverted(expectedType) && 
+                            stringValue is string)
                         {
                             typeFound = true;
-                            convertedValue = ObjectBuilder.Singleton.Parse(stringValue, expectedType);
+                            convertedValue = TypeFromStringConverters.ConvertFromInvariantString(expectedType, stringValue);
                         }
 
                         if (!typeFound && convertedValue != null && (expectedType == typeof(string)))
@@ -674,7 +675,7 @@ namespace Windows.UI.Xaml.Data
             {
                 try //this try/catch block is solely for the purpose of not raising an exception so that the GetValue finishes its thing (including handling the case where the conversion cannot be done).
                 {
-                    value = ObjectBuilder.Singleton.Parse((string)value, targetType);
+                    value = TypeFromStringConverters.ConvertFromInvariantString(targetType, (string)value);
                 }
                 catch (Exception ex)
                 {

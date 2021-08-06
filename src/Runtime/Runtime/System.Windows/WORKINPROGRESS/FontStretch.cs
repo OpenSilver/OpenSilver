@@ -12,9 +12,7 @@
 *  
 \*====================================================================================*/
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
 
 #if MIGRATION
@@ -24,7 +22,7 @@ namespace Windows.UI.Xaml
 #endif
 {
 #if WORKINPROGRESS
-    #region Not supported yet
+
     [TypeConverter(typeof(FontStretchConverter))]
     [OpenSilver.NotImplemented]
     public partial struct FontStretch : IFormattable
@@ -32,14 +30,9 @@ namespace Windows.UI.Xaml
 		[OpenSilver.NotImplemented]
         public string ToString(string format, IFormatProvider formatProvider)
         {
-            throw new NotImplementedException();
-        }
-
-        internal object ToOpenTypeStretch()
-        {
-            throw new NotImplementedException();
+            return this.ToString();
         }
     }
-    #endregion
+
 #endif
 }

@@ -21,7 +21,6 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 #if MIGRATION
@@ -54,20 +53,10 @@ namespace Windows.UI.Xaml.Controls
 #endif
         internal static bool isMSGrid()
         {
-            while (!_isMSGrid.HasValue)
+            if (!_isMSGrid.HasValue)
             {
-                var jsResult = CSHTML5.Interop.ExecuteJavaScript("document.isMSGrid");
-
-                if (bool.TryParse(jsResult.ToString(), out var result))
-                {
-                    _isMSGrid = result;
-                }
-                else
-                {
-                    Thread.Sleep(100);
-                }
+                _isMSGrid = (bool)((CSHTML5.Types.INTERNAL_JSObjectReference)(CSHTML5.Interop.ExecuteJavaScript("document.isMSGrid"))).Value;
             }
-
             return _isMSGrid.Value;
         }
 
@@ -140,7 +129,7 @@ namespace Windows.UI.Xaml.Controls
                 bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
                 if (isCSSGrid)
                 {
-                    string minWidthString = (double.IsNaN(minSize) || double.IsInfinity(minSize) ?
+                    string minWidthString = (double.IsNaN(minSize) || double.IsInfinity(minSize) ? 
                         "0px" : minSize.ToInvariantString() + "px");
                     return "minmax(" + minWidthString + ", " + gridLength.Value.ToInvariantString() + signUsedForPercentage + ")";
                 }
@@ -192,7 +181,7 @@ namespace Windows.UI.Xaml.Controls
                         var td = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("td", tr, grid);
                         var tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(td);
                         tdStyle.display = (columnDefinition.Visibility == Visibility.Visible) ? "table-cell" : "none";
-
+                        
                         INTERNAL_HtmlDomManager.SetDomElementAttribute(td, "rowspan", currentCell.RowSpan);
                         INTERNAL_HtmlDomManager.SetDomElementAttribute(td, "colspan", currentCell.ColumnSpan);
 

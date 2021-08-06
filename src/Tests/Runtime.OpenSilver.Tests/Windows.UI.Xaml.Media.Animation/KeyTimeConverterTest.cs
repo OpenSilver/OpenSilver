@@ -95,14 +95,6 @@ namespace Windows.UI.Xaml.Media.Animation.Tests
         }
 
         [TestMethod]
-        public void ConvertTo_InstanceDescriptor()
-        {
-            var keyTimeConverter = new KeyTimeConverter();
-            var test = keyTimeConverter.ConvertTo(new KeyTime(), typeof(InstanceDescriptor));
-            test.Should().BeOfType(typeof(InstanceDescriptor));
-        }
-
-        [TestMethod]
         public void ConvertTo_String_ShouldThrow_NotSupportedException()
         {
             var keyTimeConverter = new KeyTimeConverter();

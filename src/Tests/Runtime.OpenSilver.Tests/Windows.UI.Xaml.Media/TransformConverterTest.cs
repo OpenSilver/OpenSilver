@@ -69,7 +69,7 @@ namespace Windows.UI.Xaml.Media.Tests
         {
             var transformConverter = new TransformConverter();
             var test = transformConverter.ConvertTo(new MatrixTransform(), typeof(string));
-            test.Should().Be("100");
+            test.Should().Be(new MatrixTransform().ToString());
         }
 
         [TestMethod]

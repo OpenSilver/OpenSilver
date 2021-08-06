@@ -20,7 +20,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
-using DotNetForHtml5.Core;
 #if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -188,7 +187,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
                 else
                 {
-                    value = ObjectBuilder.Singleton.Parse((string)value, _propDp.PropertyType);
+                    value = DotNetForHtml5.Core.TypeFromStringConverters.ConvertFromInvariantString(_propDp.PropertyType, (string)value);
                 }
             }
 

@@ -12,12 +12,9 @@
 *  
 \*====================================================================================*/
 
-#if BRIDGE
-using System;
-#endif
 using CSHTML5.Internal;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows
@@ -30,7 +27,6 @@ namespace Windows.UI.Xaml
     /// system. Dependency properties provide support for value expressions, data
     /// binding, animation, and property change notification.
     /// </summary>
-    [TypeConverter(typeof(DependencyPropertyConverter))]
     public partial class DependencyProperty
     {
         private static readonly Type nullableType;

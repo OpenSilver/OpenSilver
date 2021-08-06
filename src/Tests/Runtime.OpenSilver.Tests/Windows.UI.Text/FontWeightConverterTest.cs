@@ -104,14 +104,5 @@ namespace Windows.UI.Text.Tests
             var test = cursorConverter.ConvertTo(true, typeof(string));
             test.Should().Be("True");
         }
-
-        [TestMethod]
-        public void ConvertTo_InstanceDescriptor()
-        {
-            var cursorConverter = new FontWeightConverter();
-            var fontWeight = new FontWeight();
-            var test = cursorConverter.ConvertTo(fontWeight, typeof(InstanceDescriptor));
-            test.Should().BeOfType(typeof(InstanceDescriptor));
-        }
     }
 }

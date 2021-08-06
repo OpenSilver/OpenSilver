@@ -12,9 +12,7 @@
 *  
 \*====================================================================================*/
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
 using System.Globalization;
 
@@ -110,7 +108,7 @@ namespace Windows.UI.Xaml.Media
             {
                 if (destinationType == typeof(string))
                 {
-                    result = collection.ToString(null, culture);
+                    result = collection.ToString();
                 }
             }
 

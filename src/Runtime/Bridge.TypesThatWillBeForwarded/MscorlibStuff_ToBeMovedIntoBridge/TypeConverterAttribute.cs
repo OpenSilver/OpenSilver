@@ -1,35 +1,85 @@
 ﻿namespace System.ComponentModel
 {
+    using System.Diagnostics;
+    using System.Globalization;
+    using System.Security.Permissions;
+
+    /// <devdoc>
+    ///    <para>Specifies what type to use as
+    ///       a converter for the object
+    ///       this
+    ///       attribute is bound to. This class cannot
+    ///       be inherited.</para>
+    /// </devdoc>
     [AttributeUsage(AttributeTargets.All)]
-    public class TypeConverterAttribute : Attribute
+    public sealed class TypeConverterAttribute : Attribute
     {
+        private string typeName;
+
+        /// <devdoc>
+        ///    <para> Specifies the type to use as
+        ///       a converter for the object this attribute is bound to. This
+        ///    <see langword='static '/>field is read-only. </para>
+        /// </devdoc>
         public static readonly TypeConverterAttribute Default = new TypeConverterAttribute();
 
+        /// <devdoc>
+        ///    <para>
+        ///       Initializes a new instance of the <see cref='System.ComponentModel.TypeConverterAttribute'/> class with the
+        ///       default type converter, which
+        ///       is an
+        ///       empty string ("").
+        ///    </para>
+        /// </devdoc>
         public TypeConverterAttribute()
         {
-            ConverterTypeName = string.Empty;
+            this.typeName = string.Empty;
         }
 
+        /// <devdoc>
+        /// <para>Initializes a new instance of the <see cref='System.ComponentModel.TypeConverterAttribute'/> class, using 
+        ///    the specified type as the data converter for the object this attribute
+        ///    is bound
+        ///    to.</para>
+        /// </devdoc>
         public TypeConverterAttribute(Type type)
         {
-            ConverterTypeName = type.AssemblyQualifiedName;
+            this.typeName = type.AssemblyQualifiedName;
         }
 
+        /// <devdoc>
+        /// <para>Initializes a new instance of the <see cref='System.ComponentModel.TypeConverterAttribute'/> class, using 
+        ///    the specified type name as the data converter for the object this attribute is bound to.</para>
+        /// </devdoc>
         public TypeConverterAttribute(string typeName)
         {
-            ConverterTypeName = typeName;
+            string temp = typeName.ToUpper();
+            Debug.Assert(temp.IndexOf(".DLL") == -1, "Came across: " + typeName + " . Please remove the .dll extension");
+            this.typeName = typeName;
         }
 
-        public string ConverterTypeName { get; set; }
+        /// <devdoc>
+        /// <para>Gets the fully qualified type name of the <see cref='System.Type'/>
+        /// to use as a converter for the object this attribute
+        /// is bound to.</para>
+        /// </devdoc>
+        public string ConverterTypeName
+        {
+            get
+            {
+                return typeName;
+            }
+        }
 
         public override bool Equals(object obj)
         {
-            return obj is TypeConverterAttribute other;
+            TypeConverterAttribute other = obj as TypeConverterAttribute;
+            return (other != null) && other.ConverterTypeName == typeName;
         }
 
         public override int GetHashCode()
         {
-            return ConverterTypeName.GetHashCode();
+            return typeName.GetHashCode();
         }
     }
 }

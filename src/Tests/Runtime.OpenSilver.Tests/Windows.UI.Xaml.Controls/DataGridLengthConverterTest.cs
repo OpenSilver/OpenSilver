@@ -114,14 +114,6 @@ namespace Windows.UI.Xaml.Controls.Tests
         }
 
         [TestMethod]
-        public void ConvertTo_InstanceDescriptor()
-        {
-            var dataGridLengthConverter = new DataGridLengthConverter();
-            var test = dataGridLengthConverter.ConvertTo(new DataGridLength(), typeof(InstanceDescriptor));
-            test.Should().BeOfType(typeof(InstanceDescriptor));
-        }
-
-        [TestMethod]
         public void ConvertTo_String_ShouldThrow_ArgumentNullException()
         {
             var dataGridLengthConverter = new DataGridLengthConverter();

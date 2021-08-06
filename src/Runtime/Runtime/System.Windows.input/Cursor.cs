@@ -115,19 +115,6 @@ namespace System.Windows.Input
             return HtmlCursors[(int)_cursorType];
         }
 
-        public override bool Equals(object obj)
-        {
-            return obj is Cursor cursor && CursorType == cursor.CursorType && _cursorType == cursor._cursorType;
-        }
-
-        public override int GetHashCode()
-        {
-            int hashCode = -1140138637;
-            hashCode = hashCode * -1521134295 + CursorType.GetHashCode();
-            hashCode = hashCode * -1521134295 + _cursorType.GetHashCode();
-            return hashCode;
-        }
-
         private CursorType _cursorType = CursorType.None;
     }
 }

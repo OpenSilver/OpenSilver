@@ -13,10 +13,9 @@
 \*====================================================================================*/
 
 
-#if BRIDGE
 using System;
-#endif
 using System.ComponentModel;
+using System.Globalization;
 
 #if MIGRATION
 namespace System.Windows
@@ -220,13 +219,18 @@ namespace Windows.Foundation
         /// <returns>A string representation of this Windows.Foundation.Size.</returns>
         public override string ToString()
         {
-            var result = "Empty";
-            if (!IsEmpty)
+            if (this.IsEmpty)
             {
-                result = string.Concat(Width, ", ", Height);
+                return "Empty";
             }
 
-            return result;
+            return string.Concat(Width, ", ", Height);
+        }
+
+        public static Size Parse(string sizeAsString)
+        {
+            return (Size)TypeDescriptor.GetConverter(typeof(Size))
+                .ConvertFromInvariantString(sizeAsString);
         }
     }
     

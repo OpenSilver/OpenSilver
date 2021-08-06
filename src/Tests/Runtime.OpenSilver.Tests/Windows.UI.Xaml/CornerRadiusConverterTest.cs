@@ -104,14 +104,5 @@ namespace Windows.UI.Xaml.Tests
             Assert.ThrowsException<ArgumentException>(() => cornerRadiusConverter.ConvertTo(true, typeof(string)));
             Assert.ThrowsException<ArgumentException>(() => cornerRadiusConverter.ConvertTo(new CornerRadius(1), typeof(bool)));
         }
-
-        [TestMethod]
-        public void ConvertTo_InstanceDescriptor()
-        {
-            var cursorConverter = new CornerRadiusConverter();
-            var cornerRadius = new CornerRadius();
-            var test = cursorConverter.ConvertTo(cornerRadius, typeof(InstanceDescriptor));
-            test.Should().BeOfType(typeof(InstanceDescriptor));
-        }
     }
 }

@@ -13,18 +13,19 @@
 \*====================================================================================*/
 
 
+using System;
 using System.ComponentModel;
 using System.Globalization;
-#if BRIDGE
-using System;
-#else
-#endif
 
 #if MIGRATION
 using System.Windows.Media.Imaging;
-namespace System.Windows.Media
 #else
 using Windows.UI.Xaml.Media.Imaging;
+#endif
+
+#if MIGRATION
+namespace System.Windows.Media
+#else
 namespace Windows.UI.Xaml.Media
 #endif
 {
