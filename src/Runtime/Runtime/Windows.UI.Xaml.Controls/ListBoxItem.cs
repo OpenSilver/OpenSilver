@@ -14,14 +14,8 @@
 
 
 using CSHTML5.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 #if MIGRATION
 using System.Windows.Controls.Primitives;
-using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
@@ -38,6 +32,21 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public partial class ListBoxItem : SelectorItem
     {
+        public ListBoxItem()
+        {
+            this.DefaultStyleKey = typeof(ListBoxItem);
+        }
+
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
+        {
+            base.OnApplyTemplate();
+            this.UpdateVisualStates();
+        }
+
         protected internal override void HandleIsSelectedChanged(bool oldValue, bool newValue)
         {
             base.HandleIsSelectedChanged(oldValue, newValue);
