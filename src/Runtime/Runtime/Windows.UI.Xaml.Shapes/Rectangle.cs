@@ -170,7 +170,20 @@ namespace Windows.UI.Xaml.Shapes
                 }
 
                 var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
-                context.rect(xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication, yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication, sizeX, sizeY);
+                double x = xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication;
+                double y = yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication;
+                double width = sizeX;
+                double height = sizeY;
+
+                context.moveTo(x + RadiusX, y);
+                context.lineTo(x + width - RadiusX, y);
+                context.quadraticCurveTo(x + width, y, x + width, y + RadiusY);
+                context.lineTo(x + width, y + height - RadiusY);
+                context.quadraticCurveTo(x + width, y + height, x + width - RadiusX, y + height);
+                context.lineTo(x + RadiusX, y + height);
+                context.quadraticCurveTo(x, y + height, x, y + height - RadiusY);
+                context.lineTo(x, y + RadiusY);
+                context.quadraticCurveTo(x, y, x + RadiusX, y);
 
                 //todo: make sure the parameters below are correct.
                 Shape.DrawFillAndStroke(this, "evenodd", xOffsetToApplyAfterMultiplication, yOffsetToApplyAfterMultiplication, xOffsetToApplyAfterMultiplication + sizeX, yOffsetToApplyAfterMultiplication + sizeY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
@@ -182,14 +195,11 @@ namespace Windows.UI.Xaml.Shapes
                 //}
             }
         }
-#if WORKINPROGRESS
-        #region Not supported yet
 
         /// <summary>
         /// Gets or sets the x-axis radius of the ellipse that is used to round the corners
         /// of the rectangle.
         /// </summary>
-		[OpenSilver.NotImplemented]
         public double RadiusX
         {
             get { return (double)GetValue(RadiusXProperty); }
@@ -199,7 +209,6 @@ namespace Windows.UI.Xaml.Shapes
         /// <summary>
         /// Identifies the <see cref="Rectangle.RadiusX"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RadiusXProperty = 
             DependencyProperty.Register(
                 nameof(RadiusX), 
@@ -212,7 +221,6 @@ namespace Windows.UI.Xaml.Shapes
         /// of the rectangle.
         /// The default is 0.
         /// </summary>
-		[OpenSilver.NotImplemented]
         public double RadiusY
         {
             get { return (double)GetValue(RadiusYProperty); }
@@ -222,15 +230,11 @@ namespace Windows.UI.Xaml.Shapes
         /// <summary>
         /// Identifies the <see cref="Rectangle.RadiusY"/> dependency property.
         /// </summary>
-		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty RadiusYProperty = 
             DependencyProperty.Register(
                 nameof(RadiusY), 
                 typeof(double), 
                 typeof(Rectangle), 
                 new PropertyMetadata(0d));
-        
-        #endregion
-#endif
     }
 }
