@@ -175,15 +175,28 @@ namespace Windows.UI.Xaml.Shapes
                 double width = sizeX;
                 double height = sizeY;
 
-                context.moveTo(x + RadiusX, y);
-                context.lineTo(x + width - RadiusX, y);
-                context.quadraticCurveTo(x + width, y, x + width, y + RadiusY);
-                context.lineTo(x + width, y + height - RadiusY);
-                context.quadraticCurveTo(x + width, y + height, x + width - RadiusX, y + height);
-                context.lineTo(x + RadiusX, y + height);
-                context.quadraticCurveTo(x, y + height, x, y + height - RadiusY);
-                context.lineTo(x, y + RadiusY);
-                context.quadraticCurveTo(x, y, x + RadiusX, y);
+                // Values greater than half the rectangle's width/height are treated as though equal to half the rectangle's width/height.
+                // Negative values are treated as positive values.
+                double radiusX = Math.Abs(RadiusX) > width / 2 ? width / 2 : Math.Abs(RadiusX);
+                double radiusY = Math.Abs(RadiusY) > height / 2 ? height / 2 : Math.Abs(RadiusY);
+
+                if (radiusX == 0 || radiusY == 0)
+                {
+                    // Just draw a rectangle if one of radiuses is 0
+                    context.rect(x, y, width, height);
+                }
+                else
+                {
+                    context.moveTo(x + radiusX, y);
+                    context.lineTo(x + width - radiusX, y);
+                    context.ellipse(x + width - radiusX, y + radiusY, radiusX, radiusY, Math.PI, Math.PI / 2, Math.PI);
+                    context.lineTo(x + width, y + height - radiusY);
+                    context.ellipse(x + width - radiusX, y + width - radiusY, radiusX, radiusY, Math.PI, Math.PI, 3 * Math.PI / 2);
+                    context.lineTo(x + radiusX, y + height);
+                    context.ellipse(x + radiusX, y + width - radiusY, radiusX, radiusY, Math.PI, 3 * Math.PI / 2, 2 * Math.PI);
+                    context.lineTo(x, y + radiusY);
+                    context.ellipse(x + radiusX, y + radiusY, radiusX, radiusY, Math.PI, 2 * Math.PI, Math.PI / 2);
+                }
 
                 //todo: make sure the parameters below are correct.
                 Shape.DrawFillAndStroke(this, "evenodd", xOffsetToApplyAfterMultiplication, yOffsetToApplyAfterMultiplication, xOffsetToApplyAfterMultiplication + sizeX, yOffsetToApplyAfterMultiplication + sizeY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
