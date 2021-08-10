@@ -121,13 +121,11 @@ namespace CSHTML5
 
                     if (jsObjectReference.IsArray)
                     {
-                        jsCodeForAccessingTheObject = string.Format(@"document.jsSimulatorObjectReferences[""{0}""][{1}]", 
-                            jsObjectReference.ReferenceId, jsObjectReference.ArrayIndex);
+                        jsCodeForAccessingTheObject = $@"document.jsSimulatorObjectReferences[""{jsObjectReference.ReferenceId}""][{jsObjectReference.ArrayIndex}]";
                     }
                     else
                     {
-                        jsCodeForAccessingTheObject = string.Format(@"document.jsSimulatorObjectReferences[""{0}""]", 
-                            jsObjectReference.ReferenceId);
+                        jsCodeForAccessingTheObject = $@"document.jsSimulatorObjectReferences[""{jsObjectReference.ReferenceId}""]";
                     }
 
                     javascript = javascript.Replace("$" + i.ToString(), jsCodeForAccessingTheObject);
@@ -139,7 +137,7 @@ namespace CSHTML5
                     //------------------------
 
                     string id = ((INTERNAL_HtmlDomElementReference)variable).UniqueIdentifier;
-                    javascript = javascript.Replace("$" + i.ToString(), string.Format(@"document.getElementByIdSafe(""{0}"")", id));
+                    javascript = javascript.Replace("$" + i.ToString(), $@"document.getElementByIdSafe(""{id}"")");
                 }
                 else if (variable is INTERNAL_SimulatorJSExpression)
                 {
@@ -199,23 +197,16 @@ namespace CSHTML5
             UnmodifiedJavascriptCalls.Add(unmodifiedJavascript);
 
             // Change the JS code to call ShowErrorMessage in case of error:
-            string errorCallBack = string.Format(
-            @"document.errorCallback(error, {0})", IndexOfNextUnmodifiedJSCallInList);
+            string errorCallBack = $"document.errorCallback(error, {IndexOfNextUnmodifiedJSCallInList.ToString()})";
             ++IndexOfNextUnmodifiedJSCallInList;
 
             // Surround the javascript code with some code that will store the
             // result into the "document.jsSimulatorObjectReferences" for later
             // use in subsequent calls to this method
-            int referenceId = ReferenceIDGenerator.GenerateId();
-            javascript = string.Format(
-@"
-try {{
-document.jsSimulatorObjectReferences[""{1}""] = eval(""{0}"");
-}}
-catch (error) {{
-    {2};
-}}
-", INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript), referenceId, INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(errorCallBack));
+            int referenceId = 0;
+            referenceId = ReferenceIDGenerator.GenerateId();
+            javascript = $"try{{ document.jsSimulatorObjectReferences[\"{referenceId.ToString()}\"] = eval(\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript)}\"); }}catch (error) {{ {errorCallBack}; }}";
+            //javascript = $"try{{ eval(\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript)}\"); }}catch (error) {{ {errorCallBack}; }}";
 
             // Execute the javascript code:
             object value = null;

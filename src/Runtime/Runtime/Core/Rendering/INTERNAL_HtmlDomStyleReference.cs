@@ -103,7 +103,7 @@ namespace CSHTML5.Internal
 
         void SetStylePropertyValue(string propertyName, string propertyValue)
         {
-            string javaScriptCodeToExecute = string.Format(@"document.setDomStyleProperty(""{0}"", ""{1}"", ""{2}"")", Uid, propertyName, propertyValue);
+            string javaScriptCodeToExecute = $@"document.setDomStyleProperty(""{Uid}"", ""{propertyName}"", ""{propertyValue}"")";
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
 
