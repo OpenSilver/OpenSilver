@@ -991,7 +991,7 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
 #if MIGRATION
                     VisualStateManager.GoToState(this, "MouseOver", true);
 #else
-            VisualStateManager.GoToState(this, "PointerOver", true);
+                    VisualStateManager.GoToState(this, "PointerOver", true);
 #endif
                 else
                     VisualStateManager.GoToState(this, "Normal", true);

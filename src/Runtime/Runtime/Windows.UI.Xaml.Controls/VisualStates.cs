@@ -52,7 +52,11 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// MouseOver state of the Common state group.
         /// </summary>
-        public const string StateMouseOver = "MouseOver";
+#if MIGRATION
+        public const string StateMouseOver = "MouseOver"; 
+#else
+        public const string StateMouseOver = "PointerOver";
+#endif
 
         /// <summary>
         /// Pressed state of the Common state group.
