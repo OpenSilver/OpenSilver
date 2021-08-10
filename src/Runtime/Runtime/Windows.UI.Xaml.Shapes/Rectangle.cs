@@ -170,7 +170,33 @@ namespace Windows.UI.Xaml.Shapes
                 }
 
                 var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
-                context.rect(xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication, yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication, sizeX, sizeY);
+                double x = xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication;
+                double y = yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication;
+                double width = sizeX;
+                double height = sizeY;
+
+                // Values greater than half the rectangle's width/height are treated as though equal to half the rectangle's width/height.
+                // Negative values are treated as positive values.
+                double radiusX = Math.Abs(RadiusX) > width / 2 ? width / 2 : Math.Abs(RadiusX);
+                double radiusY = Math.Abs(RadiusY) > height / 2 ? height / 2 : Math.Abs(RadiusY);
+
+                if (radiusX == 0 || radiusY == 0)
+                {
+                    // Just draw a rectangle if one of radiuses is 0
+                    context.rect(x, y, width, height);
+                }
+                else
+                {
+                    context.moveTo(x + radiusX, y);
+                    context.lineTo(x + width - radiusX, y);
+                    context.ellipse(x + width - radiusX, y + radiusY, radiusX, radiusY, Math.PI, Math.PI / 2, Math.PI);
+                    context.lineTo(x + width, y + height - radiusY);
+                    context.ellipse(x + width - radiusX, y + width - radiusY, radiusX, radiusY, Math.PI, Math.PI, 3 * Math.PI / 2);
+                    context.lineTo(x + radiusX, y + height);
+                    context.ellipse(x + radiusX, y + width - radiusY, radiusX, radiusY, Math.PI, 3 * Math.PI / 2, 2 * Math.PI);
+                    context.lineTo(x, y + radiusY);
+                    context.ellipse(x + radiusX, y + radiusY, radiusX, radiusY, Math.PI, 2 * Math.PI, Math.PI / 2);
+                }
 
                 //todo: make sure the parameters below are correct.
                 Shape.DrawFillAndStroke(this, "evenodd", xOffsetToApplyAfterMultiplication, yOffsetToApplyAfterMultiplication, xOffsetToApplyAfterMultiplication + sizeX, yOffsetToApplyAfterMultiplication + sizeY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
@@ -182,14 +208,11 @@ namespace Windows.UI.Xaml.Shapes
                 //}
             }
         }
-#if WORKINPROGRESS
-        #region Not supported yet
 
         /// <summary>
         /// Gets or sets the x-axis radius of the ellipse that is used to round the corners
         /// of the rectangle.
         /// </summary>
-		[OpenSilver.NotImplemented]
         public double RadiusX
         {
             get { return (double)GetValue(RadiusXProperty); }
@@ -199,7 +222,6 @@ namespace Windows.UI.Xaml.Shapes
         /// <summary>
         /// Identifies the <see cref="Rectangle.RadiusX"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RadiusXProperty = 
             DependencyProperty.Register(
                 nameof(RadiusX), 
@@ -212,7 +234,6 @@ namespace Windows.UI.Xaml.Shapes
         /// of the rectangle.
         /// The default is 0.
         /// </summary>
-		[OpenSilver.NotImplemented]
         public double RadiusY
         {
             get { return (double)GetValue(RadiusYProperty); }
@@ -222,15 +243,11 @@ namespace Windows.UI.Xaml.Shapes
         /// <summary>
         /// Identifies the <see cref="Rectangle.RadiusY"/> dependency property.
         /// </summary>
-		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty RadiusYProperty = 
             DependencyProperty.Register(
                 nameof(RadiusY), 
                 typeof(double), 
                 typeof(Rectangle), 
                 new PropertyMetadata(0d));
-        
-        #endregion
-#endif
     }
 }
