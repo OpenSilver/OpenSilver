@@ -61,6 +61,22 @@ namespace Windows.UI.Xaml.Controls
             UseSystemFocusVisuals = true;
         }
 
+        /// <summary>
+        /// The DependencyID for the PasswordChar property.
+        /// Default Value:     '*'
+        /// </summary>
+        public static readonly DependencyProperty PasswordCharProperty =
+                DependencyProperty.Register("PasswordChar", typeof(char), typeof(PasswordBox), new FrameworkPropertyMetadata('*'));
+
+        /// <summary>
+        /// Character to display instead of the actual password.
+        /// </summary>
+        public char PasswordChar
+        {
+            get => (char)GetValue(PasswordCharProperty);
+            set => SetValue(PasswordCharProperty, value);
+        }
+
         // Returns:
         //     An integer that specifies the maximum number of characters for passwords
         //     to be handled by this PasswordBox. A value of zero (0) means no limit. The
