@@ -32,7 +32,7 @@ namespace CSHTML5.Internal
         /// <returns></returns>
         public static IResizeObserver Create()
         {
-            if (Interop.IsRunningInTheSimulator_WorkAround || IsRunningOnInternetExplorer())
+            if (Application.Current.Host.Settings.UseResizeSensor || Interop.IsRunningInTheSimulator_WorkAround || IsRunningOnInternetExplorer())
             {
                 return new ResizeSensor();
             }
