@@ -40,6 +40,12 @@
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.Wrapper_BridgeVersion" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.TypeScriptDefToCSharp" />
 
+  <ItemGroup>
+    <AvailableItemName Include="ApplicationDefinition" />
+    <AvailableItemName Include="Page" />
+    <AvailableItemName Include="Resource" />
+  </ItemGroup>
+
   <!--============================================================
   PROPERTIES
   ============================================================-->
