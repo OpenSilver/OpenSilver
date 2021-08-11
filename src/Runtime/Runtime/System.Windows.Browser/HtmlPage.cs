@@ -58,7 +58,9 @@ namespace System.Windows.Browser
             }
         }
 
-		[OpenSilver.NotImplemented]
+        public static bool IsPopupWindowAllowed => false;
+
+        [OpenSilver.NotImplemented]
         public static HtmlWindow PopupWindow(Uri navigateToUri, string target, HtmlPopupWindowOptions options)
         {
             return null;
