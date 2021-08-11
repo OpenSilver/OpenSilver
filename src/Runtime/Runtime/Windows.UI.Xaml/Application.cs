@@ -51,13 +51,6 @@ namespace Windows.UI.Xaml
     /// </summary>
     public partial class Application
     {
-        // Id of the application root html div.
-#if OPENSILVER
-        public const string ApplicationRootDomElementId = "opensilver-root";
-#else
-        public const string ApplicationRootDomElementId = "cshtml5-root";
-#endif
-
         static Dictionary<string, string> _resourcesCache = null;
         INTERNAL_XamlResourcesHandler _xamlResourcesHandler = new INTERNAL_XamlResourcesHandler();
 
