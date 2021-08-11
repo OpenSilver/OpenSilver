@@ -529,7 +529,7 @@ namespace Windows.UI.Xaml
             assemblyName = str.Substring(startIndex, semicolonIndex - startIndex);
             
             int containedUriBeginIndex = str.IndexOf('/', startIndex);
-            containedUri = new Uri(str.Substring(containedUriBeginIndex + 1), UriKind.Relative);
+            containedUri = new Uri(str.Substring(containedUriBeginIndex + 1).ToLower(), UriKind.Relative);
         }
 #else
         public static async Task<StreamResourceInfo> GetResourceStream(Uri uriResource)

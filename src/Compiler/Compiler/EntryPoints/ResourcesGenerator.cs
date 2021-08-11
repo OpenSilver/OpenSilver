@@ -111,7 +111,7 @@ namespace DotNetForHtml5.Compiler
 				{
 					foreach (ITaskItem resourceFile in ResourceFiles)
 					{
-						string resFileName = resourceFile.ItemSpec.Replace(@"\", "/");
+						string resFileName = resourceFile.ItemSpec.Replace(@"\", "/").ToLower();
 					
 						// We're handing off lifetime management for the stream.
 						// True for the third argument tells resWriter to dispose of the stream when it's done.
