@@ -629,8 +629,7 @@ element.remove({1});
             else
             {
                 string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
-                string javaScriptCodeToExecute =
-                    $@"var element = document.getElementByIdSafe(""{uniqueIdentifier}"");if (element) {{ element.setAttribute(""{attributeName}"", {ConvertToStringToUseInJavaScriptCode(attributeValue)}) }};";
+                string javaScriptCodeToExecute = $@"document.setDomAttribute(""{uniqueIdentifier}"",""{attributeName}"",{ConvertToStringToUseInJavaScriptCode(attributeValue)})";
 
                 if (forceSimulatorExecuteImmediately)
                     ExecuteJavaScript(javaScriptCodeToExecute);
@@ -914,17 +913,20 @@ function(){
 
             string uniqueIdentifier = INTERNAL_HtmlDomUniqueIdentifiers.CreateNew();
 
-            Interop.ExecuteJavaScriptAsync(@"document.createElementSafe($0, $1, $2, $3)", domElementTag, uniqueIdentifier, parentRef, index);
-            INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
-
+            INTERNAL_HtmlDomElementReference parent = null;
             if (parentRef is INTERNAL_HtmlDomElementReference)
             {
-                return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, (INTERNAL_HtmlDomElementReference)parentRef);
+                parent = (INTERNAL_HtmlDomElementReference)parentRef;
+                Interop.ExecuteJavaScriptAsync(@"document.createElementSafe($0, $1, $2, $3)", domElementTag, uniqueIdentifier, parent.UniqueIdentifier, index);
             }
             else
             {
-                return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, null); //todo: this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
+                Interop.ExecuteJavaScriptAsync(@"document.createElementSafe($0, $1, $2, $3)", domElementTag, uniqueIdentifier, parentRef, index);
             }
+            
+            INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
+
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent); //todo: when parent is null this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
         }
 
 #if !BRIDGE

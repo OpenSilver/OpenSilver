@@ -103,7 +103,19 @@ namespace CSHTML5.Internal
 
         void SetStylePropertyValue(string propertyName, string propertyValue)
         {
-            string javaScriptCodeToExecute = $@"document.setDomStyleProperty(""{Uid}"", ""{propertyName}"", ""{propertyValue}"")";
+            string javaScriptCodeToExecute = $@"document.setDomStyle(""{Uid}"", ""{propertyName}"", ""{propertyValue}"")";
+            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+        }
+
+        void SetTransformPropertyValue(string propertyValue)
+        {
+            string javaScriptCodeToExecute = $@"document.setDomTransform(""{Uid}"", ""{propertyValue}"")";
+            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+        }
+
+        void SetTransformOriginPropertyValue(string propertyValue)
+        {
+            string javaScriptCodeToExecute = $@"document.setDomTransformOrigin(""{Uid}"", ""{propertyValue}"")";
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
 
@@ -172,8 +184,8 @@ namespace CSHTML5.Internal
         public string msGridRows { set { SetStylePropertyValue("msGridRows", value); } }
         public string msGridRowSpan { set { SetStylePropertyValue("msGridRowSpan", value); } }
         public string msGridRowAlign { set { SetStylePropertyValue("msGridRowAlign", value); } }
-        public string msTransform { set { SetStylePropertyValue("msTransform", value); } }
-        public string msTransformOrigin { set { SetStylePropertyValue("msTransformOrigin", value); } }
+        public string msTransform { set { transform = value; } }
+        public string msTransformOrigin { set { transformOrigin = value; } }
         public string objectPosition { set { SetStylePropertyValue("objectPosition", value); } }
         public string opacity { set { SetStylePropertyValue("opacity", value); } }
         public string outline { set { SetStylePropertyValue("outline", value); } }
@@ -192,13 +204,13 @@ namespace CSHTML5.Internal
         public string textDecoration { set { SetStylePropertyValue("textDecoration", value); } }
         public string textOverflow { set { SetStylePropertyValue("textOverflow", value); } }
         public string textShadow { set { SetStylePropertyValue("textShadow", value); } }
-        public string transform { set { SetStylePropertyValue("transform", value); } }
-        public string transformOrigin { set { SetStylePropertyValue("transformOrigin", value); } }
+        public string transform { set { SetTransformPropertyValue(value); } }
+        public string transformOrigin { set { SetTransformOriginPropertyValue(value); } }
         public string top { set { SetStylePropertyValue("top", value); } }
         public string verticalAlign { set { SetStylePropertyValue("verticalAlign", value); } }
         public string WebkitOverflowScrolling { set { SetStylePropertyValue("WebkitOverflowScrolling", value); } }
-        public string WebkitTransform { set { SetStylePropertyValue("WebkitTransform", value); } }
-        public string webkitTransformOrigin { set { SetStylePropertyValue("webkitTransformOrigin", value); } }
+        public string WebkitTransform { set { transform = value; } }
+        public string webkitTransformOrigin { set { transformOrigin = value; } }
         public string whiteSpace { set { SetStylePropertyValue("whiteSpace", value); } }
         public string width { set { SetStylePropertyValue("width", value); _width = value; } get { return _width; } }
         public string zIndex { set { SetStylePropertyValue("zIndex", value); } }

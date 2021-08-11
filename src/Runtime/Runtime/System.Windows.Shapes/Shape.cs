@@ -992,20 +992,6 @@ context.translate($6, 0);
                 catch
                 {
                 }
-                try
-                {
-                    styleOfcanvasElement.msTransform = $"translate({newFixingMargin.X.ToInvariantString()}px, {newFixingMargin.Y.ToInvariantString()}px)";
-                }
-                catch
-                {
-                }
-                try // Prevents crash in the simulator that uses IE.
-                {
-                    styleOfcanvasElement.WebkitTransform = $"translate({newFixingMargin.X.ToInvariantString()}px, {newFixingMargin.Y.ToInvariantString()}px)";
-                }
-                catch
-                {
-                }
             }
         }
 

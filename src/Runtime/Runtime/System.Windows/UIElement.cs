@@ -388,20 +388,6 @@ namespace Windows.UI.Xaml
                     catch
                     {
                     }
-                    try
-                    {
-                        domStyle.msTransform = "";
-                    }
-                    catch
-                    {
-                    }
-                    try // Prevents crash in the simulator that uses IE.
-                    {
-                        domStyle.WebkitTransform = "";
-                    }
-                    catch
-                    {
-                    }
                 }
             }
         }
@@ -444,20 +430,6 @@ namespace Windows.UI.Xaml
             try
             {
                 domStyle.transformOrigin = transformOriginValue;
-            }
-            catch
-            {
-            }
-            try
-            {
-                domStyle.webkitTransformOrigin = transformOriginValue;
-            }
-            catch
-            {
-            }
-            try // Prevents crash in the simulator that uses IE.
-            {
-                domStyle.msTransformOrigin = transformOriginValue;
             }
             catch
             {

@@ -34,7 +34,11 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
 
         internal Content(bool hookupEvents)
         {
+#if OPENSILVER
             if (CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
+#else
+            if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
                 CSHTML5.Interop.ExecuteJavaScript("document.isRunningInTheSimulator = true");
             else
                 CSHTML5.Interop.ExecuteJavaScript("document.isRunningInTheSimulator = false");
