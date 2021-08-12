@@ -36,6 +36,9 @@ namespace CSHTML5
     /// <summary>
     /// Provides static methods for executing JavaScript code from within C#.
     /// </summary>
+    #if OPENSILVER
+    [Obsolete]
+    #endif
     public static class Interop
     {
         /// <summary>
