@@ -132,11 +132,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\ItemsControlHelper.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\NumericExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ScrollExtensions.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGridBoundColumn.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGridCheckBoxColumn.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGridComboBoxColumn.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGridHyperlinkColumn.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGridTemplateColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\PasswordBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TreeView.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\TreeViewItem.cs" />
@@ -172,22 +167,12 @@
 		<Compile Include="Windows.UI.Xaml.Automation\WORKINPROGRESS\TablePatternIdentifiers.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\AccordionButton.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\CalendarItem.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridCellsPresenter.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridColumnHeader.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridColumnHeadersPresenter.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridDetailsPresenter.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridFrozenGrid.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridRowHeader.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\DataGridRowsPresenter.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\DatePickerTextBox.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\ExpandableContentControl.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\Selector.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\AccordionSelectionMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\AutoCompleteSearch.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridEditAction.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridHeadersVisibility.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridRowDetailsVisibilityMode.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ExpandDirection.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\IGeneratorHost.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\PopulatingEventArgs.cs" />
@@ -207,16 +192,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CustomTimeFormat.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGrid.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGridBeginningEditEventArgs.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGridCellEditEndedEventArgs.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGridCellEditEndingEventArgs.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGridColumn.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGridGridLinesVisibility.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGridPreparingCellForEditEventArgs.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGridRow.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGridRowEditEndedEventArgs.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataGrid\DataGridTextColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataPager.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePicker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
@@ -671,7 +646,6 @@
 		<Compile Include="Windows.UI.Text\TextDecorations.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\WORKINPROGRESS\ItemsChangedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\ButtonBase.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls.Primitives\DataGridColumnHeader.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\DragCompletedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\DragCompletedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls.Primitives\DragDeltaEventArgs.cs" />
@@ -719,22 +693,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\ContextMenuService.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\Control.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ControlTemplate.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGrid.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridBoundColumn.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridCell.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridCheckBoxColumn.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridColumn.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridComboBoxColumn.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridHyperlinkColumn.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridLength.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridLengthConverter.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridLengthUnitType.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridRow.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridRowEventArgs.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridSelectionMode.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridSelectionUnit.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridTemplateColumn.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataGrid\DataGridTextColumn.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DataPager.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DatePicker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\Dock.cs" />
@@ -1217,9 +1175,6 @@
     <Content Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
-		<Content Include="DefaultStyles\INTERNAL_DefaultDataGridStyle.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Content>
     <Content Include="DefaultStyles\INTERNAL_DefaultDatePickerTextBoxStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
