@@ -158,7 +158,11 @@ namespace Windows.UI.Xaml.Input
 
         protected internal void SetPointerAbsolutePosition(object jsEventArg, Window window)
         {
+#if OPENSILVER
+            if (true)
+#elif BRIDGE
             if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
             {
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
                 string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.pageX + '|' + $0.pageY", jsEventArg));

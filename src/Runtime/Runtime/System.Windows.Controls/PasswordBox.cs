@@ -204,7 +204,11 @@ namespace Windows.UI.Xaml.Controls
     return outerDomElement;
 })()", additionalDivForMargins);
 
+#if OPENSILVER
+                if (false)
+#elif BRIDGE
                 if(!CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
                 {
                     //Note: we replaced the former <input> with a <div> in the DOM tree because it was created before knowing that there was a Template.
                     //      In the Simulator, there is no need to do anything because INTERNAL_OuterDomElement is only linked to the DOM element through its id (which was copied in the replacement <div>).

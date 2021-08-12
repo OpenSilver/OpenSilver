@@ -700,7 +700,11 @@ namespace Windows.UI.Xaml.Shapes
                 DoubleCollection strokeDashArray = shape.StrokeDashArray;
                 if (strokeDashArray != null)
                 {
+#if OPENSILVER
+                    if (true)
+#elif BRIDGE
                     if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
                     {
                         // todo: put a message saying that it doesn't work in certain browsers (maybe use a static boolean to put that message only once)
                     }

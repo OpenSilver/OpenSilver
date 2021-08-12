@@ -244,7 +244,11 @@ $0.strokeStyle = $1", context, strokeValue);
 $0.lineWidth = $1", context, StrokeThickness);
                     if (StrokeDashArray != null)
                     {
+#if OPENSILVER
+                        if (true)
+#elif BRIDGE
                         if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
                         {
                             //todo: put a message saying that it doesn't work in certain browsers (maybe use a static boolean to put that message only once)
                         }

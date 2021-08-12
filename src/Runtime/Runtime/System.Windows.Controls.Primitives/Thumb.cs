@@ -195,7 +195,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
+#if OPENSILVER
+            if (false)
+#elif BRIDGE
             if (!CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
             {
                 // Prevent the selection of text while dragging from the thumb
                 CSHTML5.Interop.ExecuteJavaScriptAsync("$0.onselectstart = function() { return false; }", this.INTERNAL_OuterDomElement);

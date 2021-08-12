@@ -223,7 +223,7 @@ namespace Windows.UI.Xaml.Controls
             {
 #if ! BRIDGE
                 // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
-                string callerAssemblyName = CSHTML5.Interop.IsRunningInTheSimulator ? Assembly.GetCallingAssembly().GetName().Name : INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
+                string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
 #else
                 
                 // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.

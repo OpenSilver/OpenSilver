@@ -198,7 +198,11 @@ namespace Windows.UI.Xaml.Controls
             double parentWidth = parent.ActualWidth;
             double parentHeight = parent.ActualHeight;
 
+#if OPENSILVER
+            if (true)
+#elif BRIDGE
             if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
             {
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
                 string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.naturalWidth + '|' + $0.naturalHeight", _imageDiv));

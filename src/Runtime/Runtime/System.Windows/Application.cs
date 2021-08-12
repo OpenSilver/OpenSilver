@@ -92,7 +92,11 @@ namespace Windows.UI.Xaml
 
 
             // Inject the "DataContractSerializer" into the "XmlSerializer" (read note in the "XmlSerializer" implementation to understand why):
+#if OPENSILVER
+            if (false) //Note: in case of the Simulator, we reference the .NET Framework version of "System.xml.dll", so we cannot inject stuff because the required members of XmlSerializer would be missing.
+#elif BRIDGE
             if (!CSHTML5.Interop.IsRunningInTheSimulator) //Note: in case of the Simulator, we reference the .NET Framework version of "System.xml.dll", so we cannot inject stuff because the required members of XmlSerializer would be missing.
+#endif
             {
                 InjectDataContractSerializerIntoXmlSerializer();
             }

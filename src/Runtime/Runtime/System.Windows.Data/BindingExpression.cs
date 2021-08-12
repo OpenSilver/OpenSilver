@@ -402,8 +402,11 @@ namespace Windows.UI.Xaml.Data
                     {
                         //We get the new Error (which is the innermost exception as far as I know):
                         Exception currentException = e;
-
+#if OPENSILVER
+                        if (true) // Note: "InnerException" is only supported in the Simulator as of July 27, 2017.
+#elif BRIDGE
                         if (CSHTML5.Interop.IsRunningInTheSimulator) // Note: "InnerException" is only supported in the Simulator as of July 27, 2017.
+#endif
                         {
                             while (currentException.InnerException != null)
                                 currentException = currentException.InnerException;
@@ -588,7 +591,11 @@ namespace Windows.UI.Xaml.Data
                         //We get the new Error (which is the innermost exception as far as I know):
                         Exception currentException = e;
 
+#if OPENSILVER
+                        if (true) // Note: "InnerException" is only supported in the Simulator as of July 27, 2017.
+#elif BRIDGE
                         if (CSHTML5.Interop.IsRunningInTheSimulator) // Note: "InnerException" is only supported in the Simulator as of July 27, 2017.
+#endif
                         {
                             while (currentException.InnerException != null)
                                 currentException = currentException.InnerException;

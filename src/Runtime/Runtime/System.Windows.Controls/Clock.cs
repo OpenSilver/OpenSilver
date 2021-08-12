@@ -79,7 +79,11 @@ namespace Windows.UI.Xaml.Controls
                     })", div, defaultDate.Hour, defaultDate.Minute - (defaultDate.Minute % MinuteInterval), MinuteInterval);
 
 
+#if OPENSILVER
+            if (true)
+#elif BRIDGE
             if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
             {
                 // Register the JS events:
                 CSHTML5.Interop.ExecuteJavaScript(@"$0.config.onChange.push(function(args) {

@@ -61,7 +61,11 @@ namespace Windows.UI.Xaml.Controls
                 })", div, GetJsDate(defaultDate));
 
             // Register the JS events:
+#if OPENSILVER
+            if (true)
+#elif BRIDGE
             if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
             {
                 CSHTML5.Interop.ExecuteJavaScript(@"$0.config.onChange.push(function(args) {
                     var date = args[0];

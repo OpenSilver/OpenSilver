@@ -1217,7 +1217,11 @@ parentElement.appendChild(child);
             while (!IsNullOrUndefined(domElementRef))
             {
                 // Walk up the DOM tree until we find a DOM element that has a corresponding CSharp object:
+#if OPENSILVER
+                if (true)
+#elif BRIDGE
                 if (Interop.IsRunningInTheSimulator)
+#endif
                 {
                     // In the Simulator, we get the CSharp object associated to a DOM element by searching for the DOM element ID in the "INTERNAL_idsToUIElements" dictionary.
 

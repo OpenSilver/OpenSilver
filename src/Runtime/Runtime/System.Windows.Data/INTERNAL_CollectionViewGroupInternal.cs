@@ -158,7 +158,11 @@ namespace Windows.UI.Xaml.Data
             {
                 if (Items.Count != 0)
                 {
+#if OPENSILVER
+                    if (true)
+#elif BRIDGE
                     if(CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
                     {
                         Type type = GetValue(Items.ElementAt(0), operation).GetType();
 
@@ -229,7 +233,11 @@ namespace Windows.UI.Xaml.Data
 
                     // we get the value of the sorting property on this item to allow comparison (if we are here, we know that data is comparable)
                     // then we get the position where we need to insert this item
+#if OPENSILVER
+                    if (true)
+#elif BRIDGE
                     if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
                     {
                         IComparable value = (IComparable)GetValue(item, operation);
 

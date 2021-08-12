@@ -118,7 +118,11 @@ namespace Windows.UI.Xaml
                         targetDO = rootTargetObjectInstance;
                         if (list.Count > 0)
                         {
+#if OPENSILVER
+                            if (true)
+#elif BRIDGE
                             if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
                             {
                                 // Note: In OpenSilver, we want to enter this case both in the simulator and
                                 // the browser.

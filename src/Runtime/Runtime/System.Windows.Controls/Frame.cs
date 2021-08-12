@@ -579,7 +579,11 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
 #else
+#if OPENSILVER
+            if (true)
+#elif BRIDGE
             if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
             {
                 foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
@@ -611,7 +615,11 @@ namespace Windows.UI.Xaml.Controls
 
         static bool IsNullOrUndefined(object jsObject)
         {
+#if OPENSILVER
+            if (true)
+#elif BRIDGE
             if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
             {
                 if (jsObject == null)
                     return true;

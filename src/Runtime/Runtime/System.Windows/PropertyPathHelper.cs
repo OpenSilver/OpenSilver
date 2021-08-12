@@ -57,7 +57,11 @@ namespace Windows.UI.Xaml
                         //in the case of JS, members with reserved names(?) (such as "name" without uppercase) do not work properly
                         //in regards to getting the member since the name of the member was changed to "$name" AND the GetValue method does not work either even if we manage to get the $name member.
                         // for that, we try to directly get the value with currentItem["someVariationOfThePropName"];
+#if OPENSILVER
+                        if (false)
+#elif BRIDGE
                         if (!CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
                         {
                             //Note: there are a lot of tests below because depending on how the property/field was declared, it is not in the same place in JS:
                             //      - in $propName

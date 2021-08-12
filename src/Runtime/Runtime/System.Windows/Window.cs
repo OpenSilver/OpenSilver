@@ -157,7 +157,11 @@ namespace Windows.UI.Xaml
         {
             double width;
             double height;
+#if OPENSILVER
+            if (true)
+#elif BRIDGE
             if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
             {
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
                 string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.offsetWidth + '|' + $0.offsetHeight", this.INTERNAL_OuterDomElement));
@@ -234,7 +238,11 @@ namespace Windows.UI.Xaml
 
 
                 // Reset the print area so that it becomes the window root control:
+#if OPENSILVER
+                if (false)
+#elif BRIDGE
                 if (!CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
                 {
                     if (CSHTML5.Native.Html.Printing.PrintManager.IsDefaultPrintArea)
                     {
