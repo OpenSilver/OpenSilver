@@ -272,6 +272,9 @@ namespace DotNetForHtml5.Compiler
                     case "System.Windows.Controls.Data.Input":
                         assemblyName = "OpenSilver.Controls.Data.Input";
                         return;
+                    case "System.Windows.Controls.Data":
+                        assemblyName = "OpenSilver.Controls.Data";
+                        return;
                     case "System.Windows.Controls.Data.DataForm.Toolkit":
                         assemblyName = "OpenSilver.Controls.Data.DataForm.Toolkit";
                         return;
