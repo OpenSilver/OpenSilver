@@ -64,7 +64,7 @@ namespace Windows.UI.Xaml
         internal INTERNAL_XamlResourcesHandler XamlResourcesHandler { get; } = new INTERNAL_XamlResourcesHandler();
 
         internal ITextMeasurementService TextMeasurementService { get; private set; }
-      
+
         public Application()
         {
             // Keep a reference to the app:
@@ -232,7 +232,7 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-#endregion
+        #endregion
 
         /// <summary>
         /// Injects the "DataContractSerializer" into the "XmlSerializer" (read note in the "XmlSerializer" implementation to understand why).
@@ -472,6 +472,35 @@ namespace Windows.UI.Xaml
             return XamlResourcesHandler.TryFindResource(resourceKey);
         }
 
+        /// <summary>
+        /// Create logic tree from given resource Locator, and associate this
+        /// tree with the given component.
+        /// </summary>
+        /// <param name="component">Root Element</param>
+        /// <param name="resourceLocator">Resource Locator</param>
+        public static void LoadComponent(object component, Uri resourceLocator)
+        {
+            if (component is null)
+            {
+                throw new ArgumentNullException(nameof(component));
+            }
+
+            if (resourceLocator is null)
+            {
+                throw new ArgumentNullException(nameof(resourceLocator));
+            }
+
+            if (resourceLocator.OriginalString is null)
+            {
+                throw new ArgumentNullException(nameof(resourceLocator.OriginalString));
+            }
+
+            if (resourceLocator.IsAbsoluteUri)
+            {
+                throw new ArgumentException("Application URI must be relative.");
+            }
+        }
+
         // Exceptions:
         //   System.ArgumentNullException:
         //     The System.Uri that is passed to System.Windows.Application.GetResourceStream(System.Uri)
@@ -536,7 +565,7 @@ namespace Windows.UI.Xaml
         }
 
 
-#region Exit event
+        #region Exit event
 
         INTERNAL_EventManager<EventHandler, EventArgs> _ExitEventManager;
         INTERNAL_EventManager<EventHandler, EventArgs> ExitEventManager
@@ -588,7 +617,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        #endregion
 
         private Host _host = new Host(true);
 
