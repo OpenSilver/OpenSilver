@@ -11,7 +11,7 @@
     xmlns:local="clr-namespace:System.Windows.Controls;assembly=OpenSilver.Controls.Data"
     xmlns:dataInput="clr-namespace:System.Windows.Controls;assembly=OpenSilver.Controls.Data.Input"
     xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=System.Windows"
-    xmlns:localprimitives="clr-namespace:System.Windows.Controls.Primitives;assembly=System.Windows.Controls.Data"
+    xmlns:localprimitives="clr-namespace:System.Windows.Controls.Primitives;assembly=OpenSilver.Controls.Data"
     xmlns:vsm="clr-namespace:System.Windows;assembly=System.Windows">
 
     <Style TargetType="local:DataGrid">
