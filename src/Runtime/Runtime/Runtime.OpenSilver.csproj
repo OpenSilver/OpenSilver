@@ -160,6 +160,7 @@
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction_1.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase_1.cs" />
+		<Compile Include="Windows.UI.Xaml.Media.Animation\WORKINPROGRESS\PowerEase.cs" />
 		<Compile Include="Windows.UI.Xaml\FullScreenOptions.cs" />
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\BlurEffect.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\ListenFailedException.cs" />
