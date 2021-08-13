@@ -46,7 +46,7 @@ namespace System.Windows.Controls
     public partial class DataGrid : Control
     {
         #region Constants
-
+        
         private const string DATAGRID_elementRowsPresenterName = "RowsPresenter";
         private const string DATAGRID_elementColumnHeadersPresenterName = "ColumnHeadersPresenter";
         private const string DATAGRID_elementFrozenColumnScrollBarSpacerName = "FrozenColumnScrollBarSpacer";
@@ -86,7 +86,7 @@ namespace System.Windows.Controls
         internal const double DATAGRID_defaultRowGroupSublevelIndent = 20;
         private const double DATAGRID_defaultMinColumnWidth = 20;
         private const double DATAGRID_defaultMaxColumnWidth = double.PositiveInfinity;
-
+        
         #endregion Constants
 
         #region Data
@@ -305,6 +305,7 @@ namespace System.Windows.Controls
         [SuppressMessage("Microsoft.Performance", "CA1805:DoNotInitializeUnnecessarily", Justification="_minRowHeight should be 0.")]
         public DataGrid()
         {
+            base.CustomLayout = true;
             this.TabNavigation = KeyboardNavigationMode.Once;
             this.KeyDown += new KeyEventHandler(DataGrid_KeyDown);
             this.KeyUp += new KeyEventHandler(DataGrid_KeyUp);
