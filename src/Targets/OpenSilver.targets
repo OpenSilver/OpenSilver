@@ -22,6 +22,10 @@
   <PropertyGroup>
     <IsSLMigration>True</IsSLMigration>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(DefineSilverlight)'=='true'">
+    <DefineConstants>$(DefineConstants);SILVERLIGHT;</DefineConstants>
+  </PropertyGroup>
   
   <!--============================================================
   IMPORT THE MAIN TARGET FILE
