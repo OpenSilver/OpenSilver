@@ -122,7 +122,11 @@ namespace System.Windows.Interactivity
 
         private void RegisterEvent(DependencyObject associatedObject, string eventName)
         {
+#if OPENSILVER
+            if (true)
+#elif BRIDGE
             if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
             {
                 RegisterEvent_SimulatorOnly(associatedObject, eventName);
             }

@@ -79,10 +79,17 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
         public static object GetApplicationRootDomElement()
         {
-            var rootDomElement = Interop.ExecuteJavaScriptAsync("document.getElementByIdSafe($0)", Application.ApplicationRootDomElementId);
+            var rootDomElement = Interop.ExecuteJavaScriptAsync("document.getXamlRoot()");
 
             if (rootDomElement == null)
-                throw new Exception("The application root DOM element was not found. To fix this issue, please add a DIV with the ID '" + Application.ApplicationRootDomElementId + "' to the HTML page.");
+            {
+#if OPENSILVER
+                const string ROOT_NAME = "opensilver-root";
+#elif BRIDGE
+                const string ROOT_NAME = "cshtml5-root";
+#endif
+                throw new Exception("The application root DOM element was not found. To fix this issue, please add a DIV with the ID '" + ROOT_NAME + "' to the HTML page.");
+            }
 
             return rootDomElement;
         }
@@ -1210,7 +1217,11 @@ parentElement.appendChild(child);
             while (!IsNullOrUndefined(domElementRef))
             {
                 // Walk up the DOM tree until we find a DOM element that has a corresponding CSharp object:
+#if OPENSILVER
+                if (true)
+#elif BRIDGE
                 if (Interop.IsRunningInTheSimulator)
+#endif
                 {
                     // In the Simulator, we get the CSharp object associated to a DOM element by searching for the DOM element ID in the "INTERNAL_idsToUIElements" dictionary.
 

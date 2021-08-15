@@ -103,7 +103,11 @@ namespace CSHTML5.Native.Html.Controls
 
         static bool IsNullOrUndefined(object jsObject)
         {
+#if OPENSILVER
+            if (true)
+#elif BRIDGE
             if (Interop.IsRunningInTheSimulator)
+#endif
             {
                 if (jsObject == null)
                     return true;

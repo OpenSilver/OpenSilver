@@ -82,6 +82,16 @@ if (div.style.display == "grid") {
 // DEFINE OTHER SCRIPTS
 //------------------------------
 
+document.getXamlRoot = function()
+{
+	let xamlRoot = document.getElementById("opensilver-root");
+	if (!xamlRoot)
+	{
+		xamlRoot = document.getElementById("cshtml5-root");
+	}
+	return xamlRoot;
+}
+
 document.ResXFiles = {};
 
 document.modifiersPressed = 0;

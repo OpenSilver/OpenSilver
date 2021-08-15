@@ -36,6 +36,9 @@ namespace CSHTML5
     /// <summary>
     /// Provides static methods for executing JavaScript code from within C#.
     /// </summary>
+    #if OPENSILVER
+    [Obsolete]
+    #endif
     public static class Interop
     {
         /// <summary>
@@ -114,7 +117,7 @@ namespace CSHTML5
         {
             // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
 #if !BRIDGE
-            string callerAssemblyName = Interop.IsRunningInTheSimulator ? Assembly.GetCallingAssembly().GetName().Name : INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
+	        string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
 #else
             string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
@@ -131,7 +134,7 @@ namespace CSHTML5
             {
                 // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
 #if !BRIDGE
-                string callerAssemblyName = Interop.IsRunningInTheSimulator ? Assembly.GetCallingAssembly().GetName().Name : INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
+	            string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
 #else
                 string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
@@ -164,7 +167,7 @@ namespace CSHTML5
         {
             // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
 #if !BRIDGE
-            string callerAssemblyName = Interop.IsRunningInTheSimulator ? Assembly.GetCallingAssembly().GetName().Name : INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
+	        string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
 
 #else
             string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
@@ -177,7 +180,7 @@ namespace CSHTML5
         {
             // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
 #if !BRIDGE
-            string callerAssemblyName = Interop.IsRunningInTheSimulator ? Assembly.GetCallingAssembly().GetName().Name : INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
+	        string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
 #else
             string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
@@ -261,7 +264,11 @@ namespace CSHTML5
             if (frameworkElement.INTERNAL_OuterDomElement == null)
                 throw new InvalidOperationException("Cannot get the Div because the control is not in the visual tree. Consider waiting until the 'FrameworkElement.Loaded' event is fired before calling this piece of code.");
 
+#if OPENSILVER
+            if (true)
+#elif BRIDGE
             if (IsRunningInTheSimulator)
+#endif
                 return (INTERNAL_HtmlDomElementReference)frameworkElement.INTERNAL_OuterDomElement;
             else
                 return frameworkElement.INTERNAL_OuterDomElement;
@@ -281,11 +288,17 @@ namespace CSHTML5
         {
             get
             {
+#if OPENSILVER
+	            return INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround();
+#elif BRIDGE
                 return INTERNAL_InteropImplementation.IsRunningInTheSimulator();
+#endif
             }
         }
 
 #if CSHTML5BLAZOR
+        // For backwards compatibility
+        
         /// <summary>
         /// Returns True is the app is running inside the Simulator, and False otherwise.
         /// </summary>
@@ -293,7 +306,7 @@ namespace CSHTML5
         {
             get
             {
-                return INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround();
+                return IsRunningInTheSimulator;
             }
         }
 #endif

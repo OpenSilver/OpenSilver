@@ -1287,7 +1287,11 @@ namespace System.Runtime.Serialization
 
         static bool IsNullOrUndefined(object obj)
         {
+#if OPENSILVER
+            if (true)
+#elif BRIDGE
             if (Interop.IsRunningInTheSimulator)
+#endif
             {
                 if (obj == null)
                     return true;

@@ -378,7 +378,11 @@ namespace CSHTML5.Internal
         static string[] GetListOfLoadedAssemblies()
         {
             string[] listOfAssemblies;
+#if OPENSILVER
+            if (true)
+#elif BRIDGE
             if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
             {
 #if !BRIDGE
                 listOfAssemblies = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetName().Name).ToArray();

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <EnableDefaultItems>false</EnableDefaultItems>
+	<DefineSilverlight>true</DefineSilverlight>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,23 +11,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="MainPage.xaml">
-      <SubType>Designer</SubType>
+	<ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
-    </Content>
-	<Content Include="App.xaml">
+    </ApplicationDefinition>
+    <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Content>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MainPage.xaml.cs">
-      <DependentUpon>MainPage.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="App.xaml.cs" />
+    <Compile Include="MainPage.xaml.cs" />
   </ItemGroup>
   
 </Project>
