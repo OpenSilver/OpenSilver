@@ -294,6 +294,15 @@ namespace DotNetForHtml5.Compiler
                 string tokens = trimmedString.Substring(1);
                 if (tokens.Length == 6) // This is becaue XAML is tolerant when the user has forgot the alpha channel (eg. #DDDDDD for Gray).
                     tokens = "FF" + tokens;
+                //We should support 3 or 4-digit hex color because XAML does support by duplicating each digit
+                else if (tokens.Length == 4)
+                {
+                    tokens = DuplicateCharacterInString(tokens);
+                }
+                else if (tokens.Length == 3)
+                {
+                    tokens = "FF" + DuplicateCharacterInString(tokens);
+                }
 
                 int color;
                 if (int.TryParse(tokens, NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo, out color))
@@ -401,6 +410,13 @@ namespace DotNetForHtml5.Compiler
             return string.Format("new {0}(new global::System.TimeSpan({1}L))", elementTypeInCSharp, timeSpan.Ticks); ;
         }
 
+        private static string DuplicateCharacterInString(string source)
+        {
+            if (string.IsNullOrEmpty(source))
+                return null;
+
+            return String.Join("", source.ToCharArray().Select(x => x.ToString() + x.ToString()));
+        }
 
         //Types added and quickly tested:
         //  - Thickness
