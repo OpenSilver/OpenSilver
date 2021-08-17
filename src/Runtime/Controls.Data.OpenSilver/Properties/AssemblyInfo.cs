@@ -23,7 +23,7 @@ using System.Windows.Markup;
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en-us")]
 
-//[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.Windows.Controls")]
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.Windows.Controls")]
 
 
 [assembly: XmlnsPrefix("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "sdk")]
