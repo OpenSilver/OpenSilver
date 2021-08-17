@@ -26,15 +26,15 @@ namespace Windows.Foundation
 #endif
 {
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.Point" /> object to and from other types.
+    /// Converts a <see cref="T:System.Windows.Rect" /> object to and from other types.
     /// </summary>
-    public class PointConverter : TypeConverter
+    public class RectConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Point" />.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Rect" />.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
-       	/// <param name="sourceType">The type being evaluated for conversion.</param>
+        /// <param name="sourceType">The type being evaluated for conversion.</param>
         /// <returns>
         /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
@@ -43,7 +43,7 @@ namespace Windows.Foundation
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.Point" /> can be converted to the specified type.
+        /// Determines whether an instance of <see cref="T:System.Windows.Rect" /> can be converted to the specified type.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
@@ -54,12 +54,12 @@ namespace Windows.Foundation
             return destinationType == typeof(string);
         }
 
-        /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.Point" />.</summary>
+        /// <summary>Attempts to convert the specified object to a <see cref="T:System.Windows.Rect" />. </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The <see cref="T:System.Windows.Point" /> created from converting <paramref name="value" />.</returns>
-        /// <exception cref="T:System.NotSupportedException">Thrown if the specified object is <see langword="null" /> or is a type that cannot be converted to a <see cref="T:System.Windows.Point" />.</exception>
+        /// <returns>The <see cref="T:System.Windows.Rect" /> created from converting <paramref name="value" />.</returns>
+        /// <exception cref="T:System.NotSupportedException">Thrown if the specified object is <see langword="null" /> or is a type that cannot be converted to a <see cref="T:System.Windows.Rect" />.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             object result = null;
@@ -70,24 +70,28 @@ namespace Windows.Foundation
             }
             else if (value is string)
             {
-                var pointAsString = value.ToString();
+                var rectAsString = value.ToString();
 
-                var split = pointAsString.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var split = rectAsString.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                if (split.Length == 2)
+                if (split.Length == 4)
                 {
 #if OPENSILVER
                     if (double.TryParse(split[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var x) &&
-                        double.TryParse(split[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var y))
+                        double.TryParse(split[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var y) &&
+                        double.TryParse(split[2], NumberStyles.Any, CultureInfo.InvariantCulture, out var width) &&
+                        double.TryParse(split[3], NumberStyles.Any, CultureInfo.InvariantCulture, out var height))
 #else
                 if (double.TryParse(split[0], out var x) &&
-                    double.TryParse(split[1], out var y))
+                    double.TryParse(split[1], out var y) &&
+                    double.TryParse(split[2], out var width) &&
+                    double.TryParse(split[3], out var height))
 #endif
-                        result = new Point(x, y);
+                        result = new Rect(x, y, width, height);
                 }
                 else
                 {
-                    throw new FormatException($"{pointAsString} was not in the expected format: \"x, y\"");
+                    throw new FormatException($"{rectAsString} was not in the expected format: \"x, y, width, height\"");
                 }
             }
             else
@@ -98,22 +102,22 @@ namespace Windows.Foundation
             return result;
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.Point" /> to a specified type. </summary>
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.Rect" /> to a specified type. </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.Point" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Point" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.Point" />.</returns>
+        /// <param name="value">The <see cref="T:System.Windows.Rect" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Rect" /> to.</param>
+        /// <returns>The object created from converting this <see cref="T:System.Windows.Rect" />.</returns>
         /// <exception cref="T:System.NotSupportedException">
-        /// Thrown if <paramref name="value" /> is <see langword="null" /> or not a <see cref="T:System.Windows.Point" />,
+        /// Thrown if <paramref name="value" /> is <see langword="null" /> or not a <see cref="T:System.Windows.Rect" />,
         /// or if the <paramref name="destinationType" /> is not one of the valid types for conversion.</exception>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
             object result;
 
-            if (destinationType != null && destinationType == typeof(string) && value is Point point)
+            if (destinationType != null && destinationType == typeof(string) && value is Rect rect)
             {
-                result = point.ToString();
+                result = rect.ToString();
             }
             else
             {

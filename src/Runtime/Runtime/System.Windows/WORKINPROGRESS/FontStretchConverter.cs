@@ -23,16 +23,17 @@ using System.Globalization;
 #if MIGRATION
 namespace System.Windows
 #else
-namespace Windows.UI.Text
+namespace Windows.UI.Xaml
 #endif
 {
+#if WORKINPROGRESS
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.FontWeight" /> object to and from other types.
+    /// Converts a <see cref="T:System.Windows.FontStretch" /> object to and from other types.
     /// </summary>
-    public class FontWeightConverter : TypeConverter
+    public class FontStretchConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.FontWeight" />.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.FontStretch" />.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="sourceType">The type being evaluated for conversion.</param>
@@ -44,7 +45,7 @@ namespace Windows.UI.Text
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.FontWeight" /> can be converted to the specified type.
+        /// Determines whether an instance of <see cref="T:System.Windows.FontStretch" /> can be converted to the specified type.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
@@ -56,12 +57,12 @@ namespace Windows.UI.Text
             return destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string);
         }
 
-        /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.FontWeight" />.</summary>
+        /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.FontStretch" />.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The instance of <see cref="T:System.Windows.FontWeight" /> created from the converted <paramref name="value" />.</returns>
-        /// <exception cref="T:System.NotSupportedException">
+        /// <returns>The instance of <see cref="T:System.Windows.FontStretch" /> created from the converted <paramref name="value" />.</returns>
+        /// <exception cref="T:System.ArgumentException">
         ///   <paramref name="value" /> is <see langword="null" /> or is not a valid type for conversion.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
@@ -73,22 +74,7 @@ namespace Windows.UI.Text
             }
             else if (value is string)
             {
-                var fontCode = value.ToString();
-
-                try
-                {
-                    // Check if the font is a named font:
-                    if (!ushort.TryParse(fontCode, out var code))
-                    {
-                        FontWeights.INTERNAL_FontweightsEnum namedFont = (FontWeights.INTERNAL_FontweightsEnum)Enum.Parse(typeof(FontWeights.INTERNAL_FontweightsEnum), fontCode); // Note: "TryParse" does not seem to work in JSIL.
-                        result = (ushort)namedFont;
-                    }
-                    result = FontWeight.INTERNAL_ConvertFromUshort(code);
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("Invalid font: " + fontCode, ex);
-                }
+                result = new FontStretch();
             }
             else
             {
@@ -98,29 +84,29 @@ namespace Windows.UI.Text
             return result;
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.FontWeight" /> to a specified type. </summary>
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.FontStretch" /> to a specified type. </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.FontWeight" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.FontWeight" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.FontWeight" />.</returns>
+        /// <param name="value">The <see cref="T:System.Windows.FontStretch" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.FontStretch" /> to.</param>
+        /// <returns>The object created from converting this <see cref="T:System.Windows.FontStretch" />.</returns>
         /// <exception cref="T:System.NotSupportedException">
-        /// Thrown if <paramref name="value" /> is <see langword="null" /> or not a <see cref="T:System.Windows.FontWeight" />,
+        /// Thrown if <paramref name="value" /> is <see langword="null" /> or not a <see cref="T:System.Windows.FontStretch" />,
         /// or if the <paramref name="destinationType" /> is not one of the valid types for conversion.</exception>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
             object result = null;
 
-            if (destinationType != null && value is FontWeight fontWeight)
+            if (destinationType != null && value is FontStretch fontStretch)
             {
                 if (destinationType == typeof(InstanceDescriptor))
                 {
-                    var mi = typeof(FontWeight).GetMethod("FromOpenTypeWeight", new Type[] { typeof(int) });
-                    result = new InstanceDescriptor(mi, new object[] { fontWeight.ToOpenTypeWeight() });
+                    var mi = typeof(FontStretch).GetMethod("FromOpenTypeStretch", new Type[] { typeof(int) });
+                    result = new InstanceDescriptor(mi, new object[] { fontStretch.ToOpenTypeStretch() });
                 }
                 else if (destinationType == typeof(string))
                 {
-                    result = ((IFormattable)fontWeight).ToString(null, culture);
+                    result = ((IFormattable)fontStretch).ToString(null, culture);
                 }
             }
 
@@ -132,4 +118,5 @@ namespace Windows.UI.Text
             return result;
         }
     }
+#endif
 }

@@ -16,25 +16,28 @@
 #if BRIDGE
 using System;
 #endif
+#if !MIGRATION
+using Windows.Foundation;
+#endif
 using System.ComponentModel;
 using System.Globalization;
 
 #if MIGRATION
-namespace System.Windows
+namespace System.Windows.Media
 #else
-namespace Windows.Foundation
+namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.Point" /> object to and from other types.
+    /// Converts a <see cref="T:System.Windows.Media.PointCollection" /> object to and from other types.
     /// </summary>
-    public class PointConverter : TypeConverter
+    public class PointCollectionConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Point" />.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Media.PointCollection" />.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
-       	/// <param name="sourceType">The type being evaluated for conversion.</param>
+        /// <param name="sourceType">The type being evaluated for conversion.</param>
         /// <returns>
         /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
@@ -43,7 +46,7 @@ namespace Windows.Foundation
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.Point" /> can be converted to the specified type.
+        /// Determines whether an instance of <see cref="T:System.Windows.Media.PointCollection" /> can be converted to the specified type.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="destinationType">The type being evaluated for conversion.</param>
@@ -54,15 +57,15 @@ namespace Windows.Foundation
             return destinationType == typeof(string);
         }
 
-        /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.Point" />.</summary>
+        /// <summary>Attempts to convert the specified object to a <see cref="T:System.Windows.Media.PointCollection" />.</summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The <see cref="T:System.Windows.Point" /> created from converting <paramref name="value" />.</returns>
-        /// <exception cref="T:System.NotSupportedException">Thrown if the specified object is <see langword="null" /> or is a type that cannot be converted to a <see cref="T:System.Windows.Point" />.</exception>
+        /// <returns>The <see cref="T:System.Windows.Media.PointCollection" /> that is created from converting <paramref name="value" />.</returns>
+        /// <exception cref="T:System.NotSupportedException">The specified object is null or is a type that cannot be converted to a <see cref="T:System.Windows.Media.PointCollection" />.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            object result = null;
+            object result;
 
             if (value is null)
             {
@@ -70,24 +73,33 @@ namespace Windows.Foundation
             }
             else if (value is string)
             {
-                var pointAsString = value.ToString();
+                var pointsAsString = value.ToString();
 
-                var split = pointAsString.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var splittedString = pointsAsString.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var collection = new PointCollection();
 
-                if (split.Length == 2)
+                // Points count needs to be even number
+                if (splittedString.Length % 2 == 0)
                 {
+                    for (int i = 0; i < splittedString.Length; i += 2)
+                    {
 #if OPENSILVER
-                    if (double.TryParse(split[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var x) &&
-                        double.TryParse(split[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var y))
+                        if (double.TryParse(splittedString[i], NumberStyles.Any, CultureInfo.InvariantCulture, out var x) &&
+                            double.TryParse(splittedString[i + 1], NumberStyles.Any, CultureInfo.InvariantCulture, out var y))
 #else
-                if (double.TryParse(split[0], out var x) &&
-                    double.TryParse(split[1], out var y))
+                    if (double.TryParse(splittedString[i], out var x) &&
+                        double.TryParse(splittedString[i + 1], out var y))
 #endif
-                        result = new Point(x, y);
+                        {
+                            collection.Add(new Point(x, y));
+                        }
+                    }
+
+                    result = collection;
                 }
                 else
                 {
-                    throw new FormatException($"{pointAsString} was not in the expected format: \"x, y\"");
+                    throw new FormatException(pointsAsString + " is not an eligible value for a PointCollection");
                 }
             }
             else
@@ -98,24 +110,25 @@ namespace Windows.Foundation
             return result;
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.Point" /> to a specified type. </summary>
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.PointCollection" /> to a specified type. </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.Point" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Point" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.Point" />.</returns>
-        /// <exception cref="T:System.NotSupportedException">
-        /// Thrown if <paramref name="value" /> is <see langword="null" /> or not a <see cref="T:System.Windows.Point" />,
-        /// or if the <paramref name="destinationType" /> is not one of the valid types for conversion.</exception>
+        /// <param name="value">The <see cref="T:System.Windows.Media.PointCollection" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Media.PointCollection" /> to.</param>
+        /// <returns>The object created from converting this <see cref="T:System.Windows.Media.PointCollection" />.</returns>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            object result;
+            object result = null;
 
-            if (destinationType != null && destinationType == typeof(string) && value is Point point)
+            if (destinationType != null && value is PointCollection collection)
             {
-                result = point.ToString();
+                if (destinationType == typeof(string))
+                {
+                    result = collection.ToString(null, culture);
+                }
             }
-            else
+
+            if (result is null)
             {
                 result = base.ConvertTo(context, culture, value, destinationType);
             }

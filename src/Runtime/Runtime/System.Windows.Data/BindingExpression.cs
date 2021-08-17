@@ -540,13 +540,14 @@ namespace Windows.UI.Xaml.Data
                         IsUpdating = true;
                         Type[] AutoConvertTypes = { typeof(Int16), typeof(Int32), typeof(Int64), typeof(Double), typeof(Uri) };
                         bool typeFound = false;
-                        if ((AutoConvertTypes.Contains(expectedType))
-                            && convertedValue is string) //todo: find a way to do this more efficiently (and maybe mode generic ?)
+                        var stringValue = convertedValue as string;
+                        // TODO: find a way to do this more efficiently (and maybe mode generic ?)
+                        if ((AutoConvertTypes.Contains(expectedType)) && stringValue is string)
                         {
                             typeFound = true;
                             if (expectedType == typeof(Int16))
                             {
-                                convertedValue = Int16.Parse((string)convertedValue);
+                                convertedValue = Int16.Parse((string)stringValue);
                             }
                             else if (expectedType == typeof(Int32))
                             {
@@ -567,8 +568,7 @@ namespace Windows.UI.Xaml.Data
                         }
 
                         //todo: partially merge this "if" and the previous one.
-                        if ((!typeFound && TypeFromStringConverters.CanTypeBeConverted(expectedType))
-                            && convertedValue is string)
+                        if (!typeFound && stringValue is string)
                         {
                             typeFound = true;
                             convertedValue = ObjectBuilder.Singleton.Parse(stringValue, expectedType);
