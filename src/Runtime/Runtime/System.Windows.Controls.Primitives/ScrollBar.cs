@@ -33,20 +33,20 @@ namespace Windows.UI.Xaml.Controls.Primitives
         double _valueWithoutCoercion; // Note: Normally we keep the value within the Min/Max range (this is called "coercion"). However, while dragging the thumb, we store the "ValueWithoutCoercion" so that when the user drags the pointer beyond the scrollbar limits and then goes back, the "going back" movement does not modify the actual value until the pointer is again inside the scrollbar range.
 
         // Horizontal elements:
-        Canvas _horizontalRoot;
+        FrameworkElement _horizontalRoot;
         Thumb _horizontalThumb;
-        Button _horizontalSmallDecrease;
-        Button _horizontalSmallIncrease;
-        Button _horizontalLargeDecrease;
-        Button _horizontalLargeIncrease;
+        ButtonBase _horizontalSmallDecrease;
+        ButtonBase _horizontalSmallIncrease;
+        ButtonBase _horizontalLargeDecrease;
+        ButtonBase _horizontalLargeIncrease;
 
         // Vertical elements:
-        Canvas _verticalRoot;
+        FrameworkElement _verticalRoot;
         Thumb _verticalThumb;
-        Button _verticalSmallDecrease;
-        Button _verticalSmallIncrease;
-        Button _verticalLargeDecrease;
-        Button _verticalLargeIncrease;
+        ButtonBase _verticalSmallDecrease;
+        ButtonBase _verticalSmallIncrease;
+        ButtonBase _verticalLargeDecrease;
+        ButtonBase _verticalLargeIncrease;
 
         /// <summary>
         /// Initializes a new instance of the ScrollBar class.
@@ -87,19 +87,19 @@ namespace Windows.UI.Xaml.Controls.Primitives
             // Get a reference to the UI elements defined in the control template:
             //----------------------------
 
-            _horizontalRoot = this.GetTemplateChild("HorizontalRoot") as Canvas;
+            _horizontalRoot = this.GetTemplateChild("HorizontalRoot") as FrameworkElement;
             _horizontalThumb = this.GetTemplateChild("HorizontalThumb") as Thumb;
-            _horizontalSmallDecrease = this.GetTemplateChild("HorizontalSmallDecrease") as Button;
-            _horizontalSmallIncrease = this.GetTemplateChild("HorizontalSmallIncrease") as Button;
-            _horizontalLargeDecrease = this.GetTemplateChild("HorizontalLargeDecrease") as Button;
-            _horizontalLargeIncrease = this.GetTemplateChild("HorizontalLargeIncrease") as Button;
+            _horizontalSmallDecrease = this.GetTemplateChild("HorizontalSmallDecrease") as ButtonBase;
+            _horizontalSmallIncrease = this.GetTemplateChild("HorizontalSmallIncrease") as ButtonBase;
+            _horizontalLargeDecrease = this.GetTemplateChild("HorizontalLargeDecrease") as ButtonBase;
+            _horizontalLargeIncrease = this.GetTemplateChild("HorizontalLargeIncrease") as ButtonBase;
 
-            _verticalRoot = this.GetTemplateChild("VerticalRoot") as Canvas;
+            _verticalRoot = this.GetTemplateChild("VerticalRoot") as FrameworkElement;
             _verticalThumb = this.GetTemplateChild("VerticalThumb") as Thumb;
-            _verticalSmallDecrease = this.GetTemplateChild("VerticalSmallDecrease") as Button;
-            _verticalSmallIncrease = this.GetTemplateChild("VerticalSmallIncrease") as Button;
-            _verticalLargeDecrease = this.GetTemplateChild("VerticalLargeDecrease") as Button;
-            _verticalLargeIncrease = this.GetTemplateChild("VerticalLargeIncrease") as Button;
+            _verticalSmallDecrease = this.GetTemplateChild("VerticalSmallDecrease") as ButtonBase;
+            _verticalSmallIncrease = this.GetTemplateChild("VerticalSmallIncrease") as ButtonBase;
+            _verticalLargeDecrease = this.GetTemplateChild("VerticalLargeDecrease") as ButtonBase;
+            _verticalLargeIncrease = this.GetTemplateChild("VerticalLargeIncrease") as ButtonBase;
 
 
             //----------------------------
@@ -367,6 +367,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
                         _smallDecreaseButtonSize = buttonsHeight;
                         _smallIncreaseButtonSize = buttonsHeight;
 
+                        if (_verticalSmallDecrease.Visibility == Visibility.Collapsed)
+                            _smallDecreaseButtonSize = 0;
+
+                        if (_verticalSmallIncrease.Visibility == Visibility.Collapsed)
+                            _smallIncreaseButtonSize = 0;
+
                         // We apply that size:
                         _verticalSmallDecrease.Height = _smallDecreaseButtonSize;
                         _verticalSmallIncrease.Height = _smallIncreaseButtonSize;
@@ -413,6 +419,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
                         // We choose the size of the small decrease buttons (ie. the arrows):
                         _smallDecreaseButtonSize = buttonsWidth;
                         _smallIncreaseButtonSize = buttonsWidth;
+
+                        if (_horizontalSmallDecrease.Visibility == Visibility.Collapsed)
+                            _smallDecreaseButtonSize = 0;
+
+                        if (_horizontalSmallIncrease.Visibility == Visibility.Collapsed)
+                            _smallIncreaseButtonSize = 0;
 
                         // We apply that size:
                         _horizontalSmallDecrease.Width = _smallDecreaseButtonSize;
