@@ -192,7 +192,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\CustomTimeFormat.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DataPager.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\DatePicker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\Grid.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\WORKINPROGRESS\GridSplitter.cs" />
@@ -693,7 +692,6 @@
 		<Compile Include="Windows.UI.Xaml.Controls\ContextMenuService.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\Control.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\ControlTemplate.cs" />
-		<Compile Include="Windows.UI.Xaml.Controls\DataPager.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DatePicker.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\Dock.cs" />
 		<Compile Include="Windows.UI.Xaml.Controls\DockPanel.cs" />
@@ -1088,10 +1086,6 @@
 			<SubType>Designer</SubType>
 		</Content>
 		<Content Include="DefaultStyles\INTERNAL_DefaultComboBoxStyle.xaml">
-			<Generator>MSBuild:Compile</Generator>
-			<SubType>Designer</SubType>
-		</Content>
-		<Content Include="DefaultStyles\INTERNAL_DefaultDataPagerStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</Content>
