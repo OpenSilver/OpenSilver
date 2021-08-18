@@ -425,7 +425,7 @@ namespace Windows.UI.Xaml
         private static void ApplyRenderTransformOrigin(UIElement uiElement, Point newValue)
         {
             var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(uiElement);
-            string transformOriginValue = $"{(newValue.X * 100).ToString()}% {(newValue.Y * 100).ToString()}%";
+            string transformOriginValue = $"{(newValue.X * 100).ToString(CultureInfo.InvariantCulture)}% {(newValue.Y * 100).ToString(CultureInfo.InvariantCulture)}%";
 
             try
             {

@@ -1310,10 +1310,10 @@ parentElement.appendChild(child);";
 var element = document.getElementByIdSafe(""{style.Uid}"");
 if (element)
 {{
-element.style.left = ""{visualBounds.Left.ToString()}px"";
-element.style.top = ""{visualBounds.Top.ToString()}px"";
-element.style.width = ""{visualBounds.Width.ToString()}px"";
-element.style.height = ""{visualBounds.Height.ToString()}px"";
+element.style.left = ""{visualBounds.Left.ToString(CultureInfo.InvariantCulture)}px"";
+element.style.top = ""{visualBounds.Top.ToString(CultureInfo.InvariantCulture)}px"";
+element.style.width = ""{visualBounds.Width.ToString(CultureInfo.InvariantCulture)}px"";
+element.style.height = ""{visualBounds.Height.ToString(CultureInfo.InvariantCulture)}px"";
 {position}{margin}{padding}
 }}";
 
@@ -1351,8 +1351,8 @@ element.style.height = ""{visualBounds.Height.ToString()}px"";
 var element = document.getElementByIdSafe(""{style.Uid}"");
 if (element)
 {{
-element.style.left = ""{visualBounds.Left.ToString()}px"";
-element.style.top = ""{visualBounds.Top.ToString()}px"";
+element.style.left = ""{visualBounds.Left.ToString(CultureInfo.InvariantCulture)}px"";
+element.style.top = ""{visualBounds.Top.ToString(CultureInfo.InvariantCulture)}px"";
 {position}{margin}{padding}
 }}";
 

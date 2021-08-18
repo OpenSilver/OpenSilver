@@ -235,7 +235,7 @@ namespace Windows.UI.Xaml.Controls
             var thickness = (Thickness)newValue;
             domElement.boxSizing = "border-box";
             domElement.borderStyle = "solid"; //todo: see if we should put this somewhere else
-            domElement.borderWidth = $"{thickness.Top.ToString()}px {thickness.Right.ToString()}px {thickness.Bottom.ToString()}px {thickness.Left.ToString()}px";
+            domElement.borderWidth = $"{thickness.Top.ToString(CultureInfo.InvariantCulture)}px {thickness.Right.ToString(CultureInfo.InvariantCulture)}px {thickness.Bottom.ToString(CultureInfo.InvariantCulture)}px {thickness.Left.ToString(CultureInfo.InvariantCulture)}px";
         }
 
         /// <summary>
@@ -265,7 +265,7 @@ namespace Windows.UI.Xaml.Controls
             var border = (Border)d;
             var cr = (CornerRadius)newValue;
             var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(border);
-            domStyle.borderRadius = $"{cr.TopLeft.ToString()}px {cr.TopRight.ToString()}px {cr.BottomRight.ToString()}px {cr.BottomLeft.ToString()}px";
+            domStyle.borderRadius = $"{cr.TopLeft.ToString(CultureInfo.InvariantCulture)}px {cr.TopRight.ToString(CultureInfo.InvariantCulture)}px {cr.BottomRight.ToString(CultureInfo.InvariantCulture)}px {cr.BottomLeft.ToString(CultureInfo.InvariantCulture)}px";
         }
 
         /// <summary>
@@ -302,7 +302,7 @@ namespace Windows.UI.Xaml.Controls
 
                 // todo: if the container has a padding, add it to the margin
                 styleOfInnerDomElement.boxSizing = "border-box";
-                styleOfInnerDomElement.padding = $"{newPadding.Top.ToString()}px {newPadding.Right.ToString()}px {newPadding.Bottom.ToString()}px {newPadding.Left.ToString()}px";
+                styleOfInnerDomElement.padding = $"{newPadding.Top.ToString(CultureInfo.InvariantCulture)}px {newPadding.Right.ToString(CultureInfo.InvariantCulture)}px {newPadding.Bottom.ToString(CultureInfo.InvariantCulture)}px {newPadding.Left.ToString(CultureInfo.InvariantCulture)}px";
             }
         }
 
