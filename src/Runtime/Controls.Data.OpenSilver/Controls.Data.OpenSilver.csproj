@@ -120,18 +120,16 @@
   </ItemGroup>
 
 
-
   <ItemGroup>
-    <Page Include="DataGrid\System.Windows.Controls.DataGrid.DataGridCheckBoxColumn.xaml">
+    <Content Include="themes\generic.xaml">
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="DataGrid\System.Windows.Controls.DataGrid.DataGridColumnDropLocationIndicator.xaml">
+    </Content>
+    <Content Include="DataGrid\System.Windows.Controls.DataGrid.DataGridCheckBoxColumn.xaml">
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-  
-    <Page Include="themes\generic.xaml">
+    </Content>
+        <Content Include="DataGrid\System.Windows.Controls.DataGrid.DataGridColumnDropLocationIndicator.xaml">
       <Generator>MSBuild:Compile</Generator>
-    </Page>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
