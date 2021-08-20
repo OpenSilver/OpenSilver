@@ -968,6 +968,12 @@ namespace Windows.UI.Xaml
 
             // Call SizeChanged event handlers
             this.HandleSizeChanged($"{VisualBounds.Width}|{VisualBounds.Height}");
+
+            if (isFirstRendering)
+            {
+                isFirstRendering = false;
+                INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement).visibility = "visible";
+            }
         }
 
         private static Point GetAlignmentOffset(Rect container, Size alignedRectSize, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment)

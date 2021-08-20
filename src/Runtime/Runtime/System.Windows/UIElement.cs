@@ -107,6 +107,8 @@ namespace Windows.UI.Xaml
 
         internal bool IsRendered { get; private set; }
 
+        internal bool isFirstRendering;
+
         internal Rect RenderedVisualBounds { get; private set; }
 
         internal Rect PreviousFinalRect { get; private set; }
@@ -190,6 +192,7 @@ namespace Windows.UI.Xaml
             IsMeasureValid = false;
             IsArrangeValid = false;
             IsRendered = false;
+            isFirstRendering = false;
             visualLevel = -1;
 
             disableMeasureInvalidationToken = new Disposable(() => disableMeasureInvalidationRequests--);
