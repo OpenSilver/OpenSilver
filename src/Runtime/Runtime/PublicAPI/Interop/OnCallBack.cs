@@ -60,8 +60,8 @@ namespace CSHTML5.Internal
         {
             Action action = () =>
             {
-                string errorMessage = Convert.ToString(Interop.ExecuteJavaScript("document.jsSimulatorObjectReferences[$0][0]", idWhereCallbackArgsAreStored));
-                int indexOfNextUnmodifiedJSCallInList = Convert.ToInt32(Interop.ExecuteJavaScript("document.jsSimulatorObjectReferences[$0][1]", idWhereCallbackArgsAreStored));
+                string errorMessage = Convert.ToString(Interop.ExecuteJavaScript("document.jsObjRef[$0][0]", idWhereCallbackArgsAreStored));
+                int indexOfNextUnmodifiedJSCallInList = Convert.ToInt32(Interop.ExecuteJavaScript("document.jsObjRef[$0][1]", idWhereCallbackArgsAreStored));
                 INTERNAL_InteropImplementation.ShowErrorMessage(errorMessage, indexOfNextUnmodifiedJSCallInList);
             };
 

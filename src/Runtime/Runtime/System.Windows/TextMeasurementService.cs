@@ -160,8 +160,8 @@ namespace Windows.UI.Xaml
             }
             else
             {
-                textBoxDivStyle.width = String.Format(CultureInfo.InvariantCulture, "{0}px", maxWidth);
-                textBoxDivStyle.maxWidth = String.Format(CultureInfo.InvariantCulture, "{0}px", maxWidth);
+                textBoxDivStyle.width = maxWidth.ToString(CultureInfo.InvariantCulture) +"px";
+                textBoxDivStyle.maxWidth = maxWidth.ToString(CultureInfo.InvariantCulture) + "px";
             }
 
             // On Simulator, it needs time to get actualwidth and actualheight
@@ -209,8 +209,8 @@ namespace Windows.UI.Xaml
             }
             else
             {
-                textBlockDivStyle.width = String.Format(CultureInfo.InvariantCulture, "{0}px", maxWidth);
-                textBlockDivStyle.maxWidth = String.Format(CultureInfo.InvariantCulture, "{0}px", maxWidth);
+                textBlockDivStyle.width = maxWidth.ToString(CultureInfo.InvariantCulture) + "px";
+                textBlockDivStyle.maxWidth = maxWidth.ToString(CultureInfo.InvariantCulture) + "px";
             }
 
             // On Simulator, it needs time to get actualwidth and actualheight

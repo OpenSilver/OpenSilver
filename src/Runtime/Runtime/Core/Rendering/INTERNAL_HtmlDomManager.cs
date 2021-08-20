@@ -103,9 +103,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
             else
             {
-                string javaScriptCodeToExecute = string.Format(@"var element = document.getElementByIdSafe(""{0}"");
-                                                           element.parentNode.removeChild(element);",
-                                                           ((INTERNAL_HtmlDomElementReference)domNode).UniqueIdentifier);
+                string javaScriptCodeToExecute = $@"var element = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)domNode).UniqueIdentifier}"");
+                                                           element.parentNode.removeChild(element);";
                 ExecuteJavaScript(javaScriptCodeToExecute, commentForDebugging); // IMPORTANT: This cannot be replaced by "INTERNAL_SimulatorPerformanceOptimizer.QueueJavaScriptCode" because the element may no longer be in the tree when we try to remove it (cf. issues we had with the Grid on 2015.08.26)
                 if (((INTERNAL_HtmlDomElementReference)domNode).Parent != null)
                 {
@@ -249,11 +248,10 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 #endif
         static void SetFocus_SimulatorOnly(object domElementRef)
         {
-            ExecuteJavaScript(string.Format(@"var domElement = document.getElementByIdSafe(""{0}"");
+            ExecuteJavaScript($@"var domElement = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"");
                                         setTimeout(function() {{ 
                                             domElement.focus();
-                                        }}, 1);",
-                                        ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier));
+                                        }}, 1);");
         }
 
         public static void SetContentString(UIElement element, string content, bool removeTextWrapping = false)
@@ -328,17 +326,16 @@ else
             {
                 // Note: this is intended to be called by the simulator only:
                 string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElement).UniqueIdentifier;
-                string javaScriptCodeToExecute = string.Format(@"
-var element = document.getElementByIdSafe(""{0}"");
+                string javaScriptCodeToExecute = $@"
+var element = document.getElementByIdSafe(""{ uniqueIdentifier}"");
 if (element)
 {{
-    element.innerText = ""{1}"";
-    if ({2})
+    element.innerText = ""{EscapeStringForUseInJavaScript(content)}"";
+    if ({removeTextWrapping.ToString().ToLower()})
     {{
         element.style.whiteSpace = ""nowrap"";
     }}
-}}
-                ", uniqueIdentifier, EscapeStringForUseInJavaScript(content), removeTextWrapping.ToString().ToLower());
+}}";
                 INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
             }
 
@@ -377,15 +374,14 @@ if (element)
             }
 #else
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)uiElement.INTERNAL_OuterDomElement).UniqueIdentifier;
-            string javaScriptCodeToExecute = string.Format(@"
-var element = document.getElementByIdSafe(""{0}"");
+            string javaScriptCodeToExecute = $@"
+var element = document.getElementByIdSafe(""{uniqueIdentifier}"");
 if (element)
 {{
-element.value = ""{1}"";
+element.value = ""{EscapeStringForUseInJavaScript(newText)}"";
 element.style.visibility=""collapse"";
-setTimeout(function(){{ var element2 = document.getElementByIdSafe(""{0}""); if (element2) {{ element2.style.visibility=""visible""; }} }}, 0);
-}}
-            ", uniqueIdentifier, EscapeStringForUseInJavaScript(newText));
+setTimeout(function(){{ var element2 = document.getElementByIdSafe(""{uniqueIdentifier}""); if (element2) {{ element2.style.visibility=""visible""; }} }}, 0);
+}}";
 
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
 #endif
@@ -613,8 +609,7 @@ element.remove({1});
             {
                 string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
                 string javaScriptCodeToExecute =
-                    string.Format(@"var element = document.getElementByIdSafe(""{0}"");if (element) {{ element[""{1}""] = {2} }};",
-                    uniqueIdentifier, attributeName, ConvertToStringToUseInJavaScriptCode(attributeValue));
+                    $@"var element = document.getElementByIdSafe(""{uniqueIdentifier}"");if (element) {{ element[""{attributeName}""] = {ConvertToStringToUseInJavaScriptCode(attributeValue)} }};";
 
                 if (forceSimulatorExecuteImmediately)
                     ExecuteJavaScript(javaScriptCodeToExecute);
@@ -634,10 +629,7 @@ element.remove({1});
             else
             {
                 string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
-                string javaScriptCodeToExecute =
-                    //string.Format(@"var element = document.getElementByIdSafe(""{0}"");if (element) {{ element[""{1}""] = {2} }};",
-                    string.Format(@"var element = document.getElementByIdSafe(""{0}"");if (element) {{ element.setAttribute(""{1}"", {2}) }};",
-                    uniqueIdentifier, attributeName, ConvertToStringToUseInJavaScriptCode(attributeValue));
+                string javaScriptCodeToExecute = $@"document.setDomAttribute(""{uniqueIdentifier}"",""{attributeName}"",{ConvertToStringToUseInJavaScriptCode(attributeValue)})";
 
                 if (forceSimulatorExecuteImmediately)
                     ExecuteJavaScript(javaScriptCodeToExecute);
@@ -667,11 +659,10 @@ element.remove({1});
                 var value = ConvertToStringToUseInJavaScriptCode(attributeValue);
                 foreach (string propertyName in propertyCSSNames)
                 {
-                    settingProperties += string.Format(@"element.style.{0} = {1};", propertyName, value);
+                    settingProperties += $"element.style.{propertyName} = {value};";
                 }
                 string javaScriptCodeToExecute =
-                    string.Format(@"var element = document.getElementByIdSafe(""{0}"");if (element) {{ {1} }};",
-                    uniqueIdentifier, settingProperties);
+                    $@"var element = document.getElementByIdSafe(""{uniqueIdentifier}"");if (element) {{ {settingProperties} }};";
 
                 if (forceSimulatorExecuteImmediately)
                     ExecuteJavaScript(javaScriptCodeToExecute);
@@ -715,8 +706,7 @@ element.remove({1});
             {
                 string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
                 string javaScriptCodeToExecute =
-                    string.Format(@"var element = document.getElementByIdSafe(""{0}"");if (element) {{ element.removeAttribute(""{1}"") }};",
-                    uniqueIdentifier, attributeName);
+                    $@"var element = document.getElementByIdSafe(""{uniqueIdentifier}"");if (element) {{ element.removeAttribute(""{attributeName}"") }};";
 
                 if (forceSimulatorExecuteImmediately)
                     ExecuteJavaScript(javaScriptCodeToExecute);
@@ -764,8 +754,7 @@ element.remove({1});
                 }
 
                 string javaScriptCodeToExecute =
-                    string.Format(@"var element = document.getElementByIdSafe(""{0}"");if (element) {{ element[""{1}""]({2}) }};",
-                    uniqueIdentifier, methodName, parameters);
+                    $@"var element = document.getElementByIdSafe(""{uniqueIdentifier}"");if (element) {{ element[""{methodName}""]({parameters}) }};";
 
                 return ExecuteJavaScriptWithResult(javaScriptCodeToExecute);
             }
@@ -924,17 +913,20 @@ function(){
 
             string uniqueIdentifier = INTERNAL_HtmlDomUniqueIdentifiers.CreateNew();
 
-            Interop.ExecuteJavaScriptAsync(@"document.createElementSafe($0, $1, $2, $3)", domElementTag, uniqueIdentifier, parentRef, index);
-            INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
-
+            INTERNAL_HtmlDomElementReference parent = null;
             if (parentRef is INTERNAL_HtmlDomElementReference)
             {
-                return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, (INTERNAL_HtmlDomElementReference)parentRef);
+                parent = (INTERNAL_HtmlDomElementReference)parentRef;
+                Interop.ExecuteJavaScriptAsync(@"document.createElementSafe($0, $1, $2, $3)", domElementTag, uniqueIdentifier, parent.UniqueIdentifier, index);
             }
             else
             {
-                return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, null); //todo: this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
+                Interop.ExecuteJavaScriptAsync(@"document.createElementSafe($0, $1, $2, $3)", domElementTag, uniqueIdentifier, parentRef, index);
             }
+            
+            INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
+
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent); //todo: when parent is null this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
         }
 
 #if !BRIDGE
@@ -953,12 +945,12 @@ function(){
 
             string uniqueIdentifier = INTERNAL_HtmlDomUniqueIdentifiers.CreateNew();
             string parentUniqueIdentifier = ((INTERNAL_HtmlDomElementReference)parentRef).UniqueIdentifier;
-            string javaScriptToExecute = string.Format(@"
-var newElement = document.createElement(""{0}"");
-newElement.setAttribute(""id"", ""{1}"");
-var parentElement = document.getElementByIdSafe(""{2}"");
-    parentElement.children[{3}].insertAdjacentElement(""{4}"", newElement);
-", domElementTag, uniqueIdentifier, parentUniqueIdentifier, insertionIndex, relativePosition);
+            string javaScriptToExecute = $@"
+var newElement = document.createElement(""{domElementTag}"");
+newElement.setAttribute(""id"", ""{uniqueIdentifier}"");
+var parentElement = document.getElementByIdSafe(""{parentUniqueIdentifier}"");
+    parentElement.children[{insertionIndex}].insertAdjacentElement(""{relativePosition}"", newElement);";
+
             ExecuteJavaScript(javaScriptToExecute);
             INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, (INTERNAL_HtmlDomElementReference)parentRef);
@@ -984,15 +976,15 @@ var parentElement = document.getElementByIdSafe(""{2}"");
 #endif
                 string uniqueIdentifier = INTERNAL_HtmlDomUniqueIdentifiers.CreateNew();
                 string parentUniqueIdentifier = ((INTERNAL_HtmlDomElementReference)parentRef).UniqueIdentifier;
-                string javaScriptToExecute = string.Format(@"
-// Create a temporary parent div to which we can write the innerHTML, then extract the contents:
+                // Create a temporary parent div to which we can write the innerHTML, then extract the contents:
+                string javaScriptToExecute = $@"
 var tempDiv = document.createElement(""div"");
-tempDiv.innerHTML = ""{0}"";
+tempDiv.innerHTML = ""{domAsString.Replace('\"', '\'').Replace("\r", "").Replace("\n", "")}"";
 var newElement = tempDiv.firstChild;
-newElement.setAttribute(""id"", ""{1}"");
-var parentElement = document.getElementByIdSafe(""{2}"");
-parentElement.appendChild(newElement);
-", domAsString.Replace('\"', '\'').Replace("\r", "").Replace("\n", ""), uniqueIdentifier, parentUniqueIdentifier);
+newElement.setAttribute(""id"", ""{uniqueIdentifier}"");
+var parentElement = document.getElementByIdSafe(""{parentUniqueIdentifier}"");
+parentElement.appendChild(newElement);";
+
                 ExecuteJavaScript(javaScriptToExecute);
                 INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
                 return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, ((INTERNAL_HtmlDomElementReference)parentRef).Parent);
@@ -1008,11 +1000,11 @@ parentElement.appendChild(newElement);
         {
             string childUniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
             string parentUniqueIdentifier = ((INTERNAL_HtmlDomElementReference)parentDomElementRef).UniqueIdentifier;
-            string javaScriptToExecute = string.Format(@"
-var child = document.getElementByIdSafe(""{0}"");
-var parentElement = document.getElementByIdSafe(""{1}"");
-parentElement.appendChild(child);
-", childUniqueIdentifier, parentUniqueIdentifier);
+            string javaScriptToExecute = $@"
+var child = document.getElementByIdSafe(""{childUniqueIdentifier}"");
+var parentElement = document.getElementByIdSafe(""{parentUniqueIdentifier}"");
+parentElement.appendChild(child);";
+
             ExecuteJavaScript(javaScriptToExecute);
             if (INTERNAL_idsToUIElements.ContainsKey(parentUniqueIdentifier))
             {
@@ -1171,7 +1163,9 @@ parentElement.appendChild(child);
 #endif
         public static void ExecuteJavaScript(string javaScriptToExecute, string commentForDebugging = null)
         {
-            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptToExecute, "(Called from HtmlDomManager.ExecuteJavaScript)" + (commentForDebugging != null ? commentForDebugging : ""));
+            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(
+                javaScriptToExecute,
+                INTERNAL_SimulatorExecuteJavaScript.EnableInteropLogging ? "(Called from HtmlDomManager.ExecuteJavaScript)" + (commentForDebugging != null ? commentForDebugging : "") : "" );
         }
 
 #if !BRIDGE
@@ -1181,7 +1175,10 @@ parentElement.appendChild(child);
 #endif
         public static object ExecuteJavaScriptWithResult(string javaScriptToExecute, string commentForDebugging = null, bool noImpactOnPendingJSCode = false)
         {
-            return INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptSync(javaScriptToExecute, "(Called from HtmlDomManager.ExecuteJavaScriptWithResult)" + (commentForDebugging != null ? commentForDebugging : ""), noImpactOnPendingJSCode);
+            return INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptSync(
+                javaScriptToExecute,
+                INTERNAL_SimulatorExecuteJavaScript.EnableInteropLogging ? "(Called from HtmlDomManager.ExecuteJavaScriptWithResult)" + (commentForDebugging != null ? commentForDebugging : "") : "", 
+                noImpactOnPendingJSCode);
         }
 
         /// <summary>
@@ -1306,20 +1303,19 @@ parentElement.appendChild(child);
 #if OPENSILVER
         internal static void SetVisualBounds(INTERNAL_HtmlDomStyleReference style, Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
         {
-            string javaScriptCodeToExecute = string.Format(CultureInfo.InvariantCulture, @"
-var element = document.getElementByIdSafe(""{0}"");
+            string position = bSetPositionAbsolute ? "element.style.position=\"absolute\";" : "";
+            string margin = bSetZeroMargin ? "element.style.margin=\"0\";" : "";
+            string padding = bSetZeroPadding ? "element.style.padding=\"0\";" : "";
+            string javaScriptCodeToExecute = $@"
+var element = document.getElementByIdSafe(""{style.Uid}"");
 if (element)
 {{
-element.style.left = ""{1}px"";
-element.style.top = ""{2}px"";
-element.style.width = ""{3}px"";
-element.style.height = ""{4}px"";
-{5}{6}{7}
-}}
-            ", style.Uid, visualBounds.Left, visualBounds.Top, visualBounds.Width, visualBounds.Height,
-            bSetPositionAbsolute ? "element.style.position=\"absolute\";" : "",
-            bSetZeroMargin ? "element.style.margin=\"0\";" : "",
-            bSetZeroPadding ? "element.style.padding=\"0\";" : "");
+element.style.left = ""{visualBounds.Left.ToString(CultureInfo.InvariantCulture)}px"";
+element.style.top = ""{visualBounds.Top.ToString(CultureInfo.InvariantCulture)}px"";
+element.style.width = ""{visualBounds.Width.ToString(CultureInfo.InvariantCulture)}px"";
+element.style.height = ""{visualBounds.Height.ToString(CultureInfo.InvariantCulture)}px"";
+{position}{margin}{padding}
+}}";
 
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
@@ -1348,18 +1344,17 @@ element.style.height = ""{4}px"";
 #if OPENSILVER
         internal static void SetPosition(INTERNAL_HtmlDomStyleReference style, Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
         {
-            string javaScriptCodeToExecute = string.Format(CultureInfo.InvariantCulture, @"
-var element = document.getElementByIdSafe(""{0}"");
+            string position = bSetPositionAbsolute ? "element.style.position=\"absolute\";" : "";
+            string margin = bSetZeroMargin ? "element.style.margin=\"0\";" : "";
+            string padding = bSetZeroPadding ? "element.style.padding=\"0\";" : "";
+            string javaScriptCodeToExecute = $@"
+var element = document.getElementByIdSafe(""{style.Uid}"");
 if (element)
 {{
-element.style.left = ""{1}px"";
-element.style.top = ""{2}px"";
-{3}{4}{5}
-}}
-            ", style.Uid, visualBounds.Left, visualBounds.Top,
-            bSetPositionAbsolute ? "element.style.position=\"absolute\";" : "",
-            bSetZeroMargin ? "element.style.margin=\"0\";" : "",
-            bSetZeroPadding ? "element.style.padding=\"0\";" : "");
+element.style.left = ""{visualBounds.Left.ToString(CultureInfo.InvariantCulture)}px"";
+element.style.top = ""{visualBounds.Top.ToString(CultureInfo.InvariantCulture)}px"";
+{position}{margin}{padding}
+}}";
 
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }

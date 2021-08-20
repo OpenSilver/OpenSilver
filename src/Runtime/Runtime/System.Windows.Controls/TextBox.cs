@@ -1,4 +1,4 @@
-﻿
+
 
 /*===================================================================================
 * 
@@ -141,10 +141,9 @@ namespace Windows.UI.Xaml.Controls
                     {
                         //--- SIMULATOR ONLY: ---
                         // Set the "data-accepts-return" property (that we have invented) so that the "keydown" JavaScript event can retrieve this value:
-                        INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element = document.getElementByIdSafe(""{0}"");
-element.setAttribute(""data-acceptsreturn"", ""{1}"");
-", ((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier, acceptsReturn.ToString().ToLower()));
+                        INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
+var element = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier}"");
+element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower()}"");");
                     }
                 }
             }
@@ -701,23 +700,23 @@ $0.addEventListener('keydown', function(e) {
             else
             {
                 // ---- SIMULATOR ----
+                string uid = ((INTERNAL_HtmlDomElementReference)contentEditableDiv).UniqueIdentifier;
 
                 // Set the "data-accepts-return" property (that we have invented) so that the "KeyDown" and "Paste" JavaScript events can retrieve this value:
                 // also set the "data-maxlength" and the "data-isreadonly" 
-                INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element = document.getElementByIdSafe(""{0}"");
-element.setAttribute(""data-acceptsreturn"", ""{1}"");
-element.setAttribute(""data-maxlength"", ""{2}"");
-element.setAttribute(""data-isreadonly"",""{3}"");
-element.setAttribute(""data-acceptstab"", ""{4}"");
-", ((INTERNAL_HtmlDomElementReference)contentEditableDiv).UniqueIdentifier, this.AcceptsReturn.ToString().ToLower(), this.MaxLength, isReadOnly.ToString().ToLower(), this.AcceptsTab.ToString().ToLower()));
+                INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
+var element = document.getElementByIdSafe(""{uid}"");
+element.setAttribute(""data-acceptsreturn"", ""{this.AcceptsReturn.ToString().ToLower()}"");
+element.setAttribute(""data-maxlength"", ""{this.MaxLength.ToString()}"");
+element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");
+element.setAttribute(""data-acceptstab"", ""{this.AcceptsTab.ToString().ToLower()}"");");
 
                 // Register the "keydown" javascript event:
-                INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element_OutsideEventHandler = document.getElementByIdSafe(""{0}"");
+                INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
+var element_OutsideEventHandler = document.getElementByIdSafe(""{uid}"");
 element_OutsideEventHandler.addEventListener('keydown', function(e) {{
 
-    var element_InsideEventHandler = document.getElementByIdSafe(""{0}""); // For some reason we need to get again the reference to the element.
+    var element_InsideEventHandler = document.getElementByIdSafe(""{uid}""); // For some reason we need to get again the reference to the element.
     var acceptsReturn = element_InsideEventHandler.getAttribute(""data-acceptsreturn"");
     var maxLength = element_InsideEventHandler.getAttribute(""data-maxlength"");
     var acceptsTab = element_InsideEventHandler.getAttribute(""data-acceptstab"");
@@ -780,8 +779,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
         e.preventDefault();
             return false;
     }}
-}}, false);
-", ((INTERNAL_HtmlDomElementReference)contentEditableDiv).UniqueIdentifier));//comma added on purpose because we need to get maxLength somehow (see how we did for acceptsReturn).
+}}, false);");//comma added on purpose because we need to get maxLength somehow (see how we did for acceptsReturn).
             }
 #endif
 
@@ -936,13 +934,14 @@ $0.addEventListener('paste', function(e) {
             else
             {
                 // ---- SIMULATOR ----
+                string uid = ((INTERNAL_HtmlDomElementReference)contentEditableDiv).UniqueIdentifier;
 
                 // The simulator uses Chrome, so we can set "ContentEditable" to plain-text only:
                 // We still need to prevent prevent line breaks in the pasted text if "AcceptsReturn" is false:
-                INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element_OutsideEventHandler = document.getElementByIdSafe(""{0}"");
+                INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
+var element_OutsideEventHandler = document.getElementByIdSafe(""{uid}"");
 element_OutsideEventHandler.addEventListener('paste', function(e) {{
-    var element_InsideEventHandler = document.getElementByIdSafe(""{0}""); // For some reason we need to get again the reference to the element.
+    var element_InsideEventHandler = document.getElementByIdSafe(""{uid}""); // For some reason we need to get again the reference to the element.
     var isReadOnly= element_InsideEventHandler.getAttribute(""data-isreadonly"");
     if(isReadOnly !=""true"")
     {{
@@ -975,8 +974,7 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
     }}
     
 
-}}, false);
-", ((INTERNAL_HtmlDomElementReference)contentEditableDiv).UniqueIdentifier));
+}}, false);");
             }
 #endif
 
@@ -1476,10 +1474,9 @@ return globalIndexes;
                     {
                         //--- SIMULATOR ONLY: ---
                         // Set the "data-maxlength" property (that we have made up) so that the "keydown" JavaScript event can retrieve this value:
-                        INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-var element = document.getElementByIdSafe(""{0}"");
-element.setAttribute(""data-maxlength"", ""{1}"");
-", ((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier, maxlength));
+                        INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
+var element = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier}"");
+element.setAttribute(""data-maxlength"", ""{maxlength.ToString()}"");");
                     }
                 }
             }
@@ -1657,10 +1654,9 @@ element.setAttribute(""data-maxlength"", ""{1}"");
                     if (!IsRunningInJavaScript())
                     {
                         //--- SIMULATOR ONLY: ---
-                        INTERNAL_HtmlDomManager.ExecuteJavaScript(string.Format(@"
-                            var element = document.getElementByIdSafe(""{0}"");
-                            element.setAttribute(""data-isreadonly"",""{1}"");", 
-                            ((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier, isReadOnly.ToString().ToLower()));
+                        INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
+var element = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)textBox._contentEditableDiv).UniqueIdentifier}"");
+element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");");
                     }
                 }
             }

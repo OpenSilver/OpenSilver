@@ -57,7 +57,8 @@ namespace CSHTML5.Internal
         {
             if (!noImpactOnPendingJSCode)
             {
-                AddCommentsForDebuggingIfAny(ref javaScriptToExecute, commentForDebugging);
+                if (EnableInteropLogging)
+                    AddCommentsForDebuggingIfAny(ref javaScriptToExecute, commentForDebugging);
 
                 string aggregatedPendingJavaScriptCode = ReadAndClearAggregatedPendingJavaScriptCode();
 
@@ -86,7 +87,8 @@ namespace CSHTML5.Internal
 #endif
         internal static void ExecuteJavaScriptAsync(string javaScriptToExecute, string commentForDebugging = null)
         {
-            AddCommentsForDebuggingIfAny(ref javaScriptToExecute, commentForDebugging);
+            if (EnableInteropLogging)
+                AddCommentsForDebuggingIfAny(ref javaScriptToExecute, commentForDebugging);
 
             if (!_disableAsyncJavaScriptExecution)
             {
@@ -211,6 +213,9 @@ namespace CSHTML5.Internal
 #endif
             lock (_pendingAsyncJavaScriptToExecute)
             {
+                if (_pendingAsyncJavaScriptToExecute.Count == 0)
+                    return null;
+
                 string aggregatedPendingJavaScriptCode = string.Join("\r\n", _pendingAsyncJavaScriptToExecute.ToList());
                 _pendingAsyncJavaScriptToExecute.Clear();
                 return aggregatedPendingJavaScriptCode;
@@ -239,8 +244,6 @@ namespace CSHTML5.Internal
                     + Environment.NewLine
                     + "//---- END INTEROP (" + reasonForPerformingTheCallNow + ") ----";
             }
-            else
-                javaScriptToExecute = Environment.NewLine + javaScriptToExecute + Environment.NewLine;
 
             try
             {
