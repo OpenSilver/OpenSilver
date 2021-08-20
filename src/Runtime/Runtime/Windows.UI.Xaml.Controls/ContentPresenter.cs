@@ -18,7 +18,6 @@ using System.Windows.Markup;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
-using System.Collections.ObjectModel;
 
 #if MIGRATION
 using System.Windows.Data;
@@ -187,134 +186,6 @@ namespace Windows.UI.Xaml.Controls
                 new PropertyMetadata(null, OnTemplateChanged));
 
         /// <summary>
-        /// Gets or sets the vertical alignment of the control's content.
-        /// </summary>
-        public VerticalAlignment VerticalContentAlignment
-        {
-            get { return (VerticalAlignment)GetValue(VerticalContentAlignmentProperty); }
-            set { SetValue(VerticalContentAlignmentProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="Control.VerticalContentAlignment"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty VerticalContentAlignmentProperty =
-            DependencyProperty.Register(
-                nameof(VerticalContentAlignment),
-                typeof(VerticalAlignment),
-                typeof(Control),
-                new FrameworkPropertyMetadata(VerticalAlignment.Center, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
-
-        /// <summary>
-        /// Gets or sets the horizontal alignment of the control's content.
-        /// </summary>
-        public HorizontalAlignment HorizontalContentAlignment
-        {
-            get { return (HorizontalAlignment)GetValue(HorizontalContentAlignmentProperty); }
-            set { SetValue(HorizontalContentAlignmentProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="Control.HorizontalContentAlignment"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty HorizontalContentAlignmentProperty =
-            DependencyProperty.Register(
-                nameof(HorizontalContentAlignment),
-                typeof(HorizontalAlignment),
-                typeof(Control),
-                new FrameworkPropertyMetadata(HorizontalAlignment.Center, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
-        public Thickness Padding
-        {
-            get { return (Thickness)GetValue(PaddingProperty); }
-            set { SetValue(PaddingProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="Control.Padding"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty PaddingProperty =
-            DependencyProperty.Register(
-                nameof(Padding),
-                typeof(Thickness),
-                typeof(Control),
-                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
-                {
-                    MethodToUpdateDom = Padding_MethodToUpdateDom,
-                });
-
-        private static void Padding_MethodToUpdateDom(DependencyObject d, object newValue)
-        {
-            var control = (Control)d;
-            // if the parent is a canvas, we ignore this property and we want to ignore this
-            // property if there is a ControlTemplate on this control.
-            if (!(control.INTERNAL_VisualParent is Canvas) && !control.HasTemplate && !control.IsUnderCustomLayout)
-            {
-                var innerDomElement = control.INTERNAL_InnerDomElement;
-                if (innerDomElement != null)
-                {
-                    var styleOfInnerDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDomElement);
-                    Thickness newPadding = (Thickness)newValue;
-
-                    // todo: if the container has a padding, add it to the margin
-                    styleOfInnerDomElement.boxSizing = "border-box";
-                    styleOfInnerDomElement.padding = string.Format(Globalization.CultureInfo.InvariantCulture,
-                        "{0}px {1}px {2}px {3}px",
-                        newPadding.Top, newPadding.Right, newPadding.Bottom, newPadding.Left);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a brush that provides the background of the control.
-        /// </summary>
-        public Brush Background
-        {
-            get { return (Brush)GetValue(BackgroundProperty); }
-            set { SetValue(BackgroundProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="Control.Background"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty BackgroundProperty =
-            DependencyProperty.Register(
-                nameof(Background), typeof(Brush),
-                typeof(Control),
-                new PropertyMetadata(null, Background_Changed)
-                {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
-                    {
-                        Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
-                    }
-                });
-
-        private static void Background_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-#if REVAMPPOINTEREVENTS
-            INTERNAL_UpdateCssPointerEvents((Control)d);
-#endif
-        }
-
-        internal bool INTERNAL_IsLegacyVisualStates
-        {
-            get
-            {
-                if (StateGroupsRoot == null)
-                {
-                    return false;
-                }
-
-                IList<VisualStateGroup> groups = (Collection<VisualStateGroup>)this.GetValue(VisualStateManager.VisualStateGroupsProperty);
-                if (groups == null)
-                {
-                    return false;
-                }
-
-                return groups.Any(gr => ((IList<VisualState>)gr.States).Any(state => state.Name == VisualStates.StateMouseOver));
-            }
-        }
-
-        /// <summary>
         /// Template Property
         /// </summary>
         private DataTemplate Template
@@ -334,9 +205,6 @@ namespace Windows.UI.Xaml.Controls
                 cp.InvalidateMeasureInternal();
             }
         }
-
-
-
         #endregion Dependency Properties
 
         #region Internal Properties
