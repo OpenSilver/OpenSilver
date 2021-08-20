@@ -13,15 +13,9 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows
@@ -32,9 +26,7 @@ namespace Windows.Foundation
     /// <summary>
     /// Describes the width and height of an object.
     /// </summary>
-#if FOR_DESIGN_TIME
     [TypeConverter(typeof(SizeConverter))]
-#endif
     public partial struct Size
     {
         // Caching is actually over twice faster than creating a new Size, even though it is a Value Type
@@ -50,8 +42,6 @@ namespace Windows.Foundation
                 _width = double.NegativeInfinity,
                 _height = double.NegativeInfinity
             };
-
-            TypeFromStringConverters.RegisterConverter(typeof(Size), s => Parse(s));
         }
 
         /// <summary>
@@ -233,29 +223,15 @@ namespace Windows.Foundation
             {
                 return "Empty";
             }
-            return Width + "," + Height;
+
+            return string.Concat(Width, ", ", Height);
         }
 
         public static Size Parse(string sizeAsString)
         {
-            string[] splittedString = sizeAsString.Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries);
-
-            if (splittedString.Length == 2)
-            {
-                double width, height;
-#if OPENSILVER
-                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out width) && 
-                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out height))
-#else
-                if (double.TryParse(splittedString[0], out width) &&
-                    double.TryParse(splittedString[1], out height))
-#endif
-                    return new Size(width, height);
-            }
-            
-            throw new FormatException(sizeAsString + " is not an eligible value for a Size");
+            return (Size)TypeDescriptor.GetConverter(typeof(Size))
+                .ConvertFromInvariantString(sizeAsString);
         }
-
     }
     
     internal static class SizeExtensions

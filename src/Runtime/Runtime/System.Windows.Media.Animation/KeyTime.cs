@@ -13,14 +13,8 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -28,20 +22,12 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(KeyTimeConverter))]
-#endif
     /// <summary>
     /// Specifies when a particular key frame should take place during an animation.
     /// </summary>
+    [TypeConverter(typeof(KeyTimeConverter))]
     public partial struct KeyTime
     {
-
-        static KeyTime()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(KeyTime), INTERNAL_ConvertFromString);
-        }
-
         internal KeyTime(TimeSpan timeSpan)
         {
             _timeSpan = timeSpan;
@@ -61,39 +47,6 @@ namespace Windows.UI.Xaml.Media.Animation
             return new KeyTime(timeSpan);
         }
 
-
-        internal static object INTERNAL_ConvertFromString(string keyTimeCode)
-        {
-            try
-            {
-                if (keyTimeCode == "Uniform")
-                {
-                    throw new NotImplementedException("The Value \"Uniform\" for keyTime is not supported yet.");
-                }
-                else if (keyTimeCode == "Paced")
-                {
-                    throw new NotImplementedException("The Value \"Paced\" for keyTime is not supported yet.");
-                }
-                else if (keyTimeCode.EndsWith("%"))
-                {
-                    throw new NotImplementedException("The percentage values for keyTime are not supported yet.");
-                }
-                else
-                {
-#if BRIDGE
-                    TimeSpan timeSpan = INTERNAL_BridgeWorkarounds.TimeSpanParse(keyTimeCode, false);
-#else
-                    TimeSpan timeSpan = TimeSpan.Parse(keyTimeCode);
-#endif
-                    return new KeyTime(timeSpan);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Invalid KeyTime: " + keyTimeCode, ex);
-            }
-        }
-
         private TimeSpan _timeSpan;
         /// <summary>
         /// Gets the time when the key frame ends, expressed as a time relative to the
@@ -104,8 +57,6 @@ namespace Windows.UI.Xaml.Media.Animation
             get { return _timeSpan; }
             internal set { _timeSpan = value; }
         }
-
-
 
         ///// <summary>
         ///// Compares two Windows.UI.Xaml.Media.Animation.KeyTime values for inequality.

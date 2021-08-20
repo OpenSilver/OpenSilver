@@ -13,129 +13,111 @@
 \*====================================================================================*/
 
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace System.Windows.Input
 {
-#if FOR_DESIGN_TIME
-
     /// <summary>
-    /// Converts a System.Windows.Input.Cursor object to and from other types.
+    /// Converts a <see cref="T:System.Windows.Input.Cursor" /> object to and from other types.
     /// </summary>
     public partial class CursorConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an
-        /// instance of System.Windows.Input.Cursor, using the specified context.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Input.Cursor" />.
         /// </summary>
-        /// <param name="context">
-        /// A format context that provides information about the environment from which
-        /// this converter is being invoked.
-        /// </param>
+        /// <param name="context">Describes the context information of a type.</param>
         /// <param name="sourceType">The type being evaluated for conversion.</param>
-        /// <returns>true if sourceType is of type System.String; otherwise, false.</returns>
+        /// <returns>
+        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-            {
-                return true;
-            }
-
-            return base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(string);
         }
-    
+
         /// <summary>
-        /// Determines whether an instance of System.Windows.Input.Cursor can be converted
-        /// to the specified type, using the specified context.
+        /// Determines whether an instance of <see cref="T:System.Windows.Input.Cursor" /> can be converted to the specified type.
         /// </summary>
-        /// <param name="context">
-        /// A format context that provides information about the environment from which
-        /// this converter is being invoked.
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="destinationType">
+        /// The desired type this System.Windows.Input.Cursor is being evaluated to be
+        /// converted to.
         /// </param>
-        /// <param name="destinationType">The type being evaluated for conversion.</param>
-        /// <returns>true if destinationType is of type System.String; otherwise, false.</returns>
+        /// <returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
-        
-        // Exceptions:
-        //   System.NotSupportedException:
-        //     value cannot be converted
+
         /// <summary>
-        /// Attempts to convert the specified object to a System.Windows.Input.Cursor,
-        /// using the specified context.
+        /// Attempts to convert the specified object to a <see cref="T:System.Windows.Input.Cursor" />.
         /// </summary>
-        /// <param name="context">
-        /// A format context that provides information about the environment from which
-        /// this converter is being invoked.
-        /// </param>
+        /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Culture specific information.</param>
         /// <param name="value">The object to convert.</param>
-        /// <returns>The converted object, or null if value is an empty string.</returns>
+        /// <returns>The converted object, or <see langword="null" /> if <paramref name="value" /> is an empty string.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
+            object result;
+
+            if (value is null)
+            {
                 throw GetConvertFromException(value);
+            }
+            else if (value is string)
+            {
+                if (Enum.TryParse(value.ToString(), true, out CursorType cursorType) && 
+                    (int)cursorType >= (int)CursorType.None && (int)cursorType <= (int)CursorType.Eraser)
+                {
+                    result = Cursors.EnsureCursor(cursorType);
+                }
+                else
+                {
+                    throw new ArgumentException(string.Format("'{0}' cursor type is not valid.", value.ToString()));
+                }
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
 
-            if (value is string)
-                return Cursor.INTERNAL_ConvertFromString((string)value);
-
-
-            return base.ConvertFrom(context, culture, value);
+            return result;
         }
-   
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     destinationType is null.
-        //
-        //   System.NotSupportedException:
-        //     source cannot be converted.
+
         /// <summary>
-        /// Attempts to convert a System.Windows.Input.Cursor to the specified type,
-        /// using the specified context.
+        /// Attempts to convert a <see cref="T:System.Windows.Input.Cursor" /> to the specified type.
         /// </summary>
-        /// <param name="context">
-        /// A format context that provides information about the environment from which
-        /// this converter is being invoked.
-        /// </param>
+        /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Culture specific information.</param>
         /// <param name="value">The object to convert.</param>
         /// <param name="destinationType">The type to convert the object to.</param>
-        /// <returns>The converted object, or an empty string if value is null.</returns>
+        /// <returns>The converted object, or an empty string if <paramref name="value" /> is <see langword="null" />.</returns>
+        /// <exception cref="T:System.ArgumentNullException">
+        /// <paramref name="destinationType" /> is <see langword="null" />.</exception>
+        /// <exception cref="T:System.NotSupportedException">
+        /// <paramref name="value" /> cannot be converted.</exception>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            throw new NotImplementedException();
-        }
-        
-        //todo: (?) the following
+            var result = string.Empty;
 
-        ///// <summary>
-        ///// Gets a collection of standard cursor values, using the specified context.
-        ///// </summary>
-        ///// <param name="context">
-        ///// A format context that provides information about the environment from which
-        ///// this converter is being invoked.
-        ///// </param>
-        ///// <returns>A collection that holds a standard set of valid values.</returns>
-        //public override TypeConverter.StandardValuesCollection GetStandardValues(ITypeDescriptorContext context);
-       
-        ///// <summary>
-        ///// Determines whether this object supports a standard set of values that can
-        ///// be picked from a list, using the specified context.
-        ///// </summary>
-        ///// <param name="context">
-        ///// A format context that provides information about the environment from which
-        ///// this converter is being invoked.
-        ///// </param>
-        ///// <returns>Always returns true.</returns>
-        //public override bool GetStandardValuesSupported(ITypeDescriptorContext context);
+            if (destinationType is null)
+            {
+                throw new ArgumentNullException(nameof(destinationType));
+            }
+            else if (destinationType != typeof(string))
+            {
+                throw GetConvertToException(value, destinationType);
+            }
+            else
+            {
+                if (value is Cursor cursor)
+                {
+                    result = cursor.ToString();
+                }
+            }
+
+            return result;
+        }
     }
-#endif
 }

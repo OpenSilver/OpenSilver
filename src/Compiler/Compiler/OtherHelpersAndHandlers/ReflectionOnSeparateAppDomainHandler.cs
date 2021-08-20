@@ -23,17 +23,15 @@ extern alias DotNetForHtml5Core;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 #if !BRIDGE && !CSHTML5BLAZOR
 using custom::System.Windows.Markup;
 #endif
 using System.Xml.Linq;
 using DotNetForHtml5.Compiler.Common;
-using DotNetForHtml5.Compiler.OtherHelpersAndHandlers;
 
 namespace DotNetForHtml5.Compiler
 {
@@ -879,18 +877,14 @@ namespace DotNetForHtml5.Compiler
             {
                 var type = FindType(namespaceName, localTypeName, assemblyNameIfAny);
 
-                // Attempt to get the instance of the attribute if any:
-#if BRIDGE || CSHTML5BLAZOR
-                Type supportsDirectContentViaTypeFromStringConvertersAttributeType = this.FindType("System.Windows.Markup", "SupportsDirectContentViaTypeFromStringConvertersAttribute");
-#else
-                Type supportsDirectContentViaTypeFromStringConvertersAttributeType = typeof(DotNetForHtml5Core::System.Windows.Markup.SupportsDirectContentViaTypeFromStringConvertersAttribute);
-#endif
-                var attribute = Attribute.GetCustomAttribute(type, supportsDirectContentViaTypeFromStringConvertersAttributeType);
+                //var typeConverterAttr = FindType("System.ComponentModel", "TypeConverterAttribute");
+                //var attribute = Attribute.GetCustomAttribute(type, typeConverterAttr);
 
-                if (attribute != null)
-                    return true;
-                else
-                    return false;
+                //return attribute != null;
+
+                var converter = TypeDescriptor.GetConverter(type);
+
+                return converter?.CanConvertFrom(typeof(string)) ?? false;
             }
 
             public string GetContentPropertyName(string namespaceName, string localTypeName, string assemblyNameIfAny = null)

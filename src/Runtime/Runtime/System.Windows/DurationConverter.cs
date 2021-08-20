@@ -14,12 +14,10 @@
 
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 
 #if MIGRATION
 namespace System.Windows
@@ -27,69 +25,96 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if FOR_DESIGN_TIME
     /// <summary>
-    /// Converts instances of System.Windows.Duration to and from other type representations.
+    /// Converts a <see cref="T:System.Windows.Duration" /> object to and from other types.
     /// </summary>
     public partial class DurationConverter : TypeConverter
     {
         /// <summary>
-        /// Determines if conversion from a given type to an instance of System.Windows.Duration
-        /// is possible.</summary>
-        /// <param name="td">Context information used for conversion.</param>
-        /// <param name="t">Type being evaluated for conversion.</param>
-        /// <returns>true if t is of type System.String; otherwise, false.</returns>
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Duration" />.
+        /// </summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="sourceType">The type being evaluated for conversion.</param>
+        /// <returns>
+        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-            {
-                return true;
-            }
-
-            return base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(string);
         }
-    
+
         /// <summary>
-        /// Determines if conversion to a specified type is possible.
+        /// Determines whether an instance of <see cref="T:System.Windows.Duration" /> can be converted to the specified type.
         /// </summary>
-        /// <param name="context">Context information used for conversion.</param>
-        /// <param name="destinationType">Type being evaluated for conversion.</param>
-        /// <returns> if destinationType is of type System.String; otherwise, false.</returns>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="destinationType">The type being evaluated for conversion.</param>
+        /// <returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />;
+        /// otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
-     
-        /// <summary>
-        /// Converts a given string value to an instance of System.Windows.Duration.
-        /// </summary>
-        /// <param name="td">Context information used for conversion.</param>
-        /// <param name="cultureInfo">Cultural information that is respected during conversion.</param>
-        /// <param name="value">String value to convert to an instance of System.Windows.Duration.</param>
-        /// <returns>A new instance of System.Windows.Duration.</returns>
+
+        /// <summary>Converts a given string value to an instance of <see cref="T:System.Windows.Duration" />.</summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The object being converted.</param>
+        /// <returns>A new instance of <see cref="T:System.Windows.Duration" />.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
+            object result;
+
+            if (value is null)
+            {
                 throw GetConvertFromException(value);
+            }
+            else if (value is string)
+            {
+                var duration = value.ToString();
 
-            if (value is string)
-                return Duration.INTERNAL_ConvertFromString((string)value);
+                if (duration.ToLower() == "forever")
+                    return Duration.Forever;
+                if (duration.ToLower() == "automatic")
+                    return Duration.Automatic;
+#if BRIDGE
+                TimeSpan timeSpan = INTERNAL_BridgeWorkarounds.TimeSpanParse(duration);
+#else
+                TimeSpan timeSpan = TimeSpan.Parse(duration);
+#endif
+                result = new Duration(timeSpan);
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
 
-            return base.ConvertFrom(context, culture, value);
+            return result;
         }
-       
-        /// <summary>
-        /// Converts an instance of System.Windows.Duration to another type.
-        /// </summary>
-        /// <param name="context">Context information used for conversion.</param>
-        /// <param name="cultureInfo">Cultural information that is respected during conversion.</param>
-        /// <param name="value">Duration value to convert from.</param>
-        /// <param name="destinationType">Type being evaluated for conversion.</param>
-        /// <returns>A new instance of the destinationType.</returns>
+
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.Duration" /> to a specified type. </summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="cultureInfo">Describes the System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The <see cref="T:System.Windows.Duration" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Duration" /> to.</param>
+        /// <returns>A new instance of the <paramref name="destinationType" />.</returns>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo cultureInfo, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            object result = null;
+
+            if (destinationType != null && value is Duration dur)
+            {
+                if (destinationType == typeof(string))
+                {
+                    result = dur.ToString();
+                }
+            }
+
+            if (result is null)
+            {
+                result = base.ConvertTo(context, cultureInfo, value, destinationType);
+            }
+
+            return result;
         }
     }
-#endif
 }

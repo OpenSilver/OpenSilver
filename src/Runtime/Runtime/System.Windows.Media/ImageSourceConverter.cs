@@ -14,12 +14,14 @@
 
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+#if MIGRATION
+using System.Windows.Media.Imaging;
+#else
+using Windows.UI.Xaml.Media.Imaging;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -27,87 +29,112 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-#if FOR_DESIGN_TIME
     /// <summary>
-    /// Converts a System.Windows.Media.ImageSource to and from other data types.
+    /// Converts a <see cref="T:System.Windows.Media.ImageSource" /> object to and from other types.
     /// </summary>
     public sealed partial class ImageSourceConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether the converter can convert an object of the given type
-        /// to an instance of System.Windows.Media.ImageSource.</summary>
-        /// <param name="context">Type context information used to evaluate conversion.</param>
-        /// <param name="sourceType">The type of the source that is being evaluated for conversion.</param>
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Media.ImageSource" />.
+        /// </summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="sourceType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// true if the converter can convert the provided type to an instance of System.Windows.Media.ImageSource;
-        /// otherwise, false.
-        /// </returns>
+        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
+            return sourceType == typeof(string);
+        }
+
+        /// <summary>
+        /// Determines whether an instance of <see cref="T:System.Windows.Media.ImageSource" /> can be converted to the specified type.
+        /// </summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="destinationType">The type being evaluated for conversion.</param>
+        /// <returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" /> or <see cref="T:System.Windows.Media.ImageSource" />; otherwise, <see langword="false" />.</returns>
+        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+        {
+            if (destinationType == typeof(string))
             {
+                // When invoked by the serialization engine we can convert to string only for some instances
+                if (context != null && context.Instance != null)
+                {
+                    if (!(context.Instance is ImageSource))
+                    {
+                        throw new ArgumentException($"Expected type of {nameof(ImageSource)}.");
+                    }
+
+                    return false;
+                }
+
                 return true;
             }
 
-            return base.CanConvertFrom(context, sourceType);
+            return base.CanConvertTo(context, destinationType);
         }
-        
-        // Exceptions:
-        //   System.ArgumentException:
-        //     context instance is not an System.Windows.Media.ImageSource.
-        /// <summary>
-        /// Determines whether an instance of System.Windows.Media.ImageSource can be
-        /// converted to a different type.
-        /// </summary>
-        /// <param name="context">Type context information used to evaluate conversion.</param>
-        /// <param name="destinationType">The desired type to evaluate the conversion to.</param>
-        /// <returns>
-        /// true if the converter can convert this instance of System.Windows.Media.ImageSource;
-        /// otherwise, false.
-        /// </returns>
-        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-        {
-            return false;
-        }
-      
-        // Exceptions:
-        //   System.NotSupportedException:
-        //     value is null or is an invalid type.
-        /// <summary>
-        /// Attempts to convert a specified object to an instance of System.Windows.Media.ImageSource.
-        /// </summary>
-        /// <param name="context">Type context information used for conversion.</param>
-        /// <param name="culture">Cultural information that is respected during conversion.</param>
+
+        /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.Media.ImageSource" />.</summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>A new instance of System.Windows.Media.ImageSource.</returns>
+        /// <returns>A new instance of <see cref="T:System.Windows.Media.ImageSource" />.</returns>
+        /// <exception cref="T:System.NotSupportedException">
+        /// <paramref name="value" /> is <see langword="null" /> or is an invalid type.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
+            object result;
+
+            if (value is null)
+            {
                 throw GetConvertFromException(value);
+            }
+            else if (value is string)
+            {
+                var str = value.ToString();
 
-            if (value is string)
-                return ImageSource.INTERNAL_ConvertFromString((string)value);
+                var uriKind = str.Contains(@":/") ? UriKind.Absolute : UriKind.Relative;
+                result = new BitmapImage(new Uri(str, uriKind));
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
 
-            return base.ConvertFrom(context, culture, value);
+            return result;
         }
-      
-        // Exceptions:
-        //   System.NotSupportedException:
-        //     value is null or is not a valid type.-or-context instance cannot serialize
-        //     to a string.
-        /// <summary>
-        /// Attempts to convert an instance of System.Windows.Media.ImageSource to a
-        /// specified type.
-        /// </summary>
-        /// <param name="context">Context information used for conversion.</param>
-        /// <param name="culture">Cultural information that is respected during conversion.</param>
-        /// <param name="value">System.Windows.Media.ImageSource to convert.</param>
-        /// <param name="destinationType">Type being evaluated for conversion.</param>
-        /// <returns>A new instance of the destinationType.</returns>
+
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.ImageSource" /> to a specified type. </summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The <see cref="T:System.Windows.Media.ImageSource" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Media.ImageSource" /> to.</param>
+        /// <returns>The object created from converting this <see cref="T:System.Windows.Media.ImageSource" />.</returns>
+        /// <exception cref="T:System.NotSupportedException">
+        /// <paramref name="value" /> is <see langword="null" />, <paramref name="value" /> is not a <see cref="T:System.Windows.Media.ImageSource" />, or <paramref name="destinationType" /> is not a string.</exception>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            object result = null;
+
+            if (destinationType != null && value is ImageSource imageSource)
+            {
+                if (destinationType == typeof(string))
+                {
+                    if (context != null && context.Instance != null)
+                    {
+                        throw new NotSupportedException($"Conversion to {destinationType.FullName} is not supported.");
+                    }
+
+                    result = imageSource.ToString();
+                }
+            }
+
+            if (result is null)
+            {
+                result = base.ConvertTo(context, culture, value, destinationType);
+            }
+
+            return result;
         }
     }
-#endif
 }

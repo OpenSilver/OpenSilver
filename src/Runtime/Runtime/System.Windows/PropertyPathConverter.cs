@@ -14,12 +14,8 @@
 
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows
@@ -27,87 +23,90 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if FOR_DESIGN_TIME
     /// <summary>
-    /// Provides a type converter for System.Windows.PropertyPath objects.
+    /// Converts a <see cref="T:System.Windows.PropertyPath" /> object to and from other types.
     /// </summary>
     public sealed partial class PropertyPathConverter : TypeConverter
     {
         /// <summary>
-        /// Returns whether this converter can convert an object of one type to the System.Windows.PropertyPath
-        /// type.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.PropertyPath" />.
         /// </summary>
-        /// <param name="context">An System.ComponentModel.ITypeDescriptorContext that provides a format context.</param>
-        /// <param name="sourceType">A System.Type that represents the type you want to convert from.</param>
-        /// <returns>true if sourceType is type System.String; otherwise, false.</returns>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="sourceType">The type being evaluated for conversion.</param>
+        /// <returns>
+        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-            {
-                return true;
-            }
-
-            return base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(string);
         }
-       
+
         /// <summary>
-        /// Returns whether this converter can convert the object to the System.Windows.PropertyPath
-        /// type.
+        /// Determines whether an instance of <see cref="T:System.Windows.PropertyPath" /> can be converted to the specified type.
         /// </summary>
-        /// <param name="context">An System.ComponentModel.ITypeDescriptorContext that provides a format context.</param>
-        /// <param name="destinationType">A System.Type that represents the type you want to convert to.</param>
-        /// <returns>true if destinationType is type System.String; otherwise, false.</returns>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="destinationType">The type being evaluated for conversion.</param>
+        /// <returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
-        
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     The source was provided as null.
-        //
-        //   System.ArgumentException:
-        //     The source was not null, but was not of the expected System.String type.
-        /// <summary>
-        /// Converts the specified value to the System.Windows.PropertyPath type.
-        /// </summary>
-        /// <param name="context">An System.ComponentModel.ITypeDescriptorContext that provides a format context.</param>
-        /// <param name="culture">The System.Globalization.CultureInfo to use as the current culture.</param>
-        /// <param name="value">
-        /// The object to convert to a System.Windows.PropertyPath. This is expected
-        /// to be a string.
-        /// </param>
-        /// <returns>The converted System.Windows.PropertyPath.</returns>
+
+        /// <summary>Converts the specified value to the <see cref="T:System.Windows.PropertyPath" /> type.</summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The object being converted.</param>
+        /// <returns>The converted <see cref="T:System.Windows.PropertyPath" />.</returns>
+        /// <exception cref="T:System.ArgumentNullException">The <paramref name="value" /> was provided as <see langword="null." /></exception>
+        /// <exception cref="T:System.ArgumentException">The <paramref name="value" /> was not <see langword="null" />, but was not of the expected <see cref="T:System.String" /> type.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
+            object result;
+
+            if (value is null)
+            {
                 throw GetConvertFromException(value);
+            }
+            else if (value is string)
+            {
+                result = new PropertyPath(value.ToString());
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
 
-            if (value is string)
-                return PropertyPath.INTERNAL_ConvertFromString((string)value);
-
-            return base.ConvertFrom(context, culture, value);
+            return result;
         }
-        
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     The value was provided as null.
-        //
-        //   System.ArgumentException:
-        //     The value was not null, but was not of the expected System.Windows.PropertyPath
-        //     type.- or -The destinationType was not the System.String type.
-        /// <summary>
-        /// Converts the specified value object to the System.Windows.PropertyPath type.
-        /// </summary>
-        /// <param name="context">An System.ComponentModel.ITypeDescriptorContext that provides a format context.</param>
-        /// <param name="culture">The System.Globalization.CultureInfo to use as the current culture.</param>
-        /// <param name="value">The System.Windows.PropertyPath to convert.</param>
-        /// <param name="destinationType">The destination type. This is expected to be the System.String type.</param>
-        /// <returns>The converted destination System.String.</returns>
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.PropertyPath" /> to a specified type. </summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="cultureInfo">Describes the System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The <see cref="T:System.Windows.PropertyPath" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.PropertyPath" /> to.</param>
+        /// <returns>The converted destination <see cref="T:System.String" />.</returns>
+        /// <exception cref="T:System.ArgumentNullException">The <paramref name="value" /> was provided as <see langword="null" />.</exception>
+        /// <exception cref="T:System.ArgumentException">The <paramref name="value" /> was not <see langword="null" />, but was not of the expected <see cref="T:System.Windows.PropertyPath" /> type 
+        /// or the <paramref name="destinationType" /> was not the <see cref="T:System.String" /> type.</exception>
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo cultureInfo, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            if (value is null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+            else if (destinationType is null)
+            {
+                throw new ArgumentNullException(nameof(destinationType));
+            }
+
+            if (value is PropertyPath path)
+            {
+                return path.Path;
+            }
+            else
+            {
+                throw new ArgumentException($"Unexpected parameter type {value.GetType().FullName}.");
+            }
         }
     }
-#endif
 }

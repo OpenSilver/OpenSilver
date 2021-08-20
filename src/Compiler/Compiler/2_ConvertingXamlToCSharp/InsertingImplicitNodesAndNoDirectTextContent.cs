@@ -100,7 +100,6 @@ namespace DotNetForHtml5.Compiler
                 //-------------------------------------------------------------
                 // If there is some direct text content (such as <Button>content</Button), convert the text into an attribute (such as <Button Content="content"></Button>) if the element has the "[ContentProperty]" attribute.
                 // Note: if the type is a system type (such as <sys:Double>50</sys:Double>), we ignore it because later its value will be directly assigned.
-                // Similarly, if the type has the "[SupportsDirectContentViaTypeFromStringConvertersAttribute]" attribute or is an Enum, we also ignore it because later it will be transformed into a call to the "TypeFromStringConverters" class.
                 //-------------------------------------------------------------
                 XText directTextContent;
                 if (DoesElementContainDirectTextContent(currentElement, out directTextContent))
@@ -120,7 +119,8 @@ namespace DotNetForHtml5.Compiler
                     else
                     {
                         // Ensure the content is not empty:
-                        if (!string.IsNullOrWhiteSpace(contentValue)) //todo: do we really need this?
+                        // TODO: Do we really need this?
+                        if (!string.IsNullOrWhiteSpace(contentValue))
                         {
                             List<int> siblings = indexesMapper.Peek();
 
@@ -137,12 +137,14 @@ namespace DotNetForHtml5.Compiler
                             // Replace multiple spaces (and line returns) with just one space (same behavior as in WPF): //cf. http://stackoverflow.com/questions/1279859/how-to-replace-multiple-white-spaces-with-one-white-space
                             contentValue = Regex.Replace(contentValue, @"\s{2,}", " ");
 
-                            // Check if the type has the "[SupportsDirectContentViaTypeFromStringConvertersAttribute]" attribute (such as "<Color>Red</Color>")
-                            // or it is an Enum (such as "<Visibility>Collapsed</Visibility>"):
-                            if (reflectionOnSeparateAppDomain.DoesTypeContainAttributeToConvertDirectContent(namespaceName, localName, assemblyNameIfAny)
-                                || reflectionOnSeparateAppDomain.IsTypeAnEnum(namespaceName, localName, assemblyNameIfAny))
+                            // Check if the type has the supports direct content, such as "<Color>Red</Color>"
+                            //      or if it's an Enum (such as "<Visibility>Collapsed</Visibility>")
+                            var canSetAttribute = reflectionOnSeparateAppDomain.DoesTypeContainAttributeToConvertDirectContent(namespaceName, localName, assemblyNameIfAny)
+                                || reflectionOnSeparateAppDomain.IsTypeAnEnum(namespaceName, localName, assemblyNameIfAny);
+
+                            if (canSetAttribute)
                             {
-                                // Add the attribute that will tell the compiler to later intialize the type by converting from the string using the "TypeFromStringConverters" class.
+                                // Add the attribute that will tell the compiler to later intialize the type by converting from the string.
                                 currentElement.SetAttributeValue(AttributeNameForTypesToBeInitializedFromString, contentValue);
 
                                 // Remove the direct text content:

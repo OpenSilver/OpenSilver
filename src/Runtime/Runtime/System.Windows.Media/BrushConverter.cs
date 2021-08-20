@@ -12,14 +12,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -27,106 +22,110 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-#if FOR_DESIGN_TIME
     /// <summary>
-    /// Used to convert a System.Windows.Media.Brush object to or from another object
+    /// Converts a <see cref="T:System.Windows.Media.Brush" /> object to and from other types.
     /// type.
     /// </summary>
     public sealed partial class BrushConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether this class can convert an object of a given type to a
-        /// System.Windows.Media.Brush object.
+        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Media.Brush" />.
         /// </summary>
-        /// <param name="context">The conversion context.</param>
-        /// <param name="sourceType">The type from which to convert.</param>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="sourceType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// Returns true if conversion is possible (object is string type); otherwise,
-        /// false.
-        /// </returns>
+        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
+            return sourceType == typeof(string);
+        }
+
+        /// <summary>
+        /// Determines whether an instance of <see cref="T:System.Windows.Media.Brush" /> can be converted to the specified type.
+        /// </summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="destinationType">The type being evaluated for conversion.</param>
+        /// <returns>
+        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+        {
+            if (destinationType == typeof(string))
             {
+                // When invoked by the serialization engine we can convert to string only for some instances
+                if (context != null && context.Instance != null)
+                {
+                    if (!(context.Instance is Brush))
+                    {
+                        throw new ArgumentException($"Expected type of {nameof(Brush)}.");
+                    }
+
+                    return false;
+                }
+
                 return true;
             }
 
-            return base.CanConvertFrom(context, sourceType);
+            return base.CanConvertTo(context, destinationType);
         }
-        
-        /// <summary>
-        /// Determines whether this class can convert an object of a given type to the
-        /// specified destination type.
-        /// </summary>
-        /// <param name="context">The conversion context.</param>
-        /// <param name="destinationType">The destination type.</param>
-        /// <returns>Returns true if conversion is possible; otherwise, false.</returns>
-        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-        {
-            return false;
-        }
-        
-        // Exceptions:
-        //   System.NotSupportedException:
-        //     value is NULL or cannot be converted to a System.Windows.Media.Brush.
-        /// <summary>
-        /// Converts from an object of a given type to a System.Windows.Media.Brush object.
-        /// </summary>
-        /// <param name="context">The conversion context.</param>
-        /// <param name="culture">The culture information that applies to the conversion.</param>
-        /// <param name="value">The object to convert.</param>
-        /// <returns>
-        /// Returns a new System.Windows.Media.Brush object if successful; otherwise,
-        /// NULL.
-        /// </returns>
+
+        /// <summary>Converts from an object of a given type to a <see cref="T:System.Windows.Media.Brush" /> object.</summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The object being converted.</param>
+        /// <returns>Returns a new <see cref="T:System.Windows.Media.Brush" /> object if successful; otherwise, NULL.</returns>
+        /// <exception cref="T:System.NotSupportedException">
+        /// <paramref name="value" /> is <see langword="null" /> or cannot be converted to a <see cref="T:System.Windows.Media.Brush" />.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
+            object result;
+
+            if (value is null)
+            {
                 throw GetConvertFromException(value);
+            }
+            else if (value is string)
+            {
+                result = new SolidColorBrush((Color)TypeDescriptor.GetConverter(typeof(Color)).ConvertFrom(value.ToString()));
+            }
+            else
+            {
+                result = base.ConvertFrom(context, culture, value);
+            }
 
-            if (value is string)
-                return Brush.INTERNAL_ConvertFromString((string)value);
-
-            return base.ConvertFrom(context, culture, value);
+            return result;
         }
-        //
-        // Summary:
-        //     
-        //     
-        //
-        // Parameters:
-        //   context:
-        //     
-        //
-        //   culture:
-        //     
-        //
-        //   value:
-        //     
-        //
-        //   destinationType:
-        //     
-        //
-        // Returns:
-        //     
-        //
-        // Exceptions:
-        //   System.NotSupportedException:
-        //     value is NULL or it is not a System.Windows.Media.Brush-or-destinationType
-        //     is not a valid destination type.
-        /// <summary>
-        /// Converts a System.Windows.Media.Brush object to a specified type, using the
-        /// specified context and culture information.
-        /// </summary>
-        /// <param name="context">The conversion context.</param>
-        /// <param name="culture">The current culture information.</param>
-        /// <param name="value">The System.Windows.Media.Brush to convert.</param>
-        /// <param name="destinationType">The destination type that the value object is converted to.</param>
-        /// <returns>An object that represents the converted value.</returns>
+
+        /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.Brush" /> to a specified type. </summary>
+        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The <see cref="T:System.Windows.Media.Brush" /> to convert.</param>
+        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Media.Brush" /> to.</param>
+        /// <returns>The object created from converting this <see cref="T:System.Windows.Media.Brush" />.</returns>
+        /// <exception cref="T:System.NotSupportedException">
+        /// <paramref name="value" /> is <see langword="null" />, <paramref name="value" /> is not a <see cref="T:System.Windows.Media.Brush" />, or <paramref name="destinationType" /> is not a string.</exception>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            object result = null;
+
+            if (destinationType != null && value is Brush brush)
+            {
+                if (destinationType == typeof(string))
+                {
+                    if (context != null && context.Instance != null)
+                    {
+                        throw new NotSupportedException($"Conversion to {destinationType.FullName} is not supported.");
+                    }
+
+                    result = brush.ToString();
+                }
+            }
+
+            if (result is null)
+            {
+                result = base.ConvertTo(context, culture, value, destinationType);
+            }
+
+            return result;
         }
     }
-#endif
 }

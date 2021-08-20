@@ -14,16 +14,18 @@
 
 
 #if WORKINPROGRESS
+using System.ComponentModel;
 
 namespace System.Windows.Markup
 {
-	[OpenSilver.NotImplemented]
+    [TypeConverter(typeof(XmlLanguageConverter))]
+    [OpenSilver.NotImplemented]
     public sealed partial class XmlLanguage
     {
 		[OpenSilver.NotImplemented]
         public string IetfLanguageTag { get; private set; }
 
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         public static XmlLanguage GetLanguage(string ietfLanguageTag)
         {
             return null;
