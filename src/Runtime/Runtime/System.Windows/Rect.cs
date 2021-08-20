@@ -13,8 +13,12 @@
 \*====================================================================================*/
 
 
+using CSHTML5.Internal;
+using DotNetForHtml5.Core;
 using System;
-using System.ComponentModel;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Windows.Markup;
 
 #if MIGRATION
 namespace System.Windows
@@ -25,13 +29,26 @@ namespace Windows.Foundation
     /// <summary>
     /// Describes the width, height, and point origin of a rectangle.
     /// </summary>
-    [TypeConverter(typeof(RectConverter))]
-    public partial struct Rect
+    [SupportsDirectContentViaTypeFromStringConverters]
+    public partial struct Rect// : IFormattable
     {
+        //todo: Add the interface IFormattable
+
+
         internal double _x;
         internal double _y;
         internal double _width;
         internal double _height;
+
+
+        //public Rect()
+        //{
+        //    //setting the elements of the struct to their default value 
+        //    _x = 0;
+        //    _y = 0;
+        //    _width = 0;
+        //    _height = 0;
+        //}
 
         /// <summary>
         /// Initializes a Windows.Foundation.Rect structure that
@@ -132,8 +149,8 @@ namespace Windows.Foundation
         /// </returns>
         public static bool operator !=(Rect rect1, Rect rect2)
         {
-            return rect1.X != rect2.X || rect1.Y != rect2.Y ||
-                rect1.Width != rect2.Width || rect1.Height != rect2.Height;
+            return (rect1.X != rect2.X || rect1.Y != rect2.Y ||
+                rect1.Width != rect2.Width || rect1.Height != rect2.Height);
         }
 
         /// <summary>
@@ -147,8 +164,8 @@ namespace Windows.Foundation
         /// </returns>
         public static bool operator ==(Rect rect1, Rect rect2)
         {
-            return rect1.X == rect2.X && rect1.Y == rect2.Y &&
-                rect1.Width == rect2.Width && rect1.Height == rect2.Height;
+            return (rect1.X == rect2.X && rect1.Y == rect2.Y &&
+                rect1.Width == rect2.Width && rect1.Height == rect2.Height);
         }
 
         /// <summary>
@@ -235,7 +252,7 @@ namespace Windows.Foundation
         {
             get
             {
-                if (IsEmpty)
+                if (this.IsEmpty)
                 {
                     return double.NegativeInfinity;
                 }
@@ -266,7 +283,7 @@ namespace Windows.Foundation
         {
             get
             {
-                if (IsEmpty)
+                if (this.IsEmpty)
                 {
                     return double.NegativeInfinity;
                 }
@@ -297,7 +314,7 @@ namespace Windows.Foundation
         {
             get
             {
-                if (IsEmpty)
+                if (this.IsEmpty)
                 {
                     return double.NegativeInfinity;
                 }
@@ -447,6 +464,7 @@ namespace Windows.Foundation
             return X.GetHashCode() ^ Y.GetHashCode() ^ Width.GetHashCode() ^ Height.GetHashCode();
         }
 
+
         /// <summary>
         /// Finds the intersection of the rectangle represented by the current <see cref="Rect" />
         /// and the rectangle represented by the specified <see cref="Rect" />,
@@ -499,8 +517,26 @@ namespace Windows.Foundation
 
         public static Rect Parse(string rectAsString)
         {
-            return (Rect)TypeDescriptor.GetConverter(typeof(Rect))
-                .ConvertFromInvariantString(rectAsString);
+            string[] splittedString = rectAsString.Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries);
+
+            if (splittedString.Length == 4)
+            {
+                double x, y, width, height;
+#if OPENSILVER
+                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out x) &&
+                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out y) &&
+                    double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out width) &&
+                    double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out height))
+#else
+                if (double.TryParse(splittedString[0], out x) &&
+                    double.TryParse(splittedString[1], out y) &&
+                    double.TryParse(splittedString[2], out width) &&
+                    double.TryParse(splittedString[3], out height))
+#endif
+                    return new Rect(x, y, width, height);
+            }
+
+            throw new FormatException(rectAsString + "is not an eligible value for Rect");
         }
 
         /// <summary>
@@ -513,7 +549,7 @@ namespace Windows.Foundation
         /// </returns>
         public override string ToString()
         {
-            return string.Concat(X, ", ", Y, ", ", Width, ", ", Height);
+            return X + "," + Y + "," + Width + "," + Height;
         }
 
         //
@@ -589,6 +625,7 @@ namespace Windows.Foundation
                 _x = double.PositiveInfinity,
                 _y = double.PositiveInfinity
             };
+            TypeFromStringConverters.RegisterConverter(typeof(Rect), s => Parse(s));
         }
     }
 }

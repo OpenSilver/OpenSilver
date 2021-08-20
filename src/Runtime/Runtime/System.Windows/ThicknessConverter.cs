@@ -14,9 +14,12 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows
@@ -24,195 +27,99 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
+#if FOR_DESIGN_TIME
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.Thickness" /> object to and from other types.
+    /// Converts instances of other types to and from instances of System.Windows.Thickness.
     /// </summary>
-    public class ThicknessConverter : TypeConverter
+    public sealed partial class ThicknessConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Thickness" />.
+        /// Determines whether the type converter can create an instance of System.Windows.Thickness
+        /// from a specified type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="sourceType">The type being evaluated for conversion.</param>
+        /// <param name="context">The context information of a type.</param>
+        /// <param name="sourceType">The source type that the type converter is evaluating for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        /// true if the type converter can create an instance of System.Windows.Thickness
+        /// from the specified type; otherwise, false.
+        /// </returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            // We can only handle strings, integral and floating types
-            TypeCode tc = Type.GetTypeCode(sourceType);
-            switch (tc)
+            if (sourceType == typeof(string))
             {
-                case TypeCode.String:
-                case TypeCode.Decimal:
-                case TypeCode.Single:
-                case TypeCode.Double:
-                case TypeCode.Int16:
-                case TypeCode.Int32:
-                case TypeCode.Int64:
-                case TypeCode.UInt16:
-                case TypeCode.UInt32:
-                case TypeCode.UInt64:
-                    return true;
-
-                default:
-                    return false;
+                return true;
             }
+
+            return base.CanConvertFrom(context, sourceType);
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.Thickness" /> can be converted to the specified type.
+        /// Determines whether the type converter can convert an instance of System.Windows.Thickness
+        /// to a different type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">The type being evaluated for conversion.</param>
+        /// <param name="context">The context information of a type.</param>
+        /// <param name="destinationType">
+        /// The type for which the type converter is evaluating this instance of System.Windows.Thickness
+        /// for conversion.
+        /// </param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; 
-        /// otherwise, <see langword="false" />.</returns>
+        /// true if the type converter can convert this instance of System.Windows.Thickness
+        /// to the destinationType; otherwise, false.
+        /// </returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(string);
+            return false;
         }
 
-        /// <summary>Attempts to create an instance of <see cref="T:System.Windows.Thickness" /> from a specified object. </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>An instance of <see cref="T:System.Windows.Thickness" /> created from the converted <paramref name="value" />.</returns>
-        /// <exception cref="T:System.ArgumentNullException">The <paramref name="value" /> object is <see langword="null" />.</exception>
-        /// <exception cref="T:System.ArgumentException">The example object is not a null reference and is not a valid type that can be converted to a <see cref="T:System.Windows.Thickness" />.</exception>
+        // Exceptions:
+        //   System.ArgumentNullException:
+        //     The source object is a null reference (Nothing in Visual Basic).
+        //
+        //   System.ArgumentException:
+        //     The example object is not a null reference and is not a valid type that can
+        //     be converted to a System.Windows.Thickness.
+        /// <summary>
+        /// Attempts to create an instance of System.Windows.Thickness from a specified
+        /// object.
+        /// </summary>
+        /// <param name="context">The context information for a type.</param>
+        /// <param name="culture">The System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The sourceSystem.Object being converted.</param>
+        /// <returns>An instance of System.Windows.Thickness created from the converted source.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value != null)
-            {
-                if (value is string)
-                {
-                    return FromString(value.ToString(), culture);
-                }
-                else if (value is double)
-                {
-                    return new Thickness((double)value);
-                }
-                else
-                {
-                    return new Thickness(Convert.ToDouble(value, culture));
-                }
-            }
+            if (value == null)
+                throw GetConvertFromException(value);
 
-            throw GetConvertFromException(value);
+            if (value is string)
+                return Thickness.INTERNAL_ConvertFromString((string)value);
+
+            return base.ConvertFrom(context, culture, value);
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.Thickness" /> to a specified type. </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="cultureInfo">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.Thickness" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Thickness" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.Thickness" />.</returns>
-        /// <exception cref="T:System.ArgumentNullException">The <paramref name="value" /> object is not <see langword="null" /> and is not a Brush, or the <paramref name="destinationType" /> is not one of the valid types for conversion.</exception>
-        /// <exception cref="T:System.ArgumentException">The <paramref name="value" /> object is <see langword="null" />.</exception>
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo cultureInfo, object value, Type destinationType)
+        // Exceptions:
+        //   System.ArgumentNullException:
+        //     The value object is not a null reference (Nothing) and is not a Brush, or
+        //     the destinationType is not one of the valid types for conversion.
+        //
+        //   System.ArgumentException:
+        //     The value object is a null reference.
+        /// <summary>
+        /// Attempts to convert an instance of System.Windows.Thickness to a specified
+        /// type.
+        /// </summary>
+        /// <param name="context">The context information of a type.</param>
+        /// <param name="culture">The System.Globalization.CultureInfo of the type being converted.</param>
+        /// <param name="value">The instance of System.Windows.Thickness to convert.</param>
+        /// <param name="destinationType">The type that this instance of System.Windows.Thickness is converted to.</param>
+        /// <returns>
+        /// The type that is created when the type converter converts an instance of
+        /// System.Windows.Thickness.
+        /// </returns>
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            object result = null;
-
-            if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (destinationType is null)
-            {
-                throw new ArgumentNullException(nameof(destinationType));
-            }
-
-            if (value is Thickness thickness)
-            {
-                if (destinationType == typeof(string))
-                {
-                    var listSeparator = ',';
-#if NETSTANDARD
-                    var instance = NumberFormatInfo.GetInstance(cultureInfo);
-                    if (instance.NumberDecimalSeparator.Length > 0 && listSeparator == instance.NumberDecimalSeparator[0])
-                    {
-                        listSeparator = ';';
-                    }
-#endif
-
-                    // Initial capacity [64] is an estimate based on a sum of:
-                    // 48 = 4x double (twelve digits is generous for the range of values likely)
-                    //  8 = 4x Unit Type string (approx two characters)
-                    //  4 = 4x separator characters
-                    var sb = new StringBuilder(64);
-
-                    sb.Append(Convert.ToString(thickness.Left, cultureInfo));
-                    sb.Append(listSeparator);
-                    sb.Append(Convert.ToString(thickness.Top, cultureInfo));
-                    sb.Append(listSeparator);
-                    sb.Append(Convert.ToString(thickness.Right, cultureInfo));
-                    sb.Append(listSeparator);
-                    sb.Append(Convert.ToString(thickness.Bottom, cultureInfo));
-
-                    result = sb.ToString();
-                }
-            }
-            else
-            {
-                throw new ArgumentException($"Unexpected paramenter type {value.GetType().FullName}.");
-            }
-
-            if (result is null)
-            {
-                throw new ArgumentException($"Cannot convert type {nameof(CornerRadius)} to {destinationType.FullName}.");
-            }
-
-            return result;
-        }
-
-        internal static Thickness FromString(string s, CultureInfo cultureInfo)
-        {
-            var splitter = ',';
-            var trimmedThicknessAsString = s.Trim(); //we trim the string so that we don't get random spaces at the beginning and at the end act as separators (for example: Margin=" 5")
-
-            if (!trimmedThicknessAsString.Contains(","))
-            {
-                splitter = ' ';
-            }
-
-            var splittedString = trimmedThicknessAsString.Split(splitter);
-
-            if (splittedString.Length == 1)
-            {
-                if (double.TryParse(splittedString[0], out var thickness))
-                {
-                    return new Thickness(thickness);
-                }
-            }
-            else if (splittedString.Length == 2)
-            {
-                var topAndBottom = 0d;
-
-                var isParseOK = double.TryParse(splittedString[0], out var leftAndRight);
-                isParseOK = isParseOK && double.TryParse(splittedString[1], out topAndBottom);
-
-                if (isParseOK)
-                {
-                    return new Thickness(leftAndRight, topAndBottom, leftAndRight, topAndBottom);
-                }
-            }
-            else if (splittedString.Length == 4)
-            {
-                double top = 0d;
-                double right = 0d;
-                double bottom = 0d;
-
-                bool isParseOK = double.TryParse(splittedString[0], out var left);
-                isParseOK = isParseOK && double.TryParse(splittedString[1], out top);
-                isParseOK = isParseOK && double.TryParse(splittedString[2], out right);
-                isParseOK = isParseOK && double.TryParse(splittedString[3], out bottom);
-
-                if (isParseOK)
-                {
-                    return new Thickness(left, top, right, bottom);
-                }
-            }
-
-            throw new FormatException(s + " is not an eligible value for Thickness");
+            throw new NotImplementedException();
         }
     }
+#endif
 }

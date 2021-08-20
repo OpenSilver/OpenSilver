@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -56,7 +56,6 @@
     <Compile Include="Core\Main\InheritablePropertyChangeInfo.cs" />
     <Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
     <Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
-    <Compile Include="Core\Main\TypeFromStringConverters.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
     <Compile Include="OpenSilver\NotImplementedAttribute.cs" />
@@ -87,10 +86,6 @@
     <Compile Include="System.ComponentModel\ReadOnlyAttribute.cs" />
     <Compile Include="System.ComponentModel\SortDescription.cs" />
     <Compile Include="System.ComponentModel\SortDescriptionCollection.cs" />
-    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageFile.cs" />
-    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageFileStream.cs" />
-    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettings.cs" />
-    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettingsForCSharp.cs" />
     <Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageSettings.cs" />
     <Compile Include="System.Net\SecurityProtocolType.cs" />
     <Compile Include="System.Net\ServicePointManager.cs" />
@@ -105,7 +100,6 @@
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlEventArgs.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlPopupWindowOptions.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptObjectCollection.cs" />
-    <Compile Include="System.Windows.Data\RelativeSourceConverter.cs" />
     <Compile Include="System.Windows.Interactivity\EventTrigger.cs" />
     <Compile Include="System.Windows.Interactivity\InvokeCommandAction.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerAction.cs" />
@@ -115,17 +109,8 @@
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction.cs" />
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
-    <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguageConverter.cs" />
     <Compile Include="System.Windows.Markup\XmlnsPrefixAttribute.cs" />
-    <Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
-    <Compile Include="System.Windows.Media\TransformConverter.cs" />
-    <Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
-    <Compile Include="System.Windows\FontStyleConverter.cs" />
-    <Compile Include="System.Windows\RectConverter.cs" />
-    <Compile Include="System.Windows\RoutedEventConverter.cs" />
     <Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
-    <Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\FontStretchConverter.cs" />
     <Compile Include="System.Xaml\IMarkupExtension.cs" />
     <Compile Include="System.Xml\WORKINPROGRESS\XmlSerializer.cs" />
     <Compile Include="System\TypeExtensions.cs" />
@@ -244,6 +229,8 @@
     <Compile Include="Core\Main\INTERNAL_TypeToStringToDependencyProperty.cs" />
     <Compile Include="Core\Main\INTERNAL_UriHelper.cs" />
     <Compile Include="Core\Main\NamespacesDocumentation.cs" />
+    <Compile Include="Core\Main\SupportsDirectContentViaTypeFromStringConvertersAttribute.cs" />
+    <Compile Include="Core\Main\TypeFromStringConverters.cs" />
     <Compile Include="Core\Events\HtmlEventProxy.cs" />
     <Compile Include="Core\Events\INTERNAL_EventManager_2.cs" />
     <Compile Include="Core\Events\INTERNAL_EventsHelper.cs" />
@@ -354,6 +341,10 @@
     <Compile Include="System.ComponentModel\CancelEventArgs.cs" />
     <Compile Include="System.ComponentModel\ClosingEventArgs.cs" />
     <Compile Include="System.ComponentModel\DesignerProperties.cs" />
+    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageFile.cs" />
+    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageFileStream.cs" />
+    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettings.cs" />
+    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettingsForCSharp.cs" />
     <Compile Include="System.Net\CredentialsMode.cs" />
     <Compile Include="System.Net\DownloadStringCompletedEventArgs.cs" />
     <Compile Include="System.Net\DownloadStringCompletedEventHandler.cs" />
@@ -880,6 +871,7 @@
     <Compile Include="System.Windows\DependencyProperty.cs" />
     <Compile Include="System.Windows\DependencyPropertyChangedEventArgs.cs" />
     <Compile Include="System.Windows\DependencyPropertyChangedEventHandler.cs" />
+    <Compile Include="System.Windows\DependencyPropertyConverter.cs" />
     <Compile Include="System.Windows\DispatcherTimer.cs" />
     <Compile Include="System.Windows\Duration.cs" />
     <Compile Include="System.Windows\DurationConverter.cs" />
@@ -981,6 +973,7 @@
     <Compile Include="System.Windows.Media\Color.cs" />
     <Compile Include="System.Windows.Media\ColorConverter.cs" />
     <Compile Include="System.Windows.Media\Colors.cs" />
+    <Compile Include="System.Windows.Media\WORKINPROGRESS\Color.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bridge.json" />

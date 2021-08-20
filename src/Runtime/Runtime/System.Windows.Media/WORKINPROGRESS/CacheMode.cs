@@ -13,7 +13,11 @@
 \*====================================================================================*/
 
 
-using System.ComponentModel;
+using CSHTML5.Internal;
+using DotNetForHtml5.Core;
+using System;
+using System.Windows;
+using System.Windows.Markup;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -22,10 +26,26 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
 #if WORKINPROGRESS
-    [TypeConverter(typeof(CacheModeConverter))]
+    [SupportsDirectContentViaTypeFromStringConverters]
     [OpenSilver.NotImplemented]
     public abstract partial class CacheMode : DependencyObject
     {
+        static CacheMode()
+        {
+            TypeFromStringConverters.RegisterConverter(typeof(CacheMode), INTERNAL_ConvertFromString);            
+        }
+
+        internal static object INTERNAL_ConvertFromString(string cacheModeAsString)
+        {
+            string cacheModeAsStringToLower = cacheModeAsString.ToLower();
+            switch (cacheModeAsStringToLower)
+            {
+                case "bitmapcache":
+                    return new BitmapCache();
+                default:
+                    throw new Exception("\"" + cacheModeAsString + "\"" + " is not a supported type.");
+            }
+        }
     }
 #endif
 }

@@ -122,7 +122,7 @@ namespace System.Windows.Markup
             {
                 return item;
             }
-            else if (itemType == typeof(string))
+            else if (itemType == typeof(string) && TypeFromStringConverters.CanTypeBeConverted(targetType))
             {
                 return TypeFromStringConverters.ConvertFromInvariantString(targetType, (string)item);
             }

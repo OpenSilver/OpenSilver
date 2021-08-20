@@ -12,6 +12,7 @@
 *  
 \*====================================================================================*/
 
+using DotNetForHtml5.Core;
 
 namespace System.Windows.Input
 {
@@ -55,6 +56,8 @@ namespace System.Windows.Input
             HtmlCursors[(int)CursorType.ArrowCD] = "auto"; // not implemented
             HtmlCursors[(int)CursorType.Stylus] = "auto"; // not implemented
             HtmlCursors[(int)CursorType.Eraser] = "auto"; // not implemented
+
+            TypeFromStringConverters.RegisterConverter(typeof(Cursor), INTERNAL_ConvertFromString);
         }
 
         /// <summary>
@@ -113,6 +116,19 @@ namespace System.Windows.Input
         internal string ToHtmlString()
         {
             return HtmlCursors[(int)_cursorType];
+        }
+
+        internal static object INTERNAL_ConvertFromString(string cursorStr)
+        {
+            if (Enum.TryParse(cursorStr, out CursorType cursorType) &&
+                IsValidCursorType(cursorType))
+            {
+                return Cursors.EnsureCursor(cursorType);
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("'{0}' cursor type is not valid.", cursorStr));
+            }
         }
 
         private CursorType _cursorType = CursorType.None;

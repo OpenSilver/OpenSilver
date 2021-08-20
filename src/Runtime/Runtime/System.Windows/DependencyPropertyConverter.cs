@@ -22,24 +22,26 @@ using System.Text;
 using System.Threading.Tasks;
 
 #if MIGRATION
-namespace System.Windows.Media.Animation
+namespace System.Windows
 #else
-namespace Windows.UI.Xaml.Media.Animation
+namespace Windows.UI.Xaml
 #endif
 {
 #if FOR_DESIGN_TIME
-
-    public sealed partial class RepeatBehaviorConverter : TypeConverter
+    /// <summary>
+    /// Converts instances of Windows.UI.Xaml.DependencyProperty to and from other data types.
+    /// </summary>
+    public sealed partial class DependencyPropertyConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object can be converted from a given type to an instance
-        /// of a System.Windows.Media.Animation.RepeatBehavior.
+        /// Returns a value that indicates whether this converter can convert an object
+        /// of the given type to an instance of Windows.UI.Xaml.DependencyProperty.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
+        /// <param name="context">Context information of a type.</param>
         /// <param name="sourceType">The type of the source that is being evaluated for conversion.</param>
         /// <returns>
-        /// true if the type can be converted to a System.Windows.Media.Animation.RepeatBehavior; otherwise,
-        /// false.
+        /// true if the converter can convert the provided type to an instance of Windows.UI.Xaml.DependencyProperty;
+        /// otherwise, false.
         /// </returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
@@ -50,48 +52,59 @@ namespace Windows.UI.Xaml.Media.Animation
 
             return base.CanConvertFrom(context, sourceType);
         }
-
-        /// <summary>System.Windows.Media.Animation.RepeatBehavior
-        /// Determines whether an instance of a System.Windows.Media.Animation.RepeatBehavior can be converted
+       
+        /// <summary>
+        /// Determines whether an instance of Windows.UI.Xaml.DependencyProperty can be converted
         /// to a different type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">The desired type this System.Windows.Media.Animation.RepeatBehavior is being evaluated for conversion.</param>
+        /// <param name="context">Context information of a type.</param>
+        /// <param name="destinationType">
+        /// The desired type that that this instance of Windows.UI.Xaml.DependencyProperty is
+        /// being evaluated for conversion to.
+        /// </param>
         /// <returns>
-        /// true if this System.Windows.Media.Animation.RepeatBehavior can be converted to destinationType;
+        /// true if the converter can convert this instance of Windows.UI.Xaml.DependencyProperty;
         /// otherwise, false.
         /// </returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
             return false;
         }
-
+      
+        // Exceptions:
+        //   System.NotSupportedException:
+        //     value is null or is not a valid type for conversion.
         /// <summary>
-        /// Attempts to convert the specified object to a System.Windows.Media.Animation.RepeatBehavior.
+        /// Attempts to convert a specified object to an instance of Windows.UI.Xaml.DependencyProperty.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Cultural information to respect during conversion.</param>
+        /// <param name="context">Context information of a type.</param>
+        /// <param name="culture">System.Globalization.CultureInfo of the type being converted.</param>
         /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Media.Animation.RepeatBehavior created from converting value.</returns>
+        /// <returns>The instance of Windows.UI.Xaml.DependencyProperty created from the converted value.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value == null)
                 throw GetConvertFromException(value);
 
             if (value is string)
-                return RepeatBehavior.INTERNAL_ConvertFromString((string)value);
+                return null;
 
             return base.ConvertFrom(context, culture, value);
         }
-
+        
+        // Exceptions:
+        //   System.NotSupportedException:
+        //     value is null-or-value i is not an instance of Windows.UI.Xaml.DependencyProperty-or-destinationType
+        //     is not a valid destination type.
         /// <summary>
-        /// Attempts to convert a System.Windows.Media.Animation.RepeatBehavior to a specified type.
+        /// Attempts to convert an instance of Windows.UI.Xaml.DependencyProperty to a specified
+        /// type.
         /// </summary>
         /// <param name="context">Describes the context information of a type.</param>
         /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The System.Windows.Media.Animation.RepeatBehavior to convert.</param>
-        /// <param name="destinationType">The type to convert this System.Windows.Media.Animation.RepeatBehavior to.</param>
-        /// <returns>The object created from converting this System.Windows.Media.Animation.RepeatBehavior.</returns>
+        /// <param name="value">The instance of Windows.UI.Xaml.DependencyProperty to convert.</param>
+        /// <param name="destinationType">The type this instance of Windows.UI.Xaml.DependencyProperty is converted to.</param>
+        /// <returns>The object created from the converted instance of Windows.UI.Xaml.DependencyProperty.</returns>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
             throw new NotImplementedException();

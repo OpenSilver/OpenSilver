@@ -12,9 +12,7 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -28,13 +26,17 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    [TypeConverter(typeof(MatrixConverter))]
     /// <summary>
     /// Represents a 3x3 affine transformation matrix used for transformations in two-dimensional
     /// space.
     /// </summary>
     public struct Matrix : IFormattable
     {
+        static Matrix()
+        {
+            DotNetForHtml5.Core.TypeFromStringConverters.RegisterConverter(typeof(Matrix), (m => Parse(m)));
+        }
+
         // the transform is identity by default
         private static Matrix s_identity = CreateIdentity();
 
@@ -471,7 +473,7 @@ namespace Windows.UI.Xaml.Media
             throw new FormatException(source + " is not an eligible value for a Matrix");
         }
 
-#endregion Public Methods
+        #endregion Public Methods
 
         #region Operators
 
@@ -497,9 +499,9 @@ namespace Windows.UI.Xaml.Media
             return !(matrix1 == matrix2);
         }
 
-#endregion Operators
+        #endregion Operators
 
-#region Internal Properties
+        #region Internal Properties
 
         /// <summary>
         /// The determinant of this matrix
@@ -538,9 +540,9 @@ namespace Windows.UI.Xaml.Media
             return Math.Abs(value) < 10.0 * DBL_EPSILON;
         }
 
-#endregion Internal Properties
+        #endregion Internal Properties
 
-#region Internal Methods
+        #region Internal Methods
 
         /// <summary>
         /// Replaces matrix with the inverse of the transformation.  This will throw an InvalidOperationException
@@ -674,13 +676,6 @@ namespace Windows.UI.Xaml.Media
             }
 
             char separator = ',';
-#if NETSTANDARD
-            NumberFormatInfo instance = NumberFormatInfo.GetInstance(provider);
-            if (instance.NumberDecimalSeparator.Length > 0 && separator == instance.NumberDecimalSeparator[0])
-            {
-                separator = ';';
-            }
-#endif
 
             return String.Format(provider,
                                  "{1:" + format + "}{0}{2:" + format + "}{0}{3:" + format + "}{0}{4:" + format + "}{0}{5:" + format + "}{0}{6:" + format + "}",
@@ -831,9 +826,9 @@ namespace Windows.UI.Xaml.Media
             return matrix;
         }
 
-#endregion Internal Methods
+        #endregion Internal Methods
 
-#region Private Methods
+        #region Private Methods
 
         /// <summary>
         /// Sets the transformation to the identity.
@@ -935,9 +930,9 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-#endregion Private Methods
+        #endregion Private Methods
 
-#region Private Properties and Fields
+        #region Private Properties and Fields
 
         /// <summary>
         /// Efficient but conservative test for identity.  Returns
@@ -958,7 +953,7 @@ namespace Windows.UI.Xaml.Media
 
         private const double DBL_EPSILON = 2.2204460492503131e-016;
 
-#endregion Private Properties and Fields
+        #endregion Private Properties and Fields
 
         internal double _m11;
         internal double _m12;

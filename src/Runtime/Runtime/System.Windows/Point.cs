@@ -30,9 +30,18 @@ namespace Windows.Foundation
     /// Represents an x- and y-coordinate pair in two-dimensional
     /// space. Can also represent a logical point for certain property usages.
     /// </summary>
+#if FOR_DESIGN_TIME
     [TypeConverter(typeof(PointConverter))]
+#endif
+    [SupportsDirectContentViaTypeFromStringConverters]
+#if WORKINPROGRESS
     public partial struct Point : IFormattable
+#else
+    public partial struct Point //: IFormattable
+#endif
     {
+        //todo: Add the interface IFormattable
+
         internal double _x;
         internal double _y;
 
@@ -60,9 +69,10 @@ namespace Windows.Foundation
         /// </returns>
         public static bool operator !=(Point point1, Point point2)
         {
-            return point1.X != point2.X || point1.Y != point2.Y;
+            return (point1.X != point2.X || point1.Y != point2.Y);
         }
        
+
         /// <summary>
         /// Compares two Windows.Foundation.Point structures for equality
         /// </summary>
@@ -74,15 +84,15 @@ namespace Windows.Foundation
         /// </returns>
         public static bool operator ==(Point point1, Point point2)
         {
-            return point1.X == point2.X && point1.Y == point2.Y;
+            return (point1.X == point2.X && point1.Y == point2.Y);
+
         }
 
         /// <summary>
         /// Gets or sets the Windows.Foundation.Point.X-coordinate
         /// value of this Windows.Foundation.Point structure.
         /// </summary>
-        public double X 
-        {
+        public double X {
             get
             {
                 return _x;
@@ -122,7 +132,7 @@ namespace Windows.Foundation
         /// </returns>
         public override bool Equals(object o)
         {
-            return o is Point && ((Point)o) == this;
+            return (o is Point && ((Point)o) == this);
         }
 
         /// <summary>
@@ -145,9 +155,10 @@ namespace Windows.Foundation
         /// <returns>The hash code for this Windows.Foundation.Point.</returns>
         public override int GetHashCode()
         {
-            return X.GetHashCode() ^ Y.GetHashCode();
+            return (X.GetHashCode() ^ Y.GetHashCode());
         }
 
+     
         /// <summary>
         /// Creates a System.String representation of this Windows.Foundation.Point.
         /// </summary>
@@ -157,17 +168,28 @@ namespace Windows.Foundation
         /// </returns>
         public override string ToString()
         {
-            return ConvertToString(null /* format string */, null /* format provider */);
+            return X + "," + Y;
         }
+        
+        //// <summary>
+        //// Creates a System.String representation of this Windows.Foundation.Point.
+        //// </summary>
+        //// <param name="provider">Culture-specific formatting information.</param>
+        //// <returns>
+        //// A System.String containing the Windows.Foundation.Point.X and Windows.Foundation.Point.Y
+        //// values of this Windows.Foundation.Point structure.
+        //// </returns>
+        //public string ToString(IFormatProvider provider)
+        //{
+        //    throw new NotImplementedException();
+        //    //var provider.GetFormat(typeof(Point));
+        //    //todo: I don't know how a FormatProvider should be used 
+        //    return X + "," + Y;
+        //}
 
-        public string ToString(IFormatProvider provider)
+        static Point()
         {
-            return ConvertToString(null /* format string */, provider);
-        }
-
-        string IFormattable.ToString(string format, IFormatProvider provider)
-        {
-            return ConvertToString(format, provider);
+            TypeFromStringConverters.RegisterConverter(typeof(Point), s => Parse(s));
         }
 
         public static Point Parse(string pointAsString)
@@ -190,46 +212,9 @@ namespace Windows.Foundation
             throw new FormatException(pointAsString + " is not an eligible value for a Point");
         }
 
-        /// <summary>
-        /// Creates a string representation of this object based on the format string
-        /// and IFormatProvider passed in.
-        /// If the provider is null, the CurrentCulture is used.
-        /// See the documentation for IFormattable for more information.
-        /// </summary>
-        /// <returns>
-        /// A string representation of this object.
-        /// </returns>
-        internal string ConvertToString(string format, IFormatProvider provider)
+        public string ToString(string format, IFormatProvider formatProvider)
         {
-            // Helper to get the numeric list separator for a given culture.
-            char separator = GetNumericListSeparator(provider);
-
-            return string.Format(provider,
-                                 "{1:" + format + "}{0}{2:" + format + "}",
-                                 separator,
-                                 _x,
-                                 _y);
-        }
-
-        private static char GetNumericListSeparator(IFormatProvider provider)
-        {
-            char numericSeparator = ',';
-
-#if NETSTANDARD
-            // Get the NumberFormatInfo out of the provider, if possible
-            // If the IFormatProvider doesn't not contain a NumberFormatInfo, then
-            // this method returns the current culture's NumberFormatInfo.
-            var numberFormat = NumberFormatInfo.GetInstance(provider);
-
-            // Is the decimal separator is the same as the list separator?
-            // If so, we use the ";".
-            if ((numberFormat.NumberDecimalSeparator.Length > 0) && (numericSeparator == numberFormat.NumberDecimalSeparator[0]))
-            {
-                numericSeparator = ';';
-            }
-#endif
-
-            return numericSeparator;
+            return null;
         }
     }
 }

@@ -12,7 +12,8 @@
 *  
 \*====================================================================================*/
 
-using System.ComponentModel;
+using System;
+using DotNetForHtml5.Core;
 
 #if MIGRATION
 using System.Windows.Shapes;
@@ -32,9 +33,16 @@ namespace Windows.UI.Xaml.Media
     /// objects can be used for clipping regions and as geometry definitions for
     /// rendering two-dimensional graphical data as a Path.
     /// </summary>
+#if FOR_DESIGN_TIME
     [TypeConverter(typeof(GeometryConverter))]
+#endif
     public abstract partial class Geometry : DependencyObject
     {
+        static Geometry()
+        {
+            TypeFromStringConverters.RegisterConverter(typeof(Geometry), INTERNAL_ConvertFromString);
+        }
+
         internal Geometry()
         {
 
@@ -68,6 +76,11 @@ namespace Windows.UI.Xaml.Media
         internal virtual string GetFillRuleAsString()
         {
             return "evenodd";
+        }
+
+        internal static object INTERNAL_ConvertFromString(string pathAsString)
+        {
+            return PathGeometry.INTERNAL_ConvertFromString(pathAsString);
         }
 
         public static readonly DependencyProperty TransformProperty = 

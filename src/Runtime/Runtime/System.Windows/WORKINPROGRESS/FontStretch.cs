@@ -12,8 +12,11 @@
 *  
 \*====================================================================================*/
 
+
+using CSHTML5.Internal;
+using DotNetForHtml5.Core;
 using System;
-using System.ComponentModel;
+using System.Windows.Markup;
 
 #if MIGRATION
 namespace System.Windows
@@ -22,17 +25,27 @@ namespace Windows.UI.Xaml
 #endif
 {
 #if WORKINPROGRESS
-
-    [TypeConverter(typeof(FontStretchConverter))]
-    [OpenSilver.NotImplemented]
+    #region Not supported yet
+    [SupportsDirectContentViaTypeFromStringConverters]
+	[OpenSilver.NotImplemented]
     public partial struct FontStretch : IFormattable
     {
 		[OpenSilver.NotImplemented]
         public string ToString(string format, IFormatProvider formatProvider)
         {
-            return this.ToString();
+            throw new NotImplementedException();
+        }
+
+        static FontStretch()
+        {
+            TypeFromStringConverters.RegisterConverter(typeof(FontStretch), INTERNAL_ConvertFromString);
+        }
+
+        internal static object INTERNAL_ConvertFromString(string fontStretchAsString)
+        {
+            return new FontStretch();
         }
     }
-
+    #endregion
 #endif
 }

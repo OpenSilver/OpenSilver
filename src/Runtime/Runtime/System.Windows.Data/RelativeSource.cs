@@ -12,8 +12,14 @@
 *  
 \*====================================================================================*/
 
+
+using CSHTML5.Internal;
+using DotNetForHtml5.Core;
 using System;
-using System.ComponentModel;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -26,7 +32,6 @@ namespace Windows.UI.Xaml.Data
     /// Implements a markup extension that describes the location of the binding source relative to the position of the binding target.
     /// </summary>
     [ContentProperty("Mode")]
-    [TypeConverter(typeof(RelativeSourceConverter))]
     public partial class RelativeSource : MarkupExtension
     {
         /// <summary>
@@ -40,14 +45,48 @@ namespace Windows.UI.Xaml.Data
         /// <param name="relativeSourceMode">The relative source mode</param>
         public RelativeSource(RelativeSourceMode relativeSourceMode)
         {
-            Mode = relativeSourceMode;
+            _mode = relativeSourceMode;
         }
 
+
+        static RelativeSource()
+        {
+            TypeFromStringConverters.RegisterConverter(typeof(RelativeSourceMode), INTERNAL_ConvertFromString);
+        }
+
+        internal static object INTERNAL_ConvertFromString(string relativeSourceAsString)
+        {
+            switch (relativeSourceAsString)
+            {
+                case "None":
+                    return (new RelativeSource() { Mode = RelativeSourceMode.None });
+                case "Self":
+                    return (new RelativeSource() { Mode = RelativeSourceMode.Self });
+                case "TemplatedParent":
+                    return (new RelativeSource() { Mode = RelativeSourceMode.TemplatedParent });
+                default:
+                    throw new FormatException(relativeSourceAsString + " is not an eligible value for a RelativeSource");
+            }
+        }
+
+
+        RelativeSourceMode _mode = RelativeSourceMode.None;
         /// <summary>
         /// Gets or sets a value that describes the location of the binding source relative to the position of the binding target.
         /// Returns a value of the enumeration.
         /// </summary>
-        public RelativeSourceMode Mode { get; set; }
+        public RelativeSourceMode Mode
+        {
+            get
+            {
+                return _mode;
+            }
+            set
+            {
+                _mode = value;
+            }
+        }
+
 
         private int _ancestorLevel = 1;
         /// <summary>
@@ -59,7 +98,7 @@ namespace Windows.UI.Xaml.Data
             get { return _ancestorLevel; }
             set
             {
-                if (value < 1)
+                if(value < 1)
                 {
                     throw new ArgumentOutOfRangeException("The ancestor level cannot be less than one.");
                 }
@@ -76,9 +115,9 @@ namespace Windows.UI.Xaml.Data
             get { return _ancestorType; }
             set
             {
-                if (Mode == RelativeSourceMode.None)
+                if (_mode == RelativeSourceMode.None)
                 {
-                    Mode = RelativeSourceMode.FindAncestor;
+                    _mode = RelativeSourceMode.FindAncestor;
                 }
                 _ancestorType = value;
             }
