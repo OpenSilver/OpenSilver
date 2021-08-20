@@ -160,12 +160,20 @@
                           Grid.Column="1"
                           Content="{TemplateBinding Content}"
                           ContentTemplate="{TemplateBinding ContentTemplate}"
+                          Margin="6,5.5,4,4"
+                          IsHitTestVisible="true" />
+                  <!--Properties to implement later-->
+                    <!--<ContentPresenter
+                          x:Name="Content"
+                          Grid.Column="1"
+                          Content="{TemplateBinding Content}"
+                          ContentTemplate="{TemplateBinding ContentTemplate}"
                           Background="Transparent"
                           HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                           Padding="{TemplateBinding Padding}"
                           VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                           Margin="6,5.5,4,4"
-                          IsHitTestVisible="true" />
+                          IsHitTestVisible="true" />-->
                     <!-- Disabled -->
                     <Rectangle x:Name="DisabledBox" Width="13" Height="13" RadiusX="1" RadiusY="1" StrokeThickness=".75" Stroke="{StaticResource DisabledBrush}" Fill="{StaticResource DisabledBrush}" VerticalAlignment="Center" Opacity="0" />
                 </Grid>
