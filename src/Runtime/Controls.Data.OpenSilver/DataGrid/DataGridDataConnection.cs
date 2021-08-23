@@ -10,9 +10,19 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Reflection;
-using System.Windows.Data;
 
+#if MIGRATION
+using System.Windows.Data;
+#else
+using Windows.UI.Xaml.Data;
+#endif
+
+
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     internal class DataGridDataConnection
     {

@@ -7,7 +7,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     internal class DataGridSelectedItemsCollection : IList
     {

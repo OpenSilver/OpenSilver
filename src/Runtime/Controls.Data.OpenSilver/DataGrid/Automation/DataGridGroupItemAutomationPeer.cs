@@ -6,9 +6,16 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+
+#if MIGRATION
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Data;
+#else
+using Windows.UI.Xaml.Automation.Provider;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
+#endif
 
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridGroupItemAutomationPeer.#System.Windows.Automation.Provider.IExpandCollapseProvider.Collapse()", Justification = "Base functionality is available through the GetPattern method.")]
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridGroupItemAutomationPeer.#System.Windows.Automation.Provider.IExpandCollapseProvider.Expand()", Justification = "Base functionality is available through the GetPattern method.")]
@@ -21,7 +28,11 @@ using System.Windows.Data;
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridGroupItemAutomationPeer.#System.Windows.Automation.Provider.ISelectionProvider.GetSelection()", Justification = "Base functionality is available through the GetPattern method.")]
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridGroupItemAutomationPeer.#System.Windows.Automation.Provider.ISelectionProvider.IsSelectionRequired", Justification = "Base functionality is available through the GetPattern method.")]
 
+#if MIGRATION
 namespace System.Windows.Automation.Peers
+#else
+namespace Windows.UI.Xaml.Automation.Peers
+#endif
 {
     /// <summary>
     /// AutomationPeer for a group of items in a DataGrid
@@ -30,14 +41,14 @@ namespace System.Windows.Automation.Peers
     public class DataGridGroupItemAutomationPeer : FrameworkElementAutomationPeer,
         IExpandCollapseProvider, IGridProvider, IScrollItemProvider, ISelectionProvider
     {
-        #region Data
+#region Data
 
         private CollectionViewGroup _group;
         private AutomationPeer _dataGridAutomationPeer;
 
-        #endregion
+#endregion
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// AutomationPeer for a group of items in a DataGrid
@@ -66,9 +77,9 @@ namespace System.Windows.Automation.Peers
             _dataGridAutomationPeer = FrameworkElementAutomationPeer.CreatePeerForElement(dataGrid);
         }
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// The owning DataGrid
@@ -133,9 +144,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region AutomationPeer Overrides
+#region AutomationPeer Overrides
 
         ///
         protected override string GetAcceleratorKeyCore()
@@ -337,9 +348,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region IExpandCollapseProvider Members
+#region IExpandCollapseProvider Members
 
         void IExpandCollapseProvider.Collapse()
         {
@@ -377,9 +388,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region IGridProvider Members
+#region IGridProvider Members
 
         int IGridProvider.ColumnCount
         {
@@ -440,9 +451,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region IScrollItemProvider
+#region IScrollItemProvider
 
         void IScrollItemProvider.ScrollIntoView()
         {
@@ -458,9 +469,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region ISelectionProvider
+#region ISelectionProvider
 
         IRawElementProviderSimple[] ISelectionProvider.GetSelection()
         {
@@ -507,9 +518,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region Private Methods
+#region Private Methods
 
         private void EnsureEnabled()
         {
@@ -519,6 +530,6 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
     }
 }

@@ -5,8 +5,14 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+
+#if MIGRATION
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Automation.Provider;
+using Windows.UI.Xaml.Controls;
+#endif
 
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridItemAutomationPeer.#System.Windows.Automation.Provider.IInvokeProvider.Invoke()", Justification = "Base functionality is available through the GetPattern method.")]
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridItemAutomationPeer.#System.Windows.Automation.Provider.IScrollItemProvider.ScrollIntoView()", Justification = "Base functionality is available through the GetPattern method.")]
@@ -19,7 +25,11 @@ using System.Windows.Controls;
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridItemAutomationPeer.#System.Windows.Automation.Provider.ISelectionProvider.GetSelection()", Justification = "Base functionality is available through the GetPattern method.")]
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridItemAutomationPeer.#System.Windows.Automation.Provider.ISelectionProvider.IsSelectionRequired", Justification = "Base functionality is available through the GetPattern method.")]
 
+#if MIGRATION
 namespace System.Windows.Automation.Peers
+#else
+namespace Windows.UI.Xaml.Automation.Peers
+#endif
 {
     /// <summary>
     /// AutomationPeer for an item in a DataGrid
@@ -28,14 +38,14 @@ namespace System.Windows.Automation.Peers
     public class DataGridItemAutomationPeer : FrameworkElementAutomationPeer,
         IInvokeProvider, IScrollItemProvider, ISelectionItemProvider, ISelectionProvider
     {
-        #region Data
+#region Data
 
         private object _item;
         private AutomationPeer _dataGridAutomationPeer;
 
-        #endregion
+#endregion
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// AutomationPeer for an item in a DataGrid
@@ -64,9 +74,9 @@ namespace System.Windows.Automation.Peers
             _dataGridAutomationPeer = FrameworkElementAutomationPeer.CreatePeerForElement(dataGrid);
         }
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         private DataGrid OwningDataGrid
         {
@@ -106,9 +116,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region AutomationPeer Overrides
+#region AutomationPeer Overrides
 
         ///
         protected override string GetAcceleratorKeyCore()
@@ -293,9 +303,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region IInvokeProvider
+#region IInvokeProvider
 
         void IInvokeProvider.Invoke()
         {
@@ -332,18 +342,18 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region IScrollItemProvider
+#region IScrollItemProvider
 
         void IScrollItemProvider.ScrollIntoView()
         {
             this.OwningDataGrid.ScrollIntoView(_item, null);
         }
 
-        #endregion
+#endregion
 
-        #region ISelectionItemProvider
+#region ISelectionItemProvider
 
         bool ISelectionItemProvider.IsSelected
         {
@@ -446,9 +456,9 @@ namespace System.Windows.Automation.Peers
 
         }
 
-        #endregion
+#endregion
 
-        #region ISelectionProvider
+#region ISelectionProvider
 
         bool ISelectionProvider.CanSelectMultiple
         {
@@ -482,9 +492,9 @@ namespace System.Windows.Automation.Peers
             return null;
         }
 
-        #endregion
+#endregion
 
-        #region Private Methods
+#region Private Methods
 
         private void EnsureEnabled()
         {
@@ -494,6 +504,6 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
     }
 }

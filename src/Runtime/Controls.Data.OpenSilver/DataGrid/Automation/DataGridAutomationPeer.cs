@@ -6,10 +6,18 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+
+#if MIGRATION
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+#else
+using Windows.UI.Xaml.Automation.Provider;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+#endif
 
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.IGridProvider.ColumnCount", Justification = "Base functionality is available through the GetPattern method.")]
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.IGridProvider.GetItem(System.Int32,System.Int32)", Justification = "Base functionality is available through the GetPattern method.")]
@@ -28,8 +36,11 @@ using System.Windows.Data;
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.ITableProvider.GetColumnHeaders()", Justification = "Base functionality is available through the GetPattern method.")]
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.ITableProvider.GetRowHeaders()", Justification = "Base functionality is available through the GetPattern method.")]
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.ITableProvider.RowOrColumnMajor", Justification = "Base functionality is available through the GetPattern method.")]
-
+#if MIGRATION
 namespace System.Windows.Automation.Peers
+#else
+namespace Windows.UI.Xaml.Automation.Peers
+#endif
 {
     /// <summary>
     /// Exposes <see cref="T:System.Windows.Controls.DataGrid" /> types to UI Automation.
@@ -38,7 +49,7 @@ namespace System.Windows.Automation.Peers
     public class DataGridAutomationPeer : FrameworkElementAutomationPeer,
         IGridProvider, IScrollProvider, ISelectionProvider, ITableProvider
     {
-        #region Data
+#region Data
 
         private Dictionary<object, DataGridGroupItemAutomationPeer> _groupItemPeers = new Dictionary<object, DataGridGroupItemAutomationPeer>();
         private Dictionary<object, DataGridItemAutomationPeer> _itemPeers = new Dictionary<object, DataGridItemAutomationPeer>();
@@ -49,9 +60,9 @@ namespace System.Windows.Automation.Peers
         private double _oldVerticalScrollPercent;
         private double _oldVerticalViewSize;
 
-        #endregion
+#endregion
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Automation.Peers.DataGridAutomationPeer" /> class.
@@ -89,9 +100,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         private bool HorizontallyScrollable
         {
@@ -167,9 +178,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region AutomationPeer Overrides
+#region AutomationPeer Overrides
 
         /// <summary>
         /// Gets the control type for the element that is associated with the UI Automation peer.
@@ -259,9 +270,9 @@ namespace System.Windows.Automation.Peers
             return base.GetPattern(patternInterface);
         }
 
-        #endregion
+#endregion
 
-        #region IGridProvider
+#region IGridProvider
 
         int IGridProvider.ColumnCount
         {
@@ -310,9 +321,9 @@ namespace System.Windows.Automation.Peers
             return null;
         }
 
-        #endregion
+#endregion
 
-        #region IScrollProvider
+#region IScrollProvider
 
         bool IScrollProvider.HorizontallyScrollable
         {
@@ -489,9 +500,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region ISelectionProvider
+#region ISelectionProvider
 
         IRawElementProviderSimple[] ISelectionProvider.GetSelection()
         {
@@ -528,9 +539,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region ITableProvider
+#region ITableProvider
 
         RowOrColumnMajor ITableProvider.RowOrColumnMajor
         {
@@ -588,9 +599,9 @@ namespace System.Windows.Automation.Peers
             return null;
         }
 
-        #endregion
+#endregion
 
-        #region Methods
+#region Methods
 
         private AutomationPeer GetCellPeer(int slot, int column)
         {
@@ -983,6 +994,6 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
     }
 }

@@ -8,7 +8,12 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace System.Windows.Controls {
+#if MIGRATION
+namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
+{
     using System;
     
     

@@ -3,7 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+#if MIGRATION
 namespace System.Windows.Controls.Primitives
+#else
+namespace Windows.UI.Xaml.Controls,Primitives
+#endif
 {
     /// <summary>
     /// Represents a non-scrollable grid that contains <see cref="T:System.Windows.Controls.DataGrid" /> row headers.

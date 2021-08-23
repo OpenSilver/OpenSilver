@@ -4,10 +4,21 @@
 // All other rights reserved.
 
 using System.Diagnostics;
+
+
+#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Media;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls.Primitives
+#else
+namespace Windows.UI.Xaml.Controls.Primitives
+#endif
 {
     /// <summary>
     /// Used within the template of a <see cref="T:System.Windows.Controls.DataGrid" /> to specify the 

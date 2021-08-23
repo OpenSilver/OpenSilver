@@ -3,13 +3,26 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+
+#if MIGRATION
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Markup;
+using Windows.UI.Xaml.Media;
+#endif
+
 using System.ComponentModel;
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// Represents a <see cref="T:System.Windows.Controls.DataGrid" /> column that hosts textual content in its cells.
@@ -19,7 +32,7 @@ namespace System.Windows.Controls
     [StyleTypedProperty(Property = "EditingElementStyle", StyleTargetType = typeof(TextBox))]
     public class DataGridTextColumn : DataGridBoundColumn
     {
-        #region Constants
+#region Constants
 
         private const string DATAGRIDTEXTCOLUMN_fontFamilyName = "FontFamily";
         private const string DATAGRIDTEXTCOLUMN_fontSizeName = "FontSize";
@@ -27,16 +40,16 @@ namespace System.Windows.Controls
         private const string DATAGRIDTEXTCOLUMN_fontWeightName = "FontWeight";
         private const string DATAGRIDTEXTCOLUMN_foregroundName = "Foreground";
 
-        #endregion Constants
+#endregion Constants
 
-        #region Data
+#region Data
 
         private double? _fontSize;
         private FontStyle? _fontStyle;
         private FontWeight? _fontWeight;
         private Brush _foreground;
 
-        #endregion Data
+#endregion Data
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.DataGridTextColumn" /> class.
@@ -46,9 +59,9 @@ namespace System.Windows.Controls
             this.BindingTarget = TextBox.TextProperty;
         }
 
-        #region DependencyProperties
+#region DependencyProperties
 
-        #region FontFamily
+#region FontFamily
         /// <summary>
         /// Gets or sets the font name.
         /// </summary>
@@ -73,11 +86,11 @@ namespace System.Windows.Controls
             DataGridTextColumn textColumn = (DataGridTextColumn)d;
             textColumn.NotifyPropertyChanged(DATAGRIDTEXTCOLUMN_fontFamilyName);
         }
-        #endregion FontFamily
+#endregion FontFamily
 
-        #endregion DependencyProperties
+#endregion DependencyProperties
 
-        #region Public Properties
+#region Public Properties
 
         /// <summary>
         /// Gets or sets the font size.
@@ -157,13 +170,13 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Public Properties
+#endregion Public Properties
 
-        #region Internal Properties
+#region Internal Properties
 
-        #endregion Internal Properties
+#endregion Internal Properties
 
-        #region Protected Methods
+#region Protected Methods
 
         /// <summary>
         /// Causes the column cell being edited to revert to the specified value.
@@ -376,13 +389,13 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Protected Methods
+#endregion Protected Methods
 
-        #region Internal Methods
+#region Internal Methods
 
-        #endregion Internal Methods
+#endregion Internal Methods
 
-        #region Private Methods
+#region Private Methods
 
         private void SetTextFontSize(DependencyObject textElement, DependencyProperty fontSizeProperty)
         {
@@ -397,6 +410,6 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Private Methods
+#endregion Private Methods
     }
 }

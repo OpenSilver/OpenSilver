@@ -9,16 +9,28 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+
+
+#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Data;
 using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
+#endif
 
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     public partial class DataGrid
     {
-        #region Internal Properties
+#region Internal Properties
 
         internal bool AreRowBottomGridLinesRequired
         {
@@ -59,9 +71,9 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Internal Properties
+#endregion Internal Properties
 
-        #region Private Properties
+#region Private Properties
 
         // Cumulated height of all known rows, including the gridlines and details section.
         // This property returns an approximation of the actual total row heights and also
@@ -129,9 +141,9 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Private Properties
+#endregion Private Properties
 
-        #region Public Methods
+#region Public Methods
 
         /// <summary>
         /// Collapses the DataGridRowGroupHeader that represents a given CollectionViewGroup
@@ -213,9 +225,9 @@ namespace System.Windows.Controls
 
 
 
-        #endregion Public Methods
+#endregion Public Methods
 
-        #region Protected Methods
+#region Protected Methods
 
         /// <summary>
         /// Raises the <see cref="E:System.Windows.Controls.DataGrid.RowDetailsVisibilityChanged" /> event.
@@ -231,9 +243,9 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Protected Methods
+#endregion Protected Methods
 
-        #region Internal Methods
+#region Internal Methods
 
         /// <summary>
         /// Clears the entire selection. Displayed rows are deselected explicitly to visualize
@@ -799,9 +811,9 @@ namespace System.Windows.Controls
             return rowIndex + this.RowGroupHeadersTable.GetIndexCountBeforeGap(0, rowIndex);
         }
 
-        #endregion Internal Methods
+#endregion Internal Methods
 
-        #region Private Methods
+#region Private Methods
 
         private void AddSlotElement(int slot, UIElement element)
         {
@@ -3111,7 +3123,7 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Private Methods
+#endregion Private Methods
 
 #if DEBUG
         internal void PrintRowGroupInfo()

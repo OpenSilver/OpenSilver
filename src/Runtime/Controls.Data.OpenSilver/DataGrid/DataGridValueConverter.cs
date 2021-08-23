@@ -5,9 +5,19 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Windows.Data;
 
+#if MIGRATION
+using System.Windows.Data;
+#else
+using Windows.UI.Xaml.Data;
+#endif
+
+
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     internal class DataGridValueConverter : IValueConverter
     {

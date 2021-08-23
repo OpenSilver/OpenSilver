@@ -5,8 +5,15 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+
+
+#if MIGRATION
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Automation.Provider;
+using Windows.UI.Xaml.Controls;
+#endif
 
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridCellAutomationPeer.#System.Windows.Automation.Provider.IGridItemProvider.Column", Justification = "Base functionality is available through the GetPattern method.")]
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridCellAutomationPeer.#System.Windows.Automation.Provider.IGridItemProvider.ColumnSpan", Justification = "Base functionality is available through the GetPattern method.")]
@@ -23,16 +30,20 @@ using System.Windows.Controls;
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridCellAutomationPeer.#System.Windows.Automation.Provider.ITableItemProvider.GetColumnHeaderItems()", Justification = "Base functionality is available through the GetPattern method.")]
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridCellAutomationPeer.#System.Windows.Automation.Provider.ITableItemProvider.GetRowHeaderItems()", Justification = "Base functionality is available through the GetPattern method.")]
 
+#if MIGRATION
 namespace System.Windows.Automation.Peers
+#else
+namespace Windows.UI.Xaml.Automation.Peers
+#endif
 {
-    /// <summary>
-    /// AutomationPeer for DataGridCell
-    /// </summary>
-    /// <QualityBand>Mature</QualityBand>
-    public class DataGridCellAutomationPeer : FrameworkElementAutomationPeer,
+/// <summary>
+/// AutomationPeer for DataGridCell
+/// </summary>
+/// <QualityBand>Mature</QualityBand>
+public class DataGridCellAutomationPeer : FrameworkElementAutomationPeer,
         IGridItemProvider, IInvokeProvider, IScrollItemProvider, ISelectionItemProvider, ITableItemProvider
     {
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// AutomationPeer for DataGridCell
@@ -43,9 +54,9 @@ namespace System.Windows.Automation.Peers
         {
         }
 
-        #endregion
+#endregion
         
-        #region Properties
+#region Properties
 
         private IRawElementProviderSimple ContainingGrid
         {
@@ -92,9 +103,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region AutomationPeer Overrides
+#region AutomationPeer Overrides
 
         /// <summary>
         /// Gets the control type for the element that is associated with the UI Automation peer.
@@ -203,9 +214,9 @@ namespace System.Windows.Automation.Peers
             return true;
         }
 
-        #endregion
+#endregion
 
-        #region IGridItemProvider
+#region IGridItemProvider
 
         int IGridItemProvider.Column
         {
@@ -252,9 +263,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region IInvokeProvider
+#region IInvokeProvider
 
         void IInvokeProvider.Invoke()
         {
@@ -277,9 +288,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region IScrollItemProvider
+#region IScrollItemProvider
 
         void IScrollItemProvider.ScrollIntoView()
         {
@@ -296,9 +307,9 @@ namespace System.Windows.Automation.Peers
 
         }
 
-        #endregion
+#endregion
 
-        #region ISelectionItemProvider
+#region ISelectionItemProvider
 
         bool ISelectionItemProvider.IsSelected
         {
@@ -373,9 +384,9 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
 
-        #region ITableItemProvider
+#region ITableItemProvider
 
         IRawElementProviderSimple[] ITableItemProvider.GetColumnHeaderItems()
         {
@@ -411,9 +422,9 @@ namespace System.Windows.Automation.Peers
             return null;
         }
 
-        #endregion
+#endregion
 
-        #region Private Methods
+#region Private Methods
 
         private void EnsureEnabled()
         {
@@ -423,6 +434,6 @@ namespace System.Windows.Automation.Peers
             }
         }
 
-        #endregion
+#endregion
     }
 }

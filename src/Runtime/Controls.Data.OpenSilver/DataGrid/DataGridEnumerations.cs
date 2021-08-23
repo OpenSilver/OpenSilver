@@ -5,12 +5,16 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
-    /// <summary>
-    /// Defines modes that indicates how DataGrid content is copied to the Clipboard. 
-    /// </summary>
-    public enum DataGridClipboardCopyMode
+/// <summary>
+/// Defines modes that indicates how DataGrid content is copied to the Clipboard. 
+/// </summary>
+public enum DataGridClipboardCopyMode
     {
         /// <summary>
         /// Disable the DataGrid's ability to copy selected items as text.

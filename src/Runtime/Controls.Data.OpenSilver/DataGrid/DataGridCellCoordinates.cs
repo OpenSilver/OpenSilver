@@ -5,9 +5,13 @@
 
 using System.Globalization;
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
-    internal class DataGridCellCoordinates
+internal class DataGridCellCoordinates
     {
         public DataGridCellCoordinates(int columnIndex, int slot)
         {

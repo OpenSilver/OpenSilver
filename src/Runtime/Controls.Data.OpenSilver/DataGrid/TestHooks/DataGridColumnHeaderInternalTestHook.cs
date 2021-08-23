@@ -3,9 +3,18 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.Windows.Shapes;
 
+#if MIGRATION
+using System.Windows.Shapes;
+#else
+using Windows.UI.Xaml.Shapes;
+#endif
+
+#if MIGRATION
 namespace System.Windows.Controls.Primitives
+#else
+namespace Windows.UI.Xaml.Controls.Primitives
+#endif
 {
     public partial class DataGridColumnHeader
     {

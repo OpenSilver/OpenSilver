@@ -5,7 +5,11 @@
 
 using System.ComponentModel;
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// Provides information just before a row exits editing mode.

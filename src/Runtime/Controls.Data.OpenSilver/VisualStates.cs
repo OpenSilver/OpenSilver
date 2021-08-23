@@ -5,7 +5,11 @@
 
 using System.Diagnostics;
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// Names and helpers for visual states in the controls.

@@ -5,9 +5,13 @@
 
 using System.Globalization;
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
-    internal static class DataGridError
+internal static class DataGridError
     {
         public static class DataGrid
         {

@@ -4,11 +4,23 @@
 // All other rights reserved.
 
 using System.Diagnostics;
+
+#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Shapes;
+#else
+using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Shapes;#endif
+#endif
 
+
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// Represents an individual <see cref="T:System.Windows.Controls.DataGrid" /> cell.
@@ -30,17 +42,17 @@ namespace System.Windows.Controls
     [TemplateVisualState(Name = VisualStates.StateValid, GroupName = VisualStates.GroupValidation)]
     public sealed partial class DataGridCell : ContentControl
     {
-        #region Constants
+#region Constants
 
         private const string DATAGRIDCELL_elementRightGridLine = "RightGridLine";
 
-        #endregion Constants
+#endregion Constants
 
-        #region Data
+#region Data
 
         private Rectangle _rightGridLine;
 
-        #endregion Data
+#endregion Data
 
         public DataGridCell()
         {
@@ -51,9 +63,9 @@ namespace System.Windows.Controls
             DefaultStyleKey = typeof(DataGridCell);
         }
 
-        #region Dependency Properties
+#region Dependency Properties
 
-        #region IsValid
+#region IsValid
         /// <summary>
         /// Gets a value that indicates whether the data in a cell is valid. 
         /// </summary>
@@ -93,21 +105,21 @@ namespace System.Windows.Controls
                 throw DataGridError.DataGrid.UnderlyingPropertyIsReadOnly("IsValid");
             }
         }
-        #endregion IsValid
+#endregion IsValid
 
-        #endregion Dependency Properties
+#endregion Dependency Properties
 
-        #region Public Properties
+#region Public Properties
 
-        #endregion Public Properties
-
-
-        #region Protected Properties
-
-        #endregion Protected Properties
+#endregion Public Properties
 
 
-        #region Internal Properties
+#region Protected Properties
+
+#endregion Protected Properties
+
+
+#region Internal Properties
 
         internal double ActualRightGridLineWidth
         {
@@ -183,10 +195,10 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Internal Properties
+#endregion Internal Properties
 
 
-        #region Private Properties
+#region Private Properties
 
         private bool IsEdited
         {
@@ -221,15 +233,15 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Private Properties
+#endregion Private Properties
 
 
-        #region Public Methods
+#region Public Methods
 
-        #endregion Public Methods
+#endregion Public Methods
 
 
-        #region Protected Methods
+#region Protected Methods
 
         /// <summary>
         /// Builds the visual tree for the cell control when a new template is applied.
@@ -266,10 +278,10 @@ namespace System.Windows.Controls
             return base.OnCreateAutomationPeer();
         }
 
-        #endregion Protected Methods
+#endregion Protected Methods
 
         
-        #region Internal Methods
+#region Internal Methods
 
         internal void ApplyCellState(bool animate)
         {
@@ -387,10 +399,10 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Internal Methods
+#endregion Internal Methods
 
 
-        #region Private Methods
+#region Private Methods
 
         private void DataGridCell_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -428,6 +440,6 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Private Methods
+#endregion Private Methods
     }
 }
