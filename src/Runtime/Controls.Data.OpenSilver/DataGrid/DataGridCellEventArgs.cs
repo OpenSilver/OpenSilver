@@ -5,9 +5,13 @@
 
 using System.Diagnostics;
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
-    internal class DataGridCellEventArgs : EventArgs
+internal class DataGridCellEventArgs : EventArgs
     {
         internal DataGridCellEventArgs(DataGridCell dataGridCell)
         {

@@ -5,13 +5,28 @@
 
 using System.Diagnostics;
 using System.Globalization;
+
+
+#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+#endif
 
+
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// Represents the header of a <see cref="T:System.Windows.Controls.DataGrid" /> row group. 
@@ -50,9 +65,9 @@ namespace System.Windows.Controls
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRowGroupHeader_MouseLeftButtonDown), true);
         }
 
-        #region Dependency Properties
+#region Dependency Properties
 
-        #region HeaderStyle
+#region HeaderStyle
         /// <summary>
         /// The style applied to the header cell of a <see cref="T:System.Windows.Controls.DataGridRowGroupHeader" />. 
         /// </summary>
@@ -80,9 +95,9 @@ namespace System.Windows.Controls
                 groupHeader._headerElement.EnsureStyle(e.OldValue as Style);
             }
         }
-        #endregion HeaderStyle
+#endregion HeaderStyle
 
-        #region ItemCountVisibility
+#region ItemCountVisibility
         /// <summary>
         /// Gets or sets a value that indicates whether the item count is visible.
         /// </summary>
@@ -101,9 +116,9 @@ namespace System.Windows.Controls
                 typeof(Visibility),
                 typeof(DataGridRowGroupHeader),
                 null);
-        #endregion ItemCountVisibility
+#endregion ItemCountVisibility
 
-        #region PropertyName
+#region PropertyName
         /// <summary>
         /// Gets or sets the name of the property that this <see cref="T:System.Windows.Controls.DataGrid" /> row is bound to. 
         /// </summary>
@@ -122,9 +137,9 @@ namespace System.Windows.Controls
                 typeof(string),
                 typeof(DataGridRowGroupHeader),
                 null);
-        #endregion PropertyName
+#endregion PropertyName
 
-        #region PropertyNameVisibility
+#region PropertyNameVisibility
         /// <summary>
         /// Gets or sets a value that indicates whether the property name is visible.
         /// </summary>
@@ -143,9 +158,9 @@ namespace System.Windows.Controls
                 typeof(Visibility),
                 typeof(DataGridRowGroupHeader),
                 null);
-        #endregion PropertyNameVisibility
+#endregion PropertyNameVisibility
 
-        #region SublevelIndent
+#region SublevelIndent
         /// <summary>
         /// Gets or sets a value that indicates the amount that the 
         /// children of the <see cref="T:System.Windows.Controls.RowGroupHeader" /> are indented. 
@@ -189,11 +204,11 @@ namespace System.Windows.Controls
                 groupHeader.OwningGrid.OnSublevelIndentUpdated(groupHeader, newValue);
             }
         }
-        #endregion SublevelIndent
+#endregion SublevelIndent
 
-        #endregion Dependency Properties
+#endregion Dependency Properties
 
-        #region Properties
+#region Properties
 
         internal DataGridRowHeader HeaderCell
         {
@@ -254,9 +269,9 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Properties
+#endregion Properties
 
-        #region Methods
+#region Methods
 
         internal void ApplyHeaderStatus(bool animate)
         {
@@ -566,6 +581,6 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Methods
+#endregion Methods
     }
 }

@@ -9,10 +9,21 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+
+#if MIGRATION
 using System.Windows.Input;
 using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+#endif
 
+
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// Reservoir of attached properties for use by extension methods that require non-static information about objects.

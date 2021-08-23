@@ -13,14 +13,28 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+
+#if MIGRATION
 using System.Windows.Automation;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Common;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Automation;
+using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Controls.Common;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// Handles paging for an <see cref="T:System.ComponentModel.IPagedCollectionView" />. 
@@ -63,7 +77,7 @@ namespace System.Windows.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Constants
+#region Constants
 
         // Automation Id constants
         private const string DATAPAGER_currentPageTextBoxAutomationId = "CurrentPage";
@@ -135,9 +149,9 @@ namespace System.Windows.Controls
         private const int DATAPAGER_defaultNumericButtonCount = 5;
         private const int DATAPAGER_defaultPageIndex = -1;
 
-        #endregion Constants
+#endregion Constants
 
-        #region Static Fields
+#region Static Fields
 
         /// <summary>
         /// Identifies the AutoEllipsis dependency property.
@@ -301,7 +315,7 @@ namespace System.Windows.Controls
                 typeof(DataPager),
                 new PropertyMetadata(OnSourcePropertyChanged));
 
-        #endregion Static Fields
+#endregion Static Fields
 
         ////------------------------------------------------------
         ////
@@ -309,7 +323,7 @@ namespace System.Windows.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Private Fields
+#region Private Fields
 
         /// <summary>
         /// Private accessor for the text block appearing before the current page text box.
@@ -397,7 +411,7 @@ namespace System.Windows.Controls
         /// <returns>Boolean value for whether the operation succeeded</returns>
         private delegate bool PageMoveOperationDelegate();
 
-        #endregion Private Fields
+#endregion Private Fields
 
         ////------------------------------------------------------
         ////
@@ -405,7 +419,7 @@ namespace System.Windows.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Initializes a new instance of the DataPager class.
@@ -423,7 +437,7 @@ namespace System.Windows.Controls
             this.SetBinding(DataPager.PrivateForegroundProperty, foregroundBinding);
         }
 
-        #endregion Constructors
+#endregion Constructors
 
         ////------------------------------------------------------
         ////
@@ -431,7 +445,7 @@ namespace System.Windows.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Events
+#region Events
 
         /// <summary>
         /// EventHandler for when PageIndex is changing.
@@ -443,7 +457,7 @@ namespace System.Windows.Controls
         /// </summary>
         public event EventHandler<EventArgs> PageIndexChanged;
 
-        #endregion Events
+#endregion Events
 
         ////------------------------------------------------------
         ////
@@ -451,7 +465,7 @@ namespace System.Windows.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Public Properties
+#region Public Properties
 
         /// <summary>
         /// Gets or sets a value that indicates whether or not to use an ellipsis as the last button.
@@ -701,7 +715,7 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Public Properties
+#endregion Public Properties
 
         ////------------------------------------------------------
         ////
@@ -709,7 +723,7 @@ namespace System.Windows.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Internal Properties
+#region Internal Properties
 
         /// <summary>
         /// Gets the TextBox holding the current PageIndex value, if any.
@@ -733,7 +747,7 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Internal Properties
+#endregion Internal Properties
 
 
         /// <summary>
@@ -758,7 +772,7 @@ namespace System.Windows.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Public Methods
+#region Public Methods
 
         /// <summary>
         /// Applies the control's template, retrieves the elements
@@ -858,7 +872,7 @@ namespace System.Windows.Controls
             this.UpdateControl();
         }
 
-        #endregion Public Methods
+#endregion Public Methods
 
         ////------------------------------------------------------
         ////
@@ -866,7 +880,7 @@ namespace System.Windows.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Protected Methods
+#region Protected Methods
 
         /// <summary>
         /// Creates an AutomationPeer (<see cref="UIElement.OnCreateAutomationPeer"/>)
@@ -877,7 +891,7 @@ namespace System.Windows.Controls
             return new DataPagerAutomationPeer(this);
         }
 
-        #endregion Protected Methods
+#endregion Protected Methods
 
         ////------------------------------------------------------
         ////
@@ -885,7 +899,7 @@ namespace System.Windows.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Private Static Methods
+#region Private Static Methods
 
         /// <summary>
         /// AutoEllipsis property changed handler.
@@ -1212,7 +1226,7 @@ namespace System.Windows.Controls
             pager.UpdateControl();
         }
 
-        #endregion Private Static Methods
+#endregion Private Static Methods
 
         ////------------------------------------------------------
         ////
@@ -1220,7 +1234,7 @@ namespace System.Windows.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Private Methods
+#region Private Methods
 
         /// <summary>
         /// Gets the starting index that our buttons should be labeled with.
@@ -2018,6 +2032,6 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Private Methods
+#endregion Private Methods
     }
 }

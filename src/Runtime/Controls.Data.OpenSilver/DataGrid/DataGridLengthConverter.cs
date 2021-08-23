@@ -6,7 +6,11 @@
 using System.ComponentModel;
 using System.Globalization;
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// DataGridLengthConverter - Converter class for converting instances of other types to and from DataGridLength instances.

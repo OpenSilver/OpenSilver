@@ -5,13 +5,26 @@
 
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
+
+
+#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls.Primitives
+#else
+namespace Windows.UI.Xaml.Controls.Primitives
+#endif
+
 {
     /// <summary>
     /// Represents an individual <see cref="T:System.Windows.Controls.DataGrid" /> column header.
@@ -34,14 +47,14 @@ namespace System.Windows.Controls.Primitives
             Reorder = 4
         }
 
-        #region Constants
+#region Constants
 
         private const int DATAGRIDCOLUMNHEADER_resizeRegionWidth = 5;
         private const double DATAGRIDCOLUMNHEADER_separatorThickness = 1;
 
-        #endregion Constants
+#endregion Constants
 
-        #region Data
+#region Data
 
         private static DragMode _dragMode;
         private static Point? _lastMousePositionHeaders;
@@ -53,7 +66,7 @@ namespace System.Windows.Controls.Primitives
         private static DataGridColumn _dragColumn;
         private static double _frozenColumnsWidth;
 
-        #endregion Data
+#endregion Data
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.Primitives.DataGridColumnHeader" /> class. 
@@ -70,9 +83,9 @@ namespace System.Windows.Controls.Primitives
             DefaultStyleKey = typeof(DataGridColumnHeader);
         }
 
-        #region Dependency Properties
+#region Dependency Properties
 
-        #region SeparatorBrush
+#region SeparatorBrush
 
         /// <summary>
         /// Gets or sets the <see cref="T:System.Windows.Media.Brush" /> used to paint the column header separator lines. 
@@ -92,9 +105,9 @@ namespace System.Windows.Controls.Primitives
                 typeof(DataGridColumnHeader), 
                 null);
 
-        #endregion SeparatorBrush
+#endregion SeparatorBrush
 
-        #region SeparatorVisibility
+#region SeparatorVisibility
 
         /// <summary>
         /// Gets or sets a value indicating whether the column header separator lines are visible.
@@ -132,21 +145,21 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
-        #endregion SeparatorVisibility
+#endregion SeparatorVisibility
 
-        #endregion Dependency Properties
-
-
-        #region Public Properties
-
-        #endregion Public Properties
+#endregion Dependency Properties
 
 
-        #region Protected Properties
+#region Public Properties
 
-        #endregion Protected Properties
+#endregion Public Properties
 
-        #region Internal Properties
+
+#region Protected Properties
+
+#endregion Protected Properties
+
+#region Internal Properties
 
         internal int ColumnIndex
         {
@@ -184,10 +197,10 @@ namespace System.Windows.Controls.Primitives
             set;
         }
 
-        #endregion Internal Properties
+#endregion Internal Properties
 
 
-        #region Private Properties
+#region Private Properties
 
         private bool IsMouseOver
         {
@@ -201,15 +214,15 @@ namespace System.Windows.Controls.Primitives
             set;
         }
 
-        #endregion Private Properties
+#endregion Private Properties
 
 
-        #region Public Methods
+#region Public Methods
 
-        #endregion Public Methods
+#endregion Public Methods
 
 
-        #region Protected Methods
+#region Protected Methods
 
         /// <summary>
         /// Builds the visual tree for the column header when a new template is applied. 
@@ -249,10 +262,10 @@ namespace System.Windows.Controls.Primitives
             return base.OnCreateAutomationPeer();
         }
 
-        #endregion Protected Methods
+#endregion Protected Methods
 
 
-        #region Internal Methods
+#region Internal Methods
 
         internal void ApplyState(bool useTransitions)
         {
@@ -600,10 +613,10 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
-        #endregion Internal Methods
+#endregion Internal Methods
 
 
-        #region Private Methods
+#region Private Methods
 
         private bool CanReorderColumn(DataGridColumn column)
         {
@@ -911,7 +924,7 @@ namespace System.Windows.Controls.Primitives
                 return;
             }
 
-            #region handle entry into reorder mode
+#region handle entry into reorder mode
             if (_dragMode == DragMode.MouseDown && _dragColumn == null && (distanceFromRight > DATAGRIDCOLUMNHEADER_resizeRegionWidth && distanceFromLeft > DATAGRIDCOLUMNHEADER_resizeRegionWidth))
             {
                 DragStartedEventArgs dragStartedEventArgs = new DragStartedEventArgs(mousePositionHeaders.X - _lastMousePositionHeaders.Value.X, mousePositionHeaders.Y - _lastMousePositionHeaders.Value.Y);
@@ -924,9 +937,9 @@ namespace System.Windows.Controls.Primitives
                     OnMouseMove_BeginReorder(mousePosition);
                 }
             }
-            #endregion
+#endregion
 
-            #region handle reorder mode (eg, positioning of the popup)
+#region handle reorder mode (eg, positioning of the popup)
             if (_dragMode == DragMode.Reorder && this.OwningGrid.ColumnHeaders.DragIndicator != null)
             {
                 DragDeltaEventArgs dragDeltaEventArgs = new DragDeltaEventArgs(mousePositionHeaders.X - _lastMousePositionHeaders.Value.X, mousePositionHeaders.Y - _lastMousePositionHeaders.Value.Y);
@@ -957,7 +970,7 @@ namespace System.Windows.Controls.Primitives
 
                 handled = true;
             }
-            #endregion
+#endregion
         }
 
         private void OnMouseMove_Resize(ref bool handled, Point mousePositionHeaders)
@@ -1031,6 +1044,6 @@ namespace System.Windows.Controls.Primitives
             return false;
         }
 
-        #endregion Private Methods
+#endregion Private Methods
     }
 }

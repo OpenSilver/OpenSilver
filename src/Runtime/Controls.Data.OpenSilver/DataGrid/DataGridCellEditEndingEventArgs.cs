@@ -5,13 +5,17 @@
 
 using System.ComponentModel;
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
-    /// <summary>
-    /// Provides information just before a cell exits editing mode.
-    /// </summary>
-    /// <QualityBand>Preview</QualityBand>
-    public class DataGridCellEditEndingEventArgs : CancelEventArgs
+/// <summary>
+/// Provides information just before a cell exits editing mode.
+/// </summary>
+/// <QualityBand>Preview</QualityBand>
+public class DataGridCellEditEndingEventArgs : CancelEventArgs
     {
         /// <summary>
         /// Instantiates a new instance of this class.

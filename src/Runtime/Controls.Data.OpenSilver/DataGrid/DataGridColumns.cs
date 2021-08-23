@@ -8,17 +8,28 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Reflection;
+
+#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+#else
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+#endif
 
+
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     public partial class DataGrid
     {
-        #region Private Properties
-        #endregion Private Properties
+#region Private Properties
+#endregion Private Properties
 
-        #region Protected Methods
+#region Protected Methods
 
         protected virtual void OnColumnDisplayIndexChanged(DataGridColumnEventArgs e)
         {
@@ -49,9 +60,9 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Protected Methods
+#endregion Protected Methods
 
-        #region Internal Methods
+#region Internal Methods
 
         /// <summary>
         /// Adjusts the widths of all columns with DisplayIndex >= displayIndex such that the total
@@ -834,9 +845,9 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Internal Methods
+#endregion Internal Methods
         
-        #region Private Methods
+#region Private Methods
 
         private bool AddGeneratedColumn(DataGridAutoGeneratingColumnEventArgs e)
         {
@@ -1251,7 +1262,7 @@ namespace System.Windows.Controls
 
 #if DEBUG
                 Debug.Assert(this.ColumnsInternal.Debug_VerifyColumnDisplayIndexes());
-#endif 
+#endif
                 // Now raise all the OnColumnDisplayIndexChanged events
                 FlushDisplayIndexChanged(true /*raiseEvent*/);
             }
@@ -1839,6 +1850,6 @@ namespace System.Windows.Controls
             ComputeDisplayedColumns();
         }
 
-        #endregion Private Methods
+#endregion Private Methods
     }
 }

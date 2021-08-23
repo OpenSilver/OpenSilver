@@ -3,10 +3,21 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+
+
+#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Media;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls.Primitives
+#else
+namespace Windows.UI.Xaml.Controls.Primitives
+#endif
 {
     /// <summary>
     /// Used within the template of a <see cref="T:System.Windows.Controls.DataGrid" /> to specify the location in the control's visual tree 
@@ -15,7 +26,7 @@ namespace System.Windows.Controls.Primitives
     /// <QualityBand>Mature</QualityBand>
     public sealed class DataGridDetailsPresenter : Panel
     {
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Gets or sets the height of the content.
@@ -68,9 +79,9 @@ namespace System.Windows.Controls.Primitives
             set;
         }
 
-        #endregion Properties
+#endregion Properties
 
-        #region Methods
+#region Methods
 
         /// <summary>
         /// Arranges the content of the <see cref="T:System.Windows.Controls.Primitives.DataGridDetailsPresenter" />.
@@ -167,6 +178,6 @@ namespace System.Windows.Controls.Primitives
             return new DataGridDetailsPresenterAutomationPeer(this);
         }
 
-        #endregion Methods
+#endregion Methods
     }
 }

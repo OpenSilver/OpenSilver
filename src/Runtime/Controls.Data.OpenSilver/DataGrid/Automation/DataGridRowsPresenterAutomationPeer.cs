@@ -5,9 +5,17 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+#if MIGRATION
 using System.Windows.Controls.Primitives;
+#else
+using Windows.UI.Xaml.Controls.Primitives;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Automation.Peers
+#else
+namespace Windows.UI.Xaml.Automation.Peers
+#endif
 {
     /// <summary>
     /// AutomationPeer for DataGridRowsPresenter

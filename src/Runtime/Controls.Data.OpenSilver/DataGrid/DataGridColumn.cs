@@ -7,11 +7,23 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+
+
+#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// Represents a <see cref="T:System.Windows.Controls.DataGrid" /> column.
@@ -23,14 +35,14 @@ namespace System.Windows.Controls
     [StyleTypedProperty(Property = "HeaderStyle", StyleTargetType = typeof(DataGridColumnHeader))]
     public abstract class DataGridColumn : DependencyObject
     {
-        #region Constants
+#region Constants
 
         internal const int DATAGRIDCOLUMN_maximumWidth = 65536;
         private const bool DATAGRIDCOLUMN_defaultIsReadOnly = false;
 
-        #endregion Constants
+#endregion Constants
 
-        #region Data
+#region Data
 
         private List<string> _bindingPaths;
         private Style _cellStyle;
@@ -49,7 +61,7 @@ namespace System.Windows.Controls
         private DataGridLength? _width; // Null by default, null means inherit the Width from the DataGrid
         private Visibility _visibility;
 
-        #endregion Data
+#endregion Data
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.DataGridColumn" /> class.
@@ -62,11 +74,11 @@ namespace System.Windows.Controls
             this.InheritsWidth = true;
         }
 
-        #region Dependency Properties
+#region Dependency Properties
 
-        #endregion
+#endregion
 
-        #region Public Properties
+#region Public Properties
 
         /// <summary>
         /// Actual visible width after Width, MinWidth, and MaxWidth setting at the Column level and DataGrid level
@@ -560,9 +572,9 @@ namespace System.Windows.Controls
             }
         }
 
-        #endregion Public Properties
+#endregion Public Properties
 
-        #region Internal Properties
+#region Internal Properties
 
         internal bool ActualCanUserResize
         {
@@ -720,9 +732,9 @@ namespace System.Windows.Controls
             set;
         }
 
-        #endregion Internal Properties
+#endregion Internal Properties
 
-        #region Public Methods
+#region Public Methods
 
         public FrameworkElement GetCellContent(DataGridRow dataGridRow)
         {
@@ -794,9 +806,9 @@ namespace System.Windows.Controls
             return null;
         }
 
-        #endregion Public Methods
+#endregion Public Methods
 
-        #region Protected Methods
+#region Protected Methods
 
         /// <summary>
         /// When overridden in a derived class, causes the column cell being edited to revert to the unedited value.
@@ -877,9 +889,9 @@ namespace System.Windows.Controls
         {
         }
 
-        #endregion Protected Methods
+#endregion Protected Methods
 
-        #region Internal Methods
+#region Internal Methods
 
         internal void CancelCellEditInternal(FrameworkElement editingElement, object uneditedValue)
         {
@@ -1298,11 +1310,11 @@ namespace System.Windows.Controls
             SetWidthInternalNoCallback(new DataGridLength(value, this.Width.UnitType, this.Width.DesiredValue, this.Width.DisplayValue));
         }
 
-        #endregion Internal Methods
+#endregion Internal Methods
 
-        #region Private Methods
+#region Private Methods
 
-        #endregion Private Methods
+#endregion Private Methods
 
     }
 }

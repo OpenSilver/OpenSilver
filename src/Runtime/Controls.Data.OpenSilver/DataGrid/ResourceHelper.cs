@@ -5,10 +5,22 @@
 
 using System;
 using System.Collections.Generic;
+
+
+#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Markup;
+#else
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Markup;
+#endif
 
+
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     internal sealed class ResourceHelper
     {

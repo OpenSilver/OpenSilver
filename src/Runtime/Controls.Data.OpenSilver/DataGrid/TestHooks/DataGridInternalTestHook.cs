@@ -3,10 +3,21 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+
+#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+#else
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Input;
+#endif
 
+
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     public partial class DataGrid
     {

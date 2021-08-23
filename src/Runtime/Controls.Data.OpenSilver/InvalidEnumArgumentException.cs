@@ -5,7 +5,12 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+
+#if MIGRATION
 using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Controls;
+#endif
 
 namespace System.ComponentModel
 {

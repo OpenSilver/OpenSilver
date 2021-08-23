@@ -5,7 +5,11 @@
 
 using System.Runtime.InteropServices;
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// This structure encapsulate the cell information necessary when clipboard content is prepared.

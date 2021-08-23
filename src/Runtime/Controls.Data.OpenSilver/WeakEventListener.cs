@@ -7,7 +7,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// Implements a weak event listener that allows the owner to be garbage

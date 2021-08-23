@@ -5,14 +5,30 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+
+
+#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+#else
+using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.Xaml.Shapes;
+#endif
 
+
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// Represents a <see cref="T:System.Windows.Controls.DataGrid" /> row.
@@ -211,8 +227,8 @@ namespace System.Windows.Controls
 
         #region Dependency Properties
 
-/*
-        // 
+        /*
+                // 
 
 
 
@@ -241,7 +257,7 @@ namespace System.Windows.Controls
 
 
 
-*/
+        */
         #region DetailsTemplate
         /// <summary>
         /// Gets or sets the template that is used to display the details section of the row.
@@ -387,11 +403,11 @@ namespace System.Windows.Controls
         /// <summary>
         /// Identifies the <see cref="P:System.Windows.Controls.DataGridRow.HeaderStyle" /> dependency property.
         /// </summary>
-        public static readonly DependencyProperty HeaderStyleProperty = 
+        public static readonly DependencyProperty HeaderStyleProperty =
             DependencyProperty.Register(
-                "HeaderStyle", 
+                "HeaderStyle",
                 typeof(Style),
-                typeof(DataGridRow), 
+                typeof(DataGridRow),
                 new PropertyMetadata(OnHeaderStylePropertyChanged));
 
         private static void OnHeaderStylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -716,7 +732,7 @@ namespace System.Windows.Controls
                 return this.DetailsVisibility == Visibility.Visible;
             }
         }
-        
+
         private Storyboard DetailsVisibleStoryboard
         {
             get
@@ -804,7 +820,7 @@ namespace System.Windows.Controls
                 _lastHorizontalOffset = this.OwningGrid.HorizontalOffset;
                 InvalidateHorizontalArrange();
             }
-        
+
             Size size = base.ArrangeOverride(finalSize);
 
             if (_checkDetailsContentHeight)
@@ -812,7 +828,7 @@ namespace System.Windows.Controls
                 _checkDetailsContentHeight = false;
                 EnsureDetailsContentHeight();
             }
-            
+
             if (this.RootElement != null)
             {
                 foreach (UIElement child in this.RootElement.Children)
@@ -893,7 +909,7 @@ namespace System.Windows.Controls
                 this._cellsElement.Children.Clear();
                 updateVerticalScrollBar = true;
             }
-            
+
             this._cellsElement = GetTemplateChild(DATAGRIDROW_elementCells) as DataGridCellsPresenter;
             if (this._cellsElement != null)
             {
@@ -1106,7 +1122,7 @@ namespace System.Windows.Controls
                 {
                     _cellsElement.Recycle();
                 }
-                
+
                 this._checkDetailsContentHeight = false;
 
                 // Clear out the old Details cache so it won't be reused for other data
@@ -1315,7 +1331,7 @@ namespace System.Windows.Controls
                 }
             }
         }
-        
+
 
         #endregion Internal Methods
 
@@ -1379,7 +1395,7 @@ namespace System.Windows.Controls
                     }
 
                     _detailsElement.ContentHeight = e.NewSize.Height;
-                    
+
                     // Calling this when details are not visible invalidates during layout when we have no work 
                     // to do.  In certain scenarios, this could cause a layout cycle
                     OnRowDetailsChanged();
@@ -1409,7 +1425,7 @@ namespace System.Windows.Controls
         private void EnsureDetailsDesiredHeight()
         {
             Debug.Assert(_detailsElement != null && this.OwningGrid != null);
-            
+
             if (_detailsContent != null)
             {
                 Debug.Assert(_detailsElement.Children.Contains(_detailsContent));
@@ -1498,7 +1514,7 @@ namespace System.Windows.Controls
         #region Debugging Members
 
 #if DEBUG
-        [SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification="This is a debug method.")]
+        [SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "This is a debug method.")]
         public int Debug_Index
         {
             get

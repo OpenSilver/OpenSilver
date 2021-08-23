@@ -5,11 +5,23 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+
+
+#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls.Primitives
+#else
+namespace Windows.UI.Xaml.Controls.Primitives
+#endif
 {
     /// <summary>
     /// Represents an individual <see cref="T:System.Windows.Controls.DataGrid" /> row header. 
@@ -40,7 +52,7 @@ namespace System.Windows.Controls.Primitives
     [TemplateVisualState(Name = VisualStates.StateRowValid, GroupName = VisualStates.GroupValidation)]
     public partial class DataGridRowHeader : ContentControl
     {
-        #region Constants
+#region Constants
 
         private const string DATAGRIDROWHEADER_elementRootName = "Root";
         private const double DATAGRIDROWHEADER_separatorThickness = 1;
@@ -190,13 +202,13 @@ namespace System.Windows.Controls.Primitives
             DATAGRIDROWHEADER_stateSelectedFocused
         };
         
-        #endregion Constants
+#endregion Constants
 
-        #region Data
+#region Data
 
         private FrameworkElement _rootElement;
 
-        #endregion Data
+#endregion Data
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.Primitives.DataGridRowHeader" /> class. 
@@ -210,9 +222,9 @@ namespace System.Windows.Controls.Primitives
             DefaultStyleKey = typeof(DataGridRowHeader);
         }
 
-        #region Dependency Properties
+#region Dependency Properties
 
-        #region SeparatorBrush
+#region SeparatorBrush
 
         /// <summary>
         /// Gets or sets the <see cref="T:System.Windows.Media.Brush" /> used to paint the row header separator lines. 
@@ -232,9 +244,9 @@ namespace System.Windows.Controls.Primitives
                 typeof(DataGridRowHeader),
                 null);
 
-        #endregion SeparatorBrush
+#endregion SeparatorBrush
 
-        #region SeparatorVisibility
+#region SeparatorVisibility
 
         /// <summary>
         /// Gets or sets a value indicating whether the row header separator lines are visible.
@@ -254,22 +266,22 @@ namespace System.Windows.Controls.Primitives
                 typeof(DataGridRowHeader),
                 null);
 
-        #endregion SeparatorVisibility
+#endregion SeparatorVisibility
 
-        #endregion Dependency Properties
-
-
-        #region Public Properties
-
-        #endregion Public Properties
+#endregion Dependency Properties
 
 
-        #region Protected Properties
+#region Public Properties
 
-        #endregion Protected Properties
+#endregion Public Properties
 
 
-        #region Internal Properties
+#region Protected Properties
+
+#endregion Protected Properties
+
+
+#region Internal Properties
 
         private DataGrid OwningGrid
         {
@@ -309,10 +321,10 @@ namespace System.Windows.Controls.Primitives
             set;
         }
 
-        #endregion Internal Properties
+#endregion Internal Properties
 
 
-        #region Private Properties
+#region Private Properties
 
         private int Slot
         {
@@ -330,10 +342,10 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
-        #endregion Private Properties
+#endregion Private Properties
 
 
-        #region Public Methods
+#region Public Methods
 
         /// <summary>
         /// Builds the visual tree for the row header when a new template is applied. 
@@ -349,10 +361,10 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
-        #endregion Public Methods
+#endregion Public Methods
 
 
-        #region Protected Methods
+#region Protected Methods
 
         /// <summary>
         /// Measures the children of a <see cref="T:System.Windows.Controls.Primitives.DataGridRowHeader" /> to prepare for arranging them during the <see cref="M:System.Windows.FrameworkElement.ArrangeOverride(System.Windows.Size)" /> pass.
@@ -390,10 +402,10 @@ namespace System.Windows.Controls.Primitives
             return new DataGridRowHeaderAutomationPeer(this);
         }
 
-        #endregion Protected Methods
+#endregion Protected Methods
 
 
-        #region Internal Methods
+#region Internal Methods
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         internal void ApplyOwnerStatus(bool animate)
@@ -489,10 +501,10 @@ namespace System.Windows.Controls.Primitives
             this.SetStyleWithType(style);
         }
 
-        #endregion Internal Methods
+#endregion Internal Methods
 
 
-        #region Private Methods
+#region Private Methods
 
         private void DataGridRowHeader_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -529,6 +541,6 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
-        #endregion Private Methods
+#endregion Private Methods
     }
 }

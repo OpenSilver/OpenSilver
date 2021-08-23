@@ -5,11 +5,20 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Windows.Media;
 
+#if MIGRATION
+using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Media;
+#endif
+
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
-    internal class DataGridDisplayData
+internal class DataGridDisplayData
     {
         #region Data
 

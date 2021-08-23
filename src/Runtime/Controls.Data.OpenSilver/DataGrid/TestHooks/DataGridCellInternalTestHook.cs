@@ -3,11 +3,20 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.Windows.Shapes;
 
+#if MIGRATION
+using System.Windows.Shapes;
+#else
+using Windows.UI.Xaml.Shapes;
+#endif
+
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
-    public sealed partial class DataGridCell
+public sealed partial class DataGridCell
     {
         private InternalTestHook _testHook;
 

@@ -5,10 +5,18 @@
 
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Windows.Data;
+#if MIGRATION
 using System.Windows.Input;
+#else
+using Windows.UI.Xaml.Input;
+#endif
 
+
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// Represents a <see cref="T:System.Windows.Controls.DataGrid" /> column that hosts 

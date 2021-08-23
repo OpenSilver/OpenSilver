@@ -3,10 +3,22 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+
+
+#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Shapes;
+#else
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Shapes;
+#endif
 
+
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     public partial class DataGridRow
     {
@@ -37,7 +49,7 @@ namespace System.Windows.Controls
                 _row = row;
             }
 
-            #region Internal Properties
+#region Internal Properties
 
             internal Rectangle BottomGridLine
             {
@@ -70,7 +82,7 @@ namespace System.Windows.Controls
                     return _row._detailsElement;
                 }
             }
-            #endregion
+#endregion
         }
 
 
