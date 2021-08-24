@@ -100,4 +100,4 @@
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' " />
   <Import Project="..\..\packages\CSHTML5.Migration.2.0.0-alpha69-089\build\CSHTML5.Migration.targets" Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' " />
   <Import Project="..\..\packages\CSHTML5.Migration.WorkInProgress.2.0.0-alpha69-089\build\CSHTML5.Migration.WorkInProgress.targets" Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' " />
-</Project>
+</Project> 
