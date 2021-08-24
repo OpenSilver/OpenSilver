@@ -909,7 +909,7 @@ context.translate($6, 0);
 
                 RadialGradientBrush fillAsRadialGradientBrush = (RadialGradientBrush)brush;
 
-                double radiusScaling = fillAsRadialGradientBrush.RadiusX / fillAsRadialGradientBrush.RadiusY;
+                double radiusScaling = fillAsRadialGradientBrush.RadiusY == 0 ? 1d : (fillAsRadialGradientBrush.RadiusX / fillAsRadialGradientBrush.RadiusY);
                 double centerX = fillAsRadialGradientBrush.Center.X;
                 double gradientOriginX = fillAsRadialGradientBrush.GradientOrigin.X;
                 double centerY = fillAsRadialGradientBrush.Center.Y;
@@ -1135,6 +1135,9 @@ context.restore();
         private static object createRadialGradient(object context2d, double x0, double y0, double r0, double x1, double y1, double r1,
             RadialGradientBrush rgb, double opacity)
         {
+            //make sure no negative radius
+            r1 = Math.Abs(r1);
+
             object canvasGradient = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.createRadialGradient($1, $2, $3, $4, $5, $6)",
                 context2d, x0, y0, r0, x1, y1, r1);
 
