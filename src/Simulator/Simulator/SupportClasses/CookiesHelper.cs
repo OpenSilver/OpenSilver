@@ -17,7 +17,9 @@
 
 using DotNetBrowser;
 using DotNetBrowser.WPF;
+#if OPENSILVER
 using OpenSilver.Simulator;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Windows;
