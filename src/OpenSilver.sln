@@ -62,7 +62,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{99A3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Data.Input.OpenSilver", "Runtime\Controls.Data.Input\Controls.Data.Input.OpenSilver.csproj", "{BA70EA67-F71B-4DCA-A283-5C71C05DC3C3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Data.OpenSilver", "Runtime\Controls.Data.OpenSilver\Controls.Data.OpenSilver.csproj", "{05B6D9B1-237D-4965-8396-7152F6F7FBCE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Data.OpenSilver", "Runtime\Controls.Data\Controls.Data.OpenSilver.csproj", "{05B6D9B1-237D-4965-8396-7152F6F7FBCE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
