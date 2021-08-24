@@ -55,7 +55,10 @@ namespace CSHTML5.Internal
         static void AttachEvent(string eventName, object domElementRef, HtmlEventProxy newProxy, Action<object> originalEventHandler)
         {
 #if !BUILDINGDOCUMENTATION
-            Interop.ExecuteJavaScriptAsync(@"document.addEventListenerSafe($0, $1, $2)", domElementRef, eventName, (Action<object>)newProxy.OnEvent);
+            if (domElementRef is INTERNAL_HtmlDomElementReference)
+                Interop.ExecuteJavaScriptAsync(@"document.addEventListenerSafe($0, $1, $2)", ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier, eventName, (Action<object>)newProxy.OnEvent);
+            else
+                Interop.ExecuteJavaScriptAsync(@"document.addEventListenerSafe($0, $1, $2)", domElementRef, eventName, (Action<object>)newProxy.OnEvent);
 
             /*
             DOMEventType eventType;
