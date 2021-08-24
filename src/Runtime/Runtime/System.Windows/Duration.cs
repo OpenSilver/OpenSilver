@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows
@@ -28,9 +19,6 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(DurationConverter))]
-#endif
     /// <summary>
     /// Represents the duration of time that a Windows.UI.Xaml.Media.Animation.Timeline
     /// is active.
@@ -38,6 +26,7 @@ namespace Windows.UI.Xaml
     public partial struct Duration
     {
         private DurationType _durationType;
+
         // Exceptions:
         //   System.ArgumentException:
         //     timeSpan evaluates as less than System.TimeSpan.Zero.
@@ -57,11 +46,6 @@ namespace Windows.UI.Xaml
             {
                 throw new ArgumentException("The TimeSpan cannot be a negative TimeSpan.");
             }
-        }
-
-        static Duration()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(Duration), INTERNAL_ConvertFromString);
         }
 
         // Returns:
@@ -242,7 +226,8 @@ namespace Windows.UI.Xaml
         /// Gets a value that indicates if this Windows.UI.Xaml.Duration represents a
         /// System.TimeSpan value.
         /// </summary>
-        public bool HasTimeSpan { //we assume it is like that
+        public bool HasTimeSpan //we assume it is like that
+        { 
             get
             {
                 //return (_timeSpan != null
@@ -253,6 +238,7 @@ namespace Windows.UI.Xaml
         }
 
         private TimeSpan _timeSpan;
+
         // Exceptions:
         //   System.InvalidOperationException:
         //     The Windows.UI.Xaml.Duration does not represent a System.TimeSpan.
@@ -370,20 +356,6 @@ namespace Windows.UI.Xaml
         ///// </summary>
         ///// <returns>A System.String representation of this Windows.UI.Xaml.Duration.</returns>
         //public override string ToString();
-
-        internal static object INTERNAL_ConvertFromString(string p)
-        {
-            if (p.ToLower() == "forever")
-                return Duration.Forever;
-            if (p.ToLower() == "automatic")
-                return Duration.Automatic;
-#if BRIDGE
-            TimeSpan timeSpan = INTERNAL_BridgeWorkarounds.TimeSpanParse(p);
-#else
-            TimeSpan timeSpan = TimeSpan.Parse(p);
-#endif
-            return new Duration(timeSpan);
-        }
 
         /// <summary>
         /// An enumeration of the different types of Duration behaviors.

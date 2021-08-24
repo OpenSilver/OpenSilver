@@ -26,23 +26,25 @@ namespace DotNetForHtml5.Compiler
 {
     internal static class GeneratingUniqueNames
     {
-        public const string AttributeNameForUniqueName = "INTERNAL_UniqueName";
+        // Note: we use '.' to make sure this attribute is not colliding with
+        // any property defined by the user.
+        public const string UniqueNameAttribute = "__.UniqueName.__";
 
-        public static void AddUniqueNamesToAllElements(XDocument doc)
+        public static void ProcessDocument(XDocument doc)
         {
             TraverseNextElement(doc.Root);
         }
 
-        static void TraverseNextElement(XElement currentElement)
+        private static void TraverseNextElement(XElement currentElement)
         {
-            // If the current element is an object (rather than a property):
+            // If the current element is an object (rather than a property)
             if (!currentElement.Name.LocalName.Contains("."))
             {
-                // Generate unique name:
-                var uniqueName = GenerateUniqueNameForElement(currentElement);
+                // Generate unique name
+                string uniqueName = GenerateUniqueName(currentElement);
 
-                // Assign unique name:
-                currentElement.SetAttributeValue(AttributeNameForUniqueName, uniqueName);
+                // Assign unique name
+                currentElement.SetAttributeValue(UniqueNameAttribute, uniqueName);
             }
 
             // Recursion:
@@ -52,14 +54,17 @@ namespace DotNetForHtml5.Compiler
             }
         }
 
-        static string GenerateUniqueNameForElement(XElement element)
+        private static string GenerateUniqueName(XElement element)
         {
-            Guid guid = Guid.NewGuid();
-            string guidAsString = guid.ToString("N"); // Example: 00000000000000000000000000000000
+            string guidAsString = Guid.NewGuid().ToString("N"); // Example: 00000000000000000000000000000000
             string prefix = element.Name.LocalName;
+            
             if (prefix.Length > 30)
+            {
                 prefix = prefix.Substring(0, 30);
-            return prefix + "_" + guidAsString; // Example: Button_4541C363579C48A981219C392BF8ACD5
+            }
+            
+            return $"{prefix}_{guidAsString}"; // Example: Button_4541C363579C48A981219C392BF8ACD5
         }
 
         internal static string GenerateUniqueNameFromString(string str)

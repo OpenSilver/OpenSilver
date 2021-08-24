@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -27,94 +21,90 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-#if FOR_DESIGN_TIME
-
     /// <summary>
-    /// Converts instances of other types to and from instances of System.Windows.Media.Geometry.
+    /// GeometryConverter - Converter class for converting instances of other types to and from Geometry instances
     /// </summary>
-    public sealed partial class GeometryConverter : TypeConverter
+    internal class GeometryConverter : TypeConverter
     {
-        ///// <summary>
-        ///// Initializes a new instance of the System.Windows.Media.Geometry class.
-        ///// </summary>
-        //public GeometryConverter();
-
         /// <summary>
-        /// Indicates whether an object can be converted from a given type to an instance
-        /// of a System.Windows.Media.Geometry.
+        /// Returns true if this type converter can convert from a given type.
         /// </summary>
-        /// <param name="context">Context information required for conversion.</param>
-        /// <param name="sourceType">The source System.Type that is being queried for conversion support.</param>
         /// <returns>
-        /// true if object of the specified type can be converted to a System.Windows.Media.Geometry;
-        /// otherwise, false.
+        /// bool - True if this converter can convert from the provided type, false if not.
         /// </returns>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="sourceType"> The Type being queried for support. </param>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-            {
-                return true;
-            }
-
-            return base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(string);
         }
-      
+
         /// <summary>
-        /// Determines whether instances of System.Windows.Media.Geometry can be converted
-        /// to the specified type.
+        /// Returns true if this type converter can convert to the given type.
         /// </summary>
-        /// <param name="context">Context information required for conversion.</param>
-        /// <param name="destinationType">
-        /// The desired type this System.Windows.Media.Geometry is being evaluated to
-        /// be converted to.
-        /// </param>
         /// <returns>
-        /// true if instances of System.Windows.Media.Geometry can be converted to destinationType;
-        /// otherwise, false.
+        /// bool - True if this converter can convert to the provided type, false if not.
         /// </returns>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="destinationType"> The Type being queried for support. </param>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
-      
-        // Exceptions:
-        //   System.NotSupportedException:
-        //     Thrown if value is null or is not a valid type which can be converted to
-        //     a System.Windows.Media.Geometry.
+
         /// <summary>
-        /// Converts the specified object to a System.Windows.Media.Geometry.
+        /// Attempts to convert to a Geometry from the given object.
         /// </summary>
-        /// <param name="context">Context information required for conversion.</param>
-        /// <param name="culture">Cultural information respected during conversion.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Media.Geometry created from converting value.</returns>
+        /// <returns>
+        /// The Geometry which was constructed.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if the example object is null or is not a valid type
+        /// which can be converted to a Geometry.
+        /// </exception>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="culture"> The requested CultureInfo.  Note that conversion uses "en-US" rather than this parameter. </param>
+        /// <param name="value"> The object to convert to an instance of Geometry. </param>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
-                throw GetConvertFromException(value);
+            if (value is string source)
+            {
+                return GeometryParser.ParseGeometry(source);
+            }
 
-            if (value is string)
-                return Geometry.INTERNAL_ConvertFromString((string)value);
-
-            return base.ConvertFrom(context, culture, value);
+            throw GetConvertFromException(value);
         }
-      
-        // Exceptions:
-        //   System.NotSupportedException:
-        //     Thrown if value is null or is not a System.Windows.Media.Geometry, or if
-        //     the destinationType cannot be converted into a System.Windows.Media.Geometry.
+
         /// <summary>
-        /// Converts the specified System.Windows.Media.Geometry to the specified type.
+        /// ConvertTo - Attempt to convert an instance of Geometry to the given type
         /// </summary>
-        /// <param name="context">Context information required for conversion.</param>
-        /// <param name="culture">Cultural information respected during conversion.</param>
-        /// <param name="value">The System.Windows.Media.Geometry to convert.</param>
-        /// <param name="destinationType">The type to convert the System.Windows.Media.Geometry to.</param>
-        /// <returns>The object created from converting this System.Windows.Media.Geometry.</returns>
+        /// <returns>
+        /// The object which was constructoed.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if "value" is null or not an instance of Geometry,
+        /// or if the destinationType isn't one of the valid destination types.
+        /// </exception>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="culture"> The CultureInfo which is respected when converting. </param>
+        /// <param name="value"> The object to convert to an instance of "destinationType". </param>
+        /// <param name="destinationType"> The type to which this will convert the Geometry instance. </param>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            if (destinationType == null)
+            {
+                throw new ArgumentNullException(nameof(destinationType));
+            }
+
+            if (destinationType == typeof(string))
+            {
+                if (value is Geometry instance)
+                {
+                    return instance.ToString();
+                }
+            }
+
+            throw GetConvertToException(value, destinationType);
         }
     }
-#endif
 }

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -27,99 +21,85 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    #if FOR_DESIGN_TIME
     /// <summary>
-    /// Converts instances of the System.String type to and from System.Windows.Media.FontFamily
-    /// instances.
+    /// FontFamilyConverter - converter class for converting between the FontFamily
+    /// and String types.
     /// </summary>
-    public sealed partial class FontFamilyConverter : TypeConverter
+    internal class FontFamilyConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether a class can be converted from a given type to an instance
-        /// of System.Windows.Media.FontFamily.
+        /// CanConvertFrom - Returns whether or not the given type can be converted to a
+        /// FontFamily.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="sourceType">The type of the source that is being evaluated for conversion.</param>
-        /// <returns>
-        /// true if the converter can convert from the specified type to an instance
-        /// of System.Windows.Media.FontFamily; otherwise, false.
-        /// </returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-            {
-                return true;
-            }
-
-            return base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(string);
         }
 
         /// <summary>
-        /// Determines whether an instance of System.Windows.Media.FontFamily can be
-        /// converted to a different type.
+        /// CanConvertTo - Returns whether or not this class can convert to the specified type.
+        /// Conversion is possible only if the source and destination types are FontFamily and
+        /// string, respectively, and the font family is not anonymous (i.e., the Source propery
+        /// is not null).
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">
-        /// The desired type that this instance of System.Windows.Media.FontFamily is
-        /// being evaluated for conversion.
-        /// </param>
-        /// <returns>
-        /// true if the converter can convert this instance of System.Windows.Media.FontFamily
-        /// to the specified type; otherwise, false.
-        /// </returns>
+        /// <param name="context">ITypeDescriptorContext</param>
+        /// <param name="destinationType">Type to convert to</param>
+        /// <returns>true if conversion is possible</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     o is null.
-        //
-        //   System.ArgumentException:
-        //     o is not null and is not a valid type that can be converted to a System.Windows.Media.FontFamily.
         /// <summary>
-        /// Attempts to convert a specified object to an instance of System.Windows.Media.FontFamily.
+        /// ConvertFrom - Converts the specified object to a FontFamily.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Cultural-specific information that should be respected during conversion.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>
-        /// The instance of System.Windows.Media.FontFamily that is created from the
-        /// converted o parameter.
-        /// </returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
-                throw GetConvertFromException(value);
+            if (value is string stringValue)
+            {
+                stringValue = stringValue.Trim();
 
-            if (value is string)
-                return FontFamily.INTERNAL_ConvertFromString((string)value);
+                return new FontFamily(stringValue);
+            }
 
-            return base.ConvertFrom(context, culture, value);
+            throw GetConvertFromException(value);
         }
 
-        // Exceptions:
-        //   System.ArgumentException:
-        //     Occurs if value or destinationType is not a valid type for conversion.
-        //
-        //   System.ArgumentNullException:
-        //     Occurs if value or destinationType is null.
         /// <summary>
-        /// Attempts to convert a specified object to an instance of System.Windows.Media.FontFamily.
+        /// ConvertTo - Converts the specified object to an instance of the specified type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Cultural-specific information that should be respected during conversion.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <param name="destinationType">
-        /// The type that this instance of System.Windows.Media.FontFamily is converted
-        /// to.
-        /// </param>
-        /// <returns>The object that is created from the converted instance of System.Windows.Media.FontFamily.</returns>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            if (null == value)
+            {
+                throw new ArgumentNullException("value");
+            }
+
+            FontFamily fontFamily = value as FontFamily;
+            if (fontFamily == null)
+            {
+                throw new ArgumentException(string.Format("Expected object of type '{0}'.", "FontFamily"), "value");
+            }
+
+            if (null == destinationType)
+            {
+                throw new ArgumentNullException("destinationType");
+            }
+
+            if (destinationType == typeof(string))
+            {
+                if (fontFamily.Source != null)
+                {
+                    // Usual case: it's a named font family.
+                    return fontFamily.Source;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+
+            throw GetConvertToException(value, destinationType);
         }
     }
-#endif
 }

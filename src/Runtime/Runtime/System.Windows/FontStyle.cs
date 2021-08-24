@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,26 +11,19 @@
 *  
 \*====================================================================================*/
 
-
 #if MIGRATION
-using DotNetForHtml5.Core;
-using System.Windows.Markup;
+
+using System.Diagnostics;
 
 namespace System.Windows
 {
-    [SupportsDirectContentViaTypeFromStringConverters]
-    public partial struct FontStyle
+    public partial struct FontStyle : IFormattable
     {
-        private int _style;
-
-        static FontStyle()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(FontStyle), INTERNAL_ConvertFromString);
-        }
+        private readonly int _style;
 
         internal FontStyle(int style)
         {
-            this._style = style;
+            _style = style;
         }
 
         public override bool Equals(object o)
@@ -66,33 +58,33 @@ namespace System.Windows
 
         public override string ToString()
         {
-            switch (this._style)
-            {
-                case 0:
-                    return "Normal";
-                case 1:
-                    return "Oblique";
-                case 2:
-                    return "Italic";
-                default:
-                    return ""; //should not be possible
-            }
+            return ConvertToString(null, null);
         }
 
-        internal static object INTERNAL_ConvertFromString(string fontStyleAsString)
+        string IFormattable.ToString(string format, IFormatProvider formatProvider)
         {
-            switch ((fontStyleAsString ?? string.Empty).ToLower())
-            {
-                case "normal":
-                    return FontStyles.Normal;
-                case "oblique":
-                    return FontStyles.Oblique;
-                case "italic":
-                    return FontStyles.Italic;
-                default:
-                    throw new Exception(string.Format("Invalid FontStyle: '{0}'", fontStyleAsString));
-            }
+            return ConvertToString(format, formatProvider);
+        }
+
+        /// <summary>
+        /// Creates a string representation of this object based on the format string 
+        /// and IFormatProvider passed in.  
+        /// If the provider is null, the CurrentCulture is used.
+        /// See the documentation for IFormattable for more information.
+        /// </summary>
+        /// <returns>
+        /// A string representation of this object.
+        /// </returns>
+        private string ConvertToString(string format, IFormatProvider provider)
+        {
+            if (_style == 0)
+                return "Normal";
+            if (_style == 1)
+                return "Oblique";
+            Debug.Assert(_style == 2);
+            return "Italic";
         }
     }
 }
+
 #endif

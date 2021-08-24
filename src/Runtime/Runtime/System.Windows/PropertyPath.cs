@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-
-using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -34,9 +31,6 @@ namespace Windows.UI.Xaml
     /// Implements a data structure for describing a property as a path below another
     /// property, or below an owning type. Property paths are used in data binding to objects.
     /// </summary>
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(PropertyPathConverter))]
-#endif
     public sealed partial class PropertyPath : DependencyObject
     {
         internal DependencyProperty INTERNAL_DependencyProperty; //this is only defined when the user uses the PropertyPath(DependencyProperty dependencyProperty) constructor.
@@ -273,7 +267,8 @@ namespace Windows.UI.Xaml
         /// <ignore/>
         internal Func<DependencyObject, Object> INTERNAL_PropertyGetVisualState;
 
-        string _path;
+        private string _path;
+
         /// <summary>
         /// Gets the path value held by this PropertyPath. Returns the path value held by this PropertyPath.
         /// </summary>
@@ -283,16 +278,6 @@ namespace Windows.UI.Xaml
             {
                 return _path;
             }
-        }
-
-        static PropertyPath()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(PropertyPath), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string path)
-        {
-            return new PropertyPath(path);
         }
 
         public PropertyPath(string path, params object[] pathParameters) : this(path)

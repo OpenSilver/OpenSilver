@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Markup;
 
 #if MIGRATION
 namespace System.Windows
@@ -33,16 +23,12 @@ namespace Windows.UI.Xaml
     /// [SECURITY CRITICAL] Describes the characteristics of a rounded corner, such
     /// as can be applied to a Windows.UI.Xaml.Controls.Border.
     /// </summary>
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(CornerRadiusConverter))]
-#endif
-    [SupportsDirectContentViaTypeFromStringConverters]
     public partial struct CornerRadius
     {
-        double _topLeftRadius;
-        double _bottomLeftRadius;
-        double _topRightRadius;
-        double _bottomRightRadius;
+        private double _topLeftRadius;
+        private double _bottomLeftRadius;
+        private double _topRightRadius;
+        private double _bottomRightRadius;
 
         /// <summary>
         /// [SECURITY CRITICAL] Initializes a new Windows.UI.Xaml.CornerRadius structure,
@@ -77,7 +63,6 @@ namespace Windows.UI.Xaml
             _bottomRightRadius = bottomRight;
         }
 
-
         /// <summary>
         /// [SECURITY CRITICAL] Compares two Windows.UI.Xaml.CornerRadius structures
         /// for inequality.
@@ -104,7 +89,6 @@ namespace Windows.UI.Xaml
         {
             return (cr1.TopLeft == cr2.TopLeft && cr1.TopRight == cr2.TopRight && cr1.BottomRight == cr2.BottomRight && cr1.BottomLeft == cr2.BottomLeft);
         }
-
         
         /// <summary>
         /// [SECURITY CRITICAL] Gets or sets the radius of rounding, in pixels, of the
@@ -148,7 +132,6 @@ namespace Windows.UI.Xaml
             set { _topRightRadius = value; }
         }
 
-       
         /// <summary>
         /// [SECURITY CRITICAL] Compares this Windows.UI.Xaml.CornerRadius structure
         /// to another Windows.UI.Xaml.CornerRadius structure for equality.
@@ -194,53 +177,7 @@ namespace Windows.UI.Xaml
         /// <returns>A System.String that represents the Windows.UI.Xaml.CornerRadius value.</returns>
         public override string ToString()
         {
-            return TopLeft + "," + TopRight + "," + BottomRight + "," + BottomLeft;
-        }
-
-
-        static CornerRadius()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(CornerRadius), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string cornerRadiusAsString)
-        {
-            char separator;
-            if (cornerRadiusAsString.Contains(","))
-            {
-                separator = ',';
-            }
-            else
-            {
-                separator = ' ';
-            }
-            string[] splittedString = cornerRadiusAsString.Trim().Split(separator);
-            if (splittedString.Length == 1)
-            {
-                double radius = 0d;
-                if (double.TryParse(splittedString[0], out radius))
-                {
-                    return new CornerRadius(radius);
-                }
-            }
-            else if (splittedString.Length == 4)
-            {
-                double topLeft = 0d;
-                double topRight = 0d;
-                double bottomRight = 0d;
-                double bottomLeft = 0d;
-
-                bool isParseOK = double.TryParse(splittedString[0], out topLeft);
-                isParseOK = isParseOK && double.TryParse(splittedString[1], out topRight);
-                isParseOK = isParseOK && double.TryParse(splittedString[2], out bottomRight);
-                isParseOK = isParseOK && double.TryParse(splittedString[3], out bottomLeft);
-
-                if (isParseOK)
-                {
-                    return new CornerRadius(topLeft, topRight, bottomRight, bottomLeft);
-                }
-            }
-            throw new FormatException(cornerRadiusAsString + "is not an eligible value for CornerRadius");
+            return CornerRadiusConverter.ToString(this, null);
         }
     }
 }

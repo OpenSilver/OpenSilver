@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,6 +10,8 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
+
+using System;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -27,14 +28,7 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public abstract partial class Transform : GeneralTransform
     {
-        static Transform()
-        {
-            DotNetForHtml5.Core.TypeFromStringConverters.RegisterConverter(typeof(Transform), s => Parse(s));
-        }
-
-        internal Transform()
-        {
-        }
+        internal Transform() { }
 
         ///<summary>
         /// Return the current transformation value.

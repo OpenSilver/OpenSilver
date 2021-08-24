@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,19 +11,16 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using System;
-using System.ComponentModel;
-using System.Globalization;
-using System.Windows.Markup;
-using DotNetForHtml5.Core;
-using OpenSilver.Internal;
-#if !MIGRATION
-using Windows.UI.Xaml.Media;
-#endif
 #if BRIDGE
 using Bridge;
+#endif
+
+using System;
+using System.Globalization;
+using OpenSilver.Internal;
+
+#if !MIGRATION
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -33,13 +29,9 @@ namespace System.Windows.Media
 namespace Windows.UI
 #endif
 {
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(ColorConverter))]
-#endif
     /// <summary>
     /// Describes a color in terms of alpha, red, green, and blue channels.
     /// </summary>
-    [SupportsDirectContentViaTypeFromStringConverters]
 #if WORKINPROGRESS
     public partial struct Color : IFormattable
 #else
@@ -65,12 +57,6 @@ namespace Windows.UI
         /// Gets or sets the sRGB red channel value of the color.
         /// </summary>
         public byte R { get; set; }
-
-        static Color()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(Color), INTERNAL_ConvertFromString);
-        }
-
 
         /// <summary>
         /// Creates a new Windows.UI.Color structure by using the specified sRGB alpha
@@ -144,64 +130,86 @@ namespace Windows.UI
 
         internal static object INTERNAL_ConvertFromString(string colorString)
         {
-            string trimmedString = colorString.Trim();
-            if (!string.IsNullOrEmpty(trimmedString) && (trimmedString[0] == '#'))
+            return Parse(colorString, null);
+        }
+
+        internal static Color Parse(string source, IFormatProvider provider)
+        {
+            if (source == null)
             {
-                string tokens = trimmedString.Substring(1);
-                if (tokens.Length == 6) // This is becaue XAML is tolerant when the user has forgot the alpha channel (eg. #DDDDDD for Gray).
-                    tokens = "FF" + tokens;
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            string stringValue = source.Trim();
+
+            if (stringValue.Length > 0)
+            {
+                if (stringValue[0] == '#')
+                {
+                    string tokens = stringValue.Substring(1);
+                    if (tokens.Length == 6) // This is becaue XAML is tolerant when the user has forgot the alpha channel (eg. #DDDDDD for Gray).
+                    {
+                        tokens = "FF" + tokens;
+                    }
 
 #if NETSTANDARD
-                int color;
-                if (int.TryParse(tokens, NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo, out color))
-                {
+                    int color;
+                    if (int.TryParse(tokens, NumberStyles.HexNumber, NumberFormatInfo.GetInstance(provider), out color))
+                    {
+                        return INTERNAL_ConvertFromInt32(color);
+                    }
+#elif BRIDGE
+                    int color;
+                    if (CSHTML5.Interop.IsRunningInTheSimulator)
+                    {
+                        color = INTERNAL_BridgeWorkarounds.HexToInt_SimulatorOnly(tokens);
+                    }
+                    else
+                    {
+                        color = Script.Write<int>("parseInt({0}, 16);", tokens);
+                    }
+
                     return INTERNAL_ConvertFromInt32(color);
-                }
-#else // BRIDGE
-                int color;
-                if (CSHTML5.Interop.IsRunningInTheSimulator)
-                {
-                    color = INTERNAL_BridgeWorkarounds.HexToInt_SimulatorOnly(tokens);
-                }
-                else
-                {
-                    color = Script.Write<int>("parseInt({0}, 16);", tokens);
-                }
-
-                return INTERNAL_ConvertFromInt32(color);
 #endif
-            }
-            else if (trimmedString != null && trimmedString.StartsWith("sc#", StringComparison.Ordinal))
-            {
-                string tokens = trimmedString.Substring(3);
-
-                char[] separators = new char[1] { ',' };
-                string[] words = tokens.Split(separators);
-                float[] values = new float[4];
-                for (int i = 0; i < 3; i++)
-                {                    
-                    values[i] = Convert.ToSingle(words[i]);
                 }
-                if (words.Length == 4)
+                else if (stringValue.StartsWith("sc#", StringComparison.Ordinal))
                 {
-                    values[3] = Convert.ToSingle(words[3]);
-                    return Color.FromScRgb(values[0], values[1], values[2], values[3]);
+                    string tokens = stringValue.Substring(3);
+
+                    char[] separators = new char[1] { ',' };
+                    string[] words = tokens.Split(separators);
+                    float[] values = new float[4];
+                    for (int i = 0; i < 3; i++)
+                    {
+                        values[i] = Convert.ToSingle(words[i]);
+                    }
+                    if (words.Length == 4)
+                    {
+                        values[3] = Convert.ToSingle(words[3]);
+                        return Color.FromScRgb(values[0], values[1], values[2], values[3]);
+                    }
+                    else
+                    {
+                        return Color.FromScRgb(1.0f, values[0], values[1], values[2]);
+                    }
                 }
                 else
                 {
-                    return Color.FromScRgb(1.0f, values[0], values[1], values[2]);
+                    // Check if the color is a named color
+                    Colors.INTERNAL_ColorsEnum namedColor;
+                    if (Enum.TryParse(stringValue, true, out namedColor))
+                    {
+                        return INTERNAL_ConvertFromInt32((int)namedColor);
+                    }
                 }
             }
-            else
-            {
-                // Check if the color is a named color
-                Colors.INTERNAL_ColorsEnum namedColor;
-                if (Enum.TryParse(trimmedString, true, out namedColor))
-                {
-                    return INTERNAL_ConvertFromInt32((int)namedColor);
-                }
-            }
-            throw new Exception(string.Format("Invalid color: {0}", colorString));
+
+            throw new FormatException($"Invalid color: '{source}'");
+        }
+
+        internal static Color Parse(string source)
+        {
+            return Parse(source, CultureInfo.InvariantCulture);
         }
 
         internal static Color INTERNAL_ConvertFromInt32(int colorAsInt32)

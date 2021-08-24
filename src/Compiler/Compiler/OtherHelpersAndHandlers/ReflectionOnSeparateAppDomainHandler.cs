@@ -110,11 +110,6 @@ namespace DotNetForHtml5.Compiler
             return _marshalledObject.GetContentPropertyName(namespaceName, localTypeName, assemblyNameIfAny);
         }
 
-        public bool DoesTypeContainAttributeToConvertDirectContent(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
-        {
-            return _marshalledObject.DoesTypeContainAttributeToConvertDirectContent(namespaceName, localTypeName, assemblyNameIfAny);
-        }
-
         public bool IsPropertyAttached(string propertyName, string declaringTypeNamespaceName, string declaringTypeLocalName, string parentNamespaceName, string parentLocalTypeName, string declaringTypeAssemblyIfAny = null)
         {
             return _marshalledObject.IsPropertyAttached(propertyName, declaringTypeNamespaceName, declaringTypeLocalName, parentNamespaceName, parentLocalTypeName, declaringTypeAssemblyIfAny);
@@ -205,9 +200,9 @@ namespace DotNetForHtml5.Compiler
             return _marshalledObject.IsTypeAnEnum(namespaceName, localTypeName, assemblyNameIfAny);
         }
 
-        public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
+        public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out string returnValueAssemblyName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
         {
-            _marshalledObject.GetMethodReturnValueTypeInfo(methodName, namespaceName, localTypeName, out returnValueNamespaceName, out returnValueLocalTypeName, out isTypeString, out isTypeEnum, assemblyNameIfAny);
+            _marshalledObject.GetMethodReturnValueTypeInfo(methodName, namespaceName, localTypeName, out returnValueNamespaceName, out returnValueLocalTypeName, out returnValueAssemblyName, out isTypeString, out isTypeEnum, assemblyNameIfAny);
         }
 
         public void GetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
@@ -215,9 +210,9 @@ namespace DotNetForHtml5.Compiler
             _marshalledObject.GetMethodInfo(methodName, namespaceName, localTypeName, out declaringTypeName, out returnValueNamespaceName, out returnValueLocalTypeName, out isTypeString, out isTypeEnum, assemblyNameIfAny);
         }
 
-        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string propertyNamespaceName, out string propertyLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
+        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
         {
-            _marshalledObject.GetPropertyOrFieldTypeInfo(propertyOrFieldName, namespaceName, localTypeName, out propertyNamespaceName, out propertyLocalTypeName, out isTypeString, out isTypeEnum, assemblyNameIfAny, isAttached: isAttached);
+            _marshalledObject.GetPropertyOrFieldTypeInfo(propertyOrFieldName, namespaceName, localTypeName, out propertyNamespaceName, out propertyLocalTypeName, out propertyAssemblyName, out isTypeString, out isTypeEnum, assemblyNameIfAny, isAttached: isAttached);
         }
 
         public void GetPropertyOrFieldInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string memberDeclaringTypeName, out string memberTypeNamespace, out string memberTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
@@ -875,24 +870,6 @@ namespace DotNetForHtml5.Compiler
                 return type;
             }
 
-            public bool DoesTypeContainAttributeToConvertDirectContent(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
-            {
-                var type = FindType(namespaceName, localTypeName, assemblyNameIfAny);
-
-                // Attempt to get the instance of the attribute if any:
-#if BRIDGE || CSHTML5BLAZOR
-                Type supportsDirectContentViaTypeFromStringConvertersAttributeType = this.FindType("System.Windows.Markup", "SupportsDirectContentViaTypeFromStringConvertersAttribute");
-#else
-                Type supportsDirectContentViaTypeFromStringConvertersAttributeType = typeof(DotNetForHtml5Core::System.Windows.Markup.SupportsDirectContentViaTypeFromStringConvertersAttribute);
-#endif
-                var attribute = Attribute.GetCustomAttribute(type, supportsDirectContentViaTypeFromStringConvertersAttributeType);
-
-                if (attribute != null)
-                    return true;
-                else
-                    return false;
-            }
-
             public string GetContentPropertyName(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
             {
                 var type = FindType(namespaceName, localTypeName, assemblyNameIfAny);
@@ -962,39 +939,59 @@ namespace DotNetForHtml5.Compiler
                 }
             }
 
-            public string GetCSharpEquivalentOfXamlTypeAsString(string namespaceName, string localTypeName, string assemblyNameIfAny = null, bool ifTypeNotFoundTryGuessing = false)
+            public string GetCSharpEquivalentOfXamlTypeAsString(
+                string namespaceName, 
+                string localTypeName, 
+                string assemblyNameIfAny = null, 
+                bool ifTypeNotFoundTryGuessing = false)
             {
-                //todo: in this method, we assume that the alias will be global, which will be false if the user chose something else --> find the right alias.
+                // todo: in this method, we assume that the alias will be global,
+                // which will be false if the user chose something else --> find
+                // the right alias.
 
-                // Ensure that "ifTypeNotFoundTryGuessing" is always false if the namespace is not a CLR namespace. In fact, in that case, we are unable to guess:
+                // Ensure that "ifTypeNotFoundTryGuessing" is always false if the
+                // namespace is not a CLR namespace. In fact, in that case, we are
+                // unable to guess
                 if (isNamespaceAnXmlNamespace(namespaceName))
-                    ifTypeNotFoundTryGuessing = false;
-
-                // Distinguish between system types (String, Double...) and other types:
-                if (SystemTypesHelper.IsSupportedSystemType(namespaceName, localTypeName, assemblyNameIfAny))
                 {
-                    return SystemTypesHelper.GetCSharpEquivalentOfXamlType(namespaceName, localTypeName, assemblyNameIfAny);
+                    ifTypeNotFoundTryGuessing = false;
+                }
+
+                // Distinguish between system types (String, Double...) and other types
+                if (SystemTypesHelper.IsSupportedSystemType($"{namespaceName}.{localTypeName}", assemblyNameIfAny))
+                {
+                    return SystemTypesHelper.GetFullTypeName(namespaceName, localTypeName, assemblyNameIfAny);
                 }
                 else
                 {
                     // Find the type:
-                    Type type = FindType(namespaceName, localTypeName, assemblyNameIfAny, doNotRaiseExceptionIfNotFound: ifTypeNotFoundTryGuessing);
+                    Type type = FindType(
+                        namespaceName, localTypeName, assemblyNameIfAny, ifTypeNotFoundTryGuessing
+                    );
+
                     if (type == null)
                     {
                         if (ifTypeNotFoundTryGuessing)
                         {
-                            // Try guessing:
-                            return "global::" + (!string.IsNullOrEmpty(namespaceName) ? namespaceName + "." + localTypeName : localTypeName);
+                            // Try guessing
+                            return string.Format(
+                                "global::{0}{1}{2}",
+                                namespaceName, 
+                                string.IsNullOrEmpty(namespaceName) ? string.Empty : ".", 
+                                localTypeName
+                            );
                         }
                         else
                         {
-                            throw new wpf::System.Windows.Markup.XamlParseException(string.Format("Type \"{0}\" not found in namespace \"{1}\".", localTypeName, namespaceName));
+                            throw new wpf::System.Windows.Markup.XamlParseException(
+                                $"Type '{localTypeName}' not found in namespace '{namespaceName}'."
+                            );
                         }
                     }
                     else
                     {
-                        // Use information from the type:
-                        return "global::" + type.ToString();
+                        // Use information from the type
+                        return $"global::{type}";
                     }
                 }
             }
@@ -1192,11 +1189,12 @@ namespace DotNetForHtml5.Compiler
                 return elementType.IsEnum;
             }
 
-            public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
+            public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out string returnValueAssemblyName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
             {
                 var type = GetMethodReturnValueType(methodName, namespaceName, localTypeName, assemblyNameIfAny);
                 returnValueNamespaceName = this.BuildPropertyPathRecursively(type);
                 returnValueLocalTypeName = GetTypeNameIncludingGenericArguments(type);
+                returnValueAssemblyName = type.Assembly.GetName().Name;
                 isTypeString = (type == typeof(string));
                 isTypeEnum = (type.IsEnum);
             }
@@ -1216,11 +1214,12 @@ namespace DotNetForHtml5.Compiler
                 isTypeEnum = methodInfo.ReturnType.IsEnum;
             }
 
-            public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string propertyNamespaceName, out string propertyLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
+            public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
             {
                 var type = GetPropertyOrFieldType(propertyOrFieldName, namespaceName, localTypeName, assemblyNameIfAny, isAttached: isAttached);
                 propertyNamespaceName = this.BuildPropertyPathRecursively(type);
                 propertyLocalTypeName = GetTypeNameIncludingGenericArguments(type);
+                propertyAssemblyName = type.Assembly.GetName().Name;
                 isTypeString = (type == typeof(string));
                 isTypeEnum = (type.IsEnum);
             }

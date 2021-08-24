@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,365 +11,98 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
+using System.ComponentModel;
 
-#if !MIGRATION
-using Windows.UI.Text;
-#endif
+//
+// IMPORTANT: Be very careful when editing this class.
+//
+// This class is called by the XAML inspector of the Simulator using reflection.
+// If you wish to remove, rename or modify it, make sure to make the appropriate
+// changes in the Simulator.
+//
 
-namespace DotNetForHtml5.Core // Important: DO NOT RENAME. This namespace is called by the XAML inspector of the Simulator using reflection. If you wish to remove or rename it, make sure to make the appropriate changes in the Simulator.
+namespace DotNetForHtml5.Core 
 {
     /// <summary>
-    /// A class used to convert elements written as strings in the XAML code into the correct type for the properties setted
+    /// A class used to convert elements written as strings in the XAML 
+    /// code into the correct type for the properties setted
     /// </summary>
     /// <exclude/>
-    public static class TypeFromStringConverters // Important: DO NOT REMOVE OR RENAME. This class is called by the XAML inspector of the Simulator using reflection. If you wish to remove or rename it, make sure to make the appropriate changes in the Simulator.
+    public static class TypeFromStringConverters
     {
-        static bool IsBaseTypesConvertersRegistered; // Note: we use this variable instead of a static constructor that makes the call because of a bug in JSIL (2014.04.30).
-        static Dictionary<Type, Func<string, object>> Converters = new Dictionary<Type, Func<string, object>>();
-        const string AdviseToFixTheError = "To fix the issue, please locate the error by looking for the first XAML file in the Stack Trace.";
-
-        static void RegisterBaseTypesConverters()
-        {
-            // Register converters for base system types:
-            RegisterConverter(typeof(bool), ConvertBoolFromString);
-            RegisterConverter(typeof(Nullable<bool>), ConvertNullableBoolFromString);
-            RegisterConverter(typeof(int), ConvertIntFromString);
-            RegisterConverter(typeof(double), ConvertDoubleFromString);
-            RegisterConverter(typeof(Uri), ConvertUriFromString);
-            RegisterConverter(typeof(object), ConvertObjectFromString);
-            RegisterConverter(typeof(byte), ConvertByteFromString);
-#if !MIGRATION
-            RegisterConverter(typeof(TextDecorations), ConvertTextDecorationsFromString);
-            RegisterConverter(typeof(Nullable<TextDecorations>), ConvertNullableTextDecorationsFromString);
-#endif
-            RegisterConverter(typeof(TimeSpan), ConvertTimeSpanFromString);
-            RegisterConverter(typeof(Nullable<TimeSpan>), ConvertTimeSpanFromString);
-        }
+        private static readonly Type _objectType = typeof(object);
 
         /// <summary>
         /// Checks if it is possible to convert from string to a given type.
         /// </summary>
-        /// <param name="type">Type to lookup.</param>
-        /// <returns>True if a converter exists, false otherwise.</returns>
-        public static bool CanTypeBeConverted(Type type) // Important: DO NOT REMOVE OR RENAME. This method is called by the XAML inspector of the Simulator using reflection. If you wish to remove or rename it, make sure to make the appropriate changes in the Simulator.
+        /// <param name="type">
+        /// Type to lookup.
+        /// </param>
+        /// <returns>
+        /// True if a converter exists, false otherwise.
+        /// </returns>
+        public static bool CanTypeBeConverted(Type type)
         {
-            Func<string, object> converter;
-            return TryGetConverter(type, out converter);
-        }
-
-        /// <summary>
-        /// Registers a type and its associated method to convert it from a string. This method takes part in allowing the definition of an object of the said type directly in the xaml.
-        /// </summary>
-        /// <param name="type">The type for which a converter will be defined</param>
-        /// <param name="converter">The method that will convert the XAML string into an instance of the type.</param>
-        public static void RegisterConverter(Type type, Func<string, object> converter)
-        {
-            if (!Converters.ContainsKey(type))
-                Converters.Add(type, converter);
-        }
-
-        /// <summary>
-        /// Converts the given string into the specified Type using the registered converter for the Type.
-        /// </summary>
-        /// <param name="type">The Type to which the conversion method is registered.</param>
-        /// <param name="s">The string to convert.</param>
-        /// <returns>The instance of the specified type converted from the string.</returns>
-        public static object ConvertFromInvariantString(Type type, string s)  // Important: DO NOT REMOVE OR RENAME. This method is called by the XAML inspector of the Simulator using reflection. If you wish to remove or rename it, make sure to make the appropriate changes in the Simulator.
-        {
-#if PERFSTAT
-            var t0 = Performance.now();
-#endif
-
-            //if the type is Nullable and the value is Null, we don't need to get the type, just set the value to null:
-            if (type.Name == "Nullable`1" && s == "x:Null") //todo: verify this is correct and appropriate (cf. changeset 1548)
-            {
-#if PERFSTAT
-                Performance.Counter("XAML: ConvertFromInvariantString: " + type.Name, t0);
-#endif
-
-                return null;
-            }
-            //if the type is an Enum, we can simply convert the string into the enum value:
-            else if (type.IsEnum)
-            {
-                return ConvertEnumFromString(type, s);
-            }
-            else
-            {
-#if WORKINPROGRESS && !CSHTML5NETSTANDARD
-                if (CSHTML5.Interop.IsRunningInTheSimulator) // this is usefull if we need to call a static constructor of a type that is defined outside of core assembly, so that it registers the type's converter.
-                {
-                    INTERNAL_Simulator.SimulatorProxy.RunClassConstructor(type);
-                }
-#endif
-                Func<string, object> converter;
-                if (TryGetConverter(type, out converter))
-                {
-                    var convertedValue = converter(s);
-
-#if PERFSTAT
-                    Performance.Counter("XAML: ConvertFromInvariantString: " + type.Name, t0);
-#endif
-                    return convertedValue;
-                }
-                else
-                {
-#if WORKINPROGRESS
-                    Debug.WriteLine("Unable to find a converter from \"String\" to \"" + type.ToString() + "\"");
-                    if(type.IsValueType)
-                    {
-                        return Activator.CreateInstance(type);
-                    }
-                    else 
-                    {
-                        return null;
-                    }
-#else
-                    throw new Exception("Unable to find a converter from \"String\" to \"" + type.ToString() + "\"");
-#endif
-                }
-            }
-        }
-
-        static bool TryGetConverter(Type type, out Func<string, object> converter)
-        {
-#if NETSTANDARD
-            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(type.TypeHandle);
-#elif BRIDGE
-            //System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(type);
-#endif
-
-            // Register converters for base system types if not already done:
-            if (!IsBaseTypesConvertersRegistered)
-            {
-                RegisterBaseTypesConverters();
-                IsBaseTypesConvertersRegistered = true;
-            }
-
-            Type nonNullableType = type;
-            if (type.Name == "Nullable`1")
-            {
-                if (Converters.ContainsKey(type))
-                {
-                    converter = Converters[type];
-                    return true;
-                }
-                else
-                {
-#if NETSTANDARD
-                    if (type.IsGenericType && type.GenericTypeArguments.Length > 0)
-                    {
-                        nonNullableType = type.GenericTypeArguments[0];
-                    }
-#else // BRIDGE
-                    if (type.IsGenericType && type.GetGenericArguments().Length > 0)
-                    {
-                        nonNullableType = type.GetGenericArguments()[0];
-                    }
-#endif
-                }
-            }
-            
-            if (Converters.ContainsKey(nonNullableType))
-            {
-                converter = Converters[nonNullableType];
-                return true;
-            }
-            else
-            {
-                converter = null;
-                return false;
-            }
-        }
-
-#region Converters for base types
-
-        static object ConvertBoolFromString(string str)
-        {
-            string lowerStr = str.ToLower();
-            if (lowerStr == "true")
+            if (type == _objectType)
             {
                 return true;
             }
-            else if (lowerStr == "false")
-            {
-                return false;
-            }
-            else
-            {
-                throw new Exception("Xaml exception: cannot convert \"" + str + "\" to bool. " + AdviseToFixTheError);
-            }
-        }
 
-        static object ConvertNullableBoolFromString(string str)
-        {
-            string lowerStr = str.ToLower();
-            if (lowerStr == "true")
-            {
-                return true;
-            }
-            else if (lowerStr == "false")
-            {
-                return false;
-            }
-            else
-            {
-                return null;
-            }
-        }
+            TypeConverter converter = TypeConverterHelper.GetConverter(type);
 
-        static object ConvertIntFromString(string str)
-        {
-            int returnValue;
-            if (!int.TryParse(str, out returnValue))
-                throw new Exception("Xaml exception: cannot convert \"" + str + "\" to int. " + AdviseToFixTheError);
-            return returnValue;
-        }
-
-        static object ConvertDoubleFromString(string str)
-        {
-            double returnValue;
-            if (str != null && (str.ToLower() == "auto" || str.ToLower() == "nan"))
+            if (converter != null)
             {
-                returnValue = double.NaN;
-            }
-            else if (str.ToLower() == "infinity")
-            {
-                returnValue = double.PositiveInfinity;
-            }
-            else if (str.ToLower() == "-infinity")
-            {
-                returnValue = double.NegativeInfinity;
-            }
-            else if (!double.TryParse(str, out returnValue))
-            {
-                throw new Exception("Xaml exception: cannot convert \"" + str + "\" to double. " + AdviseToFixTheError);
-            }
-            return returnValue;
-        }
-
-        static object ConvertByteFromString(string str)
-        {
-            byte returnValue;
-            if (!byte.TryParse(str, out returnValue))
-                throw new Exception("Xaml exception: cannot convert \"" + str + "\" to byte. " + AdviseToFixTheError);
-            return returnValue;
-        }
-
-        internal static object ConvertUriFromString(string str)
-        {
-            UriKind uriKind;
-            if (str.Contains(":"))
-            {
-                // cf. https://stackoverflow.com/questions/1737575/are-colons-allowed-in-urls
-                string textBeforeColon = str.Substring(0, str.IndexOf(":"));
-                if (!textBeforeColon.Contains(@"\") && !textBeforeColon.Contains(@"/"))
-                {
-                    uriKind = UriKind.Absolute;
-                }
-                else
-                {
-                    uriKind = UriKind.Relative;
-                }
-            }
-            else
-            {
-                uriKind = UriKind.Relative;
+                return converter.CanConvertFrom(typeof(string));
             }
 
-            Uri returnValue = new Uri(str, uriKind);
-
-            return returnValue;
-        }
-
-        static object ConvertObjectFromString(string str)
-        {
-            return (object)str;
-        }
-
-#if !MIGRATION
-        static object ConvertTextDecorationsFromString(string textDecorations)
-        {
-            TextDecorations? returnValue;
-            if (string.IsNullOrEmpty(textDecorations) || !TryParseTextDecorations(textDecorations, out returnValue))
-                throw new Exception("Xaml exception: cannot convert \"" + (textDecorations ?? "") + "\" to TextDecorations enum. " + AdviseToFixTheError);
-            return (TextDecorations)returnValue;
-        }
-
-        static object ConvertNullableTextDecorationsFromString(string textDecorations)
-        {
-            TextDecorations? returnValue;
-            if (string.IsNullOrEmpty(textDecorations))
-                return null;
-            else if (!TryParseTextDecorations(textDecorations, out returnValue))
-                throw new Exception("Xaml exception: cannot convert \"" + textDecorations + "\" to TextDecorations enum. " + AdviseToFixTheError);
-            else
-                return returnValue;
-        }
-
-        static bool TryParseTextDecorations(string textDecorationsString, out TextDecorations? textDecorations)
-        {
-            foreach (TextDecorations value in Enum.GetValues(typeof(TextDecorations)))
-            {
-                if (textDecorationsString.ToLower() == value.ToString().ToLower())
-                {
-                    textDecorations = value;
-                    return true;
-                }
-            }
-            textDecorations = null;
             return false;
         }
-#endif
 
-        static object ConvertTimeSpanFromString(string str)
+        /// <summary>
+        /// 
+        /// </summary>
+        [Obsolete("Use System.ComponentModel.TypeConverterAttribute instead.")]
+        public static void RegisterConverter(Type type, Func<string, object> converter)
         {
-            try
-            {
-#if NETSTANDARD
-                TimeSpan returnValue = TimeSpan.Parse(str);
-#else // BRIDGE
-                TimeSpan returnValue = INTERNAL_BridgeWorkarounds.TimeSpanParse(str);
-#endif
-                return returnValue;
-            }
-            catch
-            {
-                throw new Exception("Xaml exception: cannot convert \"" + str + "\" to TimeSpan. " + AdviseToFixTheError);
-            }
         }
 
-        private static object ConvertEnumFromString(Type enumType, string str)
+        /// <summary>
+        /// Converts the given <see cref="string"/> into the specified <see cref="Type"/> 
+        /// using the registered <see cref="TypeConverter"/> for the given <see cref="Type"/>.
+        /// </summary>
+        /// <param name="type">
+        /// The Type to which the conversion method is registered.
+        /// </param>
+        /// <param name="s">
+        /// The string to convert.
+        /// </param>
+        public static object ConvertFromInvariantString(Type type, string s) 
         {
-            try
+            if (type == _objectType)
             {
-                if (str.IndexOf(',') != -1)
-                {
-                    long convertedValue = 0;
-                    string[] values = str.Split(new char[] { ',' });
-                    foreach (string v in values)
-                    {
-                        convertedValue |= Convert.ToInt64((Enum)Enum.Parse(enumType, v, true), CultureInfo.InvariantCulture);
-                    }
-                    return Enum.ToObject(enumType, convertedValue);
-                }
-                else
-                {
-                    return Enum.Parse(enumType, str, true);
-                }
+                return s;
             }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format("Xaml exception: cannot convert '{0}' to '{1}'.\n{2}",
-                    str, enumType.Name, AdviseToFixTheError), ex);
-            }
-        }
 
-#endregion
+            TypeConverter converter = TypeConverterHelper.GetConverter(type);
+
+            if (converter != null)
+            {
+                return converter.ConvertFromInvariantString(s);
+            }
+
+#if WORKINPROGRESS
+            if (type.IsValueType)
+            {
+                return Activator.CreateInstance(type);
+            }
+
+            return null;
+#else
+            throw new Exception(
+                $"Unable to find a converter from '{typeof(string)}' to '{type}'."
+            );
+#endif
+        }
     }
 }

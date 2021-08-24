@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,20 +11,16 @@
 *  
 \*====================================================================================*/
 
-
-using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OpenSilver.Internal;
+
 #if MIGRATION
 using System.Windows.Shapes;
 #else
-using Windows.UI.Xaml.Shapes;
 using Windows.Foundation;
+using Windows.UI.Xaml.Shapes;
 #endif
 
 #if MIGRATION
@@ -36,75 +31,53 @@ namespace Windows.UI.Xaml.Media
 {
     public sealed partial class PointCollection : PresentationFrameworkCollection<Point>
     {
-        #region Data
-
         private Path _parentPath;
-
-        #endregion
-
-        #region Constructor
-
-        static PointCollection()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(PointCollection), s => Parse(s));
-        }
-
-        public static PointCollection Parse(string pointsAsString)
-        {
-            string[] splittedString = pointsAsString.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            PointCollection result = new PointCollection();
-
-            // Points count needs to be even number
-            if (splittedString.Length % 2 == 0)
-            {
-                for (int i = 0; i < splittedString.Length; i += 2)
-                {
-                    double x, y;
-#if OPENSILVER
-                    if (double.TryParse(splittedString[i], NumberStyles.Any, CultureInfo.InvariantCulture, out x) &&
-                        double.TryParse(splittedString[i + 1], NumberStyles.Any, CultureInfo.InvariantCulture, out y))
-#else
-                    if (double.TryParse(splittedString[i], out x) &&
-                        double.TryParse(splittedString[i + 1], out y))
-#endif
-                    {
-                        result.Add(new Point(x, y));
-                    }
-                }
-                return result;
-            }
-
-            throw new FormatException(pointsAsString + " is not an eligible value for a PointCollection");
-        }
 
         /// <summary>
         /// Initializes a new instance that is empty.
         /// </summary>
-        public PointCollection()
-        {
-
-        }
+        public PointCollection() { }
 
         /// <summary>
         /// Initializes a new instance that is empty and has the specified initial capacity.
         /// </summary>
         /// <param name="capacity">int - The number of elements that the new list is initially capable of storing.</param>
-        public PointCollection(int capacity) : base(capacity)
-        {
-
-        }
+        public PointCollection(int capacity) : base(capacity) { }
 
         /// <summary>
         /// Creates a PointCollection with all of the same elements as collection
         /// </summary>
-        public PointCollection(IEnumerable<Point> points) : base(points)
+        public PointCollection(IEnumerable<Point> points) : base(points) { }
+
+        public static PointCollection Parse(string source)
         {
+            var result = new PointCollection();
 
+            if (source != null)
+            {
+                IFormatProvider formatProvider = CultureInfo.InvariantCulture;
+                char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
+                string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+                // Points count needs to be an even number
+                if (split.Length % 2 == 1)
+                {
+                    throw new FormatException($"'{source}' is not an eligible value for a {typeof(PointCollection)}.");
+                }
+
+                for (int i = 0; i < split.Length; i += 2)
+                {
+                    result.Add(
+                        new Point(
+                            Convert.ToDouble(split[i], formatProvider),
+                            Convert.ToDouble(split[i + 1], formatProvider)
+                        )
+                    );
+                }
+            }
+
+            return result;
         }
-
-        #endregion
-
-        #region Overriden Methods
 
         internal override void AddOverride(Point point)
         {
@@ -151,10 +124,6 @@ namespace Windows.UI.Xaml.Media
             this.NotifyCollectionChanged();
         }
 
-        #endregion
-
-        #region Internal Methods
-
         internal void SetParentPath(Path path)
         {
             this._parentPath = path;
@@ -167,40 +136,5 @@ namespace Windows.UI.Xaml.Media
                 this._parentPath.ScheduleRedraw();
             }
         }
-
-        #endregion
     }
-
-#if no
-    /// <summary>
-    /// Represents a collection of Point values that can be individually accessed
-    /// by index.
-    /// </summary>
-    public sealed partial class PointCollection : List<Point>//: IList<Point>, IEnumerable<Point>
-    {
-        ///// <summary>
-        ///// Initializes a new instance of the PointCollection class.
-        ///// </summary>
-        //public PointCollection() { }
-
-
-
-        //public int Count { get; }
-        //public bool IsReadOnly { get; }
-
-        //public Point this[int index] { get; set; }
-
-        //public void Add(Point item);
-        ///// <summary>
-        ///// Removes all items from the collection.
-        ///// </summary>
-        //public void Clear();
-        //public bool Contains(Point item);
-        //public void CopyTo(Point[] array, int arrayIndex);
-        //public int IndexOf(Point item);
-        //public void Insert(int index, Point item);
-        //public bool Remove(Point item);
-        //public void RemoveAt(int index);
-    }
-#endif
 }

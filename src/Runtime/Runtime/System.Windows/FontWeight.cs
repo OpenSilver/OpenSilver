@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
-using System.Windows.Markup;
-using DotNetForHtml5.Core;
 
 #if MIGRATION
 namespace System.Windows
@@ -29,49 +19,20 @@ namespace System.Windows
 namespace Windows.UI.Text
 #endif
 {
-
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(FontWeightConverter))]
-#endif
     /// <summary>
     /// Refers to the density of a typeface, in terms of the lightness or heaviness
     /// of the strokes.
     /// </summary>
-    [SupportsDirectContentViaTypeFromStringConverters]
-    public partial struct FontWeight
+    public partial struct FontWeight : IFormattable
     {
         /// <summary>
         /// The font weight expressed as a numeric value. See Remarks.
         /// </summary>
         public ushort Weight;
 
-        static FontWeight()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(FontWeight), INTERNAL_ConvertFromString);
-        }
-
         internal string INTERNAL_ToHtmlString()
         {
             return Weight.ToString();
-        }
-
-        internal static object INTERNAL_ConvertFromString(string fontCode)
-        {
-            try
-            {
-                // Check if the font is a named font:
-                ushort result;
-                if (!ushort.TryParse(fontCode, out result))
-                {
-                    FontWeights.INTERNAL_FontweightsEnum namedFont = (FontWeights.INTERNAL_FontweightsEnum)Enum.Parse(typeof(FontWeights.INTERNAL_FontweightsEnum), fontCode); // Note: "TryParse" does not seem to work in JSIL.
-                    result = (ushort)namedFont;
-                }
-                return INTERNAL_ConvertFromUshort(result);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Invalid font: " + fontCode, ex);
-            }
         }
 
         internal static FontWeight INTERNAL_ConvertFromUshort(ushort fontWeightAsUshort)
@@ -85,6 +46,11 @@ namespace Windows.UI.Text
         public override string ToString()
         {
             return Weight.ToString();
+        }
+
+        string IFormattable.ToString(string format, IFormatProvider formatProvider)
+        {
+            return Weight.ToString(format, formatProvider);
         }
 
         /// <summary>

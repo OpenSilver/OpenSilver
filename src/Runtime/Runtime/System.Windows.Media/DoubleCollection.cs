@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -34,21 +26,26 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public sealed class DoubleCollection : PresentationFrameworkCollection<double>
     {
-        #region Constructor
+        public DoubleCollection() { }
 
-        static DoubleCollection()
+        public static DoubleCollection Parse(string source)
         {
-            TypeFromStringConverters.RegisterConverter(typeof(DoubleCollection), INTERNAL_ConvertFromString);
+            var db = new DoubleCollection();
+
+            if (source != null)
+            {
+                IFormatProvider formatProvider = CultureInfo.InvariantCulture;
+                char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
+                string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+                for (int i = 0; i < split.Length; i++)
+                {
+                    db.Add(Convert.ToDouble(split[i], formatProvider));
+                }
+            }
+
+            return db;
         }
-
-        public DoubleCollection()
-        {
-
-        }
-
-        #endregion
-
-        #region Overriden Methods
 
         internal override void AddOverride(double value)
         {
@@ -83,27 +80,6 @@ namespace Windows.UI.Xaml.Media
         internal override void SetItemOverride(int index, double value)
         {
             this.SetItemInternal(index, value);
-        }
-
-        #endregion
-
-        internal static object INTERNAL_ConvertFromString(string doubleCollectionAsString)
-        {
-            char separator = ' ';
-            if (doubleCollectionAsString.Trim().Contains(","))
-            {
-                separator = ',';
-            }
-            string[] split = doubleCollectionAsString.Split(separator);
-            DoubleCollection doubleCollection = new DoubleCollection();
-            foreach (string element in split)
-            {
-                if (!string.IsNullOrWhiteSpace(element))
-                {
-                    doubleCollection.Add(double.Parse(element));
-                }
-            }
-            return doubleCollection;
         }
     }
 }

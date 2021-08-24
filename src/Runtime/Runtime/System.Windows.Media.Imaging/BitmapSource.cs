@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,8 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media.Imaging
@@ -29,7 +23,7 @@ namespace Windows.UI.Xaml.Media.Imaging
     /// <summary>
     /// Provides a source object for properties that use a bitmap.
     /// </summary>
-    public partial class BitmapSource : ImageSource
+    public abstract partial class BitmapSource : ImageSource
     {
         bool _isStreamAsBase64StringValid = false;
 

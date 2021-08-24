@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows
@@ -32,27 +24,10 @@ namespace Windows.Foundation
     /// <summary>
     /// Describes the width and height of an object.
     /// </summary>
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(SizeConverter))]
-#endif
     public partial struct Size
     {
-        // Caching is actually over twice faster than creating a new Size, even though it is a Value Type
-        private static readonly Size emptySize;
-        
         private double _width;
         private double _height;
-
-        static Size()
-        {
-            emptySize = new Size
-            {
-                _width = double.NegativeInfinity,
-                _height = double.NegativeInfinity
-            };
-
-            TypeFromStringConverters.RegisterConverter(typeof(Size), s => Parse(s));
-        }
 
         /// <summary>
         /// Initializes a new instance of the Windows.Foundation.Size
@@ -68,6 +43,26 @@ namespace Windows.Foundation
             }
             this._width = width;
             this._height = height;
+        }
+
+        public static Size Parse(string source)
+        {
+            if (source != null)
+            {
+                IFormatProvider formatProvider = CultureInfo.InvariantCulture;
+                char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
+                string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+                if (split.Length == 2)
+                {
+                    return new Size(
+                        Convert.ToDouble(split[0], formatProvider),
+                        Convert.ToDouble(split[1], formatProvider)
+                    );
+                }
+            }
+
+            throw new FormatException($"'{source}' is not an eligible value for a '{typeof(Size)}'.");
         }
 
         /// <summary>
@@ -101,13 +96,12 @@ namespace Windows.Foundation
         /// <summary>
         /// Gets a value that represents a static empty Windows.Foundation.Size.
         /// </summary>
-        public static Size Empty
-        {
-            get
+        public static Size Empty { get; } =
+            new Size
             {
-                return emptySize;
-            }
-        }
+                _width = double.NegativeInfinity,
+                _height = double.NegativeInfinity
+            };
 
         /// <summary>
         /// Gets or sets the height of this instance of Windows.Foundation.Size in pixels. The default is 0. The value cannot be negative.
@@ -229,33 +223,33 @@ namespace Windows.Foundation
         /// <returns>A string representation of this Windows.Foundation.Size.</returns>
         public override string ToString()
         {
-            if (this.IsEmpty)
+            return ConvertToString(null);
+        }
+
+        /// <summary>
+        /// Creates a string representation of this object based on the format string
+        /// and IFormatProvider passed in.
+        /// If the provider is null, the CurrentCulture is used.
+        /// See the documentation for IFormattable for more information.
+        /// </summary>
+        /// <returns>
+        /// A string representation of this object.
+        /// </returns>
+        internal string ConvertToString(IFormatProvider provider)
+        {
+            if (IsEmpty)
             {
                 return "Empty";
             }
-            return Width + "," + Height;
+
+            // Helper to get the numeric list separator for a given culture.
+            char separator = TokenizerHelper.GetNumericListSeparator(provider);
+            return string.Format(provider,
+                                "{1}{0}{2}",
+                                separator,
+                                _width,
+                                _height);
         }
-
-        public static Size Parse(string sizeAsString)
-        {
-            string[] splittedString = sizeAsString.Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries);
-
-            if (splittedString.Length == 2)
-            {
-                double width, height;
-#if OPENSILVER
-                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out width) && 
-                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out height))
-#else
-                if (double.TryParse(splittedString[0], out width) &&
-                    double.TryParse(splittedString[1], out height))
-#endif
-                    return new Size(width, height);
-            }
-            
-            throw new FormatException(sizeAsString + " is not an eligible value for a Size");
-        }
-
     }
     
     internal static class SizeExtensions

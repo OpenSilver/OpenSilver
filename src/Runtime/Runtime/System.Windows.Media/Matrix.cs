@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -15,6 +14,7 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using OpenSilver.Internal;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -32,11 +32,6 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public struct Matrix : IFormattable
     {
-        static Matrix()
-        {
-            DotNetForHtml5.Core.TypeFromStringConverters.RegisterConverter(typeof(Matrix), (m => Parse(m)));
-        }
-
         // the transform is identity by default
         private static Matrix s_identity = CreateIdentity();
 
@@ -86,6 +81,40 @@ namespace Windows.UI.Xaml.Media
         public static Matrix Identity
         {
             get => s_identity;
+        }
+
+        /// <summary>
+        /// Parse - returns an instance converted from the provided string using
+        /// the culture "en-US"
+        /// <param name="source"> string with Matrix data </param>
+        /// </summary>
+        public static Matrix Parse(string source)
+        {
+            if (source != null)
+            {
+                if (source == "Identity")
+                {
+                    return Identity;
+                }
+
+                IFormatProvider formatProvider = CultureInfo.InvariantCulture;
+                char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
+                string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+                if (split.Length == 6)
+                {
+                    return new Matrix(
+                        Convert.ToDouble(split[0], formatProvider),
+                        Convert.ToDouble(split[1], formatProvider),
+                        Convert.ToDouble(split[2], formatProvider),
+                        Convert.ToDouble(split[3], formatProvider),
+                        Convert.ToDouble(split[4], formatProvider),
+                        Convert.ToDouble(split[5], formatProvider)
+                    );
+                }
+            }
+
+            throw new FormatException($"'{source}' is not an eligible value for a Matrix.");
         }
 
         #endregion Constructors
@@ -435,42 +464,6 @@ namespace Windows.UI.Xaml.Media
         {
             // Delegate to the internal method which implements all ToString calls.
             return ConvertToString(format, provider);
-        }
-
-        /// <summary>
-        /// Parse - returns an instance converted from the provided string using
-        /// the culture "en-US"
-        /// <param name="source"> string with Matrix data </param>
-        /// </summary>
-        public static Matrix Parse(string source)
-        {
-            if (source == "Identity")
-                return Identity;
-
-            string[] splittedString = source.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (splittedString.Length == 6)
-            {
-                double m11, m12, m21, m22, offsetX, offsetY;
-#if NETSTANDARD
-                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out m11) &&
-                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out m12) &&
-                    double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out m21) &&
-                    double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out m22) &&
-                    double.TryParse(splittedString[4], NumberStyles.Any, CultureInfo.InvariantCulture, out offsetX) &&
-                    double.TryParse(splittedString[5], NumberStyles.Any, CultureInfo.InvariantCulture, out offsetY))
-#elif BRIDGE
-                if (double.TryParse(splittedString[0], out m11) &&
-                    double.TryParse(splittedString[1], out m12) &&
-                    double.TryParse(splittedString[2], out m21) &&
-                    double.TryParse(splittedString[3], out m22) &&
-                    double.TryParse(splittedString[4], out offsetX) &&
-                    double.TryParse(splittedString[5], out offsetY))
-#endif
-                    return new Matrix(m11, m12, m21, m22, offsetX, offsetY);
-            }
-
-            throw new FormatException(source + " is not an eligible value for a Matrix");
         }
 
         #endregion Public Methods

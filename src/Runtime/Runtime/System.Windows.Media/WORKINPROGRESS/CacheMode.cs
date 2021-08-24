@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,9 @@
 *  
 \*====================================================================================*/
 
+#if WORKINPROGRESS
 
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
-using System.Windows;
-using System.Windows.Markup;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -25,27 +21,28 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-#if WORKINPROGRESS
-    [SupportsDirectContentViaTypeFromStringConverters]
     [OpenSilver.NotImplemented]
     public abstract partial class CacheMode : DependencyObject
     {
-        static CacheMode()
+        /// <summary>
+        /// Parse - this method is called by the type converter to parse a CacheMode's string 
+        /// (provided in "value").
+        /// </summary>
+        /// <returns>
+        /// A CacheMode which was created by parsing the "value" argument.
+        /// </returns>
+        /// <param name="value"> String representation of a CacheMode. Cannot be null/empty. </param>
+        internal static CacheMode Parse(string value)
         {
-            TypeFromStringConverters.RegisterConverter(typeof(CacheMode), INTERNAL_ConvertFromString);            
-        }
-
-        internal static object INTERNAL_ConvertFromString(string cacheModeAsString)
-        {
-            string cacheModeAsStringToLower = cacheModeAsString.ToLower();
-            switch (cacheModeAsStringToLower)
+            if (value != null &&
+                value.Equals("BitmapCache", StringComparison.OrdinalIgnoreCase))
             {
-                case "bitmapcache":
-                    return new BitmapCache();
-                default:
-                    throw new Exception("\"" + cacheModeAsString + "\"" + " is not a supported type.");
+                return new BitmapCache();
             }
+            
+            throw new FormatException("Token is not valid.");
         }
     }
-#endif
 }
+
+#endif

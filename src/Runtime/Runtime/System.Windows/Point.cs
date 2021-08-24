@@ -13,8 +13,6 @@
 
 using System;
 using System.Globalization;
-using System.Windows.Markup;
-using DotNetForHtml5.Core;
 using OpenSilver.Internal;
 
 #if MIGRATION
@@ -27,19 +25,10 @@ namespace Windows.Foundation
     /// Represents an x- and y-coordinate pair in two-dimensional space. Can also represent
     /// a logical point for certain property usages.
     /// </summary>
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(PointConverter))]
-#endif
-    [SupportsDirectContentViaTypeFromStringConverters]
     public partial struct Point : IFormattable
     {
         internal double _x;
         internal double _y;
-
-        static Point()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(Point), s => Parse(s));
-        }
 
         /// <summary>
         /// Initializes a <see cref="Point"/> structure that contains the specified values.
@@ -67,11 +56,8 @@ namespace Windows.Foundation
             if (source != null)
             {
                 IFormatProvider formatProvider = CultureInfo.InvariantCulture;
-
-                string[] split = source.Split(
-                    new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' }, 
-                    StringSplitOptions.RemoveEmptyEntries
-                );
+                char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
+                string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
                 if (split.Length == 2)
                 {
@@ -159,7 +145,6 @@ namespace Windows.Foundation
         {
             return this == value;
         }
-
 
         /// <summary>
         /// Returns the hash code for this <see cref="Point"/>.

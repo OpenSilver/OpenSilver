@@ -86,8 +86,9 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(AsyncVoidMethodBuilder))]
 [assembly: TypeForwardedToAttribute(typeof(Attribute))]
 [assembly: TypeForwardedToAttribute(typeof(AttributeTargets))] // Generation Added
-[assembly: TypeForwardedToAttribute(typeof(AttributeUsageAttribute))] //AddedForXamlCompilerSupport
+[assembly: TypeForwardedToAttribute(typeof(AttributeUsageAttribute))] //AddedForXamlCompilerSupport 
 [assembly: TypeForwardedToAttribute(typeof(Base64FormattingOptions))] // Generation Added
+[assembly: TypeForwardedToAttribute(typeof(BaseNumberConverter))]
 [assembly: TypeForwardedToAttribute(typeof(BestFitMappingAttribute))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(BinaryExpression))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(BinaryReader))]
@@ -99,10 +100,12 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(BitConverter))]
 [assembly: TypeForwardedToAttribute(typeof(BlockExpression))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(Boolean))]
+[assembly: TypeForwardedToAttribute(typeof(BooleanConverter))]
 [assembly: TypeForwardedToAttribute(typeof(BrowsableAttribute))] //AddedForSimulatorSupport
 [assembly: TypeForwardedToAttribute(typeof(Buffer))]
-[assembly: TypeForwardedToAttribute(typeof(BufferedStream))] // Generation Added
+[assembly: TypeForwardedToAttribute(typeof(BufferedStream))] // Generation Added  
 [assembly: TypeForwardedToAttribute(typeof(Byte))]
+[assembly: TypeForwardedToAttribute(typeof(ByteConverter))]
 [assembly: TypeForwardedToAttribute(typeof(Calendar))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(CalendarAlgorithmType))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(CalendarWeekRule))] // Generation Added
@@ -121,7 +124,8 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(CaptureCollection))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(CatchBlock))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(Char))]
-[assembly: TypeForwardedToAttribute(typeof(CharEnumerator))] // Generation Added
+[assembly: TypeForwardedToAttribute(typeof(CharConverter))]
+[assembly: TypeForwardedToAttribute(typeof(CharEnumerator))] // Generation Added 
 [assembly: TypeForwardedToAttribute(typeof(CharSet))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(ClientWebSocket))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(ClientWebSocketOptions))] // Generation Added
@@ -161,8 +165,9 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(CreditCardAttribute))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(CSharpArgumentInfo))] //RequiredToRun
 [assembly: TypeForwardedToAttribute(typeof(CSharpArgumentInfoFlags))] //RequiredToRun
-[assembly: TypeForwardedToAttribute(typeof(CSharpBinderFlags))] //RequiredToRun
+[assembly: TypeForwardedToAttribute(typeof(CSharpBinderFlags))] //RequiredToRun 
 [assembly: TypeForwardedToAttribute(typeof(CultureInfo))]
+[assembly: TypeForwardedToAttribute(typeof(CultureInfoConverter))]
 [assembly: TypeForwardedToAttribute(typeof(CultureNotFoundException))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(CustomValidationAttribute))]
 [assembly: TypeForwardedToAttribute(typeof(DatabaseGeneratedAttribute))] // Generation Added
@@ -170,11 +175,13 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(DataContractAttribute))] //AddedForSimulatorSupport
 [assembly: TypeForwardedToAttribute(typeof(DataMemberAttribute))]
 [assembly: TypeForwardedToAttribute(typeof(DataType))] // Generation Added
-[assembly: TypeForwardedToAttribute(typeof(DataTypeAttribute))] // Generation Added
+[assembly: TypeForwardedToAttribute(typeof(DataTypeAttribute))] // Generation Added 
 [assembly: TypeForwardedToAttribute(typeof(DateTime))]
+[assembly: TypeForwardedToAttribute(typeof(DateTimeConverter))]
 [assembly: TypeForwardedToAttribute(typeof(DateTimeFormatInfo))] //AddedForSimulatorSupport
 [assembly: TypeForwardedToAttribute(typeof(DateTimeKind))] //AddedForSimulatorSupport
-[assembly: TypeForwardedToAttribute(typeof(DateTimeOffset))] // Generation Added
+[assembly: TypeForwardedToAttribute(typeof(DateTimeOffset))] // Generation Added 
+[assembly: TypeForwardedToAttribute(typeof(DateTimeOffsetConverter))] // Generation Added 
 [assembly: TypeForwardedToAttribute(typeof(DateTimeStyles))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(DaylightTime))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(DayOfWeek))] //AddedForSimulatorSupport
@@ -189,8 +196,9 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(DebuggerStepperBoundaryAttribute))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(DebuggerStepThroughAttribute))] //AddedForSimulatorSupport
 [assembly: TypeForwardedToAttribute(typeof(DebuggerTypeProxyAttribute))] // Generation Added
-[assembly: TypeForwardedToAttribute(typeof(DebuggerVisualizerAttribute))] // Generation Added
+[assembly: TypeForwardedToAttribute(typeof(DebuggerVisualizerAttribute))] // Generation Added 
 [assembly: TypeForwardedToAttribute(typeof(Decimal))]
+[assembly: TypeForwardedToAttribute(typeof(DecimalConverter))]
 //[assembly: TypeForwardedToAttribute(typeof(DecimalConfig))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(DecimalConstantAttribute))] // Generation Added
 //[assembly: TypeForwardedToAttribute(typeof(DecimalFormatConfig))] // Generation Added
@@ -211,8 +219,9 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(DisplayFormatAttribute))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(DivideByZeroException))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(DllImportAttribute))] // Generation Added
-[assembly: TypeForwardedToAttribute(typeof(DllImportSearchPath))] // Generation Added
+[assembly: TypeForwardedToAttribute(typeof(DllImportSearchPath))] // Generation Added 
 [assembly: TypeForwardedToAttribute(typeof(Double))]
+[assembly: TypeForwardedToAttribute(typeof(DoubleConverter))]
 //[assembly: TypeForwardedToAttribute(typeof(DummyTypeUsedToAddAttributeToDefaultValueTypeConstructor))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(DynamicAttribute))] //AddedForSimulatorSupport
 [assembly: TypeForwardedToAttribute(typeof(DynamicExpression))] // Generation Added
@@ -230,8 +239,9 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(EmailAddressAttribute))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(Encoding))]
 [assembly: TypeForwardedToAttribute(typeof(EncodingInfo))] // Generation Added
-[assembly: TypeForwardedToAttribute(typeof(EndOfStreamException))] // Generation Added
+[assembly: TypeForwardedToAttribute(typeof(EndOfStreamException))] // Generation Added 
 [assembly: TypeForwardedToAttribute(typeof(Enum))]
+[assembly: TypeForwardedToAttribute(typeof(EnumConverter))]
 [assembly: TypeForwardedToAttribute(typeof(EnumDataTypeAttribute))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(Enumerable))]
 //[assembly: TypeForwardedToAttribute(typeof(EnumerableInstance<>))] // Generation Added
@@ -293,7 +303,8 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(GroupCollection))]
 //[assembly: TypeForwardedToAttribute(typeof(Grouping<,>))]  // Generation Added //Error message "a type forwarder is specified for it"
 [assembly: TypeForwardedToAttribute(typeof(Guid))]
-[assembly: TypeForwardedToAttribute(typeof(GuidAttribute))] //AddedForXamlCompilerSupport
+[assembly: TypeForwardedToAttribute(typeof(GuidAttribute))] //AddedForXamlCompilerSupport 
+[assembly: TypeForwardedToAttribute(typeof(GuidConverter))]
 [assembly: TypeForwardedToAttribute(typeof(HandleRef))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(HashSet<>))] //NewInBridgeNotInJSIL
 [assembly: TypeForwardedToAttribute(typeof(Hashtable))]
@@ -339,8 +350,11 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(INotifyCompletion))]
 [assembly: TypeForwardedToAttribute(typeof(INotifyPropertyChanged))] //RequiredToRun
 [assembly: TypeForwardedToAttribute(typeof(Int16))]
+[assembly: TypeForwardedToAttribute(typeof(Int16Converter))]
 [assembly: TypeForwardedToAttribute(typeof(Int32))]
+[assembly: TypeForwardedToAttribute(typeof(Int32Converter))]
 [assembly: TypeForwardedToAttribute(typeof(Int64))]
+[assembly: TypeForwardedToAttribute(typeof(Int64Converter))]
 [assembly: TypeForwardedToAttribute(typeof(Interlocked))]
 [assembly: TypeForwardedToAttribute(typeof(InternalsVisibleToAttribute))] //Added
 [assembly: TypeForwardedToAttribute(typeof(IntPtr))]
@@ -370,6 +384,7 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(IStructuralComparable))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(IStructuralEquatable))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(IsVolatile))] // Generation Added
+[assembly: TypeForwardedToAttribute(typeof(ITypeDescriptorContext))]
 [assembly: TypeForwardedToAttribute(typeof(IValidatableObject))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(KeyAttribute))] // Generation Added
 //[assembly: TypeForwardedToAttribute(typeof(KeyCollection))]
@@ -473,7 +488,8 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(RuntimeTypeHandle))] //RequiredToRun
 [assembly: TypeForwardedToAttribute(typeof(SatelliteContractVersionAttribute))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(SByte))]
-[assembly: TypeForwardedToAttribute(typeof(ScaffoldColumnAttribute))] // Generation Added
+[assembly: TypeForwardedToAttribute(typeof(SByteConverter))]
+[assembly: TypeForwardedToAttribute(typeof(ScaffoldColumnAttribute))] // Generation Added 
 [assembly: TypeForwardedToAttribute(typeof(SecurityAction))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(SecurityCriticalAttribute))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(SecurityCriticalScope))] // Generation Added
@@ -487,7 +503,8 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(SerializationInfoEnumerator))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(SetMemberBinder))] //AddedForSimulatorSupport
 [assembly: TypeForwardedToAttribute(typeof(Single))]
-[assembly: TypeForwardedToAttribute(typeof(SortVersion))] // Generation Added
+[assembly: TypeForwardedToAttribute(typeof(SingleConverter))]
+[assembly: TypeForwardedToAttribute(typeof(SortVersion))] // Generation Added 
 [assembly: TypeForwardedToAttribute(typeof(Stack<>))]
 [assembly: TypeForwardedToAttribute(typeof(StackFrame))]
 [assembly: TypeForwardedToAttribute(typeof(StackTrace))]
@@ -498,6 +515,7 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(StreamReader))]
 [assembly: TypeForwardedToAttribute(typeof(StreamWriter))]
 [assembly: TypeForwardedToAttribute(typeof(String))]
+[assembly: TypeForwardedToAttribute(typeof(StringConverter))]
 [assembly: TypeForwardedToAttribute(typeof(StringBuilder))]
 [assembly: TypeForwardedToAttribute(typeof(StringComparer))]
 [assembly: TypeForwardedToAttribute(typeof(StringComparison))] //AddedForSimulatorSupport
@@ -532,7 +550,8 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(Timer))] //AddedForSimulatorSupport
 [assembly: TypeForwardedToAttribute(typeof(TimerCallback))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(TimeSpan))]
-[assembly: TypeForwardedToAttribute(typeof(TimestampAttribute))] // Generation Added
+[assembly: TypeForwardedToAttribute(typeof(TimeSpanConverter))]
+[assembly: TypeForwardedToAttribute(typeof(TimestampAttribute))] // Generation Added 
 [assembly: TypeForwardedToAttribute(typeof(Trace))]
 [assembly: TypeForwardedToAttribute(typeof(TryExpression))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(Tuple))]
@@ -549,12 +568,17 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(TypeAttributes))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(TypeBinaryExpression))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(TypeCode))] //RequiredToRun
+[assembly: TypeForwardedToAttribute(typeof(TypeConverter))]
+[assembly: TypeForwardedToAttribute(typeof(TypeConverterAttribute))]
 [assembly: TypeForwardedToAttribute(typeof(TypeFilter))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(TypeForwardedFromAttribute))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(UIHintAttribute))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(UInt16))]
+[assembly: TypeForwardedToAttribute(typeof(UInt16Converter))]
 [assembly: TypeForwardedToAttribute(typeof(UInt32))]
+[assembly: TypeForwardedToAttribute(typeof(UInt32Converter))]
 [assembly: TypeForwardedToAttribute(typeof(UInt64))]
+[assembly: TypeForwardedToAttribute(typeof(UInt64Converter))]
 [assembly: TypeForwardedToAttribute(typeof(UIntPtr))]
 [assembly: TypeForwardedToAttribute(typeof(UltimateResourceFallbackLocation))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(UnaryExpression))] // Generation Added
@@ -563,8 +587,9 @@ using System.Security;
 [assembly: TypeForwardedToAttribute(typeof(UnhandledExceptionEventHandler))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(UnicodeCategory))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(UnicodeEncoding))]
-[assembly: TypeForwardedToAttribute(typeof(Uri))] //NewInBridgeNotInJSIL
+[assembly: TypeForwardedToAttribute(typeof(Uri))] //NewInBridgeNotInJSIL UriTypeConverter
 [assembly: TypeForwardedToAttribute(typeof(UriKind))] //NewInBridgeNotInJSIL, Added to Bridge by Userware
+[assembly: TypeForwardedToAttribute(typeof(UriTypeConverter))]
 [assembly: TypeForwardedToAttribute(typeof(UrlAttribute))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(UTF32Encoding))] // Generation Added
 [assembly: TypeForwardedToAttribute(typeof(UTF7Encoding))] // Generation Added

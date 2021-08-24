@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -27,86 +21,90 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    #if FOR_DESIGN_TIME
     /// <summary>
-    /// Used to convert a System.Windows.Media.Matrix object to or from another object
-    /// type.
+    /// MatrixConverter - Converter class for converting instances of other types to and from Matrix instances
     /// </summary>
-    public sealed partial class MatrixConverter : TypeConverter
+    internal class MatrixConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether this class can convert an object of a given type to a
-        /// System.Windows.Media.Matrix object.
+        /// Returns true if this type converter can convert from a given type.
         /// </summary>
-        /// <param name="context">The conversion context.</param>
-        /// <param name="sourceType">The type from which to convert.</param>
         /// <returns>
-        /// true if the type converter can create an instance of System.Windows.Matrix
-        /// from the specified type; otherwise, false.
+        /// bool - True if this converter can convert from the provided type, false if not.
         /// </returns>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="sourceType"> The Type being queried for support. </param>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-            {
-                return true;
-            }
-
-            return base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(string);
         }
-        
+
         /// <summary>
-        /// Determines whether this class can convert an object of a given type to the
-        /// specified destination type.
+        /// Returns true if this type converter can convert to the given type.
         /// </summary>
-        /// <param name="context">The conversion context.</param>
-        /// <param name="destinationType">The destination type.</param>
-        /// <returns>Returns true if conversion is possible; otherwise, false.</returns>
+        /// <returns>
+        /// bool - True if this converter can convert to the provided type, false if not.
+        /// </returns>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="destinationType"> The Type being queried for support. </param>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
-        
-        // Exceptions:
-        //   System.NotSupportedException:
-        //     value is NULL or cannot be converted to a System.Windows.Media.Matrix.
+
         /// <summary>
-        /// Converts from an object of a given type to a System.Windows.Media.Matrix object.
+        /// Attempts to convert to a Matrix from the given object.
         /// </summary>
-        /// <param name="context">The conversion context.</param>
-        /// <param name="culture">The culture information that applies to the conversion.</param>
-        /// <param name="value">The object to convert.</param>
         /// <returns>
-        /// Returns a new System.Windows.Media.Matrix object if successful; otherwise,
-        /// NULL.
+        /// The Matrix which was constructed.
         /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if the example object is null or is not a valid type
+        /// which can be converted to a Matrix.
+        /// </exception>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="culture"> The requested CultureInfo.  Note that conversion uses "en-US" rather than this parameter. </param>
+        /// <param name="value"> The object to convert to an instance of Matrix. </param>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
-                throw GetConvertFromException(value);
+            if (value is string source)
+            {
+                return Matrix.Parse(source);
+            }
 
-            if (value is string)
-                return Matrix.INTERNAL_ConvertFromString((string)value);
-
-            return base.ConvertFrom(context, culture, value);
+            throw GetConvertFromException(value);
         }
-   
-        // Exceptions:
-        //   System.NotSupportedException:
-        //     value is NULL or it is not a System.Windows.Media.Matrix-or-destinationType
-        //     is not a valid destination type.
+
         /// <summary>
-        /// Converts a System.Windows.Media.Matrix object to a specified type, using the
-        /// specified context and culture information.
+        /// ConvertTo - Attempt to convert an instance of Matrix to the given type
         /// </summary>
-        /// <param name="context">The conversion context.</param>
-        /// <param name="culture">The current culture information.</param>
-        /// <param name="value">The System.Windows.Media.Matrix to convert.</param>
-        /// <param name="destinationType">The destination type that the value object is converted to.</param>
-        /// <returns>An object that represents the converted value.</returns>
+        /// <returns>
+        /// The object which was constructoed.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if "value" is null or not an instance of Matrix,
+        /// or if the destinationType isn't one of the valid destination types.
+        /// </exception>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="culture"> The CultureInfo which is respected when converting. </param>
+        /// <param name="value"> The object to convert to an instance of "destinationType". </param>
+        /// <param name="destinationType"> The type to which this will convert the Matrix instance. </param>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            if (destinationType == null)
+            {
+                throw new ArgumentNullException(nameof(destinationType));
+            }
+
+            if (destinationType == typeof(string))
+            {
+                if (value is Matrix instance)
+                {
+                    return instance.ConvertToString(null, culture);
+                }
+            }
+
+            throw GetConvertToException(value, destinationType);
         }
     }
-#endif
 }

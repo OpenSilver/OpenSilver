@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,7 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
-using CSHTML5.Internal;
-using System.Windows.Markup;
-using DotNetForHtml5.Core;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -29,21 +19,11 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(FontFamilyConverter))]
-#endif
     /// <summary>
     /// Represents a family of related fonts.
     /// </summary>
-    [SupportsDirectContentViaTypeFromStringConverters]
     public partial class FontFamily
     {
-        static FontFamily()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(FontFamily), INTERNAL_ConvertFromString);
-        }
-
-
         // Parameters:
         //   familyName:
         //     The family name of the font to represent. This can include a hashed suffix.
@@ -52,28 +32,24 @@ namespace Windows.UI.Xaml.Media
         /// family string.
         /// </summary>
         /// <param name="familyName">The family name of the font to represent. This can include a hashed suffix.</param>
-        public FontFamily(string familyName) { _source = familyName; }
+        public FontFamily(string familyName) 
+        { 
+            Source = familyName; 
+        }
 
-        string _source;
         /// <summary>
         /// Gets the font family name that is used to construct the FontFamily object.
         /// </summary>
-        public string Source { get { return _source; } }
-
+        public string Source { get; private set; }
 
         internal string INTERNAL_ToHtmlString()
         {
             return Source;
         }
 
-        internal static object INTERNAL_ConvertFromString(string fontCode)
-        {
-            return new FontFamily(fontCode);
-        }
-
         public override string ToString()
         {
-            return _source;
+            return Source;
         }
     }
 }

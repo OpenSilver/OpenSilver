@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,26 +11,14 @@
 *  
 \*====================================================================================*/
 
-
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
-using System.ComponentModel;
+
 #if MIGRATION
 namespace System.Windows.Media.Animation
 #else
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(RepeatBehaviorConverter))]
-#endif
     /// <summary>
     /// Describes how a Windows.UI.Xaml.Media.Animation.Timeline repeats its simple
     /// duration.
@@ -62,35 +49,6 @@ namespace Windows.UI.Xaml.Media.Animation
             HasDuration = false;
             Duration = new TimeSpan();
 #endif
-        }
-
-        static RepeatBehavior()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(RepeatBehavior), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string arg)
-        {
-            //BRIDGETODO : verify the code below matchs
-#if !BRIDGE
-            string loweredArg = arg.ToLowerInvariant();
-#else
-            string loweredArg = arg.ToLower();
-#endif
-            if (loweredArg == "forever")
-            {
-                return RepeatBehavior.Forever;
-            }
-            else if (loweredArg.EndsWith("x"))
-            {
-                double repeatCount = double.Parse(loweredArg.Substring(0, loweredArg.Length - 1));
-                return new RepeatBehavior(repeatCount);
-            }
-            else
-            {
-                throw new FormatException("The string: \"" + arg + "\" could not be parsed into a RepeatBehavior. Note: The duration is not supported yet as a RepeatBehavior.");
-            }
-            //todo: else duration.
         }
 
         //// Exceptions:
@@ -326,7 +284,6 @@ namespace Windows.UI.Xaml.Media.Animation
         public static bool Equals(RepeatBehavior repeatBehavior1, RepeatBehavior repeatBehavior2)
         {
             return repeatBehavior1 == repeatBehavior2;
-
         }
 
         //todo: the following

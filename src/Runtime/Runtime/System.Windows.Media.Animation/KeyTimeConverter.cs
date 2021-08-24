@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -27,75 +21,90 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if FOR_DESIGN_TIME
     /// <summary>
-    /// Converts instances of System.Windows.Media.Animation.KeyTime to and from
-    /// other types.
+    /// 
     /// </summary>
-    public partial class KeyTimeConverter : TypeConverter
+    internal class KeyTimeConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object can be converted from a given type to an instance
-        /// of a System.Windows.Media.Animation.KeyTime.
+        /// Returns whether or not this class can convert from a given type
+        /// to an instance of a KeyTime.
         /// </summary>
-        /// <param name="typeDescriptorContext">Contextual information required for conversion.</param>
-        /// <param name="type">Type being evaluated for conversion.</param>
-        /// <returns>true if this type can be converted; otherwise, false.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-            {
-                return true;
-            }
-
-            return base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(string);
         }
-  
+
         /// <summary>
-        /// Determines if a given type can be converted to an instance of System.Windows.Media.Animation.KeyTime.
+        /// Returns whether or not this class can convert from an instance of a
+        /// KeyTime to a given type.
         /// </summary>
-        /// <param name="typeDescriptorContext">Contextual information required for conversion.</param>
-        /// <param name="type">Type being evaluated for conversion.</param>
-        /// <returns>true if this type can be converted; otherwise, false.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
-      
+
         /// <summary>
-        /// Attempts to convert a given object to an instance of System.Windows.Media.Animation.KeyTime.
+        /// 
         /// </summary>
-        /// <param name="typeDescriptorContext">Context information required for conversion.</param>
-        /// <param name="cultureInfo">Cultural information that is respected during conversion.</param>
-        /// <param name="value">The object being converted to an instance of System.Windows.Media.Animation.KeyTime.</param>
-        /// <returns>
-        /// A new instance of System.Windows.Media.Animation.KeyTime, based on the supplied
-        /// value.
-        /// </returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
-                throw GetConvertFromException(value);
+            if (value is string stringValue)
+            {
+                stringValue = stringValue.Trim();
 
-            if (value is string)
-                return KeyTime.INTERNAL_ConvertFromString((string)value);
+                if (stringValue == "Uniform" || stringValue == "Paced")
+                {
+                    throw new NotSupportedException(
+                        $"The '{typeof(KeyTime)}.{stringValue}' property is not supported yet."
+                    );
+                }
+                else if (stringValue.Length > 0 &&
+                         stringValue[stringValue.Length - 1] == '%')
+                {
+                    throw new NotSupportedException(
+                        $"Percentage values for '{typeof(KeyTime)}' are not supported yet."
+                    );
+                }
+                else
+                {
+                    TimeSpan timeSpanValue = (TimeSpan)TypeConverterHelper.GetConverter(
+                        typeof(TimeSpan)).ConvertFrom(
+                            context,
+                            culture,
+                            stringValue);
 
-            return base.ConvertFrom(context, culture, value);
+                    return KeyTime.FromTimeSpan(timeSpanValue);
+                }
+            }
+
+            throw GetConvertFromException(value);
         }
 
         /// <summary>
-        /// Attempts to convert an instance of System.Windows.Media.Animation.KeyTime
-        /// to another type.
+        /// 
         /// </summary>
-        /// <param name="typeDescriptorContext">Context information required for conversion.</param>
-        /// <param name="cultureInfo">Cultural information that is respected during conversion.</param>
-        /// <param name="value">System.Windows.Media.Animation.KeyTime value to convert from.</param>
-        /// <param name="destinationType">Type being evaluated for conversion.</param>
-        /// <returns>A new object, based on value.</returns>
-        public override object ConvertTo(ITypeDescriptorContext typeDescriptorContext, CultureInfo cultureInfo, object value, Type destinationType)
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            if (destinationType == null)
+            {
+                throw new ArgumentNullException(nameof(destinationType));
+            }
+
+            if (destinationType == typeof(string))
+            {
+                if (value is KeyTime keyTime)
+                {
+                    return TypeConverterHelper.GetConverter(
+                        typeof(TimeSpan)).ConvertTo(
+                            context,
+                            culture,
+                            keyTime.TimeSpan,
+                            destinationType);
+                }
+            }
+
+            throw GetConvertToException(value, destinationType);
         }
     }
-#endif
 }

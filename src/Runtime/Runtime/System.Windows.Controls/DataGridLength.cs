@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,8 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 using System.ComponentModel;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DotNetForHtml5.Core;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -28,55 +20,14 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    // Summary:
-    //     Represents the lengths of elements within the System.Windows.Controls.DataGrid
-    //     control.
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(DataGridLengthConverter))]
-#endif
     /// <summary>
-    /// Represents the lengths of elements within the System.Windows.Controls.DataGrid
+    /// Represents the lengths of elements within the <see cref="DataGrid"/>
     /// control.
     /// </summary>
+    [TypeConverter(typeof(DataGridLengthConverter))]
     public partial struct DataGridLength : IEquatable<DataGridLength>
     {
         //todo: add SizeToCell and SizeToHeader everywhere when we'll know how to handle them (idea: add in the grid's cell something like INTERNAL_IsRelevantToAuto (depends on how auto works)
-
-        static DataGridLength()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(DataGridLength), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string gridLengthAsString)
-        {
-            string trimmedLowercase = gridLengthAsString.Trim().ToLower();
-            if (trimmedLowercase.EndsWith("*"))
-            {
-                string valueAsString = trimmedLowercase.Substring(0, trimmedLowercase.Length - 1);
-                double value;
-                if (valueAsString == "")
-                    return new DataGridLength(1.0, DataGridLengthUnitType.Star);
-                if (double.TryParse(valueAsString, out value))
-                    return new DataGridLength(value, DataGridLengthUnitType.Star);
-                else
-                    throw new Exception("Invalid GridLength: " + gridLengthAsString);
-            }
-            else if (trimmedLowercase == "auto")
-                return new DataGridLength(1.0, DataGridLengthUnitType.Auto);
-            else if (trimmedLowercase == "sizetocells")
-                return new DataGridLength(1.0, DataGridLengthUnitType.Auto);
-            else if (trimmedLowercase == "sizetoheader")
-                return new DataGridLength(1.0, DataGridLengthUnitType.Auto);
-            else
-            {
-                double value;
-                if (double.TryParse(trimmedLowercase, out value))
-                    return new DataGridLength(value, DataGridLengthUnitType.Pixel);
-                else
-                    throw new Exception("Invalid GridLength: " + gridLengthAsString);
-            }
-        }
-
 
         private double _value;
         private DataGridLengthUnitType _type;

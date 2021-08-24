@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
+using CSHTML5.Internal;
 
 #if MIGRATION
 namespace System.Windows
@@ -32,12 +26,9 @@ namespace Windows.UI.Xaml
     /// system. Dependency properties provide support for value expressions, data
     /// binding, animation, and property change notification.
     /// </summary>
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(DependencyPropertyConverter))]
-#endif
     public partial class DependencyProperty
     {
-        private static readonly Type nullableType;
+        private static readonly Type nullableType = typeof(Nullable<>);
 
         public static readonly object UnsetValue = new INTERNAL_NamedObject("DependencyProperty.UnsetValue");
 
@@ -55,11 +46,6 @@ namespace Windows.UI.Xaml
         Dictionary<Type, PropertyMetadata> _typesToOverridenMetadatas = null; //this is the same as Optimization_typesToOverrides except that this one contains only the types that called the OverrideMetaData method.
         Dictionary<Type, bool> Optimization_typesWithoutOverride = null; //todo: replace with a hashset when possible.
         Dictionary<Type, PropertyMetadata> Optimization_typesToOverrides = null; //note: see comment on _typesToOverridenMetadatas
-
-        static DependencyProperty()
-        {
-            nullableType = typeof(Nullable<>);
-        }
 
         public PropertyMetadata GetMetadata(Type type)
         {

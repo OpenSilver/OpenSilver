@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,15 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+#if MIGRATION
+using FontweightsEnum = System.Windows.FontWeights.INTERNAL_FontweightsEnum;
+#else
+using FontweightsEnum = Windows.UI.Text.FontWeights.INTERNAL_FontweightsEnum;
+#endif
 
 #if MIGRATION
 namespace System.Windows
@@ -27,88 +27,86 @@ namespace System.Windows
 namespace Windows.UI.Text
 #endif
 {
-#if FOR_DESIGN_TIME
     /// <summary>
-    /// Converts instances of System.Windows.FontWeight to and from other data types.
+    /// FontWeightConverter class parses a font weight string.
     /// </summary>
-    public sealed partial class FontWeightConverter : TypeConverter
+    internal class FontWeightConverter : TypeConverter
     {
         /// <summary>
-        /// Returns a value that indicates whether this converter can convert an object
-        /// of the given type to an instance of System.Windows.FontWeight.
+        /// CanConvertFrom
         /// </summary>
-        /// <param name="context">Context information of a type.</param>
-        /// <param name="sourceType">The type of the source that is being evaluated for conversion.</param>
-        /// <returns>
-        /// true if the converter can convert the provided type to an instance of System.Windows.FontWeight;
-        /// otherwise, false.
-        /// </returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-            {
-                return true;
-            }
-
-            return base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(string);
         }
-       
+
         /// <summary>
-        /// Determines whether an instance of System.Windows.FontWeight can be converted
-        /// to a different type.
+        /// TypeConverter method override.
         /// </summary>
-        /// <param name="context">Context information of a type.</param>
-        /// <param name="destinationType">
-        /// The desired type that that this instance of System.Windows.FontWeight is
-        /// being evaluated for conversion to.
-        /// </param>
-        /// <returns>
-        /// true if the converter can convert this instance of System.Windows.FontWeight;
-        /// otherwise, false.
-        /// </returns>
+        /// <param name="context">ITypeDescriptorContext</param>
+        /// <param name="destinationType">Type to convert to</param>
+        /// <returns>true if conversion is possible</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
-      
-        // Exceptions:
-        //   System.NotSupportedException:
-        //     value is null or is not a valid type for conversion.
+
         /// <summary>
-        /// Attempts to convert a specified object to an instance of System.Windows.FontWeight.
+        /// ConvertFrom - attempt to convert to a FontWeight from the given object
         /// </summary>
-        /// <param name="context">Context information of a type.</param>
-        /// <param name="culture">System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>The instance of System.Windows.FontWeight created from the converted value.</returns>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if the example object is null or is not a valid type
+        /// which can be converted to a FontWeight.
+        /// </exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
-                throw GetConvertFromException(value);
+            if (value is string s)
+            {
+                if (Enum.TryParse(s, true, out FontweightsEnum fontCode))
+                {
+                    return FontWeight.INTERNAL_ConvertFromUshort((ushort)fontCode);
+                }
+                else if (ushort.TryParse(s, out ushort code))
+                {
+                    return FontWeight.INTERNAL_ConvertFromUshort(code);
+                }
+                else
+                {
+                    throw new FormatException("Token is not valid.");
+                }
+            }
 
-            if (value is string)
-                return FontWeight.INTERNAL_ConvertFromString((string)value);
-
-            return base.ConvertFrom(context, culture, value);
+            throw GetConvertFromException(value);
         }
-        
-        // Exceptions:
-        //   System.NotSupportedException:
-        //     value is null-or-value i is not an instance of System.Windows.FontWeight-or-destinationType
-        //     is not a valid destination type.
+
         /// <summary>
-        /// Attempts to convert an instance of System.Windows.FontWeight to a specified
-        /// type.
+        /// TypeConverter method implementation.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The instance of System.Windows.FontWeight to convert.</param>
-        /// <param name="destinationType">The type this instance of System.Windows.FontWeight is converted to.</param>
-        /// <returns>The object created from the converted instance of System.Windows.FontWeight.</returns>
+        /// <exception cref="NotSupportedException">
+        /// An NotSupportedException is thrown if the example object is null or is not a FontWeight,
+        /// or if the destinationType isn't one of the valid destination types.
+        /// </exception>
+        /// <param name="context">ITypeDescriptorContext</param>
+        /// <param name="culture">current culture (see CLR specs)</param>
+        /// <param name="value">value to convert from</param>
+        /// <param name="destinationType">Type to convert to</param>
+        /// <returns>converted value</returns>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            if (destinationType == null)
+            {
+                throw new ArgumentNullException(nameof(destinationType));
+            }
+
+            if (destinationType == typeof(string))
+            {
+                if (value is FontWeight c)
+                {
+                    return ((IFormattable)c).ToString(null, culture);
+                }
+            }
+
+            throw GetConvertToException(value, destinationType);
         }
     }
-#endif
 }

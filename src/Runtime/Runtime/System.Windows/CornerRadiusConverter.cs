@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,11 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows
@@ -27,88 +23,190 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if FOR_DESIGN_TIME
     /// <summary>
-    /// Converts instances of other types to and from a System.Windows.CornerRadius.
-    /// </summary>
-    public sealed partial class CornerRadiusConverter : TypeConverter
+    /// CornerRadiusConverter - Converter class for converting instances of other types to and from CornerRadius instances.
+    /// </summary> 
+    internal class CornerRadiusConverter : TypeConverter
     {
         /// <summary>
-        /// Indicates whether an object can be converted from a given type to a System.Windows.CornerRadius.
+        /// CanConvertFrom - Returns whether or not this class can convert from a given type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="sourceType">The source System.Type that is being queried for conversion support.</param>
-        /// <returns>true if sourceType is of type System.String; otherwise, false.</returns>
+        /// <returns>
+        /// bool - True if thie converter can convert from the provided type, false if not.
+        /// </returns>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="sourceType"> The Type being queried for support. </param>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
+            // We can only handle strings, integral and floating types
+            TypeCode tc = Type.GetTypeCode(sourceType);
+            switch (tc)
             {
-                return true;
-            }
+                case TypeCode.String:
+                case TypeCode.Decimal:
+                case TypeCode.Single:
+                case TypeCode.Double:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                    return true;
 
-            return base.CanConvertFrom(context, sourceType);
+                default:
+                    return false;
+            }
         }
-        
+
         /// <summary>
-        /// Determines whether System.Windows.CornerRadius values can be converted to
-        /// the specified type.
+        /// CanConvertTo - Returns whether or not this class can convert to a given type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">
-        /// The desired type this System.Windows.CornerRadius is being evaluated to be
-        /// converted to.
-        /// </param>
-        /// <returns>true if destinationType is of type System.String; otherwise, false.</returns>
+        /// <returns>
+        /// bool - True if this converter can convert to the provided type, false if not.
+        /// </returns>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="destinationType"> The Type being queried for support. </param>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
 
-        
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     source is null.
-        //
-        //   System.ArgumentException:
-        //     source is not null and is not a valid type which can be converted to a System.Windows.CornerRadius.
         /// <summary>
-        /// Converts the specified object to a System.Windows.CornerRadius.
+        /// ConvertFrom - Attempt to convert to a CornerRadius from the given object
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.CornerRadius created from converting source.</returns>
+        /// <returns>
+        /// The CornerRadius which was constructed.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// An ArgumentNullException is thrown if the example object is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// An ArgumentException is thrown if the example object is not null and is not a valid type
+        /// which can be converted to a CornerRadius.
+        /// </exception>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="culture"> The CultureInfo which is respected when converting. </param>
+        /// <param name="value"> The object to convert to a CornerRadius. </param>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
-                throw GetConvertFromException(value);
+            if (value != null)
+            {
+                if (value is string)
+                { 
+                    return FromString((string)value, culture); 
+                }
+                else
+                { 
+                    return new CornerRadius(Convert.ToDouble(value, culture)); 
+                }
+            }
 
-            if (value is string)
-                return CornerRadius.INTERNAL_ConvertFromString((string)value);
-
-            return base.ConvertFrom(context, culture, value);
+            throw GetConvertFromException(value);
         }
 
-       
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     value is null.
-        //
-        //   System.ArgumentException:
-        //     value is not null and is not a System.Windows.Media.Brush, or if destinationType
-        //     is not one of the valid destination types.
         /// <summary>
-        /// Converts the specified System.Windows.CornerRadius to the specified type.
+        /// ConvertTo - Attempt to convert a CornerRadius to the given type
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The System.Windows.CornerRadius to convert.</param>
-        /// <param name="destinationType">The type to convert the System.Windows.CornerRadius to.</param>
-        /// <returns>The object created from converting this System.Windows.CornerRadius (a string).</returns>
+        /// <returns>
+        /// The object which was constructoed.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// An ArgumentNullException is thrown if the example object is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// An ArgumentException is thrown if the object is not null and is not a CornerRadius,
+        /// or if the destinationType isn't one of the valid destination types.
+        /// </exception>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="culture"> The CultureInfo which is respected when converting. </param>
+        /// <param name="value"> The CornerRadius to convert. </param>
+        /// <param name="destinationType">The type to which to convert the CornerRadius instance. </param>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            if (null == value)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
+            if (null == destinationType)
+            {
+                throw new ArgumentNullException(nameof(destinationType));
+            }
+
+            if (!(value is CornerRadius))
+            {
+                throw new ArgumentException(
+                    string.Format("Parameter is unexpected type '{0}'. Expected type is '{1}'.", value.GetType(), typeof(CornerRadius)), 
+                    nameof(value)
+                );
+            }
+
+            CornerRadius cr = (CornerRadius)value;
+            if (destinationType == typeof(string))
+            { 
+                return ToString(cr, culture); 
+            }
+
+            throw GetConvertToException(value, destinationType);
+        }
+
+        internal static string ToString(CornerRadius cr, CultureInfo culture)
+        {
+            char listSeparator = TokenizerHelper.GetNumericListSeparator(culture);
+
+            // Initial capacity [64] is an estimate based on a sum of:
+            // 48 = 4x double (twelve digits is generous for the range of values likely)
+            //  8 = 4x UnitType string (approx two characters)
+            //  4 = 4x separator characters
+            StringBuilder sb = new StringBuilder(64);
+
+            sb.Append(cr.TopLeft.ToString(culture));
+            sb.Append(listSeparator);
+            sb.Append(cr.TopRight.ToString(culture));
+            sb.Append(listSeparator);
+            sb.Append(cr.BottomRight.ToString(culture));
+            sb.Append(listSeparator);
+            sb.Append(cr.BottomLeft.ToString(culture));
+            return sb.ToString();
+        }
+
+        internal static CornerRadius FromString(string s, CultureInfo culture)
+        {
+            if (s != null)
+            {
+                char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(culture), ' ' };
+
+                string[] split = s.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+                double[] radii = new double[4];
+                int i = 0;
+
+                for (; i < split.Length; i++)
+                {
+                    if (i >= 4)
+                    {
+                        i = 5;    // Set i to a bad value. 
+                        break;
+                    }
+
+                    radii[i] = double.Parse(split[i], culture);
+                }
+
+                // We have a reasonable interpreation for one value (all four edges)
+                // and four values (left, top, right, bottom).
+                switch (i)
+                {
+                    case 1:
+                        return (new CornerRadius(radii[0]));
+
+                    case 4:
+                        return (new CornerRadius(radii[0], radii[1], radii[2], radii[3]));
+                }
+            }
+
+            throw new FormatException(
+                string.Format("'{0}' value is not valid. It must contain one or four delimited Lengths.", s)
+            );
         }
     }
-#endif
 }

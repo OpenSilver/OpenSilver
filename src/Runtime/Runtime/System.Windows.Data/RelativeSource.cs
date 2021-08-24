@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -47,28 +39,6 @@ namespace Windows.UI.Xaml.Data
         {
             _mode = relativeSourceMode;
         }
-
-
-        static RelativeSource()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(RelativeSourceMode), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string relativeSourceAsString)
-        {
-            switch (relativeSourceAsString)
-            {
-                case "None":
-                    return (new RelativeSource() { Mode = RelativeSourceMode.None });
-                case "Self":
-                    return (new RelativeSource() { Mode = RelativeSourceMode.Self });
-                case "TemplatedParent":
-                    return (new RelativeSource() { Mode = RelativeSourceMode.TemplatedParent });
-                default:
-                    throw new FormatException(relativeSourceAsString + " is not an eligible value for a RelativeSource");
-            }
-        }
-
 
         RelativeSourceMode _mode = RelativeSourceMode.None;
         /// <summary>

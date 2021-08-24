@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,45 +11,15 @@
 *  
 \*====================================================================================*/
 
-using DotNetForHtml5.Core;
-using System;
-using System.Windows.Markup;
-
 #if MIGRATION
+
 namespace System.Windows
 {
-    [SupportsDirectContentViaTypeFromStringConverters]
     public sealed partial class TextDecorationCollection
     {
-        static TextDecorationCollection()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(TextDecorationCollection), INTERNAL_ConvertFromString);
-        }
-
         internal TextDecorationCollection() { }
 
         internal TextDecoration Decoration { get; set; }
-
-        internal static object INTERNAL_ConvertFromString(string tdStr)
-        {
-            switch ((tdStr ?? string.Empty).ToLower())
-            {
-                case "underline":
-                    return TextDecorations.Underline;
-                case "strikethrough":
-                    return TextDecorations.Strikethrough;
-                case "overline":
-                    return TextDecorations.OverLine;
-                //case "baseline":
-                //    return TextDecorations.Baseline;
-                case "none":
-                    return null;
-                default:
-                    throw new InvalidOperationException(
-                        string.Format("Failed to create a '{0}' from the text '{1}'", 
-                                      typeof(TextDecorationCollection).FullName, tdStr));
-            }
-        }
 
         internal string ToHtmlString()
         {
@@ -73,7 +42,7 @@ namespace System.Windows
         }
     }
 
-    internal sealed partial class TextDecoration
+    internal sealed class TextDecoration
     {
         internal TextDecoration(TextDecorationLocation location)
         {
@@ -83,4 +52,5 @@ namespace System.Windows
         internal TextDecorationLocation Location { get; private set; }
     }
 }
+
 #endif

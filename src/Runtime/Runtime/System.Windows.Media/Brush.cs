@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using CSHTML5.Internal;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -29,19 +25,11 @@ namespace Windows.UI.Xaml.Media
     /// Defines objects used to paint graphical objects. Classes that derive from
     /// Brush describe how the area is painted.
     /// </summary>
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(BrushConverter))]
-#endif
     public partial class Brush : DependencyObject, IHasAccessToPropertiesWhereItIsUsed
     {
-        static Brush()
+        internal static Brush Parse(string source)
         {
-            TypeFromStringConverters.RegisterConverter(typeof(Brush), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string colorcode)
-        {
-            return new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString(colorcode));
+            return new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString(source));
         }
 
         /// <summary>

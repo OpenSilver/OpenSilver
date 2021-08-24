@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,8 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
-using System.ComponentModel;
-using System.Windows.Markup;
+using System.Globalization;
 
 #if MIGRATION
 namespace System.Windows
@@ -29,10 +24,6 @@ namespace Windows.UI.Xaml
     /// Represents the length of elements that explicitly support Windows.UI.Xaml.GridUnitType.Star
     /// unit types.
     /// </summary>
-#if FOR_DESIGN_TIME
-    [TypeConverter(typeof(GridLengthConverter))]
-#endif
-    [SupportsDirectContentViaTypeFromStringConverters]
     public partial struct GridLength
     {
         /// <summary>
@@ -46,38 +37,6 @@ namespace Windows.UI.Xaml
                 _type = this._type,
                 _value = this._value
             };
-        }
-
-
-        static GridLength()
-        {
-            TypeFromStringConverters.RegisterConverter(typeof(GridLength), INTERNAL_ConvertFromString);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string gridLengthAsString)
-        {
-            string trimmedLowercase = gridLengthAsString.Trim().ToLower();
-            if (trimmedLowercase.EndsWith("*"))
-            {
-                string valueAsString = trimmedLowercase.Substring(0, trimmedLowercase.Length - 1);
-                double value;
-                if (valueAsString == "")
-                    return new GridLength(1.0, GridUnitType.Star);
-                if (double.TryParse(valueAsString, out value))
-                    return new GridLength(value, GridUnitType.Star);
-                else
-                    throw new Exception("Invalid GridLength: " + gridLengthAsString);
-            }
-            else if (trimmedLowercase == "auto")
-                return new GridLength(1.0, GridUnitType.Auto);
-            else
-            {
-                double value;
-                if (double.TryParse(trimmedLowercase, out value))
-                    return new GridLength(value, GridUnitType.Pixel);
-                else
-                    throw new Exception("Invalid GridLength: " + gridLengthAsString);
-            }
         }
 
         private double _value;
@@ -260,18 +219,7 @@ namespace Windows.UI.Xaml
         /// </returns>
         public override string ToString()
         {
-            if (_type == GridUnitType.Auto)
-            {
-                return "Auto";
-            }
-            else if (_type == GridUnitType.Star)
-            {
-                return (_value == 1 ? "*" : _value.ToString() + "*");
-            }
-            else
-            {
-                return _value.ToString();
-            }
+            return GridLengthConverter.ToString(this, CultureInfo.InvariantCulture);
         }
     }
 }

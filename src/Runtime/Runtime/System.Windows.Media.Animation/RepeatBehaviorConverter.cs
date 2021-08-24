@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -27,75 +21,92 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if FOR_DESIGN_TIME
-
-    public sealed partial class RepeatBehaviorConverter : TypeConverter
+    /// <summary>
+    /// 
+    /// </summary>
+    internal class RepeatBehaviorConverter : TypeConverter
     {
+        private static readonly char[] _iterationCharacter = new char[] { 'x' };
+
         /// <summary>
-        /// Determines whether an object can be converted from a given type to an instance
-        /// of a System.Windows.Media.Animation.RepeatBehavior.
+        /// CanConvertFrom - Returns whether or not this class can convert from a given type
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="sourceType">The type of the source that is being evaluated for conversion.</param>
-        /// <returns>
-        /// true if the type can be converted to a System.Windows.Media.Animation.RepeatBehavior; otherwise,
-        /// false.
-        /// </returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-            {
-                return true;
-            }
-
-            return base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(string);
         }
 
-        /// <summary>System.Windows.Media.Animation.RepeatBehavior
-        /// Determines whether an instance of a System.Windows.Media.Animation.RepeatBehavior can be converted
-        /// to a different type.
+        /// <summary>
+        /// TypeConverter method override.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">The desired type this System.Windows.Media.Animation.RepeatBehavior is being evaluated for conversion.</param>
-        /// <returns>
-        /// true if this System.Windows.Media.Animation.RepeatBehavior can be converted to destinationType;
-        /// otherwise, false.
-        /// </returns>
+        /// <param name="context">ITypeDescriptorContext</param>
+        /// <param name="destinationType">Type to convert to</param>
+        /// <returns>true if conversion is possible</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
 
         /// <summary>
-        /// Attempts to convert the specified object to a System.Windows.Media.Animation.RepeatBehavior.
+        /// ConvertFrom
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Cultural information to respect during conversion.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>The System.Windows.Media.Animation.RepeatBehavior created from converting value.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
-                throw GetConvertFromException(value);
+            if (value is string stringValue)
+            {
+                stringValue = stringValue.Trim();
+#if NETSTANDARD
+                stringValue = stringValue.ToLowerInvariant();
+#elif BRIDGE
+                stringValue = stringValue.ToLower();
+#endif
 
-            if (value is string)
-                return RepeatBehavior.INTERNAL_ConvertFromString((string)value);
+                if (stringValue == "forever")
+                {
+                    return RepeatBehavior.Forever;
+                }
+                else if (stringValue.Length > 0 
+                    && stringValue[stringValue.Length - 1] == _iterationCharacter[0])
+                {
+                    string stringDoubleValue = stringValue.TrimEnd(_iterationCharacter);
 
-            return base.ConvertFrom(context, culture, value);
+                    double doubleValue = (double)TypeConverterHelper.GetConverter(
+                        typeof(double)).ConvertFrom(
+                            context,
+                            culture,
+                            stringDoubleValue);
+
+                    return new RepeatBehavior(doubleValue);
+                }
+            }
+
+            throw GetConvertFromException(value);
         }
 
         /// <summary>
-        /// Attempts to convert a System.Windows.Media.Animation.RepeatBehavior to a specified type.
+        /// TypeConverter method implementation.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The System.Windows.Media.Animation.RepeatBehavior to convert.</param>
-        /// <param name="destinationType">The type to convert this System.Windows.Media.Animation.RepeatBehavior to.</param>
-        /// <returns>The object created from converting this System.Windows.Media.Animation.RepeatBehavior.</returns>
+        /// <param name="context">ITypeDescriptorContext</param>
+        /// <param name="culture">current culture (see CLR specs)</param>
+        /// <param name="value">value to convert from</param>
+        /// <param name="destinationType">Type to convert to</param>
+        /// <returns>converted value</returns>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            if (destinationType == null)
+            {
+                throw new ArgumentNullException(nameof(destinationType));
+            }
+
+            if (destinationType == typeof(string))
+            {
+                if (value is RepeatBehavior repeatBehavior)
+                {
+                    return repeatBehavior.ToString();
+                }
+            }
+
+            throw GetConvertToException(value, destinationType);
         }
     }
-#endif
 }

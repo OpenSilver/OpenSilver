@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows
@@ -27,78 +21,90 @@ namespace System.Windows
 namespace Windows.Foundation
 #endif
 {
-#if FOR_DESIGN_TIME
-
     /// <summary>
-    /// Converts instances of other types to and from an instance of Windows.Foundation.Point.
+    /// PointConverter - Converter class for converting instances of other types to and from Point instances
     /// </summary>
-    public sealed partial class PointConverter : TypeConverter
+    internal class PointConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object can be converted from a given type to an instance
-        /// of a Windows.Foundation.Point.
+        /// Returns true if this type converter can convert from a given type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="sourceType">The type of the source that is being evaluated for conversion.</param>
         /// <returns>
-        /// true if the type can be converted to a Windows.Foundation.Point; otherwise,
-        /// false.
+        /// bool - True if this converter can convert from the provided type, false if not.
         /// </returns>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="sourceType"> The Type being queried for support. </param>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-            {
-                return true;
-            }
-
-            return base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(string);
         }
 
         /// <summary>
-        /// Determines whether an instance of a Windows.Foundation.Point can be converted
-        /// to a different type.
+        /// Returns true if this type converter can convert to the given type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">The desired type this Windows.Foundation.Point is being evaluated for conversion.</param>
         /// <returns>
-        /// true if this Windows.Foundation.Point can be converted to destinationType;
-        /// otherwise, false.
+        /// bool - True if this converter can convert to the provided type, false if not.
         /// </returns>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="destinationType"> The Type being queried for support. </param>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
 
         /// <summary>
-        /// Attempts to convert the specified object to a Windows.Foundation.Point.
+        /// Attempts to convert to a Point from the given object.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Cultural information to respect during conversion.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>The Windows.Foundation.Point created from converting value.</returns>
+        /// <returns>
+        /// The Point which was constructed.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if the example object is null or is not a valid type
+        /// which can be converted to a Point.
+        /// </exception>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="culture"> The requested CultureInfo.  Note that conversion uses "en-US" rather than this parameter. </param>
+        /// <param name="value"> The object to convert to an instance of Point. </param>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null)
-                throw GetConvertFromException(value);
+            if (value is string source)
+            {
+                return Point.Parse(source);
+            }
 
-            if (value is string)
-                return Point.INTERNAL_ConvertFromString((string)value);
-
-            return base.ConvertFrom(context, culture, value);
+            throw GetConvertFromException(value);
         }
 
         /// <summary>
-        /// Attempts to convert a Windows.Foundation.Point to a specified type.
+        /// ConvertTo - Attempt to convert an instance of Point to the given type
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The Windows.Foundation.Point to convert.</param>
-        /// <param name="destinationType">The type to convert this Windows.Foundation.Point to.</param>
-        /// <returns>The object created from converting this Windows.Foundation.Point.</returns>
+        /// <returns>
+        /// The object which was constructoed.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if "value" is null or not an instance of Point,
+        /// or if the destinationType isn't one of the valid destination types.
+        /// </exception>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="culture"> The CultureInfo which is respected when converting. </param>
+        /// <param name="value"> The object to convert to an instance of "destinationType". </param>
+        /// <param name="destinationType"> The type to which this will convert the Point instance. </param>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            throw new NotImplementedException();
+            if (destinationType == null)
+            {
+                throw new ArgumentNullException(nameof(destinationType));
+            }
+
+            if (destinationType == typeof(string))
+            {
+                if (value is Point instance)
+                {
+                    return instance.ToString(culture);
+                }
+            }
+
+            throw GetConvertToException(value, destinationType);
         }
     }
-#endif
 }
