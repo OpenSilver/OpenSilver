@@ -120,7 +120,7 @@ document.onkeyup = function (evt) {
     document.refreshKeyModifiers(evt);
 };
 
-document.jsSimulatorObjectReferences = new Array();
+document.jsObjRef = new Array();
 document.callbackCounterForSimulator = 0;
 
 document.reroute = function reroute(e, elem, shiftKey) {
@@ -208,6 +208,11 @@ document.createElementSafe = function (tagName, id, parentElement, index) {
 	const newElement = document.createElement(tagName);
 
 	newElement.setAttribute("id", id);
+
+    if (typeof parentElement == 'string') {
+        parentElement = document.getElementById(parentElement);
+    }
+
 	if(index < 0 || index >= parentElement.children.length)	{
 		parentElement.appendChild(newElement);
 	}
@@ -235,12 +240,40 @@ document.invoke2dContextMethod = function (id, methodName, args) {
             .filter(i => i.length > 0));
 }
 
-document.setDomStyleProperty = function (id, propertyName, value) {
+document.setDomStyle = function (id, propertyName, value) {
     const element = document.getElementById(id);
     if (!element)
         return;
 
     element.style[propertyName] = value;
+}
+
+document.setDomTransform = function (id, value) {
+    const element = document.getElementById(id);
+    if (!element)
+        return;
+
+    element.style['transform'] = value;
+    element.style['msTransform'] = value;
+    element.style['WebkitTransform'] = value;
+}
+
+document.setDomTransformOrigin = function (id, value) {
+    const element = document.getElementById(id);
+    if (!element)
+        return;
+
+    element.style['transformOrigin'] = value;
+    element.style['msTransformOrigin'] = value;
+    element.style['WebkitTransformOrigin'] = value;
+}
+
+document.setDomAttribute = function (id, propertyName, value) {
+    const element = document.getElementById(id);
+    if (!element)
+        return;
+
+    element.setAttribute(propertyName, value);
 }
 
 document.removeEventListenerSafe = function (element, method, func) {
@@ -250,6 +283,9 @@ document.removeEventListenerSafe = function (element, method, func) {
 }
 
 document.addEventListenerSafe = function (element, method, func) {
+    if (typeof element == 'string') {
+        element = document.getElementById(element);
+    }
 	if (element){
 		element.addEventListener(method, func);
 	}
@@ -258,7 +294,7 @@ document.addEventListenerSafe = function (element, method, func) {
 document.eventCallback = function (callbackId, arguments) {
 	const argsArray = arguments;
 	const idWhereCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
-	document.jsSimulatorObjectReferences[idWhereCallbackArgsAreStored] = argsArray;
+	document.jsObjRef[idWhereCallbackArgsAreStored] = argsArray;
 	setTimeout(
 		function() 
 		{{
@@ -267,12 +303,21 @@ document.eventCallback = function (callbackId, arguments) {
 		, 1);
 }
 
+document.callScriptSafe = function (referenceId, javaScriptToExecute, errorCallBackId) {
+    try {
+        document.jsObjRef[referenceId] = eval(javaScriptToExecute); 
+        return document.jsObjRef[referenceId];
+    } catch (error) {
+        document.errorCallback(error, errorCallBackId); 
+    }
+}
+
 document.errorCallback = function (error, IndexOfNextUnmodifiedJSCallInList) {
 	const idWhereErrorCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
 	const argsArr = [];
 	argsArr[0] = error.message;
 	argsArr[1] = IndexOfNextUnmodifiedJSCallInList;
-	document.jsSimulatorObjectReferences[idWhereErrorCallbackArgsAreStored] = argsArr;
+	document.jsObjRef[idWhereErrorCallbackArgsAreStored] = argsArr;
 	window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);
 }
 

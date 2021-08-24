@@ -82,8 +82,8 @@ namespace CSHTML5.Internal
         {
             string methodArgumentsFormattedForJavaScript = string.Join(", ", args.Select(x => INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(x)));
             string javaScriptCodeToExecute =
-                string.Format(@"document.invoke2dContextMethod(""{0}"" , ""{1}"", ""{2}"")", 
-                        _domElementUniqueIdentifier, methodName, methodArgumentsFormattedForJavaScript);
+                $@"document.invoke2dContextMethod(""{_domElementUniqueIdentifier}"" , ""{methodName}"", ""{methodArgumentsFormattedForJavaScript}"")";
+
             var result = CSHTML5.Interop.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
             return result;
             //INTERNAL_SimulatorPerformanceOptimizer.QueueJavaScriptCode(javaScriptCodeToExecute);

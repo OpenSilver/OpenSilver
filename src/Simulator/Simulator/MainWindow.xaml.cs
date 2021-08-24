@@ -652,7 +652,17 @@ ends with "".Browser"" in your solution.";
             {
                 if (htmlDocument != null)
                 {
-                    if (CallJSMethodAndReturnValue(htmlDocument, "getXamlRoot").IsObject())
+                    JSValue xamlRoot = null;
+                    try
+                    {
+                        xamlRoot = CallJSMethodAndReturnValue(htmlDocument, "getXamlRoot");
+                    }
+                    catch(Exception ex)
+                    {
+                        Debug.WriteLine($"Initialization: can not get the root. {ex.Message}");
+                    }
+
+                    if (xamlRoot != null && xamlRoot.IsObject())
                     {
                         loaded = true;
                         break;
@@ -1269,7 +1279,15 @@ Click OK to continue.";
                     var cshtml5DomRootElement = z;
                     */
 
-                    var cshtml5DomRootElement = CallJSMethodAndReturnValue(htmlDocument, "getXamlRoot");
+                    JSValue cshtml5DomRootElement = null;
+                    try
+                    {
+                        cshtml5DomRootElement = CallJSMethodAndReturnValue(htmlDocument, "getXamlRoot");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Can not get the root. {ex.Message}");
+                    }
 
                     if (cshtml5DomRootElement != null && cshtml5DomRootElement.IsObject()) // It is not an object for example if the app has navigated to another page via "System.Windows.Browser.HtmlPage.Window.Navigate(url)"
                     {
@@ -1303,6 +1321,10 @@ Click OK to continue.";
         static JSValue CallJSMethodAndReturnValue(JSValue instance, string methodname, params object[] args)
         {
             var function = GetJSProperty(instance, methodname);
+            if (function == null || !function.IsFunction())
+            {
+                throw new ApplicationException($"'{methodname}' is not a function or does not exist");
+            }
             var result = function.AsFunction().InvokeAndReturnValue(instance.AsObject(), args);
 
             return result;
