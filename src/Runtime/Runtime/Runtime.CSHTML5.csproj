@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -87,6 +87,7 @@
     <Compile Include="System.ComponentModel\SortDescription.cs" />
     <Compile Include="System.ComponentModel\SortDescriptionCollection.cs" />
     <Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageSettings.cs" />
+    <Compile Include="System.Linq\WORKINPROGRESS\FunctionalProgramming.cs" />
     <Compile Include="System.Net\SecurityProtocolType.cs" />
     <Compile Include="System.Net\ServicePointManager.cs" />
     <Compile Include="System.Net\WORKINPROGRESS\CookieContainer.cs" />
@@ -100,6 +101,8 @@
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlEventArgs.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlPopupWindowOptions.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptObjectCollection.cs" />
+    <Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
+    <Compile Include="System.Windows.Controls\WORKINPROGRESS\ScrollViewerExtensions.cs" />
     <Compile Include="System.Windows.Interactivity\EventTrigger.cs" />
     <Compile Include="System.Windows.Interactivity\InvokeCommandAction.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerAction.cs" />
