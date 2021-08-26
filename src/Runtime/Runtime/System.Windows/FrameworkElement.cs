@@ -933,10 +933,13 @@ namespace Windows.UI.Xaml
             bool isDefaultAlignment = HorizontalAlignment == HorizontalAlignment.Stretch && VerticalAlignment == VerticalAlignment.Stretch;
             Size finalSize = isDefaultAlignment ? finalRect.Size : new Size(
                 HorizontalAlignment != HorizontalAlignment.Stretch ? Math.Min(DesiredSize.Width, finalRect.Width) : finalRect.Width,
-                VerticalAlignment != VerticalAlignment.Stretch ? Math.Min(DesiredSize.Height ,finalRect.Height) : finalRect.Height);
+                VerticalAlignment != VerticalAlignment.Stretch ? Math.Min(DesiredSize.Height, finalRect.Height) : finalRect.Height);
 
-            finalSize.Width = Math.Max(0, finalSize.Width - Margin.Left - Margin.Right);
-            finalSize.Height = Math.Max(0, finalSize.Height - Margin.Top - Margin.Bottom);
+            if (!this.IsCustomLayoutRoot)
+            {
+                finalSize.Width = Math.Max(0, finalSize.Width - Margin.Left - Margin.Right);
+                finalSize.Height = Math.Max(0, finalSize.Height - Margin.Top - Margin.Bottom);
+            }
 
             Size MinSize = new Size(MinWidth, MinHeight);
             Size MaxSize = new Size(MaxWidth, MaxHeight);
@@ -950,15 +953,18 @@ namespace Windows.UI.Xaml
             Rect containingRect = new Rect(arrangedSize);
 
             // Add Margin
-            double newLeft = containingRect.Left - Margin.Left;
-            double newTop = containingRect.Top - Margin.Top;
-            double newWidth = containingRect.Width + Margin.Left + Margin.Right;
-            double newHeight = containingRect.Height + Margin.Top + Margin.Bottom;
+            if (!this.IsCustomLayoutRoot)
+            {
+                double newLeft = containingRect.Left - Margin.Left;
+                double newTop = containingRect.Top - Margin.Top;
+                double newWidth = containingRect.Width + Margin.Left + Margin.Right;
+                double newHeight = containingRect.Height + Margin.Top + Margin.Bottom;
 
-            if (newWidth >= 0 && newHeight >= 0)
-                containingRect = new Rect(newLeft, newTop, newWidth, newHeight);
-            else
-                throw new ArgumentException("Width or Height cannot be lower than 0");
+                if (newWidth >= 0 && newHeight >= 0)
+                    containingRect = new Rect(newLeft, newTop, newWidth, newHeight);
+                else
+                    throw new ArgumentException("Width or Height cannot be lower than 0");
+            }
 
             Point alignedOffset = GetAlignmentOffset(finalRect, containingRect.Size, HorizontalAlignment, VerticalAlignment);
 
@@ -967,7 +973,8 @@ namespace Windows.UI.Xaml
             VisualBounds = new Rect(visualOffset, arrangedSize);
 
             // Call SizeChanged event handlers
-            this.HandleSizeChanged($"{VisualBounds.Width}|{VisualBounds.Height}");
+            if (!this.IsCustomLayoutRoot)
+                this.HandleSizeChanged($"{VisualBounds.Width}|{VisualBounds.Height}");
 
             if (isFirstRendering)
             {
