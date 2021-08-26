@@ -267,7 +267,9 @@ namespace CSHTML5.Types
 
         public int ToInt32(IFormatProvider provider)
         {
-            return Convert.ToInt32(this.GetActualValue());
+            int.TryParse(GetActualValue().ToString(), out var result);
+
+            return result;
         }
 
         public long ToInt64(IFormatProvider provider)
