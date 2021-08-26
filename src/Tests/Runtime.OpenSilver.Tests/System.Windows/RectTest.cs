@@ -21,7 +21,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 #if MIGRATION
 namespace System.Windows.Tests
 #else
-namespace Windows.Foundation
+namespace Windows.Foundation.Tests
 #endif
 {
     [TestClass]
