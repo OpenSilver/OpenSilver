@@ -60,7 +60,7 @@ namespace Windows.UI.Xaml.Shapes
 		/// </summary>
 		public Polygon()
 		{
-			
+			this.Points = new PointCollection();
 		}
 
 		/// <summary>

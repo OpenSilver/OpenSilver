@@ -254,6 +254,7 @@ namespace Windows.UI.Xaml.Controls
                 typeof(Control),
                 new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
+                    Inherits = true,
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
                         Value = (inst, value) => ((FontWeight)value).Weight.ToInvariantString(),
