@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -75,54 +75,26 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="CSHTML5.Stubs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\CSHTML5.Stubs.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+  <ItemGroup>
+    <None Include="bridge.json" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' ">
+  <ItemGroup>
     <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="CSHTML5.Stubs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\CSHTML5.Stubs.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">
-    <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.Migration.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="CSHTML5.Stubs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.Migration.2.0.0-alpha69-089\lib\net40\CSHTML5.Stubs.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">
-    <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.Migration.WorkInProgress.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="CSHTML5.Stubs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.Migration.WorkInProgress.2.0.0-alpha69-089\lib\net40\CSHTML5.Stubs.dll</HintPath>
-      <Private>True</Private>
+      <HintPath Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
+      <HintPath Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' ">..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
+      <HintPath Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">..\..\packages\CSHTML5.Migration.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
+      <HintPath Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">..\..\packages\CSHTML5.Migration.WorkInProgress.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Bridge.TypesThatWillBeForwarded\Bridge.TypesThatWillBeForwarded.CSHTML5.csproj">
+      <Project>{319582e2-61e2-429a-973c-950cda0d5d1d}</Project>
+      <Name>Bridge.TypesThatWillBeForwarded.CSHTML5</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Runtime\Runtime.CSHTML5.csproj">
       <Project>{03dfd03a-5639-4523-901a-8310296a4317}</Project>
       <Name>Runtime.CSHTML5</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="bridge.json" />
   </ItemGroup>
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' " />
