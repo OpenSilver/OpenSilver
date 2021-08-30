@@ -14,7 +14,7 @@ using System.Windows.Markup;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("OpenSilver.Controls.Data")]
-[assembly: AssemblyDescription("Silverlight Data Input Controls for OpenSilve")]
+[assembly: AssemblyDescription("Silverlight Data Input Controls for OpenSilver")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("")]
@@ -42,7 +42,7 @@ using System.Windows.Markup;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("3d5900ae-111a-45be-96b3-d9e4606ca793")]
 
-[assembly: CLSCompliant(true)]
+[assembly: CLSCompliant(false)]
 
 // Version information for an assembly consists of the following four values:
 //
