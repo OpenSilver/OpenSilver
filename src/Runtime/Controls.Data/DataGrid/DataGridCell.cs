@@ -56,6 +56,7 @@ namespace Windows.UI.Xaml.Controls
 
         public DataGridCell()
         {
+            CustomLayout = true;
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridCell_MouseLeftButtonDown), true);
             this.MouseEnter += new MouseEventHandler(DataGridCell_MouseEnter);
             this.MouseLeave += new MouseEventHandler(DataGridCell_MouseLeave);

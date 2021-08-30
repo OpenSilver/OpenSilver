@@ -60,6 +60,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public DataGridRowGroupHeader()
         {
+            CustomLayout = true;
             DefaultStyleKey = typeof(DataGridRowGroupHeader);
 
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRowGroupHeader_MouseLeftButtonDown), true);
