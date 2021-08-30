@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,33 +11,23 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using CSHTML5.Types;
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
 #if MIGRATION
 using System.Windows;
 #else
 using Windows.UI.Xaml;
 #endif
 
-namespace CSHTML5
+namespace OpenSilver
 {
     /// <summary>
     /// Provides static methods for executing JavaScript code from within C#.
     /// </summary>
-    #if OPENSILVER
-    [Obsolete]
-    #endif
     public static class Interop
     {
         /// <summary>
@@ -47,11 +36,11 @@ namespace CSHTML5
         /// <param name="javascript">The JavaScript code to execute.</param>
         /// <returns>The result, if any, of the JavaScript call.</returns>
 #if BRIDGE
-        [Template]
+        [Bridge.Template]
 #endif
         public static object ExecuteJavaScript(string javascript)
         {
-            return INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: false);
+            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: false);
         }
 
         /// <summary>
@@ -61,11 +50,11 @@ namespace CSHTML5
         /// <param name="variables">The objects to use inside the JavaScript call.</param>
         /// <returns>The result, if any, of the JavaScript call.</returns>
 #if BRIDGE
-        [Template]
+        [Bridge.Template]
 #endif
         public static object ExecuteJavaScript(string javascript, params object[] variables)
         {
-            return INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: false, variables: variables);
+            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: false, variables: variables);
         }
 
         /// <summary>
@@ -73,11 +62,11 @@ namespace CSHTML5
         /// </summary>
         /// <param name="javascript">The JavaScript code to execute.</param>
 #if BRIDGE
-        [Template]
+        [Bridge.Template]
 #endif
         public static object ExecuteJavaScriptAsync(string javascript)
         {
-            return INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: true);
+            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: true);
         }
 
         /// <summary>
@@ -86,11 +75,11 @@ namespace CSHTML5
         /// <param name="javascript">The JavaScript code to execute.</param>
         /// <param name="variables">The objects to use inside the JavaScript call.</param>
 #if BRIDGE
-        [Template]
+        [Bridge.Template]
 #endif
         public static object ExecuteJavaScriptAsync(string javascript, params object[] variables)
         {
-            return INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: true, variables: variables);
+            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: true, variables: variables);
         }
 
         /// <summary>
@@ -98,9 +87,7 @@ namespace CSHTML5
         /// </summary>
         /// <param name="value">The value to unbox.</param>
         /// <returns>the unboxed value if the value was boxed, the value itself otherwise.</returns>
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("$value")]
-#else
+#if BRIDGE
         [Bridge.Template("({value} == undefined ? {value} : ({value}.v != undefined ? {value}.v : {value}))")]
 #endif
         public static object Unbox(object value)
@@ -115,32 +102,43 @@ namespace CSHTML5
         /// <returns>Nothing.</returns>
         public static Task<object> LoadJavaScriptFile(string url)
         {
-            // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
-#if !BRIDGE
+            // Get the assembly name of the calling method: 
+            //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method
+            //that is executed immediately after the one where the URI is defined! Be careful
+            //when moving the following line of code.
+#if NETSTANDARD
 	        string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
-#else
+#elif BRIDGE
             string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
 
             var t = new TaskCompletionSource<object>();
-            INTERNAL_InteropImplementation.LoadJavaScriptFile(url, callerAssemblyName, () => t.SetResult(null), () => t.SetException(new Exception("Could not load file: \"" + url + "\".")));
+            CSHTML5.INTERNAL_InteropImplementation.LoadJavaScriptFile(
+                url, 
+                callerAssemblyName, 
+                () => t.SetResult(null), () => t.SetException(new Exception("Could not load file: \"" + url + "\"."))
+            );
             return t.Task;
         }
 
-        static HashSet2<string> _jsScriptFileKeys = new HashSet2<string>(); //todo: This is probably redundant with the _pendingJSFile and _loadedFiles in INTERNAL_InteropImplementation so remove this?
+        private static HashSet2<string> _jsScriptFileKeys = new HashSet2<string>(); //todo: This is probably redundant with the _pendingJSFile and _loadedFiles in INTERNAL_InteropImplementation so remove this?
+        
         public static Task<object> LoadJavaScriptFile(ResourceFile resourceFile)
         {
             if (!_jsScriptFileKeys.Contains(resourceFile.Key))
             {
-                // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
-#if !BRIDGE
+                // Get the assembly name of the calling method: 
+                // IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method
+                // that is executed immediately after the one where the URI is defined! Be careful
+                // when moving the following line of code.
+#if NETSTANDARD
 	            string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
-#else
+#elif BRIDGE
                 string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
 
                 var t = new TaskCompletionSource<object>();
-                INTERNAL_InteropImplementation.LoadJavaScriptFile(resourceFile.Url, callerAssemblyName,
+                CSHTML5.INTERNAL_InteropImplementation.LoadJavaScriptFile(resourceFile.Url, callerAssemblyName,
                     () =>
                     {
                         t.SetResult(null);
@@ -165,23 +163,28 @@ namespace CSHTML5
         /// <param name="callbackOnError">The method that is called when one of the files could not be loaded.</param>
         public static void LoadJavaScriptFilesAsync(IEnumerable<string> urls, Action callback, Action callbackOnError = null)
         {
-            // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
-#if !BRIDGE
+            // Get the assembly name of the calling method: 
+            // IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method
+            // that is executed immediately after the one where the URI is defined! Be careful
+            // when moving the following line of code.
+#if NETSTANDARD
 	        string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
-
 #else
             string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
             List<string> urlsAsList = (urls is List<string> ? (List<string>)urls : new List<string>(urls));
-            INTERNAL_InteropImplementation.LoadJavaScriptFiles(urlsAsList, callerAssemblyName, callback, callbackOnError);
+            CSHTML5.INTERNAL_InteropImplementation.LoadJavaScriptFiles(urlsAsList, callerAssemblyName, callback, callbackOnError);
         }
 
         public static void LoadJavaScriptFilesAsync(IEnumerable<ResourceFile> resourceFiles, Action callback, Action callbackOnError = null)
         {
-            // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
-#if !BRIDGE
+            // Get the assembly name of the calling method: 
+            // IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method
+            // that is executed immediately after the one where the URI is defined! Be careful
+            // when moving the following line of code.
+#if NETSTANDARD
 	        string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
-#else
+#elif BRIDGE
             string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
             List<string> urlsAsList = new List<string>();
@@ -194,7 +197,7 @@ namespace CSHTML5
                     urlsAsList.Add(resourceFile.Url);
                 }
             }
-            INTERNAL_InteropImplementation.LoadJavaScriptFiles(urlsAsList, callerAssemblyName, callback, callbackOnError);
+            CSHTML5.INTERNAL_InteropImplementation.LoadJavaScriptFiles(urlsAsList, callerAssemblyName, callback, callbackOnError);
         }
 
         /// <summary>
@@ -205,7 +208,7 @@ namespace CSHTML5
         public static Task<object> LoadCssFile(string url)
         {
             var t = new TaskCompletionSource<object>();
-            INTERNAL_InteropImplementation.LoadCssFile(url, () => t.SetResult(null));
+            CSHTML5.INTERNAL_InteropImplementation.LoadCssFile(url, () => t.SetResult(null));
             return t.Task;
         }
 
@@ -215,7 +218,7 @@ namespace CSHTML5
             if (!_cssFileKeys.Contains(resourceFile.Key))
             {
                 var t = new TaskCompletionSource<object>();
-                INTERNAL_InteropImplementation.LoadCssFile(resourceFile.Url, () => t.SetResult(null));
+                CSHTML5.INTERNAL_InteropImplementation.LoadCssFile(resourceFile.Url, () => t.SetResult(null));
                 _cssFileKeys.Add(resourceFile.Key);
                 return t.Task;
             }
@@ -234,7 +237,7 @@ namespace CSHTML5
         public static void LoadCssFilesAsync(IEnumerable<string> urls, Action callback)
         {
             List<string> urlsAsList = (urls is List<string> ? (List<string>)urls : new List<string>(urls));
-            INTERNAL_InteropImplementation.LoadCssFiles(urlsAsList, callback);
+            CSHTML5.INTERNAL_InteropImplementation.LoadCssFiles(urlsAsList, callback);
         }
 
         public static void LoadCssFilesAsync(IEnumerable<ResourceFile> resourceFiles, Action callback)
@@ -249,7 +252,7 @@ namespace CSHTML5
                     urlsAsList.Add(resourceFile.Url);
                 }
             }
-            INTERNAL_InteropImplementation.LoadCssFiles(urlsAsList, callback);
+            CSHTML5.INTERNAL_InteropImplementation.LoadCssFiles(urlsAsList, callback);
         }
 
         /// <summary>
@@ -289,9 +292,9 @@ namespace CSHTML5
             get
             {
 #if OPENSILVER
-	            return INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround();
+	            return CSHTML5.INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround();
 #elif BRIDGE
-                return INTERNAL_InteropImplementation.IsRunningInTheSimulator();
+                return CSHTML5.INTERNAL_InteropImplementation.IsRunningInTheSimulator();
 #endif
             }
         }
@@ -316,9 +319,7 @@ namespace CSHTML5
         /// Check if the given jsnode is undefined
         /// </summary>
 #if BRIDGE
-        [Template("(typeof({jsObject}) === 'undefined')")]
-#else
-        [JSReplacement("(typeof($jsObject) === 'undefined')")]
+        [Bridge.Template("(typeof({jsObject}) === 'undefined')")]
 #endif
         public static bool IsUndefined(object jsObject)
         {
@@ -329,9 +330,7 @@ namespace CSHTML5
         /// Check if the given jsnode is undefined
         /// </summary>
 #if BRIDGE
-        [Template("({jsObject} === null)")]
-#else
-        [JSReplacement("($jsObject === null)")]
+        [Bridge.Template("({jsObject} === null)")]
 #endif
         public static bool IsNull(object jsObject)
         {
@@ -354,7 +353,6 @@ namespace CSHTML5
             /// The path to the file.
             /// </summary>
             public string Url { get; set; }
-
         }
     }
 }
