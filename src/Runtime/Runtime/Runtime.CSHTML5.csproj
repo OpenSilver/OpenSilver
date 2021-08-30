@@ -123,6 +123,7 @@
     <Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
     <Compile Include="System.Windows\FontStretchConverter.cs" />
     <Compile Include="System.Windows\FontStyleConverter.cs" />
+    <Compile Include="System.Windows\NullableBoolConverter.cs" />
     <Compile Include="System.Windows\RectConverter.cs" />
     <Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
     <Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />

@@ -364,7 +364,7 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\IApplicationLifetimeAware.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\IApplicationService.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\INativeCollectionWrapper.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\NullableBoolConverter.cs" />
+		<Compile Include="System.Windows\NullableBoolConverter.cs" />
 		<Compile Include="System.Windows\StyleTypedPropertyAttribute.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\SystemColors.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\SystemParameters.cs" />
