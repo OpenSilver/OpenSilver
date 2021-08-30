@@ -98,9 +98,11 @@ namespace Windows.UI.Xaml
         public Size RenderSize { get { return VisualBounds.Size; } }
 
         public Size DesiredSize { get; private set; }
-        
+#if DEBUG                
+        public Rect VisualBounds { get; set; }
+#else
         internal Rect VisualBounds { get; set; }
-
+#endif
         internal bool IsMeasureValid { get; private set; }
 
         internal bool IsArrangeValid { get; private set; }
@@ -770,9 +772,9 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion
+#endregion
 
-        #region pointer-events
+#region pointer-events
 
         internal static bool EnablePointerEventsBase(UIElement uie)
         {
@@ -800,7 +802,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion pointer-events
+#endregion pointer-events
 
         internal static void SetPointerEvents(UIElement element)
         {
@@ -1290,7 +1292,7 @@ namespace Windows.UI.Xaml
         //{
         //}
 
-        #region ForceInherit property support
+#region ForceInherit property support
 
         internal static void SynchronizeForceInheritProperties(UIElement uiE, DependencyObject parent)
         {
@@ -1326,7 +1328,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion ForceInherit property support
+#endregion ForceInherit property support
 
         internal bool MeasureDirty
         {
