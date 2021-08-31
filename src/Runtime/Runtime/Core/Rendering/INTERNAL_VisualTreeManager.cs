@@ -201,6 +201,12 @@ namespace CSHTML5.Internal
             element._isLoaded = false;
             if (element is FrameworkElement)
             {
+                // Detach resizeSensor
+                ((FrameworkElement)element).DetachResizeSensorFromDomElement();
+
+                // Initialize measure & arrange status
+                ((FrameworkElement)element).ClearMeasureAndArrangeValidation();
+
                 ((FrameworkElement)element).INTERNAL_RaiseUnloadedEvent();
             }
 

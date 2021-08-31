@@ -1523,6 +1523,14 @@ document.ondblclick = null;
             LayoutManager.Current.AddMeasure(this);
         }
 
+        internal void ClearMeasureAndArrangeValidation()
+        {
+            this.IsRendered = false;
+            this.RenderedVisualBounds = Rect.Empty;
+            this.IsArrangeValid = false;
+            this.IsMeasureValid = false;
+        }
+
         public void UpdateLayout()
         {
 
