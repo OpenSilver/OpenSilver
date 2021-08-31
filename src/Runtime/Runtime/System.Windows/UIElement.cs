@@ -107,6 +107,8 @@ namespace Windows.UI.Xaml
 
         internal bool IsRendered { get; private set; }
 
+        internal bool isFirstRendering;
+
         internal Rect RenderedVisualBounds { get; private set; }
 
         internal Rect PreviousFinalRect { get; private set; }
@@ -190,6 +192,7 @@ namespace Windows.UI.Xaml
             IsMeasureValid = false;
             IsArrangeValid = false;
             IsRendered = false;
+            isFirstRendering = false;
             visualLevel = -1;
 
             disableMeasureInvalidationToken = new Disposable(() => disableMeasureInvalidationRequests--);
@@ -1518,6 +1521,14 @@ document.ondblclick = null;
             IsMeasureValid = false;
 
             LayoutManager.Current.AddMeasure(this);
+        }
+
+        internal void ClearMeasureAndArrangeValidation()
+        {
+            this.IsRendered = false;
+            this.RenderedVisualBounds = Rect.Empty;
+            this.IsArrangeValid = false;
+            this.IsMeasureValid = false;
         }
 
         public void UpdateLayout()
