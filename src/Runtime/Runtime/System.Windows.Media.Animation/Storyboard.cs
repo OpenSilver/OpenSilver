@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -211,7 +206,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
                         InitializeIteration();
 
-                        bool isThisSingleLoop = RepeatBehavior.Type == RepeatBehaviorType.Count && RepeatBehavior.Count == 1;
+                        bool isThisSingleLoop = RepeatBehavior.HasCount && RepeatBehavior.Count == 1;
 
                         StartFirstIteration(parameters, isThisSingleLoop, new TimeSpan()); //todo: use a parameter instead of just a new TimeSpan since we can have a Storyboard inside a Storyboard.
                     }
@@ -437,7 +432,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     {
                         currentParameters.IsTargetParentTheTarget = false;
                     }
-                    bool isTimelineSingleLoop = timeLine.RepeatBehavior.Type == RepeatBehaviorType.Count && timeLine.RepeatBehavior.Count == 1;
+                    bool isTimelineSingleLoop = timeLine.RepeatBehavior.HasCount && timeLine.RepeatBehavior.Count == 1;
                     timeLine.StartFirstIteration(currentParameters, isTimelineSingleLoop, BeginTime);
                 }
             }
@@ -453,7 +448,7 @@ namespace Windows.UI.Xaml.Media.Animation
                         timeLine.Completed += timeLine_Completed;
                         parameters.VisualStateGroupName = "visualStateGroupName";
                         parameters.IsTargetParentTheTarget = false;
-                        bool isTimelineSingleLoop = timeLine.RepeatBehavior.Type == RepeatBehaviorType.Count && timeLine.RepeatBehavior.Count == 1;
+                        bool isTimelineSingleLoop = timeLine.RepeatBehavior.HasCount && timeLine.RepeatBehavior.Count == 1;
                         timeLine.StartFirstIteration(parameters, isTimelineSingleLoop, BeginTime);
                     }
                 }

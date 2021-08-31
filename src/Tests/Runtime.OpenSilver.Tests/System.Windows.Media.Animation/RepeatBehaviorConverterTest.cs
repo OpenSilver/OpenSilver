@@ -62,7 +62,7 @@ namespace Windows.UI.Xaml.Media.Animation.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Forever_Should_Return_RepeatBehavior_Forever()
+        public void ConvertFrom_String_Forever_Should_Return_RepeatBehavior_Forever_1()
         {
             Converter.ConvertFrom("Forever")
                 .Should()
@@ -70,7 +70,15 @@ namespace Windows.UI.Xaml.Media.Animation.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Iterations_Should_Return_RepeatBehavior()
+        public void ConvertFrom_String_Forever_Should_Return_RepeatBehavior_Forever_2()
+        {
+            Converter.ConvertFrom("  foreveR  ")
+                .Should()
+                .Be(RepeatBehavior.Forever);
+        }
+
+        [TestMethod]
+        public void ConvertFrom_String_Iterations_Should_Return_RepeatBehavior_1()
         {
             Converter.ConvertFrom("100x")
                 .Should()
@@ -78,11 +86,57 @@ namespace Windows.UI.Xaml.Media.Animation.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_String_Should_Throw_NotSupportedException()
+        public void ConvertFrom_String_Iterations_Should_Return_RepeatBehavior_2()
         {
-            Assert.ThrowsException<NotSupportedException>(
-                () => Converter.ConvertFrom("100")
-            );
+            Converter.ConvertFrom("   100x  ")
+                .Should()
+                .Be(new RepeatBehavior(100));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_String_Iterations_Should_Return_RepeatBehavior_3()
+        {
+            Converter.ConvertFrom("   100X  ")
+                .Should()
+                .Be(new RepeatBehavior(100));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_String_Iterations_Should_Return_RepeatBehavior_4()
+        {
+            Converter.ConvertFrom("   100XxxX  ")
+                .Should()
+                .Be(new RepeatBehavior(100));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_String_Duration_Should_Return_RepeatBehavior_1()
+        {
+            string s = "100";
+
+            Converter.ConvertFrom(s)
+                .Should()
+                .Be(new RepeatBehavior(TimeSpan.Parse(s)));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_String_Duration_Should_Return_RepeatBehavior_2()
+        {
+            string s = "01:02:03.69420";
+
+            Converter.ConvertFrom(s)
+                .Should()
+                .Be(new RepeatBehavior(TimeSpan.Parse(s)));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_String_Duration_Should_Return_RepeatBehavior_3()
+        {
+            string s = "   01:02:03.69420   ";
+
+            Converter.ConvertFrom(s)
+                .Should()
+                .Be(new RepeatBehavior(TimeSpan.Parse(s)));
         }
 
         [TestMethod]

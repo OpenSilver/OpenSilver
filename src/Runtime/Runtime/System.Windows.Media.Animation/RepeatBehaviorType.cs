@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,6 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 #if MIGRATION
 namespace System.Windows.Media.Animation
 #else
@@ -26,24 +18,24 @@ namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
     /// <summary>
-    /// Specifies the repeat mode that a Windows.UI.Xaml.Media.Animation.RepeatBehavior
+    /// Specifies the repeat mode that a <see cref="RepeatBehavior"/>
     /// raw value represents.
     /// </summary>
     public enum RepeatBehaviorType
     {
         /// <summary>
-        /// The Windows.UI.Xaml.Media.Animation.RepeatBehavior represents a case where
+        /// The <see cref="RepeatBehavior"/> represents a case where
         /// the timeline should repeat for a fixed number of complete runs.
         /// </summary>
         Count = 0,
-        //// <summary>
-        //// The Windows.UI.Xaml.Media.Animation.RepeatBehavior represents a case where
-        //// the timeline should repeat for a time duration, which might result in an
-        //// animation terminating part way through.
-        //// </summary>
-        //Duration = 1, //todo: implement the duration for repeatBehavior.
         /// <summary>
-        /// The Windows.UI.Xaml.Media.Animation.RepeatBehavior represents a case where
+        /// The <see cref="RepeatBehavior"/>  represents a case where
+        /// the timeline should repeat for a time duration, which might result in an
+        /// animation terminating part way through.
+        /// </summary>
+        Duration = 1,
+        /// <summary>
+        /// The <see cref="RepeatBehavior"/> represents a case where
         /// the timeline should repeat indefinitely.
         /// </summary>
         Forever = 2,

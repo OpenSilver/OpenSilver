@@ -95,13 +95,7 @@ namespace DotNetForHtml5.Compiler
             }
             else
             {
-                TimeSpan timeSpan = TimeSpan.Parse(source, CultureInfo.InvariantCulture);
-                return string.Format(
-                    CultureInfo.InvariantCulture,
-                    "{0}.FromTimeSpan(new global::System.TimeSpan({1}L))", 
-                    destinationType, 
-                    timeSpan.Ticks
-                );
+                return SystemTypesHelper.ConvertFromInvariantString(stringValue, "system.timespan");
             }
         }
 
@@ -123,7 +117,7 @@ namespace DotNetForHtml5.Compiler
                 return $"new {destinationType}({stringDoubleValue.TrimEnd()})";
             }
 
-            throw GetConvertException(source, destinationType);
+            return SystemTypesHelper.ConvertFromInvariantString(stringValue, "system.timespan");
         }
 
         private static string ConvertToBrush(string source, string destinationType, string colorTypeName)
@@ -335,12 +329,7 @@ namespace DotNetForHtml5.Compiler
             }
             else
             {
-                TimeSpan timeSpan = TimeSpan.Parse(stringValue, CultureInfo.InvariantCulture);
-                return string.Format(
-                    CultureInfo.InvariantCulture,
-                    "new {0}(new global::System.TimeSpan({1}L))",
-                    destinationType, timeSpan.Ticks
-                );
+                return SystemTypesHelper.ConvertFromInvariantString(stringValue, "system.timespan");
             }
         }
 

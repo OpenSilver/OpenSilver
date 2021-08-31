@@ -223,7 +223,6 @@
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\TextSelection.cs" />
     <Compile Include="System.Windows.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
     <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\EasingFunctionBase.cs" />
-    <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\RepeatBehavior.cs" />
     <Compile Include="System.Windows.Media\RectangleGeometry.cs" />
     <Compile Include="System.Windows.Media\WORKINPROGRESS\CompositeTransform.cs" />
     <Compile Include="System.Windows.Media\WORKINPROGRESS\SkewTransform.cs" />

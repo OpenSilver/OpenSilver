@@ -306,7 +306,6 @@
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\QuadraticEase.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\QuarticEase.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\QuinticEase.cs" />
-		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\RepeatBehavior.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\SineEase.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\SplinePointKeyFrame.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CompositeTransform.cs" />
@@ -510,8 +509,8 @@
 		<Compile Include="Core\Other\Tuple2_5.cs" />
 		<Compile Include="Core\Other\Tuple2_6.cs" />
 		<Compile Include="Core\Other\Windows.ApplicationModel.Activation.LaunchActivatedEventArgs.cs" />
-		<Compile Include="Core\Other\WorkaroundFixMe.cs" />
-		<Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
+    <Compile Include="Core\Other\WorkaroundFixMe.cs" />
+    <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_Html2dContextReference.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_HtmlDomElementReference.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_HtmlDomManager.cs" />

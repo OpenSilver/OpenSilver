@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace DotNetForHtml5.Compiler
 {
@@ -179,7 +180,7 @@ namespace DotNetForHtml5.Compiler
             }
 
             // Optimization to avoid parsing at runtime
-            if (TimeSpan.TryParse(value, out TimeSpan timeSpan))
+            if (TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out TimeSpan timeSpan))
             {
                 return $"new global::System.TimeSpan({timeSpan.Ticks}L)";
             }

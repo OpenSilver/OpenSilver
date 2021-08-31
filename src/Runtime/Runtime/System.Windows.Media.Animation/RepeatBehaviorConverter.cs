@@ -52,7 +52,9 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </summary>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value is string stringValue)
+            string stringValue = value as string;
+
+            if (stringValue != null)
             {
                 stringValue = stringValue.Trim();
 #if NETSTANDARD
@@ -80,7 +82,16 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
             }
 
-            throw GetConvertFromException(value);
+            // The value is not Forever or an iteration count so it's either a TimeSpan
+            // or we'll let the TimeSpanConverter raise the appropriate exception.
+
+            TimeSpan timeSpanValue = (TimeSpan)TypeConverterHelper.GetConverter(
+                typeof(TimeSpan)).ConvertFrom(
+                    context, 
+                    culture, 
+                    stringValue);
+
+            return new RepeatBehavior(timeSpanValue);
         }
 
         /// <summary>
@@ -102,7 +113,7 @@ namespace Windows.UI.Xaml.Media.Animation
             {
                 if (value is RepeatBehavior repeatBehavior)
                 {
-                    return repeatBehavior.ToString();
+                    return repeatBehavior.ToString(culture);
                 }
             }
 
