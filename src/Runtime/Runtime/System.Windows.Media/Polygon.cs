@@ -85,8 +85,23 @@ namespace Windows.UI.Xaml.Shapes
 		/// </returns>
 		public PointCollection Points
 		{
-			get { return (PointCollection)GetValue(PointsProperty); }
-			set { SetValue(PointsProperty, value); }
+			get 
+			{
+				var value = (PointCollection)GetValue(PointsProperty);
+				if (value == null)
+                {
+					value = new PointCollection();
+					_suspendRendering = true;
+					SetValue(PointsProperty, value);
+					_suspendRendering = false;
+				}
+
+				return value;
+			}
+			set 
+			{ 
+				SetValue(PointsProperty, value); 
+			}
 		}
 
 		public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
