@@ -148,14 +148,17 @@ namespace CSHTML5
                     int callbackId = ReferenceIDGenerator.GenerateId();
                     CallbacksDictionary.Add(callbackId, callback);
 
+                    var isVoid = callback.Method.ReturnType == typeof(void);
+
                     // Change the JS code to point to that callback:
                     javascript = javascript.Replace("$" + i.ToString(), string.Format(
-                                       @"(function() {{ document.eventCallback({0}, {1});}})", callbackId,
+                                       @"(function() {{ return document.eventCallback({0}, {1}, {2});}})", callbackId,
 #if OPENSILVER
-                                       Interop.IsRunningInTheSimulator_WorkAround ? "arguments" : "Array.prototype.slice.call(arguments)"
+                                       Interop.IsRunningInTheSimulator_WorkAround ? "arguments" : "Array.prototype.slice.call(arguments)",
 #elif BRIDGE
-                                       "Array.prototype.slice.call(arguments)"
+                                       "Array.prototype.slice.call(arguments)",
 #endif
+                                       (!isVoid).ToString().ToLower()
                                        ));
 
                     // Note: generating the random number in JS rather than C# is important in order

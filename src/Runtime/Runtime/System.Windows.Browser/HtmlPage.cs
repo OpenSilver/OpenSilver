@@ -115,7 +115,7 @@ namespace System.Windows.Browser
 
             foreach (var method in methods)
             {
-                CSHTML5.Interop.ExecuteJavaScript("window[$0][$1] = function () { $2(...arguments); }", scriptKey, method.Name, (Action<CSHTML5.Types.INTERNAL_JSObjectReference>)(jsObjectReference =>
+                CSHTML5.Interop.ExecuteJavaScript("window[$0][$1] = function () { return $2(...arguments); }", scriptKey, method.Name, (Func<CSHTML5.Types.INTERNAL_JSObjectReference, object>)(jsObjectReference =>
                 {
                     var parameters = method.GetParameters();
                     var args = new object[parameters.Length];
@@ -124,7 +124,7 @@ namespace System.Windows.Browser
                         jsObjectReference.ArrayIndex = i;
                         args[i] = (jsObjectReference.IsNull() || jsObjectReference.IsUndefined()) ? null : Convert.ChangeType(jsObjectReference, parameters[i].ParameterType);
                     }
-                    method.Invoke(instance, args);
+                    return method.Invoke(instance, args);
                 }));
             }
         }
