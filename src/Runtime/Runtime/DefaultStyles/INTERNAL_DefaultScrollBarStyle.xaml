@@ -4,359 +4,161 @@
 
     <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
 
-    <!--<Style x:Key="DefaultScrollBarStyle" TargetType="ScrollBar">-->
-    <!-- Color Palette -->
-    <SolidColorBrush x:Key="OutsideFontColor" Color="#FF000000"/>
-    <SolidColorBrush x:Key="ButtonFontColor" Color="#FF042271"/>
-    <Color x:Key="Focus">#FF04CCFF</Color>
-    <Color x:Key="HyperlinkFocus">#FF2B54BA</Color>
-    <Color x:Key="Calendar">#FF0066CC</Color>
-    <Color x:Key="PressStroke1">#FF1D415C</Color>
-    <Color x:Key="PressStroke2">#FF2C628B</Color>
-    <Color x:Key="TabStroke">#FF4F8BB9</Color>
-    <Color x:Key="DataSortArrow">#3F2C628B</Color>
-    <!--PressStroke2, 25%-->
-    <Color x:Key="DropLocate">#FF6392C8</Color>
-    <Color x:Key="TreeviewArrowNorm">#FF76D5FD</Color>
-    <Color x:Key="TreeviewArrowOver">#FFC1EFF8</Color>
-    <Color x:Key="TreeviewArrowCheck">#FF6380EE</Color>
-    <Color x:Key="ExpandArrowStroke">#FF688DC4</Color>
-    <Color x:Key="Arrow">#FF425080</Color>
-    <Color x:Key="Arrow2">#FF7682E4</Color>
-    <Color x:Key="TextBkgSelection">#FF309AFF</Color>
-    <Color x:Key="TextboxOver1">#FF5296BD</Color>
-    <Color x:Key="TextboxOver2">#FFC2E4F6</Color>
-    <Color x:Key="TextboxPress1">#FF3B79AC</Color>
-    <Color x:Key="TextboxPress2">#FFB2DBED</Color>
-    <Color x:Key="ItemOver1">#FFF4FAFD</Color>
-    <Color x:Key="ItemOver2">#FFCFEDFD</Color>
-    <Color x:Key="ItemOverStroke">#FFD8F0FA</Color>
-    <Color x:Key="ItemSelectStroke">#FF98DDFB</Color>
-    <Color x:Key="Over1">#FFE2F5FF</Color>
-    <Color x:Key="Over2">#FFC0E7FC</Color>
-    <Color x:Key="Over3">#FF9EDDFF</Color>
-    <Color x:Key="Press1">#FF759FB6</Color>
-    <Color x:Key="Press2">#FFB6E0F6</Color>
-    <Color x:Key="Press3">#FF9DD5F4</Color>
-    <Color x:Key="PressHighlight">#FF387599</Color>
-    <Color x:Key="ButtonHighlightMid">#0095D9FF</Color>
-    <Color x:Key="ButtonHighlightMid2">#9935A6E6</Color>
-    <!--60%-->
-    <Color x:Key="ButtonHighlightMid3">#A535A6E6</Color>
-    <!--65%-->
-    <Color x:Key="RadioIcon1">#FF90D5E5</Color>
-    <Color x:Key="RadioIcon2">#FF28A2D1</Color>
-    <Color x:Key="RadioIcon3">#FF1898D1</Color>
-    <Color x:Key="RadioIcon4">#FF0F83C7</Color>
-    <Color x:Key="RadioIconOver1">#FF1EBEFF</Color>
-    <Color x:Key="RadioIconOver2">#FF13A2F3</Color>
-    <Color x:Key="RadioIconPress1">#99759FB6</Color>
-    <!--Press1, 60%-->
-    <Color x:Key="RadioIconPress2">#FF4B8DAF</Color>
-    <Color x:Key="RadioStroke">#FF275674</Color>
-    <Color x:Key="CheckInnerOver">#FF79C6F9</Color>
-    <Color x:Key="CheckInnerOver2">#FFAFDEFD</Color>
-    <Color x:Key="CheckInnerPress">#FF5EB6F7</Color>
-    <Color x:Key="CheckInnerPress2">#FF90CFFC</Color>
-    <Color x:Key="CheckOutterOver">#FF5989A5</Color>
-    <Color x:Key="CheckOutterOver2">#FFDEF9FA</Color>
-    <Color x:Key="ThumbPress1">#FF6CBBE5</Color>
-    <Color x:Key="ThumbPress2">#FF50A1CC</Color>
-    <Color x:Key="ExpanderOver1">#FFB1E7FE</Color>
-    <Color x:Key="ExpanderOver2">#FFEAFFFF</Color>
-    <Color x:Key="ExpanderOver3">#A56EB4F6</Color>
-    <Color x:Key="ExpanderMid">#009DD5F4</Color>
-    <!--Press3, 0%-->
-    <Color x:Key="ExpanderPress1">#FF80CEFF</Color>
-    <Color x:Key="ExpanderPress2">#FF2D84CF</Color>
-    <Color x:Key="ThumbDivetOver">#E5387599</Color>
-    <!--PressHighlight, 20%-->
-    <Color x:Key="ThumbDivetFill1">#199DD5F4</Color>
-    <!--Press3, 10%-->
-    <Color x:Key="ThumbDivetFill2">#33387599</Color>
-    <!--PressHighlight, 20%-->
-    <!-- End Color Palette-->
+    <Style  x:Key="ScrollThumb" TargetType="Thumb">
+        <Setter Property="Background"
+                Value="#FF1F3B53" />
+        <Setter Property="Foreground"
+                Value="Black" />
+        <Setter Property="BorderThickness"
+                Value="1" />
+        <Setter Property="BorderBrush"
+                Value="#FF718597" />
+        <Setter Property="Padding"
+                Value="3" />
+        <Setter Property="Cursor"
+                Value="Hand" />
+        <Setter Property="HorizontalContentAlignment"
+                Value="Center" />
+        <Setter Property="VerticalContentAlignment"
+                Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Grid>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup Name="CommonStates">
+                                <VisualState Name="Normal">
+                                </VisualState>
+                                <VisualState Name="PointerOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="BackgroundAnimation" Storyboard.TargetProperty="Opacity" To="1"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
+                                                                       Storyboard.TargetName="BackgroundGradient">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <LinearGradientBrush StartPoint=".7,0" EndPoint=".7,1">
+                                                        <GradientStop Color="#FFFFFFFF" Offset="0" />
+                                                        <GradientStop Color="#F2FFFFFF" Offset="0.375" />
+                                                        <GradientStop Color="#CCFFFFFF" Offset="0.625" />
+                                                        <GradientStop Color="#7FFFFFFF" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState Name="Pressed">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="BackgroundAnimation" Storyboard.TargetProperty="Opacity" To="1"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
+                                                                       Storyboard.TargetName="BackgroundGradient">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <LinearGradientBrush StartPoint=".7,0" EndPoint=".7,1">
+                                                        <GradientStop Color="#D8FFFFFF" Offset="0" />
+                                                        <GradientStop Color="#C6FFFFFF" Offset="0.375" />
+                                                        <GradientStop Color="#8CFFFFFF" Offset="0.625" />
+                                                        <GradientStop Color="#3FFFFFFF" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="DisabledVisualElement" Storyboard.TargetProperty="Opacity" To=".55"/>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border x:Name="Background"
+                                CornerRadius="3"
+                                Background="White"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                            <Grid Background="{TemplateBinding Background}"  Margin="1">
+                                <Border Opacity="0" x:Name="BackgroundAnimation" Background="#FF448DCA" />
+                                <Border x:Name="BackgroundGradient" >
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint=".7,0" EndPoint=".7,1">
+                                            <GradientStop Color="#FFFFFFFF" Offset="0" />
+                                            <GradientStop Color="#F9FFFFFF" Offset="0.375" />
+                                            <GradientStop Color="#E5FFFFFF" Offset="0.625" />
+                                            <GradientStop Color="#C6FFFFFF" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <ContentPresenter x:Name="ContentPresenter"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              Content="{TemplateBinding Content}"
+                                              Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <Border x:Name="DisabledVisualElement" CornerRadius="3" Background="#FFFFFFFF" Opacity="0" IsHitTestVisible="false" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
+    <Style x:Key="ScrollButton" TargetType="Button">
+        <Setter Property="Background" Value="#FFE2E2E2"/>
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="BackgroundPointerOver"/>
+                                        <DoubleAnimation Duration="0" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Background" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="BackgroundPressed"/>
+                                        <DoubleAnimation Duration="0" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Background" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="BackgroundDisabled"/>
+                                        <DoubleAnimation Duration="0" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Background" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border x:Name="Background"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"/>
+                        <Border x:Name="BackgroundPointerOver"
+                                Background="#11000000"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Opacity="0"/>
+                        <Border x:Name="BackgroundPressed"
+                                Background="#22000000"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Opacity="0"/>
+                        <Border x:Name="BackgroundDisabled"
+                                Background="#33FFFFFF"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Opacity="0"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
-    <!-- Communal Static Resources -->
-    <SolidColorBrush x:Key="btnFocus" Color="{StaticResource Focus}"/>
-    <SolidColorBrush x:Key="btnPressStroke1" Color="{StaticResource PressStroke1}"/>
-    <SolidColorBrush x:Key="btnPressStroke2" Color="{StaticResource PressStroke2}"/>
-
-    <LinearGradientBrush x:Key="btnPressBorder" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="{StaticResource PressStroke1}" Offset="0"/>
-        <GradientStop Color="{StaticResource PressStroke2}" Offset="1"/>
-    </LinearGradientBrush>
-
-    <SolidColorBrush x:Key="hyperlinkPress" Color="{StaticResource HyperlinkFocus}"/>
-    <SolidColorBrush x:Key="calendarBtnFill" Color="{StaticResource Over2}"/>
-    <SolidColorBrush x:Key="calendarTodayStroke" Color="{StaticResource Calendar}"/>
-    <SolidColorBrush x:Key="treeviewArrowUnchecked" Color="{StaticResource TreeviewArrowNorm}"/>
-    <SolidColorBrush x:Key="treeviewArrowHover" Color="{StaticResource TreeviewArrowOver}"/>
-    <SolidColorBrush x:Key="treeviewArrowChecked" Color="{StaticResource TreeviewArrowCheck}"/>
-
-    <SolidColorBrush x:Key="TextBackgroundSelection" Color="{StaticResource TextBkgSelection}"/>
-    <SolidColorBrush x:Key="TextBoxOverBrush" Color="{StaticResource TextboxOver1}"/>
-    <SolidColorBrush x:Key="TextBoxPressBrush" Color="{StaticResource TextboxPress1}"/>
-
-    <LinearGradientBrush x:Key="TextBoxOver" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="{StaticResource TextboxOver1}" Offset="0"/>
-        <GradientStop Color="{StaticResource TextboxOver2}" Offset="0.355"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="TextBoxFocus" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="{StaticResource TextboxPress1}" Offset="0"/>
-        <GradientStop Color="{StaticResource TextboxPress2}" Offset="0.355"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="TextBoxNorm" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="#FFABAEB3" Offset="0"/>
-        <GradientStop Color="#FFE2E8EE" Offset="0.355"/>
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="grayGradient" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="#FFFFFFFF" Offset="0"/>
-        <GradientStop Color="#FFEDEDED" Offset="0.171"/>
-        <GradientStop Color="#FFE7E7E7" Offset="0.5"/>
-        <GradientStop Color="#FFDCDCDC" Offset="0.51"/>
-        <GradientStop Color="#FFEAEBEC" Offset="1"/>
-    </LinearGradientBrush>
-
-    <SolidColorBrush x:Key="hoverStroke" Color="{StaticResource ItemOverStroke}"/>
-    <SolidColorBrush x:Key="selectedStroke" Color="{StaticResource ItemSelectStroke}"/>
-
-    <LinearGradientBrush x:Key="hoverGradient" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="{StaticResource ItemOver1}" Offset="0.5"/>
-        <GradientStop Color="{StaticResource Over1}" Offset="0.5"/>
-        <GradientStop Color="{StaticResource ItemOver2}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="hoverGradientVertical" EndPoint="1,0.5" StartPoint="0,0.5">
-        <GradientStop Color="{StaticResource ItemOver1}" Offset="0.5"/>
-        <GradientStop Color="{StaticResource Over1}" Offset="0.5"/>
-        <GradientStop Color="{StaticResource ItemOver2}" Offset="1"/>
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="BtnOverFill" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="{StaticResource Over1}" Offset="0.5"/>
-        <GradientStop Color="{StaticResource Over2}" Offset="0.509"/>
-        <GradientStop Color="{StaticResource Over3}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="BtnPressFill" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="{StaticResource Press1}" Offset="0"/>
-        <GradientStop Color="{StaticResource Press2}" Offset="0.152"/>
-        <GradientStop Color="{StaticResource Over2}" Offset="0.5"/>
-        <GradientStop Color="{StaticResource Press3}" Offset="0.509"/>
-    </LinearGradientBrush>
-
-    <!-- standard button specific resources -->
-    <LinearGradientBrush x:Key="btnOverFillHighlight" EndPoint="1,0.5" StartPoint="0,0.5">
-        <GradientStop Color="{StaticResource ButtonHighlightMid2}" Offset="0"/>
-        <GradientStop Color="{StaticResource ButtonHighlightMid}" Offset="0.101"/>
-        <GradientStop Color="{StaticResource ButtonHighlightMid}" Offset="0.899"/>
-        <GradientStop Color="{StaticResource ButtonHighlightMid2}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="btnPressFillHighlight" EndPoint="1,0.5" StartPoint="0,0.5">
-        <GradientStop Color="{StaticResource PressHighlight}" Offset="0"/>
-        <GradientStop Color="{StaticResource ButtonHighlightMid3}" Offset="0.037"/>
-        <GradientStop Color="{StaticResource ButtonHighlightMid}" Offset="0.143"/>
-        <GradientStop Color="{StaticResource ButtonHighlightMid}" Offset="0.857"/>
-        <GradientStop Color="{StaticResource ButtonHighlightMid3}" Offset="0.963"/>
-        <GradientStop Color="{StaticResource PressHighlight}" Offset="1"/>
-    </LinearGradientBrush>
-
-    <!-- Radio/Checkbox specific resources -->
-    <SolidColorBrush x:Key="checkOverStroke" Color="{StaticResource CheckOutterOver}"/>
-    <SolidColorBrush x:Key="checkOverFill" Color="{StaticResource CheckOutterOver2}"/>
-    <SolidColorBrush x:Key="checkPressFill" Color="{StaticResource TextboxOver2}"/>
-    <SolidColorBrush x:Key="checkInnerOverFill" Color="{StaticResource CheckInnerOver2}"/>
-    <SolidColorBrush x:Key="checkInnerPressFill" Color="{StaticResource CheckInnerPress2}"/>
-    <SolidColorBrush x:Key="checkIconStroke" Color="{StaticResource Arrow}"/>
-    <SolidColorBrush x:Key="radioIconStroke" Color="{StaticResource RadioStroke}"/>
-
-    <LinearGradientBrush x:Key="radioIconFill" EndPoint="0.8,0.8" StartPoint="0.3,0.3">
-        <GradientStop Color="{StaticResource RadioIcon1}" Offset="0"/>
-        <GradientStop Color="{StaticResource RadioIcon2}" Offset="0.179"/>
-        <GradientStop Color="{StaticResource RadioIcon3}" Offset="0.496"/>
-        <GradientStop Color="{StaticResource RadioIcon4}" Offset="0.812"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="radioIconFillOver" EndPoint="0.8,0.8" StartPoint="0.3,0.3">
-        <GradientStop Color="{StaticResource Over2}" Offset="0"/>
-        <GradientStop Color="{StaticResource Focus}" Offset="0.179"/>
-        <GradientStop Color="{StaticResource RadioIconOver1}" Offset="0.496"/>
-        <GradientStop Color="{StaticResource RadioIconOver2}" Offset="0.812"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="radioIconFillPress" EndPoint="0.8,0.8" StartPoint="0.3,0.3">
-        <GradientStop Color="{StaticResource RadioIconPress1}" Offset="0"/>
-        <GradientStop Color="{StaticResource RadioIconPress2}" Offset="0.317"/>
-        <GradientStop Color="{StaticResource PressHighlight}" Offset="0.504"/>
-        <GradientStop Color="{StaticResource PressStroke2}" Offset="0.817"/>
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="checkInnerOverStroke" EndPoint="0.8,0.8" StartPoint="0.3,0.3">
-        <GradientStop Color="{StaticResource CheckInnerOver}" Offset="0"/>
-        <GradientStop Color="{StaticResource ItemOver2}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="checkInnerPressStroke" EndPoint="0.8,0.8" StartPoint="0.3,0.3">
-        <GradientStop Color="{StaticResource CheckInnerPress}" Offset="0"/>
-        <GradientStop Color="{StaticResource Over2}" Offset="1"/>
-    </LinearGradientBrush>
-
-    <!-- slider specific resources -->
-    <LinearGradientBrush x:Key="ThumbOver" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="#FFFFFFFF" Offset="0"/>
-        <GradientStop Color="{StaticResource Over1}" Offset="0.484"/>
-        <GradientStop Color="{StaticResource Over2}" Offset="0.493"/>
-        <GradientStop Color="{StaticResource Over3}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="ThumbPress" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="{StaticResource ItemOver1}" Offset="0"/>
-        <GradientStop Color="{StaticResource Press3}" Offset="0.576"/>
-        <GradientStop Color="{StaticResource ThumbPress1}" Offset="0.581"/>
-        <GradientStop Color="{StaticResource ThumbPress2}" Offset="1"/>
-    </LinearGradientBrush>
-
-    <!-- datagrid specific resources -->
-    <SolidColorBrush x:Name="HeaderSeparator" Color="#FFD7D5D8" />
-    <SolidColorBrush x:Name="GridBorder" Color="#FFD6D7D6" />
-
-    <SolidColorBrush x:Name="dropLocator" Color="{StaticResource DropLocate}" />
-    <LinearGradientBrush x:Key="sortArrow" EndPoint="0.725,0.832" StartPoint="0.275,0.168">
-        <GradientStop Color="{StaticResource PressStroke2}"/>
-        <GradientStop Color="{StaticResource DataSortArrow}" Offset="1"/>
-    </LinearGradientBrush>
-
-    <!-- combobox/datepicker/numericupdown specific resources -->
-    <LinearGradientBrush x:Key="ComboTogglePressHighlight" EndPoint="1,0.5" StartPoint="0,0.5">
-        <GradientStop Color="{StaticResource PressHighlight}" Offset="0"/>
-        <GradientStop Color="{StaticResource ButtonHighlightMid3}" Offset="0.088"/>
-        <GradientStop Color="{StaticResource ButtonHighlightMid}" Offset="0.221"/>
-        <GradientStop Color="{StaticResource ButtonHighlightMid}" Offset="0.779"/>
-        <GradientStop Color="{StaticResource ButtonHighlightMid3}" Offset="0.912"/>
-        <GradientStop Color="{StaticResource PressHighlight}" Offset="1"/>
-    </LinearGradientBrush>
-
-    <!-- expander specific resources -->
-    <SolidColorBrush x:Key="expanderArrowStroke" Color="{StaticResource ExpandArrowStroke}"/>
-
-    <LinearGradientBrush x:Key="ExpanderArrowHoverFill1" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="{StaticResource ItemOver1}" Offset="0"/>
-        <GradientStop Color="{StaticResource ExpanderOver1}" Offset="0.52"/>
-        <GradientStop Color="{StaticResource Over3}" Offset="0.521"/>
-        <GradientStop Color="{StaticResource Over2}" Offset="0.78"/>
-        <GradientStop Color="{StaticResource ExpanderOver2}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="ExpanderArrowHoverFill2" EndPoint="1,0" StartPoint="0,0">
-        <GradientStop Color="{StaticResource ExpanderOver3}" Offset="0"/>
-        <GradientStop Color="{StaticResource ExpanderMid}" Offset="0.346"/>
-        <GradientStop Color="{StaticResource ExpanderMid}" Offset="0.696"/>
-        <GradientStop Color="{StaticResource ExpanderOver3}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="ExpanderArrowHoverFill3" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="#B9FFFFFF" Offset="0"/>
-        <GradientStop Color="#33FFFFFF" Offset="0.51"/>
-        <GradientStop Color="#00FFFFFF" Offset="0.52"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="ExpanderArrowPressedFill1" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="{StaticResource ItemOver2}" Offset="0"/>
-        <GradientStop Color="{StaticResource ExpanderPress1}" Offset="0.52"/>
-        <GradientStop Color="{StaticResource CheckInnerOver}" Offset="0.521"/>
-        <GradientStop Color="{StaticResource TreeviewArrowOver}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="ExpanderArrowPressedFill2" EndPoint="1,0" StartPoint="0,0">
-        <GradientStop Color="{StaticResource ExpanderPress2}" Offset="0"/>
-        <GradientStop Color="{StaticResource ExpanderMid}" Offset="0.5"/>
-        <GradientStop Color="{StaticResource ExpanderPress2}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="ExpanderArrowPressedFill3" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="#A5FFFFFF" Offset="0"/>
-        <GradientStop Color="#26FFFFFF" Offset="0.506"/>
-        <GradientStop Color="#00FFFFFF" Offset="0.521"/>
-    </LinearGradientBrush>
-
-    <!-- Tab specific resources -->
-    <SolidColorBrush x:Key="TabOverStroke" Color="{StaticResource TabStroke}"/>
-
-    <!-- Tab vertical (btn over vertical) -->
-    <LinearGradientBrush x:Key="VTabOverGradient" EndPoint="1,0.5" StartPoint="0,0.5">
-        <GradientStop Color="{StaticResource Over1}" Offset="0.5"/>
-        <GradientStop Color="{StaticResource Over2}" Offset="0.509"/>
-        <GradientStop Color="{StaticResource Over3}" Offset="1"/>
-    </LinearGradientBrush>
-
-    <!-- Scrollbar specific resources -->
-    <SolidColorBrush x:Key="ScrollbarBkgNormStroke" Color="#FFA4A4A4"/>
-
-    <LinearGradientBrush x:Key="HScrollbarBkgNormFill" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="#FFEFEFF0" Offset="0.5"/>
-        <GradientStop Color="#FFD5D6D8" Offset="0.513"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="HScrollbarBkgOverFill" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="{StaticResource Over1}" Offset="0.5"/>
-        <GradientStop Color="{StaticResource Over2}" Offset="0.513"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="HScrollbarBkgPressFill" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="{StaticResource Press2}" Offset="0.5"/>
-        <GradientStop Color="{StaticResource ThumbPress1}" Offset="0.513"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="VScrollbarBkgNormFill" EndPoint="1,0.5" StartPoint="0,0.5">
-        <GradientStop Color="#FFEFEFF0" Offset="0.5"/>
-        <GradientStop Color="#FFD5D6D8" Offset="0.513"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="VScrollbarBkgOverFill" EndPoint="1,0.5" StartPoint="0,0.5">
-        <GradientStop Color="{StaticResource Over1}" Offset="0.5"/>
-        <GradientStop Color="{StaticResource Over2}" Offset="0.513"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="VScrollbarBkgPressFill" EndPoint="1,0.5" StartPoint="0,0.5">
-        <GradientStop Color="{StaticResource Press2}" Offset="0.5"/>
-        <GradientStop Color="{StaticResource ThumbPress1}" Offset="0.513"/>
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="HThumbDivetNormFill" EndPoint="0.5,1" StartPoint="0.5,0.1">
-        <GradientStop Color="#FF979797" Offset="0"/>
-        <GradientStop Color="#19979797" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="HThumbDivetNormStroke" EndPoint="0.5,1" StartPoint="0.5,0.1">
-        <GradientStop Color="#B2000000" Offset="0"/>
-        <GradientStop Color="#33000000" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="HThumbDivetOverFill" EndPoint="0.5,1" StartPoint="0.5,0.1">
-        <GradientStop Color="{StaticResource Press3}" Offset="0"/>
-        <GradientStop Color="{StaticResource ThumbDivetFill1}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="HThumbDivetOverStroke" EndPoint="0.5,1" StartPoint="0.5,0.1">
-        <GradientStop Color="{StaticResource ThumbDivetOver}" Offset="0"/>
-        <GradientStop Color="{StaticResource ThumbDivetFill2}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="HThumbDivetPressFill" EndPoint="0.5,1" StartPoint="0.5,0.1">
-        <GradientStop Color="{StaticResource RadioIconPress2}" Offset="0"/>
-        <GradientStop Color="{StaticResource ThumbDivetFill1}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="HThumbDivetPressStroke" EndPoint="0.5,1" StartPoint="0.5,0.1">
-        <GradientStop Color="{StaticResource PressStroke1}" Offset="0"/>
-        <GradientStop Color="{StaticResource ThumbDivetFill2}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="VThumbDivetNormFill" EndPoint="1,0.5" StartPoint="0.1,0.5">
-        <GradientStop Color="#FF979797" Offset="0"/>
-        <GradientStop Color="#19979797" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="VThumbDivetNormStroke" EndPoint="1,0.5" StartPoint="0.1,0.5">
-        <GradientStop Color="#B2000000" Offset="0"/>
-        <GradientStop Color="#33000000" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="VThumbDivetOverFill" EndPoint="1,0.5" StartPoint="0.1,0.5">
-        <GradientStop Color="{StaticResource Press3}" Offset="0"/>
-        <GradientStop Color="{StaticResource ThumbDivetFill1}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="VThumbDivetOverStroke" EndPoint="1,0.5" StartPoint="0.1,0.5">
-        <GradientStop Color="{StaticResource ThumbDivetOver}" Offset="0"/>
-        <GradientStop Color="{StaticResource ThumbDivetFill2}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="VThumbDivetPressFill" EndPoint="1,0.5" StartPoint="0.1,0.5">
-        <GradientStop Color="{StaticResource RadioIconPress2}" Offset="0"/>
-        <GradientStop Color="{StaticResource ThumbDivetFill1}" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="VThumbDivetPressStroke" EndPoint="1,0.5" StartPoint="0.1,0.5">
-        <GradientStop Color="{StaticResource PressStroke1}" Offset="0"/>
-        <GradientStop Color="{StaticResource ThumbDivetFill2}" Offset="1"/>
-    </LinearGradientBrush>
     <!-- End Static Resources -->
     <Style TargetType="ScrollBar">
         <Setter Property="Background" Value="#FFF1F1F1" />
@@ -379,15 +181,11 @@
                             <Button x:Name="HorizontalSmallIncrease" Padding="0" Cursor="Arrow">
                                 <Path x:Name="ArrowRight" Fill="#FF555555" Width="9" Height="9" Margin="0,0,3,0" StrokeThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Data="M 2,1 L 5.5,4.5 L 2,8"/>
                             </Button>
-                            <Button x:Name="HorizontalLargeDecrease" Padding="0" Cursor="Arrow" />
-                            <Button x:Name="HorizontalLargeIncrease" Padding="0" Cursor="Arrow" />
-                            <Thumb x:Name="HorizontalThumb" Cursor="Arrow">
-                                <Thumb.Template>
-                                    <ControlTemplate>
-                                        <Border Background="#FFBBBBBB"/>
-                                    </ControlTemplate>
-                                </Thumb.Template>
-                            </Thumb>
+                            <Button  Style="{StaticResource ScrollButton}"  x:Name="HorizontalLargeDecrease" Padding="0" Cursor="Arrow" />
+                            <Button  Style="{StaticResource ScrollButton}"  x:Name="HorizontalLargeIncrease" Padding="0" Cursor="Arrow" />
+                            <Thumb x:Name="HorizontalThumb" Cursor="Arrow" Style="{StaticResource ScrollThumb}" />
+
+
                         </Canvas>
                         <Canvas x:Name="VerticalRoot" Visibility="Collapsed" Background="{TemplateBinding Background}">
                             <Button x:Name="VerticalSmallDecrease" Padding="0" Cursor="Arrow">
@@ -396,15 +194,10 @@
                             <Button x:Name="VerticalSmallIncrease" Padding="0" Cursor="Arrow">
                                 <Path x:Name="ArrowBottom" Fill="#FF555555" Width="9" Height="9" Margin="0,0,3,0" StrokeThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Data="M 1,2 L 4.5,5.5 L 8,2"/>
                             </Button>
-                            <Button x:Name="VerticalLargeDecrease" Padding="0" Cursor="Arrow" />
-                            <Button x:Name="VerticalLargeIncrease" Padding="0" Cursor="Arrow" />
-                            <Thumb x:Name="VerticalThumb" Background="#FFBBBBBB" Cursor="Arrow">
-                                <Thumb.Template>
-                                    <ControlTemplate>
-                                        <Border Background="#FFBBBBBB"/>
-                                    </ControlTemplate>
-                                </Thumb.Template>
-                            </Thumb>
+                            <Button  Style="{StaticResource ScrollButton}"  x:Name="VerticalLargeDecrease" Padding="0" Cursor="Arrow" />
+                            <Button  Style="{StaticResource ScrollButton}"  x:Name="VerticalLargeIncrease" Padding="0" Cursor="Arrow" />
+                            <Thumb x:Name="VerticalThumb"  Style="{StaticResource ScrollThumb}" Cursor="Arrow" />
+
                         </Canvas>
                     </Grid>
                 </ControlTemplate>
