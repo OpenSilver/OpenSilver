@@ -74,6 +74,7 @@
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
     <Compile Include="OpenSilver\Internal\Parsers.cs" />
     <Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
+    <Compile Include="OpenSilver\Internal\Xaml\RuntimeHelpers.cs" />
     <Compile Include="OpenSilver\NotImplementedAttribute.cs" />
     <Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
     <Compile Include="PagedCollectionView\CollectionViewGroupRoot.cs" />
@@ -101,6 +102,8 @@
     <Compile Include="System.ComponentModel\ISupportInitialize.cs" />
     <Compile Include="System.ComponentModel\ListSortDirection.cs" />
     <Compile Include="System.ComponentModel\ReadOnlyAttribute.cs" />
+    <Compile Include="System.ComponentModel\ReflectedPropertyCollection.cs" />
+    <Compile Include="System.ComponentModel\ReflectedPropertyData.cs" />
     <Compile Include="System.ComponentModel\SortDescription.cs" />
     <Compile Include="System.ComponentModel\SortDescriptionCollection.cs" />
     <Compile Include="System.ComponentModel\TypeConverterHelper.cs" />

@@ -37,7 +37,7 @@ namespace System.ComponentModel
     internal static class TypeConverterHelper
     {
         // sentinel value used to specify we were not able to find a TypeConverter
-        private static readonly TypeConverter NullConverter = new TypeConverter();
+        internal static readonly TypeConverter NullConverter = new TypeConverter();
 
         // key associated with NullConverter
         private static readonly object _nullConverterKey = new object();
@@ -47,10 +47,13 @@ namespace System.ComponentModel
 
         private static readonly Assembly _openSilverAssembly = typeof(DependencyObject).Assembly;
         
-        private static readonly object _typeDataSyncObject = new object();
+        private static readonly object _internalSyncObject = new object();
         
         private static Dictionary<Type, ReflectedTypeData> TypeData { get; } =
             new Dictionary<Type, ReflectedTypeData>();
+
+        private static Dictionary<Type, ReflectedPropertyData[]> PropertyCache { get; } =
+            new Dictionary<Type, ReflectedPropertyData[]>();
 
         private static Dictionary<object, IntrinsicTypeConverterData> IntrinsicTypeConverters { get; } =
             GetIntrinsicTypeConvertersData();
@@ -80,6 +83,12 @@ namespace System.ComponentModel
             }
 
             return converter;
+        }
+
+        public static ReflectedPropertyCollection GetProperties(Type type)
+        {
+            ReflectedTypeData td = GetTypeData(type, true);
+            return td.GetProperties();
         }
 
         private static bool IsCoreType(Type type)
@@ -176,7 +185,7 @@ namespace System.ComponentModel
         {
             ReflectedTypeData td;
 
-            lock (_typeDataSyncObject)
+            lock (_internalSyncObject)
             {
                 if (!TypeData.TryGetValue(type, out td) && createIfNeeded)
                 {
@@ -186,6 +195,88 @@ namespace System.ComponentModel
             }
 
             return td;
+        }
+
+        internal static Attribute FindAttributeByType(Type attrType, Attribute[] attributes)
+        {
+            foreach (Attribute attr in attributes)
+            {
+                if (attr.GetType() == attrType)
+                {
+                    return attr;
+                }
+            }
+
+            return null;
+        }
+
+        private static ReflectedPropertyData[] ReflectGetProperties(Type type)
+        {
+            Dictionary<Type, ReflectedPropertyData[]> propertyCache = PropertyCache;
+            ReflectedPropertyData[] properties;
+
+            lock (_internalSyncObject)
+            {
+                if (!propertyCache.TryGetValue(type, out properties))
+                {
+                    BindingFlags bindingFlags = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance;
+
+                    // Get the type's properties. Properties may have their
+                    // get and set methods individually overridden in a derived
+                    // class, so if we find a missing method we need to walk
+                    // down the base class chain to find it. We actually merge
+                    // "new" properties of the same name, so we must preserve
+                    // the member info for each method individually.
+                    //
+                    PropertyInfo[] propertyInfos = type.GetProperties(bindingFlags);
+
+                    properties = new ReflectedPropertyData[propertyInfos.Length];
+                    int propertyCount = 0;
+
+                    for (int idx = 0; idx < propertyInfos.Length; idx++)
+                    {
+                        PropertyInfo propertyInfo = propertyInfos[idx];
+
+                        // Today we do not support parameterized properties.
+                        //
+                        if (propertyInfo.GetIndexParameters().Length > 0)
+                        {
+                            continue;
+                        }
+
+                        MethodInfo getMethod = propertyInfo.GetGetMethod();
+                        MethodInfo setMethod = propertyInfo.GetSetMethod();
+                        string name = propertyInfo.Name;
+
+                        // If the property only overrode "set", then we don't
+                        // pick it up here. Rather, we just merge it in from
+                        // the base class list.
+
+
+                        // If a property had at least a get method, we consider it. We don't
+                        // consider write-only properties.
+                        //
+                        if (getMethod != null)
+                        {
+                            properties[propertyCount++] = new ReflectedPropertyData(type, name,
+                                                                                    propertyInfo.PropertyType,
+                                                                                    propertyInfo, 
+                                                                                    getMethod, setMethod);
+                        }
+                    }
+
+                    if (propertyCount != properties.Length)
+                    {
+                        ReflectedPropertyData[] newProperties = new ReflectedPropertyData[propertyCount];
+                        Array.Copy(properties, newProperties, propertyCount);
+                        properties = newProperties;
+                    }
+
+                    propertyCache[type] = properties;
+                }
+            }
+
+            return properties;
         }
 
         /// <summary>
@@ -220,7 +311,6 @@ namespace System.ComponentModel
                 [_nullConverterKey] = new IntrinsicTypeConverterData((type) => NullConverter, false),
             };
         }
-
 
         //
         // IMPORTANT: if you add or remove entries in this dictionary, you must update
@@ -289,6 +379,7 @@ namespace System.ComponentModel
             private readonly Type _type;
             private Attribute[] _attributes;
             private TypeConverter _converter;
+            private ReflectedPropertyCollection _properties;
 
             internal ReflectedTypeData(Type type)
             {
@@ -325,7 +416,7 @@ namespace System.ComponentModel
 
                     if (_converter == null)
                     {
-                        TypeConverterAttribute typeAttr = (TypeConverterAttribute)FindAttributeByType(typeof(TypeConverterAttribute));
+                        TypeConverterAttribute typeAttr = (TypeConverterAttribute)FindAttributeByType(typeof(TypeConverterAttribute), GetAttributes());
                         if (typeAttr != null)
                         {
                             Type converterType = GetTypeFromName(typeAttr.ConverterTypeName);
@@ -348,17 +439,33 @@ namespace System.ComponentModel
                 return _converter;
             }
 
-            private Attribute FindAttributeByType(Type attrType)
+            internal ReflectedPropertyCollection GetProperties()
             {
-                foreach (Attribute attr in GetAttributes())
+                if (_properties == null)
                 {
-                    if (attr.GetType() == attrType)
+                    ReflectedPropertyData[] propertyArray;
+                    Dictionary<string, ReflectedPropertyData> propertyList = new Dictionary<string, ReflectedPropertyData>(10);
+                    Type baseType = _type;
+                    Type objType = typeof(object);
+
+                    do
                     {
-                        return attr;
+                        propertyArray = ReflectGetProperties(baseType);
+                        foreach (ReflectedPropertyData p in propertyArray)
+                        {
+                            if (!propertyList.ContainsKey(p.Name))
+                            {
+                                propertyList.Add(p.Name, p);
+                            }
+                        }
+                        baseType = baseType.BaseType;
                     }
+                    while (baseType != null && baseType != objType);
+
+                    _properties = new ReflectedPropertyCollection(propertyList);
                 }
 
-                return null;
+                return _properties;
             }
 
             /// <devdoc>

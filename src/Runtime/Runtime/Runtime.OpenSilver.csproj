@@ -80,6 +80,9 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TransitioningContentControl.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewConnectingLines.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewExtensions.cs" />
+		<Compile Include="System.ComponentModel\ReflectedPropertyCollection.cs" />
+		<Compile Include="System.ComponentModel\ReflectedPropertyData.cs" />
+		<Compile Include="OpenSilver\Internal\Xaml\RuntimeHelpers.cs" />
 		<Compile Include="System.Windows.Media\BrushConverter.cs" />
 		<Compile Include="System.Windows.Media\Color.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />

@@ -36,7 +36,7 @@ using Windows.UI.Xaml.Media.Animation;
 namespace System.ComponentModel.Tests
 {
     [TestClass]
-    public class TypeConverterHelperTest
+    public partial class TypeConverterHelperTest
     {
         [TestMethod]
         public void GetConverter_When_Cursor()

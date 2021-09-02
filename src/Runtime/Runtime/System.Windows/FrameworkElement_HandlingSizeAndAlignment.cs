@@ -12,9 +12,10 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using CSHTML5.Internal;
 using OpenSilver.Internal;
 
 #if MIGRATION
