@@ -114,12 +114,10 @@
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction_1.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase_1.cs" />
-		<Compile Include="System.Windows.Markup\ContentPropertyAttribute.cs" />
 		<Compile Include="System.Windows.Markup\ContentWrapperAttribute.cs" />
 		<Compile Include="System.Windows.Markup\IProvideValueTarget.cs" />
 		<Compile Include="System.Windows.Markup\MarkupExtension.cs" />
 		<Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguageConverter.cs" />
-		<Compile Include="System.Windows.Markup\XmlnsDefinitionAttribute.cs" />
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\BlurEffect.cs" />
 		<Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
 		<Compile Include="System.Windows.Media\TransformConverter.cs" />
@@ -429,8 +427,7 @@
 		<Compile Include="System.Windows.Interop\WORKINPROGRESS\Settings.cs" />
 		<Compile Include="System.Windows.Interop\WORKINPROGRESS\SilverlightHost.cs" />
 		<Compile Include="System.Windows.Markup\WORKINPROGRESS\IXamlTypeResolver.cs" />
-		<Compile Include="System.Windows.Markup\WORKINPROGRESS\XamlReader.cs" />
-		<Compile Include="System.Windows.Markup\XmlnsPrefixAttribute.cs" />
+		<Compile Include="System.Windows.Markup\XamlReader.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\AlignmentX.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\AlignmentY.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CompositionTarget.cs" />
@@ -1252,6 +1249,9 @@
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="Runtime.licenseheader" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\OpenSilver.Xaml\OpenSilver.Xaml.csproj" />
 	</ItemGroup>
   
 	<!-- See ths comment on the first <Import> -->
