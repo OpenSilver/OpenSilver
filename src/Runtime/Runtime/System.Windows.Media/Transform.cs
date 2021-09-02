@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,8 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System.ComponentModel;
+using System;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -28,12 +26,9 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Defines functionality that enables transformations in a two-dimensional plane.
     /// </summary>
-    [TypeConverter(typeof(TransformConverter))]
     public abstract partial class Transform : GeneralTransform
     {
-        internal Transform()
-        {
-        }
+        internal Transform() { }
 
         ///<summary>
         /// Return the current transformation value.
@@ -86,6 +81,18 @@ namespace Windows.UI.Xaml.Media
                 matrix.Invert();
                 return new MatrixTransform(matrix);
             }
+        }
+
+        /// <summary>
+        /// Parse - returns an instance converted from the provided string
+        /// using the current culture
+        /// <param name="source"> string with Transform data </param>
+        /// </summary>
+        internal static Transform Parse(string source)
+        {
+            Matrix matrix = Matrix.Parse(source);
+
+            return new MatrixTransform(matrix);
         }
 
         // Must be implemented by the concrete class:

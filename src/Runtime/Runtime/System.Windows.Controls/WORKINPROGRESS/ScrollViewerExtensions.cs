@@ -84,7 +84,7 @@ namespace Windows.UI.Xaml.Controls
                 "IsMouseWheelScrollingEnabled",
                 typeof(bool),
                 typeof(ScrollViewerExtensions),
-                new PropertyMetadata(false, OnIsMouseWheelScrollingEnabledPropertyChanged));
+                new PropertyMetadata(false, OnIsMouseWheelScrollingEnabledPropertyChanged) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Always });
 
         /// <summary>
         /// IsMouseWheelScrollingEnabledProperty property changed handler.
@@ -99,6 +99,8 @@ namespace Windows.UI.Xaml.Controls
             // Attach or detach from the MouseWheel event
             if (enabled)
             {
+                //Note: after testing, this does not appear to impact events registered through addEventListener so we can do it directly like that.
+                CSHTML5.Interop.ExecuteJavaScript("$0.onwheel = undefined", source.INTERNAL_OuterDomElement);
 #if MIGRATION
                 source.MouseWheel += OnMouseWheel;
 #else
@@ -107,6 +109,8 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
+                //Note: after testing, this does not appear to impact events registered through addEventListener so we can do it directly like that.
+                CSHTML5.Interop.ExecuteJavaScript("$0.onwheel = (e) => { e.preventDefault(); return false; }", source.INTERNAL_OuterDomElement);
 #if MIGRATION
                 source.MouseWheel -= OnMouseWheel;
 #else
@@ -568,6 +572,7 @@ namespace Windows.UI.Xaml.Controls
         /// </exception>
         public static void ScrollIntoView(this ScrollViewer viewer, FrameworkElement element, double horizontalMargin, double verticalMargin, Duration duration)
         {
+//#if OPENSILVER
             if (viewer == null)
             {
                 throw new ArgumentNullException("viewer");
@@ -641,6 +646,7 @@ namespace Windows.UI.Xaml.Controls
                 storyboard.Begin();
             }
         }
+//#endif
     }
 }
 #endif

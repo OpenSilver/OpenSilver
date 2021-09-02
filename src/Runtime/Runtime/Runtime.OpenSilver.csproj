@@ -52,8 +52,7 @@
 		<Compile Include="Core\Main\InheritablePropertyChangeInfo.cs" />
 		<Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
 		<Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
-    <Compile Include="Core\Main\TypeFromStringConverters.cs" />
-    <Compile Include="Core\Main\WeakReferenceList.cs" />
+		<Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ChangePropertyAction.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ComparisonConditionType.cs" />
@@ -63,6 +62,7 @@
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\PropertyChangedTrigger.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\StoryboardAction.cs" />
 		<Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
+		<Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
 		<Compile Include="OpenSilver\NotImplementedAttribute.cs" />
 		<Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
 		<Compile Include="PagedCollectionView\CollectionViewGroupRoot.cs" />
@@ -75,15 +75,39 @@
 		<Compile Include="PagedCollectionView\TypeHelper.cs" />
 		<Compile Include="PublicAPI\Internal\KnownTypesHelper.cs" />
 		<Compile Include="PublicAPI\Internal\WebRequestsHelper.cs" />
-		<Compile Include="PublicAPI\Interop\Interop2.cs" />
+		<Compile Include="PublicAPI\Interop\Interop.Obsolete.cs" />
 		<Compile Include="PublicAPI\Native.Html.Controls\NativeComboBox.cs" />
 		<Compile Include="System.Collections.Generic\WORKINPROGRESS\PriorityQueue.cs" />
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\CompositionHost.cs" />
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\DeploymentCatalog.cs" />
 		<Compile Include="System.ComponentModel.Composition\WORKINPROGRESS\CompositionInitializer.cs" />
+		<Compile Include="System.Windows.Media\BrushConverter.cs" />
+		<Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
+		<Compile Include="System.Windows.Media\ColorConverter.cs" />
+		<Compile Include="System.Windows\CornerRadiusConverter.cs" />
+		<Compile Include="System.Windows.input\CursorConverter.cs" />
+		<Compile Include="System.Windows.Media\DoubleCollectionConverter.cs" />
+		<Compile Include="System.Windows\DurationConverter.cs" />
+		<Compile Include="System.Windows.Media\FontFamilyConverter.cs" />
+		<Compile Include="System.Windows\FontStretchConverter.cs" />
+		<Compile Include="System.Windows\FontStyleConverter.cs" />
+		<Compile Include="System.Windows\FontWeightConverter.cs" />
+		<Compile Include="System.Windows.Media\GeometryConverter.cs" />
+		<Compile Include="System.Windows\GridLengthConverter.cs" />
 		<Compile Include="System.ComponentModel\IItemProperties.cs" />
-		<Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettings.cs" />
-		<Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettingsForCSharp.cs" />
+		<Compile Include="System.Windows.Media\ImageSourceConverter.cs" />
+		<Compile Include="System.Windows.Media.Animation\KeyTimeConverter.cs" />
+		<Compile Include="System.Windows.Media\MatrixConverter.cs" />
+		<Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
+		<Compile Include="System.Windows\PointConverter.cs" />
+		<Compile Include="System.Windows\PropertyPathConverter.cs" />
+		<Compile Include="System.Windows\RectConverter.cs" />
+		<Compile Include="System.Windows.Media.Animation\RepeatBehaviorConverter.cs" />
+		<Compile Include="System.Windows\SizeConverter.cs" />
+		<Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />
+		<Compile Include="System.Windows\ThicknessConverter.cs" />
+		<Compile Include="System.Windows.Media\TransformConverter.cs" />
+		<Compile Include="System.ComponentModel\TypeConverterHelper.cs" />
 		<Compile Include="System.Linq\WORKINPROGRESS\FunctionalProgramming.cs" />
 		<Compile Include="System.Net\DownloadStringCompletedEventArgs.cs" />
 		<Compile Include="System.Net\DownloadStringCompletedEventHandler.cs" />
@@ -107,7 +131,6 @@
 		<Compile Include="System.ServiceModel.Web\WORKINPROGRESS\WebInvokeAttribute.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlDocument.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlPopupWindowOptions.cs" />
-		<Compile Include="System.Windows.Data\RelativeSourceConverter.cs" />
 		<Compile Include="System.Windows.Interactivity\CustomPropertyValueEditor.cs" />
 		<Compile Include="System.Windows.Interactivity\CustomPropertyValueEditorAttribute.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction.cs" />
@@ -117,21 +140,14 @@
 		<Compile Include="System.Windows.Markup\ContentWrapperAttribute.cs" />
 		<Compile Include="System.Windows.Markup\IProvideValueTarget.cs" />
 		<Compile Include="System.Windows.Markup\MarkupExtension.cs" />
-		<Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguageConverter.cs" />
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\BlurEffect.cs" />
-		<Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
-		<Compile Include="System.Windows.Media\TransformConverter.cs" />
-		<Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\ListenFailedException.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\LocalMessageReceiver.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\LocalMessageSender.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\MessageReceivedEventArgs.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\ReceiverNameScope.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\SendCompletedEventArgs.cs" />
-		<Compile Include="System.Windows\FontStyleConverter.cs" />
-		<Compile Include="System.Windows\RectConverter.cs" />
 		<Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
-		<Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\ExpanderAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\TreeViewAutomationPeer.cs" />
@@ -159,7 +175,6 @@
 		<Compile Include="System.Windows\Expression.cs" />
 		<Compile Include="System.Windows\TemplateBindingExtension.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontCapitals.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\FontStretchConverter.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontStretches.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\NotificationWindow.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\WebRequestCreator.cs" />
@@ -289,7 +304,6 @@
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\QuadraticEase.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\QuarticEase.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\QuinticEase.cs" />
-		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\RepeatBehavior.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\SineEase.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\SplinePointKeyFrame.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CompositeTransform.cs" />
@@ -320,6 +334,7 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\RoutedEventArgs.cs" />
 		<Compile Include="System.Windows\FrameworkPropertyMetadata.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\UIElement.cs" />
+		<Compile Include="System.Windows.Media\WORKINPROGRESS\Color.cs" />
 		<Compile Include="Empty Namespaces\WORKINPROGRESS\SystemXaml.cs" />
 		<Compile Include="System\WORKINPROGRESS\AppDomainExtensions.cs" />
 		<Compile Include="System.Collections.Generic\WORKINPROGRESS\SynchronizedReadOnlyCollection.cs" />
@@ -346,7 +361,7 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\IApplicationLifetimeAware.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\IApplicationService.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\INativeCollectionWrapper.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\NullableBoolConverter.cs" />
+		<Compile Include="System.Windows\NullableBoolConverter.cs" />
 		<Compile Include="System.Windows\StyleTypedPropertyAttribute.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\SystemColors.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\SystemParameters.cs" />
@@ -471,6 +486,7 @@
 		<Compile Include="Core\Main\INTERNAL_TypeToStringToDependencyProperty.cs" />
 		<Compile Include="Core\Main\INTERNAL_UriHelper.cs" />
 		<Compile Include="Core\Main\NamespacesDocumentation.cs" />
+		<Compile Include="Core\Main\TypeFromStringConverters.cs" />
 		<Compile Include="Core\Other\HashSet2_1.cs" />
 		<Compile Include="Core\Other\INTERNAL_DispatcherHelpers.cs" />
 		<Compile Include="Core\Other\INTERNAL_FontsHelper.cs" />
@@ -490,8 +506,8 @@
 		<Compile Include="Core\Other\Tuple2_5.cs" />
 		<Compile Include="Core\Other\Tuple2_6.cs" />
 		<Compile Include="Core\Other\Windows.ApplicationModel.Activation.LaunchActivatedEventArgs.cs" />
-		<Compile Include="Core\Other\WorkaroundFixMe.cs" />
-		<Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
+    <Compile Include="Core\Other\WorkaroundFixMe.cs" />
+    <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_Html2dContextReference.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_HtmlDomElementReference.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_HtmlDomManager.cs" />
@@ -560,6 +576,8 @@
 		<Compile Include="System.ComponentModel\GroupDescription.cs" />
 		<Compile Include="System.ComponentModel\SortDescription.cs" />
 		<Compile Include="System.ComponentModel\SortDescriptionCollection.cs" />
+		<Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettings.cs" />
+		<Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettingsForCSharp.cs" />
 		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageSettings.cs" />
 		<Compile Include="System.Net\CredentialsMode.cs" />
 		<Compile Include="System.Net\WebClientWithCredentials.cs" />
@@ -592,7 +610,6 @@
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptObjectCollection.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\BrowserInformation.cs" />
 		<Compile Include="System.Windows.input\Cursor.cs" />
-		<Compile Include="System.Windows.input\CursorConverter.cs" />
 		<Compile Include="System.Windows.input\Cursors.cs" />
 		<Compile Include="System.Windows.input\Keyboard.cs" />
 		<Compile Include="System.Windows.input\MouseButtonEventArgs.cs" />
@@ -657,10 +674,8 @@
 		<Compile Include="TypeScriptDefinitionsSupportFiles\UnionType_5.cs" />
 		<Compile Include="System.Windows.Input\PointerDeviceType.cs" />
 		<Compile Include="System.Windows\Point.cs" />
-		<Compile Include="System.Windows\PointConverter.cs" />
 		<Compile Include="System.Windows\Rect.cs" />
 		<Compile Include="System.Windows\Size.cs" />
-		<Compile Include="System.Windows\SizeConverter.cs" />
 		<Compile Include="System.Windows.Input\VirtualKey.cs" />
 		<Compile Include="System.Windows.Input\VirtualKeyModifiers.cs" />
 		<Compile Include="System.Windows.Threading\CoreDispatcher.cs" />
@@ -669,7 +684,6 @@
 		<Compile Include="Windows.UI.Input\PointerPoint.cs" />
 		<Compile Include="System.Windows\FontStyles.cs" />
 		<Compile Include="System.Windows\FontWeight.cs" />
-		<Compile Include="System.Windows\FontWeightConverter.cs" />
 		<Compile Include="System.Windows\FontWeights.cs" />
 		<Compile Include="System.Windows\TextDecorations.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\ItemsChangedEventArgs.cs" />
@@ -905,7 +919,6 @@
 		<Compile Include="System.Windows.Media.Animation\IKeyFrame.cs" />
 		<Compile Include="System.Windows.Media.Animation\INTERNAL_ResolvedKeyFramesEntries_1.cs" />
 		<Compile Include="System.Windows.Media.Animation\KeyTime.cs" />
-		<Compile Include="System.Windows.Media.Animation\KeyTimeConverter.cs" />
 		<Compile Include="System.Windows.Media.Animation\ObjectAnimationUsingKeyFrames.cs" />
 		<Compile Include="System.Windows.Media.Animation\ObjectKeyFrame.cs" />
 		<Compile Include="System.Windows.Media.Animation\ObjectKeyFrameCollection.cs" />
@@ -913,7 +926,6 @@
 		<Compile Include="System.Windows.Media.Animation\QuarticEase.cs" />
 		<Compile Include="System.Windows.Media.Animation\QuinticEase.cs" />
 		<Compile Include="System.Windows.Media.Animation\RepeatBehavior.cs" />
-		<Compile Include="System.Windows.Media.Animation\RepeatBehaviorConverter.cs" />
 		<Compile Include="System.Windows.Media.Animation\RepeatBehaviorType.cs" />
 		<Compile Include="System.Windows.Media.Animation\SineEase.cs" />
 		<Compile Include="System.Windows.Media.Animation\Storyboard.cs" />
@@ -936,18 +948,14 @@
 		<Compile Include="System.Windows.Media\ArcSegment.cs" />
 		<Compile Include="System.Windows.Media\BezierSegment.cs" />
 		<Compile Include="System.Windows.Media\Brush.cs" />
-		<Compile Include="System.Windows.Media\BrushConverter.cs" />
 		<Compile Include="System.Windows.Media\BrushMappingMode.cs" />
 		<Compile Include="System.Windows.Media\CompositeTransform.cs" />
 		<Compile Include="System.Windows.Media\DoubleCollection.cs" />
-		<Compile Include="System.Windows.Media\DoubleCollectionConverter.cs" />
 		<Compile Include="System.Windows.Media\EllipseGeometry.cs" />
 		<Compile Include="System.Windows.Media\FillRule.cs" />
 		<Compile Include="System.Windows.Media\FontFamily.cs" />
-		<Compile Include="System.Windows.Media\FontFamilyConverter.cs" />
 		<Compile Include="System.Windows.Media\GeneralTransform.cs" />
 		<Compile Include="System.Windows.Media\Geometry.cs" />
-		<Compile Include="System.Windows.Media\GeometryConverter.cs" />
 		<Compile Include="System.Windows.Media\GeometryGroup.cs" />
 		<Compile Include="System.Windows.Media\GeometryParser.cs" />
 		<Compile Include="System.Windows.Media\GradientBrush.cs" />
@@ -955,12 +963,10 @@
 		<Compile Include="System.Windows.Media\GradientStop.cs" />
 		<Compile Include="System.Windows.Media\GradientStopCollection.cs" />
 		<Compile Include="System.Windows.Media\ImageSource.cs" />
-		<Compile Include="System.Windows.Media\ImageSourceConverter.cs" />
 		<Compile Include="System.Windows.Media\LinearGradientBrush.cs" />
 		<Compile Include="System.Windows.Media\LineGeometry.cs" />
 		<Compile Include="System.Windows.Media\LineSegment.cs" />
 		<Compile Include="System.Windows.Media\Matrix.cs" />
-		<Compile Include="System.Windows.Media\MatrixConverter.cs" />
 		<Compile Include="System.Windows.Media\MatrixTransform.cs" />
 		<Compile Include="System.Windows.Media\MediaCanPlayResponse.cs" />
 		<Compile Include="System.Windows.Media\PathFigure.cs" />
@@ -1012,7 +1018,6 @@
 		<Compile Include="System.Windows\Content.cs" />
 		<Compile Include="System.Windows\ControlToWatch.cs" />
 		<Compile Include="System.Windows\CornerRadius.cs" />
-		<Compile Include="System.Windows\CornerRadiusConverter.cs" />
 		<Compile Include="System.Windows\CSSEquivalent.cs" />
 		<Compile Include="System.Windows\DataTemplate.cs" />
 		<Compile Include="System.Windows\DependencyObject.cs" />
@@ -1021,14 +1026,12 @@
 		<Compile Include="System.Windows\DependencyPropertyChangedEventHandler.cs" />
 		<Compile Include="System.Windows\DispatcherTimer.cs" />
 		<Compile Include="System.Windows\Duration.cs" />
-		<Compile Include="System.Windows\DurationConverter.cs" />
 		<Compile Include="System.Windows\ExceptionRoutedEventArgs.cs" />
 		<Compile Include="System.Windows\ExceptionRoutedEventHandler.cs" />
 		<Compile Include="System.Windows\FrameworkElement.cs" />
 		<Compile Include="System.Windows\FrameworkElement_HandlingSizeAndAlignment.cs" />
 		<Compile Include="System.Windows\FrameworkTemplate.cs" />
 		<Compile Include="System.Windows\GridLength.cs" />
-		<Compile Include="System.Windows\GridLengthConverter.cs" />
 		<Compile Include="System.Windows\GridUnitType.cs" />
 		<Compile Include="System.Windows\HorizontalAlignment.cs" />
 		<Compile Include="System.Windows\Host.cs" />
@@ -1043,7 +1046,6 @@
 		<Compile Include="System.Windows\PropertyChangedCallback.cs" />
 		<Compile Include="System.Windows\PropertyMetadata.cs" />
 		<Compile Include="System.Windows\PropertyPath.cs" />
-		<Compile Include="System.Windows\PropertyPathConverter.cs" />
 		<Compile Include="System.Windows\PropertyPathHelper.cs" />
 		<Compile Include="System.Windows\ResourceDictionary.cs" />
 		<Compile Include="System.Windows\RoutedEvent.cs" />
@@ -1064,7 +1066,6 @@
 		<Compile Include="System.Windows\TextAlignment.cs" />
 		<Compile Include="System.Windows\TextWrapping.cs" />
 		<Compile Include="System.Windows\Thickness.cs" />
-		<Compile Include="System.Windows\ThicknessConverter.cs" />
 		<Compile Include="System.Windows\UIElement.cs" />
 		<Compile Include="System.Windows\UIElement_Events.cs" />
 		<Compile Include="System.Windows\ValueToHtmlConverter.cs" />
@@ -1105,7 +1106,6 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\AssemblyPart.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\AssemblyPartCollection.cs" />
 		<Compile Include="System.Windows.Media\Color.cs" />
-		<Compile Include="System.Windows.Media\ColorConverter.cs" />
 		<Compile Include="System.Windows.Media\Colors.cs" />
 		<Compile Include="__COMPATIBILITY__\JSIL.Meta.dll ASSEMBLY\JSIL.Meta\JSIgnoreAttribute.cs" />
 		<Compile Include="__COMPATIBILITY__\JSIL.Meta.dll ASSEMBLY\JSIL.Meta\JSReplacementAttribute.cs" />
@@ -1251,7 +1251,7 @@
 		<None Include="Runtime.licenseheader" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\OpenSilver.Xaml\OpenSilver.Xaml.csproj" />
+		<ProjectReference Include="..\OpenSilver.Xaml\OpenSilver.Xaml.csproj" />
 	</ItemGroup>
   
 	<!-- See ths comment on the first <Import> -->

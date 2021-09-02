@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.ComponentModel;
 using System.Globalization;
@@ -24,92 +22,89 @@ namespace Windows.Foundation
 #endif
 {
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.Size" /> object to and from other types.
+    /// SizeConverter - Converter class for converting instances of other types to and from Size instances
     /// </summary>
-    public sealed partial class SizeConverter : TypeConverter
+    internal class SizeConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Size" />.
+        /// Returns true if this type converter can convert from a given type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="sourceType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        /// bool - True if this converter can convert from the provided type, false if not.
+        /// </returns>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="sourceType"> The Type being queried for support. </param>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             return sourceType == typeof(string);
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.Size" /> can be converted to the specified type.
+        /// Returns true if this type converter can convert to the given type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        /// bool - True if this converter can convert to the provided type, false if not.
+        /// </returns>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="destinationType"> The Type being queried for support. </param>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
             return destinationType == typeof(string);
         }
 
-        /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.Size" />.</summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>The instance of <see cref="T:System.Windows.Size" /> that is created from the converted <paramref name="source" />.</returns>
+        /// <summary>
+        /// Attempts to convert to a Size from the given object.
+        /// </summary>
+        /// <returns>
+        /// The Size which was constructed.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if the example object is null or is not a valid type
+        /// which can be converted to a Size.
+        /// </exception>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="culture"> The requested CultureInfo.  Note that conversion uses "en-US" rather than this parameter. </param>
+        /// <param name="value"> The object to convert to an instance of Size. </param>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value is null)
+            if (value is string source)
             {
-                throw GetConvertFromException(value);
-            }
-            else if (value is string)
-            {
-                var sizeAsString = value.ToString();
-
-                var splittedString = sizeAsString.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                if (splittedString.Length == 2)
-                {
-                    double width, height;
-#if OPENSILVER
-                    if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out width) &&
-                        double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out height))
-#else
-                if (double.TryParse(splittedString[0], out width) &&
-                    double.TryParse(splittedString[1], out height))
-#endif
-                        return new Size(width, height);
-                }
-
-                throw new FormatException(sizeAsString + " is not an eligible value for a Size");
+                return Size.Parse(source);
             }
 
-            return base.ConvertFrom(context, culture, value);
+            throw GetConvertFromException(value);
         }
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.Size" /> to a specified type. </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.Size" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Size" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.Size" />.</returns>
-        /// <exception cref="T:System.NotSupportedException">
-        /// Thrown if <paramref name="value" /> is <see langword="null" /> or not an instance of <see cref="T:System.Windows.Size" />,
-        /// or if the <paramref name="destinationType" /> is not one of the valid types for conversion.</exception>
+
+        /// <summary>
+        /// ConvertTo - Attempt to convert an instance of Size to the given type
+        /// </summary>
+        /// <returns>
+        /// The object which was constructoed.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if "value" is null or not an instance of Size,
+        /// or if the destinationType isn't one of the valid destination types.
+        /// </exception>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="culture"> The CultureInfo which is respected when converting. </param>
+        /// <param name="value"> The object to convert to an instance of "destinationType". </param>
+        /// <param name="destinationType"> The type to which this will convert the Size instance. </param>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            object result;
-
-            if (destinationType != null && destinationType == typeof(string) && value is Size size)
+            if (destinationType == null)
             {
-                result = size.ToString();
-            }
-            else
-            {
-                result = base.ConvertTo(context, culture, value, destinationType);
+                throw new ArgumentNullException(nameof(destinationType));
             }
 
-            return result;
+            if (destinationType == typeof(string))
+            {
+                if (value is Size instance)
+                {
+                    return instance.ConvertToString(culture);
+                }
+            }
+
+            throw GetConvertToException(value, destinationType);
         }
     }
 }

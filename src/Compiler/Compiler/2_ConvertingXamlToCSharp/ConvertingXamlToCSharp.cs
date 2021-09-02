@@ -52,7 +52,7 @@ namespace DotNetForHtml5.Compiler
             // Insert implicit nodes in XAML:
             if (!isFirstPass) // Note: we skip this step during the 1st pass because some types are not known yet, so we cannot determine the default "ContentProperty".
             {
-                InsertingImplicitNodesAndNoDirectTextContent.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain);
+                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain);
 
                 FixingPropertiesOrder.FixPropertiesOrder(doc, reflectionOnSeparateAppDomain);
 
@@ -70,7 +70,7 @@ namespace DotNetForHtml5.Compiler
             }
 
             // Generate unique names for XAML elements:
-            GeneratingUniqueNames.AddUniqueNamesToAllElements(doc);
+            GeneratingUniqueNames.ProcessDocument(doc);
 
             // Prepare the code that will be put in the "InitializeComponent" of the Application class, which means that it will be executed when the application is launched:
             string codeToPutInTheInitializeComponentOfTheApplicationClass = string.Format(@"

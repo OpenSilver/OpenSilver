@@ -105,11 +105,29 @@ namespace System.Windows.Browser
         /// <exception cref="T:System.ArgumentNullException">
         /// <paramref name="scriptKey" /> or <paramref name="instance" /> is null.
         /// </exception>
-		[OpenSilver.NotImplemented]
         public static void RegisterScriptableObject(string scriptKey, object instance)
         {
+            CSHTML5.Interop.ExecuteJavaScript("window[$0]={};", scriptKey);
+
+            var methods = instance.GetType().GetMethods()
+                .Where(m => m.GetCustomAttributes(typeof(ScriptableMemberAttribute), false).Length > 0)
+                .ToArray();
+
+            foreach (var method in methods)
+            {
+                CSHTML5.Interop.ExecuteJavaScript("window[$0][$1] = function () { $2(...arguments); }", scriptKey, method.Name, (Action<CSHTML5.Types.INTERNAL_JSObjectReference>)(jsObjectReference =>
+                {
+                    var parameters = method.GetParameters();
+                    var args = new object[parameters.Length];
+                    for (var i = 0; i < args.Length; i++)
+                    {
+                        jsObjectReference.ArrayIndex = i;
+                        args[i] = (jsObjectReference.IsNull() || jsObjectReference.IsUndefined()) ? null : Convert.ChangeType(jsObjectReference, parameters[i].ParameterType);
+                    }
+                    method.Invoke(instance, args);
+                }));
+            }
         }
 #endif
-
     }
 }

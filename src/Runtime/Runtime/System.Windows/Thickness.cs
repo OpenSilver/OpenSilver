@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,10 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System.ComponentModel;
-using System.Globalization;
-using System.Windows.Markup;
+using System;
 
 #if MIGRATION
 namespace System.Windows
@@ -29,33 +25,9 @@ namespace Windows.UI.Xaml
     /// Windows.UI.Xaml.Thickness.Right, and Windows.UI.Xaml.Thickness.Bottom sides
     /// of the rectangle, respectively.
     /// </summary>
-#if WORKINPROGRESS
-    [MethodToTranslateXamlValueToCSharp("TranslateXamlValueToCSharp")]
-#endif
-    [TypeConverter(typeof(ThicknessConverter))]
     public partial struct Thickness
     {
-#if WORKINPROGRESS
-        public static string TranslateXamlValueToCSharp(string xamlValue)
-        {
-            string convertedXamlValue;
-            var xamlValueSplittedOnComas = xamlValue.Split(',');
-
-            if (xamlValueSplittedOnComas.Length == 2)
-            {
-                convertedXamlValue = xamlValue + "," + xamlValue;
-            }
-            else
-            {
-                convertedXamlValue = xamlValue;
-            }
-#if MIGRATION
-            return "new global::System.Windows(" + convertedXamlValue + ")";
-#else
-            return "new global::Windows.UI.Xaml(" + convertedXamlValue + ")";
-#endif
-        }
-#endif
+        double _left, _top, _right, _bottom;
 
         /// <summary>
         /// [SECURITY CRITICAL] Initializes a Windows.UI.Xaml.Thickness structure that
@@ -64,12 +36,12 @@ namespace Windows.UI.Xaml
         /// <param name="uniformLength">The uniform length applied to all four sides of the bounding rectangle.</param>
         public Thickness(double uniformLength)
         {
-            Left = uniformLength;
-            Top = uniformLength;
-            Right = uniformLength;
-            Bottom = uniformLength;
+            _left = uniformLength;
+            _top = uniformLength;
+            _right = uniformLength;
+            _bottom = uniformLength;
         }
-
+       
         /// <summary>
         /// [SECURITY CRITICAL] Initializes a Windows.UI.Xaml.Thickness structure that
         /// has specific lengths (supplied as a System.Double) applied to each side of
@@ -81,12 +53,12 @@ namespace Windows.UI.Xaml
         /// <param name="bottom">The thickness for the lower side of the rectangle.</param>
         public Thickness(double left, double top, double right, double bottom)
         {
-            Left = left;
-            Top = top;
-            Right = right;
-            Bottom = bottom;
+            _left = left;
+            _top = top;
+            _right = right;
+            _bottom = bottom;
         }
-
+        
         /// <summary>
         /// [SECURITY CRITICAL] Compares two Windows.UI.Xaml.Thickness structures for
         /// inequality.
@@ -99,9 +71,9 @@ namespace Windows.UI.Xaml
         /// </returns>
         public static bool operator !=(Thickness t1, Thickness t2)
         {
-            return t1.Left != t2.Left || t1.Top != t2.Top || t1.Bottom != t2.Bottom || t1.Right != t2.Right;
+            return (t1.Left != t2.Left || t1.Top != t2.Top || t1.Bottom != t2.Bottom || t1.Right != t2.Right);
         }
-
+      
         /// <summary>
         /// [SECURITY CRITICAL] Compares the value of two Windows.UI.Xaml.Thickness structures
         /// for equality.</summary>
@@ -113,33 +85,49 @@ namespace Windows.UI.Xaml
         /// </returns>
         public static bool operator ==(Thickness t1, Thickness t2)
         {
-            return t1.Left == t2.Left && t1.Top == t2.Top && t1.Bottom == t2.Bottom && t1.Right == t2.Right;
+            return (t1.Left == t2.Left && t1.Top == t2.Top && t1.Bottom == t2.Bottom && t1.Right == t2.Right);
         }
 
         /// <summary>
         /// [SECURITY CRITICAL] Gets or sets the width, in pixels, of the lower side
         /// of the bounding rectangle.
         /// </summary>
-        public double Bottom { get; set; }
+        public double Bottom
+        {
+            get { return _bottom; }
+            set { _bottom = value; }
+        }
 
         /// <summary>
         /// [SECURITY CRITICAL] Gets or sets the width, in pixels, of the left side of
         /// the bounding rectangle.
         /// </summary>
-        public double Left { get; set; }
-
+        public double Left
+        {
+            get { return _left; }
+            set { _left = value; }
+        }
+        
         /// <summary>
         /// [SECURITY CRITICAL] Gets or sets the width, in pixels, of the right side
         /// of the bounding rectangle.
         /// </summary>
-        public double Right { get; set; }
-
+        public double Right
+        {
+            get { return _right; }
+            set { _right = value; }
+        }
+        
         /// <summary>
         /// [SECURITY CRITICAL] Gets or sets the width, in pixels, of the upper side
         /// of the bounding rectangle.
         /// </summary>
-        public double Top { get; set; }
-
+        public double Top
+        {
+            get { return _top; }
+            set { _top = value; }
+        }
+        
         /// <summary>
         /// [SECURITY CRITICAL] Compares this Windows.UI.Xaml.Thickness structure to
         /// another System.Object for equality.
@@ -148,9 +136,9 @@ namespace Windows.UI.Xaml
         /// <returns>true if the two objects are equal; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
-            return obj is Thickness && ((Thickness)obj) == this;
+            return (obj is Thickness && ((Thickness)obj) == this);
         }
-
+       
         /// <summary>
         /// [SECURITY CRITICAL] Compares this Windows.UI.Xaml.Thickness structure to
         /// another Windows.UI.Xaml.Thickness structure for equality.
@@ -175,13 +163,15 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// [SECURITY CRITICAL] Returns the string representation of the Windows.UI.Xaml.Thickness
+        /// Returns the string representation of the <see cref="Thickness"/> structure.
         /// structure.
         /// </summary>
-        /// <returns>A System.String that represents the Windows.UI.Xaml.Thickness value.</returns>
+        /// <returns>
+        /// A <see cref="String"/> that represents the <see cref="Thickness"/> value.
+        /// </returns>
         public override string ToString()
         {
-            return string.Concat(Left, ", ", Top, ", ", Right, ", ", Bottom);
+            return ThicknessConverter.ToString(this, null);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -13,111 +12,94 @@
 \*====================================================================================*/
 
 #if MIGRATION
+
 using System.ComponentModel;
 using System.Globalization;
 
 namespace System.Windows
 {
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.FontStyle" /> object to and from other types.
+    /// FontStyleConverter class parses a font style string.
     /// </summary>
-    public class FontStyleConverter : TypeConverter
+    internal class FontStyleConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.FontStyle" />.
+        /// CanConvertFrom
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="sourceType">The type being evaluated for conversion.</param>
-        /// <returns>
-        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             return sourceType == typeof(string);
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.FontStyle" /> can be converted to the specified type.
+        /// TypeConverter method override.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">The type being evaluated for conversion.</param>
-        /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />;
-        /// otherwise, <see langword="false" />.</returns>
+        /// <param name="context">ITypeDescriptorContext</param>
+        /// <param name="destinationType">Type to convert to</param>
+        /// <returns>true if conversion is possible</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
             return destinationType == typeof(string);
         }
 
-        /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.FontStyle" />.</summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>The instance of <see cref="T:System.Windows.FontStyle" /> created from the converted <paramref name="value" />.</returns>
-        /// <exception cref="T:System.NotSupportedException">
-        ///   <paramref name="value" /> is <see langword="null" /> or is not a valid type for conversion.</exception>
+        /// <summary>
+        /// ConvertFrom - attempt to convert to a FontStyle from the given object
+        /// </summary>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if the example object is null or is not a valid type
+        /// which can be converted to a FontStyle.
+        /// </exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            object result;
-
-            if (value is null)
+            if (value is string s)
             {
-                throw GetConvertFromException(value);
-            }
-            else if (value is string)
-            {
-                var fontStyleAsString = value.ToString();
-
-                switch ((fontStyleAsString ?? string.Empty).ToLower())
+                if (s.Equals("Normal", StringComparison.OrdinalIgnoreCase))
                 {
-                    case "normal":
-                        result = FontStyles.Normal;
-                        break;
-                    case "oblique":
-                        result = FontStyles.Oblique;
-                        break;
-                    case "italic":
-                        result = FontStyles.Italic;
-                        break;
-                    default:
-                        throw new Exception(string.Format("Invalid FontStyle: '{0}'", fontStyleAsString));
+                    return FontStyles.Normal;
+                }
+                else if (s.Equals("Oblique", StringComparison.OrdinalIgnoreCase))
+                {
+                    return FontStyles.Oblique;
+                }
+                else if (s.Equals("Italic", StringComparison.OrdinalIgnoreCase))
+                {
+                    return FontStyles.Italic;
                 }
             }
-            else
-            {
-                result = base.ConvertFrom(context, culture, value);
-            }
 
-            return result;
+            throw GetConvertFromException(value);
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.FontStyle" /> to a specified type. </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.FontStyle" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.FontStyle" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.FontStyle" />.</returns>
-        /// <exception cref="T:System.NotSupportedException">
-        /// Thrown if <paramref name="value" /> is <see langword="null" /> or not a <see cref="T:System.Windows.FontStyle" />,
-        /// or if the <paramref name="destinationType" /> is not one of the valid types for conversion.</exception>
+        /// <summary>
+        /// TypeConverter method implementation.
+        /// </summary>
+        /// <exception cref="NotSupportedException">
+        /// An NotSupportedException is thrown if the example object is null or is not a FontStyle,
+        /// or if the destinationType isn't one of the valid destination types.
+        /// </exception>
+        /// <param name="context">ITypeDescriptorContext</param>
+        /// <param name="culture">current culture (see CLR specs)</param>
+        /// <param name="value">value to convert from</param>
+        /// <param name="destinationType">Type to convert to</param>
+        /// <returns>converted value</returns>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            object result = null;
-
-            if (destinationType != null && value is FontStyle style)
+            if (destinationType == null)
             {
-                if (destinationType == typeof(string))
+                throw new ArgumentNullException(nameof(destinationType));
+            }
+
+            if (destinationType == typeof(string))
+            {
+                if (value is FontStyle c)
                 {
-                    result = ((IFormattable)style).ToString(null, culture);
+                    return ((IFormattable)c).ToString(null, culture);
                 }
             }
 
-            if (result is null)
-            {
-                result = base.ConvertTo(context, culture, value, destinationType);
-            }
-
-            return result;
+            throw GetConvertToException(value, destinationType);
         }
     }
 }
+
 #endif

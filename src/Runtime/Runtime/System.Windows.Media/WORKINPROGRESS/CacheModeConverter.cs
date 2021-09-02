@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+#if WORKINPROGRESS
 
 using System;
 using System.ComponentModel;
@@ -23,121 +23,92 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-#if WORKINPROGRESS
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.Media.CacheMode" /> object to and from other types.
+    /// CacheModeConverter - Converter class for converting instances of other types to and from CacheMode instances
     /// </summary>
-    public class CacheModeConverter : TypeConverter
+    internal class CacheModeConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Media.CacheMode" />.
+        /// Returns true if this type converter can convert from a given type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="sourceType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        /// bool - True if this converter can convert from the provided type, false if not.
+        /// </returns>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="sourceType"> The Type being queried for support. </param>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             return sourceType == typeof(string);
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.Media.CacheMode" /> can be converted to the specified type.
+        /// Returns true if this type converter can convert to the given type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">The type being evaluated for conversion.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        /// bool - True if this converter can convert to the provided type, false if not.
+        /// </returns>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="destinationType"> The Type being queried for support. </param>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            if (destinationType == typeof(string))
-            {
-                // When invoked by the serialization engine we can convert to string only for some instances
-                if (context != null && context.Instance != null)
-                {
-                    if (!(context.Instance is CacheMode))
-                    {
-                        throw new ArgumentException($"Expected type of {nameof(CacheMode)}.");
-                    }
-
-                    return false;
-                }
-
-                return true;
-            }
-
-            return base.CanConvertTo(context, destinationType);
+            return destinationType == typeof(string);
         }
 
-        /// <summary>Converts a specified object to a <see cref="T:System.Windows.Media.CacheMode" />.</summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>The <see cref="T:System.Windows.Media.CacheMode" /> that is created by converting <paramref name="value" />; otherwise, an exception is raised.</returns>
-        /// <exception cref="T:System.NotSupportedException">
-        ///   <paramref name="value" /> is <see langword="null" /> or not a type that can be converted to <see cref="T:System.Windows.Media.CacheMode" />.</exception>
+        /// <summary>
+        /// Attempts to convert to a CacheMode from the given object.
+        /// </summary>
+        /// <returns>
+        /// The CacheMode which was constructed.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if the example object is null or is not a valid type
+        /// which can be converted to a CacheMode.
+        /// </exception>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="culture"> The requested CultureInfo.  Note that conversion uses "en-US" rather than this parameter. </param>
+        /// <param name="value"> The object to convert to an instance of CacheMode. </param>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            object result;
-
-            if (value is null)
+            if (value is string source)
             {
-                throw GetConvertFromException(value);
-            }
-            else if (value is string)
-            {
-                var cacheModeAsString = value.ToString();
-
-                string cacheModeAsStringToLower = cacheModeAsString.ToLower();
-                switch (cacheModeAsStringToLower)
-                {
-                    case "bitmapcache":
-                        result = new BitmapCache();
-                        break;
-                    default:
-                        throw new Exception("\"" + cacheModeAsString + "\"" + " is not a supported type.");
-                }
-            }
-            else
-            {
-                result = base.ConvertFrom(context, culture, value);
+                return CacheMode.Parse(source);
             }
 
-            return result;
+            throw GetConvertFromException(value);
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.CacheMode" /> to a specified type. </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.Media.CacheMode" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Media.CacheMode" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.Media.CacheMode" />.</returns>
-        /// <exception cref="T:System.NotSupportedException">
-        /// <paramref name="value" /> is <see langword="null" />, <paramref name="value" /> is not a <see cref="T:System.Windows.Media.CacheMode" />, or <paramref name="destinationType" /> is not a string.</exception>
+        /// <summary>
+        /// ConvertTo - Attempt to convert an instance of CacheMode to the given type
+        /// </summary>
+        /// <returns>
+        /// The object which was constructoed.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if "value" is null or not an instance of CacheMode,
+        /// or if the destinationType isn't one of the valid destination types.
+        /// </exception>
+        /// <param name="context"> The ITypeDescriptorContext for this call. </param>
+        /// <param name="culture"> The CultureInfo which is respected when converting. </param>
+        /// <param name="value"> The object to convert to an instance of "destinationType". </param>
+        /// <param name="destinationType"> The type to which this will convert the CacheMode instance. </param>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            object result = null;
-
-            if (destinationType != null && value is CacheMode mode)
+            if (destinationType == null)
             {
-                if (destinationType == typeof(string))
-                {
-                    if (context != null && context.Instance != null)
-                    {
-                        throw new NotSupportedException($"Conversion to {destinationType.FullName} is not supported.");
-                    }
+                throw new ArgumentNullException(nameof(destinationType));
+            }
 
-                    result = mode.ToString();
+            if (destinationType == typeof(string))
+            {
+                if (value is CacheMode instance)
+                {
+                    return instance.ToString();
                 }
             }
 
-            if (result is null)
-            {
-                result = base.ConvertTo(context, culture, value, destinationType);
-            }
-
-            return result;
+            throw GetConvertToException(value, destinationType);
         }
     }
-#endif
 }
+
+#endif

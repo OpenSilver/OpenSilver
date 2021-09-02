@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
-using System.Text;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -27,123 +22,102 @@ namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.Media.Animation.RepeatBehaviorConverter" /> object to and from other types.
+    /// 
     /// </summary>
-    public sealed partial class RepeatBehaviorConverter : TypeConverter
+    internal class RepeatBehaviorConverter : TypeConverter
     {
+        private static readonly char[] _iterationCharacter = new char[] { 'x' };
+
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Media.Animation.RepeatBehaviorConverter" />.
+        /// CanConvertFrom - Returns whether or not this class can convert from a given type
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="sourceType">The type being evaluated for conversion.</param>
-        /// <returns>
-        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             return sourceType == typeof(string);
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.Media.Animation.RepeatBehaviorConverter" /> can be converted to the specified type.
+        /// TypeConverter method override.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">The type being evaluated for conversion.</param>
-        /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; 
-        /// otherwise, <see langword="false" />.</returns>
+        /// <param name="context">ITypeDescriptorContext</param>
+        /// <param name="destinationType">Type to convert to</param>
+        /// <returns>true if conversion is possible</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
             return destinationType == typeof(string);
         }
 
-        /// <summary>Converts a given string value to an instance of <see cref="T:System.Windows.Media.Animation.RepeatBehaviorConverter" />.</summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>A new <see cref="T:System.Windows.Media.Animation.RepeatBehavior" /> object based on <paramref name="value" />.</returns>
+        /// <summary>
+        /// ConvertFrom
+        /// </summary>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            object result;
+            string stringValue = value as string;
 
-            if (value is null)
+            if (stringValue != null)
             {
-                throw GetConvertFromException(value);
-            }
-            else if (value is string)
-            {
-                var arg = value.ToString();
-
-                //BRIDGETODO : verify the code below matchs
+                stringValue = stringValue.Trim();
 #if NETSTANDARD
-                var loweredArg = arg.ToLowerInvariant();
-#else
-                var loweredArg = arg.ToLower();
+                stringValue = stringValue.ToLowerInvariant();
+#elif BRIDGE
+                stringValue = stringValue.ToLower();
 #endif
-                if (loweredArg == "forever")
+
+                if (stringValue == "forever")
                 {
-                    result = RepeatBehavior.Forever;
+                    return RepeatBehavior.Forever;
                 }
-                else if (loweredArg.EndsWith("x"))
+                else if (stringValue.Length > 0 
+                    && stringValue[stringValue.Length - 1] == _iterationCharacter[0])
                 {
-                    var repeatCount = double.Parse(loweredArg.Substring(0, loweredArg.Length - 1));
-                    result = new RepeatBehavior(repeatCount);
+                    string stringDoubleValue = stringValue.TrimEnd(_iterationCharacter);
+
+                    double doubleValue = (double)TypeConverterHelper.GetConverter(
+                        typeof(double)).ConvertFrom(
+                            context,
+                            culture,
+                            stringDoubleValue);
+
+                    return new RepeatBehavior(doubleValue);
                 }
-                else
-                {
-                    throw new FormatException("The string: \"" + arg + "\" could not be parsed into a RepeatBehavior. Note: The duration is not supported yet as a RepeatBehavior.");
-                }
-                //TODO: else duration.
-            }
-            else
-            {
-                result = base.ConvertFrom(context, culture, value);
             }
 
-            return result;
+            // The value is not Forever or an iteration count so it's either a TimeSpan
+            // or we'll let the TimeSpanConverter raise the appropriate exception.
+
+            TimeSpan timeSpanValue = (TimeSpan)TypeConverterHelper.GetConverter(
+                typeof(TimeSpan)).ConvertFrom(
+                    context, 
+                    culture, 
+                    stringValue);
+
+            return new RepeatBehavior(timeSpanValue);
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.Media.Animation.RepeatBehavior" /> to a specified type. </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="cultureInfo">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.Media.Animation.RepeatBehavior" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Media.Animation.RepeatBehavior" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.Media.Animation.RepeatBehavior" /> (a string).</returns>
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo cultureInfo, object value, Type destinationType)
+        /// <summary>
+        /// TypeConverter method implementation.
+        /// </summary>
+        /// <param name="context">ITypeDescriptorContext</param>
+        /// <param name="culture">current culture (see CLR specs)</param>
+        /// <param name="value">value to convert from</param>
+        /// <param name="destinationType">Type to convert to</param>
+        /// <returns>converted value</returns>
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            object result = null;
-
-            if (value is RepeatBehavior behavior && destinationType != null)
+            if (destinationType == null)
             {
-                if (destinationType == typeof(string))
+                throw new ArgumentNullException(nameof(destinationType));
+            }
+
+            if (destinationType == typeof(string))
+            {
+                if (value is RepeatBehavior repeatBehavior)
                 {
-                    switch (behavior.Type)
-                    {
-                        case RepeatBehaviorType.Forever:
-                            result = "Forever";
-                            break;
-                        case RepeatBehaviorType.Count:
-                            var sb = new StringBuilder();
-#if BRIDGE
-                            sb.AppendFormat("{0:}x", behavior.Count);
-#else
-                            sb.AppendFormat(cultureInfo, "{0:}x", behavior.Count);
-#endif
-                            result = sb.ToString();
-                            break;
-                        default:
-                            Debug.Fail("Unhandled RepeatBehaviorType.");
-                            result = null;
-                            break;
-                    }
+                    return repeatBehavior.ToString(culture);
                 }
             }
 
-            if (result is null)
-            {
-                result = base.ConvertTo(context, cultureInfo, value, destinationType);
-            }
-
-            return result;
+            throw GetConvertToException(value, destinationType);
         }
     }
 }

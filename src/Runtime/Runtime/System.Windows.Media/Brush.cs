@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -13,9 +12,8 @@
 \*====================================================================================*/
 
 using System;
-using CSHTML5.Internal;
 using System.Collections.Generic;
-using System.ComponentModel;
+using CSHTML5.Internal;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -27,9 +25,13 @@ namespace Windows.UI.Xaml.Media
     /// Defines objects used to paint graphical objects. Classes that derive from
     /// Brush describe how the area is painted.
     /// </summary>
-    [TypeConverter(typeof(BrushConverter))]
     public partial class Brush : DependencyObject, IHasAccessToPropertiesWhereItIsUsed
     {
+        internal static Brush Parse(string source)
+        {
+            return new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString(source));
+        }
+
         /// <summary>
         /// Gets or sets the degree of opacity of a Brush.
         /// The value of the Opacity property is expressed as a value between 0 and 1.0.

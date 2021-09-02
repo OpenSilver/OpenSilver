@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
-using System.ComponentModel;
 using System.Globalization;
-using System.Windows.Markup;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows
@@ -27,21 +22,24 @@ namespace Windows.Foundation
 #endif
 {
     /// <summary>
-    /// Represents an x- and y-coordinate pair in two-dimensional
-    /// space. Can also represent a logical point for certain property usages.
+    /// Represents an x- and y-coordinate pair in two-dimensional space. Can also represent
+    /// a logical point for certain property usages.
     /// </summary>
-    [TypeConverter(typeof(PointConverter))]
     public partial struct Point : IFormattable
     {
         internal double _x;
         internal double _y;
 
         /// <summary>
-        /// Initializes a Windows.Foundation.Point structure that
+        /// Initializes a <see cref="Point"/> structure that contains the specified values.
         /// contains the specified values.
         /// </summary>
-        /// <param name="x">The x-coordinate value of the Windows.Foundation.Point structure.</param>
-        /// <param name="y">The y-coordinate value of the Windows.Foundation.Point structure.</param>
+        /// <param name="x">
+        /// The x-coordinate value of the <see cref="Point"/> structure.
+        /// </param>
+        /// <param name="y">
+        /// The y-coordinate value of the <see cref="Point"/> structure.
+        /// </param>
         public Point(double x, double y)
         {
             _x = x;
@@ -49,39 +47,39 @@ namespace Windows.Foundation
         }
 
         /// <summary>
-        /// Compares two Windows.Foundation.Point structures for inequality
+        /// Parse - returns an instance converted from the provided string using
+        /// the culture "en-US"
         /// </summary>
-        /// <param name="point1">The first point to compare.</param>
-        /// <param name="point2">The second point to compare.</param>
-        /// <returns>
-        /// true if point1 and point2 have different Windows.Foundation.Point.X or Windows.Foundation.Point.Y
-        /// values; false if point1 and point2 have the same Windows.Foundation.Point.X
-        /// and Windows.Foundation.Point.Y values.
-        /// </returns>
-        public static bool operator !=(Point point1, Point point2)
+        /// <param name="source"> string with Point data </param>
+        public static Point Parse(string source)
         {
-            return point1.X != point2.X || point1.Y != point2.Y;
-        }
-       
-        /// <summary>
-        /// Compares two Windows.Foundation.Point structures for equality
-        /// </summary>
-        /// <param name="point1">The first point to compare.</param>
-        /// <param name="point2">The second point to compare.</param>
-        /// <returns>
-        /// true if both the Windows.Foundation.Point.X and Windows.Foundation.Point.Y
-        /// values of point1 and point2 are equal; otherwise, false.
-        /// </returns>
-        public static bool operator ==(Point point1, Point point2)
-        {
-            return point1.X == point2.X && point1.Y == point2.Y;
+            if (source != null)
+            {
+                IFormatProvider formatProvider = CultureInfo.InvariantCulture;
+                char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
+                string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+                if (split.Length == 2)
+                {
+                    return new Point(
+                        Convert.ToDouble(split[0], formatProvider),
+                        Convert.ToDouble(split[1], formatProvider)
+                    );
+                }
+            }
+
+            throw new FormatException($"'{source}' is not an eligible value for a '{typeof(Point)}'.");
         }
 
         /// <summary>
-        /// Gets or sets the Windows.Foundation.Point.X-coordinate
-        /// value of this Windows.Foundation.Point structure.
+        /// Gets or sets the <see cref="X"/>-coordinate value of this <see cref="Point"/>
+        /// structure.
         /// </summary>
-        public double X 
+        /// <returns>
+        /// The <see cref="X"/>-coordinate value of this <see cref="Point"/> structure.
+        /// The default value is 0.
+        /// </returns>
+        public double X
         {
             get
             {
@@ -94,9 +92,12 @@ namespace Windows.Foundation
         }
 
         /// <summary>
-        /// Gets or sets the Windows.Foundation.Point.Y-coordinate
-        /// value of this Windows.Foundation.Point.
+        /// Gets or sets the <see cref="Y"/>-coordinate value of this <see cref="Point"/>.
         /// </summary>
+        /// <returns>
+        /// The <see cref="Y"/>-coordinate value of this <see cref="Point"/> structure.
+        /// The default value is 0.
+        /// </returns>
         public double Y
         {
             get
@@ -109,85 +110,130 @@ namespace Windows.Foundation
             }
         }
 
-       
         /// <summary>
-        /// Determines whether the specified object is a Windows.Foundation.Point
-        /// and whether it contains the same values as this Windows.Foundation.Point.
+        /// Determines whether the specified object is a <see cref="Point"/> and whether
+        /// it contains the same values as this <see cref="Point"/>.
         /// </summary>
-        /// <param name="o">The object to compare.</param>
+        /// <param name="o">
+        /// The object to compare.
+        /// </param>
         /// <returns>
-        /// true if obj is a Windows.Foundation.Point and contains the same Windows.Foundation.Point.X
-        /// and Windows.Foundation.Point.Y values as this Windows.Foundation.Point; otherwise,
-        /// false.
+        /// true if obj is a <see cref="Point"/> and contains the same <see cref="X"/>
+        /// and <see cref="Y"/> values as this <see cref="Point"/>; otherwise, false.
         /// </returns>
         public override bool Equals(object o)
         {
-            return o is Point && ((Point)o) == this;
+            if ((null == o) || !(o is Point))
+            {
+                return false;
+            }
+
+            return this == (Point)o;
         }
 
         /// <summary>
-        /// Compares two Windows.Foundation.Point structures for
-        /// equality.
+        /// Compares two <see cref="Point"/> structures for equality.
         /// </summary>
-        /// <param name="value">The point to compare to this instance.</param>
+        /// <param name="value">
+        /// The point to compare to this instance.
+        /// </param>
         /// <returns>
-        /// true if both Windows.Foundation.Point structures contain the same Windows.Foundation.Point.X
-        /// and Windows.Foundation.Point.Y values; otherwise, false.
+        /// true if both <see cref="Point"/> structures contain the same <see cref="X"/>
+        /// and <see cref="Y"/> values; otherwise, false.
         /// </returns>
         public bool Equals(Point value)
         {
-            return value == this;
+            return this == value;
         }
 
         /// <summary>
-        /// Returns the hash code for this Windows.Foundation.Point.
+        /// Returns the hash code for this <see cref="Point"/>.
         /// </summary>
-        /// <returns>The hash code for this Windows.Foundation.Point.</returns>
+        /// <returns>
+        /// The hash code for this <see cref="Point"/> structure.
+        /// </returns>
         public override int GetHashCode()
         {
             return X.GetHashCode() ^ Y.GetHashCode();
         }
 
         /// <summary>
-        /// Creates a System.String representation of this Windows.Foundation.Point.
+        /// Creates a <see cref="string"/> representation of this <see cref="Point"/>.
         /// </summary>
         /// <returns>
-        /// A System.String containing the Windows.Foundation.Point.X and Windows.Foundation.Point.Y
-        /// values of this Windows.Foundation.Point structure.
+        /// A <see cref="string"/> containing the <see cref="X"/> and <see cref="Y"/>
+        /// values of this <see cref="Point"/> structure.
         /// </returns>
         public override string ToString()
         {
             return ConvertToString(null /* format string */, null /* format provider */);
         }
 
+        /// <summary>
+        /// Creates a <see cref="string"/> representation of this <see cref="Point"/>.
+        /// </summary>
+        /// <param name="provider">
+        /// Culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A <see cref="string"/> containing the <see cref="X"/> and <see cref="Y"/>
+        /// values of this <see cref="Point"/> structure.
+        /// </returns>
         public string ToString(IFormatProvider provider)
         {
             return ConvertToString(null /* format string */, provider);
         }
 
+        /// <summary>
+        /// Creates a string representation of this object based on the format string
+        /// and IFormatProvider passed in.
+        /// If the provider is null, the CurrentCulture is used.
+        /// See the documentation for IFormattable for more information.
+        /// </summary>
+        /// <returns>
+        /// A string representation of this object.
+        /// </returns>
         string IFormattable.ToString(string format, IFormatProvider provider)
         {
             return ConvertToString(format, provider);
         }
 
-        public static Point Parse(string pointAsString)
+        /// <summary>
+        /// Compares two <see cref="Point"/> structures for equality.
+        /// </summary>
+        /// <param name="point1">
+        /// The first <see cref="Point"/> structure to compare.
+        /// </param>
+        /// <param name="point2">
+        /// The second <see cref="Point"/> structure to compare.
+        /// </param>
+        /// <returns>
+        /// true if both the <see cref="X"/> and <see cref="Y"/> values of
+        /// point1 and point2 are equal; otherwise, false.
+        /// </returns>
+        public static bool operator ==(Point point1, Point point2)
         {
-            string[] splittedString = pointAsString.Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries);
+            return point1.X == point2.X &&
+                   point1.Y == point2.Y;
+        }
 
-            if (splittedString.Length == 2)
-            {
-                double x, y;
-#if OPENSILVER
-                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out x) && 
-                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out y))
-#else
-                if (double.TryParse(splittedString[0], out x) &&
-                    double.TryParse(splittedString[1], out y))
-#endif
-                    return new Point(x, y);
-            }
-            
-            throw new FormatException(pointAsString + " is not an eligible value for a Point");
+        /// <summary>
+        /// Compares two <see cref="Point"/> structures for inequality
+        /// </summary>
+        /// <param name="point1">
+        /// The first point to compare.
+        /// </param>
+        /// <param name="point2">
+        /// The second point to compare.
+        /// </param>
+        /// <returns>
+        /// true if point1 and point2 have different <see cref="X"/> or <see cref="Y"/>
+        /// values; false if point1 and point2 have the same <see cref="X"/> and <see cref="Y"/>
+        /// values.
+        /// </returns>
+        public static bool operator !=(Point point1, Point point2)
+        {
+            return !(point1 == point2);
         }
 
         /// <summary>
@@ -202,34 +248,13 @@ namespace Windows.Foundation
         internal string ConvertToString(string format, IFormatProvider provider)
         {
             // Helper to get the numeric list separator for a given culture.
-            char separator = GetNumericListSeparator(provider);
+            char separator = TokenizerHelper.GetNumericListSeparator(provider);
 
             return string.Format(provider,
                                  "{1:" + format + "}{0}{2:" + format + "}",
                                  separator,
                                  _x,
                                  _y);
-        }
-
-        private static char GetNumericListSeparator(IFormatProvider provider)
-        {
-            char numericSeparator = ',';
-
-#if NETSTANDARD
-            // Get the NumberFormatInfo out of the provider, if possible
-            // If the IFormatProvider doesn't not contain a NumberFormatInfo, then
-            // this method returns the current culture's NumberFormatInfo.
-            var numberFormat = NumberFormatInfo.GetInstance(provider);
-
-            // Is the decimal separator is the same as the list separator?
-            // If so, we use the ";".
-            if ((numberFormat.NumberDecimalSeparator.Length > 0) && (numericSeparator == numberFormat.NumberDecimalSeparator[0]))
-            {
-                numericSeparator = ';';
-            }
-#endif
-
-            return numericSeparator;
         }
     }
 }

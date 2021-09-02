@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,10 @@
 *  
 \*====================================================================================*/
 
-
-using System.Collections.Generic;
-using System.ComponentModel;
-
 #if MIGRATION
+
 namespace System.Windows
 {
-    [TypeConverter(typeof(TextDecorationCollectionConverter))]
     public sealed partial class TextDecorationCollection
     {
         internal TextDecorationCollection() { }
@@ -47,14 +42,15 @@ namespace System.Windows
         }
     }
 
-    internal sealed partial class TextDecoration
+    internal sealed class TextDecoration
     {
         internal TextDecoration(TextDecorationLocation location)
         {
-            Location = location;
+            this.Location = location;
         }
 
         internal TextDecorationLocation Location { get; private set; }
     }
 }
+
 #endif

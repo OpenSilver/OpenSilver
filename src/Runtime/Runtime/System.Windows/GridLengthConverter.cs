@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.ComponentModel;
 using System.Globalization;
@@ -24,148 +22,250 @@ namespace Windows.UI.Xaml
 #endif
 {
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.GridLength" /> object to and from other types.
-    /// </summary>
-    public class GridLengthConverter : TypeConverter
+    /// GridLengthConverter - Converter class for converting 
+    /// instances of other types to and from GridLength instances.
+    /// </summary> 
+    internal class GridLengthConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.GridLength" />.
+        /// Checks whether or not this class can convert from a given type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="sourceType">The type being evaluated for conversion.</param>
+        /// <param name="context">The ITypeDescriptorContext 
+        /// for this call.</param>
+        /// <param name="sourceType">The Type being queried for support.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        /// <c>true</c> if thie converter can convert from the provided type, 
+        /// <c>false</c> otherwise.
+        /// </returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            return sourceType == typeof(string);
+            // We can only handle strings, integral and floating types
+            TypeCode tc = Type.GetTypeCode(sourceType);
+            switch (tc)
+            {
+                case TypeCode.String:
+                case TypeCode.Decimal:
+                case TypeCode.Single:
+                case TypeCode.Double:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                    return true;
+
+                default:
+                    return false;
+            }
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.GridLength" /> can be converted to the specified type.
+        /// Checks whether or not this class can convert to a given type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">The type being evaluated for conversion.</param>
+        /// <param name="context">The ITypeDescriptorContext 
+        /// for this call.</param>
+        /// <param name="destinationType">The Type being queried for support.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; 
-        /// otherwise, <see langword="false" />.</returns>
+        /// <c>true</c> if this converter can convert to the provided type, 
+        /// <c>false</c> otherwise.
+        /// </returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
             return destinationType == typeof(string);
         }
 
-        /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.GridLength" />. </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>The instance of <see cref="T:System.Windows.GridLength" /> that is created from the converted <paramref name="value" />.</returns>
-        /// <exception cref="T:System.ArgumentNullException">
-        ///         <paramref name="value" /> object is <see langword="null" />.</exception>
-        /// <exception cref="T:System.ArgumentException">
-        ///         <paramref name="value" /> object is not <see langword="null" /> and is not a valid type that can be converted to a <see cref="T:System.Windows.GridLength" />.</exception>
-        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        /// <summary>
+        /// Attempts to convert to a GridLength from the given object.
+        /// </summary>
+        /// <param name="context">The ITypeDescriptorContext for this call.</param>
+        /// <param name="cultureInfo">The CultureInfo which is respected when converting.</param>
+        /// <param name="source">The object to convert to a GridLength.</param>
+        /// <returns>
+        /// The GridLength instance which was constructed.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// An ArgumentNullException is thrown if the example object is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// An ArgumentException is thrown if the example object is not null 
+        /// and is not a valid type which can be converted to a GridLength.
+        /// </exception>
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo cultureInfo, object source)
         {
-            object result;
-
-            if (value is null)
+            if (source != null)
             {
-                throw GetConvertFromException(value);
-            }
-            else if (value is string)
-            {
-                var gridLengthAsString = value.ToString();
-
-                var trimmedLowercase = gridLengthAsString.Trim().ToLower();
-                if (trimmedLowercase.EndsWith("*"))
+                if (source is string)
                 {
-                    var valueAsString = trimmedLowercase.Substring(0, trimmedLowercase.Length - 1);
-                    if (valueAsString == "")
-                    {
-                        result = new GridLength(1.0, GridUnitType.Star);
-                    }
-                    else if (double.TryParse(valueAsString, out var length))
-                    {
-                        result = new GridLength(length, GridUnitType.Star);
-                    }
-                    else
-                    {
-                        throw new Exception("Invalid GridLength: " + gridLengthAsString);
-                    }
-                }
-                else if (trimmedLowercase == "auto")
-                {
-                    result = new GridLength(1.0, GridUnitType.Auto);
+                    return (FromString((string)source, cultureInfo));
                 }
                 else
                 {
-                    if (double.TryParse(trimmedLowercase, out var length))
+                    //  conversion from numeric type
+                    double value;
+                    GridUnitType type;
+
+                    value = Convert.ToDouble(source, cultureInfo);
+
+                    if (double.IsNaN(value))
                     {
-                        result = new GridLength(length, GridUnitType.Pixel);
+                        //  this allows for conversion from Width / Height = "Auto" 
+                        value = 1.0;
+                        type = GridUnitType.Auto;
                     }
                     else
                     {
-                        throw new Exception("Invalid GridLength: " + gridLengthAsString);
+                        type = GridUnitType.Pixel;
                     }
+
+                    return new GridLength(value, type);
                 }
             }
-            else
-            {
-                result = base.ConvertFrom(context, culture, value);
-            }
 
-            return result;
+            throw GetConvertFromException(source);
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.GridLength" /> to a specified type. </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="cultureInfo">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.GridLength" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.GridLength" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.GridLength" />.</returns>
-        /// <exception cref="T:System.ArgumentNullException">
-        ///         <paramref name="destinationType" /> is not one of the valid types for conversion.</exception>
-        /// <exception cref="T:System.ArgumentException">
-        ///         <paramref name="value" /> is <see langword="null" />.</exception>
+        /// <summary>
+        /// Attempts to convert a GridLength instance to the given type.
+        /// </summary>
+        /// <param name="context">The ITypeDescriptorContext for this call.</param>
+        /// <param name="cultureInfo">The CultureInfo which is respected when converting.</param>
+        /// <param name="value">The GridLength to convert.</param>
+        /// <param name="destinationType">The type to which to convert the GridLength instance.</param>
+        /// <returns>
+        /// The object which was constructed.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// An ArgumentNullException is thrown if the example object is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// An ArgumentException is thrown if the object is not null and is not a GridLength,
+        /// or if the destinationType isn't one of the valid destination types.
+        /// </exception>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo cultureInfo, object value, Type destinationType)
         {
-            object result = null;
-
-            if (destinationType is null)
+            if (destinationType == null)
             {
                 throw new ArgumentNullException(nameof(destinationType));
             }
-            else if (value != null && value is GridLength length)
+
+            if (destinationType == typeof(string))
             {
-                if (destinationType == typeof(string))
+                if (value is GridLength gl)
                 {
-                    switch (length.GridUnitType)
-                    {
-                        //  for Auto print out "Auto". value is always "1.0"
-                        case GridUnitType.Auto:
-                            result = "Auto";
-                            break;
-
-                        //  Star has one special case when value is "1.0".
-                        //  in this case drop value part and print only "Star"
-                        case GridUnitType.Star:
-                            result = Math.Abs(length.Value - 1.0) < 2.2204460492503131E-015
-                                ? "*"
-                                : Convert.ToString(length.Value, cultureInfo) + "*";
-                            break;
-
-                        //  for Pixel print out the numeric value. "px" can be omitted.
-                        default:
-                            result = Convert.ToString(length.Value, cultureInfo);
-                            break;
-                    }
+                    return ToString(gl, cultureInfo);
                 }
             }
 
-            if (result is null)
+            throw GetConvertToException(value, destinationType);
+        }
+
+        /// <summary>
+        /// Converts a GridLength instance to a String given the CultureInfo.
+        /// </summary>
+        /// <param name="gl">GridLength instance to convert.</param>
+        /// <param name="cultureInfo">Culture Info.</param>
+        /// <returns>String representation of the object.</returns>
+        internal static string ToString(GridLength gl, CultureInfo cultureInfo)
+        {
+            switch (gl.GridUnitType)
             {
-                throw GetConvertToException(value, destinationType);
+                //  for Auto print out "Auto". value is always "1.0"
+                case (GridUnitType.Auto):
+                    return ("Auto");
+
+                //  Star has one special case when value is "1.0".
+                //  in this case drop value part and print only "Star"
+                case (GridUnitType.Star):
+                    return (
+                        gl.Value == 1.0
+                        ? "*"
+                        : Convert.ToString(gl.Value, cultureInfo) + "*");
+
+                //  for Pixel print out the numeric value. "px" can be omitted.
+                default:
+                    return (Convert.ToString(gl.Value, cultureInfo));
+            }
+        }
+
+        /// <summary>
+        /// Parses a GridLength from a string given the CultureInfo.
+        /// </summary>
+        /// <param name="s">String to parse from.</param>
+        /// <param name="cultureInfo">Culture Info.</param>
+        /// <returns>Newly created GridLength instance.</returns>
+        /// <remarks>
+        /// Formats: 
+        /// "[value][unit]"
+        ///     [value] is a double
+        ///     [unit] is a string in GridLength._unitTypes connected to a GridUnitType
+        /// "[value]"
+        ///     As above, but the GridUnitType is assumed to be GridUnitType.Pixel
+        /// "[unit]"
+        ///     As above, but the value is assumed to be 1.0
+        ///     This is only acceptable for a subset of GridUnitType: Auto
+        /// </remarks>
+        internal static GridLength FromString(string s, CultureInfo cultureInfo)
+        {
+            double value;
+            GridUnitType unit;
+
+            string source = s.Trim().ToLower();
+            if (source == "auto")
+            {
+                value = 1.0;
+                unit = GridUnitType.Auto;
+            }
+            else if (source.EndsWith("*"))
+            {
+                value = ReadDouble(source, cultureInfo, 1.0);
+                unit = GridUnitType.Star;
+            }
+            else
+            {
+                value = ReadDouble(source, cultureInfo, 0.0);
+                unit = GridUnitType.Pixel;
             }
 
-            return result;
+            return (new GridLength(value, unit));
         }
-    }
+
+        private static double ReadDouble(string source, CultureInfo culture, double defaultValue)
+        {
+            // flag used to keep track of dots in the sequence.
+            // If we weet more than 1 dot, just ignore the rest of the sequence.
+            bool isFloat = false;
+
+            int i = 0;
+            for (; i < source.Length; i++)
+            {
+                char c = source[i];
+                if (c == '.')
+                {
+                    if (isFloat)
+                    {
+                        break;
+                    }
+
+                    isFloat = true;
+                    continue;
+                }
+                else if (!char.IsDigit(c))
+                {
+                    break;
+                }
+            }
+
+            if (i == 0)
+            {
+                return defaultValue;
+            }
+            else if (i == 1 && source[0] == '.')
+            {
+                return 0.0;
+            }
+
+            return Convert.ToDouble(source.Substring(0, i), culture);
+        }
+    } 
 }

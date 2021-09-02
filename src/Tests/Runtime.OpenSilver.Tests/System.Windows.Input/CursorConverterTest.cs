@@ -1,103 +1,123 @@
-﻿using FluentAssertions;
+﻿
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+using System.ComponentModel;
+using OpenSilver.Tests;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace System.Windows.Input.Tests
 {
     [TestClass]
-    public class CursorConverterTest
+    public class CursorConverterTest : TypeConverterTestBase
     {
+        protected override TypeConverter Converter { get; } =
+            new CursorConverter();
+
         [TestMethod]
-        public void CanConvertFrom_String_ShouldReturnTrue()
+        public void CanConvertFrom_String_Should_Return_True()
         {
-            var cursorConverter = new CursorConverter();
-            var test = cursorConverter.CanConvertFrom(typeof(string));
-            test.Should().BeTrue();
+            Converter.CanConvertFrom(typeof(string))
+                .Should()
+                .BeTrue();
         }
 
         [TestMethod]
-        public void CanConvertFrom_Bool_ShouldReturnFalse()
+        public void CanConvertFrom_Bool_Should_Return_False()
         {
-            var cursorConverter = new CursorConverter();
-            var test = cursorConverter.CanConvertFrom(typeof(bool));
-            test.Should().BeFalse();
+            Converter.CanConvertFrom(typeof(bool))
+                .Should()
+                .BeFalse();
         }
 
         [TestMethod]
-        public void CanConvertTo_String_ShouldReturnTrue()
+        public void CanConvertTo_String_Should_Return_True()
         {
-            var cursorConverter = new CursorConverter();
-            var test = cursorConverter.CanConvertTo(typeof(string));
-            test.Should().BeTrue();
+            Converter.CanConvertTo(typeof(string))
+                .Should()
+                .BeTrue();
         }
 
         [TestMethod]
-        public void CanConvertTo_Bool_ShouldReturnFalse()
+        public void CanConvertTo_Bool_Should_Return_False()
         {
-            var cursorConverter = new CursorConverter();
-            var test = cursorConverter.CanConvertTo(typeof(bool));
-            test.Should().BeFalse();
+            Converter.CanConvertTo(typeof(bool))
+                .Should()
+                .BeFalse();
         }
 
         [TestMethod]
-        public void ConvertFrom_String_ShouldReturnCursor()
+        public void ConvertFrom_String_Should_Return_Cursor_None()
         {
-            var cursorConverter = new CursorConverter();
-            var test = cursorConverter.ConvertFrom("None");
-            test.Should().Be(Cursors.None);
+            Converter.ConvertFrom("None")
+                .Should()
+                .BeSameAs(Cursors.None);
         }
 
         [TestMethod]
-        public void ConvertFrom_InvalidCursorString_ShouldThrow_ArgumentException()
+        public void ConvertFrom_String_Should_Throw_FormatException()
         {
-            var cursorConverter = new CursorConverter();
-            var invalidCursor = "invalidCursor";
-            Assert.ThrowsException<ArgumentException>(() => cursorConverter.ConvertFrom(invalidCursor));
+            Assert.ThrowsException<FormatException>(
+                () => Converter.ConvertFrom("invalidCursor")
+            );
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_ShouldThrow_NotSupportedException()
+        public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
-            var cursorConverter = new CursorConverter();
-            Assert.ThrowsException<NotSupportedException>(() => cursorConverter.ConvertFrom(null));
+            Assert.ThrowsException<NotSupportedException>(
+                () => Converter.ConvertFrom(null)
+            );
         }
 
         [TestMethod]
-        public void ConvertFrom_Bool_ShouldThrow_NotSupportedException()
+        public void ConvertFrom_Bool_Should_Throw_NotSupportedException()
         {
-            var cursorConverter = new CursorConverter();
-            var booleanValue = true;
-            Assert.ThrowsException<NotSupportedException>(() => cursorConverter.ConvertFrom(booleanValue));
+            Assert.ThrowsException<NotSupportedException>(
+                () => Converter.ConvertFrom(true)
+            );
         }
 
         [TestMethod]
         public void ConvertTo_String()
         {
-            var cursorConverter = new CursorConverter();
-            var test = cursorConverter.ConvertTo(Cursors.Arrow, typeof(string));
-            test.Should().Be("Arrow");
+            Converter.ConvertTo(Cursors.Arrow, typeof(string))
+                .Should()
+                .Be(nameof(CursorType.Arrow));
         }
 
         [TestMethod]
-        public void ConvertTo_String_ShouldThrow_ArgumentNullException()
+        public void ConvertTo_Should_Throw_ArgumentNullException()
         {
-            var cursorConverter = new CursorConverter();
-            Assert.ThrowsException<ArgumentNullException>(() => cursorConverter.ConvertTo(true, null));
+            Assert.ThrowsException<ArgumentNullException>(
+                () => Converter.ConvertTo(Cursors.Wait, null)
+            );
         }
 
         [TestMethod]
-        public void ConvertTo_String_ShouldThrow_NotSupportedException()
+        public void ConvertTo_Boolean_Should_Throw_NotSupportedException()
         {
-            var cursorConverter = new CursorConverter();
-            var notSupportedType = typeof(bool);
-            Assert.ThrowsException<NotSupportedException>(() => cursorConverter.ConvertTo(Cursors.No, notSupportedType));
+            Assert.ThrowsException<NotSupportedException>(
+                () => Converter.ConvertTo(Cursors.No, typeof(bool))
+            );
         }
 
         [TestMethod]
-        public void ConvertTo_String_ShouldReturn_EmptyString()
+        public void ConvertTo_String_Should_Return_StringEmpty()
         {
-            var cursorConverter = new CursorConverter();
-            var test = cursorConverter.ConvertTo(null, typeof(string));
-            test.Should().Be(string.Empty);
+            Converter.ConvertTo(null, typeof(string))
+                .Should()
+                .Be(string.Empty);
         }
     }
 }

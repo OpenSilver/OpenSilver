@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,8 +11,9 @@
 *  
 \*====================================================================================*/
 
+#if WORKINPROGRESS
 
-using System.ComponentModel;
+using System;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -21,11 +21,28 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-#if WORKINPROGRESS
-    [TypeConverter(typeof(CacheModeConverter))]
     [OpenSilver.NotImplemented]
     public abstract partial class CacheMode : DependencyObject
     {
+        /// <summary>
+        /// Parse - this method is called by the type converter to parse a CacheMode's string 
+        /// (provided in "value").
+        /// </summary>
+        /// <returns>
+        /// A CacheMode which was created by parsing the "value" argument.
+        /// </returns>
+        /// <param name="value"> String representation of a CacheMode. Cannot be null/empty. </param>
+        internal static CacheMode Parse(string value)
+        {
+            if (value != null &&
+                value.Equals("BitmapCache", StringComparison.OrdinalIgnoreCase))
+            {
+                return new BitmapCache();
+            }
+            
+            throw new FormatException("Token is not valid.");
+        }
     }
-#endif
 }
+
+#endif

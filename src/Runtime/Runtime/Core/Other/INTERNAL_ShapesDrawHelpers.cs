@@ -36,8 +36,8 @@ namespace CSHTML5.Internal
             var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
             //divStyle.overflow = "hidden";
             divStyle.lineHeight = "0"; // Line height is not needed in shapes because it causes layout issues.
-            divStyle.width = "100%";
-            divStyle.height = "100%";
+            //divStyle.width = "100%";
+            //divStyle.height = "100%";
             divStyle.fontSize = "0px"; //this allows this div to be as small as we want (for some reason in Firefox, what contains a canvas has a height of at least about (1 + 1/3) * fontSize)
             canvasDomElement = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("canvas", div, associatedUIElement);
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(canvasDomElement);

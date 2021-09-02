@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,11 +11,10 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using OpenSilver.Internal;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -28,7 +26,6 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    [TypeConverter(typeof(MatrixConverter))]
     /// <summary>
     /// Represents a 3x3 affine transformation matrix used for transformations in two-dimensional
     /// space.
@@ -84,6 +81,40 @@ namespace Windows.UI.Xaml.Media
         public static Matrix Identity
         {
             get => s_identity;
+        }
+
+        /// <summary>
+        /// Parse - returns an instance converted from the provided string using
+        /// the culture "en-US"
+        /// <param name="source"> string with Matrix data </param>
+        /// </summary>
+        public static Matrix Parse(string source)
+        {
+            if (source != null)
+            {
+                if (source == "Identity")
+                {
+                    return Identity;
+                }
+
+                IFormatProvider formatProvider = CultureInfo.InvariantCulture;
+                char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
+                string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+                if (split.Length == 6)
+                {
+                    return new Matrix(
+                        Convert.ToDouble(split[0], formatProvider),
+                        Convert.ToDouble(split[1], formatProvider),
+                        Convert.ToDouble(split[2], formatProvider),
+                        Convert.ToDouble(split[3], formatProvider),
+                        Convert.ToDouble(split[4], formatProvider),
+                        Convert.ToDouble(split[5], formatProvider)
+                    );
+                }
+            }
+
+            throw new FormatException($"'{source}' is not an eligible value for a Matrix.");
         }
 
         #endregion Constructors
@@ -435,43 +466,7 @@ namespace Windows.UI.Xaml.Media
             return ConvertToString(format, provider);
         }
 
-        /// <summary>
-        /// Parse - returns an instance converted from the provided string using
-        /// the culture "en-US"
-        /// <param name="source"> string with Matrix data </param>
-        /// </summary>
-        public static Matrix Parse(string source)
-        {
-            if (source == "Identity")
-                return Identity;
-
-            string[] splittedString = source.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (splittedString.Length == 6)
-            {
-                double m11, m12, m21, m22, offsetX, offsetY;
-#if NETSTANDARD
-                if (double.TryParse(splittedString[0], NumberStyles.Any, CultureInfo.InvariantCulture, out m11) &&
-                    double.TryParse(splittedString[1], NumberStyles.Any, CultureInfo.InvariantCulture, out m12) &&
-                    double.TryParse(splittedString[2], NumberStyles.Any, CultureInfo.InvariantCulture, out m21) &&
-                    double.TryParse(splittedString[3], NumberStyles.Any, CultureInfo.InvariantCulture, out m22) &&
-                    double.TryParse(splittedString[4], NumberStyles.Any, CultureInfo.InvariantCulture, out offsetX) &&
-                    double.TryParse(splittedString[5], NumberStyles.Any, CultureInfo.InvariantCulture, out offsetY))
-#elif BRIDGE
-                if (double.TryParse(splittedString[0], out m11) &&
-                    double.TryParse(splittedString[1], out m12) &&
-                    double.TryParse(splittedString[2], out m21) &&
-                    double.TryParse(splittedString[3], out m22) &&
-                    double.TryParse(splittedString[4], out offsetX) &&
-                    double.TryParse(splittedString[5], out offsetY))
-#endif
-                    return new Matrix(m11, m12, m21, m22, offsetX, offsetY);
-            }
-
-            throw new FormatException(source + " is not an eligible value for a Matrix");
-        }
-
-#endregion Public Methods
+        #endregion Public Methods
 
         #region Operators
 
@@ -497,9 +492,9 @@ namespace Windows.UI.Xaml.Media
             return !(matrix1 == matrix2);
         }
 
-#endregion Operators
+        #endregion Operators
 
-#region Internal Properties
+        #region Internal Properties
 
         /// <summary>
         /// The determinant of this matrix
@@ -538,9 +533,9 @@ namespace Windows.UI.Xaml.Media
             return Math.Abs(value) < 10.0 * DBL_EPSILON;
         }
 
-#endregion Internal Properties
+        #endregion Internal Properties
 
-#region Internal Methods
+        #region Internal Methods
 
         /// <summary>
         /// Replaces matrix with the inverse of the transformation.  This will throw an InvalidOperationException
@@ -674,13 +669,6 @@ namespace Windows.UI.Xaml.Media
             }
 
             char separator = ',';
-#if NETSTANDARD
-            NumberFormatInfo instance = NumberFormatInfo.GetInstance(provider);
-            if (instance.NumberDecimalSeparator.Length > 0 && separator == instance.NumberDecimalSeparator[0])
-            {
-                separator = ';';
-            }
-#endif
 
             return String.Format(provider,
                                  "{1:" + format + "}{0}{2:" + format + "}{0}{3:" + format + "}{0}{4:" + format + "}{0}{5:" + format + "}{0}{6:" + format + "}",
@@ -831,9 +819,9 @@ namespace Windows.UI.Xaml.Media
             return matrix;
         }
 
-#endregion Internal Methods
+        #endregion Internal Methods
 
-#region Private Methods
+        #region Private Methods
 
         /// <summary>
         /// Sets the transformation to the identity.
@@ -935,9 +923,9 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-#endregion Private Methods
+        #endregion Private Methods
 
-#region Private Properties and Fields
+        #region Private Properties and Fields
 
         /// <summary>
         /// Efficient but conservative test for identity.  Returns
@@ -958,7 +946,7 @@ namespace Windows.UI.Xaml.Media
 
         private const double DBL_EPSILON = 2.2204460492503131e-016;
 
-#endregion Private Properties and Fields
+        #endregion Private Properties and Fields
 
         internal double _m11;
         internal double _m12;

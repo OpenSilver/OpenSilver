@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,12 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5;
+#if BRIDGE
 using CSHTML5.Internal;
+#endif
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media.Imaging
@@ -31,9 +27,8 @@ namespace Windows.UI.Xaml.Media.Imaging
     /// <summary>
     /// Provides the practical object source type for the Source and ImageSource properties.
     /// </summary>
-    public partial class BitmapImage : BitmapSource
+    public sealed partial class BitmapImage : BitmapSource
     {
-
         /// <summary>
         /// Initializes a new instance of the BitmapImage class.
         /// </summary>

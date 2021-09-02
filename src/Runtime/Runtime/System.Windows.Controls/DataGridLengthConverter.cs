@@ -1,16 +1,7 @@
-﻿
-
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 using System;
 using System.ComponentModel;
@@ -23,151 +14,236 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.Controls.DataGridLength" /> object to and from other types.
-    /// </summary>
-    public sealed partial class DataGridLengthConverter : TypeConverter
+    /// DataGridLengthConverter - Converter class for converting instances of other types to and from DataGridLength instances.
+    /// </summary> 
+    /// <QualityBand>Mature</QualityBand>
+    public class DataGridLengthConverter : TypeConverter
     {
+#region Data
+
+        private static string _starSuffix = "*";
+        private static string[] _valueInvariantUnitStrings = { "auto", /*"sizetocells", "sizetoheader"*/ };
+        private static DataGridLength[] _valueInvariantDataGridLengths = { DataGridLength.Auto, /*DataGridLength.SizeToCells, DataGridLength.SizeToHeader*/ };
+
+#endregion Data
+
+#region Methods
+
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.Controls.DataGridLength" />.
+        /// Checks whether or not this class can convert from a given type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="sourceType">The type being evaluated for conversion.</param>
+        /// <param name="context">
+        /// An ITypeDescriptorContext that provides a format context. 
+        /// </param>
+        /// <param name="sourceType">The Type being queried for support.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        /// <c>true</c> if this converter can convert from the provided type, 
+        /// <c>false</c> otherwise.
+        /// </returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            return sourceType == typeof(string);
+            // We can only handle strings, integral and floating types
+            TypeCode tc = Type.GetTypeCode(sourceType);
+            switch (tc)
+            {
+                case TypeCode.String:
+                case TypeCode.Decimal:
+                case TypeCode.Single:
+                case TypeCode.Double:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.Controls.DataGridLength" /> can be converted to the specified type.
+        /// Checks whether or not this class can convert to a given type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">The type being evaluated for conversion.</param>
+        /// <param name="context">
+        /// An ITypeDescriptorContext that provides a format context. 
+        /// </param>
+        /// <param name="destinationType">The Type being queried for support.</param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; 
-        /// otherwise, <see langword="false" />.</returns>
+        /// <c>true</c> if this converter can convert to the provided type, 
+        /// <c>false</c> otherwise.
+        /// </returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
             return destinationType == typeof(string);
         }
 
-        /// <summary>Converts the specified object to an instance of the <see cref="T:System.Windows.Controls.DataGridLength" /> class.</summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>The converted value.</returns>
-        /// <exception cref="T:System.ArgumentNullException">
-        ///         <paramref name="value" /> is <see langword="null" />.</exception>
-        /// <exception cref="T:System.ArgumentException">
-        ///         <paramref name="value" /> is not a valid type that can be converted to type <see cref="T:System.Windows.Controls.DataGridLength" />.</exception>
+        /// <summary>
+        /// Attempts to convert to a DataGridLength from the given object.
+        /// </summary>
+        /// <param name="context">
+        /// An ITypeDescriptorContext that provides a format context. 
+        /// </param>
+        /// <param name="culture">
+        /// The CultureInfo to use for the conversion. 
+        /// </param>
+        /// <param name="value">The object to convert to a GridLength.</param>
+        /// <returns>
+        /// The GridLength instance which was constructed.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if the example object is null.
+        /// </exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            object result;
-
-            if (value is null)
+            // GridLengthConverter in WPF throws a NotSupportedException on a null value as well.
+            if (value == null)
             {
-                throw GetConvertFromException(value);
+                throw new NotSupportedException(string.Format("DataGridLengthConverter cannot convert from {0}.", nameof(value)));
             }
-            else if (value is string)
-            {
-                var gridLengthAsString = value.ToString();
 
-                var trimmedLowercase = gridLengthAsString.Trim().ToLower();
-                if (trimmedLowercase.EndsWith("*"))
+            string stringValue = value as string;
+            if (stringValue != null)
+            {
+                stringValue = stringValue.Trim();
+
+                if (stringValue.EndsWith(_starSuffix, StringComparison.Ordinal))
                 {
-                    var valueAsString = trimmedLowercase.Substring(0, trimmedLowercase.Length - 1);
-                    if (valueAsString == string.Empty)
+                    string stringValueWithoutSuffix = stringValue.Substring(0, stringValue.Length - _starSuffix.Length);
+
+                    double starWeight;
+                    if (string.IsNullOrEmpty(stringValueWithoutSuffix))
                     {
-                        result = new DataGridLength(1.0, DataGridLengthUnitType.Star);
-                    }
-                    else if (double.TryParse(valueAsString, out var size))
-                    {
-                        result = new DataGridLength(size, DataGridLengthUnitType.Star);
-                    }
-                    else
-                    {
-                        throw new Exception("Invalid GridLength: " + gridLengthAsString);
-                    }
-                }
-                else if (trimmedLowercase == "auto")
-                {
-                    result = new DataGridLength(1.0, DataGridLengthUnitType.Auto);
-                }
-                else if (trimmedLowercase == "sizetocells")
-                {
-                    result = new DataGridLength(1.0, DataGridLengthUnitType.Auto);
-                }
-                else if (trimmedLowercase == "sizetoheader")
-                {
-                    result = new DataGridLength(1.0, DataGridLengthUnitType.Auto);
-                }
-                else
-                {
-                    if (double.TryParse(trimmedLowercase, out var size))
-                    {
-                        result = new DataGridLength(size, DataGridLengthUnitType.Pixel);
+                        starWeight = 1;
                     }
                     else
                     {
-                        throw new Exception("Invalid GridLength: " + gridLengthAsString);
+                        starWeight = Convert.ToDouble(stringValueWithoutSuffix, culture ?? CultureInfo.CurrentCulture);
+                    }
+
+                    return new DataGridLength(starWeight, DataGridLengthUnitType.Star);
+                }
+
+                for (int index = 0; index < _valueInvariantUnitStrings.Length; index++)
+                {
+                    if (stringValue.Equals(_valueInvariantUnitStrings[index], StringComparison.OrdinalIgnoreCase))
+                    {
+                        return _valueInvariantDataGridLengths[index];
                     }
                 }
+            }
+
+            // Conversion from numeric type, WPF lets Convert exceptions bubble out here as well
+            double doubleValue = Convert.ToDouble(value, culture ?? CultureInfo.CurrentCulture);
+            if (double.IsNaN(doubleValue))
+            {
+                // WPF returns Auto in this case as well
+                return DataGridLength.Auto;
             }
             else
             {
-                result = base.ConvertFrom(context, culture, value);
+                return new DataGridLength(doubleValue);
             }
-
-            return result;
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.Controls.DataGridLength" /> to a specified type. </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.Controls.DataGridLength" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.Controls.DataGridLength" /> to.</param>
-        /// <exception cref="T:System.ArgumentNullException">
-        ///         <paramref name="destinationType" /> is <see langword="null" />.</exception>
-        /// <exception cref="T:System.ArgumentException">
-        ///         <paramref name="value" /> is not a <see cref="T:System.Windows.Controls.DataGridLength" /> or <paramref name="destinationType" /> is not a valid conversion type.</exception>
+        /// <summary>
+        /// Attempts to convert a DataGridLength instance to the given type.
+        /// </summary>
+        /// <param name="context">
+        /// An ITypeDescriptorContext that provides a format context. 
+        /// </param>
+        /// <param name="culture">
+        /// The CultureInfo to use for the conversion. 
+        /// </param>
+        /// <param name="value">The DataGridLength to convert.</param>
+        /// <param name="destinationType">The type to which to convert the DataGridLength instance.</param>
+        /// <returns>
+        /// The object which was constructed.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// An ArgumentNullException is thrown if the example object is null.
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if the object is not null and is not a DataGridLength,
+        /// or if the destinationType isn't one of the valid destination types.
+        /// </exception>
+        ///<SecurityNote>
+        ///     Critical: calls InstanceDescriptor ctor which LinkDemands
+        ///     PublicOK: can only make an InstanceDescriptor for DataGridLength, not an arbitrary class
+        ///</SecurityNote> 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            object result = null;
-
-            if (destinationType is null)
+            if (destinationType == null)
             {
-                throw new ArgumentNullException(nameof(destinationType));
+                throw new ArgumentNullException("destinationType");
             }
-            else if ((value != null) && (value is DataGridLength length))
+            if (destinationType != typeof(string))
             {
-                if (destinationType == typeof(string))
+                throw new NotSupportedException(string.Format("Cannot convert from DataGridLength to {0}.", destinationType.ToString()));
+            }
+            DataGridLength? dataGridLength = value as DataGridLength?;
+            if (!dataGridLength.HasValue)
+            {
+                throw new NotSupportedException("Invalid DataGridLength.");
+            }
+            else
+            {
+                // Convert dataGridLength to a string
+                switch (dataGridLength.Value.UnitType)
                 {
-                    switch (length.UnitType)
-                    {
-                        case DataGridLengthUnitType.Auto:
-                            result = length.UnitType.ToString();
-                            break;
+                    //  for Auto print out "Auto". value is always "1.0"
+                    case DataGridLengthUnitType.Auto:
+                        return "Auto";
 
-                        // Star has one special case when value is "1.0" in which the value can be dropped.
-                        case DataGridLengthUnitType.Star:
-                            result = (Math.Abs(length.Value - 1.0) < 2.2204460492503131E-15) ? "*" : Convert.ToString(length.Value, culture) + "*";
-                            break;
+                    //case DataGridLengthUnitType.SizeToHeader:
+                    //    return "SizeToHeader";
 
-                        // Print out the numeric value. "px" can be omitted.
-                        default:
-                            result = Convert.ToString(length.Value, culture);
-                            break;
-                    }
+                    //case DataGridLengthUnitType.SizeToCells:
+                    //    return "SizeToCells";
+
+                    //  Star has one special case when value is "1.0".
+                    //  in this case drop value part and print only "Star"
+                    case DataGridLengthUnitType.Star:
+                        return (
+                            AreClose(1.0, dataGridLength.Value.Value)
+                            ? DataGridLengthConverter._starSuffix
+                            : Convert.ToString(dataGridLength.Value.Value, culture ?? CultureInfo.CurrentCulture) + DataGridLengthConverter._starSuffix);
+
+                    default:
+                        // WPF lets Convert Exceptions bubble out as well
+                        return (Convert.ToString(dataGridLength.Value.Value, culture ?? CultureInfo.CurrentCulture));
                 }
             }
-
-            if (result is null)
-            {
-                throw GetConvertToException(value, destinationType);
-            }
-
-            return result;
         }
+
+        /// <summary>
+        /// AreClose - Returns whether or not two doubles are "close".  That is, whether or 
+        /// not they are within epsilon of each other.  Note that this epsilon is proportional
+        /// to the numbers themselves to that AreClose survives scalar multiplication.
+        /// There are plenty of ways for this to return false even for numbers which
+        /// are theoretically identical, so no code calling this should fail to work if this 
+        /// returns false.  This is important enough to repeat:
+        /// NB: NO CODE CALLING THIS FUNCTION SHOULD DEPEND ON ACCURATE RESULTS - this should be
+        /// used for optimizations *only*.
+        /// </summary>
+        /// <returns>
+        /// bool - the result of the AreClose comparison.
+        /// </returns>
+        /// <param name="value1"> The first double to compare. </param>
+        /// <param name="value2"> The second double to compare. </param>
+        private static bool AreClose(double value1, double value2)
+        {
+            const double DBL_EPSILON = 1e-6;
+
+            //in case they are Infinities (then epsilon check does not work)
+            if (value1 == value2)
+                return true;
+            // This computes (|value1-value2| / (|value1| + |value2| + 10.0)) < DBL_EPSILON
+            double eps = (Math.Abs(value1) + Math.Abs(value2) + 10.0) * DBL_EPSILON;
+            double delta = value1 - value2;
+            return (-eps < delta) && (eps > delta);
+        }
+
+#endregion Methods
     }
 }

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.ComponentModel;
 using System.Globalization;
@@ -24,89 +22,76 @@ namespace Windows.UI.Xaml
 #endif
 {
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.PropertyPath" /> object to and from other types.
+    /// Provides type conversion support for the <see cref="PropertyPath"/> type.
     /// </summary>
-    public sealed partial class PropertyPathConverter : TypeConverter
+    public class PropertyPathConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.PropertyPath" />.
+        /// Returns whether this converter can convert an object of one type to the <see cref="PropertyPath"/>
+        /// type.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="sourceType">The type being evaluated for conversion.</param>
+        /// <param name="context">
+        /// An <see cref="ITypeDescriptorContext"/> that provides a format context.
+        /// </param>
+        /// <param name="sourceType">
+        /// A <see cref="Type"/> that represents the type you want to convert from.
+        /// </param>
         /// <returns>
-        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
+        /// true if this converter can perform the conversion; otherwise, false.
+        /// </returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             return sourceType == typeof(string);
         }
 
+        // Note: we override this method to emulate the behavior of the base.CanConvertTo() from
+        // Silverlight, which always returns false.
+
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.PropertyPath" /> can be converted to the specified type.
+        /// Always returns false.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">The type being evaluated for conversion.</param>
-        /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(string);
+            return false;
         }
 
-        /// <summary>Converts the specified value to the <see cref="T:System.Windows.PropertyPath" /> type.</summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>The converted <see cref="T:System.Windows.PropertyPath" />.</returns>
-        /// <exception cref="T:System.ArgumentNullException">The <paramref name="value" /> was provided as <see langword="null." /></exception>
-        /// <exception cref="T:System.ArgumentException">The <paramref name="value" /> was not <see langword="null" />, but was not of the expected <see cref="T:System.String" /> type.</exception>
+        /// <summary>
+        /// Converts the given value to the <see cref="PropertyPath"/> type.
+        /// </summary>
+        /// <param name="context">
+        /// An <see cref="ITypeDescriptorContext"/> that provides a format context.
+        /// </param>
+        /// <param name="culture">
+        /// The <see cref="CultureInfo"/> to use as the current culture.
+        /// </param>
+        /// <param name="value">
+        /// The object to convert.
+        /// </param>
+        /// <returns>
+        /// The returned <see cref="PropertyPath"/>.
+        /// </returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            object result;
-
-            if (value is null)
+            if (null == value || value is string)
             {
-                throw GetConvertFromException(value);
-            }
-            else if (value is string)
-            {
-                result = new PropertyPath(value.ToString());
-            }
-            else
-            {
-                result = base.ConvertFrom(context, culture, value);
+                return new PropertyPath((string)value);
             }
 
-            return result;
+            throw GetConvertFromException(value);
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.PropertyPath" /> to a specified type. </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="cultureInfo">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.PropertyPath" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.PropertyPath" /> to.</param>
-        /// <returns>The converted destination <see cref="T:System.String" />.</returns>
-        /// <exception cref="T:System.ArgumentNullException">The <paramref name="value" /> was provided as <see langword="null" />.</exception>
-        /// <exception cref="T:System.ArgumentException">The <paramref name="value" /> was not <see langword="null" />, but was not of the expected <see cref="T:System.Windows.PropertyPath" /> type 
-        /// or the <paramref name="destinationType" /> was not the <see cref="T:System.String" /> type.</exception>
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo cultureInfo, object value, Type destinationType)
-        {
-            if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            else if (destinationType is null)
-            {
-                throw new ArgumentNullException(nameof(destinationType));
-            }
+        // Note: we override this method to emulate the behavior of the base.ConvertTo() from
+        // Silverlight, which always throws a NotImplementedException.
 
-            if (value is PropertyPath path)
-            {
-                return path.Path;
-            }
-            else
-            {
-                throw new ArgumentException($"Unexpected parameter type {value.GetType().FullName}.");
-            }
+        /// <summary>
+        /// Not implemented.
+        /// </summary>
+        /// <exception cref="NotImplementedException">
+        /// Always throws.
+        /// </exception>
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        {
+            throw new NotImplementedException($"'{typeof(PropertyPathConverter)}' does not implement '{nameof(ConvertTo)}'.");
         }
     }
 }

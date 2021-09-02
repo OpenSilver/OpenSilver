@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,17 +11,15 @@
 *  
 \*====================================================================================*/
 
-
 #if MIGRATION
-using System.ComponentModel;
+
 using System.Diagnostics;
 
 namespace System.Windows
 {
-    [TypeConverter(typeof(FontStyleConverter))]
     public partial struct FontStyle : IFormattable
     {
-        private int _style;
+        private readonly int _style;
 
         internal FontStyle(int style)
         {
@@ -89,4 +86,5 @@ namespace System.Windows
         }
     }
 }
+
 #endif

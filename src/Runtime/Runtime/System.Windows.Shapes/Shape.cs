@@ -1,4 +1,4 @@
-﻿
+
 
 /*===================================================================================
 * 
@@ -987,27 +987,7 @@ context.translate($6, 0);
                 var styleOfcanvasElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_canvasDomElement);
                 try
                 {
-                    styleOfcanvasElement.transform = string.Format(CultureInfo.InvariantCulture,
-                        "translate({0}px, {1}px)",
-                        newFixingMargin.X.ToInvariantString(), newFixingMargin.Y.ToInvariantString());
-                }
-                catch
-                {
-                }
-                try
-                {
-                    styleOfcanvasElement.msTransform = string.Format(CultureInfo.InvariantCulture,
-                        "translate({0}px, {1}px)",
-                        newFixingMargin.X.ToInvariantString(), newFixingMargin.Y.ToInvariantString());
-                }
-                catch
-                {
-                }
-                try // Prevents crash in the simulator that uses IE.
-                {
-                    styleOfcanvasElement.WebkitTransform = string.Format(CultureInfo.InvariantCulture,
-                        "translate({0}px, {1}px)",
-                        newFixingMargin.X.ToInvariantString(), newFixingMargin.Y.ToInvariantString());
+                    styleOfcanvasElement.transform = $"translate({newFixingMargin.X.ToInvariantString()}px, {newFixingMargin.Y.ToInvariantString()}px)";
                 }
                 catch
                 {

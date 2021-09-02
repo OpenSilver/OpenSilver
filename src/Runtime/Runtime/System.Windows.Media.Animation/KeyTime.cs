@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,9 +11,7 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -25,7 +22,6 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// Specifies when a particular key frame should take place during an animation.
     /// </summary>
-    [TypeConverter(typeof(KeyTimeConverter))]
     public partial struct KeyTime
     {
         internal KeyTime(TimeSpan timeSpan)
@@ -48,6 +44,7 @@ namespace Windows.UI.Xaml.Media.Animation
         }
 
         private TimeSpan _timeSpan;
+
         /// <summary>
         /// Gets the time when the key frame ends, expressed as a time relative to the
         /// beginning of the animation.

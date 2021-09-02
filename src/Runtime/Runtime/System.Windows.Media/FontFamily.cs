@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,9 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System.Collections.Generic;
-using System.ComponentModel;
+using System;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -25,7 +22,6 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents a family of related fonts.
     /// </summary>
-    [TypeConverter(typeof(FontFamilyConverter))]
     public partial class FontFamily
     {
         // Parameters:
@@ -36,12 +32,15 @@ namespace Windows.UI.Xaml.Media
         /// family string.
         /// </summary>
         /// <param name="familyName">The family name of the font to represent. This can include a hashed suffix.</param>
-        public FontFamily(string familyName) { Source = familyName; }
+        public FontFamily(string familyName) 
+        { 
+            Source = familyName; 
+        }
 
         /// <summary>
         /// Gets the font family name that is used to construct the FontFamily object.
         /// </summary>
-        public string Source { get; }
+        public string Source { get; private set; }
 
         internal string INTERNAL_ToHtmlString()
         {

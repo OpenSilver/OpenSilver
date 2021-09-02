@@ -111,7 +111,7 @@ namespace Windows.UI.Xaml
         private static void CustomLayout_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             FrameworkElement fe = d as FrameworkElement;
-            if ((bool)e.NewValue == true)
+            if ((bool)e.NewValue == true && fe.IsCustomLayoutRoot)
                 fe.SizeChanged += Element_SizeChanged;
             else
                 fe.SizeChanged -= Element_SizeChanged;
@@ -1677,10 +1677,20 @@ namespace Windows.UI.Xaml
                 {
                     if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
                     {
+                        _valueOfLastSizeChanged = new Size(0d, 0d);
                         object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
                         this._resizeSensor = sensor;
                     }
                 }
+            }
+        }
+
+        internal void DetachResizeSensorFromDomElement()
+        {
+            if (this._resizeSensor != null)
+            {
+                CSHTML5.Interop.ExecuteJavaScript("$0.detach($1)", this._resizeSensor, this.INTERNAL_OuterDomElement);
+                this._resizeSensor = null;
             }
         }
 
@@ -1698,6 +1708,7 @@ namespace Windows.UI.Xaml
                     {
                         if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
                         {
+                            _valueOfLastSizeChanged = new Size(0d, 0d);
                             object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
                             this._resizeSensor = sensor;
                         } 

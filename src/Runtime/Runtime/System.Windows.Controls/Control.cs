@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -227,9 +227,7 @@ namespace Windows.UI.Xaml.Controls
                 var newThickness = (Thickness)newValue;
                 var domElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(control);
                 domElement.borderStyle = "solid"; //todo: see if we should put this somewhere else
-                domElement.borderWidth = string.Format(CultureInfo.InvariantCulture,
-                    "{0}px {1}px {2}px {3}px",
-                    newThickness.Top, newThickness.Right, newThickness.Bottom, newThickness.Left);
+                domElement.borderWidth = $"{newThickness.Top.ToString(CultureInfo.InvariantCulture)}px {newThickness.Right.ToString(CultureInfo.InvariantCulture)}px {newThickness.Bottom.ToString(CultureInfo.InvariantCulture)}px {newThickness.Left.ToString(CultureInfo.InvariantCulture)}px";
             }
         }
 
@@ -256,6 +254,7 @@ namespace Windows.UI.Xaml.Controls
                 typeof(Control),
                 new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
+                    Inherits = true,
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
                         Value = (inst, value) => ((FontWeight)value).Weight.ToInvariantString(),
@@ -550,9 +549,7 @@ namespace Windows.UI.Xaml.Controls
                     
                     // todo: if the container has a padding, add it to the margin
                     styleOfInnerDomElement.boxSizing = "border-box";
-                    styleOfInnerDomElement.padding = string.Format(CultureInfo.InvariantCulture,
-                        "{0}px {1}px {2}px {3}px",
-                        newPadding.Top, newPadding.Right, newPadding.Bottom, newPadding.Left);
+                    styleOfInnerDomElement.padding = $"{newPadding.Top.ToString(CultureInfo.InvariantCulture)}px {newPadding.Right.ToString(CultureInfo.InvariantCulture)}px {newPadding.Bottom.ToString(CultureInfo.InvariantCulture)}px {newPadding.Left.ToString(CultureInfo.InvariantCulture)}px";
                 }
             }
         }

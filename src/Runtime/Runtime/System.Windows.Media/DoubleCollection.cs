@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,10 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.ComponentModel;
 using System.Globalization;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -26,19 +24,28 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents an ordered collection of Double values.
     /// </summary>
-    [TypeConverter(typeof(DoubleCollectionConverter))]
     public sealed class DoubleCollection : PresentationFrameworkCollection<double>
     {
-        #region Constructor
+        public DoubleCollection() { }
 
-        public DoubleCollection()
+        public static DoubleCollection Parse(string source)
         {
+            var db = new DoubleCollection();
 
+            if (source != null)
+            {
+                IFormatProvider formatProvider = CultureInfo.InvariantCulture;
+                char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
+                string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+                for (int i = 0; i < split.Length; i++)
+                {
+                    db.Add(Convert.ToDouble(split[i], formatProvider));
+                }
+            }
+
+            return db;
         }
-
-        #endregion
-
-        #region Overriden Methods
 
         internal override void AddOverride(double value)
         {
@@ -74,7 +81,5 @@ namespace Windows.UI.Xaml.Media
         {
             this.SetItemInternal(index, value);
         }
-
-        #endregion
     }
 }

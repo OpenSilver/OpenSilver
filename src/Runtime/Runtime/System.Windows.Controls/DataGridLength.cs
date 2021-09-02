@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -21,11 +20,8 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    // Summary:
-    //     Represents the lengths of elements within the System.Windows.Controls.DataGrid
-    //     control.
     /// <summary>
-    /// Represents the lengths of elements within the System.Windows.Controls.DataGrid
+    /// Represents the lengths of elements within the <see cref="DataGrid"/>
     /// control.
     /// </summary>
     [TypeConverter(typeof(DataGridLengthConverter))]

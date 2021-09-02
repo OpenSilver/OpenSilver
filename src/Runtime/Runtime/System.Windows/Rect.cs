@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,9 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.ComponentModel;
+using System.Globalization;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows
@@ -25,7 +24,6 @@ namespace Windows.Foundation
     /// <summary>
     /// Describes the width, height, and point origin of a rectangle.
     /// </summary>
-    [TypeConverter(typeof(RectConverter))]
     public partial struct Rect
     {
         internal double _x;
@@ -132,8 +130,8 @@ namespace Windows.Foundation
         /// </returns>
         public static bool operator !=(Rect rect1, Rect rect2)
         {
-            return rect1.X != rect2.X || rect1.Y != rect2.Y ||
-                rect1.Width != rect2.Width || rect1.Height != rect2.Height;
+            return (rect1.X != rect2.X || rect1.Y != rect2.Y ||
+                rect1.Width != rect2.Width || rect1.Height != rect2.Height);
         }
 
         /// <summary>
@@ -147,8 +145,8 @@ namespace Windows.Foundation
         /// </returns>
         public static bool operator ==(Rect rect1, Rect rect2)
         {
-            return rect1.X == rect2.X && rect1.Y == rect2.Y &&
-                rect1.Width == rect2.Width && rect1.Height == rect2.Height;
+            return (rect1.X == rect2.X && rect1.Y == rect2.Y &&
+                rect1.Width == rect2.Width && rect1.Height == rect2.Height);
         }
 
         /// <summary>
@@ -192,7 +190,14 @@ namespace Windows.Foundation
         /// Gets a special value that represents a rectangle with
         /// no position or area.
         /// </summary>
-        public static Rect Empty { get; }
+        public static Rect Empty { get; } =
+            new Rect
+            {
+                _width = double.NegativeInfinity,
+                _height = double.NegativeInfinity,
+                _x = double.PositiveInfinity,
+                _y = double.PositiveInfinity
+            };
 
         /// <summary>
         /// Gets or sets the height of the rectangle.
@@ -235,7 +240,7 @@ namespace Windows.Foundation
         {
             get
             {
-                if (IsEmpty)
+                if (this.IsEmpty)
                 {
                     return double.NegativeInfinity;
                 }
@@ -266,7 +271,7 @@ namespace Windows.Foundation
         {
             get
             {
-                if (IsEmpty)
+                if (this.IsEmpty)
                 {
                     return double.NegativeInfinity;
                 }
@@ -297,7 +302,7 @@ namespace Windows.Foundation
         {
             get
             {
-                if (IsEmpty)
+                if (this.IsEmpty)
                 {
                     return double.NegativeInfinity;
                 }
@@ -447,6 +452,7 @@ namespace Windows.Foundation
             return X.GetHashCode() ^ Y.GetHashCode() ^ Width.GetHashCode() ^ Height.GetHashCode();
         }
 
+
         /// <summary>
         /// Finds the intersection of the rectangle represented by the current <see cref="Rect" />
         /// and the rectangle represented by the specified <see cref="Rect" />,
@@ -484,36 +490,82 @@ namespace Windows.Foundation
                                       && rect.Y + rect.Height >= this._y;
         }
 
-#if WORKINPROGRESS
-        /// <summary>
-        /// Returns a string representation of the rectangle by using
-        /// the specified format provider.
-        /// </summary>
-        /// <param name="provider">Culture-specific formatting information.</param>
-		[OpenSilver.NotImplemented]
-        public string ToString(IFormatProvider provider)
+        public static Rect Parse(string source)
         {
-            return default(string);
-        }
-#endif
+            if (source != null)
+            {
+                IFormatProvider formatProvider = CultureInfo.InvariantCulture;
+                char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
+                string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
-        public static Rect Parse(string rectAsString)
-        {
-            return (Rect)TypeDescriptor.GetConverter(typeof(Rect))
-                .ConvertFromInvariantString(rectAsString);
+                if (split.Length == 4)
+                {
+                    return new Rect(
+                        Convert.ToDouble(split[0], formatProvider),
+                        Convert.ToDouble(split[1], formatProvider),
+                        Convert.ToDouble(split[2], formatProvider),
+                        Convert.ToDouble(split[3], formatProvider)
+                    );
+                }
+            }
+
+            throw new FormatException($"'{source}' is not an eligible value for '{typeof(Rect)}'.");
         }
 
         /// <summary>
-        /// Returns a string representation of the Windows.Foundation.Rect
+        /// Returns a string representation of the <see cref="Rect"/> structure.
         /// structure.
         /// </summary>
         /// <returns>
-        /// A string representation of the current Windows.Foundation.Rect structure.
-        /// The string has the following form: "Windows.Foundation.Rect.X,Windows.Foundation.Rect.Y,Windows.Foundation.Rect.Width,Windows.Foundation.Rect.Height".
+        /// A string representation of the current <see cref="Rect"/> structure. The string
+        /// has the following form: "<see cref="Rect.X"/>,<see cref="Rect.Y"/>,<see cref="Rect.Width"/>,<see cref="Rect.Height"/>".
         /// </returns>
         public override string ToString()
         {
-            return string.Concat(X, ", ", Y, ", ", Width, ", ", Height);
+            return ConvertToString(null);
+        }
+
+        /// <summary>
+        /// Returns a string representation of the rectangle by using the specified format
+        /// provider.
+        /// </summary>
+        /// <param name="provider">
+        /// Culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A string representation of the current rectangle that is determined by the specified
+        /// format provider.
+        /// </returns>
+        public string ToString(IFormatProvider provider)
+        {
+            return ConvertToString(provider);
+        }
+
+        /// <summary>
+        /// Creates a string representation of this object based on the format string
+        /// and IFormatProvider passed in.
+        /// If the provider is null, the CurrentCulture is used.
+        /// See the documentation for IFormattable for more information.
+        /// </summary>
+        /// <returns>
+        /// A string representation of this object.
+        /// </returns>
+        internal string ConvertToString(IFormatProvider provider)
+        {
+            if (IsEmpty)
+            {
+                return "Empty";
+            }
+
+            // Helper to get the numeric list separator for a given culture.
+            char separator = TokenizerHelper.GetNumericListSeparator(provider);
+            return string.Format(provider,
+                                "{1}{0}{2}{0}{3}{0}{4}",
+                                separator,
+                                _x,
+                                _y,
+                                _width,
+                                _height);
         }
 
         //
@@ -578,17 +630,6 @@ namespace Windows.Foundation
             {
                 Height = Height + rect.Y + rect.Height - Y;
             }
-        }
-
-        static Rect()
-        {
-            Empty = new Rect
-            {
-                _width = double.NegativeInfinity,
-                _height = double.NegativeInfinity,
-                _x = double.PositiveInfinity,
-                _y = double.PositiveInfinity
-            };
         }
     }
 }

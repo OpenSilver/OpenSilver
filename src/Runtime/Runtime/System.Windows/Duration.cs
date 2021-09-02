@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -13,7 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows
@@ -25,10 +23,10 @@ namespace Windows.UI.Xaml
     /// Represents the duration of time that a Windows.UI.Xaml.Media.Animation.Timeline
     /// is active.
     /// </summary>
-    [TypeConverter(typeof(DurationConverter))]
     public partial struct Duration
     {
         private DurationType _durationType;
+
         // Exceptions:
         //   System.ArgumentException:
         //     timeSpan evaluates as less than System.TimeSpan.Zero.
@@ -228,7 +226,8 @@ namespace Windows.UI.Xaml
         /// Gets a value that indicates if this Windows.UI.Xaml.Duration represents a
         /// System.TimeSpan value.
         /// </summary>
-        public bool HasTimeSpan { //we assume it is like that
+        public bool HasTimeSpan //we assume it is like that
+        { 
             get
             {
                 //return (_timeSpan != null
@@ -239,6 +238,7 @@ namespace Windows.UI.Xaml
         }
 
         private TimeSpan _timeSpan;
+
         // Exceptions:
         //   System.InvalidOperationException:
         //     The Windows.UI.Xaml.Duration does not represent a System.TimeSpan.
@@ -351,25 +351,11 @@ namespace Windows.UI.Xaml
         ///// <returns>The subtracted Windows.UI.Xaml.Duration.</returns>
         //public Duration Subtract(Duration duration);
 
-        /// <summary>
-        /// Converts a Windows.UI.Xaml.Duration to a System.String representation.
-        /// </summary>
-        /// <returns>A System.String representation of this Windows.UI.Xaml.Duration.</returns>
-        public override string ToString()
-        {
-            if (HasTimeSpan)
-            {
-                return TypeDescriptor.GetConverter(_timeSpan).ConvertToString(_timeSpan);
-            }
-            else if (_durationType == DurationType.Forever)
-            {
-                return "Forever";
-            }
-            else // IsAutomatic
-            {
-                return "Automatic";
-            }
-        }
+        ///// <summary>
+        ///// Converts a Windows.UI.Xaml.Duration to a System.String representation.
+        ///// </summary>
+        ///// <returns>A System.String representation of this Windows.UI.Xaml.Duration.</returns>
+        //public override string ToString();
 
         /// <summary>
         /// An enumeration of the different types of Duration behaviors.

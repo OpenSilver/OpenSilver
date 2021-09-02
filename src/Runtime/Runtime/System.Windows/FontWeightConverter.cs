@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,10 +11,15 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.ComponentModel;
 using System.Globalization;
+
+#if MIGRATION
+using FontweightsEnum = System.Windows.FontWeights.INTERNAL_FontweightsEnum;
+#else
+using FontweightsEnum = Windows.UI.Text.FontWeights.INTERNAL_FontweightsEnum;
+#endif
 
 #if MIGRATION
 namespace System.Windows
@@ -24,104 +28,85 @@ namespace Windows.UI.Text
 #endif
 {
     /// <summary>
-    /// Converts a <see cref="T:System.Windows.FontWeight" /> object to and from other types.
+    /// FontWeightConverter class parses a font weight string.
     /// </summary>
-    public class FontWeightConverter : TypeConverter
+    internal class FontWeightConverter : TypeConverter
     {
         /// <summary>
-        /// Determines whether an object of the specified type can be converted to an instance of <see cref="T:System.Windows.FontWeight" />.
+        /// CanConvertFrom
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="sourceType">The type being evaluated for conversion.</param>
-        /// <returns>
-        /// <see langword="true" /> if <paramref name="sourceType" /> is of type <see cref="T:System.String" />; otherwise, <see langword="false" />.</returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             return sourceType == typeof(string);
         }
 
         /// <summary>
-        /// Determines whether an instance of <see cref="T:System.Windows.FontWeight" /> can be converted to the specified type.
+        /// TypeConverter method override.
         /// </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="destinationType">The type being evaluated for conversion.</param>
-        /// <returns>
-        /// <see langword="true" /> if <paramref name="destinationType" /> is of type <see cref="T:System.String" />; 
-        /// otherwise, <see langword="false" />.</returns>
+        /// <param name="context">ITypeDescriptorContext</param>
+        /// <param name="destinationType">Type to convert to</param>
+        /// <returns>true if conversion is possible</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
             return destinationType == typeof(string);
         }
 
-        /// <summary>Attempts to convert a specified object to an instance of <see cref="T:System.Windows.FontWeight" />.</summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The object being converted.</param>
-        /// <returns>The instance of <see cref="T:System.Windows.FontWeight" /> created from the converted <paramref name="value" />.</returns>
-        /// <exception cref="T:System.NotSupportedException">
-        ///   <paramref name="value" /> is <see langword="null" /> or is not a valid type for conversion.</exception>
+        /// <summary>
+        /// ConvertFrom - attempt to convert to a FontWeight from the given object
+        /// </summary>
+        /// <exception cref="NotSupportedException">
+        /// A NotSupportedException is thrown if the example object is null or is not a valid type
+        /// which can be converted to a FontWeight.
+        /// </exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            object result;
-
-            if (value is null)
+            if (value is string s)
             {
-                throw GetConvertFromException(value);
-            }
-            else if (value is string)
-            {
-                var fontCode = value.ToString();
-
-                try
+                if (Enum.TryParse(s, true, out FontweightsEnum fontCode))
                 {
-                    // Check if the font is a named font:
-                    if (!ushort.TryParse(fontCode, out var code))
-                    {
-                        FontWeights.INTERNAL_FontweightsEnum namedFont = (FontWeights.INTERNAL_FontweightsEnum)Enum.Parse(typeof(FontWeights.INTERNAL_FontweightsEnum), fontCode); // Note: "TryParse" does not seem to work in JSIL.
-                        result = (ushort)namedFont;
-                    }
-                    result = FontWeight.INTERNAL_ConvertFromUshort(code);
+                    return FontWeight.INTERNAL_ConvertFromUshort((ushort)fontCode);
                 }
-                catch (Exception ex)
+                else if (ushort.TryParse(s, out ushort code))
                 {
-                    throw new Exception("Invalid font: " + fontCode, ex);
+                    return FontWeight.INTERNAL_ConvertFromUshort(code);
+                }
+                else
+                {
+                    throw new FormatException("Token is not valid.");
                 }
             }
-            else
-            {
-                result = base.ConvertFrom(context, culture, value);
-            }
 
-            return result;
+            throw GetConvertFromException(value);
         }
 
-        /// <summary>Attempts to convert a <see cref="T:System.Windows.FontWeight" /> to a specified type. </summary>
-        /// <param name="context">Describes the context information of a type.</param>
-        /// <param name="culture">Describes the System.Globalization.CultureInfo of the type being converted.</param>
-        /// <param name="value">The <see cref="T:System.Windows.FontWeight" /> to convert.</param>
-        /// <param name="destinationType">The type to convert this <see cref="T:System.Windows.FontWeight" /> to.</param>
-        /// <returns>The object created from converting this <see cref="T:System.Windows.FontWeight" />.</returns>
-        /// <exception cref="T:System.NotSupportedException">
-        /// Thrown if <paramref name="value" /> is <see langword="null" /> or not a <see cref="T:System.Windows.FontWeight" />,
-        /// or if the <paramref name="destinationType" /> is not one of the valid types for conversion.</exception>
+        /// <summary>
+        /// TypeConverter method implementation.
+        /// </summary>
+        /// <exception cref="NotSupportedException">
+        /// An NotSupportedException is thrown if the example object is null or is not a FontWeight,
+        /// or if the destinationType isn't one of the valid destination types.
+        /// </exception>
+        /// <param name="context">ITypeDescriptorContext</param>
+        /// <param name="culture">current culture (see CLR specs)</param>
+        /// <param name="value">value to convert from</param>
+        /// <param name="destinationType">Type to convert to</param>
+        /// <returns>converted value</returns>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            object result = null;
-
-            if (destinationType != null && value is FontWeight fontWeight)
+            if (destinationType == null)
             {
-                if (destinationType == typeof(string))
+                throw new ArgumentNullException(nameof(destinationType));
+            }
+
+            if (destinationType == typeof(string))
+            {
+                if (value is FontWeight c)
                 {
-                    result = ((IFormattable)fontWeight).ToString(null, culture);
+                    return ((IFormattable)c).ToString(null, culture);
                 }
             }
 
-            if (result is null)
-            {
-                result = base.ConvertTo(context, culture, value, destinationType);
-            }
-
-            return result;
+            throw GetConvertToException(value, destinationType);
         }
     }
 }

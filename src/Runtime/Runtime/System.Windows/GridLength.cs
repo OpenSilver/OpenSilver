@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,8 +11,8 @@
 *  
 \*====================================================================================*/
 
-
-using System.ComponentModel;
+using System;
+using System.Globalization;
 
 #if MIGRATION
 namespace System.Windows
@@ -25,7 +24,6 @@ namespace Windows.UI.Xaml
     /// Represents the length of elements that explicitly support Windows.UI.Xaml.GridUnitType.Star
     /// unit types.
     /// </summary>
-    [TypeConverter(typeof(GridLengthConverter))]
     public partial struct GridLength
     {
         /// <summary>
@@ -63,7 +61,7 @@ namespace Windows.UI.Xaml
         /// <param name="type">The Windows.UI.Xaml.GridUnitType held by this instance of Windows.UI.Xaml.GridLength.</param>
         public GridLength(double value, GridUnitType type)
         {
-            _value = type == GridUnitType.Auto ? 0.0 : value;
+            _value = (type == GridUnitType.Auto ? 0.0 : value);
             _type = type;
         }
 
@@ -90,7 +88,7 @@ namespace Windows.UI.Xaml
                 return _type;
             }
         }
-
+        
         /// <summary>
         /// Gets a value that indicates whether the Windows.UI.Xaml.GridLength
         /// holds a value that is expressed in pixels.
@@ -152,7 +150,7 @@ namespace Windows.UI.Xaml
         /// </returns>
         public static bool operator !=(GridLength gl1, GridLength gl2)
         {
-            return gl1.GridUnitType != gl2.GridUnitType || gl1.Value != gl2.Value;
+            return (gl1.GridUnitType != gl2.GridUnitType || gl1.Value != gl2.Value);
         }
         
         /// <summary>
@@ -167,7 +165,7 @@ namespace Windows.UI.Xaml
         /// </returns>
         public static bool operator ==(GridLength gl1, GridLength gl2)
         {
-            return gl1.GridUnitType == gl2.GridUnitType && gl1.Value == gl2.Value;
+            return (gl1.GridUnitType == gl2.GridUnitType && gl1.Value == gl2.Value);
         }
 
         /// <summary>
@@ -181,7 +179,7 @@ namespace Windows.UI.Xaml
         /// </returns>
         public bool Equals(GridLength gridLength)
         {
-            return this == gridLength;
+            return (this == gridLength);
         }
         
         /// <summary>
@@ -197,7 +195,7 @@ namespace Windows.UI.Xaml
         {
             if (oCompare is GridLength)
             {
-                return this == (GridLength)oCompare;
+                return (this == (GridLength)oCompare);
             }
             else
                 return false;
@@ -221,18 +219,7 @@ namespace Windows.UI.Xaml
         /// </returns>
         public override string ToString()
         {
-            if (_type == GridUnitType.Auto)
-            {
-                return "Auto";
-            }
-            else if (_type == GridUnitType.Star)
-            {
-                return _value == 1 ? "*" : _value.ToString() + "*";
-            }
-            else
-            {
-                return _value.ToString();
-            }
+            return GridLengthConverter.ToString(this, CultureInfo.InvariantCulture);
         }
     }
 }

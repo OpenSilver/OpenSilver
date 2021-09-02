@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,9 +11,8 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.ComponentModel;
+using System.Text;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -22,61 +20,354 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
+    // for details on how the animations are supposed to behave depending on RepeatBehavior, see:
+    // https://msdn.microsoft.com/en-us/library/system.windows.media.animation.timeline.repeatbehavior(v=vs.100).aspx
+
     /// <summary>
-    /// Describes how a Windows.UI.Xaml.Media.Animation.Timeline repeats its simple
-    /// duration.
+    /// Describes how a <see cref="Timeline"/> repeats its simple duration.
     /// </summary>
-    [TypeConverter(typeof(RepeatBehaviorConverter))]
-    public partial struct RepeatBehavior// : IFormattable
+    public struct RepeatBehavior : IFormattable
     {
-        //for details on how the animations are supposed to behave depending on RepeatBehavior, see: https://msdn.microsoft.com/en-us/library/system.windows.media.animation.timeline.repeatbehavior(v=vs.100).aspx
-        //
-        // Exceptions:
-        //   System.ArgumentOutOfRangeException:
-        //     count evaluates to infinity, a value that is not a number, or is negative.
+        private double _iterationCount;
+        private TimeSpan _repeatDuration;
+        private RepeatBehaviorType _type;
 
         /// <summary>
-        /// Initializes a new instance of the Windows.UI.Xaml.Media.Animation.RepeatBehavior
+        /// Initializes a new instance of the <see cref="RepeatBehavior"/>
         /// structure with the specified iteration count.
         /// </summary>
         /// <param name="count">
-        /// A number greater than or equal to 0 that specifies the number of iterations
-        /// for an animation.
+        /// A number greater than or equal to 0 that specifies the number of iterations for
+        /// an animation.
         /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// count evaluates to infinity, a value that is not a number, or is negative.
+        /// </exception>
         public RepeatBehavior(double count)
         {
+            if (double.IsInfinity(count)
+                || double.IsNaN(count)
+                || count < 0.0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), 
+                    string.Format("'{0}' is not a valid IterationCount value for a RepeatBehavior structure. An IterationCount value must represent a number that is greater than or equal to zero but not infinite.", count)
+                );
+            }
+
+            _repeatDuration = new TimeSpan(0);
+            _iterationCount = count;
             _type = RepeatBehaviorType.Count;
-            _count = count;
-            _hasCount = true;
-#if WORKINPROGRESS
-            HasDuration = false;
-            Duration = new TimeSpan();
-#endif
         }
 
-        //// Exceptions:
-        ////   System.ArgumentOutOfRangeException:
-        ////     duration evaluates to a negative number.
-        ///// <summary>
-        ///// Initializes a new instance of the Windows.UI.Xaml.Media.Animation.RepeatBehavior
-        ///// structure with the specified repeat duration.
-        ///// </summary>
-        ///// <param name="duration">
-        ///// The total length of time that the Windows.UI.Xaml.Media.Animation.Timeline
-        ///// should play (its active duration).
-        ///// </param>
-        //public RepeatBehavior(TimeSpan duration)
-        //{
-        //    _type = RepeatBehaviorType.Duration;
-        //    _count = 1;
-        //    _duration = duration;
-        //    _hasDuration = true;
-        //    _hasCount = false;
-        //}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RepeatBehavior"/>
+        /// structure with the specified repeat duration.
+        /// </summary>
+        /// <param name="duration">
+        /// The total length of time that the <see cref="Timeline"/> should
+        /// play (its active duration).
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// duration evaluates to a negative number.
+        /// </exception>
+        public RepeatBehavior(TimeSpan duration)
+        {
+            if (duration < new TimeSpan(0))
+            {
+                throw new ArgumentOutOfRangeException(nameof(duration), 
+                    string.Format("'{0}' is not a valid RepeatDuration value for a RepeatBehavior structure. A RepeatDuration value must be a TimeSpan value greater than or equal to zero ticks.", duration)
+                );
+            }
+
+            _iterationCount = 0.0;
+            _repeatDuration = duration;
+            _type = RepeatBehaviorType.Duration;
+        }
 
         /// <summary>
-        /// Indicates whether the two Windows.UI.Xaml.Media.Animation.RepeatBehavior
-        /// values are not equal.
+        /// Gets a <see cref="RepeatBehavior"/> that specifies an infinite
+        /// number of repetitions.
+        /// </summary>
+        public static RepeatBehavior Forever
+        {
+            get
+            {
+                RepeatBehavior forever = new RepeatBehavior();
+                forever._type = RepeatBehaviorType.Forever;
+
+                return forever;
+            }
+        }
+
+        /// <summary>
+        /// Gets the number of times a <see cref="Timeline"/> should repeat.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// This <see cref="RepeatBehavior"/> describes a repeat duration,
+        /// not an iteration count.
+        /// </exception>
+        public double Count
+        {
+            get
+            {
+                if (_type != RepeatBehaviorType.Count)
+                {
+                    throw new InvalidOperationException(
+                        string.Format("'{0}' RepeatBehavior does not represent an iteration count and does not have an IterationCount value.", this)
+                    );
+                }
+
+                return _iterationCount;
+            }
+        }
+
+        /// <summary>
+        /// Gets the total length of time a <see cref="Timeline"/> should
+        /// play.
+        /// </summary>
+        /// <returns>
+        /// The total length of time a timeline should play.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">
+        /// This <see cref="RepeatBehavior"/> describes an iteration count,
+        /// not a repeat duration.
+        /// </exception>
+        public TimeSpan Duration
+        {
+            get
+            {
+                if (_type != RepeatBehaviorType.Duration)
+                {
+                    throw new InvalidOperationException(
+                        string.Format("'{0}' RepeatBehavior does not represent a repeat duration and does not have a RepeatDuration value.", this)
+                    );
+                }
+
+                return _repeatDuration;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value that indicates whether the repeat behavior has a specified iteration
+        /// count.
+        /// </summary>
+        public bool HasCount
+        {
+            get
+            {
+                return _type == RepeatBehaviorType.Count;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value that indicates whether the repeat behavior has a specified repeat
+        /// duration.
+        /// </summary>
+        /// <returns>
+        /// true if the instance represents a repeat duration; otherwise, false.
+        /// </returns>
+        public bool HasDuration
+        {
+            get
+            {
+                return _type == RepeatBehaviorType.Duration;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether the two specified <see cref="RepeatBehavior"/>
+        /// values are equal.
+        /// </summary>
+        /// <param name="repeatBehavior1">The first value to compare.</param>
+        /// <param name="repeatBehavior2">The second value to compare.</param>
+        /// <returns>
+        /// true if both the type and repeat behavior of repeatBehavior1 are equal to that
+        /// of repeatBehavior2; otherwise, false.
+        /// </returns>
+        public static bool Equals(RepeatBehavior repeatBehavior1, RepeatBehavior repeatBehavior2)
+        {
+            return repeatBehavior1.Equals(repeatBehavior2);
+        }
+
+        /// <summary>
+        /// Indicates whether the specified object is equal to this <see cref="RepeatBehavior"/>.
+        /// </summary>
+        /// <param name="value">
+        /// The object to compare with this <see cref="RepeatBehavior"/>.
+        /// </param>
+        /// <returns>
+        /// true if value is a <see cref="RepeatBehavior"/> that represents
+        /// the same repeat behavior as this <see cref="RepeatBehavior"/>;
+        /// otherwise, false.
+        /// </returns>
+        public override bool Equals(object value)
+        {
+            if (value is RepeatBehavior)
+            {
+                return this.Equals((RepeatBehavior)value);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns a value that indicates whether the specified <see cref="RepeatBehavior"/>
+        /// is equal to this <see cref="RepeatBehavior"/>.
+        /// </summary>
+        /// <param name="repeatBehavior">
+        /// The value to compare to this <see cref="RepeatBehavior"/>.
+        /// </param>
+        /// <returns>
+        /// true if both the type and repeat behavior of repeatBehavior are equal to this
+        /// <see cref="RepeatBehavior"/>; otherwise, false.
+        /// </returns>
+        public bool Equals(RepeatBehavior repeatBehavior)
+        {
+            if (_type == repeatBehavior._type)
+            {
+                switch (_type)
+                {
+                    case RepeatBehaviorType.Forever:
+
+                        return true;
+
+                    case RepeatBehaviorType.Count:
+
+                        return _iterationCount == repeatBehavior._iterationCount;
+
+                    case RepeatBehaviorType.Duration:
+
+                        return _repeatDuration == repeatBehavior._repeatDuration;
+
+                    default:
+
+                        return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns the hash code of this instance.
+        /// </summary>
+        public override int GetHashCode()
+        {
+            switch (_type)
+            {
+                case RepeatBehaviorType.Count:
+
+                    return _iterationCount.GetHashCode();
+
+                case RepeatBehaviorType.Duration:
+
+                    return _repeatDuration.GetHashCode();
+
+                case RepeatBehaviorType.Forever:
+
+                    // We try to choose an unlikely hash code value for Forever.
+                    // All Forevers need to return the same hash code value.
+                    return int.MaxValue - 42;
+
+                default:
+
+                    return base.GetHashCode();
+            }
+        }
+
+        /// <summary>
+        /// Returns a string representation of this <see cref="RepeatBehavior"/>.
+        /// </summary>
+        /// <returns>
+        /// A string representation of this <see cref="RepeatBehavior"/>.
+        /// </returns>
+        public override string ToString()
+        {
+            return InternalToString(null, null);
+        }
+
+        /// <summary>
+        /// Returns a string representation of this <see cref="RepeatBehavior"/>
+        /// with the specified format.
+        /// </summary>
+        /// <param name="formatProvider">
+        /// The format used to construct the return value.
+        /// </param>
+        /// <returns>
+        /// A string representation of this <see cref="RepeatBehavior"/>.
+        /// </returns>
+        public string ToString(IFormatProvider formatProvider)
+        {
+            return InternalToString(null, formatProvider);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="formatProvider"></param>
+        /// <returns></returns>
+        string IFormattable.ToString(string format, IFormatProvider formatProvider)
+        {
+            return InternalToString(format, formatProvider);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="formatProvider"></param>
+        /// <returns></returns>
+        internal string InternalToString(string format, IFormatProvider formatProvider)
+        {
+            switch (_type)
+            {
+                case RepeatBehaviorType.Forever:
+
+                    return "Forever";
+
+                case RepeatBehaviorType.Count:
+
+                    StringBuilder sb = new StringBuilder();
+
+                    sb.Append(
+                        string.Format(formatProvider, "{0:" + format + "}x", _iterationCount)
+                    );
+
+                    return sb.ToString();
+
+                case RepeatBehaviorType.Duration:
+
+                    return _repeatDuration.ToString();
+
+                default:
+
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether the two specified <see cref="RepeatBehavior"/>
+        /// values are equal.
+        /// </summary>
+        /// <param name="repeatBehavior1">The first value to compare.</param>
+        /// <param name="repeatBehavior2">The second value to compare.</param>
+        /// <returns>
+        /// true if both the type and repeat behavior of repeatBehavior1 are equal to that
+        /// of repeatBehavior2; otherwise, false.
+        /// </returns>
+        public static bool operator ==(RepeatBehavior repeatBehavior1, RepeatBehavior repeatBehavior2)
+        {
+            return repeatBehavior1.Equals(repeatBehavior2);
+        }
+
+        /// <summary>
+        /// Indicates whether the two <see cref="RepeatBehavior"/> values
+        /// are not equal.
         /// </summary>
         /// <param name="repeatBehavior1">The first value to compare.</param>
         /// <param name="repeatBehavior2">The second value to compare.</param>
@@ -86,129 +377,14 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </returns>
         public static bool operator !=(RepeatBehavior repeatBehavior1, RepeatBehavior repeatBehavior2)
         {
-            if (repeatBehavior1._hasCount)
-            {
-                if ((!repeatBehavior2._hasCount) || repeatBehavior1._count != repeatBehavior2._count)
-                {
-                    return true;
-                }
-            }
-            else if (repeatBehavior2._hasCount)
-            {
-                return true;
-            }
-
-            //if (repeatBehavior1._hasDuration)
-            //{
-            //    if ((!repeatBehavior2._hasDuration) || repeatBehavior1._duration != repeatBehavior2._duration)
-            //    {
-            //        return true;
-            //    }
-            //}
-            //else if (repeatBehavior2._hasDuration)
-            //{
-            //    return true;
-            //}
-            return false;
+            return !repeatBehavior1.Equals(repeatBehavior2);
         }
 
         /// <summary>
-        /// Indicates whether the two specified Windows.UI.Xaml.Media.Animation.RepeatBehavior
-        /// values are equal.
-        /// </summary>
-        /// <param name="repeatBehavior1">The first value to compare.</param>
-        /// <param name="repeatBehavior2">The second value to compare.</param>
-        /// <returns>
-        /// true if both the type and repeat behavior of repeatBehavior1 are equal to
-        /// that of repeatBehavior2; otherwise, false.
-        /// </returns>
-        public static bool operator ==(RepeatBehavior repeatBehavior1, RepeatBehavior repeatBehavior2)
-        {
-            return !(repeatBehavior1 != repeatBehavior2);
-        }
-
-        double _count;
-        // Exceptions:
-        //   System.InvalidOperationException:
-        //     This Windows.UI.Xaml.Media.Animation.RepeatBehavior describes a repeat duration,
-        //     not an iteration count.
-        /// <summary>
-        /// Gets the number of times a Windows.UI.Xaml.Media.Animation.Timeline should
-        /// repeat.
-        /// </summary>
-        public double Count
-        {
-            get
-            {
-                return _count;
-            }
-            set
-            {
-                _count = value;
-                _hasCount = true;
-                //_hasDuration = false;
-                _type = RepeatBehaviorType.Count;
-            }
-        }
-
-        //TimeSpan _duration;
-        //// Exceptions:
-        ////   System.InvalidOperationException:
-        ////     This Windows.UI.Xaml.Media.Animation.RepeatBehavior describes an iteration
-        ////     count, not a repeat duration.
-        ///// <summary>
-        ///// Gets the total length of time a Windows.UI.Xaml.Media.Animation.Timeline
-        ///// should play.
-        ///// </summary>
-        //public TimeSpan Duration
-        //{
-        //    get
-        //    {
-        //        return _duration;
-        //    }
-        //    set
-        //    {
-        //        _duration = value;
-        //        _hasCount = false;
-        //        _hasDuration = true;
-        //        _type = RepeatBehaviorType.Duration;
-        //    }
-        //}
-
-        /// <summary>
-        /// Gets a Windows.UI.Xaml.Media.Animation.RepeatBehavior that specifies an infinite
-        /// number of repetitions.
-        /// </summary>
-        public static RepeatBehavior Forever
-        {
-            get
-            {
-                RepeatBehavior forever = new RepeatBehavior();
-                forever._type = RepeatBehaviorType.Forever;
-                return forever;
-            }
-        }
-
-        bool _hasCount;
-        /// <summary>
-        /// Gets a value that indicates whether the repeat behavior has a specified iteration
-        /// count.
-        /// </summary>
-        public bool HasCount { get { return _hasCount; } }
-
-        //bool _hasDuration;
-        ///// <summary>
-        ///// Gets a value that indicates whether the repeat behavior has a specified repeat
-        ///// duration.
-        ///// </summary>
-        //public bool HasDuration { get { return _hasDuration; } }
-        ///
-        //Note: the following does not exist in WPF or Silverlight (but it does in WinRT).
-        RepeatBehaviorType _type;
-        /// <summary>
-        /// Gets or sets one of the Windows.UI.Xaml.Media.Animation.RepeatBehaviorType
+        /// Gets or sets one of the <see cref="RepeatBehaviorType"/>
         /// values that describes the way behavior repeats.
         /// </summary>
+        [Obsolete("Use HasCount and HasDuration instead. Setter does not do anything.")]
         public RepeatBehaviorType Type
         {
             get
@@ -217,99 +393,8 @@ namespace Windows.UI.Xaml.Media.Animation
             }
             set
             {
-                _type = value;
-                if (value == RepeatBehaviorType.Count)
-                {
-                    if (_count > 0)
-                    {
-                        _hasCount = true;
-                    }
-                    //_hasDuration = false;
-                }
-                //else if(value == RepeatBehaviorType.Duration)
-                //{
-                //    _hasCount = false;
-                //    if (_duration > new TimeSpan())
-                //    {
-                //        _hasDuration = true;
-                //    }
-                //}
-                else if (value == RepeatBehaviorType.Forever)
-                {
-                    _hasCount = false;
-                    //_hasDuration = false;
-                }
+
             }
-        }
-
-        /// <summary>
-        /// Indicates whether the specified object is equal to this Windows.UI.Xaml.Media.Animation.RepeatBehavior.
-        /// </summary>
-        /// <param name="value">The object to compare with this Windows.UI.Xaml.Media.Animation.RepeatBehavior.</param>
-        /// <returns>
-        /// true if value is a Windows.UI.Xaml.Media.Animation.RepeatBehavior that represents
-        /// the same repeat behavior as this Windows.UI.Xaml.Media.Animation.RepeatBehavior;
-        /// otherwise, false.
-        /// </returns>
-        public override bool Equals(object value)
-        {
-            if (!(value is RepeatBehavior))
-            {
-                return false;
-            }
-            return this == (RepeatBehavior)value;
-        }
-
-        /// <summary>
-        /// Returns a value that indicates whether the specified Windows.UI.Xaml.Media.Animation.RepeatBehavior
-        /// is equal to this Windows.UI.Xaml.Media.Animation.RepeatBehavior.
-        /// </summary>
-        /// <param name="repeatBehavior">The value to compare to this Windows.UI.Xaml.Media.Animation.RepeatBehavior.</param>
-        /// <returns>
-        /// true if both the type and repeat behavior of repeatBehavior are equal to
-        /// this Windows.UI.Xaml.Media.Animation.RepeatBehavior; otherwise, false.
-        /// </returns>
-        public bool Equals(RepeatBehavior repeatBehavior)
-        {
-            return this == repeatBehavior;
-        }
-
-        /// <summary>
-        /// Indicates whether the two specified Windows.UI.Xaml.Media.Animation.RepeatBehavior
-        /// values are equal.
-        /// </summary>
-        /// <param name="repeatBehavior1">The first value to compare.</param>
-        /// <param name="repeatBehavior2">The second value to compare.</param>
-        /// <returns>
-        /// true if both the type and repeat behavior of repeatBehavior1 are equal to
-        /// that of repeatBehavior2; otherwise, false.
-        /// </returns>
-        public static bool Equals(RepeatBehavior repeatBehavior1, RepeatBehavior repeatBehavior2)
-        {
-            return repeatBehavior1 == repeatBehavior2;
-
-        }
-
-        //todo: the following
-
-        ///// <summary>
-        ///// Returns the hash code of this instance.
-        ///// </summary>
-        ///// <returns>A hash code.</returns>
-        //public override int GetHashCode();
-
-        ///// <summary>
-        ///// Returns a string representation of this Windows.UI.Xaml.Media.Animation.RepeatBehavior.
-        ///// </summary>
-        ///// <returns></returns>
-        //public override string ToString();
-
-        ///// <summary>
-        ///// Returns a string representation of this Windows.UI.Xaml.Media.Animation.RepeatBehavior
-        ///// with the specified format.
-        ///// </summary>
-        ///// <param name="formatProvider">The format used to construct the return value.</param>
-        ///// <returns>A string representation of this Windows.UI.Xaml.Media.Animation.RepeatBehavior.</returns>
-        //public string ToString(IFormatProvider formatProvider);
+        }       
     }
 }

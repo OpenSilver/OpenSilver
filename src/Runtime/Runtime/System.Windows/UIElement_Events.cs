@@ -172,18 +172,7 @@ namespace Windows.UI.Xaml
         public static readonly RoutedEvent PointerPressedEvent = new RoutedEvent("PointerPressedEvent");
 #endif
 
-#if WORKINPROGRESS
-#if MIGRATION
-        //
-        // Summary:
-        //     Identifies the System.Windows.UIElement.MouseRightButtonDown routed event.
-        //
-        // Returns:
-        //     The identifier for the System.Windows.UIElement.MouseRightButtonDown routed event.
-        [OpenSilver.NotImplemented]
-        public static readonly RoutedEvent MouseRightButtonDownEvent = new RoutedEvent("MouseRightButtonDownEvent");
-#endif
-#endif
+
 
 #if MIGRATION
         INTERNAL_EventManager<MouseButtonEventHandler, MouseButtonEventArgs> _pointerPressedEventManager;
@@ -312,6 +301,104 @@ namespace Windows.UI.Xaml
 
         #endregion
 
+        #region MouseRightButtonDown (no equivalent in UWP)
+
+#if MIGRATION
+
+        /// <summary>
+        /// Identifies the System.Windows.UIElement.MouseRightButtonDown routed event.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly RoutedEvent MouseRightButtonDownEvent = new RoutedEvent("MouseRightButtonDownEvent");
+
+        INTERNAL_EventManager<MouseButtonEventHandler, MouseButtonEventArgs> _mouseRightButtonDownEventManager;
+        INTERNAL_EventManager<MouseButtonEventHandler, MouseButtonEventArgs> MouseRightButtonDownEventManager
+        {
+            get
+            {
+                if (_mouseRightButtonDownEventManager == null)
+                {
+                    string[] eventsNames = new string[] { "mousedown", "touchstart" };
+                    _mouseRightButtonDownEventManager = new INTERNAL_EventManager<MouseButtonEventHandler, MouseButtonEventArgs>(() => this.INTERNAL_OuterDomElement, eventsNames, (jsEventArg) =>
+                    {
+                        /*
+                        We trigger OnMouseRightButtonDown only if right mouse button has been triggered.
+
+                        Javascript Mouse events have a buttons property that can be a bitmask of:
+
+                        0 : No button or un-initialized
+                        1 : Primary button (usually the left button)
+                        2 : Secondary button (usually the right button)
+                        4 : Auxiliary button (usually the mouse wheel button or middle button)
+                        8 : 4th button (typically the "Browser Back" button)
+                        16 : 5th button (typically the "Browser Forward" button)*/
+                        int mouseBtn = 0;
+                        int.TryParse((CSHTML5.Interop.ExecuteJavaScript("$0.buttons", jsEventArg) ?? 0).ToString(), out mouseBtn);
+                        if (mouseBtn == 2)
+                        {
+                            ProcessPointerEvent(jsEventArg, (Action<MouseButtonEventArgs>)OnMouseRightButtonDown, (Action<MouseButtonEventArgs>)OnMouseRightButtonDown_ForHandledEventsToo, preventTextSelectionWhenPointerIsCaptured: true, checkForDivsThatAbsorbEvents: true, refreshClickCount: true);
+                        }
+                    });
+                }
+                return _mouseRightButtonDownEventManager;
+            }
+        }
+
+
+        public event MouseButtonEventHandler MouseRightButtonDown
+        {
+            add
+            {
+                MouseRightButtonDownEventManager.Add(value);
+            }
+            remove
+            {
+                MouseRightButtonDownEventManager.Remove(value);
+            }
+        }
+
+        /// <summary>
+        /// Raises the MouseRightButtonDown event
+        /// </summary>
+        /// <param name="eventArgs">The arguments for the event.</param>
+        protected virtual void OnMouseRightButtonDown(MouseButtonEventArgs eventArgs)
+        {
+            if (_mouseRightButtonDownEventManager == null)
+                return;
+            foreach (MouseButtonEventHandler handler in _mouseRightButtonDownEventManager.Handlers.ToList<MouseButtonEventHandler>())
+            {
+                if (eventArgs.Handled)
+                    break;
+                handler(this, eventArgs);
+            }
+
+            //Workaround so that the elements that capture the pointer events still get the focus:
+            //Note: we put this here instead of in OnPointerPressed_ForHandledEventsToo because this takes into consideration the checkForDivsThatAbsorbEvents thing (it broke the <Button><TextBox/></Button> case for example).
+            //      It might be better in certain cases to have this in the other method and especially test for those event-absorbing divs at that moment but I'm not sure.
+            //      todo: check if the position of this workaround is correct in the case of an Handled event without a div that absorbs the events.
+            if (this is Control)
+            {
+                Control thisAsControl = (Control)this;
+                if (thisAsControl.IsTabStop)
+                {
+                    thisAsControl.Focus();
+                }
+            }
+        }
+
+        void OnMouseRightButtonDown_ForHandledEventsToo(MouseButtonEventArgs eventArgs)
+        {
+            if (_mouseRightButtonDownEventManager == null)
+                return;
+            foreach (MouseButtonEventHandler handler in _mouseRightButtonDownEventManager.HandlersForHandledEventsToo.ToList<MouseButtonEventHandler>())
+            {
+                handler(this, eventArgs);
+            }
+        }
+
+#endif
+
+        #endregion
 
         #region Pointer released event
 
@@ -735,9 +822,6 @@ namespace Windows.UI.Xaml
 
         public event TextCompositionEventHandler TextInput;
         public event TextCompositionEventHandler TextInputStart;
-#if MIGRATION
-        public event MouseButtonEventHandler MouseRightButtonDown;
-#endif
 
 #endif
 
@@ -1732,6 +1816,15 @@ namespace Windows.UI.Xaml
                 _pointerReleasedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseLeftButtonUp", methodParameters);
             }
             //
+            if (_mouseRightButtonDownEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseRightButtonDown", methodParameters))
+            {
+                var v = MouseRightButtonDownEventManager; //forces the creation of the event manager.
+            }
+            if (_mouseRightButtonDownEventManager != null)
+            {
+                _mouseRightButtonDownEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseRightButtonDown", methodParameters);
+            }
+            //
             if (_rightTappedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseRightButtonUp", methodParameters))
             {
                 var v = RightTappedEventManager; //forces the creation of the event manager.
@@ -2006,11 +2099,13 @@ namespace Windows.UI.Xaml
             {
                 TappedEventManager.Add((TappedEventHandler)handler, handledEventsToo: handledEventsToo);
             }
-#if GD_WIP
+#if MIGRATION
             else if (routedEvent == UIElement.MouseRightButtonDownEvent)
             {
-                
+                MouseRightButtonDownEventManager.Add((MouseButtonEventHandler)handler, handledEventsToo: handledEventsToo);
             }
+#endif
+#if GD_WIP
             else if (routedEvent == UIElement.MouseWheelEvent)
             {
                 
@@ -2127,11 +2222,14 @@ namespace Windows.UI.Xaml
             {
                 TappedEventManager.Remove((TappedEventHandler)handler);
             }
-#if GD_WIP
+#if MIGRATION
             else if (routedEvent == UIElement.MouseRightButtonDownEvent)
             {
+                MouseRightButtonDownEventManager.Remove((MouseButtonEventHandler)handler);
                 
             }
+#endif
+#if GD_WIP
             else if (routedEvent == UIElement.MouseWheelEvent)
             {
                 

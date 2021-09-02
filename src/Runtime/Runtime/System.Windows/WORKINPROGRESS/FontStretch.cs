@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,8 +11,9 @@
 *  
 \*====================================================================================*/
 
+#if WORKINPROGRESS
+
 using System;
-using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows
@@ -21,18 +21,15 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if WORKINPROGRESS
-
-    [TypeConverter(typeof(FontStretchConverter))]
-    [OpenSilver.NotImplemented]
+	[OpenSilver.NotImplemented]
     public partial struct FontStretch : IFormattable
     {
 		[OpenSilver.NotImplemented]
         public string ToString(string format, IFormatProvider formatProvider)
         {
-            return this.ToString();
+            return ToString();
         }
     }
+}
 
 #endif
-}

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -13,7 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows
@@ -25,7 +23,6 @@ namespace Windows.UI.Text
     /// Refers to the density of a typeface, in terms of the lightness or heaviness
     /// of the strokes.
     /// </summary>
-    [TypeConverter(typeof(FontWeightConverter))]
     public partial struct FontWeight : IFormattable
     {
         /// <summary>

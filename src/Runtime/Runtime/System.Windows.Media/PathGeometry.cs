@@ -207,5 +207,10 @@ namespace Windows.UI.Xaml.Media
         }
 
         #endregion
+
+        internal new static object INTERNAL_ConvertFromString(string pathAsString)
+        {
+            return GeometryParser.ParseGeometry(pathAsString);
+        }
     }
 }

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -13,7 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using System.ComponentModel;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -26,7 +24,6 @@ namespace Windows.UI.Xaml.Data
     /// Implements a markup extension that describes the location of the binding source relative to the position of the binding target.
     /// </summary>
     [ContentProperty("Mode")]
-    [TypeConverter(typeof(RelativeSourceConverter))]
     public partial class RelativeSource : MarkupExtension
     {
         /// <summary>
@@ -40,14 +37,26 @@ namespace Windows.UI.Xaml.Data
         /// <param name="relativeSourceMode">The relative source mode</param>
         public RelativeSource(RelativeSourceMode relativeSourceMode)
         {
-            Mode = relativeSourceMode;
+            _mode = relativeSourceMode;
         }
 
+        RelativeSourceMode _mode = RelativeSourceMode.None;
         /// <summary>
         /// Gets or sets a value that describes the location of the binding source relative to the position of the binding target.
         /// Returns a value of the enumeration.
         /// </summary>
-        public RelativeSourceMode Mode { get; set; }
+        public RelativeSourceMode Mode
+        {
+            get
+            {
+                return _mode;
+            }
+            set
+            {
+                _mode = value;
+            }
+        }
+
 
         private int _ancestorLevel = 1;
         /// <summary>
@@ -59,7 +68,7 @@ namespace Windows.UI.Xaml.Data
             get { return _ancestorLevel; }
             set
             {
-                if (value < 1)
+                if(value < 1)
                 {
                     throw new ArgumentOutOfRangeException("The ancestor level cannot be less than one.");
                 }
@@ -76,9 +85,9 @@ namespace Windows.UI.Xaml.Data
             get { return _ancestorType; }
             set
             {
-                if (Mode == RelativeSourceMode.None)
+                if (_mode == RelativeSourceMode.None)
                 {
-                    Mode = RelativeSourceMode.FindAncestor;
+                    _mode = RelativeSourceMode.FindAncestor;
                 }
                 _ancestorType = value;
             }

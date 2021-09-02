@@ -107,6 +107,8 @@ namespace Windows.UI.Xaml
 
         internal bool IsRendered { get; private set; }
 
+        internal bool isFirstRendering;
+
         internal Rect RenderedVisualBounds { get; private set; }
 
         internal Rect PreviousFinalRect { get; private set; }
@@ -190,6 +192,7 @@ namespace Windows.UI.Xaml
             IsMeasureValid = false;
             IsArrangeValid = false;
             IsRendered = false;
+            isFirstRendering = false;
             visualLevel = -1;
 
             disableMeasureInvalidationToken = new Disposable(() => disableMeasureInvalidationRequests--);
@@ -388,20 +391,6 @@ namespace Windows.UI.Xaml
                     catch
                     {
                     }
-                    try
-                    {
-                        domStyle.msTransform = "";
-                    }
-                    catch
-                    {
-                    }
-                    try // Prevents crash in the simulator that uses IE.
-                    {
-                        domStyle.WebkitTransform = "";
-                    }
-                    catch
-                    {
-                    }
                 }
             }
         }
@@ -439,27 +428,11 @@ namespace Windows.UI.Xaml
         private static void ApplyRenderTransformOrigin(UIElement uiElement, Point newValue)
         {
             var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(uiElement);
-            string transformOriginValue = string.Format(CultureInfo.InvariantCulture,
-                "{0}% {1}%", 
-                newValue.X * 100, newValue.Y * 100);
+            string transformOriginValue = $"{(newValue.X * 100).ToString(CultureInfo.InvariantCulture)}% {(newValue.Y * 100).ToString(CultureInfo.InvariantCulture)}%";
 
             try
             {
                 domStyle.transformOrigin = transformOriginValue;
-            }
-            catch
-            {
-            }
-            try
-            {
-                domStyle.webkitTransformOrigin = transformOriginValue;
-            }
-            catch
-            {
-            }
-            try // Prevents crash in the simulator that uses IE.
-            {
-                domStyle.msTransformOrigin = transformOriginValue;
             }
             catch
             {
@@ -986,65 +959,64 @@ namespace Windows.UI.Xaml
                 }
                 else
                 {
-                    string javaScriptCodeToExecute = string.Format(@"
+                    string uid = ((INTERNAL_HtmlDomElementReference)element).UniqueIdentifier;
+                    string javaScriptCodeToExecute = $@"
      document.onmouseup = function(e) {{
         if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementByIdSafe(""{0}"");
+               var element = document.getElementByIdSafe(""{uid}"");
                document.reroute(e, element);
         }}
     }}
      document.onmouseover = function(e) {{
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementByIdSafe(""{0}"");
+               var element = document.getElementByIdSafe(""{uid}"");
                document.reroute(e, element);
         }}
     }} 
     document.onmousedown = function(e) {{
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementByIdSafe(""{0}"");
+               var element = document.getElementByIdSafe(""{uid}"");
                document.reroute(e, element);
         }}
     }}                       
      document.onmouseout = function(e) {{   
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementByIdSafe(""{0}"");
+               var element = document.getElementByIdSafe(""{uid}"");
                document.reroute(e, element);
         }}
     }}                            
      document.onmousemove = function(e) {{
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementByIdSafe(""{0}"");
+               var element = document.getElementByIdSafe(""{uid}"");
                document.reroute(e, element);
         }}
     }}                                    
      document.onclick = function(e) {{   
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementByIdSafe(""{0}"");
+               var element = document.getElementByIdSafe(""{uid}"");
                document.reroute(e, element);
         }}
     }}                                     
      document.oncontextmenu = function(e) {{
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementByIdSafe(""{0}"");
+               var element = document.getElementByIdSafe(""{uid}"");
                document.reroute(e, element);
         }}
     }}                                      
      document.ondblclick = function(e) {{   
        if(e.doNotReroute == undefined)
         {{
-               var element = document.getElementByIdSafe(""{0}"");
+               var element = document.getElementByIdSafe(""{uid}"");
                document.reroute(e, element);
         }}
-    }}
-
-", ((INTERNAL_HtmlDomElementReference)element).UniqueIdentifier);
+    }}";
                     INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javaScriptCodeToExecute);
                 }
                 return true;
@@ -1129,16 +1101,16 @@ namespace Windows.UI.Xaml
                 if (Pointer.INTERNAL_captured != null)
                 {
                     //todo: remove "string.Format" on the next line when JSIL will be able to compile without it (there is currently an issue with JSIL).
-                    string javaScriptCodeToExecute = string.Format(@"
- document.onmousedown = null;
- document.onmouseup = null;
- document.onmouseover = null;
- document.onmouseout = null;
- document.onmousemove = null;
- document.onclick = null;
- document.oncontextmenu = null;
- document.ondblclick = null;
-");
+                    string javaScriptCodeToExecute = @"
+document.onmousedown = null;
+document.onmouseup = null;
+document.onmouseover = null;
+document.onmouseout = null;
+document.onmousemove = null;
+document.onclick = null;
+document.oncontextmenu = null;
+document.ondblclick = null;
+";
                     INTERNAL_HtmlDomManager.ExecuteJavaScript(javaScriptCodeToExecute);
                     Pointer.INTERNAL_captured = null;
 #if MIGRATION
@@ -1549,6 +1521,14 @@ namespace Windows.UI.Xaml
             IsMeasureValid = false;
 
             LayoutManager.Current.AddMeasure(this);
+        }
+
+        internal void ClearMeasureAndArrangeValidation()
+        {
+            this.IsRendered = false;
+            this.RenderedVisualBounds = Rect.Empty;
+            this.IsArrangeValid = false;
+            this.IsMeasureValid = false;
         }
 
         public void UpdateLayout()

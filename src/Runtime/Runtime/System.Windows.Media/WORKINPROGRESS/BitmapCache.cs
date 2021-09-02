@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+#if WORKINPROGRESS
 
 using System;
 
@@ -21,10 +21,10 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-#if WORKINPROGRESS
     [OpenSilver.NotImplemented]
     public sealed partial class BitmapCache : CacheMode
     {
     }
-#endif
 }
+
+#endif

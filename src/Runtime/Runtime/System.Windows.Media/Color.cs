@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -16,10 +15,9 @@
 using Bridge;
 #endif
 
-using OpenSilver.Internal;
 using System;
-using System.ComponentModel;
 using System.Globalization;
+using OpenSilver.Internal;
 
 #if !MIGRATION
 using Windows.UI.Xaml.Media;
@@ -34,8 +32,11 @@ namespace Windows.UI
     /// <summary>
     /// Describes a color in terms of alpha, red, green, and blue channels.
     /// </summary>
-    [TypeConverter(typeof(ColorConverter))]
+#if WORKINPROGRESS
     public partial struct Color : IFormattable
+#else
+    public partial struct Color //todo: this is supposed to inherit from IFormattable
+#endif
     {
         /// <summary>
         /// Gets or sets the sRGB alpha channel value of the color.
@@ -127,6 +128,90 @@ namespace Windows.UI
                 this.R, this.G, this.B, opacity * this.A / 255d);
         }
 
+        internal static object INTERNAL_ConvertFromString(string colorString)
+        {
+            return Parse(colorString, null);
+        }
+
+        internal static Color Parse(string source, IFormatProvider provider)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            string stringValue = source.Trim();
+
+            if (stringValue.Length > 0)
+            {
+                if (stringValue[0] == '#')
+                {
+                    string tokens = stringValue.Substring(1);
+                    if (tokens.Length == 6) // This is becaue XAML is tolerant when the user has forgot the alpha channel (eg. #DDDDDD for Gray).
+                    {
+                        tokens = "FF" + tokens;
+                    }
+
+#if NETSTANDARD
+                    int color;
+                    if (int.TryParse(tokens, NumberStyles.HexNumber, NumberFormatInfo.GetInstance(provider), out color))
+                    {
+                        return INTERNAL_ConvertFromInt32(color);
+                    }
+#elif BRIDGE
+                    int color;
+                    if (CSHTML5.Interop.IsRunningInTheSimulator)
+                    {
+                        color = INTERNAL_BridgeWorkarounds.HexToInt_SimulatorOnly(tokens);
+                    }
+                    else
+                    {
+                        color = Script.Write<int>("parseInt({0}, 16);", tokens);
+                    }
+
+                    return INTERNAL_ConvertFromInt32(color);
+#endif
+                }
+                else if (stringValue.StartsWith("sc#", StringComparison.Ordinal))
+                {
+                    string tokens = stringValue.Substring(3);
+
+                    char[] separators = new char[1] { ',' };
+                    string[] words = tokens.Split(separators);
+                    float[] values = new float[4];
+                    for (int i = 0; i < 3; i++)
+                    {
+                        values[i] = Convert.ToSingle(words[i]);
+                    }
+                    if (words.Length == 4)
+                    {
+                        values[3] = Convert.ToSingle(words[3]);
+                        return Color.FromScRgb(values[0], values[1], values[2], values[3]);
+                    }
+                    else
+                    {
+                        return Color.FromScRgb(1.0f, values[0], values[1], values[2]);
+                    }
+                }
+                else
+                {
+                    // Check if the color is a named color
+                    Colors.INTERNAL_ColorsEnum namedColor;
+                    if (Enum.TryParse(stringValue, true, out namedColor))
+                    {
+                        return INTERNAL_ConvertFromInt32((int)namedColor);
+                    }
+                }
+            }
+
+            throw new FormatException($"Invalid color: '{source}'");
+        }
+
+        internal static Color Parse(string source)
+        {
+            return Parse(source, CultureInfo.InvariantCulture);
+        }
+
         internal static Color INTERNAL_ConvertFromInt32(int colorAsInt32)
         {
             return new Color()
@@ -176,31 +261,6 @@ namespace Windows.UI
                 R.ToInvariantString("X2"), 
                 G.ToInvariantString("X2"), 
                 B.ToInvariantString("X2"));
-        }
-
-        /// <summary>
-        /// Creates a string representation of the color by using the ARGB channels and the
-        /// specified format provider.
-        /// </summary>
-        /// <param name="provider">
-        /// Culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// The string representation of the color.
-        /// </returns>
-        public string ToString(IFormatProvider provider)
-        {
-            return string.Format("#{0}{1}{2}{3}",
-                A.ToString("X2", provider),
-                R.ToString("X2", provider),
-                G.ToString("X2", provider),
-                B.ToString("X2", provider));
-        }
-
-        [OpenSilver.NotImplemented]
-        string IFormattable.ToString(string format, IFormatProvider formatProvider)
-        {
-            return default(string);
         }
 
         public override int GetHashCode()

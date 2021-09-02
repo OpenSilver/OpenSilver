@@ -56,9 +56,9 @@
     <Compile Include="Core\Main\InheritablePropertyChangeInfo.cs" />
     <Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
     <Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
-    <Compile Include="Core\Main\TypeFromStringConverters.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
+    <Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
     <Compile Include="OpenSilver\NotImplementedAttribute.cs" />
     <Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
     <Compile Include="PagedCollectionView\CollectionViewGroupRoot.cs" />
@@ -72,6 +72,7 @@
     <Compile Include="PagedCollectionView\TypeHelper.cs" />
     <Compile Include="PublicAPI\Internal\KnownTypesHelper.cs" />
     <Compile Include="PublicAPI\Internal\WebRequestsHelper.cs" />
+    <Compile Include="PublicAPI\Interop\Interop.Obsolete.cs" />
     <Compile Include="PublicAPI\Native.Html.Controls\NativeComboBox.cs" />
     <Compile Include="PublicAPI\Performance\Performance.cs" />
     <Compile Include="System.Collections.Generic\WORKINPROGRESS\PriorityQueue.cs" />
@@ -87,11 +88,9 @@
     <Compile Include="System.ComponentModel\ReadOnlyAttribute.cs" />
     <Compile Include="System.ComponentModel\SortDescription.cs" />
     <Compile Include="System.ComponentModel\SortDescriptionCollection.cs" />
-    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageFile.cs" />
-    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageFileStream.cs" />
-    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettings.cs" />
-    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettingsForCSharp.cs" />
+    <Compile Include="System.ComponentModel\TypeConverterHelper.cs" />
     <Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageSettings.cs" />
+    <Compile Include="System.Linq\WORKINPROGRESS\FunctionalProgramming.cs" />
     <Compile Include="System.Net\SecurityProtocolType.cs" />
     <Compile Include="System.Net\ServicePointManager.cs" />
     <Compile Include="System.Net\WORKINPROGRESS\CookieContainer.cs" />
@@ -104,8 +103,10 @@
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\BrowserInformation.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlEventArgs.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlPopupWindowOptions.cs" />
+    <Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptableMemberAttribute.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptObjectCollection.cs" />
-    <Compile Include="System.Windows.Data\RelativeSourceConverter.cs" />
+    <Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
+    <Compile Include="System.Windows.Controls\WORKINPROGRESS\ScrollViewerExtensions.cs" />
     <Compile Include="System.Windows.Interactivity\EventTrigger.cs" />
     <Compile Include="System.Windows.Interactivity\InvokeCommandAction.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerAction.cs" />
@@ -115,17 +116,17 @@
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction.cs" />
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
-    <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguageConverter.cs" />
     <Compile Include="System.Windows.Markup\XmlnsPrefixAttribute.cs" />
+    <Compile Include="System.Windows.Media\ImageSourceConverter.cs" />
     <Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
     <Compile Include="System.Windows.Media\TransformConverter.cs" />
     <Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
+    <Compile Include="System.Windows\FontStretchConverter.cs" />
     <Compile Include="System.Windows\FontStyleConverter.cs" />
+    <Compile Include="System.Windows\NullableBoolConverter.cs" />
     <Compile Include="System.Windows\RectConverter.cs" />
-    <Compile Include="System.Windows\RoutedEventConverter.cs" />
     <Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
     <Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\FontStretchConverter.cs" />
     <Compile Include="System.Xaml\IMarkupExtension.cs" />
     <Compile Include="System.Xml\WORKINPROGRESS\XmlSerializer.cs" />
     <Compile Include="System\TypeExtensions.cs" />
@@ -222,7 +223,6 @@
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\TextSelection.cs" />
     <Compile Include="System.Windows.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
     <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\EasingFunctionBase.cs" />
-    <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\RepeatBehavior.cs" />
     <Compile Include="System.Windows.Media\RectangleGeometry.cs" />
     <Compile Include="System.Windows.Media\WORKINPROGRESS\CompositeTransform.cs" />
     <Compile Include="System.Windows.Media\WORKINPROGRESS\SkewTransform.cs" />
@@ -244,6 +244,7 @@
     <Compile Include="Core\Main\INTERNAL_TypeToStringToDependencyProperty.cs" />
     <Compile Include="Core\Main\INTERNAL_UriHelper.cs" />
     <Compile Include="Core\Main\NamespacesDocumentation.cs" />
+    <Compile Include="Core\Main\TypeFromStringConverters.cs" />
     <Compile Include="Core\Events\HtmlEventProxy.cs" />
     <Compile Include="Core\Events\INTERNAL_EventManager_2.cs" />
     <Compile Include="Core\Events\INTERNAL_EventsHelper.cs" />
@@ -354,6 +355,10 @@
     <Compile Include="System.ComponentModel\CancelEventArgs.cs" />
     <Compile Include="System.ComponentModel\ClosingEventArgs.cs" />
     <Compile Include="System.ComponentModel\DesignerProperties.cs" />
+    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageFile.cs" />
+    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageFileStream.cs" />
+    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettings.cs" />
+    <Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettingsForCSharp.cs" />
     <Compile Include="System.Net\CredentialsMode.cs" />
     <Compile Include="System.Net\DownloadStringCompletedEventArgs.cs" />
     <Compile Include="System.Net\DownloadStringCompletedEventHandler.cs" />
@@ -843,7 +848,6 @@
     <Compile Include="System.Windows.Media\VisualTreeHelper.cs" />
     <Compile Include="System.Windows.Media\BrushConverter.cs" />
     <Compile Include="System.Windows.Media\ImageSource.cs" />
-    <Compile Include="System.Windows.Media\ImageSourceConverter.cs" />
     <Compile Include="System.Windows.Media\SolidColorBrush.cs" />
     <Compile Include="System.Windows.Media\Stretch.cs" />
     <Compile Include="System.Windows.Media\WORKINPROGRESS\BitmapCache.cs" />
@@ -981,50 +985,11 @@
     <Compile Include="System.Windows.Media\Color.cs" />
     <Compile Include="System.Windows.Media\ColorConverter.cs" />
     <Compile Include="System.Windows.Media\Colors.cs" />
+    <Compile Include="System.Windows.Media\WORKINPROGRESS\Color.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bridge.json" />
     <None Include="Runtime.licenseheader" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="CSHTML5.Stubs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\CSHTML5.Stubs.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' ">
-    <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="CSHTML5.Stubs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\CSHTML5.Stubs.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">
-    <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.Migration.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="CSHTML5.Stubs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.Migration.2.0.0-alpha69-089\lib\net40\CSHTML5.Stubs.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">
-    <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.Migration.WorkInProgress.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="CSHTML5.Stubs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CSHTML5.Migration.WorkInProgress.2.0.0-alpha69-089\lib\net40\CSHTML5.Stubs.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Themes\generic.xaml">
@@ -1174,9 +1139,18 @@
     <EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="System.ComponentModel\WORKINPROGRESS\" />
-    <Folder Include="System.Reflection\WORKINPROGRESS\" />
-    <Folder Include="System.Windows.Controls\Common\" />
+    <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
+      <HintPath Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' ">..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
+      <HintPath Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">..\..\packages\CSHTML5.Migration.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
+      <HintPath Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">..\..\packages\CSHTML5.Migration.WorkInProgress.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Bridge.TypesThatWillBeForwarded\Bridge.TypesThatWillBeForwarded.CSHTML5.csproj">
+      <Project>{319582e2-61e2-429a-973c-950cda0d5d1d}</Project>
+      <Name>Bridge.TypesThatWillBeForwarded.CSHTML5</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' " />

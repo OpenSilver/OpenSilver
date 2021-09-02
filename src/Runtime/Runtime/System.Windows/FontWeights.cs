@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,7 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows
@@ -30,6 +24,10 @@ namespace Windows.UI.Text
     /// </summary>
     public sealed partial class FontWeights
     {
+        //
+        // IMPORTANT: if you add or remove entries in this Enum, you must update
+        // accordingly the file "ConvertingStringToValue.cs" in the Compiler project.
+        //
         internal enum INTERNAL_FontweightsEnum : ushort
         {
             Black = 900,
