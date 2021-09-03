@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 namespace System.ServiceModel.Channels
 {
     //
@@ -28,4 +27,3 @@ namespace System.ServiceModel.Channels
         Closed = 4
     }
 }
-#endif

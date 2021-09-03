@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 namespace System.ServiceModel.Channels
 {
     //
@@ -151,4 +150,3 @@ namespace System.ServiceModel.Channels
         }
     }
 }
-#endif

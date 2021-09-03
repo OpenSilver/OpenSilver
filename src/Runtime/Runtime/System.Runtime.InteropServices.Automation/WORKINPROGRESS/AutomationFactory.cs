@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 #if MIGRATION
 
 using System.ComponentModel;
@@ -104,5 +103,4 @@ namespace System.Runtime.InteropServices.Automation
 	}
 }
 
-#endif
 #endif

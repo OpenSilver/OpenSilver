@@ -1,6 +1,4 @@
-﻿#if WORKINPROGRESS
-
-namespace System.Net.Browser
+﻿namespace System.Net.Browser
 {
     //
     // Summary:
@@ -29,4 +27,3 @@ namespace System.Net.Browser
         public static IWebRequestCreate ClientHttp { get; }
     }
 }
-#endif

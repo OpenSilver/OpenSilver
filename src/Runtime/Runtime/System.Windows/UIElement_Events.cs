@@ -786,8 +786,6 @@ namespace Windows.UI.Xaml
 
         #region Wheel event
 
-#if WORKINPROGRESS
-
 #if MIGRATION
         /// <summary>
         /// Identifies the <see cref="UIElement.MouseWheel"/> routed event.
@@ -822,8 +820,6 @@ namespace Windows.UI.Xaml
 
         public event TextCompositionEventHandler TextInput;
         public event TextCompositionEventHandler TextInputStart;
-
-#endif
 
 #endregion
 
@@ -2141,11 +2137,7 @@ namespace Windows.UI.Xaml
             }
             else
             {
-#if WORKINPROGRESS
-                Console.WriteLine(string.Format("The following routed event cannot be used in the AddHandler method: {0} - Please contact support.", routedEvent));
-#else
                 throw new NotSupportedException(string.Format("The following routed event cannot be used in the AddHandler method: {0} - Please contact support.", routedEvent));
-#endif
             }
         }
 

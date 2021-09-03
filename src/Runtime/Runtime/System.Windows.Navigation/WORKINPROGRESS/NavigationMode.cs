@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 using System.Runtime.CompilerServices;
 
 #if MIGRATION
@@ -55,5 +52,3 @@ namespace Windows.UI.Xaml.Navigation
         Refresh = 3
     }
 }
-
-#endif

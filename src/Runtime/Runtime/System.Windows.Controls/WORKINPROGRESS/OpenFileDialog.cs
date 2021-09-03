@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -61,4 +60,3 @@ namespace Windows.UI.Xaml.Controls
 		}
 	}
 }
-#endif

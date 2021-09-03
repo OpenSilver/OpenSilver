@@ -12,8 +12,6 @@
 *  
 \*====================================================================================*/
 
-#if WORKINPROGRESS
-
 using CSHTML5.Internal;
 using System.Windows.Markup;
 
@@ -61,5 +59,3 @@ namespace Windows.UI.Xaml.Documents
         }
     }
 }
-
-#endif

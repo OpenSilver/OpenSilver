@@ -106,21 +106,13 @@ namespace Windows.UI.Core
         /// The delegate to a method, which is
         /// pushed onto the System.Windows.Threading.Dispatcher event queue.
         /// </param>
-#if WORKINPROGRESS
         public DispatcherOperation BeginInvoke(Action method)
-#else
-        public void BeginInvoke(Action method)
-#endif
         {
             if (method == null)
                 throw new ArgumentNullException("method");
-#if WORKINPROGRESS
             DispatcherOperation dispatcherOperation = new DispatcherOperation();
             BeginInvokeInternal(method);
             return dispatcherOperation;
-#else
-            BeginInvokeInternal(method);
-#endif
         }
 
 #if !BRIDGE
@@ -267,7 +259,6 @@ namespace Windows.UI.Core
             return false;
         }
 
-#if WORKINPROGRESS
 		[OpenSilver.NotImplemented]
         public DispatcherOperation BeginInvoke(Delegate d, params object[] args)
         {
@@ -279,6 +270,5 @@ namespace Windows.UI.Core
         {
             return true;
         }
-#endif
     }
 }

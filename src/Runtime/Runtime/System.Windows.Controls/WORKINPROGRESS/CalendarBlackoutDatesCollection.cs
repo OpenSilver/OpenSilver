@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 using System;
 using System.Collections.ObjectModel;
 
@@ -37,4 +34,3 @@ namespace Windows.UI.Xaml.Controls
         public void AddDatesInPast() => Add(new CalendarDateRange(DateTime.MinValue, DateTime.Today.AddDays(-1)));
     }
 }
-#endif

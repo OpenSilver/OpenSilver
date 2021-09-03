@@ -101,7 +101,6 @@ namespace Windows.UI.Xaml.Media.Imaging
         }
 
 
-#if WORKINPROGRESS
         #region Not supported yet
         /// <summary>
         /// Gets the height of the bitmap in pixels.
@@ -151,6 +150,5 @@ namespace Windows.UI.Xaml.Media.Imaging
         ////     An asynchronous handler called when the operation is complete.
         //public IAsyncAction SetSourceAsync(IRandomAccessStream streamSource);
         #endregion
-#endif
     }
 }

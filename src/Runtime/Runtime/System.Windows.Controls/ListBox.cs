@@ -542,12 +542,10 @@ namespace Windows.UI.Xaml.Controls
             set { UnselectedItemForeground = value; }
         }
 
-#if WORKINPROGRESS
         public void ScrollIntoView(object item)
         {
             var container = (ListBoxItem)ItemContainerGenerator.ContainerFromItem(item);
             CSHTML5.Interop.ExecuteJavaScript("$0.scrollIntoView({ block: 'nearest'})", container.INTERNAL_OuterDomElement);
         }
-#endif
     }
 }

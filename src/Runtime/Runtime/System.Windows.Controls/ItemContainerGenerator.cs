@@ -233,7 +233,6 @@ namespace Windows.UI.Xaml.Controls
             return DependencyProperty.UnsetValue;
         }
 
-#if WORKINPROGRESS
         //
         // Summary:
         //     Occurs when the contents of the items collection changes.
@@ -270,8 +269,6 @@ namespace Windows.UI.Xaml.Controls
         {
             return 0;
         }
-
-#endif
     }
 }
 

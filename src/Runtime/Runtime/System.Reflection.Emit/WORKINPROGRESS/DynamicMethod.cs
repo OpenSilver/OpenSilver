@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -428,4 +427,3 @@ namespace System.Reflection.Emit
 		}
 	}
 }
-#endif

@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if WORKINPROGRESS
-
 namespace System.Windows.Browser
 {
 	[OpenSilver.NotImplemented]
@@ -24,5 +22,3 @@ namespace System.Windows.Browser
         public bool Status { get; set; }
     }
 }
-
-#endif

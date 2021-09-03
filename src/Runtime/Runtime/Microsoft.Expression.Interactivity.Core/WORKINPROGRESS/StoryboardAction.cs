@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 #if MIGRATION
 
 using System.Windows.Interactivity;
@@ -55,5 +54,4 @@ namespace Microsoft.Expression.Interactivity.Core
 	}
 }
 
-#endif
 #endif

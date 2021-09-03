@@ -3,8 +3,6 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-#if WORKINPROGRESS
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -218,5 +216,3 @@ namespace Windows.UI.Xaml.Automation.Peers
         }
     }
 }
-
-#endif // WORKINPROGRESS

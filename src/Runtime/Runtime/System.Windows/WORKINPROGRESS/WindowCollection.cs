@@ -24,7 +24,6 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if WORKINPROGRESS
 	//
 	// Summary:
 	//     Represents a collection of System.Windows.Window instances.
@@ -86,5 +85,4 @@ namespace Windows.UI.Xaml
 		{
 		}
 	}
-#endif
 }

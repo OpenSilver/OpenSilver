@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 using System.Collections.Generic;
 
 #if MIGRATION
@@ -39,5 +36,3 @@ namespace Windows.UI.Xaml.Navigation
         public IDictionary<string, string> QueryString { get; }
     }
 }
-
-#endif

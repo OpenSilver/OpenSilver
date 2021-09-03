@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System.Windows.Controls.Primitives;
 
 #if !MIGRATION
@@ -45,4 +44,3 @@ namespace Windows.UI.Xaml.Automation.Peers
 		}
 	}
 }
-#endif

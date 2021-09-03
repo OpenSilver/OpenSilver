@@ -777,7 +777,6 @@ namespace Windows.UI.Xaml.Controls
                 INTERNAL_HtmlDomManager.SetDomElementProperty(this.INTERNAL_OuterDomElement, "scrollTop", offset);
         }
 
-#if WORKINPROGRESS
         // Summary:
         //     Gets the value of the HorizontalScrollBarVisibility dependency property /
         //     ScrollViewer.HorizontalScrollBarVisibility XAML attached property from a
@@ -843,7 +842,6 @@ namespace Windows.UI.Xaml.Controls
         {
             element.SetValue(VerticalScrollBarVisibilityProperty, verticalScrollBarVisibility);
         }
-#endif
         /*
         //
         // Summary:
@@ -1260,7 +1258,6 @@ namespace Windows.UI.Xaml.Controls
 
         */
 
-#if WORKINPROGRESS
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ScrollableHeightProperty = DependencyProperty.Register("ScrollableHeight", typeof(double), typeof(ScrollViewer), null);
 
@@ -1346,7 +1343,6 @@ namespace Windows.UI.Xaml.Controls
         {
 
         }
-#endif
 
         private double ScrollBarWidth
         {

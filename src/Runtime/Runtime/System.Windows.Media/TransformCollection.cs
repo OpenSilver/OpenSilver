@@ -25,13 +25,8 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-#if WORKINPROGRESS
     public sealed partial class TransformCollection : PresentationFrameworkCollection<Transform>
-#else
-    public sealed partial class TransformCollection : List<Transform>
-#endif
     {
-#if WORKINPROGRESS
         internal override void AddOverride(Transform value)
         {
             this.AddDependencyObjectInternal(value);
@@ -66,6 +61,5 @@ namespace Windows.UI.Xaml.Media
         {
             this.SetItemDependencyObjectInternal(index, value);
         }
-#endif
     }
 }

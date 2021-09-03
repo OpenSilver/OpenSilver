@@ -7,7 +7,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
 
 #if MIGRATION
 using System.Windows.Controls;

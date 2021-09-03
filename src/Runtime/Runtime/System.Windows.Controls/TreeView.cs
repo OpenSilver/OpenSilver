@@ -19,7 +19,7 @@ using Windows.UI.Xaml.Input;
 using Windows.System;
 #endif
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
 #if MIGRATION
 using System.Windows.Automation.Peers;
 #else
@@ -397,7 +397,7 @@ namespace Windows.UI.Xaml.Controls
             Interaction = new InteractionHelper(this);
         }
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
         /// <summary>
         /// Returns a
         /// <see cref="TreeViewAutomationPeer" />
@@ -786,17 +786,9 @@ namespace Windows.UI.Xaml.Controls
             {
                 // Some keys (e.g. Left/Right) need to be translated in RightToLeft mode
 #if MIGRATION
-#if WORKINPROGRESS
                 Key invariantKey = InteractionHelper.GetLogicalKey(FlowDirection, key);
 #else
-                Key invariantKey = InteractionHelper.GetLogicalKey(FlowDirection.LeftToRight, key);
-#endif
-#else
-#if WORKINPROGRESS
                 VirtualKey invariantKey = InteractionHelper.GetLogicalKey(FlowDirection, key);
-#else
-                VirtualKey invariantKey = InteractionHelper.GetLogicalKey(FlowDirection.LeftToRight, key);
-#endif
 #endif
 
                 switch (invariantKey)
@@ -807,11 +799,7 @@ namespace Windows.UI.Xaml.Controls
                     case VirtualKey.PageUp:
 #endif
                         // Move horizontally if we've run out of room vertically
-#if WORKINPROGRESS
                         if (!NumericExtensions.IsGreaterThan(scrollHost.ExtentHeight, scrollHost.ViewportHeight))
-#else
-                        if (!NumericExtensions.IsGreaterThan(0d, 0d))
-#endif
                         {
                             scrollHost.PageLeft();
                         }
@@ -826,11 +814,7 @@ namespace Windows.UI.Xaml.Controls
                     case VirtualKey.PageDown:
 #endif
                         // Move horizontally if we've run out of room vertically
-#if WORKINPROGRESS
                         if (!NumericExtensions.IsGreaterThan(scrollHost.ExtentHeight, scrollHost.ViewportHeight))
-#else
-                        if (!NumericExtensions.IsGreaterThan(0d, 0d))
-#endif
                         {
                             scrollHost.PageRight();
                         }
@@ -905,11 +889,7 @@ namespace Windows.UI.Xaml.Controls
             ScrollViewer scrollHost = ItemsControlHelper.ScrollHost;
             if (scrollHost != null)
             {
-#if WORKINPROGRESS
                 double viewportHeight = scrollHost.ViewportHeight;
-#else
-                double viewportHeight = 0d;
-#endif
 
                 double top;
                 double bottom;
@@ -1169,7 +1149,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (SelectedContainer != null)
             {
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
                 if (SelectedContainer != FocusManager.GetFocusedElement())
 #else
                 if (SelectedContainer != null)
@@ -1307,7 +1287,7 @@ namespace Windows.UI.Xaml.Controls
             // Notify when the selection changes
             if (raiseSelectionChanged)
             {
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
                 if (SelectedContainer != null && AutomationPeer.ListenerExists(AutomationEvents.SelectionItemPatternOnElementSelected))
                 {
                     AutomationPeer peer = FrameworkElementAutomationPeer.CreatePeerForElement(SelectedContainer);
@@ -1324,7 +1304,7 @@ namespace Windows.UI.Xaml.Controls
                         peer.RaiseAutomationEvent(AutomationEvents.SelectionItemPatternOnElementRemovedFromSelection);
                     }
                 }
-#endif // WORKINPROGRESS && OPENSILVER
+#endif // OPENSILVER
 
                 OnSelectedItemChanged(new RoutedPropertyChangedEventArgs<object>(oldValue, newValue));
             }

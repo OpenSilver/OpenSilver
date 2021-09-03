@@ -12,8 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
 #if MIGRATION
 
 using System.Windows.Media;
@@ -125,5 +123,4 @@ namespace System.Windows.Controls
     }
 }
 
-#endif
 #endif

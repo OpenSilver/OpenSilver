@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 #if MIGRATION
 namespace System.Windows
 #else
@@ -61,4 +58,3 @@ namespace Windows.UI.Xaml
         BottomRight = 8
     }
 }
-#endif

@@ -324,11 +324,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 child.Measure(measureSize);
             }
-#if WORKINPROGRESS
             bool isNormalFlow = FlowDirection == FlowDirection.LeftToRight;
-#else
-            bool isNormalFlow = true;
-#endif
             double childrenMainLength = 0;
             foreach (UIElement child in childrens)
             {

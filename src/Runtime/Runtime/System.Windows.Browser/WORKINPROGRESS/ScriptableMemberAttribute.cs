@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 namespace System.Windows.Browser
 {
 	//
@@ -49,5 +48,3 @@ namespace System.Windows.Browser
 		public string ScriptAlias { get; set; }
 	}
 }
-
-#endif

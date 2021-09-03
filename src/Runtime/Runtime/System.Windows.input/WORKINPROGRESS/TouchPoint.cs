@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System.Windows;
 using System;
 #if !MIGRATION
@@ -53,4 +52,3 @@ namespace Windows.UI.Xaml.Input
 		}
 	}
 }
-#endif

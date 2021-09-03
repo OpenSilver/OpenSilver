@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System;
 
 #if MIGRATION
@@ -12,4 +11,3 @@ namespace Windows.UI.Xaml.Controls.Primitives
 		void Recycle(GeneratorPosition @position, int @count);
 	}
 }
-#endif

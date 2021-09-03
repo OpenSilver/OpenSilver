@@ -21,7 +21,6 @@ using System;
 
 namespace System.Net
 {
-#if WORKINPROGRESS
     // Summary:
     //     Represents the method that will handle the System.Net.WebClient.OpenWriteCompleted
     //     event of a System.Net.WebClient.
@@ -33,5 +32,4 @@ namespace System.Net
     //   e:
     //     A System.Net.OpenWriteCompletedEventArgs containing event data.
     public delegate void OpenWriteCompletedEventHandler(object sender, OpenWriteCompletedEventArgs e);
-#endif
 }

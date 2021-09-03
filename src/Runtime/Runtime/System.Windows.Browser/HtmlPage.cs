@@ -26,9 +26,7 @@ namespace System.Windows.Browser
     {
         static HtmlWindow _initWindow;
         static HtmlDocument _initDocument;
-#if WORKINPROGRESS
         static HtmlElement _initPlugin;
-#endif
         /// <summary>
         /// Gets the browser's window object.
         /// </summary>
@@ -58,8 +56,6 @@ namespace System.Windows.Browser
                 return _initDocument;
             }
         }
-
-#if WORKINPROGRESS
 
 		[OpenSilver.NotImplemented]
         public static HtmlWindow PopupWindow(Uri navigateToUri, string target, HtmlPopupWindowOptions options)
@@ -128,6 +124,5 @@ namespace System.Windows.Browser
                 }));
             }
         }
-#endif
     }
 }

@@ -7,7 +7,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
 
 using System;
 
@@ -109,4 +109,4 @@ namespace Windows.UI.Xaml.Automation.Peers
     }
 }
 
-#endif // WORKINPROGRESS && OPENSILVER
+#endif // OPENSILVER

@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 
 #if MIGRATION
 namespace System.Windows
@@ -14,5 +13,3 @@ namespace Windows.UI.Xaml
 		public object DataType { get; set; }
 	}
 }
-
-#endif

@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System;
 
 namespace System.Windows.Markup
@@ -8,5 +7,3 @@ namespace System.Windows.Markup
         Type Resolve(string @qualifiedTypeName);
     }
 }
-
-#endif

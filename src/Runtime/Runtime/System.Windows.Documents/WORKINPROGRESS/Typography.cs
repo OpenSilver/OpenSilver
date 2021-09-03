@@ -1,6 +1,4 @@
-﻿#if WORKINPROGRESS
-
-using System;
+﻿using System;
 
 #if MIGRATION
 namespace System.Windows.Documents
@@ -735,5 +733,3 @@ namespace Windows.UI.Xaml.Documents
         }
     }
 }
-
-#endif

@@ -21,7 +21,6 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if WORKINPROGRESS
     /// <summary>
     /// This class is used as part of a PointKeyFrameCollection in conjunction
     /// with a PointAnimationUsingKeyFrames to animate a Point property value
@@ -54,6 +53,5 @@ namespace Windows.UI.Xaml.Media.Animation
             set => SetValue(KeySplineProperty, value);
         }
     }
-#endif
 }
 

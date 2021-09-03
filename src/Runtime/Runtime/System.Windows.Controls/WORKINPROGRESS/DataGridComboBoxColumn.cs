@@ -12,7 +12,6 @@
 *  
 \*====================================================================================*/
 
-#if WORKINPROGRESS
 using System;
 using System.Collections.Generic;
 using CSHTML5.Native.Html.Controls;
@@ -44,4 +43,3 @@ namespace Windows.UI.Xaml.Controls
         }
     }
 }
-#endif

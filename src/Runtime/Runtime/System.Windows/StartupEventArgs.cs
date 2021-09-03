@@ -28,7 +28,6 @@ namespace Windows.UI.Xaml
     /// </summary>
     public sealed partial class StartupEventArgs : EventArgs
     {
-#if WORKINPROGRESS
         #region Not supported yet
         // Summary:
         //     Gets the initialization parameters that were passed as part of HTML initialization
@@ -43,6 +42,5 @@ namespace Windows.UI.Xaml
             get { return new Dictionary<string, string>(); }
         }
         #endregion
-#endif
     }
 }

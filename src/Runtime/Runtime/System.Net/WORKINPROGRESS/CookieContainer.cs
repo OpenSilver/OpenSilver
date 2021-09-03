@@ -12,15 +12,9 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
-
 namespace System.Net
 {
     public partial class CookieContainer
     {
     }
 }
-
-#endif

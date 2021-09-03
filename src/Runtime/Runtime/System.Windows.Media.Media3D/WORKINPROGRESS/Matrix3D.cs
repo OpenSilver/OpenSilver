@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if WORKINPROGRESS
-
 using System;
 
 #if MIGRATION
@@ -196,5 +194,3 @@ namespace Windows.UI.Xaml.Media.Media3D
 
     }
 }
-
-#endif

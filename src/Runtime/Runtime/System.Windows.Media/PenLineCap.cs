@@ -38,11 +38,9 @@ namespace Windows.UI.Xaml.Media
         /// A semicircle that has a diameter equal to the line thickness.
         /// </summary>
         Round = 2,
-#if WORKINPROGRESS
         /// <summary>
         ///     Triangle - Triangle line cap.
         /// </summary>
         Triangle = 3,
-#endif
     }
 }

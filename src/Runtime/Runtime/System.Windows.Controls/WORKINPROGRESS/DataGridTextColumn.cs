@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 using System;
 using System.ComponentModel;
 
@@ -125,4 +122,3 @@ namespace Windows.UI.Xaml.Controls
 
     }
 }
-#endif

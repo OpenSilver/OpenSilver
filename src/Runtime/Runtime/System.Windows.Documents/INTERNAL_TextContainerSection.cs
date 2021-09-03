@@ -9,7 +9,6 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
-#if WORKINPROGRESS
 
 using CSHTML5.Internal;
 
@@ -66,4 +65,3 @@ namespace Windows.UI.Xaml.Documents
         }
     }
 }
-#endif

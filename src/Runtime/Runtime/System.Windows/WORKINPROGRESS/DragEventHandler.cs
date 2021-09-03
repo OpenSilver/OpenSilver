@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -12,5 +10,3 @@ namespace Windows.UI.Xaml
 {
 	public delegate void DragEventHandler(object sender, DragEventArgs e);
 }
-
-#endif

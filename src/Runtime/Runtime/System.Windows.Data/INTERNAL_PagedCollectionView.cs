@@ -40,18 +40,10 @@ namespace Windows.UI.Xaml.Data
     /// <remarks>
     /// <p>the order of the operations is: Filtering, Sorting, Grouping</p>
     /// </remarks>
-#if WORKINPROGRESS
 #if MIGRATION
     public partial class INTERNAL_PagedCollectionView : IEnumerable, INotifyCollectionChanged, IPagedCollectionView, INotifyPropertyChanged
 #else
     internal partial class INTERNAL_PagedCollectionView : IEnumerable, INotifyCollectionChanged, IPagedCollectionView, INotifyPropertyChanged
-#endif
-#else
-#if MIGRATION
-    public partial class INTERNAL_PagedCollectionView : IEnumerable, INotifyCollectionChanged
-#else
-    internal partial class INTERNAL_PagedCollectionView : IEnumerable, INotifyCollectionChanged
-#endif
 #endif
     {
         // the child views
@@ -315,7 +307,6 @@ namespace Windows.UI.Xaml.Data
 
         public event EventHandler<EventArgs> PageChanged;
 
-#if WORKINPROGRESS
         public event EventHandler<PageChangingEventArgs> PageChanging;
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -326,7 +317,6 @@ namespace Windows.UI.Xaml.Data
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
-#endif
         // old version 
         /*
         void ChangeOutputColletion()
@@ -371,7 +361,7 @@ namespace Windows.UI.Xaml.Data
                 {
                     //Note: we make two calls because "replace" does not work in the DataGrid at the time of writing.
                     CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-#if WORKINPROGRESS && !CSHTML5NETSTANDARD
+#if BRIDGE
                     this.OnPropertyChanged("Count");
 #endif
                 }
@@ -545,16 +535,16 @@ namespace Windows.UI.Xaml.Data
                 int newPageIndex = VerifyPageIndex(value);
                 if (newPageIndex != _PageIndex) // ChangeOutputColletion can take lot of time, because it refreshes the controls that use this as source
                 {
-#if WORKINPROGRESS && !CSHTML5NETSTANDARD
+#if BRIDGE
                     OnPageChanging(newPageIndex);
 #endif
                     _PageIndex = newPageIndex;
-#if WORKINPROGRESS && !CSHTML5NETSTANDARD
+#if BRIDGE
                     OnPropertyChanged("PageIndex");
 #endif
                     OnPageChanged();
 
-#if WORKINPROGRESS && !CSHTML5NETSTANDARD
+#if BRIDGE
                    
                     OnPropertyChanged("Count");
 #endif
@@ -562,7 +552,7 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-#if WORKINPROGRESS && !CSHTML5NETSTANDARD
+#if BRIDGE
         private void OnPageChanging(int newPageIndex)
         {
             _isPageChanging = true;
@@ -593,12 +583,12 @@ namespace Windows.UI.Xaml.Data
             {
                 int oldCount = this.Count;
                 _pageSize = value;
-#if WORKINPROGRESS && !CSHTML5NETSTANDARD
+#if BRIDGE
                 OnPropertyChanged("PageSize");
 #endif
                 if (_views.Count != 0)
                     CreatePages();
-#if WORKINPROGRESS && !CSHTML5NETSTANDARD
+#if BRIDGE
                 // if the count has changed
                 if (this.Count != oldCount)
                 {

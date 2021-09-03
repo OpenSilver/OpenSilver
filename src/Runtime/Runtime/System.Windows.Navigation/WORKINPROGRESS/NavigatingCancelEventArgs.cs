@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -110,5 +107,3 @@ namespace Windows.UI.Xaml.Navigation
         public Uri Uri { get; private set; }
     }
 }
-
-#endif

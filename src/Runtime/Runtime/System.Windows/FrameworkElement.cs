@@ -817,7 +817,6 @@ namespace Windows.UI.Xaml
 #endregion
 
 #region Work in progress
-#if WORKINPROGRESS
 #region Triggers
 
         [OpenSilver.NotImplemented]
@@ -887,7 +886,6 @@ namespace Windows.UI.Xaml
             set { this.SetValue(LanguageProperty, value); }
         }
 
-#endif
         internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             // Skip when loading or changed on TextMeasurement Div.

@@ -1,6 +1,4 @@
-﻿#if WORKINPROGRESS
-
-#if MIGRATION
+﻿#if MIGRATION
 namespace System.Windows.Controls
 #else
 namespace Windows.UI.Xaml.Controls
@@ -14,5 +12,3 @@ namespace Windows.UI.Xaml.Controls
         }
     }
 }
-
-#endif

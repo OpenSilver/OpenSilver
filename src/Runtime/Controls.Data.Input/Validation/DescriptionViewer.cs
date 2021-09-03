@@ -25,7 +25,7 @@ using InternalVisualStates = Windows.UI.Xaml.Controls.Internal.VisualStates;
 
 using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
 #if MIGRATION
 using System.Windows.Automation.Peers;
 #else
@@ -329,11 +329,7 @@ namespace Windows.UI.Xaml.Controls
             DescriptionViewer dv = d as DescriptionViewer;
             if (dv != null)
             {
-#if WORKINPROGRESS
                 bool targetFocused = e.NewValue == FocusManager.GetFocusedElement();
-#else
-                bool targetFocused = false;
-#endif
                 if (dv.IsFocused != targetFocused)
                 {
                     dv.IsFocused = targetFocused;
@@ -414,7 +410,7 @@ namespace Windows.UI.Xaml.Controls
             this.ParseTargetValidState();
         }
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
         /// <summary>
         /// Creates AutomationPeer (<see cref="UIElement.OnCreateAutomationPeer"/>)
         /// </summary>

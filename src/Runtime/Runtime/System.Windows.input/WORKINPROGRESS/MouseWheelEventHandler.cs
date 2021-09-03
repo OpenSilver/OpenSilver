@@ -13,7 +13,6 @@
 \*====================================================================================*/
 
 
-#if WORKINPROGRESS
 using System;
 
 #if MIGRATION
@@ -27,4 +26,3 @@ namespace Windows.UI.Xaml.Input
     /// </summary>
     public delegate void MouseWheelEventHandler(object sender, MouseWheelEventArgs e);
 }
-#endif

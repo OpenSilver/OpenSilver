@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System.Windows.Media;
 
 #if MIGRATION
@@ -360,4 +359,3 @@ namespace Windows.UI.Xaml
 		}
 	}
 }
-#endif

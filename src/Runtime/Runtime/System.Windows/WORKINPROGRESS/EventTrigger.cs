@@ -22,7 +22,6 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if WORKINPROGRESS
     /// <summary>
     ///   A class that controls a set of actions to activate in response to an event
     /// </summary>
@@ -52,5 +51,4 @@ namespace Windows.UI.Xaml
             set { this.SetValue(EventTrigger.RoutedEventProperty, (object)value); }
         }
     }
-#endif
 }

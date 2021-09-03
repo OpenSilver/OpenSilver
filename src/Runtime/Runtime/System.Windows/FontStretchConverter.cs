@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if WORKINPROGRESS
-
 using System;
 using System.ComponentModel;
 using System.Globalization;
@@ -95,5 +93,3 @@ namespace Windows.UI.Xaml
         }
     }
 }
-
-#endif

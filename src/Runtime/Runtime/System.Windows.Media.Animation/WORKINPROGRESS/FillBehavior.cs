@@ -19,8 +19,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#if WORKINPROGRESS
-
 #if MIGRATION
 namespace System.Windows.Media.Animation
 #else
@@ -45,4 +43,3 @@ namespace Windows.UI.Xaml.Media.Animation
         Stop = 1
     }
 }
-#endif

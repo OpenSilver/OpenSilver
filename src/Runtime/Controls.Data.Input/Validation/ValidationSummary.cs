@@ -31,7 +31,7 @@ using InternalVisualStates = Windows.UI.Xaml.Controls.Internal.VisualStates;
 
 using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
 #if MIGRATION
 using System.Windows.Automation.Peers;
 #else
@@ -733,7 +733,7 @@ namespace Windows.UI.Xaml.Controls
 
         #region Protected Methods
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
         /// <summary>
         /// Creates AutomationPeer (<see cref="UIElement.OnCreateAutomationPeer"/>)
         /// </summary>
@@ -919,7 +919,7 @@ namespace Windows.UI.Xaml.Controls
                     FocusingInvalidControlEventArgs e = new FocusingInvalidControlEventArgs(vsi, this._currentValidationSummaryItemSource);
                     this.OnFocusingInvalidControl(e);
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
                     // Raise the AutomationPeer event
                     ValidationSummaryAutomationPeer peer = ValidationSummaryAutomationPeer.FromElement(this) as ValidationSummaryAutomationPeer;
                     if (peer != null && AutomationPeer.ListenerExists(AutomationEvents.InvokePatternOnInvoked))

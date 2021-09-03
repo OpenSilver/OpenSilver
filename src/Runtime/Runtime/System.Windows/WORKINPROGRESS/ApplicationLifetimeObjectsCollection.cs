@@ -26,8 +26,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#if WORKINPROGRESS
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -139,4 +137,3 @@ namespace Windows.UI.Xaml
 		}
 	}
 }
-#endif

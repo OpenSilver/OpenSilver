@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if MIGRATION
 namespace System.Windows.Automation
 #else
@@ -44,5 +42,3 @@ namespace Windows.UI.Xaml.Automation
 		None = 5
 	}
 }
-
-#endif

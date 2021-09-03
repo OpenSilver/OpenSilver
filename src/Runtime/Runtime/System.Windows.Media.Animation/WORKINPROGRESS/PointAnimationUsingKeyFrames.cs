@@ -1,6 +1,4 @@
-﻿#if WORKINPROGRESS
-
-using System.Windows.Markup;
+﻿using System.Windows.Markup;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -46,5 +44,3 @@ namespace Windows.UI.Xaml.Media.Animation
         }
     }
 }
-
-#endif

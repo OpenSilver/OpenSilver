@@ -1,5 +1,4 @@
 using System;
-#if WORKINPROGRESS
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
@@ -24,4 +23,3 @@ namespace Windows.UI.Xaml.Controls
 		}
 	}
 }
-#endif

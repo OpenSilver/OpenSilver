@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 #if MIGRATION
 namespace System.Windows.Media.Imaging
 #else
@@ -55,5 +52,3 @@ namespace Windows.UI.Xaml.Media.Imaging
         BackgroundCreation = 16
     }
 }
-
-#endif

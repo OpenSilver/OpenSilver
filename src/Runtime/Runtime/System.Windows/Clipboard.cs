@@ -55,7 +55,6 @@ else if (navigator && navigator.clipboard && navigator.clipboard.writeText) // a
             }
         }
 
-#if WORKINPROGRESS
 		[OpenSilver.NotImplemented]
         public static string GetText()
         {
@@ -67,6 +66,5 @@ else if (navigator && navigator.clipboard && navigator.clipboard.writeText) // a
         {
             return false;
         }
-#endif
     }
 }

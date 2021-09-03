@@ -12,15 +12,7 @@ namespace OpenSilver.TemplateWizards.AppCustomizationWindow
         {
             get
             {
-                switch (BuildTypeComboBox.SelectedIndex)
-                {
-                    case 0:
-                        return OpenSilverBuildType.Stable;
-                    case 1:
-                        return OpenSilverBuildType.WorkInProgress;
-                    default:
-                        throw new InvalidOperationException("Error retrieving selected OpenSilver build type");
-                }
+                return OpenSilverBuildType.Stable;
             }
         }
 

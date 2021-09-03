@@ -30,13 +30,8 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Represents a collection of ObjectKeyFrame objects that can be individually
     /// accessed by index.
     /// </summary>
-#if WORKINPROGRESS
     public sealed partial class ObjectKeyFrameCollection : PresentationFrameworkCollection<ObjectKeyFrame>
-#else
-    public sealed partial class ObjectKeyFrameCollection : List<ObjectKeyFrame>
-#endif
     {
-#if WORKINPROGRESS
         internal override void AddOverride(ObjectKeyFrame keyFrame)
         {
             this.AddDependencyObjectInternal(keyFrame);
@@ -71,6 +66,5 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             this.SetItemDependencyObjectInternal(index, keyFrame);
         }
-#endif
     }
 }

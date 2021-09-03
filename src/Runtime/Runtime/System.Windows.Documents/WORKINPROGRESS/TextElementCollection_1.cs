@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 using System.Collections;
 using System.Collections.Generic;
 
@@ -17,5 +15,3 @@ namespace Windows.UI.Xaml.Documents
 		}
 	}
 }
-
-#endif

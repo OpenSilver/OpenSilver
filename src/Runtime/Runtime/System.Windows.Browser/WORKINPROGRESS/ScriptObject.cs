@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if WORKINPROGRESS
-
 using System.ComponentModel;
 using System.Dynamic;
 
@@ -304,5 +302,3 @@ namespace System.Windows.Browser
         }
     }
 }
-
-#endif

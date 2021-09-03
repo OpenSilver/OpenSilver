@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System;
 
 #if MIGRATION
@@ -9,4 +8,3 @@ namespace Windows.UI.Xaml.Input
 {
 	public delegate void TouchFrameEventHandler(object @sender, TouchFrameEventArgs @e);
 }
-#endif

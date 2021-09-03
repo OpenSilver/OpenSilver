@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 #if MIGRATION
 namespace System.Windows.Automation.Peers
 #else
@@ -75,4 +74,3 @@ namespace Windows.UI.Xaml.Automation.Peers
 		StructureChanged = 14
 	}
 }
-#endif

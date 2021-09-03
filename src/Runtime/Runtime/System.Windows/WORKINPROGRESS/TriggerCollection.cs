@@ -22,7 +22,6 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if WORKINPROGRESS
 	[OpenSilver.NotImplemented]
     public sealed partial class TriggerCollection : PresentationFrameworkCollection<TriggerBase>
     {
@@ -61,5 +60,4 @@ namespace Windows.UI.Xaml
             this.SetItemDependencyObjectInternal(index, value);
         }
     }
-#endif
 }

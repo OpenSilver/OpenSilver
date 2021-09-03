@@ -41,18 +41,17 @@ Note: while rarely needed, there is also a .BAT file for building the Simulator 
 
 # What are those solution configurations?
 
-### OpenSilver configurations:
+### &nbsp;&nbsp;&nbsp;&nbsp;OpenSilver configurations:
 
-- **"SL"** configuration: Uses the Silverlight-like dialect of XAML and only contains classes and methods that have been tested.
-- **"SL.WorkInProgress"** configuration: This is the recommended configuration for migrating Silverlight applications because it includes more classes and methods from the Silverlight API, even though many of them are not implemented yet (note: a warning will be displayed at compile time if you reference an unimplemented method).
-- **"UWP"** configuration: Uses the UWP-like dialect of XAML.
-- **"UWP.WorkInProgress"** configuration: This is the recommended configuration for migrating UWP applications because it includes more classes and methods from UWP, even though many of them are not implemented yet (note: a warning will be displayed at compile time if you reference an unimplemented method).
+- **SL**: Uses the Silverlight-like dialect of XAML.
+- **UWP**: Uses the UWP-like dialect of XAML.
 
-### CSHTML5 configurations:
+### &nbsp;&nbsp;&nbsp;&nbsp;CSHTML5 configurations:
 
-- **"Debug"** configuration: Uses the UWP-like dialect of XAML
-- **Migration** configuration: uses the Silverlight-like dialect of XAML.
-- **Migration.WorkInProgress** configuration: This is the recommended configuration for migrating Silverlight applications because it includes more classes and methods from the Silverlight API, even though many of them are not implemented yet
+- **Debug**: Uses the UWP-like dialect of XAML.
+- **Migration**: Uses the Silverlight-like dialect of XAML.
+
+Note: the legacy **"WorkInProgress"** configurations have been removed as the unimplemented members have been merged into the current configurations.
 
 # What if I get a compilation error with the code in this repository?
 

@@ -235,9 +235,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 if (!string.IsNullOrEmpty(this.Text))
                 {
-#if WORKINPROGRESS
                     //Select(0, this.Text.Length);
-#endif
                 }
 
                 ChangeVisualState();

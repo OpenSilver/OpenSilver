@@ -408,7 +408,6 @@ $0.focus()
         {
             CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.setSelectionRange(0, $0.value.length)", this.INTERNAL_InnerDomElement);
         }
-#if WORKINPROGRESS
         #region Not supported yet
 
         [OpenSilver.NotImplemented]
@@ -438,7 +437,6 @@ $0.focus()
         }
 
         #endregion
-#endif
 
         protected override Size MeasureOverride(Size availableSize)
         {

@@ -12,8 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
 #if MIGRATION
 namespace System.Windows
 #else
@@ -37,4 +35,3 @@ namespace Windows.UI.Xaml
         BorderlessRoundCornersWindow = 2
     }
 }
-#endif

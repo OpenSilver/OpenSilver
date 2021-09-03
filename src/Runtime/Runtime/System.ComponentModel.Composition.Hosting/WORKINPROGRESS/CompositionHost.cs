@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.Composition.Primitives;
 
-#if WORKINPROGRESS
 namespace System.ComponentModel.Composition.Hosting
 {
     //
@@ -47,4 +46,3 @@ namespace System.ComponentModel.Composition.Hosting
         }
     }
 }
-#endif
