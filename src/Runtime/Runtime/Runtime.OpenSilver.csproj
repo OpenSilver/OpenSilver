@@ -219,7 +219,6 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\CustomTimeFormat.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DataPager.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DatePicker.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Grid.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\GridSplitter.cs" />
@@ -713,7 +712,6 @@
 		<Compile Include="System.Windows.Controls\ContextMenuService.cs" />
 		<Compile Include="System.Windows.Controls\Control.cs" />
 		<Compile Include="System.Windows.Controls\ControlTemplate.cs" />
-		<Compile Include="System.Windows.Controls\DataPager.cs" />
 		<Compile Include="System.Windows.Controls\DatePicker.cs" />
 		<Compile Include="System.Windows.Controls\Dock.cs" />
 		<Compile Include="System.Windows.Controls\DockPanel.cs" />
