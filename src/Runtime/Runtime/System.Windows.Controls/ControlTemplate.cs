@@ -30,7 +30,7 @@ namespace Windows.UI.Xaml.Controls
     /// Defines the element tree that is applied as the control template for a control.
     /// </summary>
     [ContentProperty("ContentPropertyUsefulOnlyDuringTheCompilation")]
-    public  partial class ControlTemplate : FrameworkTemplate
+    public sealed partial class ControlTemplate : FrameworkTemplate
     {
         /// <summary>
         /// Initializes a new instance of the ControlTemplate class.
